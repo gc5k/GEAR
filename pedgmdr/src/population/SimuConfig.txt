@@ -1,38 +1,40 @@
-// B for dichotomous traits, Q for quantitative traits
-B
-// intercept
--5.29
-// deviation of the covariate
-3.16
-// effect of the covariate
-1
-// deviation for the residual
-1
-// effect of the gene
-1.09
-//long seed
+//long seed  0
 2008
-// replications of simulation
+// replications of simulation  1
 2
-// a mount of families
-600
-// genotype missing rate of kids
-0
-// number of different kinds of families; int[] FamNum =
-200,400,600
-// missing rate for parents int[] Kid
-2,3,4
-//int[] AffKid =
-2,2,2
-//double[][] ParentMissingRate =
-0,0,0,1,1,1
-//functional loci
+// B for dichotomous traits, Q for quantitative traits  2
+B
+//functional loci  3
 0,1
-//double threshold = 
-2.05
-//allele frequencies
+//allele frequencies  4
 0.5,0.5,0.5,0.5,0.5,0.5,0.5,0.5,0.5,0.5
-//recombination
+//recombination  5
 0.5,0.5,0.5,0.5,0.5,0.5,0.5,0.5,0.5,0.5
-//LD
+//LD  6
 0,0,0,0,0,0,0,0,0
+//affected loci  7
+1112,1211,1222,2212
+// intercept  8
+-5.29
+// effect of the gene  9
+1.09
+// effect of the covariate  10
+1
+// deviation of the covariate  11
+3.16
+// deviation for the residual  12
+1
+//double threshold =  13
+2.05
+// a mount of families  14
+600
+// number of different kinds of families; int[] FamNum =  15
+200,400,600
+// missing rate for parents int[] Kid  16
+2,3,4
+//int[] AffKid =  17
+2,2,2
+//double[][] ParentMissingRate =  18
+0,0,0,1,1,1
+// genotype missing rate of kids  19
+0
