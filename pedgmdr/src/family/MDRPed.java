@@ -1598,7 +1598,7 @@ public class MDRPed {
             try {
                 fs.RabinowitzProc(markerInfor);
             } catch (FamilyStructException E) {
-                System.err.println("Exception occured in family " + fs.getFamilyStructName() + " when in RabinowitzApproach.");
+                System.err.println("Exception in family " + fs.getFamilyStructName() + " when in RabinowitzApproach.");
             }
         }
     }
