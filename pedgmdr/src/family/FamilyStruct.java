@@ -341,10 +341,9 @@ public class FamilyStruct {
             }
             pseudoper.pseudoGenotypeClear();
         }
-        System.out.println(familyStructName);
+
         for (int i = 0; i < this.numMarkers; i++) {
             perList = persons.keys();
-            System.out.println("Marker: "+i);
             GenoSet genoset = (GenoSet) ImputedGenoSet.get(i);
             AbstractGenoDistribution gDis;
             TreeSet aSet = new TreeSet();
@@ -384,10 +383,6 @@ public class FamilyStruct {
                 }
             }
             String[] controlGenotype = gDis.getNontransmitted();
-            System.out.println("controlGenotype=" + controlGenotype.length);
-            for(int ii=0; ii<controlGenotype.length; ii++) {
-                System.out.println(controlGenotype[ii]);
-            }
             int index = 0;
             while (perList.hasMoreElements()) {
                 iid = (String) perList.nextElement();
@@ -397,7 +392,6 @@ public class FamilyStruct {
                     continue;
                 }
                 pseudoper.addMarker(controlGenotype[index++]);
-                System.out.println(index);
             }
         }
         return Informative;

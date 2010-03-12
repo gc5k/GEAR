@@ -1,9 +1,25 @@
-0.ped
-0.phe
-Rabi_ped_0.txt
-Rabi_phe_0.txt
-2
-1
+//lines starting with // are annotation lines and will not be parsed
 true
+//is pedigree
+0.ped
+//the pedgree file
+0.phe
+//the phenotype file
+0_ped.txt
+//the file to save the transmited and untransmited genotypes
+0_phe.txt
+//the file to save the score file
+0_pi.txt
+//the index file, describing the individual's ID one by one.  This file is only required in permutation test.
 2
-0
+//indexes of the covarites selected (index starts from 1, and comma is used to delimit them)
+1
+//index of the phenotype selected (only one phenotype is allowed at the current stage)
+2
+//1 for linear regression, 2 for logistic regression; for the latter, dichotomous traits are required as response variables.
+true
+//adjustment
+true
+//including founders
+1
+//replications to evaluate simulation

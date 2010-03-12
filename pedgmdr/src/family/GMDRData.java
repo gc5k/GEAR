@@ -154,7 +154,6 @@ public class GMDRData {
         if (Adjust) {
             setSelectedCovariateIndex(CIndex);
         }
-        
         for (int i = 0; i < FullPersonTable.size(); i++) {
             PI = FullPersonTable.get(i);
             if (!includeFounder) {
@@ -699,10 +698,11 @@ public class GMDRData {
      *            the name of the pedigree file
      * @throws IOException
      */
-    public void InitialPedFile(File ped) throws MDRPedFileException,
+    public void InitialPedFile(String ped) throws MDRPedFileException,
             PedFileException {
+    	File PedFile = new File(ped);
         try {
-            PedData.Initial(ped);
+            PedData.Initial(PedFile);
             PedData.parseLinkage();
         } catch (MDRPedFileException e) {
             System.err.println("PedFile initial exception.");
@@ -718,6 +718,8 @@ public class GMDRData {
             e.printStackTrace(System.err);
         }
         IsLoadPedFile = true;
+        Allele2Genotype();
+        GenotypeImputation();
     }
 
     /**
@@ -727,9 +729,10 @@ public class GMDRData {
      *            the name of the pedigree file
      * @throws IOException
      */
-    public void InitialPhenoFile(File Pheno) throws GMDRPhenoFileException {
+    public void InitialPhenoFile(String pheno) throws GMDRPhenoFileException {
+    	File PheFile = new File(pheno);
         try {
-            PhenoData.Initial(Pheno);
+            PhenoData.Initial(PheFile);
             PhenoData.parsePhenotype();
         } catch (GMDRPhenoFileException e) {
             System.err.println("Pheno file initialization exception.");

@@ -3,6 +3,7 @@ import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.regex.Pattern;
 
 import edu.mit.wi.pedfile.PedFileException;
 
@@ -14,108 +15,106 @@ import family.MDRPedFileException;
 
 public class TestRabinowitz {
 
+	public static class Parameter {
+		
+		protected ArrayList<String> lines;
+		protected BufferedReader buffer;
+		protected String filename;
+		protected boolean isPedigree; // 1		
+		protected String ped_file;  //2
+		protected String phe_file;  //3
+		protected String converted_ped_file;  //4
+		protected String converted_phe_file;  //5
+		protected String id_file;  //6
+		protected int[] cov_idx;  //7 starts from 1
+		protected int[] phe_idx;  //8 starts from 1
+		protected int method; //9; 1 for linear, 2 for logistic
+		protected boolean adjustment; //10
+		protected boolean includeFounder; //11
+		protected int replication; //12
+
+		public Parameter() {
+			lines = new ArrayList();
+		}
+
+		public void read(String file) throws IOException {
+			filename = file;
+			buffer = new BufferedReader(new FileReader(new File(file)));
+			sweepComments();
+			parseValue();
+		}
+
+		public void sweepComments() throws IOException {
+			boolean flag = true;
+			String line;
+			while ((line = buffer.readLine()) != null) {
+				if (Pattern.matches("^\\s*//*.*", line)) {// empty line
+					continue;
+				} else {
+					lines.add(line);
+				}
+			}			
+		}
+
+		public void parseValue() {
+			isPedigree = Boolean.parseBoolean(lines.get(0));
+			ped_file = lines.get(1);
+			phe_file = lines.get(2);
+			converted_ped_file = lines.get(3);
+			converted_phe_file = lines.get(4);
+			id_file = lines.get(5);
+			String[] c = lines.get(6).split(",");
+			cov_idx = new int[c.length];
+			for( int i = 0; i < c.length; i++) {
+				cov_idx[i] = Integer.parseInt(c[i]) - 1;
+			}
+			String[] p = lines.get(7).split(",");
+			phe_idx = new int[p.length];
+			for( int i = 0; i < p.length; i++) {
+				phe_idx[i] = Integer.parseInt(p[i]) - 1;
+			}
+			method = Integer.parseInt(lines.get(8));
+			adjustment = Boolean.parseBoolean(lines.get(9));
+			includeFounder = Boolean.parseBoolean(lines.get(10));
+			replication = Integer.parseInt(lines.get(11));
+		}
+	}
+
 	public static void main(String[] args) throws IOException {
 
-		File config = new File(args[0]);
-		ArrayList<String> PedFileStrings = new ArrayList(9);
-		BufferedReader Reader = new BufferedReader(new FileReader(config));
-		String Line;
-		while ((Line = Reader.readLine()) != null) {
-			if (Line.length() == 0) {// skip blank Lines
-				continue;
-			}
-			if (Line.startsWith("#")) {// skip comments
-				continue;
-			}
-			PedFileStrings.add(Line);
-		}
-		/*
-		 * There are two circumstances, 1) When there are 9 parameters, build
-		 * score with picked covariates and a phenotype; 2) when there are 6
-		 * parameters, a score column has been listed in the phenotype file
-		 * already.
-		 */
-		int ParamNum = PedFileStrings.size();
-		if (ParamNum != 9) {
-			throw new IOException("Problems in reading paremeters." + ParamNum
-					+ "\n");
-		}
-		boolean IsPedigree = true;// false for case-control design; true for
-		// family based design
-
-		boolean Adjustment = true;
-		int Reg = 0; // 0 for linear regression; 1 for logistic
-
-		GMDRData GD = new GMDRData(IsPedigree);
-		File PedFile = new File((String) PedFileStrings.get(0));
-		// load the pedigree file
-
-		File PhenoFile = new File((String) PedFileStrings.get(1));
-		// load the phenotype file
-
-		String OutPedFile = new String((String) PedFileStrings.get(2));
-		// it is used to store the new content after transformation of the pedigree
-		// file
-
-		String OutScoreFile = new String((String) PedFileStrings.get(3));
-		// it is used to store the score files indexes of the covariats selected.
-		
-		String[] Cov = PedFileStrings.get(4).split("[,\\s]++");
-		int CovIdx[] = stringTOinteger(Cov, 1);
-		if (CovIdx != null && CovIdx.length > 1) {
-			for (int j = 0; j < CovIdx.length; j++) {
-				if (CovIdx[j] < 0) {
-					throw new IOException(
-							"The index of the selected predictor cannot be "
-									+ Cov[j]);
-				}
-			}
-		}
-		if (CovIdx.length == 1 && CovIdx[0] < 0) {
-			Adjustment = false;
+		Parameter pr = new Parameter();
+		if(args.length > 0) {
+			pr.read(args[0]);
+			pr.sweepComments();
+			pr.parseValue();
+		} else {
+			pr.isPedigree = true;
+			pr.ped_file = "0.ped";
+			pr.phe_file = "0.phe";
+			pr.converted_ped_file = "Converted_0.ped";
+			pr.converted_phe_file = "Converted_0.phe";
+			pr.id_file = "Family_ID.txt";
+			pr.cov_idx = new int[1];
+			pr.cov_idx[0] = 2;
+			pr.phe_idx = new int[1];
+			pr.phe_idx[0] = 1;
+			pr.method = 1;
+			pr.adjustment = true;
+			pr.includeFounder = false;
+			pr.replication = 1000;
 		}
 
-		String[] Phe = PedFileStrings.get(5).split("[,\\s]++");
-		int[] PheIdx = stringTOinteger(Phe, 1);
-		for (int j = 0; j < PheIdx.length; j++) {
-			if (PheIdx[j] < 0) {
-				throw new IOException(
-						"The index of the selected response cannot be "
-								+ Phe[j]);
-			}
-			for (int jj = 0; jj < CovIdx.length; jj++) {
-				if (PheIdx[j] == CovIdx[jj]) {
-					throw new IOException(
-							"The "
-									+ Phe[j]
-									+ "th phenotype cannot work as predictor and response simultaneously.");
-				}
-			}
-		}
-		Adjustment = (((String) PedFileStrings.get(6)).compareTo("true") == 0) ? true
-				: false;
-		String[] RegParam = PedFileStrings.get(7).split("[,\\s]++");
-		int[] regression = stringTOinteger(RegParam, -1);
-
-		Reg = regression[0];
-		// 0 for statistics built outside the package; 
-		// 1 for linear regression; 
-		// 2 for logistic
-		int replication = Integer.parseInt((String) PedFileStrings.get(8));
-
-		boolean includeFounder = false;
+		GMDRData GD = new GMDRData(pr.isPedigree);
 
 		try {
-			GD.InitialPedFile(PedFile);// initial Pedfile
+			GD.InitialPedFile(pr.ped_file);// initial Pedfile
 		} catch (MDRPedFileException E) {
 			E.printStackTrace(System.err);
 		} catch (PedFileException E) {
 			E.printStackTrace(System.err);
 		}
-		GD.Allele2Genotype();
-		GD.GenotypeImputation();
 		try {
-			GD.InitialPhenoFile(PhenoFile);
+			GD.InitialPhenoFile(pr.phe_file);
 		} catch (GMDRPhenoFileException e) {
 			System.err.println("Phenotype File Exception.");
 		}
@@ -123,18 +122,19 @@ public class TestRabinowitz {
 		GD.RabinowitzApproach();
 		GD.realCreateTable();
 		try {
-			if (Reg >= 0) {
-				GD.buildScore2(PheIdx, CovIdx, Adjustment, Reg, includeFounder);
+			if (pr.method >= 0) {
+				GD.buildScore2(pr.phe_idx, pr.cov_idx, pr.adjustment, pr.method, pr.includeFounder);
 			} else {
-				GD.fetchScore(PheIdx[0]);
+				GD.fetchScore(pr.phe_idx[0]);
 			}
-			GD.RabinowitzPrintGMDR(OutPedFile, OutScoreFile, false);
+			GD.RabinowitzPrintGMDR(pr.converted_ped_file, pr.converted_phe_file, false);
 		} catch (CalEngineException e) {
 			e.printStackTrace(System.err);
 		} catch (Exception e) {
 			e.printStackTrace(System.err);
 		}
-		for (int i = 0; i < replication; i++) {
+		
+		for (int i = 0; i < pr.replication; i++) {
 			String opfN = "Rabin_" + Integer.toString(i) + ".txt";
 			GD.RabinowitzApproach();
 			GD.RabinowitzCreateTable();
@@ -147,25 +147,5 @@ public class TestRabinowitz {
 			}
 			System.out.println("Rabinowitz approach is simulating " + i);
 		}
-	}
-
-	/**
-	 * Covert a string array to an integer array with an offset.
-	 * 
-	 * @param s
-	 *            The String array to be converted
-	 * @param offset
-	 *            The offset
-	 * @return Converted integer array
-	 */
-	private static int[] stringTOinteger(String[] s, int offset) {
-		if (s == null) {
-			return null;
-		}
-		int[] d = new int[s.length];
-		for (int i = 0; i < d.length; i++) {
-			d[i] = Integer.parseInt(s[i]) - offset;
-		}
-		return d;
 	}
 }
