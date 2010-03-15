@@ -97,8 +97,6 @@ public class TestPed {
 		Parameter pr = new Parameter();
 		if(args.length > 0) {
 			pr.read(args[0]);
-			pr.sweepComments();
-			pr.parseValue();
 		} else {
 			pr.isPedigree = true;
 			pr.ped_file = "0.ped";
