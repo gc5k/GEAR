@@ -32,7 +32,7 @@ public class OneTraitResult extends ArrayList {
         int cv = 0;
         for (Iterator e = iterator(); e.hasNext();) {
             OneCVSet cvPair = (OneCVSet) e.next();
-            System.out.println("CV result " + cv + ", Tesint Accuracy " + cvPair.getStatistic(PublicData.TestingAccuIdx) 
+            System.out.println("CV result " + cv + ", Testing Accuracy " + cvPair.getStatistic(PublicData.TestingAccuIdx) 
                     + ", Training Accuracy " + cvPair.getStatistic(PublicData.TrainingAccuIdx));
             HashMap trMap = cvPair.getTrainingSubdivision();
             TreeSet trkeyset = new TreeSet(trMap.keySet());
@@ -145,7 +145,7 @@ public class OneTraitResult extends ArrayList {
 
         sb.append("Statistics of the best model: " + System.getProperty("line.separator"));
         sb.append("Best model: (" + bestModelKey + ")" + System.getProperty("line.separator"));
-        sb.append("Testint Accuracy: " + stats[bestidx][0] + System.getProperty("line.separator"));
+        sb.append("Testing Accuracy: " + stats[bestidx][0] + System.getProperty("line.separator"));
         sb.append("Training Accuracy: " + stats[bestidx][1] + System.getProperty("line.separator"));
         sb.append("Cross-validation consistency: " + cvConsistency + "/" + size());
     }

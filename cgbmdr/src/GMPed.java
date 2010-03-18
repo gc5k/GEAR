@@ -18,7 +18,7 @@ import mdr.moore.AbstractMergeSearch;
  *
  * @author Guo-Bo Chen
  */
-public class main {
+public class GMPed {
 
 	public static class Parameter {
 		protected ArrayList<String> lines;
@@ -111,15 +111,6 @@ public class main {
         for (int i = pr.interaction_from; i <= pr.interaction_end; i++) {
             as.search(i);
             as.summarise();
-        }
-
-        for (int i = pr.interaction_from; i <= pr.interaction_end; i++) {
-            SavedModels sm = as.getBestSavedModelAtOrder(new Integer(i));
-            Permutation pm = new Permutation(dr, sm, dr.getOffset(), sd, pr.replication_permutation);
-            pm.evaluate();
-            PermutationResult permu_res = pm.getResult(0);
-            permu_res.summarise();
-            System.out.println(permu_res);
         }
     }
 }
