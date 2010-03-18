@@ -144,7 +144,7 @@ public class OneTraitResult extends ArrayList {
         cvConsistency = big;
 
         sb.append("Statistics of the best model: " + System.getProperty("line.separator"));
-        sb.append("Best model: (" + bestModelKey + ")" + System.getProperty("line.separator"));
+        sb.append("Best model: " + bestModelKey + System.getProperty("line.separator"));
         sb.append("Testing Accuracy: " + stats[bestidx][0] + System.getProperty("line.separator"));
         sb.append("Training Accuracy: " + stats[bestidx][1] + System.getProperty("line.separator"));
         sb.append("Cross-validation consistency: " + cvConsistency + "/" + size());
