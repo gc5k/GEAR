@@ -85,8 +85,6 @@ public class TestRabinowitz {
 		Parameter pr = new Parameter();
 		if(args.length > 0) {
 			pr.read(args[0]);
-			pr.sweepComments();
-			pr.parseValue();
 		} else {
 			pr.isPedigree = true;
 			pr.ped_file = "0.ped";
@@ -145,7 +143,6 @@ public class TestRabinowitz {
 			} catch (Exception e) {
 				e.printStackTrace(System.err);
 			}
-			System.out.println("Rabinowitz approach is simulating " + i);
 		}
 	}
 }

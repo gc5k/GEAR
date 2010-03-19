@@ -4,6 +4,7 @@ import java.io.FileReader;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Iterator;
 import java.util.Random;
 import java.util.regex.Matcher;
@@ -11,23 +12,30 @@ import java.util.regex.Pattern;
 
 public class FamilyGenerator {
 
-	int samplesize;
-	int numLocus;
-	int dimension;
-	String[] cell;
+	boolean isNullHypothesis;
+	String model;	
 	int[] AffLoci;
-	int[] Kid_Diff_Family;
-	int[] AffKid_Diff_Family;
-	String[][] Allele;
-	double[][] AlleleFreq;
+	double[][] AlleleFreq;	
 	double[] recombination;
 	double[] LD;
-	double[] DPrime;
-	double[] corMarkers;// it is calculated based on LD and allele frequencies.
+	String[] FunctionalGenotype;	
+	double intercept;
+	double geneAffect;
+	double covariable;	
+	double deviation;	
+	double error;
+	double threshold;
+	int FamilySize;
 	int[] FamNum;
+	int[] Kid_Diff_Family;
+	int[] AffKid_Diff_Family;
 	double[][] ParentGenotypeMissingRate;
 	double KidGenotypeMissingRate;
+	double[] DPrime;
+	double[] corMarkers;// it is calculated based on LD and allele frequencies.
 
+	String[][] Allele;
+	int numLocus;
 	ArrayList Parents;
 	ArrayList Children;
 	ArrayList PCovariate;
@@ -36,13 +44,6 @@ public class FamilyGenerator {
 	ArrayList CPhenotype;
 	ArrayList Traits;
 	ArrayList PTraits;
-	double error;
-	double deviation;
-	double intercept;
-	double covariable;
-	double geneAffect;
-	double threshold;
-	String model;
 	Random randomData;
 
 	FamilyGenerator(long sd) {
@@ -62,32 +63,31 @@ public class FamilyGenerator {
 		protected BufferedReader buffer;
 		protected ArrayList<String> lines;
 
-		protected long seed; // 0
-		protected int simu_replication;// 1
-		protected String model; // 2
-		protected int[] AffLoci; // 3
-		protected double[] AlleleFreq; // 4
-		protected double[] Recombination; // 5
-		protected double[] LD; //6
-		protected String[] FunctionalGenotype; //7 
-		
-		protected double intercept; // 8
-		protected double gene; // 9
-		protected double cov; // 10
-		protected double dev; // 11
-		protected double err; // 12
-		protected double threshold; // 13
-		protected int family_size; // 14
-		protected int[] FamNum; // 15	
-		protected int[] Kid; // 16
-		protected int[] AffKid; // 17
-		protected double[][] ParentMissingRate; // 18
-		protected double KidGenotypeMissingRate;// 19
+		protected boolean isNullHypothesis; // 0
+		protected long seed; // 1
+		protected int simu_replication;// 2
+		protected String model; // 3
+		protected int[] AffLoci; // 4
+		protected double[] AlleleFreq; // 5
+		protected double[] Recombination; // 6
+		protected double[] LD; // 7
+		protected String[] FunctionalGenotype; // 8 
+		protected double intercept; // 9
+		protected double gene; // 10
+		protected double cov; // 11
+		protected double dev; // 12
+		protected double err; // 13
+		protected double threshold; // 14
+		protected int family_size; // 15
+		protected int[] FamNum; // 16
+		protected int[] Kid; // 17
+		protected int[] AffKid; // 18
+		protected double[][] ParentMissingRate; // 19
+		protected double KidGenotypeMissingRate;// 20
 
 		private double[] corMarkers;
 		private double[] DPrime;
 		
-
 		public Parameter() {
 			lines = new ArrayList();
 		}
@@ -115,76 +115,76 @@ public class FamilyGenerator {
 		}
 
 		public void parseValue() {
-
-			seed = Long.parseLong(lines.get(0));
-			simu_replication = Integer.parseInt(lines.get(1));
-			model = lines.get(2);
-			String[] AL = lines.get(3).split(",");
+			isNullHypothesis = Boolean.parseBoolean(lines.get(0));
+			seed = Long.parseLong(lines.get(1));
+			simu_replication = Integer.parseInt(lines.get(2));
+			model = lines.get(3);
+			String[] AL = lines.get(4).split(",");
 			AffLoci = new int[AL.length];
 			for (int i = 0; i < AL.length; i++) {
 				AffLoci[i] = Integer.parseInt(AL[i]);
 			}
-			String[] AF = lines.get(4).split(",");
+			String[] AF = lines.get(5).split(",");
 			AlleleFreq = new double[AF.length];
 			for (int i = 0; i < AlleleFreq.length; i++) {
 				AlleleFreq[i] = Double.parseDouble(AF[i]);
 			}
-			String[] Rec = lines.get(5).split(",");
+			String[] Rec = lines.get(6).split(",");
 			Recombination = new double[Rec.length];
 			for (int i = 0; i < AlleleFreq.length; i++) {
 				Recombination[i] = Double.parseDouble(Rec[i]);
 			}
-			String[] ld = lines.get(6).split(",");
+			String[] ld = lines.get(7).split(",");
 			LD = new double[ld.length];
 			for (int i = 0; i < LD.length; i++) {
 				LD[i] = Double.parseDouble(ld[i]);
 			}
-			String[] fl = lines.get(7).split(",");
+			String[] fl = lines.get(8).split(",");
 			FunctionalGenotype = new String[fl.length];
 			System.arraycopy(fl, 0, FunctionalGenotype, 0, fl.length);			
 
-			intercept = Double.parseDouble(lines.get(8));
-			gene = Double.parseDouble(lines.get(9));
-			cov = Double.parseDouble(lines.get(10));			
-			dev = Double.parseDouble(lines.get(11));
-			err = Double.parseDouble(lines.get(12));
-			threshold = Double.parseDouble(lines.get(13));			
+			intercept = Double.parseDouble(lines.get(9));
+			gene = Double.parseDouble(lines.get(10));
+			cov = Double.parseDouble(lines.get(11));			
+			dev = Double.parseDouble(lines.get(12));
+			err = Double.parseDouble(lines.get(13));
+			threshold = Double.parseDouble(lines.get(14));			
 
-			family_size = Integer.parseInt(lines.get(14));
-			String[] FM = lines.get(15).split(",");
+			family_size = Integer.parseInt(lines.get(15));
+			String[] FM = lines.get(16).split(",");
 			FamNum = new int[FM.length];
 			for (int i = 0; i < FM.length; i++) {
 				FamNum[i] = Integer.parseInt(FM[i]);
 			}
 
-			String[] K = lines.get(16).split(",");
+			String[] K = lines.get(17).split(",");
 			Kid = new int[K.length];
 			for (int i = 0; i < K.length; i++) {
 				Kid[i] = Integer.parseInt(K[i]);
 			}
-			String[] AK = lines.get(17).split(",");
+			String[] AK = lines.get(18).split(",");
 			AffKid = new int[AK.length];
 			for (int i = 0; i < AK.length; i++) {
 				AffKid[i] = Integer.parseInt(AK[i]);
 			}
-			String[] MS = lines.get(18).split(",");
+			String[] MS = lines.get(19).split(",");
 			ParentMissingRate = new double[MS.length / 2][2];
 			for (int i = 0; i < MS.length / 2; i++) {
 				ParentMissingRate[i][0] = Double.parseDouble(MS[i * 2 + 0]);
 				ParentMissingRate[i][1] = Double.parseDouble(MS[i * 2 + 1]);
 			}
-			KidGenotypeMissingRate = Double.parseDouble(lines.get(19));
+			KidGenotypeMissingRate = Double.parseDouble(lines.get(20));
 			calculateCorrelation_for_Markers();
 			calculateDPrime();
 		}
-		
+
 		public void recipe() throws IOException{
 			PrintWriter out = new PrintWriter(new File("recipe.txt"));
 			out.println(this.toString());
 			out.close();
 		}
 		
-		private void calculateCorrelation_for_Markers() {
+		protected void calculateCorrelation_for_Markers() {
 			corMarkers = new double[LD.length];
 			for (int i = 0; i < corMarkers.length; i++) {
 				corMarkers[i] = LD[i]/
@@ -197,7 +197,7 @@ public class FamilyGenerator {
 			}
 		}
 		
-		private void calculateDPrime() {
+		protected void calculateDPrime() {
 			DPrime = new double[LD.length];
 			for (int i = 0; i < DPrime.length; i++) {
 				if (LD[i] > 0) {
@@ -266,27 +266,11 @@ public class FamilyGenerator {
 	}
 
 	public void SettingUpParameter(Parameter p) {
+		isNullHypothesis = p.isNullHypothesis;
 		model = p.model;
 		numLocus = p.AlleleFreq.length;
-		samplesize = p.family_size;
-		geneAffect = p.gene;
-		error = p.err;
-		covariable = p.cov;
-		deviation = p.dev;
-		intercept = p.intercept;
 		AffLoci = new int[p.AffLoci.length];
 		System.arraycopy(p.AffLoci, 0, AffLoci, 0, p.AffLoci.length);
-		KidGenotypeMissingRate = p.KidGenotypeMissingRate;
-		FamNum = new int[p.FamNum.length];
-		System.arraycopy(p.FamNum, 0, FamNum, 0, p.FamNum.length);
-		ParentGenotypeMissingRate = new double[p.ParentMissingRate.length][2];
-		for (int i = 0; i < ParentGenotypeMissingRate.length; i++) {
-			System.arraycopy(p.ParentMissingRate[i], 0,
-					ParentGenotypeMissingRate[i], 0,
-					p.ParentMissingRate[i].length);
-		}
-		threshold = p.threshold;
-
 		AlleleFreq = new double[p.AlleleFreq.length][2];
 		for (int i = 0; i < AlleleFreq.length; i++) {
 			AlleleFreq[i][0] = p.AlleleFreq[i];
@@ -297,18 +281,36 @@ public class FamilyGenerator {
 			Allele[i][0] = "1";
 			Allele[i][1] = "2";
 		}
+		recombination = new double[p.Recombination.length];
+		System.arraycopy(p.Recombination, 0, recombination, 0, p.Recombination.length);
+		LD = new double[p.LD.length];
+		System.arraycopy(p.LD, 0, LD, 0, p.LD.length);
+		FunctionalGenotype = new String[p.FunctionalGenotype.length];
+		System.arraycopy(p.FunctionalGenotype, 0, FunctionalGenotype, 0, p.FunctionalGenotype.length);
+
+		intercept = p.intercept;
+		geneAffect = p.gene;
+		covariable = p.cov;
+		deviation = p.dev;		
+		error = p.err;
+		threshold = p.threshold;
+		
+		FamilySize = p.family_size;
 		Kid_Diff_Family = new int[p.Kid.length];
 		System.arraycopy(p.Kid, 0, Kid_Diff_Family, 0, p.Kid.length);
 		AffKid_Diff_Family = new int[p.AffKid.length];
 		System.arraycopy(p.AffKid, 0, AffKid_Diff_Family, 0, p.AffKid.length);
-		recombination = new double[p.Recombination.length];
-		System.arraycopy(p.Recombination, 0, recombination, 0,
-				p.Recombination.length);
-		LD = new double[p.LD.length];
-		System.arraycopy(p.LD, 0, LD, 0, p.LD.length);
-		cell = new String[p.FunctionalGenotype.length];
-		System.arraycopy(p.FunctionalGenotype, 0, cell, 0, p.FunctionalGenotype.length);
-		
+		ParentGenotypeMissingRate = new double[p.ParentMissingRate.length][2];
+		for (int i = 0; i < ParentGenotypeMissingRate.length; i++) {
+			System.arraycopy(p.ParentMissingRate[i], 0,
+					ParentGenotypeMissingRate[i], 0,
+					p.ParentMissingRate[i].length);
+		}
+
+		KidGenotypeMissingRate = p.KidGenotypeMissingRate;
+		FamNum = new int[p.FamNum.length];
+		System.arraycopy(p.FamNum, 0, FamNum, 0, p.FamNum.length);
+
 		corMarkers = new double[p.corMarkers.length];
 		System.arraycopy(p.corMarkers, 0, corMarkers, 0, p.corMarkers.length);
 		
@@ -317,18 +319,21 @@ public class FamilyGenerator {
 	}
 
 	public int affection(double obs) {
-		if (model.compareTo("B") == 0) {
-			double prob = Math.exp(obs) / (1D + Math.exp(obs));
-			if (randomData.nextFloat() < prob) {
+		if (isNullHypothesis ) {
+			if (model.compareTo("B") == 0) {
+				double prob = Math.exp(obs) / (1D + Math.exp(obs));
+				if (randomData.nextFloat() < prob) {
+					return 1;
+				}
+				return 0;
+			}
+			if (obs > threshold) {
 				return 1;
 			}
 			return 0;
+		} else {
+			return randomData.nextFloat() < 0.5 ? 0:1;
 		}
-
-		if (obs > threshold) {
-			return 1;
-		}
-		return 0;
 	}
 
 	private void generateFounderGenotype(String[][] pair) {
@@ -356,7 +361,7 @@ public class FamilyGenerator {
 	public void create() {
 		int NumAffectedKid = 0;
 		int i = 0;
-		while (i < samplesize) {
+		while (i < FamilySize) {
 			int sib;
 			ArrayList p_temp = new ArrayList();
 			ArrayList p_trait = new ArrayList();
@@ -367,17 +372,6 @@ public class FamilyGenerator {
 				double obs;
 				String[][] pair = new String[numLocus][2];
 				generateFounderGenotype(pair);
-//				for (int l = 0; l < numLocus; ++l) {
-//					for (int k = 0; k < 2; ++k) {
-//						double rd = randomData.nextFloat();
-//						int index = 0;
-//						double fq = AlleleFreq[l][index];
-//						while (rd > fq) {
-//							fq += AlleleFreq[l][(++index)];
-//						}
-//						pair[l][k] = Allele[l][index];
-//					}
-//				}
 				p_temp.add(pair);
 				Integer genestatus = getStatus(pair);
 
@@ -475,8 +469,8 @@ public class FamilyGenerator {
 			}
 		}
 
-		for (int i = 0; i < cell.length; ++i) {
-			if (genostr.compareTo(cell[i]) == 0) {
+		for (int i = 0; i < FunctionalGenotype.length; ++i) {
+			if (genostr.compareTo(FunctionalGenotype[i]) == 0) {
 				return new Integer(1);
 			}
 		}
@@ -503,7 +497,7 @@ public class FamilyGenerator {
 			pheout.println("FIP\tID\taffection\tphenotype\tcov");
 		}
 
-		for (int i = 0; i < samplesize; ++i) {
+		for (int i = 0; i < FamilySize; ++i) {
 			double[] MR = null;
 			for (int j = 0; j < FamNum.length; j++) {
 				if (i < FamNum[j]) {
@@ -644,7 +638,23 @@ public class FamilyGenerator {
 				E.printStackTrace(System.err);
 			}
 		} else {
+			pr.isNullHypothesis = false;
+			pr.seed = 2008;
 			pr.model = "B";
+			pr.AffLoci = new int[2];
+			pr.AffLoci[0] = 0;
+			pr.AffLoci[1] = 1;
+			pr.AlleleFreq = new double[10];
+			Arrays.fill(pr.AlleleFreq, 0.5);
+			pr.Recombination = new double[10];
+			Arrays.fill(pr.Recombination, 0.5);
+			pr.LD = new double[9];
+			Arrays.fill(pr.LD, 0);
+			pr.FunctionalGenotype = new String[4];
+			pr.FunctionalGenotype[0] = "1112";
+			pr.FunctionalGenotype[1] = "1211";
+			pr.FunctionalGenotype[2] = "1222";
+			pr.FunctionalGenotype[3] = "2212";
 			if (pr.model.compareTo("B") == 0) {
 				pr.intercept = -5.29;
 				pr.dev = 3.16;
@@ -658,10 +668,9 @@ public class FamilyGenerator {
 				pr.err = 1;
 				pr.gene = 2.05;
 			}
-			pr.seed = 2008;
+			pr.threshold = 2.05;
 			pr.simu_replication = 2;
 			pr.family_size = 600;
-			pr.KidGenotypeMissingRate = 0;
 			pr.FamNum = new int[3];
 			pr.FamNum[0] = 200;
 			pr.FamNum[1] = 400;
@@ -681,8 +690,9 @@ public class FamilyGenerator {
 			pr.ParentMissingRate[1][1] = 1;
 			pr.ParentMissingRate[2][0] = 1;
 			pr.ParentMissingRate[2][1] = 1;
-
-			pr.threshold = 2.05;
+			pr.KidGenotypeMissingRate = 0;
+			pr.calculateCorrelation_for_Markers();
+			pr.calculateDPrime();
 		}
 
 		// means AABb, Aabb, AaBB, AABb
