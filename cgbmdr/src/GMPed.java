@@ -52,7 +52,7 @@ public class GMPed {
 			boolean flag = true;
 			String line;
 			while ((line = buffer.readLine()) != null) {
-				if (Pattern.matches("^\\s*//*.*", line)) {// empty line
+				if (Pattern.matches("^//.*", line)) {// empty line
 					continue;
 				} else {
 					lines.add(line);
@@ -77,7 +77,23 @@ public class GMPed {
 			isMooreMDR = Boolean.parseBoolean(lines.get(8));
 			replication_permutation = Integer.parseInt(lines.get(9));
 			search_method = Integer.parseInt(lines.get(10));
-		}		
+		}
+		
+		public String toString() {
+			StringBuffer sb = new StringBuffer();
+			sb.append(ped_file + System.getProperty("line.separator"));
+			sb.append(phe_file + System.getProperty("line.separator"));
+			sb.append(interaction_from + System.getProperty("line.separator"));
+			sb.append(interaction_end + System.getProperty("line.separator"));
+			sb.append(scr_idx[0] + System.getProperty("line.separator"));
+			sb.append(interval + System.getProperty("line.separator"));
+			sb.append(seed + System.getProperty("line.separator"));
+			sb.append(partition_method + System.getProperty("line.separator"));
+			sb.append(isMooreMDR + System.getProperty("line.separator"));
+			sb.append(replication_permutation + System.getProperty("line.separator"));
+			sb.append(search_method + System.getProperty("line.separator"));
+			return sb.toString();
+		}
 	}
 
     public static void main(String[] args) throws IOException {
@@ -99,9 +115,7 @@ public class GMPed {
         	pr.search_method = 0;
     	}
 
-//        pFile = null;
         DataFile dr = new DataFile(pr.ped_file, pr.phe_file, pr.scr_idx);
-
         Subdivision sd = new Subdivision(pr.interval, pr.seed, dr);
         sd.RandomPartition();
 
