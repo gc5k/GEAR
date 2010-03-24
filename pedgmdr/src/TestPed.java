@@ -52,7 +52,7 @@ public class TestPed {
 			boolean flag = true;
 			String line;
 			while ((line = buffer.readLine()) != null) {
-				if (Pattern.matches("^\\s*//*.*", line)) {// empty line
+				if (Pattern.matches("^//.*", line)) {// empty line
 					continue;
 				} else {
 					lines.add(line);

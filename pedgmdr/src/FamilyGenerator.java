@@ -106,7 +106,7 @@ public class FamilyGenerator {
 			while ((line = buffer.readLine()) != null) {
 				if (Pattern.matches("\\s*", line)) {// empty line
 					continue;
-				} else if (Pattern.matches("^\\s*//*.*", line)) {// multiple line
+				} else if (Pattern.matches("^//", line)) {// multiple line
 					// comments
 					flag = false;
 				} else {
@@ -231,7 +231,11 @@ public class FamilyGenerator {
 			sb.append("\nmodel : " + model );
 			sb.append("\nFunctional loci : ");
 			for (int i = 0; i < AffLoci.length; i++) {
-				sb.append(AffLoci[i] + ",");
+				if (i == AffLoci.length -1 ) {
+					sb.append(AffLoci[i]);
+				} else {
+					sb.append(AffLoci[i] + ",");
+				}
 			}
 			sb.append("\nFunctional Genotype : ");
 			for (int i = 0; i < FunctionalGenotype.length; i++) {
