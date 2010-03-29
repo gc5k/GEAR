@@ -69,8 +69,8 @@ public class FamilyGenerator {
 		protected String model; // 3
 		protected int[] AffLoci; // 4
 		protected String[] FunctionalGenotype; // 5
-		protected double[][] AlleleFreq; // 6
-		protected double[] Recombination; // 7
+		protected double[] Recombination; // 6		
+		protected double[][] AlleleFreq; // 7
 		protected double[] LD; // 8
 
 		protected double intercept; // 9
@@ -88,7 +88,7 @@ public class FamilyGenerator {
 
 		private double[][] corMarkers;
 		private double[][] DPrime;
-		
+
 		public Parameter() {
 			lines = new ArrayList();
 		}
@@ -106,7 +106,7 @@ public class FamilyGenerator {
 			while ((line = buffer.readLine()) != null) {
 				if (Pattern.matches("\\s*", line)) {// empty line
 					continue;
-				} else if (Pattern.matches("^//", line)) {// multiple line
+				} else if (Pattern.matches("^//.*", line)) {// multiple line
 					// comments
 					flag = false;
 				} else {
@@ -137,7 +137,7 @@ public class FamilyGenerator {
 			AlleleFreq = new double[AF.length/Recombination.length][Recombination.length];
 			for (int i = 0; i < AlleleFreq.length; i++) {
 				for (int j = 0; j < AlleleFreq[i].length; j++) {
-					AlleleFreq[i][j] = Double.parseDouble(AF[j]);
+					AlleleFreq[i][j] = Double.parseDouble(AF[i*AlleleFreq[i].length + j]);
 				}
 			}
 			String[] ld = lines.get(8).split(",");
@@ -237,7 +237,7 @@ public class FamilyGenerator {
 					sb.append(AffLoci[i] + ",");
 				}
 			}
-			sb.append("\nFunctional Genotype : ");
+			sb.append("\nFunctional Genotype :");
 			for (int i = 0; i < FunctionalGenotype.length; i++) {
 				sb.append(FunctionalGenotype[i] + ",");
 			}
