@@ -1,26 +1,24 @@
-seed : 2008
-replication of simulation : 2
-model : B
-Functional loci : 0,1,
+was the data simulated under the null hypothesis: trueseed : 2010
+replication of simulation : 100
+model : Q
+Functional loci : 0,3
 Functional Genotype : 1112,1211,1222,2212,
 Allele Frequency :0.5,0.5,0.5,0.5,0.5,0.5,0.5,0.5,0.5,0.5,
-0.5,0.5,0.5,0.5,0.5,0.5,0.5,0.5,0.5,0.5,
 0.5,0.5,0.5,0.5,0.5,0.5,0.5,0.5,0.5,0.5,
 
 Recombination : 0.5,0.5,0.5,0.5,0.5,0.5,0.5,0.5,0.5,0.5,
 LD: 0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,
 D': 0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,
 0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,
-0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,
 
-intercept : -5.29
-gene : 1.09
+intercept : 0.0
+gene : 0.25
 Covariable : 1.0
-SD Cov : 3.16
+SD Cov : 1.0
 S.D. Residual error : 1.0
 Threshold : 2.05
-family size : 600
-Family number in different categories : 200,400,600,
-Kids number (affected) in different categories : 2(-2),3(-2),4(-2),
-Parent genotype Missing Rate : 0.0 0.0,0.0 1.0,1.0 1.0,
+family size : 400
+Family number in different categories : 200,400,
+Kids number (affected) in different categories : 2(-1),2(-1),
+Parent genotype Missing Rate : 0.0 0.0,0.0 0.0,
 genotype missing rate for kids : 0.0
