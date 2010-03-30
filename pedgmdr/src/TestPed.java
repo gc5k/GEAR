@@ -111,7 +111,7 @@ public class TestPed {
 			pr.method = 1;
 			pr.adjustment = true;
 			pr.includeFounder = false;
-			pr.replication = 1000;
+			pr.replication = 10;
 		}
 
 		GMDRData GD = new GMDRData(pr.isPedigree);
@@ -149,12 +149,13 @@ public class TestPed {
             e.printStackTrace(System.err);
         }
 
-        ArrayList PopulationStatistics = GD.getPopulationStatistics();// get
-        // population
-        // statistics
-
-        ArrayList MendError = GD.getMendError();// get Mendelian Error information
-
-        Hashtable FamInformative = GD.getFamilyInformative();// get family
+		for (int i = 0; i < pr.replication; i++) {
+			String opfN = "Lou_" + Integer.toString(i) + ".txt";
+			try {
+				GD.PrintNullGMDR(opfN, WhichDataSet, (new Long (i)).longValue());
+			} catch(Exception E) {
+				E.printStackTrace(System.err);
+			}
+		}
     }
 }

@@ -7,6 +7,7 @@ import java.util.Arrays;
 import java.util.ArrayList;
 import java.util.Enumeration;
 import java.util.Hashtable;
+import java.util.Random;
 
 import score.CalEngine;
 import score.CalEngineException;
@@ -43,6 +44,9 @@ public class GMDRData {
 	// individuals
 	private ArrayList RabinowitzTable;
 	// private static String Missingvalue=".";
+	private ArrayList DiscardedIndividual;
+	private ArrayList CardedIndividual;
+	
 	private double[][] Covariates;
 	private double[][] FullCovariates;
 	// private double[][] Traits;
@@ -984,7 +988,8 @@ public class GMDRData {
 		int countmiss = 0;
 		Hashtable InformativePersonHash = new Hashtable();
 
-		ArrayList Discard = new ArrayList();
+		DiscardedIndividual = new ArrayList();
+		CardedIndividual = new ArrayList();
 		for (int i = 0; i < PersonTable.size(); i++) {
 			PI = PersonTable.get(i);
 			if ((!((Boolean) faminformative.get(PI.getFamilyID()))
@@ -995,9 +1000,11 @@ public class GMDRData {
 			// score
 			{
 				countmiss++;
-				Discard.add(PI.getKey());
+				DiscardedIndividual.add(PI.getKey());
 				// System.out.println(PI.getKey());
 				continue;
+			} else {
+				CardedIndividual.add(PI);
 			}
 			InformativePersonHash.put(new String(PI.getKey()), new Integer(i));
 			TDTpiout.println(PI.getFamilyID() + "\t" + PI.getIndividualID());
@@ -1006,8 +1013,8 @@ public class GMDRData {
 		if (countmiss > 0) {
 			System.out.println("=================");
 			System.out.println("Discarded " + countmiss + " individuals.");
-			for (int i = 0; i < Discard.size(); i++) {
-				System.out.println((String) Discard.get(i));
+			for (int i = 0; i < DiscardedIndividual.size(); i++) {
+				System.out.println((String) DiscardedIndividual.get(i));
 			}
 			System.out.println("=================");
 		}
@@ -1065,49 +1072,32 @@ public class GMDRData {
 		TDTpheout.close();
 	}
 
-	public void PrintNullGMDR(String TDTped, String TDTpi, int datatype)
+	public void PrintNullGMDR(String TDTped, int datatype, long seed)
 			throws IOException, CalEngineException {
 		PrintWriter TDTpedout = new PrintWriter(TDTped);
-		PrintWriter TDTpiout = new PrintWriter(TDTpi);
 		Hashtable faminformative = PedData.getFamInformative();
 		PersonIndex PI;
 		int countmiss = 0;
 		Hashtable InformativePersonHash = new Hashtable();
 
-		ArrayList Discard = new ArrayList();
 		for (int i = 0; i < PersonTable.size(); i++) {
 			PI = PersonTable.get(i);
 			if ((!((Boolean) faminformative.get(PI.getFamilyID()))
 					.booleanValue())
 					|| (!ScoreHashTable.containsKey(PI.getKey()))){
-				// not informative or no score
-				countmiss++;
-				Discard.add(PI.getKey());
-				// System.out.println(PI.getKey());
 				continue;
 			}
 			InformativePersonHash.put(new String(PI.getKey()), new Integer(i));
-			TDTpiout.println(PI.getFamilyID() + "\t" + PI.getIndividualID());
 		}
-		TDTpiout.close();
-		if (countmiss > 0) {
-			System.out.println("=================");
-			System.out.println("Discarded " + countmiss + " individuals.");
-			for (int i = 0; i < Discard.size(); i++) {
-				System.out.println((String) Discard.get(i));
-			}
-			System.out.println("=================");
-		}
-		ArrayList marker;
 
+		ArrayList marker;
 		ArrayList markerinfor = PedData.getMarkerInformation();
 		for (int i = 0; i < markerinfor.size(); i++) {
 			TDTpedout.print(markerinfor.get(i) + "\t");
 		}
 		TDTpedout.println("class");
 
-		int sindex = 0;
-		ArrayList<String> PrintOutPersonTable = new ArrayList();
+		Random rnd = new Random(seed);
 		for (int i = 0; i < TransmittedTable.size(); i++) {
 			PI = PersonTable.get(i);
 			if (!InformativePersonHash.containsKey(PI.getKey())) {
@@ -1117,20 +1107,31 @@ public class GMDRData {
 					&& datatype == 1) {
 				continue;
 			}
-
-			marker = (ArrayList) TransmittedTable.get(i);
-			for (int j = 0; j < marker.size(); j++) {
-				TDTpedout.print(marker.get(j) + "\t");
-			}
-			TDTpedout.println(((Integer) StatusTable.get(i)).intValue() - 1);
-			marker = (ArrayList) NontransmittedTable.get(i);
-			for (int j = 0; j < marker.size(); j++) {
-				TDTpedout.print(marker.get(j) + "\t");
-			}
-			TDTpedout
+			if (rnd.nextFloat() > 0.5) {
+				marker = (ArrayList) TransmittedTable.get(i);
+				for (int j = 0; j < marker.size(); j++) {
+					TDTpedout.print(marker.get(j) + "\t");
+				}
+				TDTpedout.println(((Integer) StatusTable.get(i)).intValue() - 1);
+				marker = (ArrayList) NontransmittedTable.get(i);
+				for (int j = 0; j < marker.size(); j++) {
+					TDTpedout.print(marker.get(j) + "\t");
+				}
+				TDTpedout
 					.println(1 - (((Integer) StatusTable.get(i)).intValue() - 1));
-			sindex++;
-			PrintOutPersonTable.add(new String(PI.getKey()));
+			} else {
+				marker = (ArrayList) NontransmittedTable.get(i);
+				for (int j = 0; j < marker.size(); j++) {
+					TDTpedout.print(marker.get(j) + "\t");
+				}
+				TDTpedout.println(((Integer) StatusTable.get(i)).intValue() - 1);
+				marker = (ArrayList) TransmittedTable.get(i);
+				for (int j = 0; j < marker.size(); j++) {
+					TDTpedout.print(marker.get(j) + "\t");
+				}
+				TDTpedout
+					.println(1 - (((Integer) StatusTable.get(i)).intValue() - 1));
+			}
 		}
 		TDTpedout.close();
 	}
