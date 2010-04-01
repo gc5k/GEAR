@@ -148,7 +148,7 @@ public class FamilyGenerator {
 
 			intercept = Double.parseDouble(lines.get(9));
 			gene = Double.parseDouble(lines.get(10));
-			cov = Double.parseDouble(lines.get(11));		
+			cov = Double.parseDouble(lines.get(11));
 			dev = Double.parseDouble(lines.get(12));
 			err = Double.parseDouble(lines.get(13));
 			threshold = Double.parseDouble(lines.get(14));			
@@ -185,6 +185,21 @@ public class FamilyGenerator {
 			PrintWriter out = new PrintWriter(new File("recipe.txt"));
 			out.println(this.toString());
 			out.close();
+		}
+
+		protected void calculateCorrelation_for_Markers_with_known_DPrime() {
+			corMarkers = new double[AlleleFreq.length][DPrime.length];
+			for (int i = 0; i < corMarkers.length; i++) {
+				for (int j = 0; j < corMarkers.length; j++) {
+					double d = 0;
+					if(DPrime[i][j] > 0) {
+						d = DPrime[i][j] * Math.min(AlleleFreq[i][j]*(1 - AlleleFreq[i][j+1]), AlleleFreq[i][j+1]*(1-AlleleFreq[i][j]));
+					} else {
+						d = DPrime[i][j] * Math.min(AlleleFreq[i][j]* AlleleFreq[i][j+1], AlleleFreq[i][j+1]*AlleleFreq[i][j]);
+					}
+					corMarkers[i][j] = d/Math.sqrt(AlleleFreq[i][j]*(1 - AlleleFreq[i][j]) * AlleleFreq[i][j+1] * (1 - AlleleFreq[i][j+1]));					
+				}
+			}
 		}
 
 		protected void calculateCorrelation_for_Markers() {

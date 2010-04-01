@@ -1,8 +1,0 @@
-TAS2R16_38.ped
-TAS2R16_38.phe
-TAS16_38_ped.txt
-TAS16_38_phe.txt
-1,2,3
-6
-true
-1
