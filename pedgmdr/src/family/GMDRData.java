@@ -1098,6 +1098,8 @@ public class GMDRData {
 		TDTpedout.println("class");
 
 		Random rnd = new Random(seed);
+		int PI_fam_idx = -1;
+		double r = 0;
 		for (int i = 0; i < TransmittedTable.size(); i++) {
 			PI = PersonTable.get(i);
 			if (!InformativePersonHash.containsKey(PI.getKey())) {
@@ -1107,7 +1109,11 @@ public class GMDRData {
 					&& datatype == 1) {
 				continue;
 			}
-			if (rnd.nextFloat() > 0.5) {
+			if((Integer.parseInt(PI.FamilyID)) != PI_fam_idx) {//switch for a new family
+				r = rnd.nextDouble();
+				PI_fam_idx = Integer.parseInt(PI.FamilyID);
+			}
+			if (r > 0.5) {
 				marker = (ArrayList) TransmittedTable.get(i);
 				for (int j = 0; j < marker.size(); j++) {
 					TDTpedout.print(marker.get(j) + "\t");
@@ -1119,7 +1125,7 @@ public class GMDRData {
 				}
 				TDTpedout
 					.println(1 - (((Integer) StatusTable.get(i)).intValue() - 1));
-			} else {
+			} else {//switch genotypes
 				marker = (ArrayList) NontransmittedTable.get(i);
 				for (int j = 0; j < marker.size(); j++) {
 					TDTpedout.print(marker.get(j) + "\t");
