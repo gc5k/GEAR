@@ -93,13 +93,13 @@ public class TestRabinowitz {
 			pr.converted_phe_file = "Converted_0.phe";
 			pr.id_file = "Family_ID.txt";
 			pr.cov_idx = new int[1];
-			pr.cov_idx[0] = 2;
+			pr.cov_idx[0] = 1;
 			pr.phe_idx = new int[1];
-			pr.phe_idx[0] = 1;
+			pr.phe_idx[0] = 0;
 			pr.method = 1;
 			pr.adjustment = true;
 			pr.includeFounder = false;
-			pr.replication = 1000;
+			pr.replication = 10;
 		}
 
 		GMDRData GD = new GMDRData(pr.isPedigree);

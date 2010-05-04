@@ -99,10 +99,10 @@ public class TestPed {
 			pr.read(args[0]);
 		} else {
 			pr.isPedigree = true;
-			pr.ped_file = "0.ped";
-			pr.phe_file = "0.phe";
-			pr.converted_ped_file = "Converted_0.ped";
-			pr.converted_phe_file = "Converted_0.phe";
+			pr.ped_file = "_TAS2R16t_TAS2R38.ped";
+			pr.phe_file = "_TAS2R16t_TAS2R38.phe";
+			pr.converted_ped_file = "Converted_TAS2R16t_TAS2R38_0.ped";
+			pr.converted_phe_file = "Converted_TAS2R16t_TAS2R38_0.phe";
 			pr.id_file = "Family_ID.txt";
 			pr.cov_idx = new int[1];
 			pr.cov_idx[0] = 1;
@@ -115,7 +115,7 @@ public class TestPed {
 		}
 
 		GMDRData GD = new GMDRData(pr.isPedigree);
-        int WhichDataSet = 0; // 0 for all; 1 for affected only ; need add a
+        int WhichDataSet = 2; // 0 for all; 1 for affected only; 2 for unaffected only.
 
         try {
             GD.InitialPedFile(pr.ped_file);
@@ -137,11 +137,17 @@ public class TestPed {
         GD.realCreateTable();
 
         try {
-            if (pr.method > 0) {
-                GD.buildScore2(pr.phe_idx, pr.cov_idx, pr.adjustment, pr.method, pr.includeFounder);
-            } else {
-                GD.fetchScore(pr.phe_idx[0]);
-            }
+        	if (WhichDataSet !=0 && !pr.includeFounder) {
+        		//if only affected, or unaffeced, subjects are used, and excluded founder,
+        		//score would not be ajusted, because there is no phenotypic variation.
+        		GD.fetchScore(pr.phe_idx[0]);
+        	} else {
+        		if (pr.method > 0) {
+        			GD.buildScore2(pr.phe_idx, pr.cov_idx, pr.adjustment, pr.method, pr.includeFounder);
+        		} else {
+        			GD.fetchScore(pr.phe_idx[0]);
+        		}
+        	}
             GD.realPrintGMDR(pr.converted_ped_file, pr.converted_phe_file, pr.id_file, WhichDataSet);
         } catch (CalEngineException e) {
             e.printStackTrace(System.err);

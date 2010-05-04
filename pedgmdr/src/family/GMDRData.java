@@ -1034,9 +1034,13 @@ public class GMDRData {
 				continue;
 			}
 			if ((((Integer) StatusTable.get(i)).intValue() - 1) == 1
-					&& datatype == 1) {
+					&& datatype == 2) {//do not print out affected subjects
 				continue;
 			}
+			if ((((Integer) StatusTable.get(i)).intValue() - 1) == 0
+					&& datatype == 1) {//do not print out unaffected subjects
+				continue;
+			}			
 
 			marker = (ArrayList) TransmittedTable.get(i);
 			for (int j = 0; j < marker.size(); j++) {
@@ -1106,9 +1110,13 @@ public class GMDRData {
 				continue;
 			}
 			if ((((Integer) StatusTable.get(i)).intValue() - 1) == 1
-					&& datatype == 1) {
+					&& datatype == 2) {
 				continue;
 			}
+			if ((((Integer) StatusTable.get(i)).intValue() - 1) == 0
+					&& datatype == 1) {
+				continue;
+			}			
 			if((Integer.parseInt(PI.FamilyID)) != PI_fam_idx) {//switch for a new family
 				r = rnd.nextDouble();
 				PI_fam_idx = Integer.parseInt(PI.FamilyID);
