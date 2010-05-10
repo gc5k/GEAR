@@ -13,6 +13,7 @@ public class FamilyGenerator {
 	boolean isNullHypothesis;
 	String model;
 	int[] AffLoci;
+	double[][] AlleleFreq;
 	String[] FunctionalGenotype;
 	double[] recombination;
 
@@ -294,6 +295,11 @@ public class FamilyGenerator {
 		recombination = new double[p.Recombination.length];
 		System.arraycopy(p.Recombination, 0, recombination, 0,
 				p.Recombination.length);
+		AlleleFreq = new double[p.AlleleFreq.length][numLocus];
+		for (int i = 0; i < AlleleFreq.length; i++) {
+			System.arraycopy(p.AlleleFreq[i], 0, AlleleFreq[i], 0, p.AlleleFreq[i].length);
+		}
+
 		DPrime = new double[p.DPrime.length];
 		System.arraycopy(p.DPrime, 0, DPrime, 0, p.DPrime.length);
 		FunctionalGenotype = new String[p.FunctionalGenotype.length];
@@ -384,7 +390,7 @@ public class FamilyGenerator {
 			int chrIdx = 0;
 			for (int k = 0; k < numLocus; k++) {
 				if (k == 0) {
-					if (randomData.nextFloat() < 0.5) {
+					if (randomData.nextFloat() < AlleleFreq[FamCategory][k]) {
 						chrIdx = 0;
 					} else {
 						chrIdx = 1;
@@ -392,7 +398,17 @@ public class FamilyGenerator {
 					pair[k][i] = Allele[k][chrIdx];
 				} else {
 					double r = (1 - corMarkers[FamCategory][k - 1]) / 2;
-					if (randomData.nextFloat() < r) {
+					double r1, r2;
+					if( chrIdx == 0) {
+						r1 = r * AlleleFreq[FamCategory][k];
+						r2 = (1-r) * (1-AlleleFreq[FamCategory][k]);
+					} else {
+						r1 = (1-r) * (1-AlleleFreq[FamCategory][k]);
+						r2 = r * AlleleFreq[FamCategory][k];						
+					}
+					double r3 = r1/(r1+r2);
+					double r4 = randomData.nextFloat();
+					if (r4 > r3) {
 						chrIdx = 1 - chrIdx;
 					}
 					pair[k][i] = Allele[k][chrIdx];
@@ -448,6 +464,104 @@ public class FamilyGenerator {
 		}
 	}
 
+	public void randomFamily() {
+		int i = 0;
+		while (i < FamilySize) {
+			ArrayList p_temp = new ArrayList();
+			ArrayList p_trait = new ArrayList();
+			ArrayList p_covariate = new ArrayList();
+			ArrayList p_phenotype = new ArrayList();
+			int FamCategory = 0;
+
+			for (int j = 0; j < FamNum.length; j++) {
+				if (i < FamNum[j]) {
+					FamCategory = j;
+					break;
+				}
+			}
+
+			for (int j = 0; j < 2; ++j) {
+				double covariate;
+				double obs;
+				Integer status = null;
+				do {
+					String[][] pair = new String[numLocus][2];
+					generateFounderGenotype(pair, FamCategory);
+					p_temp.add(pair);
+					Integer genestatus = getStatus(pair);
+
+					if (model.compareTo("B") == 0) {
+						covariate = randomData.nextGaussian() * deviation;
+						obs = genestatus.doubleValue() * geneAffect + covariate
+								* covariable + intercept;
+					} else {
+						covariate = randomData.nextGaussian() * deviation;
+						obs = genestatus.doubleValue() * geneAffect + covariate
+								* covariable + intercept
+								+ randomData.nextGaussian() * error;
+						p_phenotype.add(new Double(obs));
+					}
+					status = new Integer(affection(obs));
+				} while (status.intValue() == -1);
+				p_covariate.add(new Double(covariate));
+				p_trait.add(status);
+			}
+
+			ArrayList c_temp = new ArrayList();
+			ArrayList c_trait = new ArrayList();
+			ArrayList c_covariate = new ArrayList();
+			ArrayList c_phenotype = new ArrayList();
+			int affect = 0;
+
+			for (int ii = 0; ii < Kid_Diff_Family[FamCategory]; ++ii) {
+				double covariate;
+				double obs;
+				Integer status = null;
+				String[][] child = null;
+				do {
+					child = new String[numLocus][2];
+					for (int j = 0; j < 2; ++j) {
+						String[][] P = (String[][]) (String[][]) p_temp.get(j);
+						int chr = 0;
+						for (int k = 0; k < numLocus; ++k) {
+							double rd = randomData.nextFloat();
+							if (rd > recombination[k]) {
+								chr = 1 - chr;
+							}
+							child[k][j] = P[k][chr];
+						}
+					}
+					Integer genestatus = getStatus(child);
+					if (model.compareTo("B") == 0) {
+						covariate = randomData.nextGaussian() * deviation;
+						obs = genestatus.doubleValue() * geneAffect + covariate
+								* covariable + intercept;
+					} else {
+						covariate = randomData.nextGaussian() * deviation;
+						obs = genestatus.doubleValue() * geneAffect + covariate
+								* covariable + intercept
+								+ randomData.nextGaussian() * error;
+						c_phenotype.add(new Double(obs));
+					}
+					status = new Integer(affection(obs));
+				} while (status.intValue() == -1);
+				affect += status.intValue();
+				c_covariate.add(new Double(covariate));
+				c_trait.add(status);
+				c_temp.add(child);
+			}
+			Children.add(c_temp);
+			Parents.add(p_temp);
+			PCovariate.add(p_covariate);
+			PPhenotype.add(p_phenotype);
+			CCovariate.add(c_covariate);
+			CPhenotype.add(c_phenotype);
+			PTraits.add(p_trait);
+			Traits.add(c_trait);
+			++i;
+		}	
+	}
+	
 	public void create() {
 		int i = 0;
 		while (i < FamilySize) {
@@ -737,9 +851,9 @@ public class FamilyGenerator {
 				E.printStackTrace(System.err);
 			}
 		} else {
-			pr.isNullHypothesis = false;
-			pr.seed = 2008;
-			pr.model = "Q";
+			pr.isNullHypothesis = true;
+			pr.seed = 2000;
+			pr.model = "B";
 			pr.AffLoci = new int[2];
 			pr.AffLoci[0] = 0;
 			pr.AffLoci[1] = 1;
@@ -752,10 +866,10 @@ public class FamilyGenerator {
 			Arrays.fill(pr.Recombination, 0.5);
 			pr.AlleleFreq = new double[3][10];
 			for (int i = 0; i < pr.AlleleFreq.length; i++) {
-				Arrays.fill(pr.AlleleFreq[i], 0.5);
+				Arrays.fill(pr.AlleleFreq[i], 0.125*(1+i));
 			}
 			pr.DPrime = new double[9];
-			Arrays.fill(pr.DPrime, 0.7);
+			Arrays.fill(pr.DPrime, 0);
 			if (pr.model.compareTo("B") == 0) {
 				pr.intercept = -5.29;
 				pr.dev = 3.16;
@@ -773,16 +887,26 @@ public class FamilyGenerator {
 			pr.pheno_select_quantile[0] = -0.1;
 			pr.pheno_select_quantile[1] = 0.9;
 			pr.simu_replication = 2;
-			pr.family_size = 200;
-			pr.FamNum = new int[1];
-			pr.FamNum[0] = 200;
-			pr.Kid = new int[1];
-			pr.Kid[0] = 2;
-			pr.AffKid = new int[1];
-			pr.AffKid[0] = -1;
-			pr.ParentMissingRate = new double[1][2];
+			pr.family_size = 300;
+			pr.FamNum = new int[3];
+			pr.FamNum[0] = 100;
+			pr.FamNum[1] = 200;
+			pr.FamNum[2] = 300;
+			pr.Kid = new int[3];
+			pr.Kid[0] = 0;
+			pr.Kid[1] = 0;
+			pr.Kid[2] = 0;
+			pr.AffKid = new int[3];
+			pr.AffKid[0] = 0;
+			pr.AffKid[1] = 0;
+			pr.AffKid[2] = 0;
+			pr.ParentMissingRate = new double[3][2];
 			pr.ParentMissingRate[0][0] = 0;
 			pr.ParentMissingRate[0][1] = 0;
+			pr.ParentMissingRate[1][0] = 0;
+			pr.ParentMissingRate[1][1] = 0;
+			pr.ParentMissingRate[1][0] = 0;
+			pr.ParentMissingRate[1][1] = 0;
 			pr.KidGenotypeMissingRate = 0;
 			pr.calculateCorrelation_for_Markers_with_known_DPrime();
 		}
