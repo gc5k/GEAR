@@ -136,7 +136,7 @@ public class MarkerMDRSimulation {
             switch2permutation = Boolean.parseBoolean(param.get(15));
         }
 // replication
-        int rep = 1;
+        int rep = 100;
         if (param.size() > 16) {
             rep = Integer.parseInt(param.get(16));
         }
@@ -171,7 +171,7 @@ public class MarkerMDRSimulation {
         }
 //linkage map
         double d[][] = {
-            {0, 0.1, 0.2, 0.25, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9, 0.95, 1.0}
+            {0, 0.1, 0.2, 0.29, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9, 0.95, 1.0}
         };
 
         if (param2.size() > 1) {
@@ -189,7 +189,7 @@ public class MarkerMDRSimulation {
         int[] chr1 = {0};
         int[] loci1 = {3};
         int[] genotype1 = {1};
-        double[] effect1 = {0.5};
+        double[] effect1 = {2};
         int environment1 = 0;
         AbstractLoci al = new AbstractLoci(chr1, loci1, genotype1, effect1, environment1);
         QTL.add(al);
@@ -266,7 +266,10 @@ public class MarkerMDRSimulation {
             MU = ap.getMean(0);
         }
 
-        for (int i_rep = 1; i_rep <= rep; i_rep++) {
+//        StringBuffer OUT = new StringBuffer();
+//        OUT.append("result.txt");
+//        PrintStream POUT = new PrintStream(new BufferedOutputStream(new FileOutputStream(OUT.toString())));
+        for (int i_rep = 0; i_rep < rep; i_rep++) {
             AbstractPopulation ap;
             if (pt.compareTo("F2") == 0) {
                 ap = new F2Population(ps, pheNum.length, pt, d, seed + i_rep, mu, E, sd, QTL, mf);
@@ -285,13 +288,14 @@ public class MarkerMDRSimulation {
             ap.BuildScore(0, env);
             Subdivision subdivision = new Subdivision(interval, seed + i_rep, ap);
             subdivision.RandomPartition();
-            GenomeScan gs = new GenomeScan(ap, step);
-            gs.CalculateIPP();
+            GenomeScan gs = new GenomeScan(ap, step); //set up genome-wide scan
+            gs.CalculateIPP(); //calculate conditional probability of putative QTL for given loci
             StringBuffer out = new StringBuffer();
             out.append(search_start);
             out.append("loci_result");
             out.append(i_rep);
             out.append(".txt");
+            PrintStream Pout = new PrintStream(new BufferedOutputStream(new FileOutputStream(out.toString())));
             if (i_rep == 0) {
                 StringBuffer pout = new StringBuffer();
                 pout.append("permutation");
@@ -309,17 +313,15 @@ public class MarkerMDRSimulation {
                         IMHeteroLinearMergeSearch imh = new IMHeteroLinearMergeSearch(gs, ap, subdivision, cg, pheNum, os, false, ap.getPermutatedIDs());
                         imh.setSearch(ssci, env);
                         imh.search(i, pheNum[0]);
-                        System.out.println(imh.peakStatistic());
+//                        System.out.println(imh.peakStatistic());
                     }
                 }
                 POut.close();
-                System.setOut(System.out);
             }
-            PrintStream Out = new PrintStream(new BufferedOutputStream(new FileOutputStream(out.toString())));
-//            System.setOut(Out);
+
             for (int i = search_start; i <= search_end; i++) {
                 CombinationGenerator cg = new CombinationGenerator(i, i, ap.SumMarkers());
-                cg.generateCombination();
+                cg.generateCombination();  // combinations for intervals;
                 IMHeteroLinearMergeSearch imh = new IMHeteroLinearMergeSearch(gs, ap, subdivision, cg, pheNum, os, false);
                 imh.setSearch(ssci, env);
                 imh.search(i, pheNum[0]);
@@ -330,20 +332,20 @@ public class MarkerMDRSimulation {
                 ArrayList<ArrayList> sigComs = summary.getSignificantCombinations();
                 HashMap invert_coms = summary.getSignificantCombinationMap();
                 if (sigComs != null) {
+                	Pout.println("i========" + i_rep);
                     IMHeteroLinearCompleteMergeSearch imch = new IMHeteroLinearCompleteMergeSearch(gs, ap, subdivision, cg, pheNum, os, false);
                     imch.setSearch(ssci, env);
                     for (Iterator e = sigComs.iterator(); e.hasNext();) {
                         ArrayList sigCom = (ArrayList) e.next();
                         for (Iterator e1 = sigCom.iterator(); e1.hasNext();) {
-                            System.out.println(invert_coms.get(e1.next()));
+                            Pout.println(invert_coms.get(e1.next()));
                         }
                         imch.search(i, pheNum[0], sigCom);
-                        imch.printBestEstimate();
+                        imch.printBestEstimate(Pout);
                     }
                 }
             }
-            Out.close();
-            System.setOut(System.out);
+            Pout.close();
         }
     }
 }

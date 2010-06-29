@@ -339,7 +339,7 @@ public class PowerSimulation {
                             System.out.println(invert_coms.get(e1.next()));
                         }
                         imch.search(i, pheNum[0], sigCom);
-                        imch.printBestEstimate();
+                        imch.printBestEstimate(System.out);
                     }
                 }
             }

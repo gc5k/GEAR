@@ -1,5 +1,6 @@
 package mdr.heterogeneity;
 
+import java.io.*;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.HashMap;
@@ -352,8 +353,9 @@ public class IMHeteroLinearCompleteMergeSearch extends AbstractHeteroMergeSearch
         }
     }
 
-    public void printBestEstimate() {
+    public void printBestEstimate(PrintStream out) {
         HashMap<String, Double> t = (HashMap<String, Double>) wholedataAccuracy.get(0);
+        System.setOut(out);
         double bt = 0.0;
         String bKey = null;
         for (int i = 0; i < wholedataAccuracyKey.size(); i++) {
@@ -407,6 +409,7 @@ public class IMHeteroLinearCompleteMergeSearch extends AbstractHeteroMergeSearch
             System.out.print(ChrInt[j][0] + " " + ChrInt[j][1] + " " + String.valueOf(dis1) + "\t");
         }
         System.out.println(t.get(bKey));
+        System.setOut(System.out);
     }
 
     private boolean goNext() {
