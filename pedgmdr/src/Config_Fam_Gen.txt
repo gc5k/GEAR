@@ -1,12 +1,12 @@
 //lines starting with // are annotation lines and will not be parsed
 //simulating data under the null hypothesis
-true
+false
 //seed
 2010
 //replications of simulation
-100
+2
 //model, B for dichotomous, quantitatives otherwise
-Q
+B
 //functional loci
 0,3
 //functional genotype
@@ -18,26 +18,29 @@ Q
 //LD
 0,0,0,0,0,0,0,0,0
 //intercept
-0
+-5.29
 //gene effect
-0.25
-//covariat
 1
+//covariat
+3.16
 //deviation of covariat
 1
 //deviation of the residual
 1
 //threshold
-2.05
+0, 1
 //family size
-400
+2000
+//number of case
+1000
 //families in each category
-200,200
+2000
 //kids in each category
-2,2
+1
 //affected kids in each category
--1,-1
+-1
 //missing rate of parent's genotypes
-0,0,0,0
+0,0
 //missing rate of kid's genotypes
 0
+
