@@ -785,7 +785,11 @@ public class FamilyGenerator {
 			for (int j = 0; j < Allele.length; ++j) {
 				double rd = randomData.nextFloat();
 				if (rd > MR[0]) {
-					pedout.print(pair1[j][0] + " " + pair1[j][1]);
+					if (pair1[j][0].compareTo( pair1[j][1]) <=0) {
+						pedout.print(pair1[j][0] + " " + pair1[j][1]);
+					} else {
+						pedout.print(pair1[j][1] + " " + pair1[j][0]);
+					}
 				} else {
 					pedout.print("0 0");
 				}
@@ -809,9 +813,11 @@ public class FamilyGenerator {
 			for (int j = 0; j < Allele.length; ++j) {
 				double rd = randomData.nextFloat();
 				if (rd > MR[1]) {
-					pedout.print(pair2[j][0] + " " + pair2[j][1]);
-				} else {
-					pedout.print("0 0");
+					if (pair2[j][0].compareTo( pair2[j][1]) <=0) {
+						pedout.print(pair2[j][0] + " " + pair2[j][1]);
+					} else {
+						pedout.print(pair2[j][1] + " " + pair2[j][0]);
+					}
 				}
 				if (j != Allele.length - 1) {
 					pedout.print("\t");
@@ -846,7 +852,11 @@ public class FamilyGenerator {
 				for (int k = 0; k < child.length; ++k) {
 					double rd = randomData.nextFloat();
 					if (rd > KidGenotypeMissingRate) {
-						pedout.print(child[k][0] + " " + child[k][1]);
+						if (child[k][0].compareTo( child[k][1]) <=0) {
+							pedout.print(child[k][0] + " " + child[k][1]);
+						} else {
+							pedout.print(child[k][1] + " " + child[k][0]);
+						}
 					} else {
 						pedout.print("0 0");
 					}
@@ -907,7 +917,11 @@ public class FamilyGenerator {
 				for (int k = 0; k < child.length; ++k) {
 					double rd = randomData.nextFloat();
 					if (rd > KidGenotypeMissingRate) {
-						pedout.print(child[k][0] + " " + child[k][1]);
+						if (child[k][0].compareTo( child[k][1]) <=0) {
+							pedout.print(child[k][0] + " " + child[k][1]);
+						} else {
+							pedout.print(child[k][1] + " " + child[k][0]);
+						}
 					} else {
 						pedout.print("0 0");
 					}
@@ -953,7 +967,7 @@ public class FamilyGenerator {
 				E.printStackTrace(System.err);
 			}
 		} else {
-			pr.isNullHypothesis = true;
+			pr.isNullHypothesis = false;
 			pr.seed = 2000;
 			pr.model = "B";
 			pr.AffLoci = new int[2];
@@ -989,10 +1003,10 @@ public class FamilyGenerator {
 			pr.pheno_select_quantile[0] = -0.1;
 			pr.pheno_select_quantile[1] = 0.9;
 			pr.simu_replication = 2;
-			pr.family_size = 300;
-			pr.number_case = 150;
+			pr.family_size = 1000;
+			pr.number_case = 500;
 			pr.FamNum = new int[1];
-			pr.FamNum[0] = 300;
+			pr.FamNum[0] = 500;
 			pr.Kid = new int[1];
 			pr.Kid[0] = 1;
 			pr.AffKid = new int[1];
