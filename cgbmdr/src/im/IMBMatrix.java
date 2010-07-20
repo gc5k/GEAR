@@ -24,6 +24,60 @@ public class IMBMatrix {
         imp = im;
     }
 
+    public double[][] getCIMMatrixAtPoint(String com, double[][] coeff, int interval) {
+    	SNPIdx = ToolKit.StringToIntArray(com);
+    	double[][] matrix = new double[imp.IndividualNumber()][imp.MarkerNumber() - (SNPIdx.length * coeff.length + 1) + 2];
+    	ChrInt();
+        IntervalPriorProbability[] iip = new IntervalPriorProbability[SNPIdx.length];
+        for (int i = 0; i < SNPIdx.length; i++) {
+            iip[i] = gs.getIPPTable(ChrInt[i][0], ChrInt[i][1]);
+        }
+    	for (int i = 0; i < imp.IndividualNumber(); i++) {
+    		int markerindex = 0;
+    		int c = coeff.length * SNPIdx.length + 1;
+    		matrix[i][0] = 1;
+    		for (int j = 0; j < imp.ChromosomeNumber(); j++) {
+    			int IIPIdx = gs.getIPPRowIndexForIndividual(i, ChrInt[j][0], ChrInt[j][1]);
+    			for (int jj = 0; jj < SNPIdx.length; jj++) {
+                    for (int jjj = 0; jjj < coeff.length; jjj++) {
+                    	for (int k = 0; k < iip[jj].NumQTLtypes(); k++) {
+                    		matrix[i][1 + jj*coeff.length + jjj] += iip[jj].PriorProbabilityAt(IIPIdx, interval, k) * coeff[jj][k];
+                    	}
+                    }
+    			}
+    			for (int k = 0; k < imp.MarkerNumber(j); k++) {
+    				boolean flag = true;
+    				for (int kk = 0; kk < SNPIdx.length; kk++) {
+    					if (markerindex == SNPIdx[kk] || markerindex == (SNPIdx[kk] + 1)) {
+    						
+    						flag = false;
+    						break;
+    					}
+    				}
+    				if (flag) {
+    					matrix[i][c++] = imp.MarkerAt(i, j, k);
+    				}
+    				markerindex++;
+    			}
+    		}
+    	}
+    	return matrix;
+    }
+
+    public double[][] getFullMatrix() {
+    	double[][] matrix = new double[imp.IndividualNumber()][imp.MarkerNumber() + 1];
+    	for (int i = 0; i < imp.IndividualNumber(); i++) {
+    		matrix[i][0] = 1;
+    		int c = 0;
+    		for (int j = 0; j < imp.ChromosomeNumberOriginal(); j++) {
+    			for (int k = 0; k < imp.MarkerNumber(j); k++) {
+    				matrix[i][++c] = imp.MarkerAt(i, j, k);
+    			}
+    		}
+    	}
+    	return matrix;
+    }
+
     public double[][] getPPMatrix(String com, double[][] coeff) {
         SNPIdx = ToolKit.StringToIntArray(com);
         double[][] matrix = new double[imp.IndividualNumber()][SNPIdx.length * (coeff.length) + 1];
@@ -37,9 +91,9 @@ public class IMBMatrix {
             for (int j = 0; j < SNPIdx.length; j++) {
                 int IIPIdx = gs.getIPPRowIndexForIndividual(i, ChrInt[j][0], ChrInt[j][1]);
                 for (int jj = 0; jj < coeff.length; jj++) {
-                    for (int k = 0; k < iip[j].NumQTLtypes(); k++) {
-                        matrix[i][1 + j * coeff.length +jj] += iip[j].MidPriorProbability(IIPIdx, k) * coeff[jj][k];
-                    }
+                	for (int k = 0; k < iip[j].NumQTLtypes(); k++) {
+                		matrix[i][1 + j * coeff.length + jj] += iip[j].MidPriorProbability(IIPIdx, k) * coeff[j][k];
+                	}
                 }
             }
         }

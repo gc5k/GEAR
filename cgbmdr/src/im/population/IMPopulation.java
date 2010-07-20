@@ -892,4 +892,17 @@ public class IMPopulation {
             }
         }
     }
+    
+    public String toString() {
+    	StringBuffer bs = new StringBuffer();
+    	for (int i = 0; i < IndividualNumber(); i++) {
+    		for (int j = 0; j < ChromosomeNumberOriginal(); j++) {
+    			for (int k = 0; k < MarkerNumber(j); k++) {
+    				bs.append(MarkerAt(i,j,k) + " ");
+    			}
+    			bs.append(PhenotypeAt(i, 0) + "\n");
+    		}
+    	}
+    	return bs.toString();
+    }
 }

@@ -39,6 +39,7 @@ public class IMHeteroLinearCompleteMergeSearch extends AbstractHeteroMergeSearch
     ArrayList IDs;
     ArrayList permutatedIDs;
     ArrayList<HashMap<String, Double>> wholedataAccuracy;
+    ArrayList<HashMap<String, Double>> expectedProportion;
     ArrayList<String> wholedataAccuracyKey;
     HashMap<String, IMSuite> trModel;
     HashMap<String, IMSuite> tModel;
@@ -52,7 +53,7 @@ public class IMHeteroLinearCompleteMergeSearch extends AbstractHeteroMergeSearch
         imp = im;
         IDs = im.getIDs();
         wholedataAccuracy = new ArrayList();
-
+        expectedProportion = new ArrayList();
         for (int i = 0; i < numTraits; i++) {
             HashMap<String, Double> t = new HashMap();
             wholedataAccuracy.add(t);

@@ -1,6 +1,10 @@
+
+import java.io.BufferedOutputStream;
 import java.io.BufferedReader;
 import java.io.File;
+import java.io.FileOutputStream;
 import java.io.FileReader;
+import java.io.PrintStream;
 import java.io.Reader;
 import java.io.IOException;
 import java.util.ArrayList;
@@ -84,7 +88,7 @@ public class RegPopulation {
 				os[0] = 0;
 			}
 			// population type
-			pt = new String("B1");
+			pt = new String("B2");
 			if (param.size() > 2) {
 				pt = param.get(2);
 			}
@@ -266,7 +270,30 @@ public class RegPopulation {
 		}		
 	}
 
-	public static void main(String[] args) throws IOException {
+    public static int[][] ChrInt(IMPopulation imp, int[] SNPIdx) {
+    	int[][] chrint = new int[SNPIdx.length][2];
+        int c = 0;
+        int idx = 0;
+        for (int i = 0; i < imp.ChromosomeNumber(); i++) {
+            for (int j = 0; j < imp.IntervalNumberAtChromosome(i); j++) {
+                if (c == SNPIdx[idx]) {
+                    chrint[idx][0] = i;
+                    chrint[idx][1] = j;
+                    idx++;
+                    if (idx == SNPIdx.length) {
+                        break;
+                    }
+                }
+                c++;
+            }
+            if (idx == SNPIdx.length) {
+                break;
+            }
+        }
+        return chrint;
+    }
+
+    public static void main(String[] args) throws IOException {
 		Parameter1 Param1 = null;
 		if (args.length > 0) {
 			Param1 = new Parameter1(args[0]);
@@ -289,7 +316,7 @@ public class RegPopulation {
 		int[] chr1 = { 0 };
 		int[] loci1 = { 3 };
 		int[] genotype1 = { 1 };
-		double[] effect1 = { 0.5 };
+		double[] effect1 = { 4 };
 		int environment1 = 0;
 		AbstractLoci al = new AbstractLoci(chr1, loci1, genotype1, effect1, environment1);
 		ArrayList QTL = new ArrayList();
@@ -313,7 +340,10 @@ public class RegPopulation {
 			for (int i = 0; i < Param1.pheNum.length; i++) {
 				ap.ProducePhenotype(i, Param1.MU, Param1.T);
 			}
-
+			
+			PrintStream Pout = new PrintStream(new BufferedOutputStream(new FileOutputStream("simulation1.txt")));
+			Pout.println(ap);
+			Pout.close();
 			GenomeScan gs = new GenomeScan(ap, Param1.step);
 			gs.CalculateIPP();
 			double[][] Y = new double[ap.IndividualNumber()][1];
@@ -326,6 +356,10 @@ public class RegPopulation {
 					Y[id.intValue()][0] = ap.PhenotypeAt(id.intValue(), 0);
 				}
 				IMBMatrix imb = new IMBMatrix(gs, ap);
+				double[][] fm = imb.getFullMatrix();
+				LinearRegression lm1 = new LinearRegression(fm, Y);
+				lm1.MLE();
+				System.out.println(lm1.getEstimate());
 				for (int i = Param1.search_start; i <= Param1.search_end; i++) {
 					imb.setOrder(i);
 					CombinationGenerator cg = new CombinationGenerator(i, i, ap.SumIntevals());
@@ -335,17 +369,25 @@ public class RegPopulation {
 
 					for (Iterator e = com.iterator(); e.hasNext();) {
 						String s = (String) e.next();
-						for (int w = 0; w < 10; w++) {
-							// X = imb.getPPMatrix(s, Coeff);
-							X = imb.getPPMatrixAtPoint(s, w, Coeff);
-							System.out.print(imb.getString());
-							LinearRegression lm = new LinearRegression(X, Y);
-							lm.MLE();
-							// System.out.println(s + " " + w + " " +
-							// lm.getEstimate()+" "+lm.getSSTO()+" "+lm.getSSR()+" "+lm.getSSE()
-							// + " " +lm.get_F_Statistic() + " " + lm.getP_F());
-							System.out.println(s + " " + w + " " + lm.get_F_Statistic() + " " + lm.getP_F());
+						if(s.compareTo("20") != 0) {
+							continue;
 						}
+						int[] SNPIdx = ToolKit.StringToIntArray(s);
+						int[][] ChrInt = ChrInt(ap, SNPIdx);
+				        IntervalPriorProbability[] iip = new IntervalPriorProbability[SNPIdx.length];
+				        for (int j = 0; j < SNPIdx.length; j++) {
+				            iip[j] = gs.getIPPTable(ChrInt[j][0], ChrInt[j][1]);
+				        }
+				        for (int j = 0; j < iip.length; j++) {
+				        	int steps = iip[j].getWalks();
+				        	for (int jj = 0; jj < steps; jj++) {
+				    			PrintStream Pout1 = new PrintStream(new BufferedOutputStream(new FileOutputStream("PPm1.txt")));
+				        		double[][] m = imb.getCIMMatrixAtPoint(s, Coeff, jj);
+				        		LinearRegression lm = new LinearRegression(m,Y);
+				        		lm.MLE();
+				        		System.out.println(s + " " + jj + " " + lm.getEstimate() + " " + lm.get_F_Statistic() + " " + lm.getP_F());
+				        	}
+				        }
 					}
 				}
 			} else {
