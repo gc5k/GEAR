@@ -136,7 +136,7 @@ public class MarkerMDRSimulation {
             switch2permutation = Boolean.parseBoolean(param.get(15));
         }
 // replication
-        int rep = 100;
+        int rep = 1;
         if (param.size() > 16) {
             rep = Integer.parseInt(param.get(16));
         }
@@ -171,7 +171,7 @@ public class MarkerMDRSimulation {
         }
 //linkage map
         double d[][] = {
-            {0, 0.1, 0.2, 0.29, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9, 0.95, 1.0}
+            {0, 0.1, 0.2, 0.25, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9, 0.95, 1.0}
         };
 
         if (param2.size() > 1) {
