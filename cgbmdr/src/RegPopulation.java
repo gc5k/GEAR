@@ -369,7 +369,7 @@ public class RegPopulation {
 
 					for (Iterator e = com.iterator(); e.hasNext();) {
 						String s = (String) e.next();
-						if(s.compareTo("20") != 0) {
+						if(s.compareTo("2") != 0) {
 							continue;
 						}
 						int[] SNPIdx = ToolKit.StringToIntArray(s);
