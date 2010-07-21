@@ -315,7 +315,7 @@ public class RegPopulation {
 		// QTL
 		int[] chr1 = { 0 };
 		int[] loci1 = { 3 };
-		int[] genotype1 = { 1 };
+		int[] genotype1 = { 0 };
 		double[] effect1 = { 4 };
 		int environment1 = 0;
 		AbstractLoci al = new AbstractLoci(chr1, loci1, genotype1, effect1, environment1);
@@ -381,6 +381,9 @@ public class RegPopulation {
 				        for (int j = 0; j < iip.length; j++) {
 				        	int steps = iip[j].getWalks();
 				        	for (int jj = 0; jj < steps; jj++) {
+				        		if (jj != 1) {
+				        			continue;
+				        		}
 				    			PrintStream Pout1 = new PrintStream(new BufferedOutputStream(new FileOutputStream("PPm1.txt")));
 				        		double[][] m = imb.getCIMMatrixAtPoint(s, Coeff, jj);
 				        		LinearRegression lm = new LinearRegression(m,Y);
