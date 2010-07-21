@@ -23,11 +23,12 @@ public class LinearRegression {
     double SSTO;
     double SSR;
     double SSE;
+    double mse;
     double F_statistic;
     double P_F_statistic;
     int df;
-    int df_numerator;
-    int df_denominator;
+    int df_Predictor;
+    int df_residual;
     double[] Var;
     double[] residuals;
 
@@ -37,8 +38,8 @@ public class LinearRegression {
         df = Response.getRowDimension() - Predictor.getColumnDimension();
         Var = new double[Predictor.getColumnDimension()];
         residuals = new double[y.length];
-        df_numerator = Predictor.getColumnDimension() - 1;
-        df_denominator = df;
+        df_Predictor = Predictor.getColumnDimension() - 1;
+        df_residual = df;
     }
 
     public void MLE() {
@@ -54,7 +55,7 @@ public class LinearRegression {
         RealMatrix residual_t = residual.transpose();
         RealMatrix sse = residual_t.multiply(residual);
         double d = (Response.getRowDimension()-Predictor.getColumnDimension());
-        double mse = sse.getEntry(0, 0)/d;
+        mse = sse.getEntry(0, 0)/d;
         RealMatrix FI = X_tX_Ivt;
         TDistribution t = new TDistributionImpl(d);
         for(int i = 0; i < Var.length; i++) {
@@ -76,12 +77,12 @@ public class LinearRegression {
         SSTO = SS_ssto.getVariance()*SS_ssto.getN();
         SSE = SS_sse.getVariance()*SS_sse.getN();
         SSR = SSTO - SSE;
-        if(df_numerator <= 0) {
+        if(df_Predictor <= 0) {
             F_statistic = 0;
             P_F_statistic = 1;
         } else {
-            F_statistic = (SSR/df_numerator)/(SSE/df_denominator);
-            FDistribution fd = new FDistributionImpl(df_numerator, df_denominator);
+            F_statistic = (SSR/df_Predictor)/(SSE/df_residual);
+            FDistribution fd = new FDistributionImpl(df_Predictor, df_residual);
             try {
                 P_F_statistic = 1 - fd.cumulativeProbability(F_statistic);
             } catch (MathException E) {
