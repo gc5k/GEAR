@@ -1,4 +1,3 @@
-
 import java.io.BufferedOutputStream;
 import java.io.BufferedReader;
 import java.io.File;
@@ -22,6 +21,7 @@ import im.population.simulation.*;
 import publicAccess.PublicData;
 import publicAccess.ToolKit;
 import regression.LinearRegression;
+import regression.Likelihood;
 
 /**
  * 
@@ -75,7 +75,7 @@ public class RegPopulation {
 			}
 
 			// population size
-			populationSize = 500;
+			populationSize = 200;
 			if (param.size() > 0) {
 				populationSize = Integer.parseInt(param.get(0));
 			}
@@ -88,7 +88,7 @@ public class RegPopulation {
 				os[0] = 0;
 			}
 			// population type
-			pt = new String("B2");
+			pt = new String("B1");
 			if (param.size() > 2) {
 				pt = param.get(2);
 			}
@@ -158,7 +158,7 @@ public class RegPopulation {
 				rep = Integer.parseInt(param.get(15));
 			}
 			// permutation
-			permutation = 0;
+			permutation = 100;
 			if (param.size() > 16) {
 				permutation = Integer.parseInt(param.get(16));
 			}
@@ -167,8 +167,9 @@ public class RegPopulation {
 
 	public static class Parameter2 {
 		protected ArrayList<String> param;
+
 		public Parameter2(String file) {
-			param = new ArrayList<String> ();
+			param = new ArrayList<String>();
 			BufferedReader Reader2 = null;
 			if (file != null) {
 				try {
@@ -179,12 +180,13 @@ public class RegPopulation {
 			}
 			String Line2;
 			try {
-			while ((Reader2 != null) && (Line2 = Reader2.readLine()) != null) {
-				if (Line2.length() == 0 || Line2.startsWith("#")) {
-					continue;
+				while ((Reader2 != null)
+						&& (Line2 = Reader2.readLine()) != null) {
+					if (Line2.length() == 0 || Line2.startsWith("#")) {
+						continue;
+					}
+					param.add(Line2);
 				}
-				param.add(Line2);
-			}
 			} catch (Exception E) {
 				E.printStackTrace(System.err);
 			}
@@ -207,7 +209,7 @@ public class RegPopulation {
 			int[] chr1 = { 0 };
 			int[] loci1 = { 3 };
 			int[] genotype1 = { 1 };
-			double[] effect1 = { 0.5 };			
+			double[] effect1 = { 0.5 };
 			int pl = 0;
 			if (param.size() > 0) {
 				pl = Integer.parseInt(param.get(0));
@@ -217,7 +219,8 @@ public class RegPopulation {
 				qtl.clear();
 				int qtlnumber = Integer.parseInt(param.get(pl + 1));
 				for (int k = 0; k < qtlnumber; k++) {
-					String[] chr = param.get((pl + 2 + k * 5)).split("[,\\s]++");
+					String[] chr = param.get((pl + 2 + k * 5))
+							.split("[,\\s]++");
 					chr1 = new int[chr.length];
 					for (int kk = 0; kk < chr.length; kk++) {
 						chr1[kk] = Integer.parseInt(chr[kk]);
@@ -244,22 +247,33 @@ public class RegPopulation {
 						effect1[kk] = Double.parseDouble(eff[kk]);
 					}
 					int envi1 = new Integer((param.get(pl + 2 + k * 5) + 4));
-					AbstractLoci al = new AbstractLoci(chr1, loci1, genotype1, effect1, envi1);
+					AbstractLoci al = new AbstractLoci(chr1, loci1, genotype1,
+							effect1, envi1);
 					qtl.add(al);
 				}
 			}
 		}
 	}
 
-	public static void calculateMU(Parameter1 Param1, double[] env, ArrayList QTL, double[][] d) {
+	public static void calculateMU(Parameter1 Param1, double[] env,
+			ArrayList QTL, double[][] d) {
 		if ((Param1.MU - 0) > PublicData.epsilon) {
 			AbstractPopulation ap;
 			if (Param1.pt.compareTo("F2") == 0) {
-				ap = new F2Population(Param1.populationSize, Param1.pheNum.length, Param1.pt, d, Param1.seed + Param1.rep, Param1.mu, env, Param1.sd, QTL, Param1.mf);
+				ap = new F2Population(Param1.populationSize,
+						Param1.pheNum.length, Param1.pt, d, Param1.seed
+								+ Param1.rep, Param1.mu, env, Param1.sd, QTL,
+						Param1.mf);
 			} else if (Param1.pt.compareTo("DH") == 0) {
-				ap = new DHPopulation(Param1.populationSize, Param1.pheNum.length, Param1.pt, d, Param1.seed + Param1.rep, Param1.mu, env, Param1.sd, QTL, Param1.mf);
+				ap = new DHPopulation(Param1.populationSize,
+						Param1.pheNum.length, Param1.pt, d, Param1.seed
+								+ Param1.rep, Param1.mu, env, Param1.sd, QTL,
+						Param1.mf);
 			} else {
-				ap = new BackCrossPopulation(Param1.populationSize, Param1.pheNum.length, Param1.pt, d, Param1.seed + Param1.rep, Param1.mu, env, Param1.sd, QTL, Param1.mf);
+				ap = new BackCrossPopulation(Param1.populationSize,
+						Param1.pheNum.length, Param1.pt, d, Param1.seed
+								+ Param1.rep, Param1.mu, env, Param1.sd, QTL,
+						Param1.mf);
 			}
 			ap.ProducePopulation();
 
@@ -267,33 +281,33 @@ public class RegPopulation {
 				ap.ProducePhenotype(i, Param1.MU, Param1.T);
 			}
 			Param1.MU = ap.getMean(0);
-		}		
+		}
 	}
 
-    public static int[][] ChrInt(IMPopulation imp, int[] SNPIdx) {
-    	int[][] chrint = new int[SNPIdx.length][2];
-        int c = 0;
-        int idx = 0;
-        for (int i = 0; i < imp.ChromosomeNumber(); i++) {
-            for (int j = 0; j < imp.IntervalNumberAtChromosome(i); j++) {
-                if (c == SNPIdx[idx]) {
-                    chrint[idx][0] = i;
-                    chrint[idx][1] = j;
-                    idx++;
-                    if (idx == SNPIdx.length) {
-                        break;
-                    }
-                }
-                c++;
-            }
-            if (idx == SNPIdx.length) {
-                break;
-            }
-        }
-        return chrint;
-    }
+	public static int[][] ChrInt(IMPopulation imp, int[] SNPIdx) {
+		int[][] chrint = new int[SNPIdx.length][2];
+		int c = 0;
+		int idx = 0;
+		for (int i = 0; i < imp.ChromosomeNumber(); i++) {
+			for (int j = 0; j < imp.IntervalNumberAtChromosome(i); j++) {
+				if (c == SNPIdx[idx]) {
+					chrint[idx][0] = i;
+					chrint[idx][1] = j;
+					idx++;
+					if (idx == SNPIdx.length) {
+						break;
+					}
+				}
+				c++;
+			}
+			if (idx == SNPIdx.length) {
+				break;
+			}
+		}
+		return chrint;
+	}
 
-    public static void main(String[] args) throws IOException {
+	public static void main(String[] args) throws IOException {
 		Parameter1 Param1 = null;
 		if (args.length > 0) {
 			Param1 = new Parameter1(args[0]);
@@ -309,41 +323,68 @@ public class RegPopulation {
 			String file = null;
 			Param2 = new Parameter2(file);
 		}
-		double d[][] = { { 0, 0.1, 0.2, 0.25, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9, 1.0 } };
+		double d[][] = { { 0, 0.1, 0.2, 0.25, 0.3, 0.4, 0.5, 0.6, 0.65, 0.67,
+				0.7, 0.75, 0.77, 0.8, 0.9, 1.0 } };
 		Param2.ReadMap(d);
 
 		// QTL
+		ArrayList QTL = new ArrayList();
+
 		int[] chr1 = { 0 };
 		int[] loci1 = { 3 };
-		int[] genotype1 = { 0 };
-		double[] effect1 = { 4 };
+		int[] genotype1 = { 2 };
+		double[] effect1 = { 1 };
 		int environment1 = 0;
-		AbstractLoci al = new AbstractLoci(chr1, loci1, genotype1, effect1, environment1);
-		ArrayList QTL = new ArrayList();
-		QTL.add(al);
+		AbstractLoci al1 = new AbstractLoci(chr1, loci1, genotype1, effect1,
+				environment1);
+		QTL.add(al1);
+
+		int[] chr2 = { 0 };
+		int[] loci2 = { 9 };
+		int[] genotype2 = { 2 };
+		double[] effect2 = { 1 };
+		AbstractLoci al2 = new AbstractLoci(chr2, loci2, genotype2, effect2,
+				environment1);
+		QTL.add(al2);
+
+		int[] chr3 = { 0 };
+		int[] loci3 = { 11 };
+		int[] genotype3 = { 2 };
+		double[] effect3 = { -1 };
+		AbstractLoci al3 = new AbstractLoci(chr3, loci3, genotype3, effect3,
+				environment1);
+		QTL.add(al3);
+
 		Param2.ReadQTL(QTL);
 
 		double[] env = { 0.0 };
 		calculateMU(Param1, env, QTL, d);
-
+		PrintStream Pout = new PrintStream(new BufferedOutputStream(
+				new FileOutputStream("res1.txt")));
 		for (int i_rep = 0; i_rep < Param1.rep; i_rep++) {
 			AbstractPopulation ap;
 			if (Param1.pt.compareTo("F2") == 0) {
-				ap = new F2Population(Param1.populationSize, Param1.pheNum.length, Param1.pt, d, Param1.seed + i_rep, Param1.mu, env, Param1.sd, QTL, Param1.mf);
+				ap = new F2Population(Param1.populationSize,
+						Param1.pheNum.length, Param1.pt, d,
+						Param1.seed + i_rep, Param1.mu, env, Param1.sd, QTL,
+						Param1.mf);
 			} else if (Param1.pt.compareTo("DH") == 0) {
-				ap = new DHPopulation(Param1.populationSize, Param1.pheNum.length, Param1.pt, d, Param1.seed + i_rep, Param1.mu, env, Param1.sd, QTL, Param1.mf);
+				ap = new DHPopulation(Param1.populationSize,
+						Param1.pheNum.length, Param1.pt, d,
+						Param1.seed + i_rep, Param1.mu, env, Param1.sd, QTL,
+						Param1.mf);
 			} else {
-				ap = new BackCrossPopulation(Param1.populationSize,	Param1.pheNum.length, Param1.pt, d,	Param1.seed + i_rep, Param1.mu, env, Param1.sd, QTL, Param1.mf);
+				ap = new BackCrossPopulation(Param1.populationSize,
+						Param1.pheNum.length, Param1.pt, d,
+						Param1.seed + i_rep, Param1.mu, env, Param1.sd, QTL,
+						Param1.mf);
 			}
 			ap.ProducePopulation();
 
 			for (int i = 0; i < Param1.pheNum.length; i++) {
 				ap.ProducePhenotype(i, Param1.MU, Param1.T);
 			}
-			
-			PrintStream Pout = new PrintStream(new BufferedOutputStream(new FileOutputStream("simulation1.txt")));
-			Pout.println(ap);
-			Pout.close();
+
 			GenomeScan gs = new GenomeScan(ap, Param1.step);
 			gs.CalculateIPP();
 			double[][] Y = new double[ap.IndividualNumber()][1];
@@ -359,53 +400,100 @@ public class RegPopulation {
 				double[][] fm = imb.getFullMatrix();
 				LinearRegression lm1 = new LinearRegression(fm, Y);
 				lm1.MLE();
-				System.out.println(lm1.getEstimate());
 				for (int i = Param1.search_start; i <= Param1.search_end; i++) {
 					imb.setOrder(i);
-					CombinationGenerator cg = new CombinationGenerator(i, i, ap.SumIntevals());
+					CombinationGenerator cg = new CombinationGenerator(i, i, ap
+							.SumIntevals());
 					cg.generateCombination();
 					List com = cg.get(i);
 					double[][] Coeff = { { 1, 0 } };
-
+					double[] mask = { 1, 0 };
 					for (Iterator e = com.iterator(); e.hasNext();) {
 						String s = (String) e.next();
-						if(s.compareTo("2") != 0) {
-							continue;
-						}
+
+						double[][] H0Matrix = imb.getNullCIMMatrix(s);
+						LinearRegression H0lm = new LinearRegression(H0Matrix,
+								Y);
+						H0lm.MLE();
+						Likelihood lkhd0 = new Likelihood(ap, gs, s);
+						double log0 = lkhd0.LogLikelihood2(H0lm);
+
 						int[] SNPIdx = ToolKit.StringToIntArray(s);
 						int[][] ChrInt = ChrInt(ap, SNPIdx);
-				        IntervalPriorProbability[] iip = new IntervalPriorProbability[SNPIdx.length];
-				        for (int j = 0; j < SNPIdx.length; j++) {
-				            iip[j] = gs.getIPPTable(ChrInt[j][0], ChrInt[j][1]);
-				        }
-				        for (int j = 0; j < iip.length; j++) {
-				        	int steps = iip[j].getWalks();
-				        	for (int jj = 0; jj < steps; jj++) {
-				        		if (jj != 1) {
-				        			continue;
-				        		}
-				    			PrintStream Pout1 = new PrintStream(new BufferedOutputStream(new FileOutputStream("PPm1.txt")));
-				        		double[][] m = imb.getCIMMatrixAtPoint(s, Coeff, jj);
-				        		LinearRegression lm = new LinearRegression(m,Y);
-				        		lm.MLE();
-				        		System.out.println(s + " " + jj + " " + lm.getEstimate() + " " + lm.get_F_Statistic() + " " + lm.getP_F());
-				        	}
-				        }
+						IntervalPriorProbability[] iip = new IntervalPriorProbability[SNPIdx.length];
+						for (int j = 0; j < SNPIdx.length; j++) {
+							iip[j] = gs.getIPPTable(ChrInt[j][0], ChrInt[j][1]);
+						}
+						for (int j = 0; j < iip.length; j++) {
+							int steps = iip[j].getWalks();
+							for (int jj = 0; jj < steps; jj++) {
+								double[][] H1Matrix = imb.getCIMMatrixAtPoint(
+										s, Coeff, jj);
+								LinearRegression H1lm = new LinearRegression(
+										H1Matrix, Y);
+								H1lm.MLE();
+								Likelihood lkhd1 = new Likelihood(ap, gs, s);
+								double log1 = lkhd1.LogLikelihood1(H1lm, jj);
+								Pout.print((log0 - log1) * (-1) + " ");
+							}
+						}
 					}
 				}
 			} else {
 				for (int i_permu = 0; i_permu < Param1.permutation; i_permu++) {
-					ap.Swith2Permutation(Param1.switch2permutation, Param1.seed * (i_rep * 100) + i_permu);
+					ap.Swith2Permutation(Param1.switch2permutation, Param1.seed
+							* (i_rep * 100) + i_permu);
 					ArrayList ids = ap.getIDs();
 					for (int i = 0; i < ids.size(); i++) {
 						Integer id = (Integer) ids.get(i);
 						Y[id.intValue()][0] = ap.PhenotypeAt(id.intValue(), 0);
-					}
+					}					
+					IMBMatrix imb = new IMBMatrix(gs, ap);
+					double[][] fm = imb.getFullMatrix();
+					LinearRegression lm1 = new LinearRegression(fm, Y);
+					lm1.MLE();
 					for (int i = Param1.search_start; i <= Param1.search_end; i++) {
-						CombinationGenerator cg = new CombinationGenerator(i, i, ap.SumIntevals());
+						imb.setOrder(i);
+						CombinationGenerator cg = new CombinationGenerator(i,
+								i, ap.SumIntevals());
 						cg.generateCombination();
+						List com = cg.get(i);
+						double[][] Coeff = { { 1, 0 } };
+						double[] mask = { 1, 0 };
+						for (Iterator e = com.iterator(); e.hasNext();) {
+							String s = (String) e.next();
+
+							double[][] H0Matrix = imb.getNullCIMMatrix(s);
+							LinearRegression H0lm = new LinearRegression(
+									H0Matrix, Y);
+							H0lm.MLE();
+							Likelihood lkhd0 = new Likelihood(ap, gs, s);
+							double log0 = lkhd0.LogLikelihood2(H0lm);
+
+							int[] SNPIdx = ToolKit.StringToIntArray(s);
+							int[][] ChrInt = ChrInt(ap, SNPIdx);
+							IntervalPriorProbability[] iip = new IntervalPriorProbability[SNPIdx.length];
+							for (int j = 0; j < SNPIdx.length; j++) {
+								iip[j] = gs.getIPPTable(ChrInt[j][0],
+										ChrInt[j][1]);
+							}
+							for (int j = 0; j < iip.length; j++) {
+								int steps = iip[j].getWalks();
+								for (int jj = 0; jj < steps; jj++) {
+									double[][] H1Matrix = imb
+											.getCIMMatrixAtPoint(s, Coeff, jj);
+									LinearRegression H1lm = new LinearRegression(H1Matrix, Y);
+									H1lm.MLE();
+									Likelihood lkhd1 = new Likelihood(ap, gs, s);
+									double log1 = lkhd1.LogLikelihood1(H1lm, jj);
+									Pout.print((log0 - log1) * (-1) + " ");
+								}
+							}
+						}
 					}
+					Pout.println();	
 				}
+				Pout.close();
 			}
 		}
 	}

@@ -37,9 +37,9 @@ public class IMBMatrix {
     		int c = coeff.length * SNPIdx.length + 1;
     		matrix[i][0] = 1;
     		for (int j = 0; j < imp.ChromosomeNumber(); j++) {
-    			int IIPIdx = gs.getIPPRowIndexForIndividual(i, ChrInt[j][0], ChrInt[j][1]);
     			for (int jj = 0; jj < SNPIdx.length; jj++) {
-                    for (int jjj = 0; jjj < coeff.length; jjj++) {
+        			int IIPIdx = gs.getIPPRowIndexForIndividual(i, ChrInt[j][0], ChrInt[j][1]);
+    				for (int jjj = 0; jjj < coeff.length; jjj++) {
                     	for (int k = 0; k < iip[jj].NumQTLtypes(); k++) {
                     		matrix[i][1 + jj*coeff.length + jjj] += iip[jj].PriorProbabilityAt(IIPIdx, interval, k) * coeff[jj][k];
                     	}
@@ -48,10 +48,34 @@ public class IMBMatrix {
     			for (int k = 0; k < imp.MarkerNumber(j); k++) {
     				boolean flag = true;
     				for (int kk = 0; kk < SNPIdx.length; kk++) {
-    					if (markerindex == SNPIdx[kk] || markerindex == (SNPIdx[kk] + 1)) {
-    						
+    					if (markerindex == SNPIdx[kk] || markerindex == (SNPIdx[kk] + 1)) {	
     						flag = false;
     						break;
+    					}
+    				}
+    				if (flag) {
+    					matrix[i][c++] = imp.MarkerAt(i, j, k);
+    				}
+    				markerindex++;
+    			}
+    		}
+    	}
+    	return matrix;
+    }
+
+    public double[][] getNullCIMMatrix(String com) {
+       	SNPIdx = ToolKit.StringToIntArray(com);
+    	double[][] matrix = new double[imp.IndividualNumber()][imp.MarkerNumber() - (SNPIdx.length + 1) + 1];
+    	for (int i = 0; i < imp.IndividualNumber(); i++) {
+    		matrix[i][0] = 1;
+    		int c = 1;
+    		int markerindex = 0;
+    		for (int j = 0; j < imp.ChromosomeNumber(); j++) {
+    			for (int k = 0; k < imp.MarkerNumber(j); k++) {
+    				boolean flag = true;
+    				for (int kk = 0; kk < SNPIdx.length; kk++) {
+    					if (markerindex == SNPIdx[kk] || markerindex == (SNPIdx[kk] + 1)) {
+    						flag = false;
     					}
     				}
     				if (flag) {
@@ -97,13 +121,6 @@ public class IMBMatrix {
                 }
             }
         }
-//        for(int i = 0; i < matrix.length; i ++) {
-//            System.out.print(imp.MarkerAt(i, ChrInt[0][0], ChrInt[0][1]) + " " + imp.MarkerAt(i, ChrInt[0][0], ChrInt[0][1]+1) + "\t");
-//            for(int j = 0; j < matrix[i].length; j++) {
-//                System.out.print(matrix[i][j]+"\t");
-//            }
-//            System.out.println(imp.PhenotypeAt(i, 0));
-//        }
         return matrix;
     }
 
@@ -126,13 +143,6 @@ public class IMBMatrix {
                 }
             }
         }
-//        for(int i = 0; i < matrix.length; i ++) {
-//            System.out.print(imp.MarkerAt(i, ChrInt[0][0], ChrInt[0][1]) + " " + imp.MarkerAt(i, ChrInt[0][0], ChrInt[0][1]+1) + "\t");
-//            for(int j = 0; j < matrix[i].length; j++) {
-//                System.out.print(matrix[i][j]+"\t");
-//            }
-//            System.out.println(imp.PhenotypeAt(i, 0));
-//        }
         return matrix;
     }
 
