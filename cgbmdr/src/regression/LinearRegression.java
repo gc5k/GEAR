@@ -1,5 +1,8 @@
 package regression;
 
+import im.GenomeScan;
+import im.population.IMPopulation;
+
 import org.apache.commons.math.distribution.FDistribution;
 import org.apache.commons.math.distribution.FDistributionImpl;
 import org.apache.commons.math.distribution.TDistribution;
@@ -19,6 +22,7 @@ public class LinearRegression {
     RealMatrix Response;
     RealMatrix Predictor;
     RealMatrix estimate;
+    RealMatrix residual;
     double sd_residual;
     double SSTO;
     double SSR;
@@ -26,7 +30,7 @@ public class LinearRegression {
     double mse;
     double F_statistic;
     double P_F_statistic;
-    int df;
+    double logScore;
     int df_Predictor;
     int df_residual;
     double[] Var;
@@ -35,11 +39,10 @@ public class LinearRegression {
     public LinearRegression(double[][] x, double [][] y) {
         Predictor = new RealMatrixImpl(x);
         Response = new RealMatrixImpl(y);
-        df = Response.getRowDimension() - Predictor.getColumnDimension();
+        df_residual = Response.getRowDimension() - Predictor.getColumnDimension();
         Var = new double[Predictor.getColumnDimension()];
         residuals = new double[y.length];
         df_Predictor = Predictor.getColumnDimension() - 1;
-        df_residual = df;
     }
 
     public void MLE() {
@@ -48,16 +51,14 @@ public class LinearRegression {
         RealMatrix X_tX_Ivt = X_tX.inverse();
         RealMatrix X_tX_Ivt_Xt = X_tX_Ivt.multiply(X_t);
         estimate = X_tX_Ivt_Xt.multiply(Response);
-
         RealMatrix fit = Predictor.multiply(estimate);
-        RealMatrix residual = Response.subtract(fit);
+        residual = Response.subtract(fit);
         residuals = residual.getColumn(0);
         RealMatrix residual_t = residual.transpose();
         RealMatrix sse = residual_t.multiply(residual);
-        double d = (Response.getRowDimension()-Predictor.getColumnDimension());
-        mse = sse.getEntry(0, 0)/d;
+        mse = sse.getEntry(0, 0)/df_residual;
         RealMatrix FI = X_tX_Ivt;
-        TDistribution t = new TDistributionImpl(d);
+        TDistribution t = new TDistributionImpl(df_residual);
         for(int i = 0; i < Var.length; i++) {
             Var[i] = mse*FI.getEntry(i, i);
             double t_val = Math.abs(estimate.getEntry(i, 0))/Math.sqrt(Var[i]);
@@ -115,10 +116,22 @@ public class LinearRegression {
         return estimate;
     }
 
+    public RealMatrix Y() {
+    	return Response;
+    }
+    
+    public RealMatrix X() {
+    	return Predictor;
+    }
+
     public double[] getResiduals() {
         return residuals;
     }
     
+    public RealMatrix getResidual() {
+    	return residual;
+    }
+
     public static void main (String[] args) {
         double[][] data = { {1, 1, 2, 3},
                             {1, 1.3, 2.1, 3.4},
