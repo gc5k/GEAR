@@ -157,7 +157,7 @@ public class RegPopulation {
 				rep = Integer.parseInt(param.get(15));
 			}
 			// permutation
-			permutation = 100;
+			permutation = 0;
 			if (param.size() > 16) {
 				permutation = Integer.parseInt(param.get(16));
 			}
@@ -356,12 +356,15 @@ public class RegPopulation {
 
 		Param2.ReadQTL(QTL);
 
-		ArrayList<Double> threshold;
+		ArrayList<Double> thresholdCIM;
+		ArrayList<Double> thresholdICIM;
 		ArrayList<ArrayList<Double>> LODCIM = new ArrayList();
+		ArrayList<ArrayList<Double>> LODICIM = new ArrayList();
 		double[] env = { 0.0 };
 		calculateMU(Param1, env, QTL, d);
 
 		for (int i_rep = 0; i_rep < Param1.rep; i_rep++) {
+			//generate a population
 			AbstractPopulation ap;
 			if (Param1.pt.compareTo("F2") == 0) {
 				ap = new F2Population(Param1.populationSize,
@@ -385,32 +388,42 @@ public class RegPopulation {
 				ap.ProducePhenotype(i, Param1.MU, Param1.T);
 			}
 
+			//config scan
 			GenomeScan gs = new GenomeScan(ap, Param1.step);
 			gs.CalculateIPP();
-			double[][] Y = new double[ap.IndividualNumber()][1];
-			double[][] X = null;
 
+			//ICIM begins
+//			if (Param1.permutation > 0 && i_rep == 0) {
+//				thresholdICIM = new ArrayList();
+//			}
+//			ArrayList ILOD = ICIM(i_rep, ap, gs, Param1, 0, true);
+//			LODICIM.add(ILOD);
+			//ICIM ends
+
+			//CIM begins
 			if (Param1.permutation > 0 && i_rep == 0) {
-				threshold = new ArrayList();
+				thresholdCIM = new ArrayList();
 				PrintStream Pout = new PrintStream(new BufferedOutputStream(
 						new FileOutputStream("permu1.txt")));
 				for (int i_permu = 0; i_permu < Param1.permutation; i_permu++) {
-					ArrayList LOD = CIM(i_rep, ap, gs, Param1, Y, i_permu);
+					ArrayList LOD = CIM(i_rep, ap, gs, Param1, i_permu);
 					for (int ii = 0; ii < LOD.size(); ii++) {
 						Pout.print(LOD.get(ii) + " ");
 					}
 					Pout.println();
 					Collections.sort(LOD);
-					threshold.add((Double) LOD.get(LOD.size()-1));
+					thresholdCIM.add((Double) LOD.get(LOD.size() - 1));
 				}
 				Pout.close();
-				Collections.sort(threshold);
+				Collections.sort(thresholdCIM);
 			}
-			ArrayList LOD = CIM(i_rep, ap, gs, Param1, Y, 0);
+			ArrayList LOD = CIM(i_rep, ap, gs, Param1, 0);
 			LODCIM.add(LOD);
+			//CIM ends
+
 		}
 		PrintStream Pout = new PrintStream(new BufferedOutputStream(
-				new FileOutputStream("res1.txt")));
+				new FileOutputStream("LODCIM.txt")));
 		for (int i = 0; i < LODCIM.size(); i++) {
 			ArrayList Lod = (ArrayList) LODCIM.get(i);
 			for (int j = 0; j < Lod.size(); j++) {
@@ -419,15 +432,100 @@ public class RegPopulation {
 			Pout.println();
 		}
 		Pout.close();
+
+		PrintStream Pout1 = new PrintStream(new BufferedOutputStream(
+				new FileOutputStream("LODICIM.txt")));
+		for (int i = 0; i < LODICIM.size(); i++) {
+			System.out.println(i);
+			ArrayList Lod = (ArrayList) LODICIM.get(i);
+			for (int j = 0; j < Lod.size(); j++) {
+				Pout1.print(Lod.get(j) + " ");
+			}
+			Pout1.println();
+		}
+		Pout1.close();
 	}
 
-	public static ArrayList CIM(int i_rep, IMPopulation ap, GenomeScan gs, Parameter1 Param1, double[][] Y, int isPermutation) {
+	public static ArrayList ICIM(int i_rep, IMPopulation ap, GenomeScan gs, Parameter1 Param1, int isPermutation, boolean shouldKeepMean) {
+		double[][] Y = new double[ap.IndividualNumber()][1];
+		double[][] H0Matrix = null;
+		if (shouldKeepMean) {
+			H0Matrix = new double[ap.IndividualNumber()][1];
+			for(int i = 0; i < H0Matrix.length; i++) {
+				H0Matrix[i][0] = 1;
+			}
+		}
+		ArrayList t = new ArrayList();
+		ArrayList ids;
+		if (isPermutation == 0) {
+			ids = ap.getIDs();
+		} else {
+			ap.Swith2Permutation(Param1.switch2permutation, Param1.seed
+					* (i_rep * 100) + isPermutation);
+			ids = ap.getPermutatedIDs();
+		}
+		for (int i = 0; i < ids.size(); i++) {
+			Integer id = (Integer) ids.get(i);
+			if (isPermutation == 0) {
+				Y[id.intValue()][0] = ap.PhenotypeAt(id.intValue(), 0);
+			} else {
+				Y[i][0] = ap.PhenotypeAt(id.intValue(), 0);
+			}
+		}
+		IMBMatrix imb = new IMBMatrix(gs, ap);
+		double[][] fm = imb.getFullMatrix();
+		LinearRegression lmfull = new LinearRegression(fm, Y);
+		lmfull.MLE();
+		for (int i = Param1.search_start; i <= Param1.search_end; i++) {
+			imb.setOrder(i);
+			CombinationGenerator cg = new CombinationGenerator(i, i, ap.SumIntevals());
+			cg.generateCombination();
+			List com = cg.get(i);
+			double[][] Coeff = { {1, 0} };
+			for (Iterator e = com.iterator(); e.hasNext();) {
+				String s = (String) e.next();
+				int[] SNPIdx = ToolKit.StringToIntArray(s);
+				double[][] Y_res = lmfull.quasiResidual(SNPIdx[0], shouldKeepMean);
+				int[][] ChrInt = ChrInt(ap, SNPIdx);
+				double log0 = 0;
+				if (shouldKeepMean) {
+					LinearRegression H0lm = new LinearRegression(H0Matrix, Y_res);
+					H0lm.MLE();
+					Likelihood lkhd0 = new Likelihood(ap, gs, s);
+					log0 = lkhd0.LogLikelihoodNullICIM(H0lm);
+				}
+				IntervalPriorProbability[] iip = new IntervalPriorProbability[SNPIdx.length];
+				for (int j = 0; j < SNPIdx.length; j++) {
+					iip[j] = gs.getIPPTable(ChrInt[j][0], ChrInt[j][1]);
+				}
+				for (int j = 0; j < iip.length; j++) {
+					int steps = iip[j].getWalks();
+					for (int jj = 0; jj < steps; jj++) {
+						double[][] H1Matrix = imb.getICIMMatrixAtPoint(s, Coeff,
+								jj);
+						LinearRegression H1lm = new LinearRegression(H1Matrix,
+								Y_res);
+						H1lm.MLE();
+						Likelihood lkhd1 = new Likelihood(ap, gs, s);
+						double log1 = lkhd1.LogLikelihoodAlternativeICIM(H1lm, jj);
+						t.add(new Double((log0 - log1) * (-1)));
+					}
+				}				
+			}
+		}
+		return t;
+	}
+
+	public static ArrayList CIM(int i_rep, IMPopulation ap, GenomeScan gs,
+			Parameter1 Param1, int isPermutation) {
+		double[][] Y = new double[ap.IndividualNumber()][1];
 		ArrayList ids;
 		ArrayList t = new ArrayList();
 		if (isPermutation == 0) {
 			ids = ap.getIDs();
 		} else {
-			ap.Swith2Permutation(Param1.switch2permutation, Param1.seed * (i_rep * 100) + isPermutation);
+			ap.Swith2Permutation(Param1.switch2permutation, Param1.seed
+					* (i_rep * 100) + isPermutation);
 			ids = ap.getPermutatedIDs();
 		}
 		for (int i = 0; i < ids.size(); i++) {
@@ -449,32 +547,31 @@ public class RegPopulation {
 			cg.generateCombination();
 			List com = cg.get(i);
 			double[][] Coeff = { { 1, 0 } };
-			double[] mask = { 1, 0 };
 			for (Iterator e = com.iterator(); e.hasNext();) {
 				String s = (String) e.next();
-
 				double[][] H0Matrix = imb.getNullCIMMatrix(s);
 				LinearRegression H0lm = new LinearRegression(H0Matrix, Y);
 				H0lm.MLE();
 				Likelihood lkhd0 = new Likelihood(ap, gs, s);
-				double log0 = lkhd0.LogLikelihood2(H0lm);
+				double log0 = lkhd0.LogLikelihoodNullCIM(H0lm);
 
 				int[] SNPIdx = ToolKit.StringToIntArray(s);
 				int[][] ChrInt = ChrInt(ap, SNPIdx);
 				IntervalPriorProbability[] iip = new IntervalPriorProbability[SNPIdx.length];
+				
 				for (int j = 0; j < SNPIdx.length; j++) {
 					iip[j] = gs.getIPPTable(ChrInt[j][0], ChrInt[j][1]);
 				}
 				for (int j = 0; j < iip.length; j++) {
 					int steps = iip[j].getWalks();
 					for (int jj = 0; jj < steps; jj++) {
-						double[][] H1Matrix = imb.getCIMMatrixAtPoint(s,
-								Coeff, jj);
-						LinearRegression H1lm = new LinearRegression(
-								H1Matrix, Y);
+						double[][] H1Matrix = imb.getCIMMatrixAtPoint(s, Coeff,
+								jj);
+						LinearRegression H1lm = new LinearRegression(H1Matrix,
+								Y);
 						H1lm.MLE();
 						Likelihood lkhd1 = new Likelihood(ap, gs, s);
-						double log1 = lkhd1.LogLikelihood1(H1lm, jj);
+						double log1 = lkhd1.LogLikelihoodAlternativeCIM(H1lm, jj);
 						t.add(new Double((log0 - log1) * (-1)));
 					}
 				}
@@ -483,4 +580,3 @@ public class RegPopulation {
 		return t;
 	}
 }
-

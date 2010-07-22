@@ -25,7 +25,8 @@ public class Likelihood {
     	ChrInt = ChrInt();
     }
 
-    public double LogLikelihood1(LinearRegression lr, int interval) {
+
+    public double LogLikelihoodAlternativeICIM(LinearRegression lr, int interval) {
     	double LODLikelihood = 0;
     	RealMatrix B = lr.estimate;
     	double[] v = new double[B.getRowDimension()];
@@ -37,7 +38,7 @@ public class Likelihood {
     	RealMatrix X = lr.X();
     	RealMatrix Y = lr.Y();
     	RealMatrix Res0 = lr.getResidual();
-        RealMatrix fit = X.multiply(B);
+        RealMatrix fit = X.multiply(BA);
         RealMatrix Res1 = Y.subtract(fit);
     	double mse = lr.mse;
         IntervalPriorProbability[] iip = new IntervalPriorProbability[SNPIdx.length];
@@ -57,7 +58,54 @@ public class Likelihood {
     	return LODLikelihood;
     }
 
-    public double LogLikelihood2(LinearRegression lr) {
+    public double LogLikelihoodAlternativeCIM(LinearRegression lr, int interval) {
+    	double LODLikelihood = 0;
+    	RealMatrix B = lr.estimate;
+    	double[] v = new double[B.getRowDimension()];
+    	for(int i = 0; i < v.length; i++) {
+    		v[i] = B.getEntry(i, 0);
+    	}
+    	v[1] = 0;
+    	RealMatrix BA = new RealMatrixImpl(v);
+    	RealMatrix X = lr.X();
+    	RealMatrix Y = lr.Y();
+        RealMatrix fit = X.multiply(BA);
+        RealMatrix Res1 = Y.subtract(fit);
+    	RealMatrix Res0 = lr.getResidual();
+    	double mse = lr.mse;
+        IntervalPriorProbability[] iip = new IntervalPriorProbability[SNPIdx.length];
+        for (int i = 0; i < SNPIdx.length; i++) {
+            iip[i] = gs.getIPPTable(ChrInt[i][0], ChrInt[i][1]);
+        }
+
+        for (int i = 0; i < Res0.getRowDimension(); i++) {
+   			int IIPIdx = gs.getIPPRowIndexForIndividual(i, ChrInt[0][0], ChrInt[0][1]);
+   			double[] PriorProbability = new double[iip[0].NumQTLtypes()];
+   			for (int j = 0; j < PriorProbability.length; j++) {
+   				PriorProbability[j] = iip[0].PriorProbabilityAt(IIPIdx, interval, j);
+   			}
+   			double LogInd = GaussPDF(Res0.getEntry(i, 0), 0, mse) * PriorProbability[0] + GaussPDF(Res1.getEntry(i, 0), 0, mse) * PriorProbability[1];
+    		LODLikelihood += Math.log10(LogInd);
+    	}
+    	return LODLikelihood;
+    }
+
+    public double LogLikelihoodNullCIM(LinearRegression lr) {
+    	double LODLikelihood = 0;
+    	RealMatrix B = lr.estimate;
+    	RealMatrix X = lr.X();
+    	RealMatrix Y = lr.Y();
+    	RealMatrix residual = lr.getResidual();
+    	double mse = lr.mse;
+   		for (int i = 0; i < residual.getRowDimension(); i++) {
+   			double res = residual.getEntry(i, 0);
+       		double LogInd = GaussPDF(res, 0, mse); 
+    		LODLikelihood += Math.log10(LogInd);
+    	}
+    	return LODLikelihood;
+    }
+
+    public double LogLikelihoodNullICIM(LinearRegression lr) {
     	double LODLikelihood = 0;
     	RealMatrix B = lr.estimate;
     	RealMatrix X = lr.X();

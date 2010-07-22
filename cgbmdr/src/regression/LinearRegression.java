@@ -23,7 +23,6 @@ public class LinearRegression {
     RealMatrix Predictor;
     RealMatrix estimate;
     RealMatrix residual;
-    double sd_residual;
     double SSTO;
     double SSR;
     double SSE;
@@ -90,6 +89,23 @@ public class LinearRegression {
                 E.printStackTrace(System.err);
             }
         }
+    }
+
+    public double[][] quasiResidual(int interval, boolean shouldKeepMean) {
+    	double[][] Y_res = new double[Response.getRowDimension()][1];
+    	for (int i = 0; i < Y_res.length; i++) {
+    		Y_res[i][0] = Response.getEntry(1, 0);
+    		for (int j = 0; j < estimate.getRowDimension(); j++) {
+    			if (shouldKeepMean && j == 0) {
+    				continue;
+    			}
+    			if (j == (interval+1) || j == (interval + 2)) {
+    				continue;
+    			}
+				Y_res[i][0] -= Predictor.getEntry(i, j) * estimate.getEntry(j, 0);
+    		}
+    	}
+    	return Y_res;
     }
 
     public double get_F_Statistic () {

@@ -840,7 +840,6 @@ public class IMPopulation {
         } else {
             return distance[chr].length;
         }
-
     }
 
     public int MarkerNumberSelected(int chr) {
