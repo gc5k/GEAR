@@ -24,6 +24,28 @@ public class IMBMatrix {
         imp = im;
     }
 
+    public double[][] getICIMMatrixAtPoint(String com, double[][] coeff, int interval) {
+    	SNPIdx = ToolKit.StringToIntArray(com);
+    	double[][] matrix = new double[imp.IndividualNumber()][2];
+    	ChrInt();
+        IntervalPriorProbability[] iip = new IntervalPriorProbability[SNPIdx.length];
+        for (int i = 0; i < SNPIdx.length; i++) {
+            iip[i] = gs.getIPPTable(ChrInt[i][0], ChrInt[i][1]);
+        }
+    	for (int i = 0; i < imp.IndividualNumber(); i++) {
+    		matrix[i][0] = 1;
+    		for (int j = 0; j < imp.ChromosomeNumber(); j++) {
+        		int IIPIdx = gs.getIPPRowIndexForIndividual(i, ChrInt[j][0], ChrInt[j][1]);
+    			for (int jj = 0; jj < coeff.length; jj++) {
+                   	for (int k = 0; k < iip[jj].NumQTLtypes(); k++) {
+                   		matrix[i][1] += iip[jj].PriorProbabilityAt(IIPIdx, interval, k) * coeff[jj][k];
+                   	}
+                }
+    		}
+    	}
+    	return matrix;
+    }
+
     public double[][] getCIMMatrixAtPoint(String com, double[][] coeff, int interval) {
     	SNPIdx = ToolKit.StringToIntArray(com);
     	double[][] matrix = new double[imp.IndividualNumber()][imp.MarkerNumber() - (SNPIdx.length * coeff.length + 1) + 2];
