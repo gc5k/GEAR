@@ -34,14 +34,10 @@ public class IMBMatrix {
         }
     	for (int i = 0; i < imp.IndividualNumber(); i++) {
     		matrix[i][0] = 1;
-    		for (int j = 0; j < imp.ChromosomeNumber(); j++) {
-        		int IIPIdx = gs.getIPPRowIndexForIndividual(i, ChrInt[j][0], ChrInt[j][1]);
-    			for (int jj = 0; jj < coeff.length; jj++) {
-                   	for (int k = 0; k < iip[jj].NumQTLtypes(); k++) {
-                   		matrix[i][1] += iip[jj].PriorProbabilityAt(IIPIdx, interval, k) * coeff[jj][k];
-                   	}
-                }
-    		}
+        	int IIPIdx = gs.getIPPRowIndexForIndividual(i, ChrInt[0][0], ChrInt[0][1]);
+            for (int k = 0; k < iip[0].NumQTLtypes(); k++) {
+            	matrix[i][1] += iip[0].PriorProbabilityAt(IIPIdx, interval, k) * coeff[0][k];
+            }
     	}
     	return matrix;
     }
@@ -60,7 +56,7 @@ public class IMBMatrix {
     		matrix[i][0] = 1;
     		for (int j = 0; j < imp.ChromosomeNumber(); j++) {
     			for (int jj = 0; jj < SNPIdx.length; jj++) {
-        			int IIPIdx = gs.getIPPRowIndexForIndividual(i, ChrInt[j][0], ChrInt[j][1]);
+        			int IIPIdx = gs.getIPPRowIndexForIndividual(i, ChrInt[jj][0], ChrInt[jj][1]);
     				for (int jjj = 0; jjj < coeff.length; jjj++) {
                     	for (int k = 0; k < iip[jj].NumQTLtypes(); k++) {
                     		matrix[i][1 + jj*coeff.length + jjj] += iip[jj].PriorProbabilityAt(IIPIdx, interval, k) * coeff[jj][k];
