@@ -94,15 +94,18 @@ public class LinearRegression {
     public double[][] quasiResidual(int interval, boolean shouldKeepMean) {
     	double[][] Y_res = new double[Response.getRowDimension()][1];
     	for (int i = 0; i < Y_res.length; i++) {
-    		Y_res[i][0] = Response.getEntry(1, 0);
+    		Y_res[i][0] = residual.getEntry(i, 0);
     		for (int j = 0; j < estimate.getRowDimension(); j++) {
-    			if (shouldKeepMean && j == 0) {
-    				continue;
+//    			if (shouldKeepMean && j == 0) {
+//    				continue;
+//    			}
+//    			if (j == (interval+1) || j == (interval + 2)) {
+//    				continue;
+//    			}
+//				Y_res[i][0] -= Predictor.getEntry(i, j) * estimate.getEntry(j, 0);
+    			if (j == (interval + 1) || j == (interval + 2)) {
+    				Y_res[i][0] += Predictor.getEntry(i, j) * estimate.getEntry(j, 0);
     			}
-    			if (j == (interval+1) || j == (interval + 2)) {
-    				continue;
-    			}
-				Y_res[i][0] -= Predictor.getEntry(i, j) * estimate.getEntry(j, 0);
     		}
     	}
     	return Y_res;

@@ -74,7 +74,7 @@ public class RegPopulation {
 			}
 
 			// population size
-			populationSize = 200;
+			populationSize = 500;
 			if (param.size() > 0) {
 				populationSize = Integer.parseInt(param.get(0));
 			}
@@ -157,7 +157,7 @@ public class RegPopulation {
 				rep = Integer.parseInt(param.get(15));
 			}
 			// permutation
-			permutation = 0;
+			permutation = 100;
 			if (param.size() > 16) {
 				permutation = Integer.parseInt(param.get(16));
 			}
@@ -322,8 +322,7 @@ public class RegPopulation {
 			String file = null;
 			Param2 = new Parameter2(file);
 		}
-		double d[][] = { { 0, 0.1, 0.2, 0.25, 0.3, 0.4, 0.5, 0.6, 0.65, 0.67,
-				0.7, 0.75, 0.77, 0.8, 0.9, 1.0 } };
+		double d[][] = { { 0, 0.1, 0.2, 0.25, 0.3, 0.4, 0.5, 0.6, 0.65, 0.67, 0.7, 0.75, 0.77, 0.8, 0.9, 1.0 } };
 		Param2.ReadMap(d);
 
 		// QTL
@@ -393,32 +392,45 @@ public class RegPopulation {
 			gs.CalculateIPP();
 
 			//ICIM begins
-//			if (Param1.permutation > 0 && i_rep == 0) {
-//				thresholdICIM = new ArrayList();
-//			}
-//			ArrayList ILOD = ICIM(i_rep, ap, gs, Param1, 0, true);
-//			LODICIM.add(ILOD);
+			if (Param1.permutation > 0 && i_rep == 0) {
+				thresholdICIM = new ArrayList();
+				PrintStream Pout = new PrintStream(new BufferedOutputStream(
+						new FileOutputStream("permuICIM.txt")));
+				for (int i_permu = 0; i_permu < Param1.permutation; i_permu++) {
+					ArrayList LOD = ICIM(i_rep, ap, gs, Param1, i_permu, true);
+					Collections.sort(LOD);			
+//					for (int ii = 0; ii < LOD.size(); ii++) {
+//						Pout.print(LOD.get(ii) + " ");
+//					}		
+					Pout.println(LOD.get(LOD.size() - 1));
+					thresholdICIM.add((Double) LOD.get(LOD.size() - 1));
+				}
+				Pout.close();
+				Collections.sort(thresholdICIM);
+			}
+			ArrayList ILOD = ICIM(i_rep, ap, gs, Param1, 0, true);
+			LODICIM.add(ILOD);
 			//ICIM ends
 
 			//CIM begins
-			if (Param1.permutation > 0 && i_rep == 0) {
-				thresholdCIM = new ArrayList();
-				PrintStream Pout = new PrintStream(new BufferedOutputStream(
-						new FileOutputStream("permu1.txt")));
-				for (int i_permu = 0; i_permu < Param1.permutation; i_permu++) {
-					ArrayList LOD = CIM(i_rep, ap, gs, Param1, i_permu);
-					for (int ii = 0; ii < LOD.size(); ii++) {
-						Pout.print(LOD.get(ii) + " ");
-					}
-					Pout.println();
-					Collections.sort(LOD);
-					thresholdCIM.add((Double) LOD.get(LOD.size() - 1));
-				}
-				Pout.close();
-				Collections.sort(thresholdCIM);
-			}
-			ArrayList LOD = CIM(i_rep, ap, gs, Param1, 0);
-			LODCIM.add(LOD);
+//			if (Param1.permutation > 0 && i_rep == 0) {
+//				thresholdCIM = new ArrayList();
+//				PrintStream Pout = new PrintStream(new BufferedOutputStream(
+//						new FileOutputStream("permu1.txt")));
+//				for (int i_permu = 0; i_permu < Param1.permutation; i_permu++) {
+//					ArrayList LOD = CIM(i_rep, ap, gs, Param1, i_permu);
+//					for (int ii = 0; ii < LOD.size(); ii++) {
+//						Pout.print(LOD.get(ii) + " ");
+//					}
+//					Pout.println();
+//					Collections.sort(LOD);
+//					thresholdCIM.add((Double) LOD.get(LOD.size() - 1));
+//				}
+//				Pout.close();
+//				Collections.sort(thresholdCIM);
+//			}
+//			ArrayList LOD = CIM(i_rep, ap, gs, Param1, 0);
+//			LODCIM.add(LOD);
 			//CIM ends
 
 		}
