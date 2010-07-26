@@ -5,6 +5,7 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Random;
+import java.io.PrintStream;
 import mdr.TraitStatistic;
 import im.reader.IMReaderAbstract;
 import im.reader.IMConstant;
@@ -890,6 +891,58 @@ public class IMPopulation {
                 System.out.println();
             }
         }
+    }
+    
+    public void CIMFormat(PrintStream ps) {
+    	ps.println("#FileID 285296362");
+    	ps.println("#bychromosome");
+    	ps.println("-type position");
+    	ps.println("-function 1");
+    	ps.println("-Units M");
+    	ps.println("-chromosomes 1");
+    	ps.println("-maximum " + MarkerNumber());
+    	ps.println("-named yes");
+    	ps.println("-start");
+    	for (int i = 1; i <= ChromosomeNumber(); i++) {
+    		ps.println("-Chromosome C" + i);
+    		for (int j = 0; j <MarkerNumber(i-1); j++) {
+    			ps.println(MarkerNameAt(i-1, j) + "\t" + distance[i-1][j]);
+    		}
+    	}
+    	ps.println("-stop\n---------------------------------------------------");
+    	ps.println("#bycross");
+    	ps.println("-SampleSize "+ IDs.size());
+    	ps.println("-Cross " + populationType);
+    	ps.println("-traits 1");
+    	ps.println("-missingtrait .");
+    	ps.println("-case yes");
+    	ps.println("-TranslationTable");
+    	ps.println("AA    2     2");
+    	ps.println("Aa    1     1");
+    	ps.println("aa    0     0");
+    	ps.println("A-    12    12");
+    	ps.println("a-    10    10");
+    	ps.println("--    -1    -1");
+    	ps.println("-start individuals markers");
+    	for (int i = 0; i < IndividualNumber(); i++) {
+    		ps.print("I-" + (i+1));
+    		for (int j = 0; j < ChromosomeNumber(); j++) {
+    			for (int k = 0; k < MarkerNumber(j); k++) {
+    				ps.print(" " + MarkerAt(i, j, k));
+    			}
+    		}
+    		ps.print("\n");
+    	}
+    	ps.println("-stop individuals markers");
+    	ps.println("-start traits");
+    	ps.print("t1");
+    	for (int i = 0; i < IndividualNumber(); i++) {
+    		ps.print(" " + PhenotypeAt(i, 0));
+    	}
+    	ps.println("\n-stop traits");
+    	ps.println("-quit");
+    	ps.println("-end");
+    	
     }
     
     public String toString() {

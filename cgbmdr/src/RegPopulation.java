@@ -154,12 +154,12 @@ public class RegPopulation {
 				switch2permutation = Boolean.parseBoolean(param.get(14));
 			}
 			// replication
-			rep = 100;
+			rep = 1;
 			if (param.size() > 15) {
 				rep = Integer.parseInt(param.get(15));
 			}
 			// permutation
-			permutation = 100;
+			permutation = 0;
 			if (param.size() > 16) {
 				permutation = Integer.parseInt(param.get(16));
 			}
@@ -324,14 +324,14 @@ public class RegPopulation {
 			String file = null;
 			Param2 = new Parameter2(file);
 		}
-		double d[][] = { { 0, 0.1, 0.2, 0.25, 0.3, 0.4, 0.5, 0.6, 0.65, 0.67, 0.7, 0.75, 0.77, 0.8, 0.9, 1.0 } };
+		double d[][] = { { 0, 0.05, 0.1, 0.2, 0.3, 0.35, 0.4, 0.5, 0.6, 0.7, 0.75, 0.77, 0.8, 0.85, 0.9, 1.0 } };
 		Param2.ReadMap(d);
 
 		// QTL
 		ArrayList QTL = new ArrayList();
 
 		int[] chr1 = { 0 };
-		int[] loci1 = { 3 };
+		int[] loci1 = { 1 };
 		int[] genotype1 = { 2 };
 		double[] effect1 = { 0.5 };
 		int environment1 = 0;
@@ -340,7 +340,7 @@ public class RegPopulation {
 		QTL.add(al1);
 
 		int[] chr2 = { 0 };
-		int[] loci2 = { 9 };
+		int[] loci2 = { 5 };
 		int[] genotype2 = { 2 };
 		double[] effect2 = { 0.5 };
 		AbstractLoci al2 = new AbstractLoci(chr2, loci2, genotype2, effect2,
@@ -348,7 +348,7 @@ public class RegPopulation {
 		QTL.add(al2);
 
 		int[] chr3 = { 0 };
-		int[] loci3 = { 12 };
+		int[] loci3 = { 11 };
 		int[] genotype3 = { 2 };
 		double[] effect3 = { -0.5 };
 		AbstractLoci al3 = new AbstractLoci(chr3, loci3, genotype3, effect3,
@@ -394,10 +394,14 @@ public class RegPopulation {
 			}
 			ap.ProducePopulation();
 
+
 			for (int i = 0; i < Param1.pheNum.length; i++) {
 				ap.ProducePhenotype(i, Param1.MU, Param1.T);
 			}
-
+			PrintStream CIMfile = new PrintStream(new BufferedOutputStream(
+					new FileOutputStream("CIMformat.mcd")));
+			ap.CIMFormat(CIMfile);
+			CIMfile.close();
 			//config scan
 			GenomeScan gs = new GenomeScan(ap, Param1.step);
 			gs.CalculateIPP();
@@ -436,12 +440,12 @@ public class RegPopulation {
 			if (Param1.permutation > 0 && i_rep == 0) {
 				thresholdCIM = new ArrayList();
 				PrintStream Pout = new PrintStream(new BufferedOutputStream(
-						new FileOutputStream("permu1.txt")));
+						new FileOutputStream("permu1CIM.txt")));
 				for (int i_permu = 0; i_permu < Param1.permutation; i_permu++) {
 					ArrayList LOD = CIM(i_rep, ap, gs, Param1, i_permu);
 					Double max = Collections.max(LOD);
 					for (int ii = 0; ii < LOD.size(); ii++) {
-						if (max == ILOD.get(ii)) {
+						if (max == LOD.get(ii)) {
 							Integer max_index = new Integer(ii);
 							if(CIM_permutation_Max_Index.containsKey(max_index)) {
 								int c = ((Integer) CIM_permutation_Max_Index.get(max_index)).intValue();
@@ -462,6 +466,7 @@ public class RegPopulation {
 			LODCIM.add(LOD);
 			//CIM ends
 		}
+//		System.out.println( "Threshold CIM: "+thresholdCIM.get((int)(0.95*Param1.permutation)));
 		PrintStream Pout = new PrintStream(new BufferedOutputStream(
 				new FileOutputStream("LODCIM.txt")));
 		for (int i = 0; i < LODCIM.size(); i++) {
@@ -471,13 +476,17 @@ public class RegPopulation {
 			}
 			Pout.println();
 			for (int j = 0; j < PointIndex.length; j++) {
-				if(((Double) Lod.get(PointIndex[j])) > ((Double) thresholdCIM.get((int)(0.95*Param1.rep)))) {
+				if(Param1.permutation == 0) {
+					continue;
+				}
+				if(((Double) Lod.get(PointIndex[j])) > ((Double) thresholdCIM.get((int)(0.95*Param1.permutation)))) {
 					powerCIM[j] += 1;
 				}
 			}
 		}
 		Pout.close();
 
+//		System.out.println( "Threshold ICIM: "+thresholdICIM.get((int)(0.95*Param1.permutation)));
 		PrintStream Pout1 = new PrintStream(new BufferedOutputStream(
 				new FileOutputStream("LODICIM.txt")));
 		for (int i = 0; i < LODICIM.size(); i++) {
@@ -487,7 +496,10 @@ public class RegPopulation {
 			}
 			Pout1.println();
 			for (int j = 0; j < PointIndex.length; j++) {
-				if(((Double) ILod.get(PointIndex[j])) > ((Double) thresholdICIM.get((int)(0.95*Param1.rep)))) {
+				if(Param1.permutation == 0) {
+					continue;
+				}
+				if(((Double) ILod.get(PointIndex[j])) > ((Double) thresholdICIM.get((int)(0.95*Param1.permutation)))) {
 					powerICIM[j] += 1;
 				}
 			}
