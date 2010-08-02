@@ -124,9 +124,19 @@ public class LinearRegression {
 		return Y_res;
 	}
 
-	public double get_F_Statistic() {
-		return F_statistic;
-	}
+    public double[][] getResponse() {
+    	double[][] y = new double[Response.getRowDimension()][Response.getColumnDimension()];
+    	for (int i = 0; i < Response.getRowDimension(); i++) {
+    		for (int j = 0; j < Response.getColumnDimension(); j++) {
+    			y[i][j] = Response.getEntry(i, j);
+    		}
+    	}
+    	return y;
+    }
+    
+    public double get_F_Statistic () {
+        return F_statistic;
+    }
 
 	public double getP_F() {
 		return P_F_statistic;
