@@ -32,6 +32,7 @@ public class LinearRegression {
 	double logScore;
 	int df_Predictor;
 	int df_residual;
+	double[] p_value_t_test;
 	double[] Var;
 	double[] residuals;
 
@@ -41,6 +42,7 @@ public class LinearRegression {
 		df_residual = Response.getRowDimension()
 				- Predictor.getColumnDimension();
 		Var = new double[Predictor.getColumnDimension()];
+		p_value_t_test = new double[Predictor.getColumnDimension()];
 		residuals = new double[y.length];
 		df_Predictor = Predictor.getColumnDimension() - 1;
 	}
@@ -56,7 +58,32 @@ public class LinearRegression {
 		residuals = residual.getColumn(0);
 		RealMatrix residual_t = residual.transpose();
 		RealMatrix sse = residual_t.multiply(residual);
-		mse = sse.getEntry(0, 0) / df_residual;
+		mse = sse.getEntry(0, 0)/ df_residual;
+//		//ML mse
+//		if (usingML_MSE && estimate.getRowDimension() > 1) {
+//			mse = sse.getEntry(0, 0) / df_residual;
+//			RealMatrix estimate1 = estimate;
+//			double[] v = new double[estimate1.getRowDimension()];
+//			for (int i = 0; i < v.length; i++) {
+//				v[i] = estimate1.getEntry(i, 0);
+//			}
+//			v[1] = 0;
+//			RealMatrix BA = new RealMatrixImpl(v);
+//			RealMatrix fit1 = Predictor.multiply(BA);
+//			RealMatrix Res1 = Response.subtract(fit1);
+//			RealMatrix Res1_t = Res1.transpose();
+//			double c = 0;
+//			for (int i = 0; i < Predictor.getRowDimension(); i++) {
+//				c += Predictor.getEntry(i, 1);
+//			}
+//
+//			double mse_ML = (((RealMatrix) Res1_t.multiply(Res1))
+//					.getEntry(0, 0) - estimate.getEntry(1, 0)
+//					* estimate.getEntry(1, 0) * c)
+//					/ Response.getRowDimension();
+//			mse = mse_ML;
+//		}
+//		//ML mse
 		RealMatrix FI = X_tX_Ivt;
 		TDistribution t = new TDistributionImpl(df_residual);
 		for (int i = 0; i < Var.length; i++) {
@@ -65,6 +92,7 @@ public class LinearRegression {
 					/ Math.sqrt(Var[i]);
 			try {
 				double p = t.cumulativeProbability(t_val);
+				p_value_t_test[i] = p;
 			} catch (MathException E) {
 				E.printStackTrace(System.err);
 			}
@@ -170,6 +198,9 @@ public class LinearRegression {
 		return residuals;
 	}
 
+	public double getPValueTTest(int idx) {
+		return p_value_t_test[idx];
+	}
 	public RealMatrix getResidual() {
 		return residual;
 	}

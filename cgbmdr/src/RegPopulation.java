@@ -160,7 +160,7 @@ public class RegPopulation {
 				rep = Integer.parseInt(param.get(15));
 			}
 			// permutation
-			permutation = 100;
+			permutation = 200;
 			if (param.size() > 16) {
 				permutation = Integer.parseInt(param.get(16));
 			}
@@ -325,43 +325,43 @@ public class RegPopulation {
 			String file = null;
 			Param2 = new Parameter2(file);
 		}
-		double d[][] = { { 0, 0.05, 0.475,
-			               0.5, 0.525, 0.95, 1.0 } };
+		double d[][] = { { 0,   0.05, 0.1,  0.2,  0.3, 0.35, 0.4,
+			               0.5, 0.6,  0.7, 0.75, 0.8,  0.9,  1.0 } };
 		Param2.ReadMap(d);
 
 		// QTL
 		ArrayList QTL = new ArrayList();
 
 		int[] chr1 = { 0 };
-		int[] loci1 = { 3 };
+		int[] loci1 = { 1 };
 		int[] genotype1 = { 2 };
-		double[] effect1 = { 1 };
+		double[] effect1 = { 0.25 };
 		int environment1 = 0;
 		AbstractLoci al1 = new AbstractLoci(chr1, loci1, genotype1, effect1,
 				environment1);
 		QTL.add(al1);
 
-//		int[] chr2 = { 0 };
-//		int[] loci2 = { 6 };
-//		int[] genotype2 = { 2 };
-//		double[] effect2 = { 1 };
-//		AbstractLoci al2 = new AbstractLoci(chr2, loci2, genotype2, effect2,
-//				environment1);
-//		QTL.add(al2);
-//
-//		int[] chr3 = { 0 };
-//		int[] loci3 = { 12 };
-//		int[] genotype3 = { 2 };
-//		double[] effect3 = { 1 };
-//		AbstractLoci al3 = new AbstractLoci(chr3, loci3, genotype3, effect3,
-//				environment1);
-//		QTL.add(al3);
+		int[] chr2 = { 0 };
+		int[] loci2 = { 5 };
+		int[] genotype2 = { 2 };
+		double[] effect2 = { 0.25 };
+		AbstractLoci al2 = new AbstractLoci(chr2, loci2, genotype2, effect2,
+				environment1);
+		QTL.add(al2);
+
+		int[] chr3 = { 0 };
+		int[] loci3 = { 10 };
+		int[] genotype3 = { 2 };
+		double[] effect3 = { 0.25 };
+		AbstractLoci al3 = new AbstractLoci(chr3, loci3, genotype3, effect3,
+				environment1);
+		QTL.add(al3);
 
 		Param2.ReadQTL(QTL);
 
-		int[] PointIndex = {(new Double(d[0][loci1[0]] * 100)).intValue()};
-//							(new Double(d[0][loci2[0]] * 100)).intValue(), 
-//							(new Double(d[0][loci3[0]] * 100)).intValue()}; 
+		int[] PointIndex = {(new Double(d[0][loci1[0]] * 100)).intValue(),
+							(new Double(d[0][loci2[0]] * 100)).intValue(), 
+							(new Double(d[0][loci3[0]] * 100)).intValue()}; 
 		
 		ArrayList selectedMarker = null;
 		//new ArrayList();
@@ -369,20 +369,18 @@ public class RegPopulation {
 //		selectedMarker.add(new Integer(2));
 		//selectedMarker.add(new Integer(7));
 
+		boolean isLODTest = false;
 		double[] powerCIM = new double[PointIndex.length];
-		double[] powerICIM= new double[PointIndex.length];
-
+		double[] powertCIM= new double[PointIndex.length];
+		double[] powerPermutationtCIM = new double[PointIndex.length];
 		HashMap CIM_permutation_Max_Index = new HashMap();
-		HashMap ICIM_permutation_Max_Index = new HashMap();
+		HashMap tCIM_permutation_Max_Index = new HashMap();
 		ArrayList<Double> thresholdCIM = new ArrayList();
-		ArrayList<Double> thresholdICIM = new ArrayList();
-		
-		ArrayList<ArrayList<Double>> LODCIM = new ArrayList();
-		ArrayList<ArrayList<Double>> LODICIM = new ArrayList();
+		ArrayList<Double> thresholdtCIM = new ArrayList();
 
-		ArrayList<ArrayList<Double>> bCIM = new ArrayList();
-		ArrayList<ArrayList<Double>> bICIM = new ArrayList();
-		
+		ArrayList<ArrayList<Double>> LODCIM = new ArrayList();
+		ArrayList<ArrayList<Double>> LODtCIM = new ArrayList();
+
 		double[] env = { 0.0 };
 		calculateMU(Param1, env, QTL, d);
 
@@ -420,44 +418,90 @@ public class RegPopulation {
 			gs.CalculateIPP();
 
 			//ICIM begins
+//			if (Param1.permutation > 0 && i_rep == 0) {
+//				thresholdICIM = new ArrayList();
+//				PrintStream Pout = new PrintStream(new BufferedOutputStream(
+//						new FileOutputStream("permuICIM.txt")));
+//				PrintStream PoutICIM = new PrintStream(new BufferedOutputStream(
+//						new FileOutputStream("nullICIM.txt")));
+//				for (int i_permu = 0; i_permu < Param1.permutation; i_permu++) {
+//					ArrayList ILOD = IM(selectedMarker, i_rep, ap, gs, Param1, i_permu + 1, true, UsingML);
+//					PoutICIM.print(ILOD.size() + "\t");
+//					for (int ii = 0; ii < ILOD.size(); ii++) {
+//						PoutICIM.print(ILOD.get(ii) + ",");
+//					}
+//					PoutICIM.println();
+//					Double max = Collections.max(ILOD);
+//					for (int ii = 0; ii < ILOD.size(); ii++) {
+//						if (max == ILOD.get(ii)) {
+//							Integer max_index = new Integer(ii);
+//							if(ICIM_permutation_Max_Index.containsKey(max_index)) {
+//								int c = ((Integer) ICIM_permutation_Max_Index.get(max_index)).intValue();
+//								c++;
+//								ICIM_permutation_Max_Index.put(max_index, new Integer(++c));
+//							} else {
+//								ICIM_permutation_Max_Index.put(max_index, new Integer(1));
+//							}
+//						}
+//					}
+//					Pout.println(max);
+//					thresholdICIM.add(max);
+//				}
+//				Pout.close();
+//				PoutICIM.close();
+//				Collections.sort(thresholdICIM);
+//			}
+//			ArrayList ILOD = IM(selectedMarker, i_rep, ap, gs, Param1, 0, true, UsingML);
+//			LODICIM.add(ILOD);
+			//ICIM ends
+			
+			//CIM t
+			isLODTest = false;
 			if (Param1.permutation > 0 && i_rep == 0) {
-				thresholdICIM = new ArrayList();
+				thresholdtCIM = new ArrayList();
 				PrintStream Pout = new PrintStream(new BufferedOutputStream(
-						new FileOutputStream("permuICIM.txt")));
-				PrintStream PoutICIM = new PrintStream(new BufferedOutputStream(
-						new FileOutputStream("nullICIM.txt")));
+						new FileOutputStream("permutCIM.txt")));
+				PrintStream PoutCIM = new PrintStream(new BufferedOutputStream(
+						new FileOutputStream("nulltCIM.txt")));
 				for (int i_permu = 0; i_permu < Param1.permutation; i_permu++) {
-					ArrayList ILOD = IM(selectedMarker, i_rep, ap, gs, Param1, i_permu + 1, true);
-					PoutICIM.print(ILOD.size() + "\t");
-					for (int ii = 0; ii < ILOD.size(); ii++) {
-						PoutICIM.print(ILOD.get(ii) + ",");
+					ArrayList tLOD = CIM(selectedMarker, i_rep, ap, gs, Param1, i_permu + 1, isLODTest);
+					PoutCIM.print(tLOD.size()+ "\t");
+					for (int ii = 0; ii < tLOD.size(); ii++) {
+						PoutCIM.print(tLOD.get(ii) + ",");
 					}
-					PoutICIM.println();
-					Double max = Collections.max(ILOD);
-					for (int ii = 0; ii < ILOD.size(); ii++) {
-						if (max == ILOD.get(ii)) {
+					PoutCIM.println();
+					Double max = Collections.max(tLOD);
+					Double min = Collections.min(tLOD);
+					if (!isLODTest) {
+						if (Math.abs(min.doubleValue())>Math.abs(max.doubleValue())) {
+							max = min;
+						}
+					}
+					for (int ii = 0; ii < tLOD.size(); ii++) {
+						if (max == tLOD.get(ii)) {
 							Integer max_index = new Integer(ii);
-							if(ICIM_permutation_Max_Index.containsKey(max_index)) {
-								int c = ((Integer) ICIM_permutation_Max_Index.get(max_index)).intValue();
+							if(tCIM_permutation_Max_Index.containsKey(max_index)) {
+								int c = ((Integer) tCIM_permutation_Max_Index.get(max_index)).intValue();
 								c++;
-								ICIM_permutation_Max_Index.put(max_index, new Integer(++c));
+								tCIM_permutation_Max_Index.put(max_index, new Integer(++c));
 							} else {
-								ICIM_permutation_Max_Index.put(max_index, new Integer(1));
+								tCIM_permutation_Max_Index.put(max_index, new Integer(1));
 							}
 						}
 					}
 					Pout.println(max);
-					thresholdICIM.add(max);
+					thresholdtCIM.add(max);
 				}
 				Pout.close();
-				PoutICIM.close();
-				Collections.sort(thresholdICIM);
+				PoutCIM.close();
+				Collections.sort(thresholdtCIM);
 			}
-			ArrayList ILOD = IM(selectedMarker, i_rep, ap, gs, Param1, 0, true);
-			LODICIM.add(ILOD);
-			//ICIM ends
-
-			//CIM begins
+			ArrayList tLOD = CIM(selectedMarker, i_rep, ap, gs, Param1, 0, isLODTest);
+			LODtCIM.add(tLOD);
+			//CIM end t
+			
+			//CIM begins LOD
+			isLODTest = true;
 			if (Param1.permutation > 0 && i_rep == 0) {
 				thresholdCIM = new ArrayList();
 				PrintStream Pout = new PrintStream(new BufferedOutputStream(
@@ -465,13 +509,19 @@ public class RegPopulation {
 				PrintStream PoutCIM = new PrintStream(new BufferedOutputStream(
 						new FileOutputStream("nullCIM.txt")));
 				for (int i_permu = 0; i_permu < Param1.permutation; i_permu++) {
-					ArrayList LOD = CIM(selectedMarker, i_rep, ap, gs, Param1, i_permu + 1);
+					ArrayList LOD = CIM(selectedMarker, i_rep, ap, gs, Param1, i_permu + 1, isLODTest);
 					PoutCIM.print(LOD.size()+ "\t");
 					for (int ii = 0; ii < LOD.size(); ii++) {
 						PoutCIM.print(LOD.get(ii) + ",");
 					}
 					PoutCIM.println();
 					Double max = Collections.max(LOD);
+					Double min = Collections.min(LOD);
+					if (!isLODTest) {
+						if (Math.abs(min.doubleValue())>Math.abs(max.doubleValue())) {
+							max = min;
+						}
+					}
 					for (int ii = 0; ii < LOD.size(); ii++) {
 						if (max == LOD.get(ii)) {
 							Integer max_index = new Integer(ii);
@@ -491,11 +541,41 @@ public class RegPopulation {
 				PoutCIM.close();
 				Collections.sort(thresholdCIM);
 			}
-			ArrayList LOD = CIM(selectedMarker, i_rep, ap, gs, Param1, 0);
+			ArrayList LOD = CIM(selectedMarker, i_rep, ap, gs, Param1, 0, isLODTest);
 			LODCIM.add(LOD);
 			//CIM ends
 		}
-//		System.out.println( "Threshold CIM: "+thresholdCIM.get((int)(0.95*Param1.permutation)));
+
+		PrintStream Pout1 = new PrintStream(new BufferedOutputStream(
+				new FileOutputStream("LODtCIM.txt")));
+		for (int i = 0; i < LODtCIM.size(); i++) {
+			ArrayList tLod = (ArrayList) LODtCIM.get(i);
+			for (int j = 0; j < tLod.size(); j++) {
+				Pout1.print(tLod.get(j) + " ");
+			}
+			Pout1.println();
+			for (int j = 0; j < PointIndex.length; j++) {
+				if(Param1.permutation == 0) {
+					continue;
+				}
+				if ((Double) tLod.get(PointIndex[j])>0) {
+					if(((Double) tLod.get(PointIndex[j])) > ((Double) thresholdtCIM.get((int)(0.975*Param1.permutation)))) {
+						powerPermutationtCIM[j] += 1;
+					}
+					if(((Double) tLod.get(PointIndex[j])).doubleValue() > (1-0.05/(d[0].length))) {
+						powertCIM[j] += 1;;
+					}
+				} else {
+					if(((Double) tLod.get(PointIndex[j])) > ((Double) thresholdtCIM.get((int)(0.025*Param1.permutation)))) {
+						powerPermutationtCIM[j] += 1;
+					}
+					if(((Double) tLod.get(PointIndex[j])).doubleValue() > (0.05/(d[0].length))) {
+						powertCIM[j] += 1;;
+					}
+				}
+			}
+		}
+		Pout1.close();
 		PrintStream Pout = new PrintStream(new BufferedOutputStream(
 				new FileOutputStream("LODCIM.txt")));
 		for (int i = 0; i < LODCIM.size(); i++) {
@@ -516,32 +596,14 @@ public class RegPopulation {
 		Pout.close();
 
 //		System.out.println( "Threshold ICIM: "+thresholdICIM.get((int)(0.95*Param1.permutation)));
-		PrintStream Pout1 = new PrintStream(new BufferedOutputStream(
-				new FileOutputStream("LODICIM.txt")));
-		for (int i = 0; i < LODICIM.size(); i++) {
-			ArrayList ILod = (ArrayList) LODICIM.get(i);
-			for (int j = 0; j < ILod.size(); j++) {
-				Pout1.print(ILod.get(j) + " ");
-			}
-			Pout1.println();
-			for (int j = 0; j < PointIndex.length; j++) {
-				if(Param1.permutation == 0) {
-					continue;
-				}
-				if(((Double) ILod.get(PointIndex[j])) > ((Double) thresholdICIM.get((int)(0.95*Param1.permutation)))) {
-					powerICIM[j] += 1;
-				}
-			}
-		}
-		Pout1.close();
 		for (int i = 0; i < PointIndex.length; i++) {
-			System.out.println(powerCIM[i] + " " +powerICIM[i]);
+			System.out.println(powertCIM[i] + " " + powerPermutationtCIM[i] + " " + powerCIM[i]);
 		}
 		System.out.println("++++++++++++++++");
-		Set Ikeys = ICIM_permutation_Max_Index.keySet();
+		Set Ikeys = tCIM_permutation_Max_Index.keySet();
 		for (Iterator e = Ikeys.iterator(); e.hasNext(); ) {
 			Integer Idx = (Integer) e.next();
-			System.out.println(Idx + "->" + ICIM_permutation_Max_Index.get(Idx));
+			System.out.println(Idx + "->" + tCIM_permutation_Max_Index.get(Idx));
 		}
 		System.out.println("++++++++++++++++");
 		Set keys = CIM_permutation_Max_Index.keySet();
@@ -622,7 +684,7 @@ public class RegPopulation {
 	}
 
 	public static ArrayList CIM(ArrayList selectedMarker, int i_rep, IMPopulation ap, GenomeScan gs,
-			Parameter1 Param1, int isPermutation) {
+			Parameter1 Param1, int isPermutation, boolean isLODTest) {
 		double[][] Y = new double[ap.IndividualNumber()][1];
 		ArrayList ids;
 		ArrayList t = new ArrayList();
@@ -677,8 +739,11 @@ public class RegPopulation {
 						H1lm.MLE();
 						Likelihood lkhd1 = new Likelihood(ap, gs, s);
 						double log1 = lkhd1.LogLikelihoodAlternativeCIM(H1lm, jj);
-						t.add(new Double((log0 - log1) * (-1)));
-//						t.add(new Double( ((RealMatrix) (H1lm.getEstimate())).getEntry(1, 0)));
+						if (isLODTest) {
+							t.add(new Double((log0 - log1) * (-1)));
+						} else {
+							t.add(H1lm.getPValueTTest(1));														
+						}
 					}
 				}
 			}
@@ -686,7 +751,7 @@ public class RegPopulation {
 		return t;
 	}
 
-	public static ArrayList IM(ArrayList selectedMarker, int i_rep, IMPopulation ap, GenomeScan gs, Parameter1 Param1, int isPermutation, boolean shouldKeepMean) {
+	public static ArrayList IM(ArrayList selectedMarker, int i_rep, IMPopulation ap, GenomeScan gs, Parameter1 Param1, int isPermutation, boolean shouldKeepMean, boolean UsingML) {
 		double[][] Y = new double[ap.IndividualNumber()][1];
 		double[][] H0Matrix = null;
 		if (shouldKeepMean) {
