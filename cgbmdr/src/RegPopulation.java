@@ -160,7 +160,7 @@ public class RegPopulation {
 				rep = Integer.parseInt(param.get(15));
 			}
 			// permutation
-			permutation = 1000;
+			permutation = 0;
 			if (param.size() > 16) {
 				permutation = Integer.parseInt(param.get(16));
 			}
@@ -325,8 +325,9 @@ public class RegPopulation {
 			String file = null;
 			Param2 = new Parameter2(file);
 		}
-		double d[][] = { { 0, 0.05, 0.1, 0.2, 0.3, 0.35, 0.4, 0.5,
-			               0.6, 0.7, 0.75, 0.8, 0.9, 1.0 } };
+		double d[][] = { { 0, 0.05, 0.1, 0.2, 0.3, 0.35, 0.4, 0.5, 0.6, 0.7, 0.75, 0.8, 0.9, 1.0}};
+		//, 1.10, 1.2, 1.30, 1.40, 1.5,
+			//               1.6, 1.7, 1.8, 1.9, 2.0} };
 		Param2.ReadMap(d);
 
 		// QTL
@@ -335,7 +336,7 @@ public class RegPopulation {
 		int[] chr1 = { 0 };
 		int[] loci1 = { 1 };
 		int[] genotype1 = { 2 };
-		double[] effect1 = { 1 };
+		double[] effect1 = { 0.5 };
 		int environment1 = 0;
 		AbstractLoci al1 = new AbstractLoci(chr1, loci1, genotype1, effect1,
 				environment1);
@@ -344,7 +345,7 @@ public class RegPopulation {
 		int[] chr2 = { 0 };
 		int[] loci2 = { 5 };
 		int[] genotype2 = { 2 };
-		double[] effect2 = { 1 };
+		double[] effect2 = { 0.5 };
 		AbstractLoci al2 = new AbstractLoci(chr2, loci2, genotype2, effect2,
 				environment1);
 		QTL.add(al2);
@@ -352,7 +353,7 @@ public class RegPopulation {
 		int[] chr3 = { 0 };
 		int[] loci3 = { 10 };
 		int[] genotype3 = { 2 };
-		double[] effect3 = { 1 };
+		double[] effect3 = { -0.5 };
 		AbstractLoci al3 = new AbstractLoci(chr3, loci3, genotype3, effect3,
 				environment1);
 		QTL.add(al3);
@@ -363,13 +364,13 @@ public class RegPopulation {
 							(new Double(d[0][loci2[0]] * 100)).intValue(), 
 							(new Double(d[0][loci3[0]] * 100)).intValue()}; 
 		
-		ArrayList selectedMarker = new ArrayList();
-		selectedMarker.add(new Integer(0));
-		selectedMarker.add(new Integer(1));
-		selectedMarker.add(new Integer(3));
-		selectedMarker.add(new Integer(4));
-		selectedMarker.add(new Integer(7));
-		selectedMarker.add(new Integer(8));
+		ArrayList selectedMarker = null;// new ArrayList();
+//		selectedMarker.add(new Integer(0));
+//		selectedMarker.add(new Integer(1));
+//		selectedMarker.add(new Integer(3));
+//		selectedMarker.add(new Integer(4));
+//		selectedMarker.add(new Integer(7));
+//		selectedMarker.add(new Integer(8));
 
 		boolean isLODTest = false;
 		double[] powerIM = new double[PointIndex.length];

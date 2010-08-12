@@ -125,7 +125,7 @@ public class Likelihood {
     	pdf = (1/Math.sqrt(2*Math.PI*var)) * Math.exp(-(mu1-mu0)*(mu1-mu0)/(2*var));
     	return pdf;
     }
-    
+
     public int[][] ChrInt() {
     	int[][] chrint = new int[SNPIdx.length][2];
         int c = 0;
