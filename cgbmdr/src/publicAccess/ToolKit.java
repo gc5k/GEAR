@@ -124,6 +124,48 @@ public class ToolKit {
         return accuracy;
     }
 
+    public static HashMap AccuracyLou(HashMap model, HashMap QTLProbabilityMatrix) throws ToolKitException {
+    	HashMap posteriorProbability = new HashMap();
+    	double accuracy = 0;
+        if (model == null) {
+            throw new ToolKitException("It is an empty model.");
+        }
+        double weightH = 0;
+        double weightL = 0;
+        double truePos = 0;
+        double trueNeg = 0;
+        double falsePos = 0;
+        double falseNeg = 0;
+        Set keys = model.keySet();
+        for (Iterator e = keys.iterator(); e.hasNext();) {
+            String key = (String) e.next();
+            Cell cell = (Cell) model.get(key);
+            if (cell.getStatus() == 1) {
+            	weightH += ((Double) QTLProbabilityMatrix.get(key)).doubleValue();
+                truePos += cell.getPositiveScore();
+                falseNeg += Math.abs(cell.getNegativeScore());
+            } else if (cell.getStatus() == 0) {
+            	weightL += ((Double) QTLProbabilityMatrix.get(key)).doubleValue();
+                trueNeg += Math.abs(cell.getNegativeScore());
+                falsePos += cell.getPositiveScore();
+            } else {
+                //what's going on if for a negative status;
+            }
+        }
+        for (Iterator e = keys.iterator(); e.hasNext();) {
+        	String key = (String) e.next();
+        	Cell cell = (Cell) model.get(key);
+        	if (cell.getStatus() == 1) {
+        		posteriorProbability.put(key, new Double(weightH));
+        	} else if (cell.getStatus() == 0) {
+        		posteriorProbability.put(key, new Double(weightL));
+        	} else {
+        		
+        	}
+        }
+        return posteriorProbability;
+    }
+
     public static double CGBStatistic(HashMap model) throws ToolKitException {
         double cgbStatistic = 0;
 
