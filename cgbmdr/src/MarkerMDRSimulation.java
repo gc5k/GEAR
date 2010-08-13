@@ -171,7 +171,7 @@ public class MarkerMDRSimulation {
         }
 //linkage map
         double d[][] = {
-            {0, 0.1, 0.2, 0.25, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9, 0.95, 1.0}
+            {0, 0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9, 0.95, 1.0, 1.05, 1.1, 1.2, 1.3, 1.4, 1.5, 1.6, 1.7, 1.8, 1.9, 2.0}
         };
 
         if (param2.size() > 1) {
@@ -187,9 +187,9 @@ public class MarkerMDRSimulation {
 //QTL
         ArrayList QTL = new ArrayList();
         int[] chr1 = {0};
-        int[] loci1 = {3};
-        int[] genotype1 = {1};
-        double[] effect1 = {2};
+        int[] loci1 = {11};
+        int[] genotype1 = {2};
+        double[] effect1 = {1};
         int environment1 = 0;
         AbstractLoci al = new AbstractLoci(chr1, loci1, genotype1, effect1, environment1);
         QTL.add(al);
