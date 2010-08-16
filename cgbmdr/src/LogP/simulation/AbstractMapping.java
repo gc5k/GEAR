@@ -18,6 +18,7 @@ import java.util.Collections;
 import java.util.Hashtable;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 import publicAccess.ToolKit;
@@ -41,15 +42,20 @@ public abstract class AbstractMapping {
 	Hashtable pointPowerDT;
 	Hashtable pointPowerAPvalue;
 	Hashtable pointPowerDPvalue;
+	Hashtable pointPowerEmpiricalAPvalue;
+	Hashtable pointPowerEmpiricalDPvalue;
 
 	ArrayList thresholdLOD;
 	ArrayList thresholdAT;
 	ArrayList thresholdDT;
+	ArrayList thresholdPvalue;
 
 	ArrayList SimulationResults;
 
 	double[][] distance;
 	double LogBon;
+	double typeI_LogBon;
+	double EmpiricalLogBon;
 	double Num_interval;
 	public AbstractMapping() {
 		selectedMarker = null;
@@ -77,6 +83,7 @@ public abstract class AbstractMapping {
 		}
 		return chrint;
 	}
+
 	private void setup(ArrayList QTL, double[][] map) {
 		int[][] pointIndex = new int[QTL.size()][3];
 		pointPowerLOD = new Hashtable();
@@ -84,6 +91,8 @@ public abstract class AbstractMapping {
 		pointPowerDT = new Hashtable();
 		pointPowerAPvalue = new Hashtable();
 		pointPowerDPvalue = new Hashtable();
+		pointPowerEmpiricalAPvalue = new Hashtable();
+		pointPowerEmpiricalDPvalue = new Hashtable();
 		for (int i = 0; i < QTL.size(); i++) {
 			AbstractLoci al = (AbstractLoci) QTL.get(i);
 			pointIndex[i][0] = al.getChr()[0];
@@ -100,6 +109,8 @@ public abstract class AbstractMapping {
 			pointPowerDT.put(Utils.makeKey(pointIndex[i]), new Integer(0));
 			pointPowerAPvalue.put(Utils.makeKey(pointIndex[i]), new Integer(0));
 			pointPowerDPvalue.put(Utils.makeKey(pointIndex[i]), new Integer(0));
+			pointPowerEmpiricalAPvalue.put(Utils.makeKey(pointIndex[i]), new Integer(0));
+			pointPowerEmpiricalDPvalue.put(Utils.makeKey(pointIndex[i]), new Integer(0));
 		}
 	}
 	
@@ -136,9 +147,38 @@ public abstract class AbstractMapping {
 		}
 	}
 
+	public abstract void correctLogBon();
+	
+	public void selectMarker(ArrayList QTL, double[][] map) {
+		selectedMarker = new ArrayList();
+		for (Iterator e = QTL.iterator(); e.hasNext(); ) {
+			AbstractLoci al = (AbstractLoci) e.next();
+			int chr = al.getChr()[0];
+			double loc = al.getLocation()[0];
+			int c = 0;
+			for (int i = 0; i < map.length; i++) {
+				for (int j = 1; j < map[i].length; j++) {
+					if (i == chr && map[i][j] > loc && map[i][j-1] < loc) {
+						ArrayList mp1 = new ArrayList();
+						mp1.add(new Integer(i));
+						mp1.add(new Integer(j-1));
+						ArrayList mp2 = new ArrayList();
+						mp2.add(new Integer(i));
+						mp2.add(new Integer(j));
+						selectedMarker.add(mp1);
+						selectedMarker.add(mp2);
+						break;
+					}
+				}
+			}
+		}
+	}
+
 	public void Simulation(Parameter1 p, ArrayList QTL,
-			double[] env, double[][] w, double[][] map, ArrayList sm) {
-		selectedMarker = sm;
+			double[] env, double[][] w, double[][] map, boolean isSelectMarker) {
+		if (isSelectMarker ) {
+			selectMarker(QTL, map);
+		}
 		weight = new double[w.length][];
 		for (int i = 0; i < w.length; i++) {
 			weight[i] = new double[w[i].length];
@@ -147,7 +187,7 @@ public abstract class AbstractMapping {
 		for (int i = 0; i < map.length; i++) {
 			Num_interval += map[i].length - 1;
 		}
-		LogBon = -1 * Math.log10(0.05 / Num_interval);
+		correctLogBon();
 		makeFullMap(QTL, map);
 		setup(QTL, map);
 		Param1 = p;
@@ -181,27 +221,41 @@ public abstract class AbstractMapping {
 				thresholdLOD = new ArrayList();
 				thresholdAT = new ArrayList();
 				thresholdDT = new ArrayList();
-
+				thresholdPvalue = new ArrayList();
 				for (int i_permu = 0; i_permu < Param1.permutation; i_permu++) {
 					ArrayList IMStatistic = MappingProcedure(i_rep, i_permu + 1);
 					ArrayList IMLOD = new ArrayList();
 					ArrayList IMAT = new ArrayList();
 					ArrayList IMDT = new ArrayList();
+					ArrayList IMPvalue = new ArrayList();
 
+					int c = 0;
 					for (int ii = 0; ii < IMStatistic.size(); ii++) {
 						PointMappingStatistic pms = (PointMappingStatistic) IMStatistic.get(ii);
 						IMLOD.add(new Double(pms.get_LOD()));
 						IMAT.add(new Double(pms.get_tStatistic_additive()));
 						IMDT.add(new Double(pms.get_tStatistic_dominant()));
+						IMPvalue.add(new Double(pms.get_logP_additive()));
+						if (((Double)(pms.get_logP_additive())).doubleValue() > LogBon ) {
+							c++;
+						}
+						if(weight.length >1) {
+							IMPvalue.add(new Double(pms.get_logP_dominant()));
+						}
+					}
+					if (c>0) {
+						typeI_LogBon +=1;
 					}
 					Double maxLOD = Collections.max(IMLOD);
 					thresholdLOD.add(maxLOD);
-					
+
 					thresholdAT.add(Collections.max(IMAT));
 					thresholdAT.add(Collections.min(IMAT));
 
 					thresholdDT.add(Collections.max(IMDT));
 					thresholdDT.add(Collections.min(IMDT));
+					
+					thresholdPvalue.add(Collections.max(IMPvalue));
 				}
 			}
 			ArrayList IMLOD = MappingProcedure(i_rep, 0);
@@ -212,7 +266,11 @@ public abstract class AbstractMapping {
 	public abstract ArrayList MappingProcedure(int i_rep, int isPermutation);
 
 	private void calculatePower() {
+		Collections.sort(thresholdPvalue);
+		EmpiricalLogBon = ((Double) thresholdPvalue.get((new Double (thresholdPvalue.size()*0.95)).intValue())).doubleValue();
+
 		System.out.println("logBon: " + LogBon);
+		System.out.println("EmpLogBon: " + EmpiricalLogBon);
 		Collections.sort(thresholdLOD);
 		double threshold_LOD = ((Double) thresholdLOD.get((new Double(
 				thresholdLOD.size() * 0.95)).intValue())).doubleValue();
@@ -249,18 +307,24 @@ public abstract class AbstractMapping {
 					p++;
 					pointPowerAPvalue.put(key, new Integer(p));
 				}
+				if (pointPowerEmpiricalAPvalue.containsKey(key) && pms.get_logP_additive() > EmpiricalLogBon) {
+					int p = ((Integer) pointPowerEmpiricalAPvalue.get(key)).intValue();
+					p++;
+					pointPowerEmpiricalAPvalue.put(key, new Integer(p));
+				}
 				if (weight.length > 1) {
-					if (pointPowerDPvalue.containsKey(key)) {
-						Integer power = (Integer) pointPowerDPvalue.get(key);
-						if (pms.get_logP_dominant() > LogBon) {
-							int p = power.intValue();
-							p++;
-							pointPowerDPvalue.put(key, new Integer(p));
-						}
+					if (pointPowerDPvalue.containsKey(key) && pms.get_logP_dominant() > LogBon) {
+						int p = ((Integer) pointPowerDPvalue.get(key)).intValue();
+						p++;
+						pointPowerDPvalue.put(key, new Integer(p));
+					}
+					if (pointPowerEmpiricalDPvalue.containsKey(key) && pms.get_logP_dominant() > EmpiricalLogBon) {
+						int p = ((Integer) pointPowerDPvalue.get(key)).intValue();
+						p++;
+						pointPowerEmpiricalDPvalue.put(key, new Integer(p));
 					}
 				}
 				if (pointPowerAT.containsKey(key)) {
-					Integer power = (Integer) pointPowerAT.get(key);
 					int p = ((Integer) pointPowerAT.get(key)).intValue();
 					if (pms.get_tStatistic_additive() > 0
 							&& pms.get_tStatistic_additive() > threshold_at_975) {
@@ -275,7 +339,6 @@ public abstract class AbstractMapping {
 				}
 				if (weight.length > 1) {
 					if (pointPowerDT.contains(key)) {
-						Integer power = (Integer) pointPowerDT.get(key);
 						int p = ((Integer) pointPowerDT.get(key)).intValue();
 						if (pms.get_tStatistic_dominant() > 0
 								&& pms.get_tStatistic_dominant() > threshold_dt_975) {
@@ -292,16 +355,19 @@ public abstract class AbstractMapping {
 			}
 		}
 		Set keys = pointPowerLOD.keySet();
-		System.out.println("QTL\tLOD\tAP\tDP\tAT\tDT");
+		System.out.println("type I LogBon: " + typeI_LogBon/Param1.permutation);
+		System.out.println("QTL\tLOD\tBonAP\tEmpAP\tBonDP\tEmpDP\tAT\tDT");
 		for (Iterator e = keys.iterator(); e.hasNext();) {
 			String key = (String) e.next();
 			System.out.print(key + "\t");
 			System.out.print((Integer) pointPowerLOD.get(key) + "\t");
 			System.out.print((Integer) pointPowerAPvalue.get(key) + "\t");
+			System.out.print((Integer) pointPowerEmpiricalAPvalue.get(key) + "\t");
 			if (weight.length > 1) {
 				System.out.print(pointPowerDPvalue.get(key) + "\t");
+				System.out.print(pointPowerEmpiricalDPvalue.get(key) + "\t");
 			} else {
-				System.out.print("--\t");
+				System.out.print("--\t--\t");
 			}
 			System.out.print(pointPowerAT.get(key) + "\t");
 			if (weight.length > 1) {

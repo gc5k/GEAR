@@ -33,6 +33,10 @@ public class CompositeIntervalMapping extends AbstractMapping{
 		super();
 	}
 
+	public void correctLogBon() {
+		LogBon = (-1) * Math.log10(0.025/(Num_interval));
+	}
+
 	public ArrayList MappingProcedure(int i_rep, int isPermutation) {
 		double[][] Y = new double[ap.IndividualNumber()][1];
 		ArrayList ids;
@@ -62,7 +66,6 @@ public class CompositeIntervalMapping extends AbstractMapping{
 					.SumIntevals());
 			cg.generateCombination();
 			List com = cg.get(i);
-			double[][] Coeff = { { 1, 0 } };
 			for (Iterator e = com.iterator(); e.hasNext();) {
 				String s = (String) e.next();
 				double[][] H0Matrix = imb.getNullCIMMatrix(selectedMarker, s);
@@ -82,7 +85,7 @@ public class CompositeIntervalMapping extends AbstractMapping{
 					int steps = iip[j].getWalks();
 					for (int jj = 0; jj < steps; jj++) {
 						double[][] H1Matrix = imb.getCIMMatrixAtPoint(
-								selectedMarker, s, Coeff, jj);
+								selectedMarker, s, weight, jj);
 						LinearRegression H1lm = new LinearRegression(H1Matrix,
 								Y);
 						H1lm.MLE();
