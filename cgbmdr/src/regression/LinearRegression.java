@@ -34,6 +34,7 @@ public class LinearRegression {
 	int df_residual;
 	double[] p_value_t_test;
 	double[] Var;
+	double[] tStatic;
 	double[] residuals;
 
 	public LinearRegression(double[][] x, double[][] y) {
@@ -43,6 +44,7 @@ public class LinearRegression {
 				- Predictor.getColumnDimension();
 		Var = new double[Predictor.getColumnDimension()];
 		p_value_t_test = new double[Predictor.getColumnDimension()];
+		tStatic = new double[Predictor.getColumnDimension()];
 		residuals = new double[y.length];
 		df_Predictor = Predictor.getColumnDimension() - 1;
 	}
@@ -59,39 +61,15 @@ public class LinearRegression {
 		RealMatrix residual_t = residual.transpose();
 		RealMatrix sse = residual_t.multiply(residual);
 		mse = sse.getEntry(0, 0)/ df_residual;
-//		//ML mse
-//		if (usingML_MSE && estimate.getRowDimension() > 1) {
-//			mse = sse.getEntry(0, 0) / df_residual;
-//			RealMatrix estimate1 = estimate;
-//			double[] v = new double[estimate1.getRowDimension()];
-//			for (int i = 0; i < v.length; i++) {
-//				v[i] = estimate1.getEntry(i, 0);
-//			}
-//			v[1] = 0;
-//			RealMatrix BA = new RealMatrixImpl(v);
-//			RealMatrix fit1 = Predictor.multiply(BA);
-//			RealMatrix Res1 = Response.subtract(fit1);
-//			RealMatrix Res1_t = Res1.transpose();
-//			double c = 0;
-//			for (int i = 0; i < Predictor.getRowDimension(); i++) {
-//				c += Predictor.getEntry(i, 1);
-//			}
-//
-//			double mse_ML = (((RealMatrix) Res1_t.multiply(Res1))
-//					.getEntry(0, 0) - estimate.getEntry(1, 0)
-//					* estimate.getEntry(1, 0) * c)
-//					/ Response.getRowDimension();
-//			mse = mse_ML;
-//		}
-//		//ML mse
+
 		RealMatrix FI = X_tX_Ivt;
 		TDistribution t = new TDistributionImpl(df_residual);
 		for (int i = 0; i < Var.length; i++) {
 			Var[i] = mse * FI.getEntry(i, i);
-			double t_val = Math.abs(estimate.getEntry(i, 0))
+			tStatic[i] = estimate.getEntry(i, 0)
 					/ Math.sqrt(Var[i]);
 			try {
-				double p = t.cumulativeProbability(t_val);
+				double p = t.cumulativeProbability(tStatic[i]);
 				p_value_t_test[i] = p;
 			} catch (MathException E) {
 				E.printStackTrace(System.err);
@@ -121,8 +99,7 @@ public class LinearRegression {
 		}
 	}
 
-	public double[][] quasiResidual(ArrayList selectedMarker, int interval,
-			boolean shouldKeepMean) {
+	public double[][] quasiResidual(ArrayList selectedMarker, int interval) {
 		double[][] Y_res = new double[Response.getRowDimension()][1];
 		if (selectedMarker == null) {
 			for (int i = 0; i < Y_res.length; i++) {
@@ -162,8 +139,28 @@ public class LinearRegression {
     	return y;
     }
     
+    public double getSD(int idx) {
+    	return Var[idx];
+    }
+
+    public double DFResidual() {
+    	return df_residual;
+    }
+    
+    public double DFPredictor() {
+    	return df_Predictor;
+    }
+
+    public double DFTotal() {
+    	return df_residual+df_Predictor+1;
+    }
+
     public double get_F_Statistic () {
         return F_statistic;
+    }
+
+    public double getTStatic(int idx) {
+    	return tStatic[idx];
     }
 
 	public double getP_F() {
@@ -184,6 +181,10 @@ public class LinearRegression {
 
 	public RealMatrix getEstimate() {
 		return estimate;
+	}
+
+	public double getCoefficient(int idx) {
+		return estimate.getEntry(idx, 0);
 	}
 
 	public RealMatrix Y() {

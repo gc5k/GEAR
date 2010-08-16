@@ -27,7 +27,7 @@ public class IMBMatrix {
 	public double[][] getICIMMatrixAtPoint(String com, double[][] coeff,
 			int interval) {
 		SNPIdx = ToolKit.StringToIntArray(com);
-		double[][] matrix = new double[imp.IndividualNumber()][2];
+		double[][] matrix = new double[imp.IndividualNumber()][coeff.length+1];
 		ChrInt();
 		IntervalPriorProbability[] iip = new IntervalPriorProbability[SNPIdx.length];
 		for (int i = 0; i < SNPIdx.length; i++) {
@@ -37,9 +37,10 @@ public class IMBMatrix {
 			matrix[i][0] = 1;
 			int IIPIdx = gs.getIPPRowIndexForIndividual(i, ChrInt[0][0],
 					ChrInt[0][1]);
-			for (int k = 0; k < iip[0].NumQTLtypes(); k++) {
-				matrix[i][1] += iip[0].PriorProbabilityAt(IIPIdx, interval, k)
-						* coeff[0][k];
+			for (int j = 0; j < coeff.length; j++) {
+				for (int k = 0; k < iip[0].NumQTLtypes(); k++) {
+					matrix[i][1+j] += iip[0].PriorProbabilityAt(IIPIdx, interval, k) * coeff[j][k];
+				}
 			}
 		}
 		return matrix;

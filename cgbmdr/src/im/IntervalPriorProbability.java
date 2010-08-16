@@ -28,7 +28,23 @@ public class IntervalPriorProbability {
     ArrayList QTLtype;
     Pattern[] population;
     double[][][] interval_pp;   // [NumGenotype][Interval/step][NumQTL]
-
+    boolean isLastInterval;
+    
+    public IntervalPriorProbability(IMPopulation imp, double s, double l, int chr, int inter, boolean isLast) {
+        chromosome = chr;
+        interval = inter;
+        length = l;
+        populationType = imp.getCrossParameter();
+        step = s;
+        map_function = imp.MapFunction();
+        walks = CalculateWalks(l, s);
+        isLastInterval = isLast;
+        if (isLastInterval) {
+        	walks++;
+        }
+        initial();
+    }
+    
     public IntervalPriorProbability(IMPopulation imp, double s, double l, int chr, int inter) {
         chromosome = chr;
         interval = inter;
@@ -51,9 +67,6 @@ public class IntervalPriorProbability {
         }
         int len = ((int) Math.ceil(l / s)) > 0 ? ((int) Math.round(l / s)) : 1;
 
-//        if ((len != 1) && ((Math.abs((len - 1) * step) - l) < (s / 2))) {
-//            len--;
-//        }
         return len;
     }
 
@@ -163,7 +176,7 @@ public class IntervalPriorProbability {
         }
         return idx;
     }
-
+    
     public boolean ScanInterval(int markerScore) {
         boolean flag = false;
         int idx = ((Integer) genoPPMap.get(new Integer(markerScore))).intValue();
@@ -223,7 +236,15 @@ public class IntervalPriorProbability {
                     pp[i][0] = rM1Q * rQM2 / (1 - rM1M2);
                     pp[i][1] = (1 - rM1Q) * (1 - rQM2) / (1 - rM1M2);
             }
-            s += step;
+            if ((walks - i)==2) {
+            	if (isLastInterval) {
+            		s  = length;
+            	} else {
+            		s += step;
+            	}
+            } else  {
+            	s += step;
+            }
         }
         BayesProbability(pp);
         for (int i = 0; i < walks; i++) {
@@ -267,7 +288,15 @@ public class IntervalPriorProbability {
                     pp[i][0] = rM1Q * rQM2 / (1 - rM1M2);
                     pp[i][1] = (1 - rM1Q) * (1 - rQM2) / (1 - rM1M2);
             }
-            s += step;
+            if ((walks - i)==2) {
+            	if (isLastInterval) {
+            		s  = length;
+            	} else {
+            		s += step;
+            	}
+            } else  {
+            	s += step;
+            }
         }
         BayesProbability(pp);
         for (int i = 0; i < walks; i++) {
@@ -346,7 +375,15 @@ public class IntervalPriorProbability {
                     pp[i][1] = 0;
                     pp[i][2] = 1;
             }
-            s += step;
+            if ((walks - i)==2) {
+            	if (isLastInterval) {
+            		s  = length;
+            	} else {
+            		s += step;
+            	}
+            } else  {
+            	s += step;
+            }
         }
         BayesProbability(pp);
         for (int i = 0; i < walks; i++) {
@@ -390,7 +427,15 @@ public class IntervalPriorProbability {
                     pp[i][0] = rM1Q * rQM2 / (1 - rM1M2);
                     pp[i][1] = (1 - rM1Q) * (1 - rQM2) / (1 - rM1M2);
             }
-            s += step;
+            if ((walks - i)==2) {
+            	if (isLastInterval) {
+            		s  = length;
+            	} else {
+            		s += step;
+            	}
+            } else  {
+            	s += step;
+            }
         }
         BayesProbability(pp);
         for (int i = 0; i < walks; i++) {
