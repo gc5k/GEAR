@@ -24,7 +24,8 @@ public class GenomeScan {
         if(!imp.IsPicked()) {
             for (int i = 0; i < imp.ChromosomeNumber(); i++) {
                 for (int j = 0; j < imp.IntervalNumberAtChromosome(i); j++) {
-                    IntervalPriorProbability ipp = new IntervalPriorProbability(imp, step, (imp.DistanceAt(i, j + 1) - imp.DistanceAt(i, j)), i, j);
+                	boolean flag = (j == imp.IntervalNumberAtChromosome(i)-1) ? true:false;
+                    IntervalPriorProbability ipp = new IntervalPriorProbability(imp, step, (imp.DistanceAt(i, j + 1) - imp.DistanceAt(i, j)), i, j, flag);
                     String key = IMToolKit.MakeKey(IMToolKit.chr_prefix, IMToolKit.interval_prefix, i, j);
                     intervalPP.put(key, ipp);
                     for (int k = 0; k < imp.ObservedGenotype(); k++) {
