@@ -26,6 +26,9 @@ import regression.LinearRegression;
 import regression.Likelihood;
 import org.apache.commons.math.linear.RealMatrix;
 
+
+import org.apache.commons.math.distribution.TDistribution;
+import org.apache.commons.math.distribution.TDistributionImpl;
 /**
  * 
  * @author Guo-Bo Chen
@@ -161,7 +164,7 @@ public class RegPopulation {
 				rep = Integer.parseInt(param.get(15));
 			}
 			// permutation
-			permutation = 5000;
+			permutation = 100;
 			if (param.size() > 16) {
 				permutation = Integer.parseInt(param.get(16));
 			}
@@ -288,6 +291,7 @@ public class RegPopulation {
 	}
 
 	public static void main(String[] args) throws IOException {
+		
 		Parameter1 Param1 = null;
 		if (args.length > 0) {
 			Param1 = new Parameter1(args[0]);
@@ -313,7 +317,7 @@ public class RegPopulation {
 		ArrayList QTL = new ArrayList();
 
 		int[] chr1 = { 0 };
-		double[] location1 = {0.45};
+		double[] location1 = {0.05};
 		int[] genotype1 = { 2 };
 		double[] effect1 = { 0.5 };
 		int environment1 = 0;
@@ -321,7 +325,7 @@ public class RegPopulation {
 				environment1);
 		QTL.add(al1);
 
-		int[] chr2 = { 1 };
+		int[] chr2 = { 0 };
 		double[] location2 = {0.45};
 		int[] genotype2 = { 2 };
 		double[] effect2 = { 0.5 };
@@ -329,7 +333,7 @@ public class RegPopulation {
 				environment1);
 		QTL.add(al2);
 
-		int[] chr3 = { 1 };
+		int[] chr3 = { 0 };
 		double[] location3 = { 0.85 };
 		int[] genotype3 = { 2 };
 		double[] effect3 = { 0.5 };

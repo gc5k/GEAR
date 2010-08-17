@@ -269,7 +269,7 @@ public abstract class AbstractMapping {
 		Collections.sort(thresholdPvalue);
 		EmpiricalLogBon = ((Double) thresholdPvalue.get((new Double (thresholdPvalue.size()*0.95)).intValue())).doubleValue();
 
-		System.out.println("logBon: " + LogBon);
+		System.out.println("LogBon: " + LogBon);
 		System.out.println("EmpLogBon: " + EmpiricalLogBon);
 		Collections.sort(thresholdLOD);
 		double threshold_LOD = ((Double) thresholdLOD.get((new Double(
