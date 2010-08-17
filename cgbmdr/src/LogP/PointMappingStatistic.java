@@ -15,8 +15,9 @@ public class PointMappingStatistic {
 	private double D_t_p_value_cu;
 	private double degree_freedom;
 	private String key;
+
 	public PointMappingStatistic(int c, int i, int w, double l, 
-			double a, double a_sd, double a_t, double a_t_p,
+			double a,double a_sd, double a_t, double a_t_p, 
 			double d, double d_sd, double d_t, double d_t_p, double df) {
 		chr = c;
 		interval = i;
@@ -31,39 +32,39 @@ public class PointMappingStatistic {
 		D_t = d_t;
 		D_t_p_value_cu = d_t_p;
 		degree_freedom = df;
-		int[] substring = {chr, interval, walk};
+		int[] substring = { chr, interval, walk };
 		key = Utils.makeKey(substring);
 	}
-	
+
 	public String getKey() {
 		return key;
 	}
 
-	public double get_logP_additive () {
+	public double get_logP_additive() {
 		double logp = 0;
-		if (A_t<0) {
-			logp = -1*Math.log10(A_t_p_value_cu);
+		if (A_t < 0) {
+			logp = -1 * Math.log10(A_t_p_value_cu);
 		} else {
-			logp = -1*Math.log10(1-A_t_p_value_cu);
+			logp = -1 * Math.log10(1 - A_t_p_value_cu);
 		}
 		return logp;
 	}
 
-	public double get_logP_dominant () {
+	public double get_logP_dominant() {
 		double logp = 0;
-		if (D_t<0) {
-			logp = -1*Math.log10(D_t_p_value_cu);
+		if (D_t < 0) {
+			logp = -1 * Math.log10(D_t_p_value_cu);
 		} else {
-			logp = -1*Math.log10(1-D_t_p_value_cu);
+			logp = -1 * Math.log10(1 - D_t_p_value_cu);
 		}
 		return logp;
 	}
-	
-	public double get_tStatistic_additive () {
+
+	public double get_tStatistic_additive() {
 		return A_t;
 	}
 
-	public double get_tStatistic_dominant () {
+	public double get_tStatistic_dominant() {
 		return D_t;
 	}
 

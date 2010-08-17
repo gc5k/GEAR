@@ -69,8 +69,7 @@ public class LinearRegression {
 			tStatic[i] = estimate.getEntry(i, 0)
 					/ Math.sqrt(Var[i]);
 			try {
-				double p = t.cumulativeProbability(tStatic[i]);
-				p_value_t_test[i] = p;
+				p_value_t_test[i] =  t.cumulativeProbability(tStatic[i]);
 			} catch (MathException E) {
 				E.printStackTrace(System.err);
 			}
