@@ -164,7 +164,7 @@ public class RegPopulation {
 				rep = Integer.parseInt(param.get(15));
 			}
 			// permutation
-			permutation = 100;
+			permutation = 5000;
 			if (param.size() > 16) {
 				permutation = Integer.parseInt(param.get(16));
 			}
@@ -308,8 +308,10 @@ public class RegPopulation {
 			Param2 = new Parameter2(file);
 		}
 
-		double map[][] = { {0, 0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9, 1.0},
-				{0, 0.05, 0.1, 0.15, 0.2, 0.25, 0.3, 0.35, 0.4, 0.5, 0.55, 0.6, 0.65, 0.7, 0.75, 0.8, 0.9, 0.95, 1.0}};
+		double map[][] = { {0, 0.1, 0.2} };
+//							{0, 0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9, 1.0},
+//							{0, 0.05, 0.1, 0.15, 0.2, 0.25, 0.3, 0.35, 0.4, 0.45, 0.5} };
+//				{0, 0.05, 0.1, 0.15, 0.2, 0.25, 0.3, 0.35, 0.4, 0.5, 0.55, 0.6, 0.65, 0.7, 0.75, 0.8, 0.9, 0.95, 1.0}};
 						//1.1, 1.2, 1.3, 1.4,	1.5, 1.6, 1.7, 1.8, 1.9, 2.0} };
 		Param2.ReadMap(map);
 
@@ -319,27 +321,27 @@ public class RegPopulation {
 		int[] chr1 = { 0 };
 		double[] location1 = {0.05};
 		int[] genotype1 = { 2 };
-		double[] effect1 = { 0.5 };
+		double[] effect1 = { 1 };
 		int environment1 = 0;
 		AbstractLoci al1 = new AbstractLoci(chr1, location1, genotype1, effect1,
 				environment1);
 		QTL.add(al1);
 
-		int[] chr2 = { 0 };
-		double[] location2 = {0.45};
-		int[] genotype2 = { 2 };
-		double[] effect2 = { 0.5 };
-		AbstractLoci al2 = new AbstractLoci(chr2, location2, genotype2, effect2,
-				environment1);
-		QTL.add(al2);
-
-		int[] chr3 = { 0 };
-		double[] location3 = { 0.85 };
-		int[] genotype3 = { 2 };
-		double[] effect3 = { 0.5 };
-		AbstractLoci al3 = new AbstractLoci(chr3, location3, genotype3, effect3,
-				environment1);
-		QTL.add(al3);
+//		int[] chr2 = { 0 };
+//		double[] location2 = {0.45};
+//		int[] genotype2 = { 2 };
+//		double[] effect2 = { 0.5 };
+//		AbstractLoci al2 = new AbstractLoci(chr2, location2, genotype2, effect2,
+//				environment1);
+//		QTL.add(al2);
+//
+//		int[] chr3 = { 0 };
+//		double[] location3 = { 0.85 };
+//		int[] genotype3 = { 2 };
+//		double[] effect3 = { 0.5 };
+//		AbstractLoci al3 = new AbstractLoci(chr3, location3, genotype3, effect3,
+//				environment1);
+//		QTL.add(al3);
 
 		Param2.ReadQTL(QTL);
 		double[] env = { 0.0 };

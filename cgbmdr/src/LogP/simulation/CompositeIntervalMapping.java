@@ -34,7 +34,8 @@ public class CompositeIntervalMapping extends AbstractMapping{
 	}
 
 	public void correctLogBon() {
-		LogBon = (-1) * Math.log10(0.025/(Num_interval));
+		LogBon = (-1) * Math.log10(0.05/(Num_interval));
+		BonT = 0.05/Num_interval;		
 	}
 
 	public ArrayList MappingProcedure(int i_rep, int isPermutation) {
