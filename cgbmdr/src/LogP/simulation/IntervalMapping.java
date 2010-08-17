@@ -35,7 +35,8 @@ public class IntervalMapping extends AbstractMapping{
 	}
 
 	public void correctLogBon() {
-		LogBon = -1 * Math.log10(0.025/(Num_interval));
+		LogBon = -1 * Math.log10(0.05/(Num_interval));
+		BonT = 0.05/Num_interval;
 	}
 
 	private void setup(ArrayList QTL, double[][]d, double[][] map) {

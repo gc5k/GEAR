@@ -46,7 +46,8 @@ public abstract class AbstractMapping {
 	Hashtable pointPowerEmpiricalDPvalue;
 
 	ArrayList thresholdLOD;
-	ArrayList thresholdAT;
+	ArrayList thresholdATPos;
+	ArrayList thresholdATNeg;
 	ArrayList thresholdDT;
 	ArrayList thresholdPvalue;
 
@@ -54,6 +55,11 @@ public abstract class AbstractMapping {
 
 	double[][] distance;
 	double LogBon;
+	double t_at_0975 = 2.7611;
+	double t_at_0025 = -2.784;
+	double BonT;
+	double typeI_bt;
+	double typeI_EmpT;
 	double typeI_LogBon;
 	double EmpiricalLogBon;
 	double Num_interval;
@@ -100,7 +106,7 @@ public abstract class AbstractMapping {
 			for (int j = 0; j < map[al.getChr()[0]].length-1; j++) {
 				if(location < map[al.getChr()[0]][j+1]) {
 					pointIndex[i][1] = j;
-					pointIndex[i][2] = (new Double((location-map[al.getChr()[0]][j])*100)).intValue() + 1;
+					pointIndex[i][2] = (new Double((location-map[al.getChr()[0]][j])*100)).intValue()+ 1;
 					break;
 				}
 			}
@@ -185,7 +191,7 @@ public abstract class AbstractMapping {
 			System.arraycopy(w[i], 0, weight[i], 0, weight[i].length);
 		}
 		for (int i = 0; i < map.length; i++) {
-			Num_interval += map[i].length - 1;
+			Num_interval += map[i].length == 1 ? map[i].length : (map[i].length - 1);
 		}
 		correctLogBon();
 		makeFullMap(QTL, map);
@@ -218,8 +224,16 @@ public abstract class AbstractMapping {
 			gs.CalculateIPP();
 
 			if (Param1.permutation > 0 && i_rep == 0) {
+				PrintStream Pout1 = null;
+				try {
+					Pout1 = new PrintStream(new BufferedOutputStream(
+							new FileOutputStream("Ghost.txt")));
+				} catch (Exception E) {
+					E.printStackTrace(System.err);
+				}				
 				thresholdLOD = new ArrayList();
-				thresholdAT = new ArrayList();
+				thresholdATPos = new ArrayList();
+				thresholdATNeg = new ArrayList();
 				thresholdDT = new ArrayList();
 				thresholdPvalue = new ArrayList();
 				for (int i_permu = 0; i_permu < Param1.permutation; i_permu++) {
@@ -230,33 +244,54 @@ public abstract class AbstractMapping {
 					ArrayList IMPvalue = new ArrayList();
 
 					int c = 0;
+					int ct = 0;
+					int bt = 0;
 					for (int ii = 0; ii < IMStatistic.size(); ii++) {
 						PointMappingStatistic pms = (PointMappingStatistic) IMStatistic.get(ii);
 						IMLOD.add(new Double(pms.get_LOD()));
 						IMAT.add(new Double(pms.get_tStatistic_additive()));
 						IMDT.add(new Double(pms.get_tStatistic_dominant()));
 						IMPvalue.add(new Double(pms.get_logP_additive()));
-						if (((Double)(pms.get_logP_additive())).doubleValue() > LogBon ) {
+						if (pms.get_logP_additive() > LogBon ) {
 							c++;
 						}
+						if (pms.get_P_additive() < BonT) {
+							bt++;
+						}
+						if (pms.get_tStatistic_additive() > 0 && pms.get_tStatistic_additive() > t_at_0975) {
+							ct++;
+						}
+						if (pms.get_tStatistic_additive() < 0 && pms.get_tStatistic_additive() < t_at_0025) {
+							ct++;
+						}
 						if(weight.length >1) {
-							IMPvalue.add(new Double(pms.get_logP_dominant()));
+							IMPvalue.add(new Double(pms.get_logP_dominance()));
 						}
 					}
 					if (c>0) {
 						typeI_LogBon +=1;
 					}
-					Double maxLOD = Collections.max(IMLOD);
-					thresholdLOD.add(maxLOD);
+					if (ct>0) {
+						typeI_EmpT +=1;
+						for (Iterator ep = IMPvalue.iterator(); ep.hasNext(); ) {
+							Pout1.print(ep.next() + "\t");
+						}
+						Pout1.println();
+					}
+					if (bt>0) {
+						typeI_bt +=1;
+					}
+					thresholdLOD.add(Collections.max(IMLOD));
 
-					thresholdAT.add(Collections.max(IMAT));
-					thresholdAT.add(Collections.min(IMAT));
+					thresholdATPos.add(Collections.max(IMAT));
+					thresholdATNeg.add(Collections.min(IMAT));
 
 					thresholdDT.add(Collections.max(IMDT));
 					thresholdDT.add(Collections.min(IMDT));
 					
 					thresholdPvalue.add(Collections.max(IMPvalue));
 				}
+				Pout1.close();
 			}
 			ArrayList IMLOD = MappingProcedure(i_rep, 0);
 			SimulationResults.add(IMLOD);
@@ -267,20 +302,20 @@ public abstract class AbstractMapping {
 
 	private void calculatePower() {
 		Collections.sort(thresholdPvalue);
-		EmpiricalLogBon = ((Double) thresholdPvalue.get((new Double (thresholdPvalue.size()*0.95)).intValue())).doubleValue();
-
+		EmpiricalLogBon = ((Double) thresholdPvalue.get((new Double ((thresholdPvalue.size()-1)*0.95)).intValue())).doubleValue();
+		System.out.println("BonT: " + BonT);
 		System.out.println("LogBon: " + LogBon);
 		System.out.println("EmpLogBon: " + EmpiricalLogBon);
 		Collections.sort(thresholdLOD);
 		double threshold_LOD = ((Double) thresholdLOD.get((new Double(
-				thresholdLOD.size() * 0.95)).intValue())).doubleValue();
+				(thresholdLOD.size()-1) * 0.95)).intValue())).doubleValue();
 		System.out.println("threshold_LOD: " + threshold_LOD);
 
-		Collections.sort(thresholdAT);
-		double threshold_at_975 = ((Double) thresholdAT.get((new Double(
-				(thresholdAT.size()-1) * 0.975)).intValue())).doubleValue();
-		double threshold_at_025 = ((Double) thresholdAT.get((new Double(
-				(thresholdAT.size()-1) * 0.025)).intValue())).doubleValue();
+		Collections.sort(thresholdATPos);
+		double threshold_at_975 = ((Double) thresholdATPos.get((new Double(
+				(thresholdATPos.size()-1) * 0.975)).intValue())).doubleValue();
+		double threshold_at_025 = ((Double) thresholdATNeg.get((new Double(
+				(thresholdATNeg.size()-1) * 0.025)).intValue())).doubleValue();
 		System.out.println("threshold_at_975: " + threshold_at_975);
 		System.out.println("threshold_at_025: " + threshold_at_025);
 
@@ -313,12 +348,12 @@ public abstract class AbstractMapping {
 					pointPowerEmpiricalAPvalue.put(key, new Integer(p));
 				}
 				if (weight.length > 1) {
-					if (pointPowerDPvalue.containsKey(key) && pms.get_logP_dominant() > LogBon) {
+					if (pointPowerDPvalue.containsKey(key) && pms.get_logP_dominance() > LogBon) {
 						int p = ((Integer) pointPowerDPvalue.get(key)).intValue();
 						p++;
 						pointPowerDPvalue.put(key, new Integer(p));
 					}
-					if (pointPowerEmpiricalDPvalue.containsKey(key) && pms.get_logP_dominant() > EmpiricalLogBon) {
+					if (pointPowerEmpiricalDPvalue.containsKey(key) && pms.get_logP_dominance() > EmpiricalLogBon) {
 						int p = ((Integer) pointPowerDPvalue.get(key)).intValue();
 						p++;
 						pointPowerEmpiricalDPvalue.put(key, new Integer(p));
@@ -356,6 +391,8 @@ public abstract class AbstractMapping {
 		}
 		Set keys = pointPowerLOD.keySet();
 		System.out.println("type I LogBon: " + typeI_LogBon/Param1.permutation);
+		System.out.println("type I BonT: " + typeI_bt/Param1.permutation);
+		System.out.println("type I EmpT: " + typeI_EmpT/Param1.permutation);		
 		System.out.println("QTL\tLOD\tBonAP\tEmpAP\tBonDP\tEmpDP\tAT\tDT");
 		for (Iterator e = keys.iterator(); e.hasNext();) {
 			String key = (String) e.next();

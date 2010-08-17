@@ -43,23 +43,40 @@ public class PointMappingStatistic {
 	public double get_logP_additive() {
 		double logp = 0;
 		if (A_t < 0) {
-			logp = -1 * Math.log10(A_t_p_value_cu);
+			logp = -1 * Math.log10(A_t_p_value_cu*2);
 		} else {
-			logp = -1 * Math.log10(1 - A_t_p_value_cu);
+			logp = -1 * Math.log10((1 - A_t_p_value_cu)*2);
 		}
 		return logp;
 	}
 
-	public double get_logP_dominant() {
+	public double get_P_additive() {
+		if (A_t < 0) {
+			return A_t_p_value_cu * 2;
+		} else {
+			return (1-A_t_p_value_cu) * 2;
+		}
+	}
+
+	public double get_logP_dominance() {
 		double logp = 0;
 		if (D_t < 0) {
-			logp = -1 * Math.log10(D_t_p_value_cu);
+			logp = -1 * Math.log10(D_t_p_value_cu*2);
 		} else {
-			logp = -1 * Math.log10(1 - D_t_p_value_cu);
+			logp = -1 * Math.log10((1 - D_t_p_value_cu)*2);
 		}
 		return logp;
 	}
 
+	public double get_P_dominance() {
+		if (A_t < 0) {
+			return A_t_p_value_cu * 2;
+		} else {
+			return (1-A_t_p_value_cu) * 2;
+		}
+	}
+
+	
 	public double get_tStatistic_additive() {
 		return A_t;
 	}
