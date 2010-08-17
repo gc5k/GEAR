@@ -90,7 +90,7 @@ public abstract class AbstractMapping {
 		return chrint;
 	}
 
-	private void setup(ArrayList QTL, double[][] map) {
+	private void setup(ArrayList QTL, double[][] map, Parameter1 p) {
 		int[][] pointIndex = new int[QTL.size()][3];
 		pointPowerLOD = new Hashtable();
 		pointPowerAT = new Hashtable();
@@ -106,7 +106,7 @@ public abstract class AbstractMapping {
 			for (int j = 0; j < map[al.getChr()[0]].length-1; j++) {
 				if(location < map[al.getChr()[0]][j+1]) {
 					pointIndex[i][1] = j;
-					pointIndex[i][2] = (new Double((location-map[al.getChr()[0]][j])*100)).intValue()+ 1;
+					pointIndex[i][2] = (new Double((location-map[al.getChr()[0]][j])/p.step)).intValue()+ 1;
 					break;
 				}
 			}
@@ -195,7 +195,7 @@ public abstract class AbstractMapping {
 		}
 		correctLogBon();
 		makeFullMap(QTL, map);
-		setup(QTL, map);
+		setup(QTL, map, p);
 		Param1 = p;
 		SimulationResults = new ArrayList();
 		for (int i_rep = 0; i_rep < Param1.rep; i_rep++) {
@@ -258,28 +258,16 @@ public abstract class AbstractMapping {
 						if (pms.get_P_additive() < BonT) {
 							bt++;
 						}
-						if (pms.get_tStatistic_additive() > 0 && pms.get_tStatistic_additive() > t_at_0975) {
-							ct++;
-						}
-						if (pms.get_tStatistic_additive() < 0 && pms.get_tStatistic_additive() < t_at_0025) {
-							ct++;
-						}
 						if(weight.length >1) {
 							IMPvalue.add(new Double(pms.get_logP_dominance()));
 						}
 					}
 					if (c>0) {
 						typeI_LogBon +=1;
-					}
-					if (ct>0) {
-						typeI_EmpT +=1;
 						for (Iterator ep = IMPvalue.iterator(); ep.hasNext(); ) {
 							Pout1.print(ep.next() + "\t");
 						}
-						Pout1.println();
-					}
-					if (bt>0) {
-						typeI_bt +=1;
+						Pout1.println();						
 					}
 					thresholdLOD.add(Collections.max(IMLOD));
 
@@ -390,9 +378,7 @@ public abstract class AbstractMapping {
 			}
 		}
 		Set keys = pointPowerLOD.keySet();
-		System.out.println("type I LogBon: " + typeI_LogBon/Param1.permutation);
-		System.out.println("type I BonT: " + typeI_bt/Param1.permutation);
-		System.out.println("type I EmpT: " + typeI_EmpT/Param1.permutation);		
+		System.out.println("type I LogBon: " + typeI_LogBon/Param1.permutation);	
 		System.out.println("QTL\tLOD\tBonAP\tEmpAP\tBonDP\tEmpDP\tAT\tDT");
 		for (Iterator e = keys.iterator(); e.hasNext();) {
 			String key = (String) e.next();
