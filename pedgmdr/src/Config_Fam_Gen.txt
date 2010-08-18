@@ -1,46 +1,44 @@
-//lines starting with // are annotation lines and will not be parsed
-//simulating data under the null hypothesis
-false
+//simulating data under the null hypothesis 
+False
 //seed
 2010
 //replications of simulation
-2
-//model, B for dichotomous, quantitatives otherwise
-B
+200
+//model, B for dichotomous, and quantitative otherwise 
+Q 
 //functional loci
 0,3
 //functional genotype
-1112,1211,1222,2212
-//recombinations
+1111,1212,2222
+//recombination
 0.5,0.5,0.5,0.5,0.5,0.5,0.5,0.5,0.5,0.5
-//allele frequencies
-0.5,0.5,0.5,0.5,0.5,0.5,0.5,0.5,0.5,0.5,0.5,0.5,0.5,0.5,0.5,0.5,0.5,0.5,0.5,0.5
+//MAF
+0.5,0.5,0.5,0.5,0.5,0.5,0.5,0.5,0.5,0.5
 //LD
 0,0,0,0,0,0,0,0,0
 //intercept
--5.29
+0
 //gene effect
 1
-//covariat
-3.16
-//deviation of covariat
+//covariate
+1
+//deviation of covariate
 1
 //deviation of the residual
 1
-//threshold
-0, 1
+//threshold (two tails, a negative sign means no selection is applied)
+-1,0.9
 //family size
-2000
-//number of case
-1000
+400
+//number of cases (for case-control design)
+100
 //families in each category
-2000
+200,200
 //kids in each category
-1
-//affected kids in each category
--1
+1,1
+//affected kids in each category ( if this number(s), n, is negative, it means that only abs(n) affected offspring; otherwise, at least n offspring should be observed)
+1,0
 //missing rate of parent's genotypes
-0,0
+1,1
 //missing rate of kid's genotypes
 0
-
