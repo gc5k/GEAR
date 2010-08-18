@@ -19,6 +19,9 @@ import java.util.Hashtable;
 import java.util.Iterator;
 import java.util.List;
 
+import org.apache.commons.math.distribution.ChiSquaredDistribution;
+import org.apache.commons.math.distribution.ChiSquaredDistributionImpl;
+
 import publicAccess.ToolKit;
 import regression.Likelihood;
 import regression.LinearRegression;
@@ -26,6 +29,9 @@ import LogP.PointMappingStatistic;
 import LogP.Utils;
 import LogP.simulation.RegPopulation.Parameter1;
 import algorithm.CombinationGenerator;
+
+import org.apache.commons.math.distribution.ChiSquaredDistribution;
+import org.apache.commons.math.distribution.ChiSquaredDistributionImpl;
 
 public class CompositeIntervalMapping extends AbstractMapping{
 
@@ -61,6 +67,7 @@ public class CompositeIntervalMapping extends AbstractMapping{
 		double[][] fm = imb.getFullMatrix(selectedMarker);
 		LinearRegression lm1 = new LinearRegression(fm, Y);
 		lm1.MLE();
+		ChiSquaredDistribution chi = new ChiSquaredDistributionImpl(weight.length);
 		for (int i = Param1.search_start; i <= Param1.search_end; i++) {
 			imb.setOrder(i);
 			CombinationGenerator cg = new CombinationGenerator(i, i, ap
@@ -92,7 +99,7 @@ public class CompositeIntervalMapping extends AbstractMapping{
 						H1lm.MLE();
 						Likelihood lkhd1 = new Likelihood(ap, gs, s);
 						double log1 = lkhd1.LogLikelihoodAlternativeCIM(H1lm,
-								jj);
+								jj, weight);
 						double lod = (log0 - log1) * (-1);
 						double additive = H1lm.getCoefficient(1);
 						double additive_sd = H1lm.getSD(1);
@@ -109,11 +116,18 @@ public class CompositeIntervalMapping extends AbstractMapping{
 							dominant_t = H1lm.getPValueTTest(2);
 							dominant_t_p = H1lm.getTStatic(2);
 						}
+						double wald = H1lm.getWald(weight.length);
+						double p_wald = 0;
+						try {
+							chi.cumulativeProbability(wald);
+						} catch (Exception E) {
+							E.printStackTrace(System.err);
+						}
 						PointMappingStatistic pms = new PointMappingStatistic(
 								ChrInt[j][0], ChrInt[j][1], jj, lod, additive,
 								additive_sd, additive_t, additive_t_p,
 								dominant, dominant_sd, dominant_t,
-								dominant_t_p, df);
+								dominant_t_p, df, wald, p_wald, weight.length);
 						t.add(pms);
 					}
 				}

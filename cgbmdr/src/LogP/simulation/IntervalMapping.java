@@ -28,6 +28,9 @@ import LogP.Utils;
 import LogP.simulation.RegPopulation.Parameter1;
 import algorithm.CombinationGenerator;
 
+import org.apache.commons.math.distribution.ChiSquaredDistribution;
+import org.apache.commons.math.distribution.ChiSquaredDistributionImpl;
+
 public class IntervalMapping extends AbstractMapping{
 
 	public IntervalMapping() {
@@ -94,6 +97,7 @@ public class IntervalMapping extends AbstractMapping{
 		double[][] fm = imb.getFullMatrix(selectedMarker);
 		LinearRegression lmfull = new LinearRegression(fm, Y);
 		lmfull.MLE();
+		ChiSquaredDistribution chi = new ChiSquaredDistributionImpl(weight.length);
 		for (int i = Param1.search_start; i <= Param1.search_end; i++) {
 			imb.setOrder(i);
 			CombinationGenerator cg = new CombinationGenerator(i, i, ap
@@ -111,7 +115,7 @@ public class IntervalMapping extends AbstractMapping{
 				LinearRegression H0lm = new LinearRegression(H0Matrix, Y_res);
 				H0lm.MLE();
 				Likelihood lkhd0 = new Likelihood(ap, gs, s);
-				log0 = lkhd0.LogLikelihoodNullICIM(H0lm);
+				log0 = lkhd0.LogLikelihoodNullIM(H0lm);
 
 				IntervalPriorProbability[] iip = new IntervalPriorProbability[SNPIdx.length];
 				for (int j = 0; j < SNPIdx.length; j++) {
@@ -126,8 +130,8 @@ public class IntervalMapping extends AbstractMapping{
 								Y_res);
 						H1lm.MLE();
 						Likelihood lkhd1 = new Likelihood(ap, gs, s);
-						double log1 = lkhd1.LogLikelihoodAlternativeICIM(H1lm,
-								jj);
+						double log1 = lkhd1.LogLikelihoodAlternativeIM(H1lm,
+								jj, weight);
 						double lod = (log0 - log1) * (-1);
 						double additive = H1lm.getCoefficient(1);
 						double additive_sd = H1lm.getSD(1);
@@ -144,11 +148,18 @@ public class IntervalMapping extends AbstractMapping{
 							dominant_t = H1lm.getPValueTTest(2);
 							dominant_t_p = H1lm.getTStatic(2);
 						}
+						double wald = H1lm.getWald(weight.length);
+						double p_wald = 0;
+						try {
+							p_wald = chi.cumulativeProbability(wald);
+						} catch (Exception E) {
+							E.printStackTrace(System.err);
+						}
 						PointMappingStatistic pms = new PointMappingStatistic(
 								ChrInt[j][0], ChrInt[j][1], jj, lod, additive,
 								additive_sd, additive_t, additive_t_p,
 								dominant, dominant_sd, dominant_t,
-								dominant_t_p, df);
+								dominant_t_p, df, wald, p_wald, weight.length);
 						t.add(pms);
 					}
 				}

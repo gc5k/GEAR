@@ -156,7 +156,7 @@ public class InclusiveIntervalMapping {
 				LinearRegression H0lm = new LinearRegression(H0Matrix, Y_res);
 				H0lm.MLE();
 				Likelihood lkhd0 = new Likelihood(ap, gs, s);
-				log0 = lkhd0.LogLikelihoodNullICIM(H0lm);
+				log0 = lkhd0.LogLikelihoodNullIM(H0lm);
 				IntervalPriorProbability[] iip = new IntervalPriorProbability[SNPIdx.length];
 				for (int j = 0; j < SNPIdx.length; j++) {
 					iip[j] = gs.getIPPTable(ChrInt[j][0], ChrInt[j][1]);
@@ -170,8 +170,8 @@ public class InclusiveIntervalMapping {
 								Y_res);
 						H1lm.MLE();
 						Likelihood lkhd1 = new Likelihood(ap, gs, s);
-						double log1 = lkhd1.LogLikelihoodAlternativeICIM(H1lm, jj);
-						t.add(new Double((log0 - log1) * (-1)));
+//						double log1 = lkhd1.LogLikelihoodAlternativeICIM(H1lm, jj,);
+//						t.add(new Double((log0 - log1) * (-1)));
 					}
 				}
 			}

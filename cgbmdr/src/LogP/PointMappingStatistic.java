@@ -13,12 +13,15 @@ public class PointMappingStatistic {
 	private double D_sd;
 	private double D_t;
 	private double D_t_p_value_cu;
-	private double degree_freedom;
+	private double degree_freedom_t;
+	private double wald;
+	private double p_wald_cu;
+	private double degree_freedom_wald;
 	private String key;
 
 	public PointMappingStatistic(int c, int i, int w, double l, 
 			double a,double a_sd, double a_t, double a_t_p, 
-			double d, double d_sd, double d_t, double d_t_p, double df) {
+			double d, double d_sd, double d_t, double d_t_p, double df_t, double wa, double pw, double df_w) {
 		chr = c;
 		interval = i;
 		walk = w;
@@ -31,7 +34,10 @@ public class PointMappingStatistic {
 		D_sd = d_sd;
 		D_t = d_t;
 		D_t_p_value_cu = d_t_p;
-		degree_freedom = df;
+		degree_freedom_t = df_t;
+		wald = wa;
+		p_wald_cu = pw;
+		degree_freedom_wald = df_w;
 		int[] substring = { chr, interval, walk };
 		key = Utils.makeKey(substring);
 	}
@@ -87,5 +93,17 @@ public class PointMappingStatistic {
 
 	public double get_LOD() {
 		return lod;
+	}
+	
+	public double get_wald() {
+		return wald;
+	}
+	
+	public double get_P_wald() {
+		return 1 - p_wald_cu;
+	}
+	
+	public double get_logP_wald() {
+		return -1 * Math.log10(1 - p_wald_cu);
 	}
 }
