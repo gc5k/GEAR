@@ -890,9 +890,9 @@ public class FamilyGenerator {
 		pedout.println("Affection");
 
 		if (model.compareTo("B") == 0) {
-			pheout.println("affection\tcov");
+			pheout.println("affection\t#cov");
 		} else {
-			pheout.println("affection\tphenotype\tcov");
+			pheout.println("affection\tphenotype\t#cov");
 		}
 
 		for (int i = 0; i < FamilySize; ++i) {
