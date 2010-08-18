@@ -23,6 +23,7 @@ public class LinearRegression {
 	RealMatrix Predictor;
 	RealMatrix estimate;
 	RealMatrix residual;
+	RealMatrix FisherInformation;
 	double SSTO;
 	double SSR;
 	double SSE;
@@ -62,7 +63,8 @@ public class LinearRegression {
 		RealMatrix sse = residual_t.multiply(residual);
 		mse = sse.getEntry(0, 0)/ df_residual;
 
-		RealMatrix FI = X_tX_Ivt;
+		RealMatrix FI = X_tX_Ivt.scalarMultiply(mse);
+		FisherInformation = X_tX;
 		TDistribution t = new TDistributionImpl(df_residual);
 		for (int i = 0; i < Var.length; i++) {
 			Var[i] = mse * FI.getEntry(i, i);
@@ -198,9 +200,28 @@ public class LinearRegression {
 		return residuals;
 	}
 
+	public double getWald(int n) {
+		double d = 0;
+		double[] e = new double[n];
+		for(int i = 0; i < e.length; i++) {
+			e[i] = estimate.getEntry(1+i, 0);
+		}
+		double[] t = new double[n];
+		for(int i = 0; i < e.length; i++) {
+			for (int j = 0; j < e.length; j++) {
+				t[i] = e[j] * FisherInformation.getEntry(1+j, i);
+			}
+		}
+		for (int i = 0; i < t.length; i++) {
+			d += t[i] * e[i];
+		}
+		return d;
+	}
+
 	public double getPValueTTest(int idx) {
 		return p_value_t_test[idx];
 	}
+
 	public RealMatrix getResidual() {
 		return residual;
 	}
