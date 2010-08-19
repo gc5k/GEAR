@@ -114,7 +114,7 @@ public class IMBMatrix {
 							ChrInt[jj][0], ChrInt[jj][1]);
 					for (int jjj = 0; jjj < coeff.length; jjj++) {
 						for (int k = 0; k < iip[jj].NumQTLtypes(); k++) {
-							matrix[i][1 + jj * coeff.length + jjj] += iip[jj].PriorProbabilityAt(IIPIdx, interval, k) * coeff[jj][k];
+							matrix[i][1 + jj * coeff.length + jjj] += iip[jj].PriorProbabilityAt(IIPIdx, interval, k) * coeff[jjj][k];
 						}
 					}
 				}

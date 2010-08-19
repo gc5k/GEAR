@@ -92,7 +92,7 @@ public class PointMappingStatistic {
 		return A_t;
 	}
 
-	public double get_tStatistic_dominant() {
+	public double get_tStatistic_dominance() {
 		return D_t;
 	}
 
