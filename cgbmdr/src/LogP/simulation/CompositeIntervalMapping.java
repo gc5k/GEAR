@@ -113,13 +113,13 @@ public class CompositeIntervalMapping extends AbstractMapping{
 						if (weight.length > 1) {
 							dominant = H1lm.getCoefficient(2);
 							dominant_sd = H1lm.getSD(2);
-							dominant_t = H1lm.getPValueTTest(2);
-							dominant_t_p = H1lm.getTStatic(2);
+							dominant_t = H1lm.getTStatic(2);
+							dominant_t_p = H1lm.getPValueTTest(2);
 						}
 						double wald = H1lm.getWald(weight.length);
 						double p_wald = 0;
 						try {
-							chi.cumulativeProbability(wald);
+							p_wald = chi.cumulativeProbability(wald);
 						} catch (Exception E) {
 							E.printStackTrace(System.err);
 						}
