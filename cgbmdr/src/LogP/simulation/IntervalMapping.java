@@ -96,7 +96,7 @@ public class IntervalMapping extends AbstractMapping{
 		IMBMatrix imb = new IMBMatrix(gs, ap);
 		double[][] fm = imb.getFullMatrix(selectedMarker);
 		LinearRegression lmfull = new LinearRegression(fm, Y);
-		lmfull.MLE();
+//		lmfull.MLE();
 		ChiSquaredDistribution chi = new ChiSquaredDistributionImpl(weight.length);
 		for (int i = Param1.search_start; i <= Param1.search_end; i++) {
 			imb.setOrder(i);
@@ -159,7 +159,7 @@ public class IntervalMapping extends AbstractMapping{
 								ChrInt[j][0], ChrInt[j][1], jj, lod, additive,
 								additive_sd, additive_t, additive_t_p,
 								dominant, dominant_sd, dominant_t,
-								dominant_t_p, df, wald, p_wald, weight.length);
+								dominant_t_p, df, wald, p_wald, weight.length, H1lm.getMSE());
 						t.add(pms);
 					}
 				}

@@ -61,17 +61,16 @@ public class LinearRegression {
 		residuals = residual.getColumn(0);
 		RealMatrix residual_t = residual.transpose();
 		RealMatrix sse = residual_t.multiply(residual);
-		mse = sse.getEntry(0, 0)/ df_residual;
+		mse = sse.getEntry(0, 0) / df_residual;
 
 		RealMatrix FI = X_tX_Ivt.scalarMultiply(mse);
-		FisherInformation = X_tX;
+		FisherInformation = X_tX.scalarMultiply(1/mse);
 		TDistribution t = new TDistributionImpl(df_residual);
 		for (int i = 0; i < Var.length; i++) {
-			Var[i] = mse * FI.getEntry(i, i);
-			tStatic[i] = estimate.getEntry(i, 0)
-					/ Math.sqrt(Var[i]);
+			Var[i] = FI.getEntry(i, i);
+			tStatic[i] = estimate.getEntry(i, 0) / Math.sqrt(Var[i]);
 			try {
-				p_value_t_test[i] =  t.cumulativeProbability(tStatic[i]);
+				p_value_t_test[i] = t.cumulativeProbability(tStatic[i]);
 			} catch (MathException E) {
 				E.printStackTrace(System.err);
 			}
@@ -118,51 +117,54 @@ public class LinearRegression {
 				Y_res[i][0] = Response.getEntry(i, 0);
 				for (int j = 0; j < estimate.getRowDimension(); j++) {
 					if (j != 0) {
-						int mi = ((Integer) selectedMarker.get(j-1)).intValue();
+						int mi = ((Integer) selectedMarker.get(j - 1))
+								.intValue();
 						if (mi == interval || mi == (interval + 1)) {
 							continue;
 						}
 					}
-					Y_res[i][0] -= Predictor.getEntry(i, j) * estimate.getEntry(j, 0);
+					Y_res[i][0] -= Predictor.getEntry(i, j)
+							* estimate.getEntry(j, 0);
 				}
 			}
 		}
 		return Y_res;
 	}
 
-    public double[][] getResponse() {
-    	double[][] y = new double[Response.getRowDimension()][Response.getColumnDimension()];
-    	for (int i = 0; i < Response.getRowDimension(); i++) {
-    		for (int j = 0; j < Response.getColumnDimension(); j++) {
-    			y[i][j] = Response.getEntry(i, j);
-    		}
-    	}
-    	return y;
-    }
-    
-    public double getSD(int idx) {
-    	return Var[idx];
-    }
+	public double[][] getResponse() {
+		double[][] y = new double[Response.getRowDimension()][Response
+				.getColumnDimension()];
+		for (int i = 0; i < Response.getRowDimension(); i++) {
+			for (int j = 0; j < Response.getColumnDimension(); j++) {
+				y[i][j] = Response.getEntry(i, j);
+			}
+		}
+		return y;
+	}
 
-    public double DFResidual() {
-    	return df_residual;
-    }
-    
-    public double DFPredictor() {
-    	return df_Predictor;
-    }
+	public double getSD(int idx) {
+		return Var[idx];
+	}
 
-    public double DFTotal() {
-    	return df_residual+df_Predictor+1;
-    }
+	public double DFResidual() {
+		return df_residual;
+	}
 
-    public double get_F_Statistic () {
-        return F_statistic;
-    }
+	public double DFPredictor() {
+		return df_Predictor;
+	}
 
-    public double getTStatic(int idx) {
-    	return tStatic[idx];
-    }
+	public double DFTotal() {
+		return df_residual + df_Predictor + 1;
+	}
+
+	public double get_F_Statistic() {
+		return F_statistic;
+	}
+
+	public double getTStatic(int idx) {
+		return tStatic[idx];
+	}
 
 	public double getP_F() {
 		return P_F_statistic;
@@ -178,6 +180,10 @@ public class LinearRegression {
 
 	public double getSSE() {
 		return SSE;
+	}
+
+	public double getMSE() {
+		return mse;
 	}
 
 	public RealMatrix getEstimate() {
@@ -203,13 +209,13 @@ public class LinearRegression {
 	public double getWald(int n) {
 		double d = 0;
 		double[] e = new double[n];
-		for(int i = 0; i < e.length; i++) {
-			e[i] = estimate.getEntry(1+i, 0);
+		for (int i = 0; i < e.length; i++) {
+			e[i] = estimate.getEntry(1 + i, 0);
 		}
 		double[] t = new double[n];
-		for(int i = 0; i < e.length; i++) {
+		for (int i = 0; i < e.length; i++) {
 			for (int j = 0; j < e.length; j++) {
-				t[i] = e[j] * FisherInformation.getEntry(1+j, i);
+				t[i] += e[j] * FisherInformation.getEntry(1 + j, i + 1);
 			}
 		}
 		for (int i = 0; i < t.length; i++) {
