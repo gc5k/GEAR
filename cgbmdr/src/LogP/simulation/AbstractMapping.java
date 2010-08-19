@@ -30,6 +30,7 @@ public abstract class AbstractMapping {
 	Parameter1 Param1;
 	int isPermutation;
 	double[][] weight;
+	Hashtable pointPowerF;
 	Hashtable pointPowerWald;
 	Hashtable pointPowerLOD;
 	Hashtable pointPowerAT;
@@ -39,6 +40,7 @@ public abstract class AbstractMapping {
 	Hashtable pointPowerEmpiricalAPvalue;
 	Hashtable pointPowerEmpiricalDPvalue;
 
+	ArrayList thresholdPF;
 	ArrayList thresholdLOD;
 	ArrayList thresholdPvalue;
 	ArrayList thresholdPwald;
@@ -84,6 +86,7 @@ public abstract class AbstractMapping {
 
 	private void setup(ArrayList QTL, double[][] map, Parameter1 p) {
 		int[][] pointIndex = new int[QTL.size()][3];
+		pointPowerF = new Hashtable();
 		pointPowerWald = new Hashtable();
 		pointPowerLOD = new Hashtable();
 		pointPowerAT = new Hashtable();
@@ -105,6 +108,7 @@ public abstract class AbstractMapping {
 					break;
 				}
 			}
+			pointPowerF.put(Utils.makeKey(pointIndex[i]), new Integer(0));
 			pointPowerWald.put(Utils.makeKey(pointIndex[i]), new Integer(0));
 			pointPowerLOD.put(Utils.makeKey(pointIndex[i]), new Integer(0));
 			pointPowerAT.put(Utils.makeKey(pointIndex[i]), new Integer(0));
@@ -225,6 +229,7 @@ public abstract class AbstractMapping {
 				thresholdLOD = new ArrayList();
 				thresholdPvalue = new ArrayList();
 				thresholdPwald = new ArrayList();
+				thresholdPF = new ArrayList();
 				for (int i_permu = 0; i_permu < Param1.permutation; i_permu++) {
 					ArrayList IMStatistic = MappingProcedure(i_rep, i_permu + 1);
 					ArrayList IMLOD = new ArrayList();
@@ -232,6 +237,7 @@ public abstract class AbstractMapping {
 					ArrayList IMDT = new ArrayList();
 					ArrayList IMPvalue = new ArrayList();
 					ArrayList IMPWald = new ArrayList();
+					ArrayList IMPF = new ArrayList();
 					int c = 0;
 					int ct = 0;
 					int bt = 0;
@@ -244,6 +250,7 @@ public abstract class AbstractMapping {
 						IMDT.add(new Double(pms.get_tStatistic_dominant()));
 						IMPvalue.add(new Double(pms.get_logP_additive()));
 						IMPWald.add(new Double(pms.get_logP_wald()));
+						IMPF.add(new Double(pms.get_logP_F()));
 						if (pms.get_logP_additive() > LogBon) {
 							c++;
 						}
@@ -260,6 +267,7 @@ public abstract class AbstractMapping {
 					thresholdLOD.add(Collections.max(IMLOD));
 					thresholdPvalue.add(Collections.max(IMPvalue));
 					thresholdPwald.add(Collections.max(IMPWald));
+					thresholdPF.add(Collections.max(IMPF));
 				}
 			}
 			ArrayList IMLOD = MappingProcedure(i_rep, 0);
@@ -275,31 +283,41 @@ public abstract class AbstractMapping {
 		Collections.sort(thresholdPvalue);
 		Collections.sort(thresholdLOD);
 		Collections.sort(thresholdPwald);
+		Collections.sort(thresholdPF);
 		EmpiricalLogBon = ((Double) thresholdPvalue.get((new Double(
 				(thresholdPvalue.size() - 1) * 0.95)).intValue()))
 				.doubleValue();
-		System.out.println("BonT: " + BonT);
-		System.out.println("LogBon: " + LogBon );
-		System.out.println("EmpLogBon: " + EmpiricalLogBon);
-		
+
 		double threshold_LOD = ((Double) thresholdLOD.get((new Double(
 				(thresholdLOD.size() - 1) * 0.95)).intValue())).doubleValue();
 		double lodp = 0;
 		double ln = threshold_LOD/0.217;
+		double threshold_Pwald = ((Double) thresholdPwald.get((new Double(
+				(thresholdPwald.size() - 1) * 0.95)).intValue())).doubleValue();
+		double threshold_PF = ((Double) thresholdPF.get((new Double(
+				(thresholdPF.size() - 1) * 0.95)).intValue())).doubleValue();
 		try {
 			lodp = -1*Math.log10(1-chi.cumulativeProbability(ln));
 		} catch (Exception E) {
 			E.printStackTrace(System.err);
 		}
+		System.out.println("BonT: " + BonT);
+		System.out.println("LogBon: " + LogBon );
+		System.out.println("EmpLogBon: " + EmpiricalLogBon);
 		System.out.println("threshold_LOD: " + "log10:" + threshold_LOD + " LR: " + ln + " P(ln) " + lodp );
-		double threshold_Pwald = ((Double) thresholdPwald.get((new Double(
-				(thresholdPwald.size() - 1) * 0.95)).intValue())).doubleValue();
 		System.out.println("threshold_PWald: " + threshold_Pwald );
+		System.out.println("threshold_PF: " + threshold_PF);
 		for (Iterator e = SimulationResults.iterator(); e.hasNext();) {
 			ArrayList result = (ArrayList) e.next();
 			for (Iterator e1 = result.iterator(); e1.hasNext();) {
 				PointMappingStatistic pms = (PointMappingStatistic) e1.next();
 				String key = pms.getKey();
+				if (Param1.permutation > 0 && pointPowerF.containsKey(key)
+						&& pms.get_logP_F() > threshold_PF) {
+					int p = ((Integer) pointPowerF.get(key)).intValue();
+					p++;
+					pointPowerF.put(key, new Integer(p));
+				}			
 				if (Param1.permutation > 0 && pointPowerWald.containsKey(key)
 						&& pms.get_logP_wald() > threshold_Pwald) {
 					int p = ((Integer) pointPowerWald.get(key)).intValue();
@@ -346,10 +364,11 @@ public abstract class AbstractMapping {
 		Set keys = pointPowerLOD.keySet();
 		System.out.println("type I LogBon: " + typeI_LogBon
 				/ Param1.permutation);
-		System.out.println("QTL\tWald\tLOD\tBonAP\tEmpAP\tBonDP\tEmpDP\tAT\tDT");
+		System.out.println("QTL\tFP\tWald\tLOD\tBonAP\tEmpAP\tBonDP\tEmpDP\tAT\tDT");
 		for (Iterator e = keys.iterator(); e.hasNext();) {
 			String key = (String) e.next();
 			System.out.print(key + "\t");
+			System.out.print((Integer) pointPowerF.get(key) + "\t");
 			System.out.print((Integer) pointPowerWald.get(key) + "\t");
 			System.out.print((Integer) pointPowerLOD.get(key) + "\t");
 			System.out.print((Integer) pointPowerAPvalue.get(key) + "\t");
@@ -376,6 +395,7 @@ public abstract class AbstractMapping {
 		PrintStream Pout2 = null;
 		PrintStream Pout3 = null;
 		PrintStream Pout4 = null;
+		PrintStream Pout5 = null;
 		ChiSquaredDistribution chi = new ChiSquaredDistributionImpl(weight.length);
 		try {
 			Pout1 = new PrintStream(new BufferedOutputStream(
@@ -386,6 +406,8 @@ public abstract class AbstractMapping {
 					new FileOutputStream("LOD.txt")));
 			Pout4 = new PrintStream(new BufferedOutputStream(
 					new FileOutputStream("Wald.txt")));
+			Pout5 = new PrintStream(new BufferedOutputStream(
+					new FileOutputStream("F.txt")));
 		} catch (Exception E) {
 			E.printStackTrace(System.err);
 		}
@@ -407,15 +429,18 @@ public abstract class AbstractMapping {
 				Pout2.print(logLOD + " ");
 				Pout3.print(pms.get_LOD() + " ");
 				Pout4.print(pms.get_logP_wald() + " ");
+				Pout5.print(pms.get_logP_F() + " ");
 			}
 			Pout1.println();
 			Pout2.println();
 			Pout3.println();
 			Pout4.println();
+			Pout5.println();
 		}
 		Pout1.close();
 		Pout2.close();
 		Pout3.close();
 		Pout4.close();
+		Pout5.close();
 	}
 }

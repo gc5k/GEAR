@@ -1,5 +1,8 @@
 package LogP;
 
+import org.apache.commons.math.distribution.FDistribution;
+import org.apache.commons.math.distribution.FDistributionImpl;
+
 public class PointMappingStatistic {
 	private int chr;
 	private int interval;
@@ -17,11 +20,12 @@ public class PointMappingStatistic {
 	private double wald;
 	private double p_wald_cu;
 	private double degree_freedom_wald;
+	private double mse;
 	private String key;
 
 	public PointMappingStatistic(int c, int i, int w, double l, 
 			double a,double a_sd, double a_t, double a_t_p, 
-			double d, double d_sd, double d_t, double d_t_p, double df_t, double wa, double pw, double df_w) {
+			double d, double d_sd, double d_t, double d_t_p, double df_t, double wa, double pw, double df_w, double m) {
 		chr = c;
 		interval = i;
 		walk = w;
@@ -38,6 +42,7 @@ public class PointMappingStatistic {
 		wald = wa;
 		p_wald_cu = pw;
 		degree_freedom_wald = df_w;
+		mse = m;
 		int[] substring = { chr, interval, walk };
 		key = Utils.makeKey(substring);
 	}
@@ -98,12 +103,36 @@ public class PointMappingStatistic {
 	public double get_wald() {
 		return wald;
 	}
-	
+
 	public double get_P_wald() {
 		return 1 - p_wald_cu;
 	}
 	
 	public double get_logP_wald() {
 		return -1 * Math.log10(1 - p_wald_cu);
+	}
+	
+	public double get_P_F() {
+		double pf = 0;
+		double s = (wald/degree_freedom_wald)/mse;
+		FDistribution fd = new FDistributionImpl(degree_freedom_wald, degree_freedom_t);
+		try {
+			pf = 1 - fd.cumulativeProbability(s);
+		} catch (Exception E) {
+			E.printStackTrace(System.err);
+		}
+		return pf;
+	}
+	
+	public double get_logP_F() {
+		double pf = 0;
+		double s = (wald/degree_freedom_wald)/mse;
+		FDistribution fd = new FDistributionImpl(degree_freedom_wald, degree_freedom_t);
+		try {
+			pf = 1 - fd.cumulativeProbability(s);
+		} catch (Exception E) {
+			E.printStackTrace(System.err);
+		}
+		return (-1) * Math.log10(pf);
 	}
 }

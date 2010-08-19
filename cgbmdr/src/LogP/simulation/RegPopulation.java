@@ -75,7 +75,7 @@ public class RegPopulation {
 				os[0] = 0;
 			}
 			// population type
-			pt = new String("F2");
+			pt = new String("B1");
 			if (param.size() > 2) {
 				pt = param.get(2);
 			}
@@ -343,7 +343,7 @@ public class RegPopulation {
 		Param2.ReadQTL(QTL);
 		double[] env = { 0.0 };
 		boolean isSelectMarker = false;
-		double[][] weight = {{2, 1, 0}};
+		double[][] weight = {{1, 0}};
 		AbstractMapping IM = new IntervalMapping();
 		IM.Simulation(Param1, QTL, env, weight, map, isSelectMarker);
 		IM.SummuarySimulation();

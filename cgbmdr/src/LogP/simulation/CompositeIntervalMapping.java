@@ -127,7 +127,7 @@ public class CompositeIntervalMapping extends AbstractMapping{
 								ChrInt[j][0], ChrInt[j][1], jj, lod, additive,
 								additive_sd, additive_t, additive_t_p,
 								dominant, dominant_sd, dominant_t,
-								dominant_t_p, df, wald, p_wald, weight.length);
+								dominant_t_p, df, wald, p_wald, weight.length, H1lm.getMSE());
 						t.add(pms);
 					}
 				}
