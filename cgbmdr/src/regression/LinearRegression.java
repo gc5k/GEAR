@@ -64,7 +64,7 @@ public class LinearRegression {
 		mse = sse.getEntry(0, 0) / df_residual;
 
 		RealMatrix FI = X_tX_Ivt.scalarMultiply(mse);
-		FisherInformation = X_tX.scalarMultiply(1/mse);
+		FisherInformation = FI;
 		TDistribution t = new TDistributionImpl(df_residual);
 		for (int i = 0; i < Var.length; i++) {
 			Var[i] = FI.getEntry(i, i);
@@ -213,9 +213,22 @@ public class LinearRegression {
 			e[i] = estimate.getEntry(1 + i, 0);
 		}
 		double[] t = new double[n];
+		int[] subrow = new int[n];
+		int[] subcol = new int[n];
+		for(int i = 0; i < subrow.length; i++) {
+			subrow[i] = i + 1;
+			subcol[i] = i + 1;
+		}
+		RealMatrix FI_sub = null;
+		try {
+			FI_sub = FisherInformation.getSubMatrix(subrow, subcol);
+		} catch (Exception E) {
+			E.printStackTrace(System.err);
+		}
+		RealMatrix FI_invt = FI_sub.inverse();
 		for (int i = 0; i < e.length; i++) {
 			for (int j = 0; j < e.length; j++) {
-				t[i] += e[j] * FisherInformation.getEntry(1 + j, i + 1);
+				t[i] += e[j] * FI_invt.getEntry(j, i);
 			}
 		}
 		for (int i = 0; i < t.length; i++) {
@@ -233,9 +246,9 @@ public class LinearRegression {
 	}
 
 	public static void main(String[] args) {
-		double[][] data = { { 1, 1, 2, 3 }, { 1, 1.3, 2.1, 3.4 },
-				{ 1, 1.2, 1.0, 3.9 }, { 1, 0.8, 2.3, 3.4 },
-				{ 1, 0.9, 2.5, 3.1 }, { 1, 0.98, 3.2, 3.9 }, };
+		double[][] data = { { 1, 1}, { 1, 1.3},
+				{ 1, 1.2 }, { 1, 0.8},
+				{ 1, 0.9}, { 1, 0.98 }, };
 		double[][] y_data = { { 5 }, { 7 }, { 6 }, { 5.6 }, { 6.7 }, { 6.5 } };
 		LinearRegression lm = new LinearRegression(data, y_data);
 		lm.MLE();
@@ -243,5 +256,10 @@ public class LinearRegression {
 		for (int i = 0; i < res.length; i++) {
 			System.out.println(res[i]);
 		}
+		for (int i = 0; i < 2; i++) {
+			System.out.println(lm.getTStatic(i));
+		}
+		System.out.println(lm.getWald(1));
+		System.out.println(lm.estimate);
 	}
 }
