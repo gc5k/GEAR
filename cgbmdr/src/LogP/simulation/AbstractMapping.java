@@ -270,7 +270,9 @@ public abstract class AbstractMapping {
 					}
 					thresholdLOD.add(Collections.max(IMLOD));
 					thresholdAP.add(Collections.max(IMAP));
-					thresholdDP.add(Collections.max(IMDP));
+					if (weight.length > 1) {
+						thresholdDP.add(Collections.max(IMDP));
+					}
 					thresholdPF.add(Collections.max(IMPF));
 					thresholdPwald.add(Collections.max(IMPWald));
 
@@ -294,9 +296,11 @@ public abstract class AbstractMapping {
 		EmpiricalLogBonAP = ((Double) thresholdAP.get((new Double(
 				(thresholdAP.size() - 1) * 0.95)).intValue()))
 				.doubleValue();
-		EmpiricalLogBonDP = ((Double) thresholdDP.get((new Double(
-				(thresholdDP.size() - 1) * 0.95)).intValue()))
-				.doubleValue();
+		if(weight.length > 1) {
+			EmpiricalLogBonDP = ((Double) thresholdDP.get((new Double(
+					(thresholdDP.size() - 1) * 0.95)).intValue()))
+					.doubleValue();
+		}
 
 		
 		double threshold_LOD = ((Double) thresholdLOD.get((new Double(
@@ -384,13 +388,12 @@ public abstract class AbstractMapping {
 			System.out.print((Integer) pointPowerWald.get(key) + "\t");
 			System.out.print((Integer) pointPowerLOD.get(key) + "\t");
 			System.out.print((Integer) pointPowerAPvalue.get(key) + "\t");
-			System.out.println((Integer) pointPowerEmpiricalAPvalue.get(key)
-					);
+			System.out.print((Integer) pointPowerEmpiricalAPvalue.get(key)+ "\t");
 			if (weight.length > 1) {
 				System.out.print(pointPowerDPvalue.get(key) + "\t");
-				System.out.print(pointPowerEmpiricalDPvalue.get(key) + "\t");
+				System.out.println(pointPowerEmpiricalDPvalue.get(key) + "\t");
 			} else {
-				System.out.print("--\t--\t");
+				System.out.println("--\t--\t");
 			}
 		}
 	}

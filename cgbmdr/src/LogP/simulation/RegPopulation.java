@@ -289,8 +289,8 @@ public class RegPopulation {
 			Param2 = new Parameter2(file);
 		}
 
-		double map[][] = { {0, 0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9, 1.0},
-							{0, 0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9, 1.0}};
+		double map[][] = { {0, 0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9, 1.0} };
+							//{0, 0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9, 1.0}};
 //							{0, 0.05, 0.1, 0.15, 0.2, 0.25, 0.3, 0.35, 0.4, 0.45, 0.5} };
 //				{0, 0.05, 0.1, 0.15, 0.2, 0.25, 0.3, 0.35, 0.4, 0.5, 0.55, 0.6, 0.65, 0.7, 0.75, 0.8, 0.9, 0.95, 1.0}};
 						//1.1, 1.2, 1.3, 1.4,	1.5, 1.6, 1.7, 1.8, 1.9, 2.0} };
@@ -343,7 +343,7 @@ public class RegPopulation {
 		Param2.ReadQTL(QTL);
 		double[] env = { 0.0 };
 		boolean isSelectMarker = true;
-		double[][] weight = {{2, 1, 0}, {0, 1, 0}};
+		double[][] weight = {{1, 0, -1}, {-0.5, 0.5, -0.5}};
 		AbstractMapping IM = new CompositeIntervalMapping();
 		IM.Simulation(Param1, QTL, env, weight, map, isSelectMarker);
 		IM.SummuarySimulation();
