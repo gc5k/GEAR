@@ -307,14 +307,14 @@ public class RegPopulation {
 		AbstractLoci al0 = new AbstractLoci(chr0, location0, genotype0, effect0,
 				environment1);
 		QTL.add(al0);
-//
-//		int[] chr1 = { 0 };
-//		double[] location1 = {0.25};
-//		int[] genotype1 = { 2 };
-//		double[] effect1 = { 0.5 };
-//		AbstractLoci al1 = new AbstractLoci(chr1, location1, genotype1, effect1,
-//				environment1);
-//		QTL.add(al1);
+
+		int[] chr1 = { 0 };
+		double[] location1 = {0.25};
+		int[] genotype1 = { 2, 1 };
+		double[] effect1 = { 0.5, 0.5 };
+		AbstractLoci al1 = new AbstractLoci(chr1, location1, genotype1, effect1,
+				environment1);
+		QTL.add(al1);
 //
 //		int[] chr2 = { 0 };
 //		double[] location2 = {0.45};
