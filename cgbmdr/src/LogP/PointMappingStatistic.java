@@ -114,7 +114,7 @@ public class PointMappingStatistic {
 	
 	public double get_P_F() {
 		double pf = 0;
-		double s = (wald/degree_freedom_wald)/mse;
+		double s = (wald/degree_freedom_wald);
 		FDistribution fd = new FDistributionImpl(degree_freedom_wald, degree_freedom_t);
 		try {
 			pf = 1 - fd.cumulativeProbability(s);
@@ -126,7 +126,7 @@ public class PointMappingStatistic {
 	
 	public double get_logP_F() {
 		double pf = 0;
-		double s = (wald/degree_freedom_wald)/mse;
+		double s = (wald/degree_freedom_wald);
 		FDistribution fd = new FDistributionImpl(degree_freedom_wald, degree_freedom_t);
 		try {
 			pf = 1 - fd.cumulativeProbability(s);
