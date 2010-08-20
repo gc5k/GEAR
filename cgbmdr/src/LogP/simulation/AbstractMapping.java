@@ -384,8 +384,8 @@ public abstract class AbstractMapping {
 			System.out.print((Integer) pointPowerWald.get(key) + "\t");
 			System.out.print((Integer) pointPowerLOD.get(key) + "\t");
 			System.out.print((Integer) pointPowerAPvalue.get(key) + "\t");
-			System.out.print((Integer) pointPowerEmpiricalAPvalue.get(key)
-					+ "\t");
+			System.out.println((Integer) pointPowerEmpiricalAPvalue.get(key)
+					);
 			if (weight.length > 1) {
 				System.out.print(pointPowerDPvalue.get(key) + "\t");
 				System.out.print(pointPowerEmpiricalDPvalue.get(key) + "\t");
