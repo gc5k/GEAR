@@ -47,6 +47,11 @@ public abstract class AbstractMapping {
 	ArrayList thresholdPwald;
 	ArrayList SimulationResults;
 
+	double threshold_LOD;
+	double threshold_lodp;
+	double threshold_Pwald;
+	double threshold_PF;
+	
 	double[][] distance;
 	double LogBon;
 	double t_at_0975 = 2.7611;
@@ -59,6 +64,8 @@ public abstract class AbstractMapping {
 	double EmpiricalLogBonDP;
 	double Num_interval;
 
+	ArrayList QTL;
+	double[][] map;
 	public AbstractMapping() {
 		selectedMarker = null;
 	}
@@ -159,36 +166,18 @@ public abstract class AbstractMapping {
 
 	public abstract void correctLogBon();
 
-	public void selectMarker(ArrayList QTL, double[][] map) {
-		selectedMarker = new ArrayList();
-		for (Iterator e = QTL.iterator(); e.hasNext();) {
-			AbstractLoci al = (AbstractLoci) e.next();
-			int chr = al.getChr()[0];
-			double loc = al.getLocation()[0];
-			int c = 0;
-			for (int i = 0; i < map.length; i++) {
-				for (int j = 1; j < map[i].length; j++) {
-					if (i == chr && map[i][j] > loc && map[i][j - 1] < loc) {
-						ArrayList mp1 = new ArrayList();
-						mp1.add(new Integer(i));
-						mp1.add(new Integer(j - 1));
-						ArrayList mp2 = new ArrayList();
-						mp2.add(new Integer(i));
-						mp2.add(new Integer(j));
-						selectedMarker.add(mp1);
-						selectedMarker.add(mp2);
-						break;
-					}
-				}
-			}
-		}
-	}
+	protected abstract void selectMarker() ;
 
-	public void Simulation(Parameter1 p, ArrayList QTL, double[] env,
-			double[][] w, double[][] map, boolean isSelectMarker) {
-		if (isSelectMarker) {
-			selectMarker(QTL, map);
+	public void Simulation(Parameter1 p, ArrayList qtl, double[] env,
+			double[][] w, double[][] m, boolean isSelectMarker) {
+		Param1 = p;
+		QTL = qtl;
+		map = new double[m.length][];
+		for (int i = 0; i < map.length; i++) {
+			map[i] = new double[m[i].length];
+			System.arraycopy(m[i], 0, map[i], 0, map[i].length);
 		}
+
 		weight = new double[w.length][];
 		for (int i = 0; i < w.length; i++) {
 			weight[i] = new double[w[i].length];
@@ -197,10 +186,12 @@ public abstract class AbstractMapping {
 		for (int i = 0; i < map.length; i++) {
 			Num_interval += map[i].length == 1? map[i].length : map[i].length - 1;
 		}
+		if (isSelectMarker) {
+			selectMarker();
+		}
 		correctLogBon();
 		makeFullMap(QTL, map);
-		setup(QTL, map, p);
-		Param1 = p;
+		setup(QTL, map, Param1);
 		SimulationResults = new ArrayList();
 		for (int i_rep = 0; i_rep < Param1.rep; i_rep++) {
 			if (Param1.pt.compareTo("F2") == 0) {
@@ -224,6 +215,15 @@ public abstract class AbstractMapping {
 			for (int i = 0; i < Param1.pheNum.length; i++) {
 				ap.ProducePhenotype(i, Param1.MU, Param1.T);
 			}
+			PrintStream cim = null;
+			try {
+				cim = new PrintStream(new BufferedOutputStream(
+					new FileOutputStream("CIM.mcd")));
+			} catch (Exception e) {
+				
+			}
+			ap.CIMFormat(cim);
+			cim.close();
 			gs = new GenomeScan(ap, Param1.step);
 			gs.CalculateIPP();
 
@@ -303,16 +303,16 @@ public abstract class AbstractMapping {
 		}
 
 		
-		double threshold_LOD = ((Double) thresholdLOD.get((new Double(
+		threshold_LOD = ((Double) thresholdLOD.get((new Double(
 				(thresholdLOD.size() - 1) * 0.95)).intValue())).doubleValue();
-		double lodp = 0;
+		threshold_lodp = 0;
 		double ln = threshold_LOD/0.217;
-		double threshold_Pwald = ((Double) thresholdPwald.get((new Double(
+		threshold_Pwald = ((Double) thresholdPwald.get((new Double(
 				(thresholdPwald.size() - 1) * 0.95)).intValue())).doubleValue();
-		double threshold_PF = ((Double) thresholdPF.get((new Double(
+		threshold_PF = ((Double) thresholdPF.get((new Double(
 				(thresholdPF.size() - 1) * 0.95)).intValue())).doubleValue();
 		try {
-			lodp = -1*Math.log10(1-chi.cumulativeProbability(ln));
+			threshold_lodp = -1*Math.log10(1-chi.cumulativeProbability(ln));
 		} catch (Exception E) {
 			E.printStackTrace(System.err);
 		}
@@ -320,7 +320,7 @@ public abstract class AbstractMapping {
 		System.out.println("LogBon: " + LogBon );
 		System.out.println("EmpLogBonAP: " + EmpiricalLogBonAP);
 		System.out.println("EmpLogBonDP: " + EmpiricalLogBonDP);
-		System.out.println("threshold_LOD: " + "log10:" + threshold_LOD + " LR: " + ln + " P(ln) " + lodp );
+		System.out.println("threshold_LOD: " + "log10:" + threshold_LOD + " LR: " + ln + " P(ln) " + threshold_lodp );
 		System.out.println("threshold_PWald: " + threshold_Pwald );
 		System.out.println("threshold_PF: " + threshold_PF);
 		for (Iterator e = SimulationResults.iterator(); e.hasNext();) {
@@ -396,6 +396,22 @@ public abstract class AbstractMapping {
 				System.out.println("--\t--\t");
 			}
 		}
+	}
+
+	public double get_threshold_LOD() {
+		return threshold_LOD;
+	}
+	
+	public double get_threshold_LODP() {
+		return threshold_lodp;
+	}
+	
+	public double get_threshold_PWald() {
+		return threshold_Pwald;
+	}
+	
+	public double get_threshold_PF() {
+		return threshold_PF;
 	}
 
 	public void SummuarySimulation() {

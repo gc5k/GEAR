@@ -143,7 +143,7 @@ public class LinearRegression {
 	}
 
 	public double getSD(int idx) {
-		return Var[idx];
+		return Math.sqrt(Var[idx]);
 	}
 
 	public double DFResidual() {

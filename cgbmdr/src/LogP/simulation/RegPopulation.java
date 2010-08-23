@@ -5,9 +5,9 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.FileReader;
 import java.io.IOException;
+import java.io.PrintStream;
 import java.util.ArrayList;
 
-import im.population.simulation.AbstractLoci;
 import im.population.simulation.*;
 import publicAccess.PublicData;
 /**
@@ -62,7 +62,7 @@ public class RegPopulation {
 			}
 
 			// population size
-			populationSize = 300;
+			populationSize = 3000;
 			if (param.size() > 0) {
 				populationSize = Integer.parseInt(param.get(0));
 			}
@@ -75,7 +75,7 @@ public class RegPopulation {
 				os[0] = 0;
 			}
 			// population type
-			pt = new String("F2");
+			pt = new String("B1");
 			if (param.size() > 2) {
 				pt = param.get(2);
 			}
@@ -95,7 +95,7 @@ public class RegPopulation {
 				mf = Integer.parseInt(param.get(5));
 			}
 			// step
-			step = 0.01;
+			step = 0.05;
 			if (param.size() > 6) {
 				step = Double.parseDouble(param.get(6));
 			}
@@ -140,12 +140,12 @@ public class RegPopulation {
 				switch2permutation = Boolean.parseBoolean(param.get(14));
 			}
 			// replication
-			rep = 100;
+			rep = 1;
 			if (param.size() > 15) {
 				rep = Integer.parseInt(param.get(15));
 			}
 			// permutation
-			permutation = 500;
+			permutation = 1;
 			if (param.size() > 16) {
 				permutation = Integer.parseInt(param.get(16));
 			}
@@ -289,7 +289,7 @@ public class RegPopulation {
 			Param2 = new Parameter2(file);
 		}
 
-		double map[][] = { {0, 0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9, 1.0} };
+		double map[][] = { {0, 0.1, 0.2} };
 							//{0, 0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9, 1.0}};
 //							{0, 0.05, 0.1, 0.15, 0.2, 0.25, 0.3, 0.35, 0.4, 0.45, 0.5} };
 //				{0, 0.05, 0.1, 0.15, 0.2, 0.25, 0.3, 0.35, 0.4, 0.5, 0.55, 0.6, 0.65, 0.7, 0.75, 0.8, 0.9, 0.95, 1.0}};
@@ -300,21 +300,21 @@ public class RegPopulation {
 		ArrayList QTL = new ArrayList();
 
 		int[] chr0 = { 0 };
-		double[] location0 = { 0.05 };
-		int[] genotype0 = { 2, 1 };
-		double[] effect0 = { 0.5, 0.5 };
+		double[] location0 = { 0.15 };
+		int[] genotype0 = { 2 };
+		double[] effect0 = { 0.5 };
 		int environment1 = 0;
 		AbstractLoci al0 = new AbstractLoci(chr0, location0, genotype0, effect0,
 				environment1);
 		QTL.add(al0);
 
-		int[] chr1 = { 0 };
-		double[] location1 = {0.25};
-		int[] genotype1 = { 2, 1 };
-		double[] effect1 = { 0.5, 0.5 };
-		AbstractLoci al1 = new AbstractLoci(chr1, location1, genotype1, effect1,
-				environment1);
-		QTL.add(al1);
+//		int[] chr1 = { 0 };
+//		double[] location1 = {0.25};
+//		int[] genotype1 = { 2 };
+//		double[] effect1 = { 0.5 };
+//		AbstractLoci al1 = new AbstractLoci(chr1, location1, genotype1, effect1,
+//				environment1);
+//		QTL.add(al1);
 //
 //		int[] chr2 = { 0 };
 //		double[] location2 = {0.45};
@@ -340,12 +340,37 @@ public class RegPopulation {
 //				environment1);
 //		QTL.add(al4);
 
+		int marker_control_stratagy = 0;
 		Param2.ReadQTL(QTL);
 		double[] env = { 0.0 };
-		boolean isSelectMarker = true;
-		double[][] weight = {{1, 0, -1}, {-0.5, 0.5, -0.5}};
-		AbstractMapping IM = new CompositeIntervalMapping();
-		IM.Simulation(Param1, QTL, env, weight, map, isSelectMarker);
-		IM.SummuarySimulation();
+		boolean isSelectMarker = false;
+		double[][] weight = {{1, 0}};
+		PrintStream Pout1 = null;
+		try {
+			Pout1 = new PrintStream(new BufferedOutputStream(
+					new FileOutputStream("LogP Permutation.txt")));
+		} catch (Exception E) {
+			
+		}
+		Pout1.println("LOD\tLODP\tPWald\tPF");
+		for (int i = 0; i < 1; i++) {
+			Param1.seed = i*Param1.permutation;
+			
+			marker_control_stratagy = 1;
+			isSelectMarker = true;
+			AbstractMapping IM1 = new IntervalMapping();
+			IM1.Simulation(Param1, QTL, env, weight, map, isSelectMarker);
+			IM1.SummuarySimulation();
+			Pout1.print(IM1.get_threshold_LOD() + " " + IM1.get_threshold_LODP() + " " + IM1.get_threshold_PWald() + " " + IM1.get_threshold_PF() + "\t");
+
+//			marker_control_stratagy = 1;
+//			isSelectMarker = true;
+//			AbstractMapping IM3 = new CompositeIntervalMapping(marker_control_stratagy);
+//			IM3.Simulation(Param1, QTL, env, weight, map, isSelectMarker);
+//			IM3.SummuarySimulation();
+//			Pout1.print(IM3.get_threshold_LOD() + " " + IM3.get_threshold_LODP() + " " + IM3.get_threshold_PWald() + " " + IM3.get_threshold_PF() + "\t");
+//			Pout1.println();
+		}
+		Pout1.close();
 	}
 }
