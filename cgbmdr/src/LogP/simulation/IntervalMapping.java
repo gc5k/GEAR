@@ -102,13 +102,6 @@ public class IntervalMapping extends AbstractMapping{
 		LinearRegression lmfull = new LinearRegression(fm, Y);
 //		lmfull.MLE();
 		ChiSquaredDistribution chi = new ChiSquaredDistributionImpl(weight.length);
-		PrintStream Pout1 = null;
-		try {
-			Pout1 = new PrintStream(new BufferedOutputStream(
-				new FileOutputStream("B.txt")));
-		} catch (Exception E) {
-			
-		}
 		for (int i = Param1.search_start; i <= Param1.search_end; i++) {
 			imb.setOrder(i);
 			CombinationGenerator cg = new CombinationGenerator(i, i, ap
@@ -137,10 +130,7 @@ public class IntervalMapping extends AbstractMapping{
 					for (int jj = 0; jj < steps; jj++) {
 						double[][] H1Matrix = imb.getICIMMatrixAtPoint(s,
 								weight, jj);
-						for(int k = 0; k < H1Matrix.length; k++) {
-							Pout1.print(H1Matrix[k][1] + " ");
-						}
-						Pout1.println();
+
 						LinearRegression H1lm = new LinearRegression(H1Matrix,
 								Y_res);
 						H1lm.MLE();
@@ -180,7 +170,6 @@ public class IntervalMapping extends AbstractMapping{
 				}
 			}
 		}
-		Pout1.close();
 		return t;
 	}
 }

@@ -75,7 +75,7 @@ public class RegPopulation {
 				os[0] = 0;
 			}
 			// population type
-			pt = new String("B1");
+			pt = new String("F2");
 			if (param.size() > 2) {
 				pt = param.get(2);
 			}
@@ -95,7 +95,7 @@ public class RegPopulation {
 				mf = Integer.parseInt(param.get(5));
 			}
 			// step
-			step = 0.05;
+			step = 0.01;
 			if (param.size() > 6) {
 				step = Double.parseDouble(param.get(6));
 			}
@@ -140,12 +140,12 @@ public class RegPopulation {
 				switch2permutation = Boolean.parseBoolean(param.get(14));
 			}
 			// replication
-			rep = 1;
+			rep = 100;
 			if (param.size() > 15) {
 				rep = Integer.parseInt(param.get(15));
 			}
 			// permutation
-			permutation = 1;
+			permutation = 100;
 			if (param.size() > 16) {
 				permutation = Integer.parseInt(param.get(16));
 			}
@@ -289,8 +289,7 @@ public class RegPopulation {
 			Param2 = new Parameter2(file);
 		}
 
-		double map[][] = { {0, 0.1, 0.2} };
-							//{0, 0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9, 1.0}};
+		double map[][] = { {0, 0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9, 1.0} };
 //							{0, 0.05, 0.1, 0.15, 0.2, 0.25, 0.3, 0.35, 0.4, 0.45, 0.5} };
 //				{0, 0.05, 0.1, 0.15, 0.2, 0.25, 0.3, 0.35, 0.4, 0.5, 0.55, 0.6, 0.65, 0.7, 0.75, 0.8, 0.9, 0.95, 1.0}};
 						//1.1, 1.2, 1.3, 1.4,	1.5, 1.6, 1.7, 1.8, 1.9, 2.0} };
@@ -340,28 +339,17 @@ public class RegPopulation {
 //				environment1);
 //		QTL.add(al4);
 
-		int marker_control_stratagy = 0;
+		int marker_control_stratagy = 1;
 		Param2.ReadQTL(QTL);
 		double[] env = { 0.0 };
 		boolean isSelectMarker = false;
-		double[][] weight = {{1, 0}};
-		PrintStream Pout1 = null;
-		try {
-			Pout1 = new PrintStream(new BufferedOutputStream(
-					new FileOutputStream("LogP Permutation.txt")));
-		} catch (Exception E) {
-			
-		}
-		Pout1.println("LOD\tLODP\tPWald\tPF");
-		for (int i = 0; i < 1; i++) {
-			Param1.seed = i*Param1.permutation;
-			
-			marker_control_stratagy = 1;
-			isSelectMarker = true;
-			AbstractMapping IM1 = new IntervalMapping();
-			IM1.Simulation(Param1, QTL, env, weight, map, isSelectMarker);
-			IM1.SummuarySimulation();
-			Pout1.print(IM1.get_threshold_LOD() + " " + IM1.get_threshold_LODP() + " " + IM1.get_threshold_PWald() + " " + IM1.get_threshold_PF() + "\t");
+		double[][] weight = {{1, 0, -1}, {-0.5, 0.5, -0.5}};
+
+		marker_control_stratagy = 1;
+		isSelectMarker = true;
+		AbstractMapping IM1 = new CompositeIntervalMapping(marker_control_stratagy);
+		IM1.Simulation(Param1, QTL, env, weight, map, isSelectMarker);
+		IM1.SummuarySimulation();
 
 //			marker_control_stratagy = 1;
 //			isSelectMarker = true;
@@ -370,7 +358,5 @@ public class RegPopulation {
 //			IM3.SummuarySimulation();
 //			Pout1.print(IM3.get_threshold_LOD() + " " + IM3.get_threshold_LODP() + " " + IM3.get_threshold_PWald() + " " + IM3.get_threshold_PF() + "\t");
 //			Pout1.println();
-		}
-		Pout1.close();
 	}
 }
