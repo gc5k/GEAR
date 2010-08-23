@@ -35,13 +35,58 @@ import org.apache.commons.math.distribution.ChiSquaredDistributionImpl;
 
 public class CompositeIntervalMapping extends AbstractMapping{
 
-	public CompositeIntervalMapping() {
+	int marker_selection_stratagy;
+	public CompositeIntervalMapping(int mcs) {
 		super();
+		marker_selection_stratagy = mcs;
 	}
 
 	public void correctLogBon() {
 		LogBon = (-1) * Math.log10(0.05/(Num_interval));
 		BonT = 0.05/Num_interval;		
+	}
+
+	protected void selectMarker() {
+		selectedMarker = new ArrayList();
+		switch (marker_selection_stratagy) {
+			case 0: selectPairMarker(); break;
+			case 1: selectAllMarker(); break;
+		}
+	}
+
+	protected void selectPairMarker() {
+		for (Iterator e = QTL.iterator(); e.hasNext();) {
+			AbstractLoci al = (AbstractLoci) e.next();
+			int chr = al.getChr()[0];
+			double loc = al.getLocation()[0];
+			int c = 0;
+			for (int i = 0; i < map.length; i++) {
+				for (int j = 1; j < map[i].length; j++) {
+					if (i == chr && map[i][j] > loc && map[i][j - 1] < loc) {
+						ArrayList mp1 = new ArrayList();
+						mp1.add(new Integer(i));
+						mp1.add(new Integer(j - 1));
+						ArrayList mp2 = new ArrayList();
+						mp2.add(new Integer(i));
+						mp2.add(new Integer(j));
+						selectedMarker.add(mp1);
+						selectedMarker.add(mp2);
+						break;
+					}
+				}
+			}
+		}
+	}
+
+	protected void selectAllMarker() {
+		for (int i = 0; i < map.length; i++) {
+			for (int j = 0; j < map[i].length; j++) {
+				ArrayList mp1 = new ArrayList();
+				mp1.add(new Integer(i));
+				mp1.add(new Integer(j));
+				selectedMarker.add(mp1);
+			}
+		}
 	}
 
 	public ArrayList MappingProcedure(int i_rep, int isPermutation) {
