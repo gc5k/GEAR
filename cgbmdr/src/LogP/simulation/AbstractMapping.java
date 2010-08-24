@@ -22,6 +22,9 @@ import LogP.simulation.RegPopulation.Parameter1;
 
 import org.apache.commons.math.distribution.ChiSquaredDistribution;
 import org.apache.commons.math.distribution.ChiSquaredDistributionImpl;
+import org.apache.commons.math.stat.descriptive.DescriptiveStatistics;
+import org.apache.commons.math.stat.descriptive.DescriptiveStatisticsImpl;
+import org.apache.commons.math.stat.regression.SimpleRegression;
 
 public abstract class AbstractMapping {
 	ArrayList selectedMarker;
@@ -441,11 +444,21 @@ public abstract class AbstractMapping {
 		}
 		for (int i = 0; i < SimulationResults.size(); i++) {
 			ArrayList PointStatistics = (ArrayList) SimulationResults.get(i);
+			double[] LRT = new double[PointStatistics.size()];
+			double[] WALD = new double[PointStatistics.size()]; 
+			DescriptiveStatistics dsLRT = new DescriptiveStatisticsImpl();
+			DescriptiveStatistics dsWALD = new DescriptiveStatisticsImpl();
+			SimpleRegression sr = new SimpleRegression();
 			for (int j = 0; j < PointStatistics.size(); j++) {
 				PointMappingStatistic pms = (PointMappingStatistic) PointStatistics
 						.get(j);
-
+				dsLRT.addValue(pms.get_LOD());
+				dsWALD.addValue(pms.get_wald());
+				LRT[j] = pms.get_LOD()/0.217;
+				WALD[j] = pms.get_wald();
+				sr.addData(pms.get_LOD()/0.217, pms.get_wald());
 				double lod = pms.get_LOD()>0 ? pms.get_LOD() : 0;
+
 				double ln = lod/0.217;
 				double p = 0;
 				try {
@@ -461,6 +474,10 @@ public abstract class AbstractMapping {
 				Pout5.print(pms.get_logP_F() + " ");
 				Pout6.print(pms.get_logP_dominance() + " ");
 			}
+			System.out.println(dsLRT.getMean() + "+-" + dsLRT.getStandardDeviation() + " " + dsWALD.getMean() + "+-" + dsWALD.getStandardDeviation() + " cor " + sr.getR());
+			dsLRT.clear();
+			dsWALD.clear();
+			sr.clear();
 			Pout1.println();
 			Pout2.println();
 			Pout3.println();
