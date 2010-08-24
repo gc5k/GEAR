@@ -8,6 +8,11 @@ import java.io.IOException;
 import java.io.PrintStream;
 import java.util.ArrayList;
 
+import org.apache.commons.math.distribution.ChiSquaredDistribution;
+import org.apache.commons.math.distribution.ChiSquaredDistributionImpl;
+
+import LogP.LogPConstant;
+
 import im.population.simulation.*;
 import publicAccess.PublicData;
 /**
@@ -62,7 +67,7 @@ public class RegPopulation {
 			}
 
 			// population size
-			populationSize = 3000;
+			populationSize = 200;
 			if (param.size() > 0) {
 				populationSize = Integer.parseInt(param.get(0));
 			}
@@ -75,7 +80,7 @@ public class RegPopulation {
 				os[0] = 0;
 			}
 			// population type
-			pt = new String("F2");
+			pt = new String("B1");
 			if (param.size() > 2) {
 				pt = param.get(2);
 			}
@@ -145,7 +150,7 @@ public class RegPopulation {
 				rep = Integer.parseInt(param.get(15));
 			}
 			// permutation
-			permutation = 100;
+			permutation = 10;
 			if (param.size() > 16) {
 				permutation = Integer.parseInt(param.get(16));
 			}
@@ -281,26 +286,20 @@ public class RegPopulation {
 			Param1 = new Parameter1(file);
 		}
 
-		Parameter2 Param2 = null;
-		if (args.length > 1) {
-			Param2 = new Parameter2(args[1]);
-		} else {
-			String file = null;
-			Param2 = new Parameter2(file);
-		}
-
-		double map[][] = { {0, 0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9, 1.0} };
-							//{0, 0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9, 1.0}};
-//							{0, 0.05, 0.1, 0.15, 0.2, 0.25, 0.3, 0.35, 0.4, 0.45, 0.5} };
-//				{0, 0.05, 0.1, 0.15, 0.2, 0.25, 0.3, 0.35, 0.4, 0.5, 0.55, 0.6, 0.65, 0.7, 0.75, 0.8, 0.9, 0.95, 1.0}};
-						//1.1, 1.2, 1.3, 1.4,	1.5, 1.6, 1.7, 1.8, 1.9, 2.0} };
-		Param2.ReadMap(map);
-
-		// QTL
+		/////////////////////////////////////////////////////////////Map
+		MapMaker mapMaker = new MapMaker();
+		double map[][] = { {0.0, 0.05392271280288696, 0.1356232762336731, 0.19633138179779053, 0.5293703675270081, 0.5840020775794983, 0.6356768608093262, 0.7160268425941467, 0.7968748807907104, 0.8703390955924988, 1.0 } };
+		double[] len = {1.0};
+		int[] m = {11};
+		double[] criterion = {0.05, 0.25};
+//		mapMaker.MakeRandomMap(len, m, Param1.seed, criterion);
+//		map = mapMaker.getMap();
+		
+		/////////////////////////////////////////////////////////////QTL
 		ArrayList QTL = new ArrayList();
 
 		int[] chr0 = { 0 };
-		double[] location0 = { 0.15 };
+		double[] location0 = { 0.05 };
 		int[] genotype0 = { 2 };
 		double[] effect0 = { 0.5 };
 		int environment1 = 0;
@@ -308,56 +307,48 @@ public class RegPopulation {
 				environment1);
 		QTL.add(al0);
 
-//		int[] chr1 = { 0 };
-//		double[] location1 = {0.25};
-//		int[] genotype1 = { 2 };
-//		double[] effect1 = { 0.5 };
-//		AbstractLoci al1 = new AbstractLoci(chr1, location1, genotype1, effect1,
-//				environment1);
-//		QTL.add(al1);
-//
-//		int[] chr2 = { 0 };
-//		double[] location2 = {0.45};
-//		int[] genotype2 = { 2 };
-//		double[] effect2 = { 0.5 };
-//		AbstractLoci al2 = new AbstractLoci(chr2, location2, genotype2, effect2,
-//				environment1);
-//		QTL.add(al2);
-//
-//		int[] chr3 = { 2 };
-//		double[] location3 = { 0.17 };
-//		int[] genotype3 = { 2 };
-//		double[] effect3 = { 0.5 };
-//		AbstractLoci al3 = new AbstractLoci(chr3, location3, genotype3, effect3,
-//				environment1);
-//		QTL.add(al3);
-//
-//		int[] chr4 = { 2 };
-//		double[] location4 = { 0.37 };
-//		int[] genotype4 = { 2 };
-//		double[] effect4 = { 0.5 };
-//		AbstractLoci al4 = new AbstractLoci(chr4, location4, genotype4, effect4,
-//				environment1);
-//		QTL.add(al4);
+		int[] chr1 = { 0 };
+		double[] location1 = {0.45};
+		int[] genotype1 = { 2 };
+		double[] effect1 = { 0.5 };
+		AbstractLoci al1 = new AbstractLoci(chr1, location1, genotype1, effect1,
+				environment1);
+		QTL.add(al1);
 
-		int marker_control_stratagy = 1;
-		Param2.ReadQTL(QTL);
+		
+		
 		double[] env = { 0.0 };
-		boolean isSelectMarker = false;
-		double[][] weight = {{1, 0, -1}, {-0.5, 0.5, -0.5}};
+		double[][] weight = {{1, 0}};
 
-		marker_control_stratagy = 1;
-		isSelectMarker = true;
-		AbstractMapping IM1 = new CompositeIntervalMapping(marker_control_stratagy);
-		IM1.Simulation(Param1, QTL, env, weight, map, isSelectMarker);
-		IM1.SummuarySimulation();
+		PrintStream Pout1 = null;
+		ChiSquaredDistribution chi = new ChiSquaredDistributionImpl(weight.length);
+		try {
+			Pout1 = new PrintStream(new BufferedOutputStream(
+					new FileOutputStream("LogAP.txt")));
+		} catch (Exception E) {
+			E.printStackTrace(System.err);
+		}		
+		
+		ArrayList ControlMarker = null;
+//		ControlMarker = mapMaker.getRandomMarker(map, Param1.seed);
+		boolean isSelectMarker = true;
+		int marker_control_stratagy = LogPConstant.SelectPairMarker;
+		
+		for (int i = 0; i < 100; i++) {
+			AbstractMapping IM1 = new CompositeIntervalMapping(marker_control_stratagy);
+			mapMaker.MakeRandomMap(len, m, Param1.seed + i, criterion);
+			map = mapMaker.getMap();
+			for (int j = 0; j < map.length; j++) {
+				for (int k = 0; k < map[j].length; k++) {
+					Pout1.print(map[i][j] + "\t");
+				}
+			}
 
-//			marker_control_stratagy = 1;
-//			isSelectMarker = true;
-//			AbstractMapping IM3 = new CompositeIntervalMapping(marker_control_stratagy);
-//			IM3.Simulation(Param1, QTL, env, weight, map, isSelectMarker);
-//			IM3.SummuarySimulation();
-//			Pout1.print(IM3.get_threshold_LOD() + " " + IM3.get_threshold_LODP() + " " + IM3.get_threshold_PWald() + " " + IM3.get_threshold_PF() + "\t");
-//			Pout1.println();
+			Param1.seed = i * 500;
+			Param1.rep = 1;
+			IM1.Simulation(Param1, QTL, env, weight, map, ControlMarker, isSelectMarker);
+			IM1.SummuarySimulation();
+		}
+		Pout1.close();
 	}
 }
