@@ -100,6 +100,10 @@ public class PointMappingStatistic {
 		return lod;
 	}
 	
+	public double get_LN() {
+		return lod/0.217;
+	}
+	
 	public double get_wald() {
 		return wald;
 	}

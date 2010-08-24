@@ -172,7 +172,7 @@ public abstract class AbstractMapping {
 	protected abstract void selectMarker() ;
 
 	public void Simulation(Parameter1 p, ArrayList qtl, double[] env,
-			double[][] w, double[][] m, boolean isSelectMarker) {
+			double[][] w, double[][] m, ArrayList sm, boolean isSelectMarker) {
 		Param1 = p;
 		QTL = qtl;
 		map = new double[m.length][];
@@ -180,7 +180,6 @@ public abstract class AbstractMapping {
 			map[i] = new double[m[i].length];
 			System.arraycopy(m[i], 0, map[i], 0, map[i].length);
 		}
-
 		weight = new double[w.length][];
 		for (int i = 0; i < w.length; i++) {
 			weight[i] = new double[w[i].length];
@@ -189,8 +188,12 @@ public abstract class AbstractMapping {
 		for (int i = 0; i < map.length; i++) {
 			Num_interval += map[i].length == 1? map[i].length : map[i].length - 1;
 		}
-		if (isSelectMarker) {
-			selectMarker();
+		if (sm != null) {
+			selectedMarker = sm;
+		} else {
+			if (isSelectMarker) {
+				selectMarker();
+			}
 		}
 		correctLogBon();
 		makeFullMap(QTL, map);
@@ -278,7 +281,6 @@ public abstract class AbstractMapping {
 					}
 					thresholdPF.add(Collections.max(IMPF));
 					thresholdPwald.add(Collections.max(IMPWald));
-
 				}
 			}
 			ArrayList IMLOD = MappingProcedure(i_rep, 0);
@@ -289,7 +291,6 @@ public abstract class AbstractMapping {
 	public abstract ArrayList MappingProcedure(int i_rep, int isPermutation);
 
 	private void calculatePower() {
-		
 		ChiSquaredDistribution chi = new ChiSquaredDistributionImpl(weight.length);
 		Collections.sort(thresholdAP);
 		Collections.sort(thresholdDP);
@@ -304,7 +305,6 @@ public abstract class AbstractMapping {
 					(thresholdDP.size() - 1) * 0.95)).intValue()))
 					.doubleValue();
 		}
-
 		
 		threshold_LOD = ((Double) thresholdLOD.get((new Double(
 				(thresholdLOD.size() - 1) * 0.95)).intValue())).doubleValue();
@@ -418,7 +418,7 @@ public abstract class AbstractMapping {
 	}
 
 	public void SummuarySimulation() {
-		calculatePower();
+//		calculatePower();
 		PrintStream Pout1 = null;
 		PrintStream Pout2 = null;
 		PrintStream Pout3 = null;
@@ -430,9 +430,9 @@ public abstract class AbstractMapping {
 			Pout1 = new PrintStream(new BufferedOutputStream(
 					new FileOutputStream("LogAP.txt")));
 			Pout2 = new PrintStream(new BufferedOutputStream(
-					new FileOutputStream("LODP.txt")));
+					new FileOutputStream("LNP.txt")));
 			Pout3 = new PrintStream(new BufferedOutputStream(
-					new FileOutputStream("LOD.txt")));
+					new FileOutputStream("LN.txt")));
 			Pout4 = new PrintStream(new BufferedOutputStream(
 					new FileOutputStream("Wald.txt")));
 			Pout5 = new PrintStream(new BufferedOutputStream(
@@ -452,14 +452,8 @@ public abstract class AbstractMapping {
 			for (int j = 0; j < PointStatistics.size(); j++) {
 				PointMappingStatistic pms = (PointMappingStatistic) PointStatistics
 						.get(j);
-				dsLRT.addValue(pms.get_LOD());
-				dsWALD.addValue(pms.get_wald());
-				LRT[j] = pms.get_LOD()/0.217;
-				WALD[j] = pms.get_wald();
-				sr.addData(pms.get_LOD()/0.217, pms.get_wald());
 				double lod = pms.get_LOD()>0 ? pms.get_LOD() : 0;
-
-				double ln = lod/0.217;
+				double ln = pms.get_LN();
 				double p = 0;
 				try {
 					p = chi.cumulativeProbability(ln);
@@ -469,12 +463,18 @@ public abstract class AbstractMapping {
 				double logLOD = -1 * Math.log10(1-p);
 				Pout1.print(pms.get_logP_additive() + " ");
 				Pout2.print(logLOD + " ");
-				Pout3.print(pms.get_LOD() + " ");
-				Pout4.print(pms.get_logP_wald() + " ");
+				Pout3.print(pms.get_LN() + " ");
+				Pout4.print(pms.get_wald() + " ");
 				Pout5.print(pms.get_logP_F() + " ");
 				Pout6.print(pms.get_logP_dominance() + " ");
+
+				dsLRT.addValue(pms.get_LN());
+				dsWALD.addValue(pms.get_wald());
+				LRT[j] = pms.get_LN();
+				WALD[j] = pms.get_wald();
+				sr.addData(pms.get_LN(), pms.get_wald());
 			}
-			System.out.println(dsLRT.getMean() + "+-" + dsLRT.getStandardDeviation() + " " + dsWALD.getMean() + "+-" + dsWALD.getStandardDeviation() + " cor " + sr.getR());
+			System.out.println(dsLRT.getMean() + " +- " + dsLRT.getStandardDeviation() + " " + dsWALD.getMean() + " +- " + dsWALD.getStandardDeviation() + " cor " + sr.getR());
 			dsLRT.clear();
 			dsWALD.clear();
 			sr.clear();
