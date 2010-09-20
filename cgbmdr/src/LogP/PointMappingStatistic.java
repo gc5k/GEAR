@@ -1,5 +1,7 @@
 package LogP;
 
+import org.apache.commons.math.distribution.ChiSquaredDistribution;
+import org.apache.commons.math.distribution.ChiSquaredDistributionImpl;
 import org.apache.commons.math.distribution.FDistribution;
 import org.apache.commons.math.distribution.FDistributionImpl;
 
@@ -106,6 +108,17 @@ public class PointMappingStatistic {
 	
 	public double get_wald() {
 		return wald;
+	}
+
+	public double get_P_LN() {
+		double pLN = 0;
+		ChiSquaredDistribution chid = new ChiSquaredDistributionImpl(degree_freedom_wald);
+		try {
+			pLN = 1 - chid.cumulativeProbability(lod/0.217);
+		} catch (Exception E) {
+			E.printStackTrace(System.err);
+		}
+		return pLN;
 	}
 
 	public double get_P_wald() {

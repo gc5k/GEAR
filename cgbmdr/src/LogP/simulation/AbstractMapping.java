@@ -234,6 +234,23 @@ public abstract class AbstractMapping {
 			gs.CalculateIPP();
 
 			if (Param1.permutation > 0 && i_rep == 0) {
+				PrintStream PoutPW = null;
+				PrintStream PoutPL = null;
+				PrintStream PoutW = null;
+				PrintStream PoutL = null;
+				try {
+					PoutW = new PrintStream(new BufferedOutputStream(
+							new FileOutputStream("PermuWald.txt")));
+					PoutL = new PrintStream(new BufferedOutputStream(
+							new FileOutputStream("PermuLN.txt")));
+					PoutPW = new PrintStream(new BufferedOutputStream(
+							new FileOutputStream("PermuWaldP.txt")));
+					PoutPL = new PrintStream(new BufferedOutputStream(
+							new FileOutputStream("PermuLNP.txt")));
+				} catch (Exception E) {
+					E.printStackTrace(System.err);
+				}
+
 				thresholdLOD = new ArrayList();
 				thresholdAP = new ArrayList();
 				thresholdDP = new ArrayList();
@@ -255,6 +272,10 @@ public abstract class AbstractMapping {
 					for (int j = 0; j < IMStatistic.size(); j++) {
 						PointMappingStatistic pms = (PointMappingStatistic) IMStatistic
 								.get(j);
+						PoutPW.print(pms.get_P_wald() + " ");
+						PoutPL.print(pms.get_P_LN() + " ");
+						PoutW.print(pms.get_wald() + " ");
+						PoutL.print(pms.get_LN() + " ");
 						IMLOD.add(new Double(pms.get_LOD()));
 						IMAT.add(new Double(pms.get_tStatistic_additive()));
 						IMDT.add(new Double(pms.get_tStatistic_dominance()));
@@ -271,6 +292,10 @@ public abstract class AbstractMapping {
 							IMDP.add(new Double(pms.get_logP_dominance()));
 						}
 					}
+					PoutPW.println();
+					PoutPL.println();
+					PoutW.println();
+					PoutL.println();
 					if (c > 0) {
 						typeI_LogBon += 1;
 					}
@@ -282,6 +307,10 @@ public abstract class AbstractMapping {
 					thresholdPF.add(Collections.max(IMPF));
 					thresholdPwald.add(Collections.max(IMPWald));
 				}
+				PoutPW.close();
+				PoutPL.close();
+				PoutW.close();
+				PoutL.close();
 			}
 			ArrayList IMLOD = MappingProcedure(i_rep, 0);
 			SimulationResults.add(IMLOD);
@@ -418,7 +447,7 @@ public abstract class AbstractMapping {
 	}
 
 	public void SummuarySimulation() {
-//		calculatePower();
+		calculatePower();
 		PrintStream Pout1 = null;
 		PrintStream Pout2 = null;
 		PrintStream Pout3 = null;

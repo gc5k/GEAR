@@ -145,12 +145,12 @@ public class RegPopulation {
 				switch2permutation = Boolean.parseBoolean(param.get(14));
 			}
 			// replication
-			rep = 100;
+			rep = 1;
 			if (param.size() > 15) {
 				rep = Integer.parseInt(param.get(15));
 			}
 			// permutation
-			permutation = 10;
+			permutation = 5000;
 			if (param.size() > 16) {
 				permutation = Integer.parseInt(param.get(16));
 			}
@@ -288,18 +288,18 @@ public class RegPopulation {
 
 		/////////////////////////////////////////////////////////////Map
 		MapMaker mapMaker = new MapMaker();
-		double map[][] = { {0.0, 0.05392271280288696, 0.1356232762336731, 0.19633138179779053, 0.5293703675270081, 0.5840020775794983, 0.6356768608093262, 0.7160268425941467, 0.7968748807907104, 0.8703390955924988, 1.0 } };
+		double map[][] = { {0.0, 0.05, 0.1, 0.15} };
 		double[] len = {1.0};
 		int[] m = {11};
 		double[] criterion = {0.05, 0.25};
 //		mapMaker.MakeRandomMap(len, m, Param1.seed, criterion);
 //		map = mapMaker.getMap();
-		
+
 		/////////////////////////////////////////////////////////////QTL
 		ArrayList QTL = new ArrayList();
 
 		int[] chr0 = { 0 };
-		double[] location0 = { 0.05 };
+		double[] location0 = { 0.075 };
 		int[] genotype0 = { 2 };
 		double[] effect0 = { 0.5 };
 		int environment1 = 0;
@@ -307,16 +307,14 @@ public class RegPopulation {
 				environment1);
 		QTL.add(al0);
 
-		int[] chr1 = { 0 };
-		double[] location1 = {0.45};
-		int[] genotype1 = { 2 };
-		double[] effect1 = { 0.5 };
-		AbstractLoci al1 = new AbstractLoci(chr1, location1, genotype1, effect1,
-				environment1);
-		QTL.add(al1);
+//		int[] chr1 = { 0 };
+//		double[] location1 = {0.45};
+//		int[] genotype1 = { 2 };
+//		double[] effect1 = { 0.5 };
+//		AbstractLoci al1 = new AbstractLoci(chr1, location1, genotype1, effect1,
+//				environment1);
+//		QTL.add(al1);
 
-		
-		
 		double[] env = { 0.0 };
 		double[][] weight = {{1, 0}};
 
@@ -324,31 +322,20 @@ public class RegPopulation {
 		ChiSquaredDistribution chi = new ChiSquaredDistributionImpl(weight.length);
 		try {
 			Pout1 = new PrintStream(new BufferedOutputStream(
-					new FileOutputStream("LogAP.txt")));
+					new FileOutputStream("Map.txt")));
 		} catch (Exception E) {
 			E.printStackTrace(System.err);
-		}		
-		
+		}
+
 		ArrayList ControlMarker = null;
 //		ControlMarker = mapMaker.getRandomMarker(map, Param1.seed);
 		boolean isSelectMarker = true;
-		int marker_control_stratagy = LogPConstant.SelectPairMarker;
-		
-		for (int i = 0; i < 100; i++) {
-			AbstractMapping IM1 = new CompositeIntervalMapping(marker_control_stratagy);
-			mapMaker.MakeRandomMap(len, m, Param1.seed + i, criterion);
-			map = mapMaker.getMap();
-			for (int j = 0; j < map.length; j++) {
-				for (int k = 0; k < map[j].length; k++) {
-					Pout1.print(map[i][j] + "\t");
-				}
-			}
+		int marker_control_stratagy = LogPConstant.SelectFullMarker;
 
-			Param1.seed = i * 500;
-			Param1.rep = 1;
-			IM1.Simulation(Param1, QTL, env, weight, map, ControlMarker, isSelectMarker);
-			IM1.SummuarySimulation();
-		}
-		Pout1.close();
+		AbstractMapping IM1 = new CompositeIntervalMapping(marker_control_stratagy);
+//			mapMaker.MakeRandomMap(len, m, Param1.seed + i, criterion);
+//			map = mapMaker.getMap();
+		IM1.Simulation(Param1, QTL, env, weight, map, ControlMarker, isSelectMarker);
+		IM1.SummuarySimulation();
 	}
 }
