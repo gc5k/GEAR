@@ -1004,7 +1004,7 @@ public class FamilyGenerator {
 			pr.pheno_select_quantile[1] = -0.9;
 			pr.simu_replication = 2;
 			pr.family_size = 2000;
-			pr.number_case = 1000;
+			pr.number_case = 0;
 			pr.FamNum = new int[1];
 			pr.FamNum[0] = 2000;
 

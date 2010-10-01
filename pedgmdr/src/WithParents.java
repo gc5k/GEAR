@@ -13,7 +13,7 @@ import family.GMDRData;
 import family.GMDRPhenoFileException;
 import family.MDRPedFileException;
 
-public class TestRabinowitz {
+public class WithParents {
 
 	public static class Parameter {
 		
@@ -98,7 +98,7 @@ public class TestRabinowitz {
 			pr.phe_idx[0] = 0;
 			pr.method = 1;
 			pr.adjustment = true;
-			pr.includeFounder = false;
+			pr.includeFounder = true;
 			pr.replication = 10;
 		}
 
@@ -118,14 +118,14 @@ public class TestRabinowitz {
 		}
 		GD.Match();
 		GD.RabinowitzApproach();
-		GD.realCreateTable();
+		GD.realCreateTableWithParents();
 		try {
 			if (pr.method >= 0) {
 				GD.buildScore2(pr.phe_idx, pr.cov_idx, pr.adjustment, pr.method, pr.includeFounder);
 			} else {
 				GD.fetchScore(pr.phe_idx[0]);
 			}
-			GD.RabinowitzPrintGMDR(pr.converted_ped_file, pr.converted_phe_file, false);
+			GD.RabinowitzPrintGMDRwithParents(pr.converted_ped_file, pr.converted_phe_file, false);
 		} catch (CalEngineException e) {
 			e.printStackTrace(System.err);
 		} catch (Exception e) {
@@ -133,11 +133,11 @@ public class TestRabinowitz {
 		}
 
 		for (int i = 0; i < pr.replication; i++) {
-			String opfN = "Rabin_" + Integer.toString(i) + ".txt";
+			String opfN = "ParentsRabin_" + Integer.toString(i) + ".txt";
 			GD.RabinowitzApproach();
-			GD.RabinowitzCreateTable();
+			GD.RabinowitzCreateTableWithParents();
 			try {
-				GD.RabinowitzPrintGMDR(opfN, null, true);
+				GD.RabinowitzPrintGMDRwithParents(opfN, null, true);
 			} catch (CalEngineException e) {
 				e.printStackTrace(System.err);
 			} catch (Exception e) {
