@@ -68,7 +68,7 @@ public class UnobservedParents extends AbstractGenoDistribution {
                     Set GSet = childrenGenoMap.keySet();
                     double vk1 = ((Integer) childrenGenoMap.get((String) childrenGenoMap.firstKey())).doubleValue();
                     double vk2 = ((Integer) childrenGenoMap.get((String) childrenGenoMap.lastKey())).doubleValue();
-                    double rd = Math.random() * ( vk1 + vk2 );
+                    double rd = rnd.nextFloat() * ( vk1 + vk2 );
                     if (rd < vk1) {
                         nontran = new String((String) childrenGenoMap.firstKey());
                     } else {
@@ -87,7 +87,7 @@ public class UnobservedParents extends AbstractGenoDistribution {
             for (; it.hasNext();) {
                 Geno.add((String) it.next());
             }
-            int index = (new Double(Math.random() * childrenGenoMap.size())).intValue();
+            int index = (new Double(rnd.nextFloat() * childrenGenoMap.size())).intValue();
             nontran = (String) Geno.get(index);
         }
         add(nontran);

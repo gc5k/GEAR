@@ -1,23 +1,18 @@
 package family;
 
-import java.io.BufferedReader;
-import java.io.File;
-import java.io.FileReader;
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.regex.Pattern;
-
-import edu.mit.wi.pedfile.PedFileException;
+import java.util.Random;
 
 import score.CalEngineException;
-
+import edu.mit.wi.pedfile.PedFileException;
+import family.RabinowitzLairdAlgorithm.AbstractGenoDistribution;
 import family.pedigree.GMDRData;
 import family.pedigree.GMDRPhenoFileException;
 import family.pedigree.MDRPedFileException;
 
-public class WithParents {
+public class RunPedSimulation {
 
-	public static void main(String[] args) throws IOException {
+	public static void main (String[] args) throws IOException {
 
 		PedigreeParameter pr = new PedigreeParameter();
 		if(args.length > 0) {
@@ -39,21 +34,21 @@ public class WithParents {
 		GMDRData GD = new GMDRData(true);
 
 		try {
-			GD.InitialPedFile(pr.ped_file);// initial Pedfile
+			GD.InitialPedFile(pr.getPedigreeFile());// initial Pedfile
+			GD.InitialPhenoFile(pr.getPhenotypeFile());// initial phenotype
 		} catch (MDRPedFileException E) {
 			E.printStackTrace(System.err);
-		}
-		try {
-			GD.InitialPhenoFile(pr.phe_file);
 		} catch (GMDRPhenoFileException e) {
 			System.err.println("Phenotype File Exception.");
 		}
+		AbstractGenoDistribution.rnd = new Random(2);
 		GD.Match();
 		GD.RabinowitzApproach();
 		GD.realCreateTableWithParents();
 		try {
 			if (pr.getScoreBuildMethod() >= 0) {
-				GD.buildScore(pr.phe_idx, pr.cov_idx, pr.isAdjustScore(), pr.scoreBuildMethod, pr.scoreBuildWithFounder);
+				GD.buildScore(pr.getPhenotypeIndex(), pr.getCovarianteIndex(), pr.isAdjustScore(), pr.getScoreBuildMethod(), 
+						pr.getScoreBuildWithFounder());
 			} else {
 				GD.fetchScore(pr.phe_idx[0]);
 			}
@@ -64,6 +59,8 @@ public class WithParents {
 			e.printStackTrace(System.err);
 		}
 
+		
+		
 		for (int i = 0; i < pr.replication; i++) {
 			String opfN = "ParentsRabin_" + Integer.toString(i) + ".txt";
 			GD.RabinowitzApproach();

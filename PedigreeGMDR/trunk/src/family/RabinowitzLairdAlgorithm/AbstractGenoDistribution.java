@@ -4,6 +4,7 @@ package family.RabinowitzLairdAlgorithm;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.Map;
+import java.util.Random;
 import java.util.Set;
 import java.util.TreeMap;
 import java.util.TreeSet;
@@ -24,6 +25,7 @@ public abstract class AbstractGenoDistribution {
     protected TreeSet parentalleleSet;
     protected ArrayList parentGeno;
 
+    static public Random rnd;
     /**
      * Construct the GenoDistribution
      * 
@@ -85,7 +87,7 @@ public abstract class AbstractGenoDistribution {
     protected void Produce(String[] control, TreeMap cM, String[] genopool,
             double[] freq) {
         for (int i = 0; i < control.length; i++) {
-            double rd = Math.random();
+            double rd = rnd.nextFloat();
             int index = 0;
             for (int j = 0; j < freq.length; j++) {
                 index = j;
@@ -120,8 +122,8 @@ public abstract class AbstractGenoDistribution {
                 {p2.charAt(0), p2.charAt(1)}
             };
             char allele[] = new char[2];
-            int index1 = (Math.random() > 0.5) ? 0 : 1;
-            int index2 = (Math.random() > 0.5) ? 0 : 1;
+            int index1 = (rnd.nextFloat() > 0.5) ? 0 : 1;
+            int index2 = (rnd.nextFloat() > 0.5) ? 0 : 1;
             if (PG[0][index1] <= PG[1][index2]) {
                 allele[0] = PG[0][index1];
                 allele[1] = PG[1][index2];
@@ -138,7 +140,7 @@ public abstract class AbstractGenoDistribution {
                 for (; it.hasNext();) {
                     Geno.add((String) it.next());
                 }
-                int index = (new Double(Math.random() * childrenGenoMap.size())).intValue();
+                int index = (new Double(rnd.nextFloat() * childrenGenoMap.size())).intValue();
                 geno = new String((String) Geno.get(index));
             }
         }

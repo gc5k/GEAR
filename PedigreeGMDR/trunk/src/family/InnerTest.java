@@ -113,8 +113,6 @@ public class InnerTest {
             GD.InitialPedFile(pr.ped_file);
         } catch (MDRPedFileException E) {
             E.printStackTrace(System.err);
-        } catch (PedFileException E) {
-            E.printStackTrace(System.err);
         }
         GD.Allele2Genotype();
         try {
@@ -127,7 +125,7 @@ public class InnerTest {
         GD.realCreateTable();
         try {
             if (pr.method >= 0) {
-                GD.buildScore2(pr.phe_idx, pr.cov_idx, pr.adjustment, pr.method, pr.includeFounder);
+                GD.buildScore(pr.phe_idx, pr.cov_idx, pr.adjustment, pr.method, pr.includeFounder);
             } else {
                 GD.fetchScore(pr.phe_idx[0]);
             }

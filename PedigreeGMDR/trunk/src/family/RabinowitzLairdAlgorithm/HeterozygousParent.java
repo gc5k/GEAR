@@ -84,7 +84,7 @@ public class HeterozygousParent extends AbstractGenoDistribution {
                 } else {//4-2 
                     double vk1 = ((Integer) childrenGenoMap.get((String) childrenGenoMap.firstKey())).doubleValue();
                     double vk2 = ((Integer) childrenGenoMap.get((String) childrenGenoMap.lastKey())).doubleValue();
-                    double rd = Math.random() * (vk1 + vk2);
+                    double rd = rnd.nextFloat() * (vk1 + vk2);
                     if (rd < vk1) {
                         nontran = new String((String) childrenGenoMap.firstKey());
                     } else {
@@ -102,7 +102,7 @@ public class HeterozygousParent extends AbstractGenoDistribution {
 
                     if (tran.compareTo(parentgeno1) == 0) {
                         // code
-                        double rd = Math.random();
+                        double rd = rnd.nextFloat();
                         if (rd < 0.5) {
                             nontran = new String(ExtractUniqueAllele2Genotype(
                                     (String) childrenGenoMap.firstKey(),
@@ -122,7 +122,7 @@ public class HeterozygousParent extends AbstractGenoDistribution {
         } else {// situation 15
 
             if (tran.compareTo(parentgeno1) == 0) {
-                double rd = Math.random();
+                double rd = rnd.nextFloat();
                 Set GSet = childrenGenoMap.keySet();
                 Iterator it = GSet.iterator();
                 ArrayList GVec = new ArrayList();

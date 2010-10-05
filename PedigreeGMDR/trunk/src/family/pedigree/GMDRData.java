@@ -50,7 +50,7 @@ public class GMDRData {
 	// private static String Missingvalue=".";
 	private ArrayList DiscardedIndividual;
 	private ArrayList CardedIndividual;
-
+	
 	private double[][] Covariates;
 	private double[][] FullCovariates;
 	// private double[][] Traits;
@@ -157,7 +157,7 @@ public class GMDRData {
 	 *            with predictor.
 	 * @throws CalEngineException
 	 */
-	public void buildScore2(int[] PIndex, int[] CIndex, boolean Adjust,
+	public void buildScore(int[] PIndex, int[] CIndex, boolean Adjust,
 			int method, boolean includeFounder) throws CalEngineException {// method
 		// 0
 		// for
@@ -218,9 +218,7 @@ public class GMDRData {
 						flag = false;
 						break;
 					}
-					c
-							.add((Double.parseDouble((String) tempc
-									.get(CovIndex[j]))));
+					c.add((Double.parseDouble((String) tempc.get(CovIndex[j]))));
 				}
 				if (!flag) {
 					continue;
@@ -255,197 +253,6 @@ public class GMDRData {
 		}
 	}
 
-	/**
-	 * Build score with a selected response and predictor(s).
-	 * 
-	 * @param Adjust
-	 *            a boolean variable. If it equals false, don't adjust the model
-	 *            with predictor.
-	 * @throws CalEngineException
-	 */
-	public void buildScore(int[] PIndex, int[] CIndex, boolean Adjust,
-			int method) throws CalEngineException {// method 0 for regression, 1
-		// for logistic
-		ScoreHashTable.clear();
-		PersonIndex PI;
-		String key;
-		scoreProc = method;
-		ArrayList<Double> T = new ArrayList();
-		ArrayList<ArrayList> C = new ArrayList();
-		ArrayList<PersonIndex> P = new ArrayList();
-
-		setScoreProc(method);
-		setAdjustmentOfCovariate(Adjust);
-		setSelectedPhenoIndex(PIndex);
-
-		if (Adjust) {
-			setSelectedCovariateIndex(CIndex);
-		}
-		for (int i = 0; i < FullPersonTable.size(); i++) {
-			boolean flag = true;
-			double t = 0;
-			ArrayList c = new ArrayList();
-			ArrayList tempc = (ArrayList) FullCovariateTable.get(i);
-			if (PheIndex[0] == -1) {// using affecting status as phenotype
-				if (((Integer) FullStatusTable.get(i)).intValue() == 0) {// ignor
-					// missing
-					// value
-					flag = false;
-					continue;
-				} else {// after converting, 0 for unaffected; 1 for affected;
-					// -1 for unknown;
-					t = ((Integer) FullStatusTable.get(i)).intValue() - 1;
-				}
-			} else {
-				if (((String) tempc.get(PheIndex[0]))
-						.compareTo(PublicData.MissingValue) == 0) {
-					flag = false;
-					continue;
-				} else {
-					t = Double.parseDouble((String) tempc.get(PheIndex[0]));
-				}
-			}
-			if (Adjust) {
-				for (int j = 0; j < CovIndex.length; j++) {
-					if (((String) tempc.get(CovIndex[j]))
-							.compareTo(PublicData.MissingValue) == 0) {
-						flag = false;
-						break;
-					}
-					c
-							.add((Double.parseDouble((String) tempc
-									.get(CovIndex[j]))));
-				}
-				if (!flag) {
-					continue;
-				}
-				C.add(c);
-			}
-			P.add(FullPersonTable.get(i));
-			T.add(new Double(t));
-		}
-		double[][] X = null;
-		if (Adjust) {
-			X = new double[C.size()][CovIndex.length];
-			for (int i = 0; i < C.size(); i++) {
-				ArrayList c = C.get(i);
-				for (int j = 0; j < c.size(); j++) {
-					X[i][j] = ((Double) c.get(j)).doubleValue();
-				}
-			}
-		}
-		double[][] Y = new double[T.size()][1];
-		for (int i = 0; i < T.size(); i++) {
-			Y[i][0] = ((Double) T.get(i)).doubleValue();
-		}
-
-		CalEngine CE = new CalEngine(X, Y, Adjust);
-		double[][] s = CE.GeneralScore(method);
-		for (int i = 0; i < P.size(); i++) {
-			PI = P.get(i);
-			key = PI.getKey();
-			ScoreHashTable.put(new String(key), new Double(s[i][0]));
-		}
-	}
-
-	/**
-	 * Calculate score with given parameters
-	 * 
-	 * @param CovIndex
-	 *            indexes of the covariates
-	 * @param PhenoIndex
-	 *            index of the response
-	 * @param adjustment
-	 *            whether adjust the response with covariates of not
-	 * @param method
-	 *            linear regression or logistic regression
-	 * @throws CalEngineException
-	 */
-	public void CalculateScore(int[] CovIndex, int PhenoIndex,
-			boolean adjustment, int method) throws CalEngineException // adjust=false
-	// ,no
-	// cov
-	// adjust=ture, with cov
-	{
-		double[][] status;
-		double[][] score;
-		double covariate[][] = new double[FullCovariateTable.size()][CovIndex.length];
-
-		PersonIndex PI;
-		String key;
-		ScoreHashTable.clear();
-
-		for (int i = 0; i < FullCovariateTable.size(); i++) {
-			for (int j = 0; j < CovIndex.length; j++) {
-				covariate[i][j] = FullCovariates[i][CovIndex[j]];
-			}
-		}
-
-		if (PhenoIndex == -1) {
-			status = FullStatus;
-		} else {
-			status = new double[FullCovariates.length][1];
-			for (int i = 0; i < status.length; i++) {
-				for (int j = 0; j < status[i].length; j++) {
-					status[i][j] = FullCovariates[i][j];
-				}
-			}
-		}
-
-		CalEngine CE = new CalEngine(covariate, status, adjustment);
-		score = CE.GeneralScore(method);
-		for (int i = 0; i < FullPersonTable.size(); i++) {
-			PI = FullPersonTable.get(i);
-			key = PI.getKey();
-			ScoreHashTable.put(key, new Double(score[i][0]));
-		}
-	}
-
-	public void CalculateScore2(int[] CovIndex, int PhenoIndex, boolean adjust,
-			int method) throws CalEngineException// only sibs are used in score
-	// calculation
-	// adjust=false ,no cov
-	// adjust=ture, with cov
-	{
-		double[][] status;
-		double[][] score;
-		double covariate[][] = new double[CovariateTable.size()][CovIndex.length];
-
-		PersonIndex PI;
-		String key;
-		ScoreHashTable.clear();
-
-		for (int i = 0; i < CovariateTable.size(); i++) {
-			for (int j = 0; j < CovIndex.length; j++) {
-				covariate[i][j] = Covariates[i][CovIndex[j]];
-			}
-		}
-
-		if (PhenoIndex == -1) {
-			status = Status;
-		} else {
-			status = new double[Covariates.length][1];
-			for (int i = 0; i < status.length; i++) {
-				for (int j = 0; j < status[i].length; j++) {
-					status[i][j] = Covariates[i][j];
-				}
-			}
-		}
-
-		CalEngine CE = new CalEngine(covariate, status, adjust);
-		score = CE.GeneralScore(method);
-		for (int i = 0; i < PersonTable.size(); i++) {
-			PI = PersonTable.get(i);
-			key = PI.getKey();
-			ScoreHashTable.put(key, new Double(score[i][0]));
-		}
-	}
-
-	/**
-	 * Clear all tables, including TDTGenoTable, CovariateTable,
-	 * FulCovariateTable, StatusTable, TDTScoreTable, TransmittedTable,
-	 * PersonTable, FullPersonTable, NontransmittedTable.
-	 */
 	private void clearTables() {
 		TDTGenoTable.clear();
 		CovariateTable.clear();
@@ -828,8 +635,7 @@ public class GMDRData {
 	 *            the name of the pedigree file
 	 * @throws IOException
 	 */
-	public void InitialPedFile(String ped) throws MDRPedFileException,
-			PedFileException {
+	public void InitialPedFile(String ped) throws MDRPedFileException{
 		File PedFile = new File(ped);
 		try {
 			PedData.Initial(PedFile);
@@ -1541,5 +1347,13 @@ public class GMDRData {
 				FullCovariates[i][j] = Double.parseDouble(co);
 			}
 		}
+	}
+	
+	public ArrayList<String> getMarkerName() {
+		return PedData.getMarkerInformation();
+	}
+	
+	public ArrayList<String> getTraitName() {
+		return PhenoData.getTraitName();
 	}
 }

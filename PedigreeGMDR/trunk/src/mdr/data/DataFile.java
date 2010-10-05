@@ -33,7 +33,7 @@ public class DataFile {
     protected String markerFile;
     protected String phenotypeFile;
     protected String[] SNPID;
-    protected String[] phenotype;
+    protected String[] traitName;
     protected int[][] missing;
     protected static int[] scrIndex;
     protected double[] offset;
@@ -183,6 +183,59 @@ public class DataFile {
     }
 
     public DataFile() {}
+
+    public DataFile(ArrayList<String> mkInformation, ArrayList marker, ArrayList statue, ArrayList<String> traitInformation, ArrayList phenotype) {
+    	SNPID = mkInformation.toArray(new String[0]);
+    	traitName = traitInformation.toArray(new String[0]);
+    	initial1(marker, statue, phenotype);
+    }
+
+    private void initial1(ArrayList<ArrayList> marker, ArrayList statue, ArrayList<ArrayList> phenotype) {
+        TreeMap tempMap = new TreeMap();
+        
+    	for (int i= 0; i < marker.size(); i++) {
+    		ArrayList<String> geno = (ArrayList) marker.get(i);
+    		geno.add((String) statue.get(i));
+    		String[] content = geno.toArray(new String[0]);
+            Subject sub = new Subject(content);
+            sub.setID(i);
+            sample.add(sub);
+            //count alleles;
+            for (int j = 0; j < content.length - 1; j++) {
+                Integer Ii = new Integer(j);
+                if (content[j].compareTo(PublicData.MissingGenotype) == 0) {
+                    if (tempMap.containsKey(Ii)) {
+                        ArrayList tempArray = (ArrayList) tempMap.get(Ii);
+                        tempArray.add(new Integer(i));
+                    } else {
+                        ArrayList tempArray = new ArrayList();
+                        tempArray.add(new Integer(i));
+                        tempMap.put(Ii, tempArray);
+                    }
+                }
+            }
+    	}
+        Set keys = tempMap.keySet();
+        missing = new int[SNPID.length][];
+        for (Iterator e = keys.iterator(); e.hasNext();) {
+            Integer Ii = (Integer) e.next();
+            ArrayList tempArray = (ArrayList) tempMap.get(Ii);
+            missing[Ii.intValue()] = new int[tempArray.size()];
+            for (int i = 0; i < tempArray.size(); i++) {
+                missing[Ii.intValue()][i] = ((Integer) tempArray.get(i)).intValue();
+            }
+        }
+        
+        
+        
+        for (int i = 0; i < sample.size(); i++ ) {
+            Subject sub = (Subject) sample.get(i);
+            ArrayList<String> traits = phenotype.get(i);
+            String[] ps = traits.toArray(new String[0]);
+            sub.addScore(ps);
+        }        
+        
+    }
     public DataFile(IMPopulation imp, int[] scrIdx) {
         markerFile = "simulationMarker.txt";
         phenotypeFile = "simulationPhenotype.txt";
@@ -405,7 +458,7 @@ public class DataFile {
             System.out.println("It's empty.");
             System.exit(0);
         }
-        phenotype = line.split(PublicData.delim);
+        traitName = line.split(PublicData.delim);
         List pl = new ArrayList();
         while ((line = b.readLine()) != null) {
             pl.add(line);
@@ -420,7 +473,7 @@ public class DataFile {
         for (; e.hasNext();) {
             String p = (String) e.next();
             String[] ps = p.split(PublicData.delim);
-            if (ps.length != phenotype.length) {
+            if (ps.length != traitName.length) {
                 System.err.println("The " + c + "th phenotype row does not match the total size of the phenotypes");
             }
             Subject sub = (Subject) sample.get(c++);
