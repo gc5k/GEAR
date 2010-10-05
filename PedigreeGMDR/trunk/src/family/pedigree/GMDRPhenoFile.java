@@ -160,6 +160,10 @@ public class GMDRPhenoFile {
         return traitInfor.size();
     }
 
+    public ArrayList getTraitName() {
+    	return traitInfor;
+    }
+    
     public String getTraitAtI(int index) throws GMDRPhenoFileException {
         if (index < 0 || index > traitInfor.size()) {
             throw new GMDRPhenoFileException(

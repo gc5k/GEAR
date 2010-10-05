@@ -392,7 +392,7 @@ public class Rabinowitz2 extends AbstractGenoDistribution {
         }
         int N = control.length;
         for (int i = 0; i < N; i++) {
-            int Ind = i + (int) (Math.random() * (N - i));
+            int Ind = i + (int) (rnd.nextFloat() * (N - i));
             String tmp = control[i];
             control[i] = control[Ind];
             control[Ind] = tmp;

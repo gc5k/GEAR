@@ -6,12 +6,14 @@ import java.io.FileReader;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Hashtable;
+import java.util.Random;
 import java.util.regex.Pattern;
 import score.CalEngineException;
 import edu.mit.wi.pedfile.PedFileException;
 import family.pedigree.GMDRData;
 import family.pedigree.GMDRPhenoFileException;
 import family.pedigree.MDRPedFileException;
+import family.RabinowitzLairdAlgorithm.AbstractGenoDistribution;
 
 /**
  * It's a beta version of the PedGMDR, which produces nontransmitted genotypes and scores. TestPed is mainly developed
@@ -117,14 +119,11 @@ public class TestPed {
 
 		GMDRData GD = new GMDRData(pr.isPedigree);
         int WhichDataSet = 2; // 0 for all; 1 for affected only; 2 for unaffected only.
-
+        AbstractGenoDistribution.rnd = new Random(2);
         try {
             GD.InitialPedFile(pr.ped_file);
         } catch (MDRPedFileException e) {
             System.err.println("Pedigree File Exception.");
-            e.printStackTrace(System.err);
-        } catch (PedFileException e) {
-            System.err.println("Pedigree File checking Excetpion.");
             e.printStackTrace(System.err);
         }
         GD.NonTransmittedGenoType();
@@ -144,7 +143,7 @@ public class TestPed {
         		GD.fetchScore(pr.phe_idx[0]);
         	} else {
         		if (pr.method > 0) {
-        			GD.buildScore2(pr.phe_idx, pr.cov_idx, pr.adjustment, pr.method, pr.includeFounder);
+        			GD.buildScore(pr.phe_idx, pr.cov_idx, pr.adjustment, pr.method, pr.includeFounder);
         		} else {
         			GD.fetchScore(pr.phe_idx[0]);
         		}

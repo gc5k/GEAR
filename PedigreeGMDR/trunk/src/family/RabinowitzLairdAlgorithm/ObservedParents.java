@@ -49,8 +49,8 @@ public class ObservedParents extends AbstractGenoDistribution {
 
         if (transmitted.compareTo(PublicData.MissingGenotype) == 0) {// missing data
 
-            int index1 = (Math.random() > 0.5) ? 0 : 1;
-            int index2 = (Math.random() > 0.5) ? 0 : 1;
+            int index1 = (rnd.nextFloat() > 0.5) ? 0 : 1;
+            int index2 = (rnd.nextFloat() > 0.5) ? 0 : 1;
             if (PG[0][index1] <= PG[1][index2]) {
                 allele[0] = PG[0][index1];
                 allele[1] = PG[1][index2];
