@@ -106,6 +106,10 @@ public class GMDRParameter {
 			scr_idx[i] = Integer.parseInt(c[i]) - 1;
 		}
 	}
+
+	public void setScoreIndex(int[] scrIdx) {		
+		scr_idx = scrIdx;
+	}
 	
 	public int[] getScoreIndex() {
 		return scr_idx;

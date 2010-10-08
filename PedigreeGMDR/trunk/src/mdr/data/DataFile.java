@@ -184,7 +184,7 @@ public class DataFile {
 
     public DataFile() {}
 
-    public DataFile(ArrayList<String> mkInformation, ArrayList marker, ArrayList statue, ArrayList<String> traitInformation, ArrayList phenotype) {
+    public DataFile(ArrayList<String> mkInformation, ArrayList<ArrayList> marker, ArrayList<Integer> statue, ArrayList<String> traitInformation, ArrayList<ArrayList> phenotype) {
     	SNPID = mkInformation.toArray(new String[0]);
     	traitName = traitInformation.toArray(new String[0]);
     	initial1(marker, statue, phenotype);
@@ -195,7 +195,7 @@ public class DataFile {
         
     	for (int i= 0; i < marker.size(); i++) {
     		ArrayList<String> geno = (ArrayList) marker.get(i);
-    		geno.add((String) statue.get(i));
+    		geno.add((String) statue.get(i).toString());
     		String[] content = geno.toArray(new String[0]);
             Subject sub = new Subject(content);
             sub.setID(i);
@@ -225,17 +225,20 @@ public class DataFile {
                 missing[Ii.intValue()][i] = ((Integer) tempArray.get(i)).intValue();
             }
         }
-        
-        
-        
+
         for (int i = 0; i < sample.size(); i++ ) {
             Subject sub = (Subject) sample.get(i);
             ArrayList<String> traits = phenotype.get(i);
             String[] ps = traits.toArray(new String[0]);
             sub.addScore(ps);
-        }        
-        
+        }
+//        setPhenotypeIndex(scrIdx);
+        double[] os = calculateDefaultMu();
+        TraitSummary(os);
+        setScore(os);
     }
+    
+
     public DataFile(IMPopulation imp, int[] scrIdx) {
         markerFile = "simulationMarker.txt";
         phenotypeFile = "simulationPhenotype.txt";
