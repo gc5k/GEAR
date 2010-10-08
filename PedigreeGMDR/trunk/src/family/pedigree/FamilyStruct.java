@@ -12,6 +12,7 @@ package family.pedigree;
  * use, misuse, or functionality.
  */
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Enumeration;
 import java.util.Hashtable;
 import java.util.Iterator;
@@ -173,6 +174,17 @@ public class FamilyStruct {
         return this.persons.keys();
     }
 
+    public String[] getPersonListSorted() {
+    	Enumeration perstrList = getPersonList();
+    	String[] PID = new String[persons.size()];
+		int ind = 0;
+		while (perstrList.hasMoreElements()) {
+			PID[ind++] = (String) perstrList.nextElement();
+		}
+		Arrays.sort(PID);
+		return PID;
+    }
+
     /**
      * get transmitted genoset
      * 
@@ -208,18 +220,11 @@ public class FamilyStruct {
      *            the personID of the person we want
      * @return the person with matching personID
      */
-    public Person getPerson(String personID) throws MDRPedFileException {
-        if (!(this.persons.containsKey(personID))) {
-            throw new MDRPedFileException("Individual " + personID + " in family " + familyStructName + " is referenced, but appears to be missing.");
-        }
+    public Person getPerson(String personID) {
         return (Person) this.persons.get(personID);
     }
 
-    public PseudoPerson getPseudoPerson(String pseudopersonID)
-            throws MDRPedFileException {
-        if (!(this.pseudopersons.containsKey(pseudopersonID))) {
-            throw new MDRPedFileException("Pseudoindividual " + pseudopersonID + " in family " + familyStructName + " is referenced, but appears to be missing.");
-        }
+    public PseudoPerson getPseudoPerson(String pseudopersonID) {
         return (PseudoPerson) this.pseudopersons.get(pseudopersonID);
     }
 

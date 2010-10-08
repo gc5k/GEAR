@@ -114,10 +114,7 @@ public class FamilyUnit {
      *            the individualID of the individual we want
      * @return the individual with matching individualID
      */
-    public Subject getSubject(String subjectID) throws GMDRPhenoFileException {
-        if (!(this.subjects.containsKey(subjectID))) {
-            throw new GMDRPhenoFileException("Individual " + subjectID + " in family " + familyUnitName + " is referenced, but appears to be missing.");
-        }
+    public Subject getSubject(String subjectID) {
         return (Subject) this.subjects.get(subjectID);
     }
 }

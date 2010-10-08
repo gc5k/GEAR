@@ -31,11 +31,6 @@ import org._3pq.jgrapht.graph.SimpleGraph;
 
 import publicAccess.PublicData;
 import family.RabinowitzLairdAlgorithm.AbstractGenoDistribution;
-import family.imputation.AbstractImputation;
-import family.imputation.GenotypedParents;
-import family.imputation.OneHeterozygousParent;
-import family.imputation.OneHomozygousParent;
-import family.imputation.UngenotypedParents;
 import family.imputation.*;
 import edu.mit.wi.haploview.Chromosome;
 import edu.mit.wi.haploview.SNP;
@@ -613,6 +608,17 @@ public class MDRPed {
 
     public Enumeration getFamStrList() {
         return this.familystructure.keys();
+    }
+
+    public String[] getFamListSorted() {
+    	Enumeration famstrList = this.familystructure.keys();
+		String[] FID = new String[getNumFamilies()];
+		int ind = 0;
+		while (famstrList.hasMoreElements()) {
+			FID[ind++] = (String) famstrList.nextElement();
+		}
+		Arrays.sort(FID);
+		return FID;
     }
 
     public Hashtable getFamInformative() {
@@ -1589,7 +1595,7 @@ public class MDRPed {
      */
     }
 
-    public void RabinowitzApproach() {
+    public void RabinowitzApproach(boolean forNontransmitted) {
         Enumeration fsList = this.familystructure.keys();
         boolean informative;
         String fid;
@@ -1601,30 +1607,13 @@ public class MDRPed {
                 continue;
             }
             try {
-                fs.RabinowitzProc(markerInfor);
+            	if (forNontransmitted) {
+            		fs.NontransmittedProc(markerInfor);
+            	} else {
+            		fs.RabinowitzProc(markerInfor);
+            	}
             } catch (FamilyStructException E) {
                 System.err.println("Exception in family " + fs.getFamilyStructName() + " when in RabinowitzApproach.");
-            }
-        }
-    }
-
-    public void NonTransmittedGenoType() {
-        // System.out.println("MDRPed:NONTransmittedGenoType");
-        Enumeration fsList = this.familystructure.keys();
-        boolean informative;
-        String fid;
-        while (fsList.hasMoreElements()) {
-            fid = (String) fsList.nextElement();
-            FamilyStruct fs = (FamilyStruct) getFamilyStruct(fid);
-            if (!((Boolean) famInformative.get(fid)).booleanValue()) {
-                System.err.println("Omitted" + fs.getFamilyStructName());
-                continue;
-            }
-            try {
-                fs.NontransmittedProc(markerInfor);
-            } catch (FamilyStructException e) {
-                System.err.println(" Exception occured in family " + fs.getFamilyStructName() + " when getting nontransmitted genoyype.");
-                e.printStackTrace(System.err);
             }
         }
     }

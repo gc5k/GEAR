@@ -164,12 +164,11 @@ public class GMDRPhenoFile {
     	return traitInfor;
     }
     
-    public String getTraitAtI(int index) throws GMDRPhenoFileException {
+    public String getTraitAtI(int index)  {
         if (index < 0 || index > traitInfor.size()) {
-            throw new GMDRPhenoFileException(
-                    "Could not find the phenotype at index " + index);
+            System.err.println("Could not find the phenotype at index " + index);
+            System.exit(0);
         }
-
         return (String) traitInfor.get(index);
     }
 }
