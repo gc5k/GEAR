@@ -51,13 +51,13 @@ public class WithParents {
 		} else {
 			GD.fetchScore(pr.getPhenotypeIndex(), pr.getScoreBuildWithFounder());
 		}
-		GD.RabinowitzPrintGMDR(pr.getConvertedPedigreeFile(), pr.getConvertedPhenotypeFile(), false);
+		GD.PrintGMDR(pr.getConvertedPedigreeFile(), pr.getConvertedPhenotypeFile(), false);
 		isRabinowitzProc = true;
 		for (int i = 0; i < pr.getReplication(); i++) {
 			String opfN = "Rabin_" + Integer.toString(i) + ".txt";
 			GD.RabinowitzApproach();
 			GD.CreateTable(isRabinowitzProc);
-			GD.RabinowitzPrintGMDR(opfN, null, true);
+			GD.PrintGMDR(opfN, null, true);
 		}
 	}
 }

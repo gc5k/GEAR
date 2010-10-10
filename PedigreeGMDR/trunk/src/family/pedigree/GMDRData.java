@@ -25,11 +25,19 @@ public class GMDRData {
 	public ArrayList unMatched;
 	public ArrayList Matched;
 
-	private ArrayList RabinowitzTable; // a sampling of genotypes under null distribution	
-	private ArrayList TransmittedTable;// Only informative Transmitted Genotypes for offspring only
-	private ArrayList NontransmittedTable;// corresponding Nontransmitted genotypes.
-	private ArrayList CovariateTable;// phenotypes of informative individuals excluded parents
+	private ArrayList RabinowitzTable; // a sampling of genotypes under null
+										// distribution
+	private ArrayList TransmittedTable;// Only informative Transmitted Genotypes
+										// for offspring only
+	private ArrayList NontransmittedTable;// corresponding Nontransmitted
+											// genotypes.
+	private ArrayList CovariateTable;// phenotypes of informative individuals
+										// excluded parents
 	private ArrayList StatusTable;// Affection status
+
+	private ArrayList workingGenoTable;
+	private ArrayList workingStatusTable;
+	private ArrayList workingScoreTable;
 	
 	private ArrayList<Hashtable> ScoreTable;
 	private ArrayList ScoreName;
@@ -44,6 +52,7 @@ public class GMDRData {
 	private boolean isLouAlgorithm;
 
 	public static Random rnd;
+
 	/**
 	 * PersonIndex class is developed to construct a unique key for each
 	 * individual.
@@ -123,7 +132,7 @@ public class GMDRData {
 		IsGenotypeReady = false;
 		RabinowitzTable = new ArrayList();
 	}
-	
+
 	/**
 	 * Convert two alleles at a locus to a genotype value.
 	 */
@@ -156,7 +165,7 @@ public class GMDRData {
 	 * @throws CalEngineException
 	 */
 	public void buildScore(int PIndex, int[] CIndex, boolean adjust,
-			int method, boolean includeFounder)  {
+			int method, boolean includeFounder) {
 		// method: 0 for regression, 1 for logistic
 		Hashtable ScoreHashTable = new Hashtable();
 		PersonIndex PI;
@@ -181,14 +190,18 @@ public class GMDRData {
 			ArrayList c = new ArrayList();
 			ArrayList tempc = (ArrayList) CovariateTable.get(i);
 			if (PIndex == -1) {// using affecting status as phenotype
-				if (((Integer) StatusTable.get(i)).intValue() == 0) {// ignor missing value
+				if (((Integer) StatusTable.get(i)).intValue() == 0) {// ignor
+																		// missing
+																		// value
 					flag = false;
 					continue;
-				} else {// after converting, 0 for unaffected; 1 for affected; -1 for unknown;
+				} else {// after converting, 0 for unaffected; 1 for affected;
+						// -1 for unknown;
 					t = ((Integer) StatusTable.get(i)).intValue() - 1;
 				}
 			} else {
-				if (((String) tempc.get(PIndex)).compareTo(PublicData.MissingValue) == 0) {
+				if (((String) tempc.get(PIndex))
+						.compareTo(PublicData.MissingValue) == 0) {
 					flag = false;
 					continue;
 				} else {
@@ -232,27 +245,28 @@ public class GMDRData {
 		CalEngine CE = null;
 		try {
 			CE = new CalEngine(X, Y, adjust);
-		} catch (CalEngineException E){
+		} catch (CalEngineException E) {
 			E.printStackTrace(System.err);
 			System.exit(0);
 		}
 		double[][] s = CE.GeneralScore(method);
 		for (int i = 0; i < P.size(); i++) {
 			PI = P.get(i);
-			ScoreHashTable.put(PI.getKey(), Double.toString(s[i][0]));
+			ScoreHashTable.put(PI.getKey(), new Double(s[i][0]));
 		}
 		ScoreTable.add(ScoreHashTable);
 		nameScore(PIndex, CIndex, adjust, method, includeFounder);
 	}
 
-	private void nameScore(int PIndex, int[] CIndex, boolean adjust, int method, boolean includeFounder) {
+	private void nameScore(int PIndex, int[] CIndex, boolean adjust,
+			int method, boolean includeFounder) {
 		String ln = new String();
-		ln += method==1? "linear(":"logistic(";
-		ln += PIndex == -1 ? "status->":PhenoData.getTraitAtI(PIndex) + "->";
+		ln += method == 1 ? "linear(" : "logistic(";
+		ln += PIndex == -1 ? "status->" : PhenoData.getTraitAtI(PIndex) + "->";
 		for (int i = 0; i < CIndex.length; i++) {
 			ln += PhenoData.getTraitAtI(CIndex[i]) + ",";
 		}
-		ln += includeFounder? "included founders)":"excluded founders";
+		ln += includeFounder ? "included founders)" : "excluded founders";
 		ScoreName.add(ln);
 	}
 
@@ -269,7 +283,8 @@ public class GMDRData {
 		for (int i = 0; i < PersonTable.size(); i++) {
 			PersonIndex PI = PersonTable.get(i);
 			FamilyStruct FamStr = PedData.getFamilyStruct(PI.getFamilyID());
-			if(unMatched.contains(PI.getIndividualID()) && FamStr.containsPerson(PI.getIndividualID())) {
+			if (unMatched.contains(PI.getIndividualID())
+					&& FamStr.containsPerson(PI.getIndividualID())) {
 				continue;
 			}
 			if (score_index == -1) {
@@ -277,14 +292,16 @@ public class GMDRData {
 				if (as.intValue() == PublicData.MissingAffection) {
 					continue;
 				}
-				ScoreHashTable.put(new String(PI.getKey()), new Double(as.intValue()));
+				ScoreHashTable.put(new String(PI.getKey()), new Double(as
+						.intValue()));
 			} else {
 				ArrayList v = (ArrayList) CovariateTable.get(i);
 				String s = (String) v.get(score_index);
 				if (s.compareTo(PublicData.MissingValue) == 0) {
 					continue;
 				}
-				ScoreHashTable.put(new String(PI.getKey()), new Double(Double.parseDouble(s)));
+				ScoreHashTable.put(new String(PI.getKey()), new Double(Double
+						.parseDouble(s)));
 			}
 		}
 		if (score_index == -1) {
@@ -335,7 +352,7 @@ public class GMDRData {
 		ArrayList UsedTransmittedTable = new ArrayList();
 		return TransmittedTable;
 	}
-	
+
 	public ArrayList getPopulationStatistics() {
 		return PedData.getTableData();
 	}
@@ -390,7 +407,7 @@ public class GMDRData {
 		ParsePhenoFile(phe);
 		Match();
 	}
-	
+
 	/**
 	 * Initialize basic implementation of the genotype file.
 	 * 
@@ -488,8 +505,9 @@ public class GMDRData {
 					while (subList.hasMoreElements()) {
 						String sid = (String) subList.nextElement();
 						Subject sub = FamUnit.getSubject(sid);
-						if (((String) sub.getSubjectID()).equals((String) ind.getIndividualID())) {
-								flag = true;
+						if (((String) sub.getSubjectID()).equals((String) ind
+								.getIndividualID())) {
+							flag = true;
 						}
 					}
 					ArrayList temp = new ArrayList();
@@ -521,7 +539,8 @@ public class GMDRData {
 
 		for (int i = 0; i < PersonTable.size(); i++) {
 			PI = PersonTable.get(i);
-			if (!((Boolean) faminformative.get(PI.getFamilyID())).booleanValue()) { 
+			if (!((Boolean) faminformative.get(PI.getFamilyID()))
+					.booleanValue()) {
 				// not informative or no score
 				continue;
 			}
@@ -576,21 +595,23 @@ public class GMDRData {
 				per = FamStr.getPerson(pid);
 				pseudoper = FamStr.getPseudoPerson(pid);
 				sub = FamUnit.getSubject(pid);
-				if(!isRabinowitzProc) {
+				if (!isRabinowitzProc) {
 					PersonTable.add(new PersonIndex(fid, pid));
 					CovariateTable.add((ArrayList) sub.getTraits().clone());
 					StatusTable.add(new Integer(per.getAffectedStatus()));
 					TransmittedTable.add(per.getGenotype().clone());
 				} else {
 					if (FamStr.hasAncestor(pid)) {
-						RabinowitzTable.add(pseudoper.getPseudoGenotype().clone());
+						RabinowitzTable.add(pseudoper.getPseudoGenotype()
+								.clone());
 					} else {
 						RabinowitzTable.add(per.getGenotype().clone());
 					}
 				}
 				if (isLouAlgorithm) {
 					if (FamStr.hasAncestor(per.getPersonID())) {
-						NontransmittedTable.add(pseudoper.getPseudoGenotype().clone());						
+						NontransmittedTable.add(pseudoper.getPseudoGenotype()
+								.clone());
 					} else {
 						NontransmittedTable.add(per.getGenotype().clone());
 					}
@@ -602,122 +623,16 @@ public class GMDRData {
 		}
 	}
 
-	/**
-	 * It is used for real data analysis
-	 * 
-	 * @param TDTped
-	 *            The file for printing out transmitted-nontransmitted
-	 *            genotypes.
-	 * @param TDTphe
-	 *            The file for printing out score.
-	 * @param TDTpi
-	 *            The file for printing index of the genotypes.
-	 * @param datatype
-	 *            Determines which part of data to print out
-	 * @throws IOException
-	 * @throws CalEngineException
-	 */
-	public void PrintLouGMDR(String TDTped, String TDTphe, String TDTpi, int datatype) throws IOException {
+	public void PrintGMDR(String TDTped, String TDTphe,
+			boolean isPermutation) throws IOException {
 		PrintWriter TDTpedout = new PrintWriter(TDTped);
-		PrintWriter TDTpheout = (TDTphe == null) ? null:new PrintWriter(TDTphe);
-		PrintWriter TDTpiout = (TDTpi == null) ? null:new PrintWriter(TDTpi);	
-		PersonIndex PI;
+		PrintWriter TDTpheout = isPermutation ? null : new PrintWriter(TDTphe);
 
-		for (int i = 0; i < PersonTable.size(); i++) {
-			PI = PersonTable.get(i);
-			if (InformativePersonHash.containsKey(PI.getKey())){
-				continue;
-			}
-			if(TDTpiout != null) {
-				TDTpiout.println(PI.getFamilyID() + "\t" + PI.getIndividualID());
-			}
-		}
-		if(TDTpiout != null) {
-			TDTpiout.close();
-		}
-		
-		printMissingInformation();
-		
-		ArrayList marker1;
-		ArrayList marker2;
-		ArrayList markerinfor = PedData.getMarkerInformation();
-		for (int i = 0; i < markerinfor.size(); i++) {
-			TDTpedout.print(markerinfor.get(i) + "\t");
-		}
-		TDTpedout.println("class");
-
-		ArrayList<String> PrintOutPersonTable = new ArrayList();
-		ArrayList workingTransTable = getWorkingTransmittedTable();
-		ArrayList workingNontransTable = getWorkingNontransmittedTable();
-		for (int i = 0; i < workingTransTable.size(); i++) {
-			PI = PersonTable.get(i);
-			marker1 = (ArrayList) workingTransTable.get(i);
-			marker2 = (ArrayList) workingNontransTable.get(i);
-			if (TDTpiout!=null && rnd.nextFloat() > 0.5) {
-				marker1 = (ArrayList) workingNontransTable.get(i);
-				marker2 = (ArrayList) workingTransTable.get(i);
-			}
-			for (int j = 0; j < marker1.size(); j++) {
-				TDTpedout.print(marker1.get(j) + "\t");
-			}
-			TDTpedout.println(((Integer) StatusTable.get(i)).intValue() - 1);
-			for (int j = 0; j < marker2.size(); j++) {
-				TDTpedout.print(marker2.get(j) + "\t");
-			}
-			TDTpedout.println(1 - (((Integer) StatusTable.get(i)).intValue() - 1));
-			PrintOutPersonTable.add(new String(PI.getKey()));
-		}
-		TDTpedout.close();
-		if(TDTpheout != null) {
-			for (int i = 0; i < ScoreName.size(); i++) {
-				if (i != ScoreName.size() - 1) {
-					TDTpheout.print(ScoreName.get(i));
-				} else {
-					TDTpheout.print(ScoreName.get(i) + "\t");
-				}
-			}
-			TDTpheout.println();
-			Hashtable ScoreHashTable;
-			for (int i = 0; i < PrintOutPersonTable.size(); i++) {
-				String pi = PrintOutPersonTable.get(i);
-				String s1 = new String();
-				String s2 = new String();
-
-				for (int j = 0; j < ScoreTable.size(); j++) {
-					ScoreHashTable = ScoreTable.get(j);
-					if (ScoreHashTable.containsKey(pi)) {
-						Double s = (Double) ScoreHashTable.get(pi);
-						double ss = s.doubleValue();
-						s1 += (j == ScoreTable.size() - 1) ? s.toString()
-								+ "\t" : s.toString();
-						s2 += (j == ScoreTable.size() - 1) ? Double.toString(ss
-								* (-1))
-								+ "\t" : Double.toString(ss * (-1));
-					} else {
-						s1 += (j == ScoreTable.size() - 1) ? PublicData.MissingValue
-								+ "\t"
-								: PublicData.MissingValue;
-						s2 += (j == ScoreTable.size() - 1) ? PublicData.MissingValue
-								+ "\t"
-								: PublicData.MissingValue;
-					}
-				}
-				TDTpheout.println(s1);
-				TDTpheout.println(s2);
-			}
-			TDTpheout.close();
-		}
-	}
-	
-	public void RabinowitzPrintGMDR(String TDTped, String TDTphe, boolean isPermutation) throws IOException {
-		PrintWriter TDTpedout = new PrintWriter(TDTped);
-		PrintWriter TDTpheout = isPermutation?null:new PrintWriter(TDTphe);
-		Hashtable faminformative = PedData.getFamInformative();
-
+		createWorkingTable(isPermutation);
 		printMissingInformation();
 
-		ArrayList genotypeConsus = isPermutation? getWorkingRabinowitzTable():getWorkingTransmittedTable();
-		ArrayList statusConsus = getWorkingStatusTable();
+		ArrayList genotypeCensus = getWorkingGenoTable();
+		ArrayList statusCensus = getWorkingStatusTable();
 		ArrayList marker;
 
 		ArrayList markerinfor = PedData.getMarkerInformation();
@@ -726,43 +641,36 @@ public class GMDRData {
 		}
 		TDTpedout.println("class");
 
-		for (int i = 0; i < genotypeConsus.size(); i++) {
-			marker = (ArrayList) genotypeConsus.get(i);
+		for (int i = 0; i < genotypeCensus.size(); i++) {
+			marker = (ArrayList) genotypeCensus.get(i);
 			for (int j = 0; j < marker.size(); j++) {
 				TDTpedout.print(marker.get(j) + "\t");
 			}
-			TDTpedout.println(((Integer) statusConsus.get(i)).intValue() - 1);
+			TDTpedout.println(statusCensus.get(i));
 		}
 		TDTpedout.close();
 
 		if (!isPermutation) {
 			for (int i = 0; i < ScoreName.size(); i++) {
-				if (i!=ScoreName.size()-1) {
+				if (i != ScoreName.size() - 1) {
 					TDTpheout.print(ScoreName.get(i));
 				} else {
-					TDTpheout.print(ScoreName.get(i)+"\t");
+					TDTpheout.print(ScoreName.get(i) + "\t");
 				}
 			}
 			TDTpheout.println();
 			ArrayList scoreConsus = getWorkingScoreTable();
-			Enumeration PIs = InformativePersonHash.elements();
-			while(PIs.hasMoreElements()) {
-				String PIkey = (String) PIs.nextElement();
-				for (int j = 0; j < scoreConsus.size(); j++) {
-					Hashtable sht = (Hashtable) scoreConsus.get(j);
-					String v;
-					if (sht.containsKey(PIkey)) {
-						v = ((Double) sht.get(PIkey)).toString();
+
+			for (int j = 0; j < scoreConsus.size(); j++) {
+				ArrayList sht = (ArrayList) scoreConsus.get(j);
+				for (int k = 0; k < sht.size(); k++) {
+					if (k != sht.size() - 1) {
+						TDTpheout.print(sht.get(k) + "\t");
 					} else {
-						v = PublicData.MissingValue;
-					}
-					if (j != ScoreTable.size() -1) {
-						TDTpheout.print(v + "\t");
-					} else {
-						TDTpheout.print(v);
+						TDTpheout.print(sht.get(k));
 					}
 				}
-				TDTpheout.println();
+				TDTpheout.println();				
 			}
 			TDTpheout.close();
 		}
@@ -774,7 +682,7 @@ public class GMDRData {
 		ArrayList Discard = new ArrayList();
 		for (int i = 0; i < PersonTable.size(); i++) {
 			PI = PersonTable.get(i);
-			if (!InformativePersonHash.containsKey(PI.getKey())) { 
+			if (!InformativePersonHash.containsKey(PI.getKey())) {
 				countmiss++;
 				Discard.add(PI.getKey());
 				continue;
@@ -788,113 +696,88 @@ public class GMDRData {
 				System.out.println((String) Discard.get(i));
 			}
 			System.out.println("=================");
-		}		
-	}
-		
-	public ArrayList<ArrayList> getWorkingTransmittedTable() {
-		ArrayList workingTG = new ArrayList();
-		PersonIndex PI;
-		for(int i = 0; i < PersonTable.size(); i++) {
-			PI = PersonTable.get(i);
-			String fid = PI.getFamilyID();
-			FamilyStruct fs = PedData.getFamilyStruct(fid);
-			if(!InformativePersonHash.containsKey(PI.getKey())) {
-				continue;
-			}
-			if(!usingFounder && !fs.hasAncestor(PI.getIndividualID())) {
-				continue;
-			}
-			workingTG.add(TransmittedTable.get(i));
 		}
-		return workingTG;
 	}
 
-	public ArrayList<ArrayList> getWorkingNontransmittedTable() {
-		ArrayList workingNTG = new ArrayList();
+	private void  createWorkingTable(boolean isRabinowitzProc) {
+		ArrayList currentTranGeno = (isRabinowitzProc && !isLouAlgorithm) ? RabinowitzTable:TransmittedTable;
+		workingGenoTable = new ArrayList();
+		workingStatusTable = new ArrayList();
+		workingScoreTable = new ArrayList();
 		PersonIndex PI;
-		for(int i = 0; i < PersonTable.size(); i++) {
+		String fid1 = "";
+		float r = 1;
+		for (int i = 0; i < PersonTable.size(); i++) {
 			PI = PersonTable.get(i);
-			String fid = PI.getFamilyID();
-			FamilyStruct fs = PedData.getFamilyStruct(fid);
-			if(!InformativePersonHash.containsKey(PI.getKey())) {
+			String fid2 = PI.getFamilyID();
+			FamilyStruct fs = PedData.getFamilyStruct(PI.getFamilyID());
+			if (!InformativePersonHash.containsKey(PI.getKey())) {
 				continue;
 			}
-			if(!usingFounder && !fs.hasAncestor(PI.getIndividualID())) {
+			if (!usingFounder && !fs.hasAncestor(PI.getIndividualID())) {
 				continue;
 			}
-			workingNTG.add(NontransmittedTable.get(i));
+			if (isLouAlgorithm && fid1.compareTo(fid2) !=0) {
+				r = rnd.nextFloat();
+				fid1 = fid2;
+			}
+			
+			int s1 = ((Integer) StatusTable.get(i)).intValue();
+			String s2 = s1 == 0 ? PublicData.MissingValue:Integer.toString(s1-1);
+			String s3 = s1 == 0 ? PublicData.MissingValue:Integer.toString(1-Integer.parseInt(s2));
+
+			ArrayList tempS = new ArrayList();
+			ArrayList tempSR = new ArrayList();
+			for (int j =0; j < ScoreTable.size(); j++) {
+				Hashtable score = (Hashtable) ScoreTable.get(j);
+				if (score.containsKey(PI.getKey())) {
+						tempS.add((Double) score.get(PI.getKey()));
+						tempSR.add(Double.toString((((Double) score.get(PI.getKey())).doubleValue() * (-1))));
+				} else {
+					tempS.add(PublicData.MissingValue);
+					tempSR.add(PublicData.MissingValue);
+				}
+			}
+			if ( r < 0.5) {
+				if (isLouAlgorithm) {
+					workingGenoTable.add(NontransmittedTable.get(i));
+				}
+				workingGenoTable.add(currentTranGeno.get(i));
+				workingStatusTable.add(s2);
+				workingScoreTable.add(tempS);
+				if (isLouAlgorithm) {
+					workingStatusTable.add(s3);
+					workingScoreTable.add(tempSR);
+				}
+			} else {
+				workingGenoTable.add(currentTranGeno.get(i));
+				workingStatusTable.add(s2);
+				workingScoreTable.add(tempS);
+				if (isLouAlgorithm) {
+					workingGenoTable.add(NontransmittedTable.get(i));
+					workingStatusTable.add(s3);
+					workingScoreTable.add(tempSR);
+				}
+			}
 		}
-		return workingNTG;
-		
+	}
+
+	public ArrayList getWorkingGenoTable() {
+		return workingGenoTable;
 	}
 	
-	public ArrayList<ArrayList> getWorkingRabinowitzTable() {
-		ArrayList workingRG = new ArrayList();
-		PersonIndex PI;
-		for(int i = 0; i < PersonTable.size(); i++) {
-			PI = PersonTable.get(i);
-			FamilyStruct fs = PedData.getFamilyStruct(PI.getFamilyID());
-			if(!InformativePersonHash.containsKey(PI.getKey())) {
-				continue;
-			}
-			if(!usingFounder && !fs.hasAncestor(PI.getIndividualID())) {
-				continue;
-			}			
-			workingRG.add(RabinowitzTable.get(i));
-		}
-		return workingRG;
-	}
-
 	public ArrayList getWorkingStatusTable() {
-		ArrayList workingST = new ArrayList();
-		PersonIndex PI;
-		for (int i = 0; i < PersonTable.size(); i++) {
-			PI = (PersonIndex) PersonTable.get(i);
-			FamilyStruct fs = PedData.getFamilyStruct(PI.getFamilyID());
-			if(!InformativePersonHash.containsKey(PI.getKey())) {
-				continue;
-			}
-			if(!usingFounder && !fs.hasAncestor(PI.getIndividualID())) {
-				continue;
-			}
-			workingST.add((Integer) StatusTable.get(i));
-		}
-		return workingST;
+		return workingStatusTable;
 	}
-
+	
 	public ArrayList getWorkingScoreTable() {
-		ArrayList workingST = new ArrayList();
-		PersonIndex PI;
-		for (int i = 0; i < PersonTable.size(); i++) {
-			PI = (PersonIndex) PersonTable.get(i);
-			FamilyStruct fs = PedData.getFamilyStruct(PI.getFamilyID());
-			if(!InformativePersonHash.containsKey(PI.getKey())) {
-				continue;
-			}
-			if(!usingFounder && !fs.hasAncestor(PI.getIndividualID())) {
-				continue;
-			}
-			String pi = PI.getIndividualID();
-			ArrayList p = new ArrayList();
-			for (int j = 0; j < ScoreTable.size(); j++) {
-				Hashtable sht = ScoreTable.get(j);
-				String v;
-				if (sht.containsKey(pi)) {
-					v = ((Double) sht.get(pi)).toString();
-				} else {
-					v = PublicData.MissingValue;
-				}
-				p.add(v);
-			}
-			workingST.add(p);
-		}
-		return workingST;
+		return workingScoreTable;
 	}
 
 	public ArrayList<String> getMarkerName() {
 		return PedData.getMarkerInformation();
 	}
-	
+
 	public ArrayList<String> getTraitName() {
 		return PhenoData.getTraitName();
 	}
