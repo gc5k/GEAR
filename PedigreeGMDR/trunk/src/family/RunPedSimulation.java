@@ -27,7 +27,7 @@ public class RunPedSimulation {
 			pr.read(args[0]);
 		} else {
 			pr.setIsLouAlgorithm(false);
-			pr.setUsingFounderGenotype(true);
+			pr.setUsingFounderGenotype(false);
 			pr.setPedigreeFile("0.ped");
 			pr.setPhenotypeFile("0.phe");
 			pr.setConvertedPedigreeFile("Converted_0.ped");
@@ -42,8 +42,8 @@ public class RunPedSimulation {
 			pr.setSeed(10);
 		}
 		boolean isRabinowitzProc = false;
+		GMDRData.rnd = new Random(pr.seed);
 		GMDRData GD = new GMDRData(pr.isLouAlgorithm, pr.usingFounderGenotype);
-		
 		AbstractGenoDistribution.rnd = new Random(pr.seed);
 		GD.RevvingUp(pr.getPedigreeFile(), pr.getPhenotypeFile());
 
@@ -56,7 +56,7 @@ public class RunPedSimulation {
 		} else {
 			GD.fetchScore(pr.getPhenotypeIndex(), pr.getScoreBuildWithFounder());
 		}
-		GD.RabinowitzPrintGMDR(pr.getConvertedPedigreeFile(), pr.getConvertedPhenotypeFile(), false);
+		GD.PrintGMDR(pr.getConvertedPedigreeFile(), pr.getConvertedPhenotypeFile(), false);
 
 		GMDRParameter gmdrPr = new GMDRParameter();
 		gmdrPr.setInteractionEnd(2);
@@ -84,7 +84,7 @@ public class RunPedSimulation {
 			String opfN = "ParentsRabin_" + Integer.toString(i) + ".txt";
 			GD.RabinowitzApproach();
 			GD.CreateTable(isRabinowitzProc);
-			GD.RabinowitzPrintGMDR(opfN, null, true);
+			GD.PrintGMDR(opfN, null, true);
 		}
 	}
 }

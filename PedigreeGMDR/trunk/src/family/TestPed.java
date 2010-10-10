@@ -56,7 +56,7 @@ public class TestPed {
 		GMDRData.rnd = new Random(10);
 		GMDRData GD = new GMDRData(pr.usingFounderGenotype, pr.isLouAlgorithm);
 		AbstractGenoDistribution.rnd = new Random(pr.seed);
-        int WhichDataSet = 0; // 0 for all; 1 for affected only; 2 for unaffected only.
+        boolean isPermutation = false; // 0 for all; 1 for affected only; 2 for unaffected only.
 
         GD.RevvingUp(pr.getPedigreeFile(), pr.getPhenotypeFile());
         GD.RabinowitzApproach();
@@ -67,11 +67,11 @@ public class TestPed {
 		} else {
 			GD.fetchScore(pr.getPhenotypeIndex(), pr.getScoreBuildWithFounder());
 		}
-		GD.PrintLouGMDR(pr.getConvertedPedigreeFile(), pr.getConvertedPhenotypeFile(), pr.getFamilyIDFile(), WhichDataSet);
-
+		GD.PrintGMDR(pr.getConvertedPedigreeFile(), pr.getConvertedPhenotypeFile(), isPermutation);
+		isPermutation = true;
 		for (int i = 0; i < pr.replication; i++) {
 			String opfN = "Lou_" + Integer.toString(i) + ".txt";
-			GD.PrintLouGMDR(opfN, null, null, WhichDataSet);
+			GD.PrintGMDR(opfN, null, isPermutation);
 		}
     }
 }
