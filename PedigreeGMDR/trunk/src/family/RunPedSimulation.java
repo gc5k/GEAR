@@ -34,8 +34,8 @@ public class RunPedSimulation {
 			pr.setConvertedPhenotypeFile("Converted_0.phe");
 			pr.setFamilyIDFile("Family_ID_0.txt");
 			pr.setCovariateIndex("2");
-			pr.setPhenotypeIndex("1");
-			pr.setScoreBuildMethod(1);
+			pr.setPhenotypeIndex("0");
+			pr.setScoreBuildMethod(2);
 			pr.setAdjustScore(true);
 			pr.setScoreBuildWithFounder(true);
 			pr.setReplication(10);
@@ -56,17 +56,18 @@ public class RunPedSimulation {
 		} else {
 			GD.fetchScore(pr.getPhenotypeIndex(), pr.getScoreBuildWithFounder());
 		}
-		GD.PrintGMDR(pr.getConvertedPedigreeFile(), pr.getConvertedPhenotypeFile(), false);
-
+		GD.PrintGMDR(pr.getConvertedPedigreeFile(), pr.getConvertedPhenotypeFile(), isRabinowitzProc);
+		int[] scrIdx = {0};
 		GMDRParameter gmdrPr = new GMDRParameter();
 		gmdrPr.setInteractionEnd(2);
-		gmdrPr.setInteractionFrom(1);
+		gmdrPr.setInteractionFrom(2);
 		gmdrPr.setInterval(5);
 		gmdrPr.setMooreMDR(true);
 		gmdrPr.setPartitionMethod(0);
 		gmdrPr.setReplicationPermutation(10);
 		gmdrPr.setSeed(seed);
-		DataFile mdrData = new DataFile(GD.getMarkerName(), GD.getTransmittedTable(), GD.getStatusTable(), GD.getTraitName(), GD.getCovariateTable());
+		gmdrPr.setScoreIndex(scrIdx);
+		DataFile mdrData = new DataFile(GD.getMarkerName(), GD.getWorkingGenoTable(), GD.getWorkingStatusTable(), GD.getTraitName(), GD.getWorkingScoreTable(), scrIdx);
         Subdivision sd = new Subdivision(gmdrPr.getInterval(), gmdrPr.getSeed(), mdrData);
         sd.RandomPartition();
 

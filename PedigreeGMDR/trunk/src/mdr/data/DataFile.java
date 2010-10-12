@@ -184,15 +184,14 @@ public class DataFile {
 
     public DataFile() {}
 
-    public DataFile(ArrayList<String> mkInformation, ArrayList<ArrayList> marker, ArrayList<Integer> statue, ArrayList<String> traitInformation, ArrayList<ArrayList> phenotype) {
+    public DataFile(ArrayList<String> mkInformation, ArrayList<ArrayList> marker, ArrayList<Integer> statue, ArrayList<String> traitInformation, ArrayList<ArrayList> phenotype, int[] si) {
     	SNPID = mkInformation.toArray(new String[0]);
     	traitName = traitInformation.toArray(new String[0]);
-    	initial1(marker, statue, phenotype);
+    	initial1(marker, statue, phenotype, si);
     }
 
-    private void initial1(ArrayList<ArrayList> marker, ArrayList statue, ArrayList<ArrayList> phenotype) {
-        TreeMap tempMap = new TreeMap();
-        
+    private void initial1(ArrayList<ArrayList> marker, ArrayList statue, ArrayList<ArrayList> phenotype, int[] si) {
+        TreeMap tempMap = new TreeMap();        
     	for (int i= 0; i < marker.size(); i++) {
     		ArrayList<String> geno = (ArrayList) marker.get(i);
     		geno.add((String) statue.get(i).toString());
@@ -228,11 +227,11 @@ public class DataFile {
 
         for (int i = 0; i < sample.size(); i++ ) {
             Subject sub = (Subject) sample.get(i);
-            ArrayList<String> traits = phenotype.get(i);
+            ArrayList<Double> traits = phenotype.get(i);
             String[] ps = traits.toArray(new String[0]);
             sub.addScore(ps);
         }
-//        setPhenotypeIndex(scrIdx);
+        setPhenotypeIndex(si);
         double[] os = calculateDefaultMu();
         TraitSummary(os);
         setScore(os);
