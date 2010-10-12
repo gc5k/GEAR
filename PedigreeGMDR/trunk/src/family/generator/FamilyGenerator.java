@@ -968,7 +968,7 @@ public class FamilyGenerator {
 				E.printStackTrace(System.err);
 			}
 		} else {
-			pr.isNullHypothesis = true;
+			pr.isNullHypothesis = false;
 			pr.seed = 2000;
 			pr.model = "B";
 			pr.AffLoci = new int[2];
@@ -1004,13 +1004,13 @@ public class FamilyGenerator {
 			pr.pheno_select_quantile[0] = -0.1;
 			pr.pheno_select_quantile[1] = -0.9;
 			pr.simu_replication = 2;
-			pr.family_size = 2000;
+			pr.family_size = 500;
 			pr.number_case = 0;
 			pr.FamNum = new int[1];
-			pr.FamNum[0] = 2000;
+			pr.FamNum[0] = 500;
 
 			pr.Kid = new int[1];
-			pr.Kid[0] = 1;
+			pr.Kid[0] = 2;
 			pr.AffKid = new int[1];
 			pr.AffKid[0] = 1;
 			pr.ParentMissingRate = new double[1][2];

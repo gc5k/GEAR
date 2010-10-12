@@ -26,7 +26,7 @@ public class WithParents {
 			pr.read(args[0]);
 		} else {
 			pr.setIsLouAlgorithm(false);
-			pr.setUsingFounderGenotype(false);
+			pr.setUsingFounderGenotype(true);
 			pr.setPedigreeFile("0.ped");
 			pr.setPhenotypeFile("0.phe");
 			pr.setConvertedPedigreeFile("Converted_0.ped");

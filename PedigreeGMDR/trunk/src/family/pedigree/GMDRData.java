@@ -252,7 +252,7 @@ public class GMDRData {
 		double[][] s = CE.GeneralScore(method);
 		for (int i = 0; i < P.size(); i++) {
 			PI = P.get(i);
-			ScoreHashTable.put(PI.getKey(), new Double(s[i][0]));
+			ScoreHashTable.put(PI.getKey(), Double.toString(s[i][0]));
 		}
 		ScoreTable.add(ScoreHashTable);
 		nameScore(PIndex, CIndex, adjust, method, includeFounder);
@@ -576,7 +576,6 @@ public class GMDRData {
 			PseudoPerson pseudoper;
 			Subject sub;
 			String[] PID = FamStr.getPersonListSorted();
-			int c = 0;
 
 			ArrayList<String> FounderID = new ArrayList();
 			while (memberList.hasMoreElements()) {
@@ -589,10 +588,13 @@ public class GMDRData {
 					FounderID.add(pid);
 				}
 			}
-
+			if (isRabinowitzProc) {
+				Collections.shuffle(FounderID);
+			}
+			int c = 0;
 			for (int j = 0; j < PID.length; j++) {
 				pid = PID[j];
-				per = FamStr.getPerson(pid);
+				per = FamStr.hasAncestor(pid)?FamStr.getPerson(pid):FamStr.getPerson(FounderID.get(c++));
 				pseudoper = FamStr.getPseudoPerson(pid);
 				sub = FamUnit.getSubject(pid);
 				if (!isRabinowitzProc) {
@@ -731,8 +733,9 @@ public class GMDRData {
 			for (int j =0; j < ScoreTable.size(); j++) {
 				Hashtable score = (Hashtable) ScoreTable.get(j);
 				if (score.containsKey(PI.getKey())) {
-						tempS.add((Double) score.get(PI.getKey()));
-						tempSR.add(Double.toString((((Double) score.get(PI.getKey())).doubleValue() * (-1))));
+						tempS.add(score.get(PI.getKey()));
+						double sr = -1 * Double.parseDouble((String)score.get(PI.getKey()));
+						tempSR.add(Double.toString(sr));
 				} else {
 					tempS.add(PublicData.MissingValue);
 					tempSR.add(PublicData.MissingValue);
@@ -770,7 +773,7 @@ public class GMDRData {
 		return workingStatusTable;
 	}
 	
-	public ArrayList getWorkingScoreTable() {
+	public ArrayList<ArrayList> getWorkingScoreTable() {
 		return workingScoreTable;
 	}
 
