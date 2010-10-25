@@ -48,7 +48,8 @@ public class GMDRData {
 	private boolean IsLoadPhenoFile;
 	private boolean IsGenotypeReady;
 
-	private boolean usingFounder;
+	private boolean usingFounderGenotype;
+	private boolean usingChildrenGenotype;
 	private boolean isLouAlgorithm;
 
 	public static Random rnd;
@@ -113,8 +114,9 @@ public class GMDRData {
 	 * 
 	 * @param filetype
 	 */
-	public GMDRData(boolean exP, boolean isLou) {
-		usingFounder = exP;
+	public GMDRData(boolean exP, boolean usingKid, boolean isLou) {
+		usingFounderGenotype = exP;
+		usingChildrenGenotype = usingKid;
 		isLouAlgorithm = isLou;
 		PhenoData = new GMDRPhenoFile();
 		PedData = new MDRPed();
@@ -165,7 +167,7 @@ public class GMDRData {
 	 * @throws CalEngineException
 	 */
 	public void buildScore(int PIndex, int[] CIndex, boolean adjust,
-			int method, boolean includeFounder) {
+			int method, boolean includeFounder, boolean includeChildren) {
 		// method: 0 for regression, 1 for logistic
 		Hashtable ScoreHashTable = new Hashtable();
 		PersonIndex PI;
@@ -179,6 +181,12 @@ public class GMDRData {
 			if (!includeFounder) {
 				FamilyStruct FamStr = PedData.getFamilyStruct(PI.getFamilyID());
 				if (!FamStr.hasAncestor(PI.getIndividualID())) {
+					continue;
+				}
+			}
+			if (!includeChildren) {
+				FamilyStruct FamStr = PedData.getFamilyStruct(PI.getFamilyID());
+				if (FamStr.hasAncestor(PI.getIndividualID())) {
 					continue;
 				}
 			}
@@ -266,7 +274,7 @@ public class GMDRData {
 		for (int i = 0; i < CIndex.length; i++) {
 			ln += PhenoData.getTraitAtI(CIndex[i]) + ",";
 		}
-		ln += includeFounder ? "included founders)" : "excluded founders";
+		ln += includeFounder ? "included founders)" : "excluded founders)";
 		ScoreName.add(ln);
 	}
 
@@ -716,14 +724,16 @@ public class GMDRData {
 			if (!InformativePersonHash.containsKey(PI.getKey())) {
 				continue;
 			}
-			if (!usingFounder && !fs.hasAncestor(PI.getIndividualID())) {
+			if (!usingChildrenGenotype && fs.hasAncestor(PI.getIndividualID())) {
+				continue;
+			} 
+			if (!usingFounderGenotype && !fs.hasAncestor(PI.getIndividualID())) {
 				continue;
 			}
 			if (isLouAlgorithm && fid1.compareTo(fid2) !=0) {
 				r = rnd.nextFloat();
 				fid1 = fid2;
 			}
-			
 			int s1 = ((Integer) StatusTable.get(i)).intValue();
 			String s2 = s1 == 0 ? PublicData.MissingValue:Integer.toString(s1-1);
 			String s3 = s1 == 0 ? PublicData.MissingValue:Integer.toString(1-Integer.parseInt(s2));
