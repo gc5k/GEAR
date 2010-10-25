@@ -1,4 +1,5 @@
 package family.generator;
+
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileReader;
@@ -28,6 +29,7 @@ public class FamilyGenerator {
 	int FamilySize;
 	int number_case;
 	int[] FamNum;
+	int[] AffParent;
 	int[] Kid_Diff_Family;
 	int[] AffKid_Diff_Family;
 	double[][] ParentGenotypeMissingRate;
@@ -83,12 +85,13 @@ public class FamilyGenerator {
 		protected double[] pheno_select_quantile; // 14
 		protected int family_size; // 15
 		protected int number_case; // 16 which is zero for family based design,
-									// and otherwise 0<number_case<family_size
+		// and otherwise 0<number_case<family_size
 		protected int[] FamNum; // 17
-		protected int[] Kid; // 18
-		protected int[] AffKid; // 19
-		protected double[][] ParentMissingRate; // 20
-		protected double KidGenotypeMissingRate;// 21
+		protected int[] AffParent; // 18
+		protected int[] Kid; // 19
+		protected int[] AffKid; // 20
+		protected double[][] ParentMissingRate; // 21
+		protected double KidGenotypeMissingRate;// 22
 
 		private double[][] corMarkers;
 
@@ -168,24 +171,28 @@ public class FamilyGenerator {
 			for (int i = 0; i < FM.length; i++) {
 				FamNum[i] = Integer.parseInt(FM[i]);
 			}
-
-			String[] K = lines.get(18).split(",");
+			String[] AP = lines.get(18).split(",");
+			AffParent = new int[AP.length];
+			for (int i = 0; i < AffParent.length; i++) {
+				AffParent[i] = Integer.parseInt(AP[i]);
+			}
+			String[] K = lines.get(19).split(",");
 			Kid = new int[K.length];
 			for (int i = 0; i < K.length; i++) {
 				Kid[i] = Integer.parseInt(K[i]);
 			}
-			String[] AK = lines.get(19).split(",");
+			String[] AK = lines.get(20).split(",");
 			AffKid = new int[AK.length];
 			for (int i = 0; i < AK.length; i++) {
 				AffKid[i] = Integer.parseInt(AK[i]);
 			}
-			String[] MS = lines.get(20).split(",");
+			String[] MS = lines.get(21).split(",");
 			ParentMissingRate = new double[MS.length / 2][2];
 			for (int i = 0; i < MS.length / 2; i++) {
 				ParentMissingRate[i][0] = Double.parseDouble(MS[i * 2 + 0]);
 				ParentMissingRate[i][1] = Double.parseDouble(MS[i * 2 + 1]);
 			}
-			KidGenotypeMissingRate = Double.parseDouble(lines.get(21));
+			KidGenotypeMissingRate = Double.parseDouble(lines.get(22));
 			calculateCorrelation_for_Markers_with_known_DPrime();
 		}
 
@@ -325,6 +332,8 @@ public class FamilyGenerator {
 
 		FamilySize = p.family_size;
 		number_case = p.number_case;
+		AffParent = new int[p.AffParent.length];
+		System.arraycopy(p.AffParent, 0, AffParent, 0, p.AffParent.length);
 		Kid_Diff_Family = new int[p.Kid.length];
 		System.arraycopy(p.Kid, 0, Kid_Diff_Family, 0, p.Kid.length);
 		AffKid_Diff_Family = new int[p.AffKid.length];
@@ -353,44 +362,44 @@ public class FamilyGenerator {
 		}
 	}
 
-	public int affection(double obs) {
+	public Integer affection(double obs) {
 		if (!isNullHypothesis) {
 			if (model.compareTo("B") == 0) {
 				double prob = Math.exp(obs) / (1D + Math.exp(obs));
 				if (randomData.nextFloat() < prob) {
-					return 1;
+					return new Integer(1);
 				}
-				return 0;
+				return new Integer(0);
 			} else {
 				if (pheno_select_quantile[0] > 0
 						&& pheno_select_quantile[1] > 0) {// select both sides
 					if (obs > pheno_select_threshold[1]) {
-						return 1;
+						return new Integer(1);
 					} else if (obs < pheno_select_threshold[0]) {
-						return 0;
+						return new Integer(0);
 					} else {
-						return -1;
+						return new Integer(-1);
 					}
 				} else if (pheno_select_quantile[0] < 0
 						&& pheno_select_quantile[1] > 0) {// select upper tail
 					if (obs > pheno_select_threshold[1]) {
-						return 1;
+						return new Integer(1);
 					} else {
-						return 0;
+						return new Integer(0);
 					}
 				} else if (pheno_select_quantile[0] > 0
 						&& pheno_select_quantile[1] < 0) {// select lower tail
 					if (obs < pheno_select_threshold[0]) {
-						return 0;
+						return new Integer(0);
 					} else {
-						return 1;
+						return new Integer(1);
 					}
 				} else {// no selection
-					return randomData.nextFloat() < 0.5 ? 0 : 1;
+					return randomData.nextFloat() < 0.5 ? new Integer(0) : new Integer(1);
 				}
 			}
 		} else {
-			return randomData.nextFloat() < 0.5 ? 0 : 1;
+			return randomData.nextFloat() < 0.5 ? new Integer(0) : new Integer(1);
 		}
 	}
 
@@ -466,8 +475,8 @@ public class FamilyGenerator {
 			pheno_select_threshold[0] = pheno_select_threshold[1] = p_phenotype[(int) Math
 					.floor((p_phenotype.length) * pheno_select_quantile[1])];
 		} else if (pheno_select_quantile[0] > 0 && pheno_select_quantile[1] < 0) {// select
-																					// lower
-																					// side
+			// lower
+			// side
 			pheno_select_threshold[0] = pheno_select_threshold[1] = p_phenotype[(int) Math
 					.floor((p_phenotype.length) * pheno_select_quantile[0])];
 		} else { // no selection
@@ -512,7 +521,7 @@ public class FamilyGenerator {
 								+ randomData.nextGaussian() * error;
 						p_phenotype.add(new Double(obs));
 					}
-					status = new Integer(affection(obs));
+					status = affection(obs);
 				} while (status.intValue() == -1);
 				p_covariate.add(new Double(covariate));
 				p_trait.add(status);
@@ -554,7 +563,7 @@ public class FamilyGenerator {
 								+ randomData.nextGaussian() * error;
 						c_phenotype.add(new Double(obs));
 					}
-					status = new Integer(affection(obs));
+					status = affection(obs);
 				} while (status.intValue() == -1);
 				affect += status.intValue();
 				c_covariate.add(new Double(covariate));
@@ -575,8 +584,8 @@ public class FamilyGenerator {
 
 	public void create() {
 		int i = 0;
-		int cases = 0;  // this variable is only used when number_case > 0
-		int controls = 0;  //this variable is only used when number_case > 0
+		int cases = 0; // this variable is only used when number_case > 0
+		int controls = 0; // this variable is only used when number_case > 0
 		while (i < FamilySize) {
 			ArrayList p_temp = new ArrayList();
 			ArrayList p_trait = new ArrayList();
@@ -591,32 +600,46 @@ public class FamilyGenerator {
 				}
 			}
 
-			for (int j = 0; j < 2; ++j) {
-				double covariate;
-				double obs;
-				Integer status = null;
-				do {
-					String[][] pair = new String[numLocus][2];
-					generateFounderGenotype(pair, FamCategory);
-					p_temp.add(pair);
-					Integer genestatus = getStatus(pair);
-
-					if (model.compareTo("B") == 0) {
-						covariate = randomData.nextGaussian() * deviation;
-						obs = genestatus.doubleValue() * geneAffect + covariate
-								* covariable + intercept;
-					} else {
-						covariate = randomData.nextGaussian() * deviation;
-						obs = genestatus.doubleValue() * geneAffect + covariate
-								* covariable + intercept
-								+ randomData.nextGaussian() * error;
-						p_phenotype.add(new Double(obs));
-					}
-					status = new Integer(affection(obs));
-				} while (status.intValue() == -1);
-				p_covariate.add(new Double(covariate));
-				p_trait.add(status);
-			}
+			int parent_proband;
+			boolean parent_proband_flag;
+			do {
+				parent_proband = 0;
+				p_temp.clear();
+				p_trait.clear();
+				p_covariate.clear();
+				p_phenotype.clear();
+				for (int j = 0; j < 2; ++j) {
+					double covariate;
+					double obs;
+					Integer status = null;
+					do {
+						String[][] pair = new String[numLocus][2];
+						generateFounderGenotype(pair, FamCategory);
+						p_temp.add(pair);
+						Integer genestatus = getStatus(pair);
+						if (model.compareTo("B") == 0) {
+							covariate = randomData.nextGaussian() * deviation;
+							obs = genestatus.doubleValue() * geneAffect
+									+ covariate * covariable + intercept;
+						} else {
+							covariate = randomData.nextGaussian() * deviation;
+							obs = genestatus.doubleValue() * geneAffect
+									+ covariate * covariable + intercept
+									+ randomData.nextGaussian() * error;
+							p_phenotype.add(new Double(obs));
+						}
+						status = affection(obs);
+						parent_proband += status.intValue();
+					} while (status.intValue() == -1);
+					p_covariate.add(new Double(covariate));
+					p_trait.add(status);
+				}
+				if (AffParent[FamCategory] > 0) {
+					parent_proband_flag = parent_proband >= AffParent[FamCategory];
+				} else {
+					parent_proband_flag = parent_proband == AffParent[FamCategory];
+				}
+			} while (!parent_proband_flag);
 
 			ArrayList c_temp = new ArrayList();
 			ArrayList c_trait = new ArrayList();
@@ -654,66 +677,42 @@ public class FamilyGenerator {
 								+ randomData.nextGaussian() * error;
 						c_phenotype.add(new Double(obs));
 					}
-					status = new Integer(affection(obs));
+					status = affection(obs);
 				} while (status.intValue() == -1);
 				affect += status.intValue();
 				c_covariate.add(new Double(covariate));
 				c_trait.add(status);
 				c_temp.add(child);
 			}
+			boolean Aff_Kid_flag = false;
 			if (number_case == 0) {
 				if (AffKid_Diff_Family[FamCategory] > 0) {
-					if (affect >= AffKid_Diff_Family[FamCategory]) {
-						Children.add(c_temp);
-						Parents.add(p_temp);
-						PCovariate.add(p_covariate);
-						PPhenotype.add(p_phenotype);
-						CCovariate.add(c_covariate);
-						CPhenotype.add(c_phenotype);
-						PTraits.add(p_trait);
-						Traits.add(c_trait);
-						++i;
-					}
+					Aff_Kid_flag = affect >= AffKid_Diff_Family[FamCategory];
 				} else {
-					if (affect == Math.abs(AffKid_Diff_Family[FamCategory])) {
-						Children.add(c_temp);
-						Parents.add(p_temp);
-						PCovariate.add(p_covariate);
-						PPhenotype.add(p_phenotype);
-						CCovariate.add(c_covariate);
-						CPhenotype.add(c_phenotype);
-						PTraits.add(p_trait);
-						Traits.add(c_trait);
-						++i;
-					}
+					Aff_Kid_flag = affect == Math.abs(AffKid_Diff_Family[FamCategory]);
+				}
+			} else {
+				if (affect > 0) {
+					Aff_Kid_flag = cases < number_case;
+				} else {
+					Aff_Kid_flag = controls < (FamilySize- number_case);
 				}
 			}
-			else {
-				if (affect > 0) {
-					if (cases < number_case) {
-						Children.add(c_temp);
-						Parents.add(p_temp);
-						PCovariate.add(p_covariate);
-						PPhenotype.add(p_phenotype);
-						CCovariate.add(c_covariate);
-						CPhenotype.add(c_phenotype);
-						PTraits.add(p_trait);
-						Traits.add(c_trait);
+			if (Aff_Kid_flag) {
+				Children.add(c_temp);
+				Parents.add(p_temp);
+				PCovariate.add(p_covariate);
+				PPhenotype.add(p_phenotype);
+				CCovariate.add(c_covariate);
+				CPhenotype.add(c_phenotype);
+				PTraits.add(p_trait);
+				Traits.add(c_trait);
+				++i;
+				if (number_case != 0) {
+					if(affect>0) {
 						++cases;
-						++i;
-					}
-				} else {
-					if (controls < (FamilySize-number_case)) {
-						Children.add(c_temp);
-						Parents.add(p_temp);
-						PCovariate.add(p_covariate);
-						PPhenotype.add(p_phenotype);
-						CCovariate.add(c_covariate);
-						CPhenotype.add(c_phenotype);
-						PTraits.add(p_trait);
-						Traits.add(c_trait);
+					} else {
 						++controls;
-						++i;
 					}
 				}
 			}
@@ -786,7 +785,7 @@ public class FamilyGenerator {
 			for (int j = 0; j < Allele.length; ++j) {
 				double rd = randomData.nextFloat();
 				if (rd > MR[0]) {
-					if (pair1[j][0].compareTo( pair1[j][1]) <=0) {
+					if (pair1[j][0].compareTo(pair1[j][1]) <= 0) {
 						pedout.print(pair1[j][0] + " " + pair1[j][1]);
 					} else {
 						pedout.print(pair1[j][1] + " " + pair1[j][0]);
@@ -814,7 +813,7 @@ public class FamilyGenerator {
 			for (int j = 0; j < Allele.length; ++j) {
 				double rd = randomData.nextFloat();
 				if (rd > MR[1]) {
-					if (pair2[j][0].compareTo( pair2[j][1]) <=0) {
+					if (pair2[j][0].compareTo(pair2[j][1]) <= 0) {
 						pedout.print(pair2[j][0] + " " + pair2[j][1]);
 					} else {
 						pedout.print(pair2[j][1] + " " + pair2[j][0]);
@@ -853,7 +852,7 @@ public class FamilyGenerator {
 				for (int k = 0; k < child.length; ++k) {
 					double rd = randomData.nextFloat();
 					if (rd > KidGenotypeMissingRate) {
-						if (child[k][0].compareTo( child[k][1]) <=0) {
+						if (child[k][0].compareTo(child[k][1]) <= 0) {
 							pedout.print(child[k][0] + " " + child[k][1]);
 						} else {
 							pedout.print(child[k][1] + " " + child[k][0]);
@@ -886,7 +885,7 @@ public class FamilyGenerator {
 		PrintWriter pheout = new PrintWriter(new File(phe));
 
 		for (int i = 0; i < Allele.length; ++i) {
-				pedout.print("M" + (i + 1) + "\t");
+			pedout.print("M" + (i + 1) + "\t");
 		}
 		pedout.println("Affection");
 
@@ -918,7 +917,7 @@ public class FamilyGenerator {
 				for (int k = 0; k < child.length; ++k) {
 					double rd = randomData.nextFloat();
 					if (rd > KidGenotypeMissingRate) {
-						if (child[k][0].compareTo( child[k][1]) <=0) {
+						if (child[k][0].compareTo(child[k][1]) <= 0) {
 							pedout.print(child[k][0] + " " + child[k][1]);
 						} else {
 							pedout.print(child[k][1] + " " + child[k][0]);
@@ -931,11 +930,10 @@ public class FamilyGenerator {
 				pedout.print(((Integer) t_temp.get(j)).intValue());
 				pedout.println();
 				if (model.compareTo("B") == 0) {
-					pheout.println(t_temp.get(j)
-							+ "\t" + cc_temp.get(j));
+					pheout.println(t_temp.get(j) + "\t" + cc_temp.get(j));
 				} else {
-					pheout.println(t_temp.get(j)
-							+ "\t" + cp_temp.get(j) + "\t" + cc_temp.get(j));
+					pheout.println(t_temp.get(j) + "\t" + cp_temp.get(j) + "\t"
+							+ cc_temp.get(j));
 				}
 			}
 		}
@@ -943,7 +941,6 @@ public class FamilyGenerator {
 		pheout.close();
 	}
 
-	
 	public void setAffect(double gene) {
 		geneAffect = gene;
 	}
@@ -983,7 +980,7 @@ public class FamilyGenerator {
 			Arrays.fill(pr.Recombination, 0.5);
 			pr.AlleleFreq = new double[1][10];
 			for (int i = 0; i < pr.AlleleFreq.length; i++) {
-				Arrays.fill(pr.AlleleFreq[i], 0.5 );
+				Arrays.fill(pr.AlleleFreq[i], 0.5);
 			}
 			pr.DPrime = new double[9];
 			Arrays.fill(pr.DPrime, 0);
@@ -1004,11 +1001,12 @@ public class FamilyGenerator {
 			pr.pheno_select_quantile[0] = -0.1;
 			pr.pheno_select_quantile[1] = -0.9;
 			pr.simu_replication = 2;
-			pr.family_size = 500;
+			pr.family_size = 1000;
 			pr.number_case = 0;
 			pr.FamNum = new int[1];
-			pr.FamNum[0] = 500;
-
+			pr.FamNum[0] = 1000;
+			pr.AffParent = new int[1];
+			pr.AffParent[0] = 1;
 			pr.Kid = new int[1];
 			pr.Kid[0] = 2;
 			pr.AffKid = new int[1];
@@ -1029,7 +1027,7 @@ public class FamilyGenerator {
 			simu.SettingUpParameter(pr);
 			simu.create();
 			try {
-				if(pr.number_case > 0) {
+				if (pr.number_case > 0) {
 					simu.print_case_control(Ped, Phe);
 				} else {
 					simu.print(Ped, Phe);

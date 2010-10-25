@@ -27,6 +27,7 @@ public class WithParents {
 		} else {
 			pr.setIsLouAlgorithm(false);
 			pr.setUsingFounderGenotype(true);
+			pr.setUsingChildrenGenotype(false);
 			pr.setPedigreeFile("0.ped");
 			pr.setPhenotypeFile("0.phe");
 			pr.setConvertedPedigreeFile("Converted_0.ped");
@@ -37,17 +38,18 @@ public class WithParents {
 			pr.setScoreBuildMethod(2);
 			pr.setAdjustScore(true);
 			pr.setScoreBuildWithFounder(true);
+			pr.setScoreBuildWithChildren(false);
 			pr.setReplication(10);
 			pr.setSeed(10);
 		}
-		GMDRData GD = new GMDRData(pr.usingFounderGenotype(), pr.isLouAlgorithm());
+		GMDRData GD = new GMDRData(pr.usingFounderGenotype(), pr.usingChildrenGenotype, pr.isLouAlgorithm());
 		AbstractGenoDistribution.rnd = new Random(pr.seed);
 		boolean isRabinowitzProc = false;
 		GD.RevvingUp(pr.getPedigreeFile(), pr.getPhenotypeFile());
 		GD.RabinowitzApproach();
 		GD.CreateTable(isRabinowitzProc);
 		if (pr.getScoreBuildMethod() >= 0) {
-			GD.buildScore(pr.getPhenotypeIndex(), pr.getCovarianteIndex(), pr.isAdjustScore(), pr.getScoreBuildMethod(), pr.getScoreBuildWithFounder());
+			GD.buildScore(pr.getPhenotypeIndex(), pr.getCovarianteIndex(), pr.isAdjustScore(), pr.getScoreBuildMethod(), pr.getScoreBuildWithFounder(), pr.getScoreBuildWithChildren());
 		} else {
 			GD.fetchScore(pr.getPhenotypeIndex(), pr.getScoreBuildWithFounder());
 		}

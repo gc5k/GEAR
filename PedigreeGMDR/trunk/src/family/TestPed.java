@@ -40,6 +40,7 @@ public class TestPed {
 		} else {
 			pr.setIsLouAlgorithm(true);
 			pr.setUsingFounderGenotype(false);
+			pr.setUsingChildrenGenotype(false);
 			pr.setPedigreeFile("0.ped");
 			pr.setPhenotypeFile("0.phe");
 			pr.setConvertedPedigreeFile("Converted_0.ped");
@@ -50,11 +51,12 @@ public class TestPed {
 			pr.setScoreBuildMethod(2);
 			pr.setAdjustScore(true);
 			pr.setScoreBuildWithFounder(true);
+			pr.setScoreBuildWithChildren(false);
 			pr.setReplication(10);
 			pr.setSeed(10);
 		}
 		GMDRData.rnd = new Random(10);
-		GMDRData GD = new GMDRData(pr.usingFounderGenotype, pr.isLouAlgorithm);
+		GMDRData GD = new GMDRData(pr.usingFounderGenotype, pr.usingChildrenGenotype, pr.isLouAlgorithm);
 		AbstractGenoDistribution.rnd = new Random(pr.seed);
         boolean isPermutation = false; // 0 for all; 1 for affected only; 2 for unaffected only.
 
@@ -63,7 +65,7 @@ public class TestPed {
         GD.CreateTable(false);
 
 		if (pr.getScoreBuildMethod() >= 0) {
-			GD.buildScore(pr.getPhenotypeIndex(), pr.getCovarianteIndex(), pr.isAdjustScore(), pr.getScoreBuildMethod(), pr.getScoreBuildWithFounder());
+			GD.buildScore(pr.getPhenotypeIndex(), pr.getCovarianteIndex(), pr.isAdjustScore(), pr.getScoreBuildMethod(), pr.getScoreBuildWithFounder(), pr.getScoreBuildWithChildren());
 		} else {
 			GD.fetchScore(pr.getPhenotypeIndex(), pr.getScoreBuildWithFounder());
 		}

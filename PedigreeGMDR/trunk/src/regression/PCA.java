@@ -88,7 +88,7 @@ public class PCA {
 		}
 
 		PCA pca = new PCA(data);
-		
+
 		double[][] pc = pca.principalComponent();
 		System.out.println("eigen vectors");
 		for(int i = 0; i < pc.length; i++) {
