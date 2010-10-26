@@ -31,6 +31,10 @@ public class CombinationGenerator {
         }
     }
 
+    public void fill(Integer order, List com) {
+    	combination.put(order, com);
+    }
+
     public List get(Object o) {
         return combination.get(o);
     }

@@ -637,7 +637,7 @@ public class FamilyGenerator {
 				if (AffParent[FamCategory] > 0) {
 					parent_proband_flag = parent_proband >= AffParent[FamCategory];
 				} else {
-					parent_proband_flag = parent_proband == AffParent[FamCategory];
+					parent_proband_flag = parent_proband == Math.abs(AffParent[FamCategory]);
 				}
 			} while (!parent_proband_flag);
 
@@ -1000,13 +1000,13 @@ public class FamilyGenerator {
 			pr.pheno_select_quantile = new double[2];
 			pr.pheno_select_quantile[0] = -0.1;
 			pr.pheno_select_quantile[1] = -0.9;
-			pr.simu_replication = 2;
+			pr.simu_replication = 50;
 			pr.family_size = 1000;
 			pr.number_case = 0;
 			pr.FamNum = new int[1];
 			pr.FamNum[0] = 1000;
 			pr.AffParent = new int[1];
-			pr.AffParent[0] = 1;
+			pr.AffParent[0] = -1;
 			pr.Kid = new int[1];
 			pr.Kid[0] = 2;
 			pr.AffKid = new int[1];
