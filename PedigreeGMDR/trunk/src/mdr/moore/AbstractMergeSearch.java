@@ -7,6 +7,8 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
 
+import publicAccess.ToolKit;
+
 import algorithm.CombinationGenerator;
 import mdr.data.DataFile;
 import algorithm.Subdivision;
@@ -66,6 +68,12 @@ public abstract class AbstractMergeSearch {
     
     public SavedModels getBestSavedModelAtOrder(Integer i) {
         return bestSavedModelsMap.get(i);
+    }
+    
+    public int[] getBestModel(int o, int trIdx) {
+    	SavedModels sm = bestSavedModelsMap.get(new Integer(o));
+    	String m = sm.getModekKey(trIdx);
+    	return ToolKit.StringToIntArray(m);
     }
 
     public abstract void search(int or);

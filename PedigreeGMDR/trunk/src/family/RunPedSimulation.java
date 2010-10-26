@@ -2,6 +2,7 @@ package family;
 
 import java.io.IOException;
 import java.util.Random;
+import java.util.ArrayList;
 
 import algorithm.CombinationGenerator;
 import algorithm.Subdivision;
@@ -21,11 +22,12 @@ public class RunPedSimulation {
 
 	public static void main(String[] args) throws IOException {
 
-		for (int i = 0; i < 50; i++) {
+		for (int i = 0; i < 1; i++) {
 			String PedFile = Integer.toString(i) + ".ped";
 			String PhenoFile = Integer.toString(i) + ".phe";
-			String CovertPedFile = "Converted_" + Integer.toString(i)+".ped";
-			String CovertPhenoFile = "Converted_" + Integer.toString(i) + ".phe";
+			String CovertPedFile = "Converted_" + Integer.toString(i) + ".ped";
+			String CovertPhenoFile = "Converted_" + Integer.toString(i)
+					+ ".phe";
 			String FamIDFile = "Family_ID_" + Integer.toString(i) + ".txt";
 			PedigreeParameter pr = new PedigreeParameter();
 			long seed = 10;
@@ -69,7 +71,8 @@ public class RunPedSimulation {
 						.getScoreBuildWithFounder());
 			}
 			GD.CreateWorkingTable(isRabinowitzProc);
-//			GD.PrintGMDR(pr.getConvertedPedigreeFile(), pr.getConvertedPhenotypeFile(), isRabinowitzProc);
+			// GD.PrintGMDR(pr.getConvertedPedigreeFile(),
+			// pr.getConvertedPhenotypeFile(), isRabinowitzProc);
 			int[] scrIdx = { 0 };
 			GMDRParameter gmdrPr = new GMDRParameter();
 			gmdrPr.setInteractionEnd(2);
@@ -95,20 +98,42 @@ public class RunPedSimulation {
 			as = new LinearMergeSearch(mdrData, sd, cg,
 					gmdrPr.getScoreIndex().length, mdrData.getOffset(), gmdrPr
 							.isMooreMDR());
-			for (int j = gmdrPr.getInterctionFrom(); j <= gmdrPr
-					.getInteractionEnd(); j++) {
+			for (int j = gmdrPr.getInterctionFrom(); j <= gmdrPr.getInteractionEnd(); j++) {
 				as.search(j);
 				as.summarise();
-			}
+				int[] bm = as.getBestModel(j, scrIdx[0]);
+				GD.SetChosenMarker(bm);
+				isRabinowitzProc = true;
+				System.out.println("permutation test");
+				for (int k = 0; k < pr.replication; k++) {
+					GD.RabinowitzApproach();
+					GD.CreateTable(isRabinowitzProc);
+					String opfN = "ParentsRabin_" + Integer.toString(k) + ".txt";
+					GD.CreateWorkingTable(isRabinowitzProc);
+					GD.PrintGMDR(opfN, null, true);
+					ArrayList t = GD.getMarkerName();
+					t = GD.getWorkingGenoTable();
+					t = GD.getWorkingStatusTable();
+					t = GD.getWorkingScoreTable();
+					DataFile mdrData1 = new DataFile(GD.getMarkerName(), GD.getWorkingGenoTable(), GD.getWorkingStatusTable(),
+							GD.getTraitName(), GD.getWorkingScoreTable(), scrIdx);
+					System.out.println("\t");
 
-//			 isRabinowitzProc = true;
-//			 for (int j = 0; j < pr.replication; j++) {
-//			 String opfN = "ParentsRabin_" + Integer.toString(j) + ".txt";
-//			 GD.CreateWorkingTable(isRabinowitzProc);
-//			 GD.RabinowitzApproach();
-//			 GD.CreateTable(isRabinowitzProc);
-//			 GD.PrintGMDR(opfN, null, true);
-//			 }
+//					CombinationGenerator cg1 = new CombinationGenerator(gmdrPr
+//							.getInterctionFrom(), gmdrPr.getInteractionEnd(), mdrData1
+//							.getMarkerNum());
+//					cg1.generateCombination();
+//					AbstractMergeSearch as1;
+//					Subdivision sd1 = new Subdivision(gmdrPr.getInterval(), gmdrPr
+//							.getSeed(), mdrData1);
+//					sd.RandomPartition();
+//					as1 = new LinearMergeSearch(mdrData1, sd1, cg1,
+//							gmdrPr.getScoreIndex().length, mdrData1.getOffset(), gmdrPr
+//									.isMooreMDR());
+//					as1.search(j);
+//					as1.summarise();
+				}
+			}
 		}
 	}
 }

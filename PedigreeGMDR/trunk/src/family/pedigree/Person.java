@@ -229,6 +229,18 @@ public class Person {
         return genotype;
     }
 
+    public ArrayList getGenotype(int[] subsetMarker) {
+    	if (subsetMarker.length == genotype.size()) {
+    		return genotype;
+    	} else {
+    		ArrayList sub = new ArrayList();
+    		for (int i = 0; i < subsetMarker.length; i++) {
+    			sub.add((String) genotype.get(subsetMarker[i]));
+    		}
+    		return sub;
+    	}
+    	
+    }
     public String getGenotype(int index) {
         return (String) genotype.get(index);
     }

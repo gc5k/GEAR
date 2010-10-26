@@ -253,7 +253,7 @@ public class FamilyStruct {
         }
     }
 
-    public boolean NontransmittedProc(ArrayList markerInfor)
+    public boolean NontransmittedProc(ArrayList markerInfor, int[] subsetMarker)
             throws FamilyStructException {
         boolean Informative = true;
         Enumeration perList;
@@ -261,9 +261,9 @@ public class FamilyStruct {
         PseudoPerson pseudoper;
         String iid;
         String nontran_tran[];
-        for (int i = 0; i < this.numMarkers; i++) {
+        for (int i = 0; i < subsetMarker.length; i++) {
             perList = persons.keys();
-            GenoSet genoset = (GenoSet) ImputedGenoSet.get(i);
+            GenoSet genoset = (GenoSet) ImputedGenoSet.get(subsetMarker[i]);
             int numGenotypedParents = genoset.getNumTypedParents();
             AbstractGenoDistribution gDis;
             TreeSet aSet = new TreeSet();
@@ -275,7 +275,7 @@ public class FamilyStruct {
                 countAllele(genoset.getchildrenGenoMap(), aSet);
                 countAllele(genoset.getparentsGenoMap(), aSet);
                 if (aSet.size() > 4) {
-                    throw new FamilyStructException("Marker " + markerInfor.get(i) + " has more than 4 alleles.");
+                    throw new FamilyStructException("Marker " + markerInfor.get(subsetMarker[i]) + " has more than 4 alleles.");
                 }
                 gDis = new ObservedParents(genoset.getchildrenGenoMap(),
                         genoset.getparentsGenoMap());
@@ -288,14 +288,14 @@ public class FamilyStruct {
                     {
                         if (aSet.size() > 3) {
                             throw new FamilyStructException(
-                                    "Marker " + markerInfor.get(i) + " has more than 3 alleles with one parent is homozygous.");
+                                    "Marker " + markerInfor.get(subsetMarker[i]) + " has more than 3 alleles with one parent is homozygous.");
                         }
                         gDis = new HomozygousParent(genoset.getchildrenGenoMap(), genoset.getparentsGenoMap());
                     } else // table 2
                     {
                         if (aSet.size() > 4) {
                             throw new FamilyStructException(
-                                    "Marker " + markerInfor.get(i) + " has more than 4 alleles with one parent is heterozygous.");
+                                    "Marker " + markerInfor.get(subsetMarker[i]) + " has more than 4 alleles with one parent is heterozygous.");
                         }
                         gDis = new HeterozygousParent(genoset.getchildrenGenoMap(), genoset.getparentsGenoMap());
                     }
@@ -311,14 +311,14 @@ public class FamilyStruct {
                 if (!hasAncestor(per.getPersonID())) {
                     continue;
                 }
-                nontran_tran = getNonTransmitted(per.getGenotype(i), gDis);
+                nontran_tran = getNonTransmitted(per.getGenotype(subsetMarker[i]), gDis);
                 pseudoper.addMarker(nontran_tran[0]);
                 if (nontran_tran[0].compareTo(PublicData.MissingGenotype) == 0) {
                     Informative = false;
-                    System.err.println("Individual " + per.getPersonID() + ", in family " + per.getFamilyID() + ", failed to get the nontransmitted genotype for marker " + markerInfor.get(i));
+                    System.err.println("Individual " + per.getPersonID() + ", in family " + per.getFamilyID() + ", failed to get the nontransmitted genotype for marker " + markerInfor.get(subsetMarker[i]));
                 } else {
-                    if (per.getGenotype(i).compareTo(PublicData.MissingGenotype) == 0) {
-                        per.setGenotype(i, nontran_tran[1]);
+                    if (per.getGenotype(subsetMarker[i]).compareTo(PublicData.MissingGenotype) == 0) {
+                        per.setGenotype(subsetMarker[i], nontran_tran[1]);
                     }
                 }
             }
@@ -330,7 +330,7 @@ public class FamilyStruct {
         persons.remove(id);
     }
 
-    public boolean RabinowitzProc(ArrayList markerInfor) throws FamilyStructException {
+    public boolean RabinowitzProc(ArrayList markerInfor, int[] subsetMarker) throws FamilyStructException {
         boolean Informative = true;
         Enumeration perList;
         Person per;
@@ -347,9 +347,9 @@ public class FamilyStruct {
             pseudoper.pseudoGenotypeClear();
         }
 
-        for (int i = 0; i < this.numMarkers; i++) {
+        for (int i = 0; i < subsetMarker.length; i++) {
             perList = persons.keys();
-            GenoSet genoset = (GenoSet) ImputedGenoSet.get(i);
+            GenoSet genoset = (GenoSet) ImputedGenoSet.get(subsetMarker[i]);
             AbstractGenoDistribution gDis;
             TreeSet aSet = new TreeSet();
             if (genoset.getNumParents() > 2) {
@@ -360,7 +360,7 @@ public class FamilyStruct {
                 countAllele(genoset.getchildrenGenoMap(), aSet);
                 countAllele(genoset.getparentsGenoMap(), aSet);
                 if (aSet.size() > 4) {
-                    throw new FamilyStructException("Marker " + markerInfor.get(i) + " has more than 4 alleles.");
+                    throw new FamilyStructException("Marker " + markerInfor.get(subsetMarker[i]) + " has more than 4 alleles.");
                 }
                 gDis = new Rabinowitz0(genoset.getchildrenGenoMap(), genoset.getparentsGenoMap());
             } else {
@@ -371,7 +371,7 @@ public class FamilyStruct {
                     if (!AbstractGenoDistribution.isHeterozygous(PG)) {// table 1                  
                         if (aSet.size() > 3) {
                             throw new FamilyStructException(
-                                    "Marker " + markerInfor.get(i) + " has more than 3 alleles with one parent is homozygous.");
+                                    "Marker " + markerInfor.get(subsetMarker[i]) + " has more than 3 alleles with one parent is homozygous.");
                         }
                         gDis = new Rabinowitz1(genoset.getchildrenGenoMap(),
                                 genoset.getparentsGenoMap());
