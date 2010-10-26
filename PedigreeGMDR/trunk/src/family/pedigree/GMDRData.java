@@ -52,7 +52,7 @@ public class GMDRData {
 	private boolean usingChildrenGenotype;
 	private boolean isLouAlgorithm;
 
-	private ArrayList<Integer> subsetMarker;
+	private int[] subsetMarker;
 	public static Random rnd;
 
 	/**
@@ -413,6 +413,11 @@ public class GMDRData {
 		ParsePedFile(ped);
 		ParsePhenoFile(phe);
 		Match();
+		int[] m = new int[PedData.getNumMarkers()];
+		for (int i = 0; i < m.length; i++) {
+			m[i] = i;
+		}
+		SetChosenMarker(m);
 	}
 
 	/**
@@ -556,7 +561,7 @@ public class GMDRData {
 	}
 
 	public void RabinowitzApproach() {
-		PedData.RabinowitzApproach(isLouAlgorithm);
+		PedData.RabinowitzApproach(isLouAlgorithm, subsetMarker);
 	}
 
 	/**
@@ -576,7 +581,6 @@ public class GMDRData {
 		for (int i = 0; i < FID.length; i++) {
 			String fid = (String) FID[i];
 			FamilyStruct FamStr = PedData.getFamilyStruct(fid);
-			String[] memberList = FamStr.getPersonListSorted();
 			FamilyUnit FamUnit = PhenoData.getFamilyUnit(fid);
 			String pid;
 			Person per;
@@ -585,8 +589,8 @@ public class GMDRData {
 			String[] PID = FamStr.getPersonListSorted();
 
 			ArrayList<String> FounderID = new ArrayList();
-			for(int j = 0; j < memberList.length; j++) {
-				pid = (String) memberList[j];
+			for(int j = 0; j < PID.length; j++) {
+				pid = (String) PID[j];
 				if (IsUnMatchedIndividual(fid, pid)) {
 					continue;
 				}
@@ -605,23 +609,21 @@ public class GMDRData {
 				sub = FamUnit.getSubject(pid);
 				if (!isRabinowitzProc) {
 					PersonTable.add(new PersonIndex(fid, pid));
-					CovariateTable.add((ArrayList) sub.getTraits().clone());
+					CovariateTable.add((ArrayList) sub.getTraits());
 					StatusTable.add(new Integer(per.getAffectedStatus()));
-					TransmittedTable.add(per.getGenotype().clone());
+					TransmittedTable.add(per.getGenotype(subsetMarker));
 				} else {
 					if (FamStr.hasAncestor(pid)) {
-						RabinowitzTable.add(pseudoper.getPseudoGenotype()
-								.clone());
+						RabinowitzTable.add(pseudoper.getPseudoGenotype(subsetMarker));
 					} else {
-						RabinowitzTable.add(per.getGenotype().clone());
+						RabinowitzTable.add(per.getGenotype(subsetMarker));
 					}
 				}
 				if (isLouAlgorithm) {
 					if (FamStr.hasAncestor(per.getPersonID())) {
-						NontransmittedTable.add(pseudoper.getPseudoGenotype()
-								.clone());
+						NontransmittedTable.add(pseudoper.getPseudoGenotype(subsetMarker));
 					} else {
-						NontransmittedTable.add(per.getGenotype().clone());
+						NontransmittedTable.add(per.getGenotype(subsetMarker));
 					}
 				}
 			}
@@ -644,8 +646,8 @@ public class GMDRData {
 		ArrayList marker;
 
 		ArrayList markerinfor = PedData.getMarkerInformation();
-		for (int i = 0; i < markerinfor.size(); i++) {
-			TDTpedout.print(markerinfor.get(i) + "\t");
+		for (int i = 0; i < subsetMarker.length; i++) {
+			TDTpedout.print(markerinfor.get(subsetMarker[i]) + "\t");
 		}
 		TDTpedout.println("class");
 
@@ -786,7 +788,7 @@ public class GMDRData {
 	}
 
 	public ArrayList<String> getMarkerName() {
-		return PedData.getMarkerInformation();
+		return PedData.getMarkerInformation(subsetMarker);
 	}
 
 	public ArrayList<String> getTraitName() {
@@ -794,9 +796,9 @@ public class GMDRData {
 	}
 	
 	public void SetChosenMarker(int[] mi) {
-		subsetMarker = new ArrayList();
+		subsetMarker = new int[mi.length];
 		for(int i = 0; i < mi.length; i++) {
-			subsetMarker.add(new Integer(mi[i]));
+			subsetMarker[i] = mi[i];
 		}
 	}
 }

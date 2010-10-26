@@ -234,7 +234,7 @@ public class LinearMergeSearch extends AbstractMergeSearch {
             }
             mean_TA /= subdivision.getInterval();
             mean_TrA /= subdivision.getInterval();
-            System.out.print("mean of Testing Accuracy is " + mean_TA + "\t");
+            System.out.println("mean of Testing Accuracy is " + mean_TA);
             System.out.println("mean of Training Accuracy is " + mean_TrA);
             OneTraitResult i_thResult = (OneTraitResult) bestKFoldResult.get(i);
             i_thResult.summarise();

@@ -45,10 +45,6 @@ public class PseudoPerson {
         this.pseudopersonID = pid;
     }
 
-    public void add(String genotype) {
-        pseudoGenotype.add(genotype);
-    }
-
     public ArrayList getGenotype() {
         return pseudoGenotype;
     }
@@ -129,5 +125,17 @@ public class PseudoPerson {
 
     public ArrayList getPseudoGenotype() {
         return pseudoGenotype;
+    }
+    
+    public ArrayList getPseudoGenotype(int[] subsetMarker) {
+    	if(subsetMarker.length == pseudoGenotype.size()) {
+    		return pseudoGenotype;
+    	} else {
+    		ArrayList sub = new ArrayList();
+    		for(int i = 0; i < subsetMarker.length; i++) {
+    			sub.add((String) pseudoGenotype.get(subsetMarker[i]));
+    		}
+    		return sub;
+    	}
     }
 }

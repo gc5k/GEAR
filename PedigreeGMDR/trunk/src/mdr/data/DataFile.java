@@ -193,7 +193,7 @@ public class DataFile {
     private void initial1(ArrayList<ArrayList> marker, ArrayList statue, ArrayList<ArrayList> phenotype, int[] si) {
         TreeMap tempMap = new TreeMap();        
     	for (int i= 0; i < marker.size(); i++) {
-    		ArrayList<String> geno = (ArrayList) marker.get(i);
+    		ArrayList<String> geno = (ArrayList) marker.get(i).clone();
     		geno.add((String) statue.get(i).toString());
     		String[] content = geno.toArray(new String[0]);
             Subject sub = new Subject(content);

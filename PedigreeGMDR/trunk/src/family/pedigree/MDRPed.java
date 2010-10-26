@@ -1414,6 +1414,17 @@ public class MDRPed {
         return markerInfor;
     }
 
+    public ArrayList getMarkerInformation(int[] subsetMarker) {
+    	if(subsetMarker.length == markerInfor.size() || subsetMarker == null) {
+    		return markerInfor;
+    	} else {
+    		ArrayList mk = new ArrayList();
+    		for(int i = 0; i < subsetMarker.length; i++) {
+    			mk.add((String) markerInfor.get(subsetMarker[i]));
+    		}
+    		return markerInfor;
+    	}
+    }
     public int[] getMarkerRatings() {
         return markerRatings;
     }
@@ -1595,7 +1606,7 @@ public class MDRPed {
      */
     }
 
-    public void RabinowitzApproach(boolean forNontransmitted) {
+    public void RabinowitzApproach(boolean forNontransmitted, int[] subsetMarker) {
         Enumeration fsList = this.familystructure.keys();
         boolean informative;
         String fid;
@@ -1608,9 +1619,9 @@ public class MDRPed {
             }
             try {
             	if (forNontransmitted) {
-            		fs.NontransmittedProc(markerInfor);
+            		fs.NontransmittedProc(markerInfor, subsetMarker);
             	} else {
-            		fs.RabinowitzProc(markerInfor);
+            		fs.RabinowitzProc(markerInfor, subsetMarker);
             	}
             } catch (FamilyStructException E) {
                 System.err.println("Exception in family " + fs.getFamilyStructName() + " when in RabinowitzApproach.");
