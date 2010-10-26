@@ -168,10 +168,10 @@ public class LogisticScore implements AbstractScore{
 		if (s == null) {
 			return null;
 		}
-		for (int i=0; i < s.length; i++)
-		{
-			System.out.println(s[i]);
-		}
+//		for (int i=0; i < s.length; i++)
+//		{
+//			System.out.println(s[i]);
+//		}
 		double[] d = new double[s.length];
 		for (int i = 0; i < d.length; i++) {
 			d[i] = Double.parseDouble(s[i]);

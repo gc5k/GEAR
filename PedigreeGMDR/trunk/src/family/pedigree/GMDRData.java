@@ -52,6 +52,7 @@ public class GMDRData {
 	private boolean usingChildrenGenotype;
 	private boolean isLouAlgorithm;
 
+	private ArrayList<Integer> subsetMarker;
 	public static Random rnd;
 
 	/**
@@ -198,9 +199,7 @@ public class GMDRData {
 			ArrayList c = new ArrayList();
 			ArrayList tempc = (ArrayList) CovariateTable.get(i);
 			if (PIndex == -1) {// using affecting status as phenotype
-				if (((Integer) StatusTable.get(i)).intValue() == 0) {// ignor
-																		// missing
-																		// value
+				if (((Integer) StatusTable.get(i)).intValue() == 0) {
 					flag = false;
 					continue;
 				} else {// after converting, 0 for unaffected; 1 for affected;
@@ -577,7 +576,7 @@ public class GMDRData {
 		for (int i = 0; i < FID.length; i++) {
 			String fid = (String) FID[i];
 			FamilyStruct FamStr = PedData.getFamilyStruct(fid);
-			Enumeration memberList = FamStr.getPersonList();
+			String[] memberList = FamStr.getPersonListSorted();
 			FamilyUnit FamUnit = PhenoData.getFamilyUnit(fid);
 			String pid;
 			Person per;
@@ -586,13 +585,12 @@ public class GMDRData {
 			String[] PID = FamStr.getPersonListSorted();
 
 			ArrayList<String> FounderID = new ArrayList();
-			while (memberList.hasMoreElements()) {
-				pid = (String) memberList.nextElement();
+			for(int j = 0; j < memberList.length; j++) {
+				pid = (String) memberList[j];
 				if (IsUnMatchedIndividual(fid, pid)) {
 					continue;
 				}
-				per = FamStr.getPerson(pid);
-				if (!FamStr.hasAncestor(per.getPersonID())) {
+				if (!FamStr.hasAncestor(pid)) {
 					FounderID.add(pid);
 				}
 			}
@@ -638,7 +636,7 @@ public class GMDRData {
 		PrintWriter TDTpedout = new PrintWriter(TDTped);
 		PrintWriter TDTpheout = isPermutation ? null : new PrintWriter(TDTphe);
 
-		createWorkingTable(isPermutation);
+//		createWorkingTable(isPermutation);
 		printMissingInformation();
 
 		ArrayList genotypeCensus = getWorkingGenoTable();
@@ -680,7 +678,7 @@ public class GMDRData {
 						TDTpheout.print(sht.get(k));
 					}
 				}
-				TDTpheout.println();				
+				TDTpheout.println();
 			}
 			TDTpheout.close();
 		}
@@ -709,7 +707,7 @@ public class GMDRData {
 		}
 	}
 
-	private void  createWorkingTable(boolean isRabinowitzProc) {
+	public void  CreateWorkingTable(boolean isRabinowitzProc) {
 		ArrayList currentTranGeno = (isRabinowitzProc && !isLouAlgorithm) ? RabinowitzTable:TransmittedTable;
 		workingGenoTable = new ArrayList();
 		workingStatusTable = new ArrayList();
@@ -793,5 +791,12 @@ public class GMDRData {
 
 	public ArrayList<String> getTraitName() {
 		return PhenoData.getTraitName();
+	}
+	
+	public void SetChosenMarker(int[] mi) {
+		subsetMarker = new ArrayList();
+		for(int i = 0; i < mi.length; i++) {
+			subsetMarker.add(new Integer(mi[i]));
+		}
 	}
 }
