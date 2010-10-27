@@ -7,12 +7,8 @@ import java.util.ArrayList;
 import algorithm.CombinationGenerator;
 import algorithm.Subdivision;
 
-import score.CalEngineException;
-import edu.mit.wi.pedfile.PedFileException;
 import family.RabinowitzLairdAlgorithm.AbstractGenoDistribution;
 import family.pedigree.GMDRData;
-import family.pedigree.GMDRPhenoFileException;
-import family.pedigree.MDRPedFileException;
 import mdr.data.DataFile;
 import mdr.moore.AbstractMergeSearch;
 import mdr.moore.LinearMergeSearch;
@@ -103,35 +99,28 @@ public class RunPedSimulation {
 				as.summarise();
 				int[] bm = as.getBestModel(j, scrIdx[0]);
 				GD.SetChosenMarker(bm);
-				isRabinowitzProc = true;
+				isRabinowitzProc = false;
 				System.out.println("permutation test");
 				for (int k = 0; k < pr.replication; k++) {
 					GD.RabinowitzApproach();
 					GD.CreateTable(isRabinowitzProc);
 					String opfN = "ParentsRabin_" + Integer.toString(k) + ".txt";
 					GD.CreateWorkingTable(isRabinowitzProc);
-					GD.PrintGMDR(opfN, null, true);
-					ArrayList t = GD.getMarkerName();
-					t = GD.getWorkingGenoTable();
-					t = GD.getWorkingStatusTable();
-					t = GD.getWorkingScoreTable();
 					DataFile mdrData1 = new DataFile(GD.getMarkerName(), GD.getWorkingGenoTable(), GD.getWorkingStatusTable(),
 							GD.getTraitName(), GD.getWorkingScoreTable(), scrIdx);
-					System.out.println("\t");
 
-//					CombinationGenerator cg1 = new CombinationGenerator(gmdrPr
-//							.getInterctionFrom(), gmdrPr.getInteractionEnd(), mdrData1
-//							.getMarkerNum());
-//					cg1.generateCombination();
-//					AbstractMergeSearch as1;
-//					Subdivision sd1 = new Subdivision(gmdrPr.getInterval(), gmdrPr
-//							.getSeed(), mdrData1);
-//					sd.RandomPartition();
-//					as1 = new LinearMergeSearch(mdrData1, sd1, cg1,
-//							gmdrPr.getScoreIndex().length, mdrData1.getOffset(), gmdrPr
-//									.isMooreMDR());
-//					as1.search(j);
-//					as1.summarise();
+					CombinationGenerator cg1 = new CombinationGenerator(j, j, mdrData1
+							.getMarkerNum());
+					cg1.generateCombination();
+					AbstractMergeSearch as1;
+					Subdivision sd1 = new Subdivision(gmdrPr.getInterval(), gmdrPr
+							.getSeed(), mdrData1);
+					sd1.RandomPartition();
+					as1 = new LinearMergeSearch(mdrData1, sd1, cg1,
+							gmdrPr.getScoreIndex().length, mdrData1.getOffset(), gmdrPr
+									.isMooreMDR());
+					as1.search(j);
+					as1.summarise();
 				}
 			}
 		}

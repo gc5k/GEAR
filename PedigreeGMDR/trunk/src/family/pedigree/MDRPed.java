@@ -1422,7 +1422,7 @@ public class MDRPed {
     		for(int i = 0; i < subsetMarker.length; i++) {
     			mk.add((String) markerInfor.get(subsetMarker[i]));
     		}
-    		return markerInfor;
+    		return mk;
     	}
     }
     public int[] getMarkerRatings() {

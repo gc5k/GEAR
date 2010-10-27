@@ -72,7 +72,7 @@ public abstract class AbstractMergeSearch {
     
     public int[] getBestModel(int o, int trIdx) {
     	SavedModels sm = bestSavedModelsMap.get(new Integer(o));
-    	String m = sm.getModekKey(trIdx);
+    	String m = sm.getModelKey(trIdx);
     	return ToolKit.StringToIntArray(m);
     }
 

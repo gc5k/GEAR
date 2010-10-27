@@ -20,10 +20,11 @@ public class OneTraitResult extends ArrayList {
 
     private int traitIdx;
     private double[] statistic;
+    private double[] bestModelStatistic;
     private HashMap modelCount = new HashMap();
     private String bestModelKey;
     private int cvConsistency;
-    private StringBuffer sb = new StringBuffer();
+    private StringBuffer sb;
     public OneTraitResult(int i) {
         traitIdx = i;
     }
@@ -58,12 +59,17 @@ public class OneTraitResult extends ArrayList {
         return statistic;
     }
 
+    public double[] getBestModelStatistic() {
+    	return bestModelStatistic;
+    }
+
     public String getBestModelKey() {
         return bestModelKey;
     }
 
     public void summarise() {
         statistic = new double[PublicData.NumOfStatistics];
+        bestModelStatistic = new double[PublicData.NumOfStatistics];
 
         for (int i = 0; i < size(); i++) {
             OneCVSet cvSet = (OneCVSet) get(i);
@@ -104,7 +110,7 @@ public class OneTraitResult extends ArrayList {
             }
         }
 
-        double[][] stats = new double[majorKey.size()][PublicData.NumOfStatistics];
+        double[][] _bestModelStats = new double[majorKey.size()][PublicData.NumOfStatistics];
         for (int i = 0; i < size(); i++) {
             OneCVSet cvSet = (OneCVSet) get(i);
             String key = cvSet.getCombination();
@@ -113,25 +119,25 @@ public class OneTraitResult extends ArrayList {
             }
             int idx = majorKey.indexOf(key);
             for (int j = 0; j < PublicData.NumOfStatistics; j++) {
-                stats[idx][j] += cvSet.getStatistic(j);
+            	_bestModelStats[idx][j] += cvSet.getStatistic(j);
             }
         }
         double[] bigStats = new double[PublicData.NumOfStatistics];
         int idx = 0;
         for (Iterator e = majorKey.iterator(); e.hasNext();) {
             String key = (String) e.next();
-            for (int j = 0; j < stats[idx].length; j++) {
-                stats[idx][j] /= ((Integer) (majorModel.get(key))).intValue();
-                if (bigStats[j] < stats[idx][j]) {
-                    bigStats[j] = stats[idx][j];
+            for (int j = 0; j < _bestModelStats[idx].length; j++) {
+            	_bestModelStats[idx][j] /= ((Integer) (majorModel.get(key))).intValue();
+                if (bigStats[j] < _bestModelStats[idx][j]) {
+                    bigStats[j] = _bestModelStats[idx][j];
                 }
             }
             idx++;
         }
         for (int i = 0; i < PublicData.NumOfStatistics; i++) {
             int c = 0;
-            for (int j = 0; j < stats.length; j++) {
-                if ((bigStats[i] - stats[j][i]) < PublicData.epsilon) {
+            for (int j = 0; j < _bestModelStats.length; j++) {
+                if ((bigStats[i] - _bestModelStats[j][i]) < PublicData.epsilon) {
                     c++;
                     bestModelKey = (String) majorKey.get(j);
                 }
@@ -142,15 +148,33 @@ public class OneTraitResult extends ArrayList {
         }
         int bestidx = majorKey.indexOf(bestModelKey);
         cvConsistency = big;
-
-        sb.append("Statistics of the best model: " + System.getProperty("line.separator"));
-        sb.append("Best model: " + bestModelKey + System.getProperty("line.separator"));
-        sb.append("Testing Accuracy: " + stats[bestidx][0] + System.getProperty("line.separator"));
-        sb.append("Training Accuracy: " + stats[bestidx][1] + System.getProperty("line.separator"));
-        sb.append("Cross-validation consistency: " + cvConsistency + "/" + size());
+        System.arraycopy(_bestModelStats[bestidx], 0, bestModelStatistic, 0, _bestModelStats[bestidx].length);
     }
 
     public String toString() {
+    	sb = new StringBuffer();
+    	sb.append("Statistics of the CV model for trait " + traitIdx + System.getProperty("line.separator"));
+        for (int i = 0; i < size(); i++) {
+            OneCVSet cvSet = (OneCVSet) get(i);
+            for(int j = 0; j < PublicData.NumOfStatistics; j++ ) {
+                statistic[j] += cvSet.getStatistic(j);
+            }
+
+            String key = cvSet.getCombination();
+            Integer count = (Integer) modelCount.get(key);
+            if (count == null) {
+                modelCount.put(new String(key), new Integer(1));
+            } else {
+                int v = count.intValue();
+                modelCount.put(key, new Integer(++v));
+            }
+        }
+        sb.append("Statistics of the best model" + System.getProperty("line.separator"));
+        sb.append("Best model: " + bestModelKey + System.getProperty("line.separator"));
+        sb.append("Testing Accuracy: " + bestModelStatistic[PublicData.TestingAccuIdx] + System.getProperty("line.separator"));
+        sb.append("Training Accuracy: " + bestModelStatistic[PublicData.TrainingAccuIdx] + System.getProperty("line.separator"));
+        sb.append("Cross-validation consistency: " + cvConsistency + "/" + size());
+
         return sb.toString();
     }
 }

@@ -56,7 +56,7 @@ public class Permutation {
         subdivision = sub;
         replication = rep + 1;
         for( int i = 0; i < numTraits; i++) {
-            modelKey[i] = sm.getModekKey(new Integer(i));
+            modelKey[i] = sm.getModelKey(new Integer(i));
             Trait.add(new ArrayList());
             TraitIndex.add(new HashMap());
             permutationResult.add(new PermutationResult(replication, subdivision.getInterval()));
@@ -103,33 +103,6 @@ public class Permutation {
         }
         calculateFullModel();        
     }
-
-//    private void initial(Combination com) {
-//        Set keys = com.keySet();
-//        for (Iterator e = keys.iterator(); e.hasNext(); ) {
-//            String key = (String) e.next();
-//            Suite s = (Suite) com.get(key);
-//            ArrayList subjects = s.getSubjects();
-//            for (int i = 0; i < numTraits; i++) {
-//                ArrayList trait = (ArrayList) Trait.get(i);
-//                HashMap traitIndex = (HashMap) TraitIndex.get(i);
-//                for (Iterator e1 = subjects.iterator(); e1.hasNext();) {
-//                    DataFile.Subject sub = (DataFile.Subject) e1.next();
-//                    if (sub.isScoreExisted(i)) {
-//                        trait.add(new Double(sub.getDoubleScore(i)));
-//                        traitIndex.put(sub.getIntegerID(), new Integer(trait.size()-1));
-//                    }
-//                }
-//            }
-//            PSuite ps = new PSuite(numTraits);
-//            for (Iterator e1 = subjects.iterator(); e1.hasNext(); ) {
-//                DataFile.Subject sub = (DataFile.Subject) e1.next();
-//                ps.addSubject(sub, TraitIndex);
-//            }
-//            pcombination.addPSuite(key, ps);
-//        }
-//        calculateFullModel();
-//    }
 
     private void calculateFullModel() {
         for (int i = 0; i < pcomList.size(); i++) {
