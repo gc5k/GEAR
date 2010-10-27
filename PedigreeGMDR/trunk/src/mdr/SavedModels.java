@@ -15,7 +15,7 @@ public class SavedModels {
 
     HashMap<String, Combination> savedModels = new HashMap();
     HashMap<String, Integer> modelCount = new HashMap();
-    HashMap<Integer, String> modelKeys = new HashMap();//keep accordingly the key of the best model to each trait.
+    HashMap<Integer, String> modelKeys = new HashMap();//keep the key of the best model to each trait.
 
     public SavedModels() {}
 
@@ -56,7 +56,7 @@ public class SavedModels {
         return modelKeys;
     }
 
-    public String getModekKey(Integer i) {
+    public String getModelKey(Integer i) {
         return modelKeys.get(i);
     }
 

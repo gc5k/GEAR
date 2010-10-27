@@ -66,6 +66,7 @@ public class LinearMergeSearch extends AbstractMergeSearch {
             count++;
         }
         bestSavedModelsMap.put(new Integer(or), savedModels);
+        model_summary();
     }
 
     public void mergeSearch(ArrayList subjects, String combination, int idxMarker) {
@@ -144,6 +145,8 @@ public class LinearMergeSearch extends AbstractMergeSearch {
             } catch (DataFileException E) {
                 E.printStackTrace(System.err);
             }
+            ArrayList cvSetHolder = new ArrayList();
+            boolean flag = false;
             for (int j = 0; j < subdivision.getInterval(); j++) {
                 OneCVSet cvSet = new OneCVSet(j, modelName);
                 Combination testingModels = (Combination) cvTestingSet.get(j);
@@ -207,11 +210,9 @@ public class LinearMergeSearch extends AbstractMergeSearch {
         }
     }
 
-    public void summarise() {
+    private void model_summary() {
         HashMap bestModelKeyMap = new HashMap();
-        System.out.println("--------Order of interaction is " + bestKFoldResult.getOrder() + " --------");
         for (int i = 0; i < numTraits; i++) {
-            System.out.println("========Statistics on trait " + (i + 1) + ".");
             for (int j = 0; j < subdivision.getInterval(); j++) {
                 OneCVSet cvSet = bestKFoldResult.get(i, j);
                 double testingAccu = 0;
@@ -221,27 +222,24 @@ public class LinearMergeSearch extends AbstractMergeSearch {
                     E.printStackTrace(System.err);
                 }
                 cvSet.setStatistic(PublicData.TestingAccuIdx, testingAccu);
+                System.out.println(cvSet.getCombination() + " " + cvSet.getStatistic(PublicData.TestingAccuIdx) + " " + cvSet.getStatistic(PublicData.TrainingAccuIdx));
             }
-            double mean_TA = 0;
-            double mean_TrA = 0;
-            for (int j = 0; j < subdivision.getInterval(); j++) {
-                OneCVSet cvSet = bestKFoldResult.get(i, j);
-                double ta = cvSet.getStatistic(PublicData.TestingAccuIdx);
-                double tra = cvSet.getStatistic(PublicData.TrainingAccuIdx);
-                System.out.println("the chosen model at cv " + j + " is (" + cvSet.getCombination() + ")" + ", Testing accuracy is " + ta + ", Training accuracy is " + tra);
-                mean_TA += ta;
-                mean_TrA += tra;
-            }
-            mean_TA /= subdivision.getInterval();
-            mean_TrA /= subdivision.getInterval();
-            System.out.println("mean of Testing Accuracy is " + mean_TA);
-            System.out.println("mean of Training Accuracy is " + mean_TrA);
             OneTraitResult i_thResult = (OneTraitResult) bestKFoldResult.get(i);
             i_thResult.summarise();
-            System.out.println(i_thResult);
             bestModelKeyMap.put(new Integer(i), i_thResult.getBestModelKey());
         }
         SavedModels sModels = (SavedModels) bestSavedModelsMap.get(new Integer(order));
-        sModels.saveModel(bestModelKeyMap);
+        sModels.saveModel(bestModelKeyMap); 	
+    }
+
+    public void summarise() {
+        HashMap bestModelKeyMap = new HashMap();
+        for (int i = 0; i < numTraits; i++) {
+            for (int j = 0; j < subdivision.getInterval(); j++) {
+                OneCVSet cvSet = bestKFoldResult.get(i, j);
+            }
+            OneTraitResult i_thResult = (OneTraitResult) bestKFoldResult.get(i);
+            System.out.println(i_thResult);
+        }
     }
 }
