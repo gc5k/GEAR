@@ -87,7 +87,9 @@ public class FamilyGenerator {
 		protected int number_case; // 16 which is zero for family based design,
 		// and otherwise 0<number_case<family_size
 		protected int[] FamNum; // 17
-		protected int[] AffParent; // 18
+		protected int[] AffParent; // 18; if it is a positive number k, it means at least k parents are affected;
+		// if it is a negative number k, it means that only k parents are affected;
+		// if it is a number great than 2, it means no selection of parents
 		protected int[] Kid; // 19
 		protected int[] AffKid; // 20
 		protected double[][] ParentMissingRate; // 21
@@ -484,104 +486,6 @@ public class FamilyGenerator {
 		}
 	}
 
-	public void randomFamily() {
-		int i = 0;
-		while (i < FamilySize) {
-			ArrayList p_temp = new ArrayList();
-			ArrayList p_trait = new ArrayList();
-			ArrayList p_covariate = new ArrayList();
-			ArrayList p_phenotype = new ArrayList();
-			int FamCategory = 0;
-
-			for (int j = 0; j < FamNum.length; j++) {
-				if (i < FamNum[j]) {
-					FamCategory = j;
-					break;
-				}
-			}
-
-			for (int j = 0; j < 2; ++j) {
-				double covariate;
-				double obs;
-				Integer status = null;
-				do {
-					String[][] pair = new String[numLocus][2];
-					generateFounderGenotype(pair, FamCategory);
-					p_temp.add(pair);
-					Integer genestatus = getStatus(pair);
-
-					if (model.compareTo("B") == 0) {
-						covariate = randomData.nextGaussian() * deviation;
-						obs = genestatus.doubleValue() * geneAffect + covariate
-								* covariable + intercept;
-					} else {
-						covariate = randomData.nextGaussian() * deviation;
-						obs = genestatus.doubleValue() * geneAffect + covariate
-								* covariable + intercept
-								+ randomData.nextGaussian() * error;
-						p_phenotype.add(new Double(obs));
-					}
-					status = affection(obs);
-				} while (status.intValue() == -1);
-				p_covariate.add(new Double(covariate));
-				p_trait.add(status);
-			}
-
-			ArrayList c_temp = new ArrayList();
-			ArrayList c_trait = new ArrayList();
-			ArrayList c_covariate = new ArrayList();
-			ArrayList c_phenotype = new ArrayList();
-			int affect = 0;
-
-			for (int ii = 0; ii < Kid_Diff_Family[FamCategory]; ++ii) {
-				double covariate;
-				double obs;
-				Integer status = null;
-				String[][] child = null;
-				do {
-					child = new String[numLocus][2];
-					for (int j = 0; j < 2; ++j) {
-						String[][] P = (String[][]) (String[][]) p_temp.get(j);
-						int chr = 0;
-						for (int k = 0; k < numLocus; ++k) {
-							double rd = randomData.nextFloat();
-							if (rd > recombination[k]) {
-								chr = 1 - chr;
-							}
-							child[k][j] = P[k][chr];
-						}
-					}
-					Integer genestatus = getStatus(child);
-					if (model.compareTo("B") == 0) {
-						covariate = randomData.nextGaussian() * deviation;
-						obs = genestatus.doubleValue() * geneAffect + covariate
-								* covariable + intercept;
-					} else {
-						covariate = randomData.nextGaussian() * deviation;
-						obs = genestatus.doubleValue() * geneAffect + covariate
-								* covariable + intercept
-								+ randomData.nextGaussian() * error;
-						c_phenotype.add(new Double(obs));
-					}
-					status = affection(obs);
-				} while (status.intValue() == -1);
-				affect += status.intValue();
-				c_covariate.add(new Double(covariate));
-				c_trait.add(status);
-				c_temp.add(child);
-			}
-			Children.add(c_temp);
-			Parents.add(p_temp);
-			PCovariate.add(p_covariate);
-			PPhenotype.add(p_phenotype);
-			CCovariate.add(c_covariate);
-			CPhenotype.add(c_phenotype);
-			PTraits.add(p_trait);
-			Traits.add(c_trait);
-			++i;
-		}
-	}
-
 	public void create() {
 		int i = 0;
 		int cases = 0; // this variable is only used when number_case > 0
@@ -634,7 +538,9 @@ public class FamilyGenerator {
 					p_covariate.add(new Double(covariate));
 					p_trait.add(status);
 				}
-				if (AffParent[FamCategory] > 0) {
+				if (Math.abs(AffParent[FamCategory]) > 2) {
+					parent_proband_flag = true;
+				} else if (AffParent[FamCategory] > 0) {
 					parent_proband_flag = parent_proband >= AffParent[FamCategory];
 				} else {
 					parent_proband_flag = parent_proband == Math.abs(AffParent[FamCategory]);
@@ -686,7 +592,9 @@ public class FamilyGenerator {
 			}
 			boolean Aff_Kid_flag = false;
 			if (number_case == 0) {
-				if (AffKid_Diff_Family[FamCategory] > 0) {
+				if (Math.abs(AffKid_Diff_Family[FamCategory]) > Kid_Diff_Family[FamCategory] ) {
+					Aff_Kid_flag = true;
+				} else if (AffKid_Diff_Family[FamCategory] > 0) {
 					Aff_Kid_flag = affect >= AffKid_Diff_Family[FamCategory];
 				} else {
 					Aff_Kid_flag = affect == Math.abs(AffKid_Diff_Family[FamCategory]);
@@ -1000,13 +908,13 @@ public class FamilyGenerator {
 			pr.pheno_select_quantile = new double[2];
 			pr.pheno_select_quantile[0] = -0.1;
 			pr.pheno_select_quantile[1] = -0.9;
-			pr.simu_replication = 50;
+			pr.simu_replication = 5;
 			pr.family_size = 1000;
 			pr.number_case = 0;
 			pr.FamNum = new int[1];
 			pr.FamNum[0] = 1000;
 			pr.AffParent = new int[1];
-			pr.AffParent[0] = -1;
+			pr.AffParent[0] = 3;
 			pr.Kid = new int[1];
 			pr.Kid[0] = 2;
 			pr.AffKid = new int[1];

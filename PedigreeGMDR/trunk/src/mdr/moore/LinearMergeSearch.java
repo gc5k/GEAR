@@ -194,7 +194,7 @@ public class LinearMergeSearch extends AbstractMergeSearch {
                     E.printStackTrace(System.err);
                 }
                 cvSet.setStatistic(PublicData.TrainingAccuIdx, trAccu);
-                cvSet.setStatistic(PublicData.Correlation_Training_Testing, cor);
+//                cvSet.setStatistic(PublicData.Correlation_Training_Testing, cor);
                 if (count == 0) {
                     currBestStatistic[i][j] = trAccu;
                     bestKFoldResult.set(i, j, cvSet);
@@ -222,11 +222,12 @@ public class LinearMergeSearch extends AbstractMergeSearch {
                     E.printStackTrace(System.err);
                 }
                 cvSet.setStatistic(PublicData.TestingAccuIdx, testingAccu);
-                System.out.println(cvSet.getCombination() + " " + cvSet.getStatistic(PublicData.TestingAccuIdx) + " " + cvSet.getStatistic(PublicData.TrainingAccuIdx));
+//                System.out.println(cvSet.getCombination() + " " + cvSet.getStatistic(PublicData.TestingAccuIdx) + " " + cvSet.getStatistic(PublicData.TrainingAccuIdx));
             }
             OneTraitResult i_thResult = (OneTraitResult) bestKFoldResult.get(i);
             i_thResult.summarise();
             bestModelKeyMap.put(new Integer(i), i_thResult.getBestModelKey());
+            stats[i] = i_thResult.getStatistic();
         }
         SavedModels sModels = (SavedModels) bestSavedModelsMap.get(new Integer(order));
         sModels.saveModel(bestModelKeyMap); 	
@@ -239,6 +240,7 @@ public class LinearMergeSearch extends AbstractMergeSearch {
                 OneCVSet cvSet = bestKFoldResult.get(i, j);
             }
             OneTraitResult i_thResult = (OneTraitResult) bestKFoldResult.get(i);
+            System.out.println("Trait name: " + data.getTraitName(i));
             System.out.println(i_thResult);
         }
     }

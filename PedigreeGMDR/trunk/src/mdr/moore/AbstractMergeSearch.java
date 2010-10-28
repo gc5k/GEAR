@@ -8,7 +8,7 @@ import java.util.HashMap;
 import java.util.HashSet;
 
 import publicAccess.ToolKit;
-
+import publicAccess.PublicData;
 import algorithm.CombinationGenerator;
 import mdr.data.DataFile;
 import algorithm.Subdivision;
@@ -37,6 +37,8 @@ public abstract class AbstractMergeSearch {
     protected SavedModels savedModels;
     protected Subdivision subdivision;
 
+    protected double[][] stats;
+
     public AbstractMergeSearch(DataFile dr, Subdivision sd, CombinationGenerator cg, int traits, double[] os, boolean ismooremdr) {
         data = dr;
         subdivision = sd;
@@ -45,7 +47,6 @@ public abstract class AbstractMergeSearch {
         offset = new double[os.length];
         System.arraycopy(os, 0, offset, 0, os.length);
         isMooreMDR = ismooremdr;
-
         for (int i = 0; i < subdivision.getInterval(); i++) {
             Combination testingMap = new Combination();
             cvTestingSet.add(testingMap);
@@ -56,6 +57,7 @@ public abstract class AbstractMergeSearch {
         for (int i = 0; i < numTraits; i++) {
             currBestStatistic[i] = new double[subdivision.getInterval()];
         }
+        stats = new double[numTraits][PublicData.NumOfStatistics];
     }
 
     public int size() {
@@ -65,18 +67,28 @@ public abstract class AbstractMergeSearch {
     public boolean isMooreMDR() {
         return isMooreMDR;
     }
-    
+
     public SavedModels getBestSavedModelAtOrder(Integer i) {
         return bestSavedModelsMap.get(i);
     }
-    
+
+    public double[] getStats(int trIdx, int o) {
+    	return stats[trIdx];
+    }
+
     public int[] getBestModel(int o, int trIdx) {
     	SavedModels sm = bestSavedModelsMap.get(new Integer(o));
     	String m = sm.getModelKey(trIdx);
     	return ToolKit.StringToIntArray(m);
     }
 
+    public String getBestModelKey(int o, int trIdx) {
+    	SavedModels sm = bestSavedModelsMap.get(new Integer(o));
+    	return sm.getModelKey(trIdx);
+    }
+    
     public abstract void search(int or);
     protected abstract void assignKFold(String key, ArrayList subsample);
     public abstract void summarise();
+
 }

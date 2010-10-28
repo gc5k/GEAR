@@ -93,6 +93,21 @@ public class ToolKit {
         return sum / (double) vector.length;
     }
 
+    public static double[] Mean(double[][] vector, boolean row) {
+    	double[] mean;
+    	double[][] v;
+    	if(!row) {
+    		v = transposeMatrix(vector);
+    	} else {
+    		v = vector;
+    	}
+    	mean = new double[v.length];
+        for (int i = 0; i < mean.length; i++) {
+            mean[i] += Mean(v[i]);
+    	}
+        return mean;
+    }
+
     public static double Variance(double[] vector) {
         double sum = 0, sumSquared = 0;
         if (vector.length <= 1) {
@@ -110,6 +125,31 @@ public class ToolKit {
         } else {
             return result;
         }
+    }
+
+    public static double[] Variance(double[][] vector, boolean row) {
+    	double[] var;
+    	double[][] v;
+    	if (!row) {
+    		v = transposeMatrix(vector);
+    	} else {
+    		v = vector; 
+    	}
+    	var = new double[v.length];
+    	for (int i = 0; i < var.length; i++) {
+    		var[i] = Variance(v[i]);
+    	}
+    	return var;
+    }
+
+    public static double[][] transposeMatrix(double[][] vector) {
+    	double[][] tm = new double[vector[0].length][vector.length];
+    	for(int i = 0; i < tm.length; i++) {
+    		for(int j = 0; j < tm[i].length; j++) {
+    			tm[i][j] = vector[j][i];
+    		}
+    	}
+    	return tm;
     }
 
     public static double Accuracy(HashMap model) throws ToolKitException {

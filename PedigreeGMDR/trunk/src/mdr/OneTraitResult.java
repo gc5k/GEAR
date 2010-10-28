@@ -153,7 +153,6 @@ public class OneTraitResult extends ArrayList {
 
     public String toString() {
     	sb = new StringBuffer();
-    	sb.append("Statistics of the CV model for trait " + traitIdx + System.getProperty("line.separator"));
         for (int i = 0; i < size(); i++) {
             OneCVSet cvSet = (OneCVSet) get(i);
             for(int j = 0; j < PublicData.NumOfStatistics; j++ ) {

@@ -710,4 +710,8 @@ public class DataFile {
     public int size() {
         return sample.size();
     }
+    
+    public String getTraitName(int idx) {
+    	return traitName[idx];
+    }
 }
