@@ -21,7 +21,7 @@ public class PublicData {
     public static int DynamicSearch = 2;
     public static int GenotypeSearch = 3;
 
-    public static int NumOfStatistics = 5;
+    public static int NumOfStatistics = 2;
     public static int TestingAccuIdx = 0;
     public static int TrainingAccuIdx = 1;
     public static int Correlation_Training_Testing = 2;
