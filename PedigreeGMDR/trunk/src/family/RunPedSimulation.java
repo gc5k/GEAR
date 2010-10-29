@@ -18,7 +18,7 @@ import family.report.Report;
 public class RunPedSimulation {
 	public static void main(String[] args) throws IOException {
 		Report report = new Report();
-		int replication = args.length > 0 ? Integer.parseInt(args[0]) : 5; 
+		int replication = args.length > 0 ? Integer.parseInt(args[2]) : 5; 
 		for (int i = 0; i < replication; i++) {
 			String PedFile = Integer.toString(i) + ".ped";
 			String PhenoFile = Integer.toString(i) + ".phe";
@@ -30,6 +30,8 @@ public class RunPedSimulation {
 			long seed = 10;
 			if (args.length > 1) {
 				pr.read(args[1]);
+				pr.setPedigreeFile(PedFile);
+				pr.setPhenotypeFile(PhenoFile);
 			} else {
 				pr.setIsLouAlgorithm(false);
 				pr.setUsingFounderGenotype(true);
@@ -94,44 +96,38 @@ public class RunPedSimulation {
 					.getInterctionFrom(), gmdrPr.getInteractionEnd(), mdrData
 					.getMarkerNum());
 			cg.generateCombination();
-			AbstractMergeSearch as;
+			LinearMergeSearch as;
 			as = new LinearMergeSearch(mdrData, sd, cg,
 					gmdrPr.getScoreIndex().length, mdrData.getOffset(), gmdrPr
 							.isMooreMDR());
 			for (int j = gmdrPr.getInterctionFrom(); j <= gmdrPr.getInteractionEnd(); j++) {
 				as.search(j);
 				report.NewRound(as.getBestModelKey(j, 0));
-				int[] bm = as.getBestModel(j, 0);
-				GD.SetChosenMarker(bm);
+				double[][] stats = as.singleBest(as.getBestModelKey(j, 0));
+				report.Add_test_statistic(stats[0]);
 				isRabinowitzProc = false;
-				for (int k = 0; k <= pr.replication; k++) {
+				for (int k = 0; k < pr.replication; k++) {
+					isRabinowitzProc = true;
 					GD.RabinowitzApproach();
 					GD.CreateTable(isRabinowitzProc);
 					GD.CreateWorkingTable(isRabinowitzProc);
 					DataFile mdrData1 = new DataFile(GD.getMarkerName(), GD.getWorkingGenoTable(), GD.getWorkingStatusTable(),
 							GD.getTraitName(), GD.getWorkingScoreTable(), gmdrPr.getScoreIndex());
-
 					CombinationGenerator cg1 = new CombinationGenerator(j, j, mdrData1
 							.getMarkerNum());
 					cg1.generateCombination();
-					AbstractMergeSearch as1;
+					LinearMergeSearch as1;
 					Subdivision sd1 = new Subdivision(gmdrPr.getInterval(), gmdrPr
-							.getSeed(), mdrData1);
+							.getSeed()+ i * pr.replication + k, mdrData1);
 					sd1.RandomPartition();
 					as1 = new LinearMergeSearch(mdrData1, sd1, cg1,
 							gmdrPr.getScoreIndex().length, mdrData1.getOffset(), gmdrPr
 									.isMooreMDR());
 					as1.search(j);
-					if (k == 0) {
-						double[] s = as1.getStats(0, j);
-						report.Add_test_statistic(s);
-					} else {
-						double[] s = as1.getStats(0, j);
-						report.Add_null_test_statistic(s);
-					}
-					isRabinowitzProc = true;
+					double[][] stats1 = as1.singleBest(as1.getBestModelKey(j, 0));
+					report.Add_null_test_statistic(stats1[0]);
 				}
-				report.RoundSummary();		
+				report.RoundSummary();
 			}
 		}
 		System.out.println(report);
