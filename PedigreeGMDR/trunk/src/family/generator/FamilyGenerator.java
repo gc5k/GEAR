@@ -897,7 +897,7 @@ public class FamilyGenerator {
 				pr.dev = 3.16;
 				pr.cov = 1;
 				pr.err = 1;
-				pr.gene = 1.09;
+				pr.gene = 0.09;
 			} else {
 				pr.intercept = 0;
 				pr.dev = 1;

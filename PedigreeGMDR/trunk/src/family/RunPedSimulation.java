@@ -16,12 +16,10 @@ import mdr.GMDRParameter;
 import family.report.Report;
 
 public class RunPedSimulation {
-
 	public static void main(String[] args) throws IOException {
-		String truemodel = "0,3";
 		Report report = new Report();
-		for (int i = 0; i < 5; i++) {
-
+		int replication = args.length > 0 ? Integer.parseInt(args[0]) : 5; 
+		for (int i = 0; i < replication; i++) {
 			String PedFile = Integer.toString(i) + ".ped";
 			String PhenoFile = Integer.toString(i) + ".phe";
 			String CovertPedFile = "Converted_" + Integer.toString(i) + ".ped";
@@ -30,8 +28,8 @@ public class RunPedSimulation {
 			String FamIDFile = "Family_ID_" + Integer.toString(i) + ".txt";
 			PedigreeParameter pr = new PedigreeParameter();
 			long seed = 10;
-			if (args.length > 0) {
-				pr.read(args[0]);
+			if (args.length > 1) {
+				pr.read(args[1]);
 			} else {
 				pr.setIsLouAlgorithm(false);
 				pr.setUsingFounderGenotype(true);
@@ -51,25 +49,26 @@ public class RunPedSimulation {
 				pr.setSeed(10);
 			}
 			GMDRParameter gmdrPr = new GMDRParameter();
-			if (args.length > 1) {
-				gmdrPr.read(args[1]);
+			if (args.length > 2) {
+				gmdrPr.read(args[2]);
 			} else {
-				int[] scrIdx = { 0 };
 				gmdrPr.setInteractionEnd(2);
 				gmdrPr.setInteractionFrom(2);
+				int[] scrIdx = { 0 };
+				gmdrPr.setScoreIndex(scrIdx);
 				gmdrPr.setInterval(5);
-				gmdrPr.setMooreMDR(true);
-				gmdrPr.setPartitionMethod(0);
-				gmdrPr.setReplicationPermutation(10);
 				gmdrPr.setSeed(seed);
-				gmdrPr.setScoreIndex(scrIdx);				
+				gmdrPr.setPartitionMethod(0);
+				gmdrPr.setMooreMDR(true);
+				gmdrPr.setReplicationPermutation(10);
+				gmdrPr.setSearchMethod(0);
 			}
 
 			boolean isRabinowitzProc = false;
-			GMDRData.rnd = new Random(pr.seed);
+			GMDRData.rnd = new Random(pr.seed + i);
 			GMDRData GD = new GMDRData(pr.usingFounderGenotype,
 					pr.usingChildrenGenotype, pr.isLouAlgorithm);
-			AbstractGenoDistribution.rnd = new Random(pr.seed);
+			AbstractGenoDistribution.rnd = new Random(pr.seed + 1);
 			GD.RevvingUp(pr.getPedigreeFile(), pr.getPhenotypeFile());
 
 			GD.CreateTable(isRabinowitzProc);
@@ -88,7 +87,7 @@ public class RunPedSimulation {
 					.getWorkingGenoTable(), GD.getWorkingStatusTable(), GD
 					.getTraitName(), GD.getWorkingScoreTable(), gmdrPr.getScoreIndex());
 			Subdivision sd = new Subdivision(gmdrPr.getInterval(), gmdrPr
-					.getSeed(), mdrData);
+					.getSeed() + i, mdrData);
 			sd.RandomPartition();
 
 			CombinationGenerator cg = new CombinationGenerator(gmdrPr
