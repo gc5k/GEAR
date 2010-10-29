@@ -18,7 +18,7 @@ public class Report {
 	protected String curr_model;
 	public Report() {
 		sum = new StringBuffer();
-		sum.append("model\tTA\tZ\tP-value\tTrA\t\tZ-score\tP-value" + System.getProperty("line.separator"));
+		sum.append("model\tTA\tZ\tP-value\tTrA\tZ-score\tP-value" + System.getProperty("line.separator"));
 		test_statistics = new ArrayList();
 	}
 

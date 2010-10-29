@@ -210,6 +210,78 @@ public class LinearMergeSearch extends AbstractMergeSearch {
         }
     }
 
+    public double[][] calculate1(String modelName) {
+        Set cellKeys = model.keySet();
+        double[][] mean = new double[numTraits][PublicData.NumOfStatistics]; 
+        for (int i = 0; i < numTraits; i++) {
+            double thresholdRatio = 0;
+            try {
+                thresholdRatio = data.getTraitRatio(i, SNPIndex);
+            } catch (DataFileException E) {
+                E.printStackTrace(System.err);
+            }
+            ArrayList cvSetHolder = new ArrayList();
+            boolean flag = false;
+
+            for (int j = 0; j < subdivision.getInterval(); j++) {
+                OneCVSet cvSet = new OneCVSet(j, modelName);
+                Combination testingModels = (Combination) cvTestingSet.get(j);
+                int tr_status;
+                int t_status;
+                Cell trCell;
+                Cell tCell;
+                double[] trStatus = new double[cellKeys.size()];
+                double[] tStatus = new double[cellKeys.size()];
+                int idx = 0;
+                for (Iterator e = cellKeys.iterator(); e.hasNext();) {
+                    String cellKey = (String) e.next();
+                    Suite fullSuite = (Suite) model.get(cellKey);
+                    int fullposSubs = fullSuite.getPositiveSubjects(i);
+                    int fullnegSubs = fullSuite.getNegativeSubjects(i);
+                    double fullposScr = fullSuite.getPositiveScore(i);
+                    double fullnegScr = fullSuite.getNegativeScore(i);
+                    if (testingModels.containsKey(cellKey)) {
+                        Suite testingSuite = (Suite) testingModels.get(cellKey);
+                        int pos_Subs = testingSuite.getPositiveSubjects(i);
+                        int neg_Subs = testingSuite.getNegativeSubjects(i);
+                        double pos_Scr = testingSuite.getPositiveScore(i);
+                        double neg_Scr = testingSuite.getNegativeScore(i);
+                        tr_status = ToolKit.Acertainment(fullposScr - pos_Scr, fullnegScr - neg_Scr, thresholdRatio);
+                        t_status = ToolKit.Acertainment(pos_Scr, neg_Scr, thresholdRatio);
+                        trCell = new Cell(fullposSubs - pos_Subs, fullnegSubs - neg_Subs, fullposScr - pos_Scr, fullnegScr - neg_Scr, tr_status);
+                        tCell = new Cell(pos_Subs, neg_Subs, pos_Scr, neg_Scr, tr_status);
+                    } else {
+                        tr_status = ToolKit.Acertainment(fullposScr, fullnegScr, thresholdRatio);
+                        t_status = 1 - tr_status;
+                        trCell = new Cell(fullposSubs, fullnegSubs, fullposScr, fullnegScr, tr_status);
+                        tCell = new Cell(0, 0, 0, 0, -1);
+                    }
+                    cvSet.addTrainingModel(cellKey, trCell);
+                    cvSet.addTestingModel(cellKey, tCell);
+                    trStatus[idx] = tr_status;
+                    tStatus[idx] = t_status;
+                    idx++;
+                }
+                double cor = ToolKit.getPMCC(trStatus, tStatus);
+                double trAccu = 0;
+                double tAccu = 0;
+                try {
+                    trAccu = ToolKit.Accuracy(cvSet.getTrainingSubdivision());
+                    mean[i][PublicData.TrainingAccuIdx] += trAccu;
+                    tAccu = ToolKit.Accuracy(cvSet.getTestingSubdivision());
+                    mean[i][PublicData.TestingAccuIdx] += tAccu;
+                } catch (ToolKitException E) {
+                    E.printStackTrace(System.err);
+                }
+                cvSet.setStatistic(PublicData.TrainingAccuIdx, trAccu);
+                cvSet.setStatistic(PublicData.TestingAccuIdx, tAccu);
+            }
+            mean[i][PublicData.TrainingAccuIdx] /= subdivision.getInterval();
+            mean[i][PublicData.TestingAccuIdx] /= subdivision.getInterval();
+        }
+        return mean;
+    }
+
     private void model_summary() {
         HashMap bestModelKeyMap = new HashMap();
         for (int i = 0; i < numTraits; i++) {
@@ -230,7 +302,19 @@ public class LinearMergeSearch extends AbstractMergeSearch {
             stats[i] = i_thResult.getStatistic();
         }
         SavedModels sModels = (SavedModels) bestSavedModelsMap.get(new Integer(order));
-        sModels.saveModel(bestModelKeyMap); 	
+        sModels.saveModel(bestModelKeyMap);
+    }
+
+    public double[][] singleBest(String com) {
+        for (int i = 0; i < cvTestingSet.size(); i++) {
+            Combination testingModel = (Combination) cvTestingSet.get(i);
+            testingModel.clear();
+        }
+        model = new Combination();
+        SNPIndex = ToolKit.StringToIntArray(com);
+        String c = new String();
+        mergeSearch((ArrayList) data.getSample(), c, 0);
+        return calculate1(com);
     }
 
     public void summarise() {

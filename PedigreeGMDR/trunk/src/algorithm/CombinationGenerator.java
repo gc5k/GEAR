@@ -15,7 +15,7 @@ import publicAccess.PublicData;
 public class CombinationGenerator {
 
     private HashMap<Integer, List> combination = new HashMap();
-    
+
     private int start;
     private int end;
     private int N;
