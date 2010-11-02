@@ -18,7 +18,7 @@ import family.report.Report;
 public class RunPedSimulation {
 	public static void main(String[] args) throws IOException {
 		Report report = new Report();
-		int replication = args.length > 0 ? Integer.parseInt(args[2]) : 5; 
+		int replication = args.length > 0 ? Integer.parseInt(args[0]) : 5; 
 		for (int i = 0; i < replication; i++) {
 			String PedFile = Integer.toString(i) + ".ped";
 			String PhenoFile = Integer.toString(i) + ".phe";
