@@ -7,6 +7,7 @@ import java.util.Hashtable;
  * stores the familyName and the members of a family from a pedigree file this class is not thread safe (untested)
  * 
  * @author Julian Maller
+ * @author Guo-Bo Chen
  */
 public class FamilyUnit {
 //save phenotype information;

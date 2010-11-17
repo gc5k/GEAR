@@ -22,10 +22,11 @@ public class Report {
 		test_statistics = new ArrayList();
 	}
 
-	public void NewRound(String m) {
-		int c = 0;
-		null_test_statistics = new ArrayList();
+	public void NewRound(String m, boolean create_null) {
 		curr_model = m;
+		if(create_null) {
+			null_test_statistics = new ArrayList();
+		}
 	}
 
 	public void Add_test_statistic(double[] stat) {
