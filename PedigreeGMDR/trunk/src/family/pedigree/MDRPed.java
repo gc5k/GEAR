@@ -46,9 +46,11 @@ import edu.mit.wi.pedparser.PedigreeException;
  * and checkdata classes by Hui Gong
  * 
  * @author Julian Maller
+ * @author Guo-Bo Chen
  */
 public class MDRPed {
 
+	private Hashtable famNonInformative;
     private Hashtable famInformative;
     private Hashtable families;
     private Hashtable familystructure;
@@ -83,6 +85,7 @@ public class MDRPed {
 
         // hardcoded hapmap info
         this.famInformative = new Hashtable();
+        this.famNonInformative = new Hashtable();
         this.families = new Hashtable();
         this.familystructure = new Hashtable();
         this.menderrortrace = new ArrayList();
@@ -616,6 +619,34 @@ public class MDRPed {
 		int ind = 0;
 		while (famstrList.hasMoreElements()) {
 			FID[ind++] = (String) famstrList.nextElement();
+		}
+		Arrays.sort(FID);
+		return FID;
+    }
+
+    public String[] getInformativeFamListSorted() {
+    	Enumeration famstrList = this.familystructure.keys();
+		String[] FID = new String[getNumFamilies()];
+		int ind = 0;
+		while (famstrList.hasMoreElements()) {
+			String F = (String) famstrList.nextElement();
+			if ( ((Boolean) (famInformative.get(F))).booleanValue()) {
+				FID[ind++] = F;
+			}
+		}
+		Arrays.sort(FID);
+		return FID;
+    }
+
+    public String[] getUninformativeFamListSorted() {
+    	Enumeration famstrList = this.familystructure.keys();
+		String[] FID = new String[getNumFamilies()];
+		int ind = 0;
+		while (famstrList.hasMoreElements()) {
+			String F = (String) famstrList.nextElement();
+			if ( !((Boolean) (famInformative.get(F))).booleanValue()) {
+				FID[ind++] = F;
+			}
 		}
 		Arrays.sort(FID);
 		return FID;

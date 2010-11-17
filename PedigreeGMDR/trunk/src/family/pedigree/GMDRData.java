@@ -26,30 +26,33 @@ public class GMDRData {
 	public ArrayList Matched;
 
 	private ArrayList RabinowitzTable; // a sampling of genotypes under null
-										// distribution
+	// distribution
 	private ArrayList TransmittedTable;// Only informative Transmitted Genotypes
-										// for offspring only
+	// for offspring only
 	private ArrayList NontransmittedTable;// corresponding Nontransmitted
-											// genotypes.
+	// genotypes.
 	private ArrayList CovariateTable;// phenotypes of informative individuals
-										// excluded parents
+	// excluded parents
 	private ArrayList StatusTable;// Affection status
 
 	private ArrayList workingGenoTable;
 	private ArrayList workingStatusTable;
 	private ArrayList workingScoreTable;
-	
+
 	private ArrayList<Hashtable> ScoreTable;
 	private ArrayList ScoreName;
 	private ArrayList<PersonIndex> PersonTable;// The indexing file records the
+	private ArrayList<PersonIndex> UnrelatedPersonTable;
 
 	private Hashtable InformativePersonHash;
+	private Hashtable UnrelatedPersonHash;
 	private boolean IsLoadPedFile;
 	private boolean IsLoadPhenoFile;
 	private boolean IsGenotypeReady;
 
 	private boolean usingFounderGenotype;
 	private boolean usingChildrenGenotype;
+	private boolean usingUnrelatedGenotype;
 	private boolean isLouAlgorithm;
 
 	private int[] subsetMarker;
@@ -167,8 +170,8 @@ public class GMDRData {
 	 *            with predictor.
 	 * @throws CalEngineException
 	 */
-	public void buildScore(int PIndex, int[] CIndex, boolean adjust,
-			int method, boolean includeFounder, boolean includeChildren) {
+	public void buildScore(int PIndex, int[] CIndex, boolean adjust, int method, boolean includeFounder,
+			boolean includeChildren) {
 		// method: 0 for regression, 1 for logistic
 		Hashtable ScoreHashTable = new Hashtable();
 		PersonIndex PI;
@@ -203,12 +206,11 @@ public class GMDRData {
 					flag = false;
 					continue;
 				} else {// after converting, 0 for unaffected; 1 for affected;
-						// -1 for unknown;
+					// -1 for unknown;
 					t = ((Integer) StatusTable.get(i)).intValue() - 1;
 				}
 			} else {
-				if (((String) tempc.get(PIndex))
-						.compareTo(PublicData.MissingValue) == 0) {
+				if (((String) tempc.get(PIndex)).compareTo(PublicData.MissingValue) == 0) {
 					flag = false;
 					continue;
 				} else {
@@ -217,8 +219,7 @@ public class GMDRData {
 			}
 			if (adjust) {
 				for (int j = 0; j < CIndex.length; j++) {
-					if (((String) tempc.get(CIndex[j]))
-							.compareTo(PublicData.MissingValue) == 0) {
+					if (((String) tempc.get(CIndex[j])).compareTo(PublicData.MissingValue) == 0) {
 						flag = false;
 						break;
 					}
@@ -265,8 +266,7 @@ public class GMDRData {
 		nameScore(PIndex, CIndex, adjust, method, includeFounder);
 	}
 
-	private void nameScore(int PIndex, int[] CIndex, boolean adjust,
-			int method, boolean includeFounder) {
+	private void nameScore(int PIndex, int[] CIndex, boolean adjust, int method, boolean includeFounder) {
 		String ln = new String();
 		ln += method == 1 ? "linear(" : "logistic(";
 		ln += PIndex == -1 ? "status->" : PhenoData.getTraitAtI(PIndex) + "->";
@@ -290,8 +290,7 @@ public class GMDRData {
 		for (int i = 0; i < PersonTable.size(); i++) {
 			PersonIndex PI = PersonTable.get(i);
 			FamilyStruct FamStr = PedData.getFamilyStruct(PI.getFamilyID());
-			if (unMatched.contains(PI.getIndividualID())
-					&& FamStr.containsPerson(PI.getIndividualID())) {
+			if (unMatched.contains(PI.getIndividualID()) && FamStr.containsPerson(PI.getIndividualID())) {
 				continue;
 			}
 			if (score_index == -1) {
@@ -299,16 +298,14 @@ public class GMDRData {
 				if (as.intValue() == PublicData.MissingAffection) {
 					continue;
 				}
-				ScoreHashTable.put(new String(PI.getKey()), new Double(as
-						.intValue()));
+				ScoreHashTable.put(new String(PI.getKey()), new Double(as.intValue()));
 			} else {
 				ArrayList v = (ArrayList) CovariateTable.get(i);
 				String s = (String) v.get(score_index);
 				if (s.compareTo(PublicData.MissingValue) == 0) {
 					continue;
 				}
-				ScoreHashTable.put(new String(PI.getKey()), new Double(Double
-						.parseDouble(s)));
+				ScoreHashTable.put(new String(PI.getKey()), new Double(Double.parseDouble(s)));
 			}
 		}
 		if (score_index == -1) {
@@ -476,8 +473,7 @@ public class GMDRData {
 	private boolean IsUnMatchedIndividual(String fid, String pid) {
 		for (int i = 0; i < unMatched.size(); i++) {
 			ArrayList tmp = (ArrayList) unMatched.get(i);
-			if (((String) tmp.get(0)).equals(fid)
-					&& ((String) tmp.get(1)).equals(pid)) {
+			if (((String) tmp.get(0)).equals(fid) && ((String) tmp.get(1)).equals(pid)) {
 				return true; // individual #iid in family #fid does not have
 				// phenotype
 
@@ -517,8 +513,7 @@ public class GMDRData {
 					while (subList.hasMoreElements()) {
 						String sid = (String) subList.nextElement();
 						Subject sub = FamUnit.getSubject(sid);
-						if (((String) sub.getSubjectID()).equals((String) ind
-								.getIndividualID())) {
+						if (((String) sub.getSubjectID()).equals((String) ind.getIndividualID())) {
 							flag = true;
 						}
 					}
@@ -527,16 +522,15 @@ public class GMDRData {
 					temp.add(iid);
 
 					if (!flag) {
-						System.err.println("no such individual with ID " + iid
-								+ " in family " + fid
+						System.err.println("no such individual with ID " + iid + " in family " + fid
 								+ " in the phenotype file.");
 						unMatched.add(temp);
 					} else {
 						Matched.add(temp);
 					}
 				} catch (PedFileException e) {
-					System.err.println("no such individual with ID " + iid
-							+ " in family " + fid + "in the pedigree file.");
+					System.err.println("no such individual with ID " + iid + " in family " + fid
+							+ "in the pedigree file.");
 				}
 			}
 		}
@@ -548,20 +542,141 @@ public class GMDRData {
 		PersonIndex PI;
 		int countmiss = 0;
 		InformativePersonHash = new Hashtable();
-
+		UnrelatedPersonHash = new Hashtable();
 		for (int i = 0; i < PersonTable.size(); i++) {
 			PI = PersonTable.get(i);
-			if (!((Boolean) faminformative.get(PI.getFamilyID()))
-					.booleanValue()) {
-				// not informative or no score
-				continue;
+			if (((Boolean) faminformative.get(PI.getFamilyID())).booleanValue()) {// informative
+				InformativePersonHash.put(PI.getKey(), PI.IndividualID);
+			} else {
+				UnrelatedPersonHash.put(PI.getKey(), PI.IndividualID);
 			}
-			InformativePersonHash.put(PI.getKey(), PI.IndividualID);
 		}
 	}
 
 	public void RabinowitzApproach() {
 		PedData.RabinowitzApproach(isLouAlgorithm, subsetMarker);
+	}
+
+	/**
+	 * It is used for real data analysis.
+	 */
+	public void CreateTableII(boolean isRabinowitzProc) {
+		if (isRabinowitzProc) {
+			RabinowitzTable.clear();
+		} else {
+			clearTables();
+		}
+		if (Matched == null || unMatched == null) {
+			return;
+		}
+		String[] InforFID = PedData.getInformativeFamListSorted();
+
+		for (int i = 0; i < InforFID.length; i++) {
+			String fid = (String) InforFID[i];
+			FamilyStruct FamStr = PedData.getFamilyStruct(fid);
+			FamilyUnit FamUnit = PhenoData.getFamilyUnit(fid);
+			String pid;
+			Person per;
+			PseudoPerson pseudoper;
+			Subject sub;
+			String[] PID = FamStr.getPersonListSorted();
+
+			ArrayList<String> FounderID = new ArrayList();
+			for (int j = 0; j < PID.length; j++) {
+				pid = (String) PID[j];
+				if (IsUnMatchedIndividual(fid, pid)) {
+					continue;
+				}
+				if (!FamStr.hasAncestor(pid)) {
+					if (InformativePersonHash.containsValue(pid)) {
+						FounderID.add(pid);
+					}
+				}
+			}
+			if (isRabinowitzProc) {
+				Collections.shuffle(FounderID);
+			}
+			int c = 0;
+			for (int j = 0; j < PID.length; j++) {
+				pid = PID[j];
+				per = FamStr.hasAncestor(pid) ? FamStr.getPerson(pid) : FamStr.getPerson(FounderID.get(c++));
+				pseudoper = FamStr.getPseudoPerson(pid);
+				sub = FamUnit.getSubject(pid);
+				if (!isRabinowitzProc) {
+					PersonTable.add(new PersonIndex(fid, pid));
+					CovariateTable.add((ArrayList) sub.getTraits());
+					StatusTable.add(new Integer(per.getAffectedStatus()));
+					TransmittedTable.add(per.getGenotype(subsetMarker));
+				} else {
+					if (FamStr.hasAncestor(pid)) {
+						RabinowitzTable.add(pseudoper.getPseudoGenotype(subsetMarker));
+					} else {
+						RabinowitzTable.add(per.getGenotype(subsetMarker));
+					}
+				}
+				if (isLouAlgorithm) {
+					if (FamStr.hasAncestor(per.getPersonID())) {
+						NontransmittedTable.add(pseudoper.getPseudoGenotype(subsetMarker));
+					} else {
+						NontransmittedTable.add(per.getGenotype(subsetMarker));
+					}
+				}
+			}
+		}
+
+		//for unrelated individuals;
+		String[] UnrelatedFID = PedData.getUninformativeFamListSorted();
+		
+			for(int i = 0; i < UnrelatedFID.length; i++) {
+				String fid = (String) InforFID[i];
+				FamilyStruct FamStr = PedData.getFamilyStruct(fid);
+				String pid;
+				String[] PID = FamStr.getPersonListSorted();
+				for (int j = 0; j < PID.length; j++) {
+					pid = (String) PID[j];
+					if (IsUnMatchedIndividual(fid, pid)) {
+						continue;
+					}
+					UnrelatedPersonTable.add(new PersonIndex(fid, pid));
+				}
+			}
+		if (isRabinowitzProc) {
+			Collections.shuffle(UnrelatedPersonTable);
+		}
+
+		for(int i = 0; i < UnrelatedPersonTable.size(); i++) {
+			PersonIndex PI = UnrelatedPersonTable.get(i);
+			String fid = PI.getFamilyID();
+			String pid = PI.getIndividualID();
+			FamilyStruct FamStr = PedData.getFamilyStruct(fid);
+			FamilyUnit FamUnit = PhenoData.getFamilyUnit(fid);
+			Person per = FamStr.getPerson(pid);
+			PseudoPerson pseudoper = FamStr.getPseudoPerson(pid);
+			Subject sub = FamUnit.getSubject(pid);
+			if (!isRabinowitzProc) {
+				PersonTable.add(new PersonIndex(fid, pid));
+				CovariateTable.add((ArrayList) sub.getTraits());
+				StatusTable.add(new Integer(per.getAffectedStatus()));
+				TransmittedTable.add(per.getGenotype(subsetMarker));
+			} else {
+				if (FamStr.hasAncestor(pid)) {
+					RabinowitzTable.add(pseudoper.getPseudoGenotype(subsetMarker));
+				} else {
+					RabinowitzTable.add(per.getGenotype(subsetMarker));
+				}
+			}
+			if (isLouAlgorithm) {
+				if (FamStr.hasAncestor(per.getPersonID())) {
+					NontransmittedTable.add(pseudoper.getPseudoGenotype(subsetMarker));
+				} else {
+					NontransmittedTable.add(per.getGenotype(subsetMarker));
+				}
+			}
+		}
+
+		if (!isRabinowitzProc) {
+			makeupWorkingTable();
+		}
 	}
 
 	/**
@@ -589,7 +704,7 @@ public class GMDRData {
 			String[] PID = FamStr.getPersonListSorted();
 
 			ArrayList<String> FounderID = new ArrayList();
-			for(int j = 0; j < PID.length; j++) {
+			for (int j = 0; j < PID.length; j++) {
 				pid = (String) PID[j];
 				if (IsUnMatchedIndividual(fid, pid)) {
 					continue;
@@ -604,7 +719,7 @@ public class GMDRData {
 			int c = 0;
 			for (int j = 0; j < PID.length; j++) {
 				pid = PID[j];
-				per = FamStr.hasAncestor(pid)?FamStr.getPerson(pid):FamStr.getPerson(FounderID.get(c++));
+				per = FamStr.hasAncestor(pid) ? FamStr.getPerson(pid) : FamStr.getPerson(FounderID.get(c++));
 				pseudoper = FamStr.getPseudoPerson(pid);
 				sub = FamUnit.getSubject(pid);
 				if (!isRabinowitzProc) {
@@ -633,12 +748,11 @@ public class GMDRData {
 		}
 	}
 
-	public void PrintGMDR(String TDTped, String TDTphe,
-			boolean isPermutation) throws IOException {
+	public void PrintGMDR(String TDTped, String TDTphe, boolean isPermutation) throws IOException {
 		PrintWriter TDTpedout = new PrintWriter(TDTped);
 		PrintWriter TDTpheout = isPermutation ? null : new PrintWriter(TDTphe);
 
-//		createWorkingTable(isPermutation);
+		// createWorkingTable(isPermutation);
 		printMissingInformation();
 
 		ArrayList genotypeCensus = getWorkingGenoTable();
@@ -709,8 +823,74 @@ public class GMDRData {
 		}
 	}
 
-	public void  CreateWorkingTable(boolean isRabinowitzProc) {
-		ArrayList currentTranGeno = (isRabinowitzProc && !isLouAlgorithm) ? RabinowitzTable:TransmittedTable;
+	public void CreateWorkingTableII(boolean isRabinowitzProc) {
+		ArrayList currentTranGeno = (isRabinowitzProc && !isLouAlgorithm) ? RabinowitzTable : TransmittedTable;
+		workingGenoTable = new ArrayList();
+		workingStatusTable = new ArrayList();
+		workingScoreTable = new ArrayList();
+		PersonIndex PI;
+		String fid1 = "";
+		float r = 1;
+		for (int i = 0; i < PersonTable.size(); i++) {
+			PI = PersonTable.get(i);
+			String fid2 = PI.getFamilyID();
+			FamilyStruct fs = PedData.getFamilyStruct(PI.getFamilyID());
+			if (!InformativePersonHash.containsKey(PI.getKey()) && !UnrelatedPersonHash.containsKey(PI.getKey())) {
+				continue;
+			}
+			if (!usingChildrenGenotype && fs.hasAncestor(PI.getIndividualID())) {
+				continue;
+			}
+			if (!usingFounderGenotype && !fs.hasAncestor(PI.getIndividualID())) {
+				continue;
+			}
+			if (!usingUnrelatedGenotype && UnrelatedPersonHash.containsKey(PI.getKey())) {
+				continue;
+			}
+			if (isLouAlgorithm && fid1.compareTo(fid2) != 0) {
+				r = rnd.nextFloat();
+				fid1 = fid2;
+			}
+			int s1 = ((Integer) StatusTable.get(i)).intValue();
+			String s2 = s1 == 0 ? PublicData.MissingValue : Integer.toString(s1 - 1);
+			String s3 = s1 == 0 ? PublicData.MissingValue : Integer.toString(1 - Integer.parseInt(s2));
+
+			ArrayList tempS = new ArrayList();
+			ArrayList tempSR = new ArrayList();
+			for (int j = 0; j < ScoreTable.size(); j++) {
+				Hashtable score = (Hashtable) ScoreTable.get(j);
+				if (score.containsKey(PI.getKey())) {
+					tempS.add(score.get(PI.getKey()));
+					double sr = -1 * Double.parseDouble((String) score.get(PI.getKey()));
+					tempSR.add(Double.toString(sr));
+				} else {
+					tempS.add(PublicData.MissingValue);
+					tempSR.add(PublicData.MissingValue);
+				}
+			}
+			if (r < 0.5) {
+				if (isLouAlgorithm) {
+					workingGenoTable.add(NontransmittedTable.get(i));
+				}
+				workingGenoTable.add(currentTranGeno.get(i));
+				workingScoreTable.add(tempS);
+			} else {
+				workingGenoTable.add(currentTranGeno.get(i));
+				workingScoreTable.add(tempS);
+				if (isLouAlgorithm) {
+					workingGenoTable.add(NontransmittedTable.get(i));
+				}
+			}
+			workingStatusTable.add(s2);
+			if (isLouAlgorithm) {
+				workingStatusTable.add(s3);
+				workingScoreTable.add(tempSR);
+			}
+		}
+	}
+
+	public void CreateWorkingTable(boolean isRabinowitzProc) {
+		ArrayList currentTranGeno = (isRabinowitzProc && !isLouAlgorithm) ? RabinowitzTable : TransmittedTable;
 		workingGenoTable = new ArrayList();
 		workingStatusTable = new ArrayList();
 		workingScoreTable = new ArrayList();
@@ -726,51 +906,48 @@ public class GMDRData {
 			}
 			if (!usingChildrenGenotype && fs.hasAncestor(PI.getIndividualID())) {
 				continue;
-			} 
+			}
 			if (!usingFounderGenotype && !fs.hasAncestor(PI.getIndividualID())) {
 				continue;
 			}
-			if (isLouAlgorithm && fid1.compareTo(fid2) !=0) {
+			if (isLouAlgorithm && fid1.compareTo(fid2) != 0) {
 				r = rnd.nextFloat();
 				fid1 = fid2;
 			}
 			int s1 = ((Integer) StatusTable.get(i)).intValue();
-			String s2 = s1 == 0 ? PublicData.MissingValue:Integer.toString(s1-1);
-			String s3 = s1 == 0 ? PublicData.MissingValue:Integer.toString(1-Integer.parseInt(s2));
+			String s2 = s1 == 0 ? PublicData.MissingValue : Integer.toString(s1 - 1);
+			String s3 = s1 == 0 ? PublicData.MissingValue : Integer.toString(1 - Integer.parseInt(s2));
 
 			ArrayList tempS = new ArrayList();
 			ArrayList tempSR = new ArrayList();
-			for (int j =0; j < ScoreTable.size(); j++) {
+			for (int j = 0; j < ScoreTable.size(); j++) {
 				Hashtable score = (Hashtable) ScoreTable.get(j);
 				if (score.containsKey(PI.getKey())) {
-						tempS.add(score.get(PI.getKey()));
-						double sr = -1 * Double.parseDouble((String)score.get(PI.getKey()));
-						tempSR.add(Double.toString(sr));
+					tempS.add(score.get(PI.getKey()));
+					double sr = -1 * Double.parseDouble((String) score.get(PI.getKey()));
+					tempSR.add(Double.toString(sr));
 				} else {
 					tempS.add(PublicData.MissingValue);
 					tempSR.add(PublicData.MissingValue);
 				}
 			}
-			if ( r < 0.5) {
+			if (r < 0.5) {
 				if (isLouAlgorithm) {
 					workingGenoTable.add(NontransmittedTable.get(i));
 				}
 				workingGenoTable.add(currentTranGeno.get(i));
-				workingStatusTable.add(s2);
 				workingScoreTable.add(tempS);
-				if (isLouAlgorithm) {
-					workingStatusTable.add(s3);
-					workingScoreTable.add(tempSR);
-				}
 			} else {
 				workingGenoTable.add(currentTranGeno.get(i));
-				workingStatusTable.add(s2);
 				workingScoreTable.add(tempS);
 				if (isLouAlgorithm) {
 					workingGenoTable.add(NontransmittedTable.get(i));
-					workingStatusTable.add(s3);
-					workingScoreTable.add(tempSR);
 				}
+			}
+			workingStatusTable.add(s2);
+			if (isLouAlgorithm) {
+				workingStatusTable.add(s3);
+				workingScoreTable.add(tempSR);
 			}
 		}
 	}
@@ -778,11 +955,11 @@ public class GMDRData {
 	public ArrayList getWorkingGenoTable() {
 		return workingGenoTable;
 	}
-	
+
 	public ArrayList getWorkingStatusTable() {
 		return workingStatusTable;
 	}
-	
+
 	public ArrayList<ArrayList> getWorkingScoreTable() {
 		return workingScoreTable;
 	}
@@ -794,10 +971,10 @@ public class GMDRData {
 	public ArrayList<String> getTraitName() {
 		return PhenoData.getTraitName();
 	}
-	
+
 	public void SetChosenMarker(int[] mi) {
 		subsetMarker = new int[mi.length];
-		for(int i = 0; i < mi.length; i++) {
+		for (int i = 0; i < mi.length; i++) {
 			subsetMarker[i] = mi[i];
 		}
 	}

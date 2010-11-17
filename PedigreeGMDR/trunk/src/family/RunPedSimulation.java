@@ -18,7 +18,7 @@ import family.report.Report;
 public class RunPedSimulation {
 	public static void main(String[] args) throws IOException {
 		Report report = new Report();
-		int replication = args.length > 0 ? Integer.parseInt(args[0]) : 5; 
+		int replication = args.length > 0 ? Integer.parseInt(args[0]) : 1; 
 		for (int i = 0; i < replication; i++) {
 			String PedFile = Integer.toString(i) + ".ped";
 			String PhenoFile = Integer.toString(i) + ".phe";
@@ -102,11 +102,11 @@ public class RunPedSimulation {
 							.isMooreMDR());
 			for (int j = gmdrPr.getInterctionFrom(); j <= gmdrPr.getInteractionEnd(); j++) {
 				as.search(j);
-				report.NewRound(as.getBestModelKey(j, 0));
+				report.NewRound(as.getBestModelKey(j, 0), i==0);
 				double[][] stats = as.singleBest(as.getBestModelKey(j, 0));
 				report.Add_test_statistic(stats[0]);
 				isRabinowitzProc = false;
-				for (int k = 0; k < pr.replication; k++) {
+				for (int k = 0; k < (i>0? 0:pr.replication); k++) {
 					isRabinowitzProc = true;
 					GD.RabinowitzApproach();
 					GD.CreateTable(isRabinowitzProc);
