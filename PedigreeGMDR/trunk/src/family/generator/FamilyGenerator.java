@@ -516,9 +516,8 @@ public class FamilyGenerator {
 							p_phenotype.add(new Double(obs));
 						}
 						status = affection(obs);
-						parent_proband += status.intValue();
 					} while (status.intValue() == -1);
-
+					parent_proband += status.intValue();
 					p_covariate.add(new Double(covariate));
 					p_trait.add(status);
 				}
