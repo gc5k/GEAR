@@ -799,12 +799,12 @@ public class FamilyGenerator {
 					double rd = randomData.nextFloat();
 					if (rd > KidGenotypeMissingRate) {
 						if (child[k][0].compareTo(child[k][1]) <= 0) {
-							pedout.print(child[k][0] + " " + child[k][1]);
+							pedout.print(child[k][0] + child[k][1]);
 						} else {
-							pedout.print(child[k][1] + " " + child[k][0]);
+							pedout.print(child[k][1] + child[k][0]);
 						}
 					} else {
-						pedout.print("0 0");
+						pedout.print("..");
 					}
 					pedout.print("\t");
 				}
@@ -882,13 +882,13 @@ public class FamilyGenerator {
 			pr.pheno_select_quantile[1] = -0.9;
 			pr.simu_replication = 5;
 			pr.family_size = 1000;
-			pr.number_case = 0;
+			pr.number_case = 500;
 			pr.FamNum = new int[1];
 			pr.FamNum[0] = 1000;
 			pr.AffParent = new int[1];
 			pr.AffParent[0] = 3;
 			pr.Kid = new int[1];
-			pr.Kid[0] = 2;
+			pr.Kid[0] = 1;
 			pr.AffKid = new int[1];
 			pr.AffKid[0] = 1;
 			pr.ParentMissingRate = new double[1][2];
