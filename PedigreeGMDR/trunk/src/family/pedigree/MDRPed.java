@@ -624,9 +624,18 @@ public class MDRPed {
 		return FID;
     }
 
+    public int getNumInformativeFamilies() {
+    	int c = 0;
+    	Enumeration famstrList = this.familystructure.keys();
+    	while (famstrList.hasMoreElements()) {
+    		c += ((Boolean) famInformative.get(famstrList.nextElement())).booleanValue() ? 1 : 0;
+    	}
+    	return c;
+    }
+
     public String[] getInformativeFamListSorted() {
     	Enumeration famstrList = this.familystructure.keys();
-		String[] FID = new String[getNumFamilies()];
+		String[] FID = new String[getNumInformativeFamilies()];
 		int ind = 0;
 		while (famstrList.hasMoreElements()) {
 			String F = (String) famstrList.nextElement();
@@ -640,7 +649,7 @@ public class MDRPed {
 
     public String[] getUninformativeFamListSorted() {
     	Enumeration famstrList = this.familystructure.keys();
-		String[] FID = new String[getNumFamilies()];
+		String[] FID = new String[getNumFamilies()-getNumInformativeFamilies()];
 		int ind = 0;
 		while (famstrList.hasMoreElements()) {
 			String F = (String) famstrList.nextElement();
@@ -1645,7 +1654,7 @@ public class MDRPed {
             fid = (String) fsList.nextElement();
             FamilyStruct fs = (FamilyStruct) getFamilyStruct(fid);
             if (!((Boolean) famInformative.get(fid)).booleanValue()) {
-                System.err.println("Omitted" + fs.getFamilyStructName());
+//                System.err.println("Omitted" + fs.getFamilyStructName());
                 continue;
             }
             try {

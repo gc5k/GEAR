@@ -588,9 +588,7 @@ public class GMDRData {
 					continue;
 				}
 				if (!FamStr.hasAncestor(pid)) {
-					if (InformativePersonHash.containsValue(pid)) {
-						FounderID.add(pid);
-					}
+					FounderID.add(pid);
 				}
 			}
 			if (isRabinowitzProc) {
@@ -624,27 +622,27 @@ public class GMDRData {
 			}
 		}
 
-		//for unrelated individuals;
+		// for unrelated individuals;
 		String[] UnrelatedFID = PedData.getUninformativeFamListSorted();
-		
-			for(int i = 0; i < UnrelatedFID.length; i++) {
-				String fid = (String) InforFID[i];
-				FamilyStruct FamStr = PedData.getFamilyStruct(fid);
-				String pid;
-				String[] PID = FamStr.getPersonListSorted();
-				for (int j = 0; j < PID.length; j++) {
-					pid = (String) PID[j];
-					if (IsUnMatchedIndividual(fid, pid)) {
-						continue;
-					}
-					UnrelatedPersonTable.add(new PersonIndex(fid, pid));
+		UnrelatedPersonTable = new ArrayList();
+		for (int i = 0; i < UnrelatedFID.length; i++) {
+			String fid = (String) UnrelatedFID[i];
+			FamilyStruct FamStr = PedData.getFamilyStruct(fid);
+			String pid;
+			String[] PID = FamStr.getPersonListSorted();
+			for (int j = 0; j < PID.length; j++) {
+				pid = (String) PID[j];
+				if (IsUnMatchedIndividual(fid, pid)) {
+					continue;
 				}
+				UnrelatedPersonTable.add(new PersonIndex(fid, pid));
 			}
+		}
 		if (isRabinowitzProc) {
 			Collections.shuffle(UnrelatedPersonTable);
 		}
 
-		for(int i = 0; i < UnrelatedPersonTable.size(); i++) {
+		for (int i = 0; i < UnrelatedPersonTable.size(); i++) {
 			PersonIndex PI = UnrelatedPersonTable.get(i);
 			String fid = PI.getFamilyID();
 			String pid = PI.getIndividualID();
