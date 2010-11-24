@@ -73,7 +73,7 @@ public class RunPedSimulation {
 			AbstractGenoDistribution.rnd = new Random(pr.seed + 1);
 			GD.RevvingUp(pr.getPedigreeFile(), pr.getPhenotypeFile());
 
-			GD.CreateTable(isRabinowitzProc);
+			GD.CreateTableII(isRabinowitzProc);
 			if (pr.getScoreBuildMethod() >= 0) {
 				GD.buildScore(pr.getPhenotypeIndex(), pr.getCovarianteIndex(),
 						pr.isAdjustScore(), pr.getScoreBuildMethod(),
@@ -109,7 +109,7 @@ public class RunPedSimulation {
 				for (int k = 0; k < (i>0? 0:pr.replication); k++) {
 					isRabinowitzProc = true;
 					GD.RabinowitzApproach();
-					GD.CreateTable(isRabinowitzProc);
+					GD.CreateTableII(isRabinowitzProc);
 					GD.CreateWorkingTable(isRabinowitzProc);
 					DataFile mdrData1 = new DataFile(GD.getMarkerName(), GD.getWorkingGenoTable(), GD.getWorkingStatusTable(),
 							GD.getTraitName(), GD.getWorkingScoreTable(), gmdrPr.getScoreIndex());
