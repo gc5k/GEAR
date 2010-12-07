@@ -13,13 +13,13 @@ public class MultiClassLogisticRegression {
 	double LogLikelihood_old;
 	double LogLikelihood_new;
 
-	public MultiClassLogisticRegression(int[] y, double[][] x, int k) {
+	public MultiClassLogisticRegression(double[] y, double[][] x, int k) {
 		category = k;
 		Y = new double[y.length][k - 1];
 		P = new double[y.length][k - 1];
 		for (int i = 0; i < y.length; i++) {
 			if (y[i] < (k - 1)) {
-				Y[i][y[i]] = 1;
+				Y[i][(new Double(y[i])).intValue()] = 1;
 			}
 		}
 		X = new double[x.length * (k - 1)][x[0].length * (k - 1)];
@@ -38,22 +38,24 @@ public class MultiClassLogisticRegression {
 		int iter = 0;
 		RealMatrix B_old = new RealMatrixImpl(B);
 		RealMatrix B_new = new RealMatrixImpl(B);
-		LogLikelihood_old = convergence(B_old);
+		calculate_P(B);
+		LogLikelihood_old = Likelihood();
 		do {
 			B_old = B_new;
 			LogLikelihood_old = LogLikelihood_new;
 			B = B_old.getColumn(0);
-			RealMatrix Matrix_W = new RealMatrixImpl(getWMatrix(B));
+			RealMatrix Matrix_W = new RealMatrixImpl(getWMatrix());
 			RealMatrix Matrix_XT_W = Matrix_XT.multiply(Matrix_W);
 			RealMatrix Matrix_XT_W_X = Matrix_XT_W.multiply(Matrix_X);
 			RealMatrix Inv_XT_W_X = Matrix_XT_W_X.inverse();
 			RealMatrix Inv_XT_W_X_XT = Inv_XT_W_X.multiply(Matrix_XT);
-			RealMatrix Vector_Pre = new RealMatrixImpl(predicted(B));
+			RealMatrix Vector_Pre = new RealMatrixImpl(Residual());
 			RealMatrix Vector_H = Inv_XT_W_X_XT.multiply(Vector_Pre);
 			B_new = B_old.add(Vector_H);
-			LogLikelihood_new = convergence(B_new);
+			calculate_P(B_new.getColumn(0));
+			LogLikelihood_new = Likelihood();
 			System.out.println(iter + "--->" + B_new);
-			System.out.println(LogLikelihood_old - LogLikelihood_new);
+			System.out.println("LogLikelihood_old " + LogLikelihood_old + ", LogLikelihood_new " + LogLikelihood_new);
 		} while (iter++ < iteration && Math.abs(LogLikelihood_old - LogLikelihood_new) > threshold);
 		System.out.println();
 	}
@@ -64,8 +66,8 @@ public class MultiClassLogisticRegression {
 			double sum = 0;
 			for (int j = 0; j < P[i].length; j++) {
 				double s = 0;
-				for (int k = P.length * j; k < P.length * j + P.length; k++) {
-					s += X[P.length * j][k] * b[k];
+				for (int k = 0; k < b.length; k++) {
+					s += X[P.length * j + i][b.length * j + k] * b[k];
 				}
 				p_ele[j] = Math.exp(s);
 				sum += p_ele[j];
@@ -76,7 +78,7 @@ public class MultiClassLogisticRegression {
 		}
 	}
 
-	public double[][] predicted(double[] b) {
+	public double[][] Residual() {
 		double[][] res = new double[Y.length][Y[0].length];
 		for (int i = 0; i < res.length; i++) {
 			for (int j = 0; j < res[i].length; j++) {
@@ -86,7 +88,7 @@ public class MultiClassLogisticRegression {
 		return res;
 	}
 
-	public double[][] getWMatrix( double[] b) {
+	public double[][] getWMatrix() {
 		double[][] W = new double[Y.length * (category - 1)][Y.length * (category - 1)];
 		for (int i = 0; i < category - 1; i++) {
 			for (int j = 0; j < category - 1; j++) {
@@ -109,8 +111,7 @@ public class MultiClassLogisticRegression {
 		return stopit;
 	}
 
-	public double convergence(RealMatrix b) {
-		boolean converg = true;
+	public double Likelihood() {
 		double L = 0;
 		for (int i = 0; i < P.length; i++) {
 			double sum_y = 0;
@@ -126,10 +127,11 @@ public class MultiClassLogisticRegression {
 	}
 
 	public static void main(String[] args) {
-		int[] Y = { 2, 1, 2, 1, 1, 0, 2, 0, 0, 0 };
+		double[] Y = { 1, 1, 1, 1, 1, 0, 0, 0, 0, 0 };
 		double[][] X = { { 1, 15, 4 }, { 1, 30, 14 }, { 1, 31, 16 }, { 1, 31, 11 }, { 1, 32, 17 }, { 1, 29, 10 },
 				{ 1, 30, 8 }, { 1, 31, 12 }, { 1, 32, 6 }, { 1, 40, 7 } };
-		MultiClassLogisticRegression MCLR = new MultiClassLogisticRegression(Y, X, 3);
-		MCLR.MLE();
+		double[] b = { 0, 0, 0 };
+		MultiClassLogisticRegression MLogReg = new MultiClassLogisticRegression(Y, X, 2);
+		MLogReg.MLE();
 	}
 }
