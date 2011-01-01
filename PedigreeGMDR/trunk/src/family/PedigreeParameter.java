@@ -66,7 +66,7 @@ public class PedigreeParameter {
 		for (int i = 0; i < c.length; i++) {
 			cov_idx[i] = Integer.parseInt(c[i]) - 1;
 		}
-		phe_idx = Integer.parseInt(lines.get(9));
+		phe_idx = Integer.parseInt(lines.get(9)) - 1;
 		scoreBuildMethod = Integer.parseInt(lines.get(10));
 		scoreAdjustmentScheme = Boolean.parseBoolean(lines.get(11));
 		scoreBuildWithFounder = Boolean.parseBoolean(lines.get(12));
@@ -152,7 +152,7 @@ public class PedigreeParameter {
 	}
 
 	public void setPhenotypeIndex(String ind) {
-		phe_idx = Integer.parseInt(ind);
+		phe_idx = Integer.parseInt(ind) - 1;
 	}
 
 	public int getPhenotypeIndex() {

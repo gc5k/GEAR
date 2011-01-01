@@ -261,6 +261,16 @@ public class FamilyStruct {
         PseudoPerson pseudoper;
         String iid;
         String nontran_tran[];
+        perList = persons.keys();
+        while (perList.hasMoreElements()) {
+            iid = (String) perList.nextElement();
+            per = (Person) (persons.get(iid));
+            pseudoper = (PseudoPerson) pseudopersons.get(iid);
+            if (!hasAncestor(per.getPersonID())) {
+                continue;
+            }
+            pseudoper.pseudoGenotypeClear();
+        }
         for (int i = 0; i < subsetMarker.length; i++) {
             perList = persons.keys();
             GenoSet genoset = (GenoSet) ImputedGenoSet.get(subsetMarker[i]);
