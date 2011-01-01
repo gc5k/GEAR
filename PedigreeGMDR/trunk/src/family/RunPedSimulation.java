@@ -2,7 +2,6 @@ package family;
 
 import java.io.IOException;
 import java.util.Random;
-import java.util.ArrayList;
 
 import algorithm.CombinationGenerator;
 import algorithm.Subdivision;
@@ -10,7 +9,6 @@ import algorithm.Subdivision;
 import family.RabinowitzLairdAlgorithm.AbstractGenoDistribution;
 import family.pedigree.GMDRData;
 import mdr.data.DataFile;
-import mdr.moore.AbstractMergeSearch;
 import mdr.moore.LinearMergeSearch;
 import mdr.GMDRParameter;
 import family.report.Report;
@@ -33,21 +31,21 @@ public class RunPedSimulation {
 				pr.setPedigreeFile(PedFile);
 				pr.setPhenotypeFile(PhenoFile);
 			} else {
-				pr.setIsLouAlgorithm(false);
-				pr.setUsingFounderGenotype(true);
-				pr.setUsingChildrenGenotype(false);
+				pr.setIsLouAlgorithm(true);
+				pr.setUsingFounderGenotype(false);
+				pr.setUsingChildrenGenotype(true);
 				pr.setPedigreeFile(PedFile);
 				pr.setPhenotypeFile(PhenoFile);
 				pr.setConvertedPedigreeFile(CovertPedFile);
 				pr.setConvertedPhenotypeFile(CovertPhenoFile);
 				pr.setFamilyIDFile(FamIDFile);
 				pr.setCovariateIndex("2");
-				pr.setPhenotypeIndex("0");
+				pr.setPhenotypeIndex("1");
 				pr.setScoreBuildMethod(2);
 				pr.setAdjustScore(true);
 				pr.setScoreBuildWithFounder(true);
-				pr.setScoreBuildWithChildren(false);
-				pr.setReplication(10);
+				pr.setScoreBuildWithChildren(true);
+				pr.setReplication(100);
 				pr.setSeed(10);
 			}
 			GMDRParameter gmdrPr = new GMDRParameter();
@@ -72,7 +70,9 @@ public class RunPedSimulation {
 					pr.usingChildrenGenotype, pr.isLouAlgorithm);
 			AbstractGenoDistribution.rnd = new Random(pr.seed + 1);
 			GD.RevvingUp(pr.getPedigreeFile(), pr.getPhenotypeFile());
-
+			if (pr.isLouAlgorithm) {
+				GD.RabinowitzApproach();
+			}
 			GD.CreateTableII(isRabinowitzProc);
 			if (pr.getScoreBuildMethod() >= 0) {
 				GD.buildScore(pr.getPhenotypeIndex(), pr.getCovarianteIndex(),
@@ -105,8 +105,8 @@ public class RunPedSimulation {
 				report.NewRound(as.getBestModelKey(j, 0), i==0);
 				double[][] stats = as.singleBest(as.getBestModelKey(j, 0));
 				report.Add_test_statistic(stats[0]);
-				isRabinowitzProc = false;
 				for (int k = 0; k < (i>0? 0:pr.replication); k++) {
+					System.out.println(k);
 					isRabinowitzProc = true;
 					GD.RabinowitzApproach();
 					GD.CreateTableII(isRabinowitzProc);

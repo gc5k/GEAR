@@ -846,7 +846,7 @@ public class FamilyGenerator {
 			}
 		} else {
 			pr.isNullHypothesis = false;
-			pr.seed = 2000;
+			pr.seed = 300;
 			pr.model = "B";
 			pr.AffLoci = new int[2];
 			pr.AffLoci[0] = 0;
@@ -869,7 +869,7 @@ public class FamilyGenerator {
 				pr.dev = 3.16;
 				pr.cov = 1;
 				pr.err = 1;
-				pr.gene = 0.09;
+				pr.gene = 0.5;
 			} else {
 				pr.intercept = 0;
 				pr.dev = 1;
