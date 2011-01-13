@@ -14,7 +14,8 @@ public class LogisticRegression {
 	double[][] X;
 	double[] B;
 	boolean intercept;
-	double threshold = 0.001;
+	double tolerance = 0.0000001;
+	int max_iteration = 50;
 	double LogLikelihood_old;
 	double LogLikelihood_new;
 
@@ -45,10 +46,11 @@ public class LogisticRegression {
 		}
 		B = new double[X[0].length];
 	}
+
 	public void MLE() {
 		RealMatrix Matrix_X = new RealMatrixImpl(X);
 		RealMatrix Matrix_XT = Matrix_X.transpose();
-		int iteration = 20;
+
 		int iter = 0;
 		RealMatrix B_old = new RealMatrixImpl(B);
 		RealMatrix B_new = new RealMatrixImpl(B);
@@ -74,7 +76,7 @@ public class LogisticRegression {
 			LogLikelihood_new = Likelihood();
 //			System.out.println(iter + "--->" + B_new);
 //			System.out.println("LogLikelihood_old " + LogLikelihood_old + ", LogLikelihood_new " + LogLikelihood_new);
-		} while (iter++ < iteration && Math.abs(LogLikelihood_old - LogLikelihood_new) > threshold);
+		} while (iter++ < max_iteration && Math.abs(LogLikelihood_old - LogLikelihood_new) > tolerance);
 //		System.out.println();
 	}
 
@@ -110,17 +112,6 @@ public class LogisticRegression {
 			W[i][i] = P[i] * (1 - P[i]);
 		}
 		return W;
-	}
-
-	public boolean stop(RealMatrix b_old, RealMatrix b_new) {
-		boolean stopit = true;
-		for (int i = 0; i < b_old.getRowDimension(); i++) {
-			if (Math.abs(b_old.getEntry(i, 0) - b_new.getEntry(i, 0)) > threshold) {
-				stopit = false;
-				break;
-			}
-		}
-		return stopit;
 	}
 
 	public double Likelihood() {
