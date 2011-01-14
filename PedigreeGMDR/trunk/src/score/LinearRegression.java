@@ -25,19 +25,21 @@ public class LinearRegression {
 		System.arraycopy(y, 0, Y, 0, Y.length);
 		initial(x, intercept);
 	}
-	
+
 	private void initial(double[][] x, boolean intercept) {
-		fitted = new double[x.length];
-		res = new double[x.length];
-		X = new double[x.length][];
+		fitted = new double[Y.length];
+		res = new double[Y.length];
+		X = new double[Y.length][];
 		this.intercept = intercept;
 		int u = intercept ? 1:0;
-		for (int i = 0; i < x.length; i++) {
-			X[i] = new double[x[i].length+u];
+		for (int i = 0; i < Y.length; i++) {
+			X[i] = new double[x == null ? u : x[i].length + u];
 			if (intercept) {
 				X[i][0] = u;
 			}
-			System.arraycopy(x[i], 0, X[i], u, x[i].length);
+			if (x != null) {
+				System.arraycopy(x[i], 0, X[i], u, x[i].length);
+			}
 		}
 		T_statistic = new double[X[0].length];
 	}

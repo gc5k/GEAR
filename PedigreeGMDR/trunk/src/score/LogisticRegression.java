@@ -33,16 +33,18 @@ public class LogisticRegression {
 	}
 
 	private void initial(double[][] x, boolean intercept) {
-		P = new double[x.length];
+		P = new double[Y.length];
 		this.intercept = intercept;
 		int u = intercept ? 1:0;
-		X = new double[x.length][];
-		for (int i = 0; i < x.length; i++) {
-			X[i] = new double[x[i].length+u];
+		X = new double[Y.length][];
+		for (int i = 0; i < X.length; i++) {
+			X[i] = new double[x == null ? u: x[i].length+u];
 			if (intercept) {
 				X[i][0] = u;
 			}
-			System.arraycopy(x[i], 0, X[i], u, x[i].length);
+			if(x != null) {
+				System.arraycopy(x[i], 0, X[i], u, x[i].length);
+			}
 		}
 		B = new double[X[0].length];
 	}
