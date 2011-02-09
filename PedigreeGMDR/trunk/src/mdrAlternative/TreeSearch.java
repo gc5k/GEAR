@@ -21,7 +21,7 @@ import publicAccess.ToolKit;
  */
 public class TreeSearch extends AbstractSearch {
 
-    HashMap models;
+    HashMap<String, Combination> models;
 
     public TreeSearch(DataFile d, CombinationGenerator cg, int[] sI) {
         super(d, cg, sI);
