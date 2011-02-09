@@ -26,8 +26,8 @@ public class main {
     	if (args.length > 0) {
     		pr.read(args[0]);
     	} else {
-    		pr.setMarkerFile("ped0.txt");
-    		pr.setPhenotypeFile("phe0.txt");
+    		pr.setMarkerFile("0.ped");
+    		pr.setPhenotypeFile("0.phe");
     		pr.setInteractionFrom(1);
     		pr.setInteractionEnd(2);
     		pr.setScoreIndex("0");
@@ -37,7 +37,6 @@ public class main {
     		pr.setMooreMDR(true);
     		pr.setReplicationPermutation(100);
     		pr.setSearchMethod(0);
-
     	}
 
 //        pFile = null;
