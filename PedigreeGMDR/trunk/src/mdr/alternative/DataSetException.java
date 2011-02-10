@@ -1,5 +1,5 @@
 
-package mdrAlternative;
+package mdr.alternative;
 
 /**
  *

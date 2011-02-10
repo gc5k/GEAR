@@ -1,4 +1,4 @@
-package mdrAlternative;
+package mdr.alternative;
 
 import algorithm.*;
 import mdr.TraitStatistic;

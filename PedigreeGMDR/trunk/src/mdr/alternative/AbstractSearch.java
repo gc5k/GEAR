@@ -1,8 +1,7 @@
-package mdrAlternative;
+package mdr.alternative;
 
 import java.util.AbstractMap;
 import java.util.Collections;
-import java.util.Iterator;
 import java.util.Map;
 import java.util.HashMap;
 import java.util.Set;
@@ -10,15 +9,14 @@ import java.util.TreeSet;
 
 import algorithm.CombinationGenerator;
 import mdr.data.DataFile;
-import algorithm.Subdivision;
 import mdr.Suite;
 import mdr.Combination;
 import util.NewIt;
 /**
  *
- * @author Guo-Bo Chen
+ * @author Guo-Bo Chen, chenguobo@gmail.com
  */
-public abstract class AbstractSearch extends AbstractMap {
+public abstract class AbstractSearch extends AbstractMap<Integer, HashMap<String, Combination>> {
 
     protected HashMap<Integer, HashMap<String, Combination>> modelMap = NewIt.newHashMap();
 
@@ -53,9 +51,8 @@ public abstract class AbstractSearch extends AbstractMap {
     }
     
     public void testPrint() {
-        Set<Integer> keys = modelMap.keySet();
 //        for (Iterator e = keys.iterator(); e.hasNext();) {
-        for(Integer key:keys) {
+        for(Integer key:modelMap.keySet()) {
             System.out.println("Order of interaction " + key);
             Map<String, Combination> hm = modelMap.get(key);
             Set<String> modelkeys = new TreeSet<String>(hm.keySet());
@@ -63,7 +60,7 @@ public abstract class AbstractSearch extends AbstractMap {
             for(String modelkey:modelkeys) {
                 System.out.println("model " + modelkey);
                 Map<String, Suite> model = hm.get(modelkey);
-                Set<String> genoset = new TreeSet(model.keySet());
+                Set<String> genoset = new TreeSet<String>(model.keySet());
                 for (String geno:genoset) {
                     Suite s = (Suite) model.get(geno);
                     System.out.println(geno);

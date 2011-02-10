@@ -11,13 +11,11 @@ import java.util.Arrays;
 import java.util.GregorianCalendar;
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.Iterator;
-import java.util.List;
 import java.util.Random;
-import java.util.Set;
 import java.util.TreeMap;
 
 import publicAccess.PublicData;
+import util.NewIt;
 import im.reader.IMReaderAbstract;
 import im.population.IMPopulation;
 
@@ -27,8 +25,8 @@ import im.population.IMPopulation;
  */
 public class DataFile {
 
-    protected ArrayList sample = new ArrayList();
-    protected ArrayList shuffledPhenoIDs;
+    protected ArrayList<DataFile.Subject> sample = NewIt.newArrayList();
+    protected ArrayList<Integer> shuffledPhenoIDs;
     protected static boolean isPermutation = false;
     protected String markerFile;
     protected String phenotypeFile;
@@ -37,12 +35,12 @@ public class DataFile {
     protected int[][] missing;
     protected static int[] scrIndex;
     protected double[] offset;
-    protected HashMap traitStatistics = new HashMap();
+    protected HashMap<Integer, TraitStatistic> traitStatistics = NewIt.newHashMap();
 
-    public static class Subject extends AbstractList {
+    public static class Subject extends AbstractList<String> {
 
         int id;
-        private List genotypes;
+        private ArrayList<String> genotypes;
         private Double status;
         private Object mu;
         private ArrayList<Double> score;
@@ -54,7 +52,7 @@ public class DataFile {
             } else {
                 this.status = new Double(Double.parseDouble(content[content.length - 1]));
             }
-            genotypes = new ArrayList(content.length - 1);
+            genotypes = new ArrayList<String>(content.length - 1);
             genotypes.addAll(Arrays.asList(content).subList(0, content.length - 1));
         }
 
@@ -137,7 +135,7 @@ public class DataFile {
             return genotypes == null ? 0 : genotypes.size();
         }
 
-        public Object get(int idx) {
+        public String get(int idx) {
             return genotypes == null ? null : genotypes.get(idx);
         }
 
@@ -146,7 +144,7 @@ public class DataFile {
             genotypes.add(index, s);
         }
 
-        public Object remove(int idx) {
+        public String remove(int idx) {
             modCount++;
             return genotypes.remove(idx);
         }
@@ -163,9 +161,9 @@ public class DataFile {
             }
             b.append(status);
             b.append(PublicData.delim);
-            Iterator e = score.iterator();
-            for (; e.hasNext();) {
-                b.append(e.next());
+
+            for (Double s:score) {
+                b.append(s);
                 b.append(PublicData.delim);
             }
             return b.toString();
@@ -184,16 +182,16 @@ public class DataFile {
 
     public DataFile() {}
 
-    public DataFile(ArrayList<String> mkInformation, ArrayList<ArrayList> marker, ArrayList<Integer> statue, ArrayList<String> traitInformation, ArrayList<ArrayList> phenotype, int[] si) {
+    public DataFile(ArrayList<String> mkInformation, ArrayList<ArrayList<String>> marker, ArrayList<Integer> statue, ArrayList<String> traitInformation, ArrayList<ArrayList<Double>> phenotype, int[] si) {
     	SNPID = mkInformation.toArray(new String[0]);
     	traitName = traitInformation.toArray(new String[0]);
     	initial1(marker, statue, phenotype, si);
     }
 
-    private void initial1(ArrayList<ArrayList> marker, ArrayList statue, ArrayList<ArrayList> phenotype, int[] si) {
-        TreeMap tempMap = new TreeMap();        
+    private void initial1(ArrayList<ArrayList<String>> marker, ArrayList<Integer> statue, ArrayList<ArrayList<Double>> phenotype, int[] si) {
+        TreeMap<Integer, ArrayList<Integer>> tempMap = NewIt.newTreeMap();        
     	for (int i= 0; i < marker.size(); i++) {
-    		ArrayList<String> geno = (ArrayList) marker.get(i).clone();
+    		ArrayList<String> geno = marker.get(i);
     		geno.add((String) statue.get(i).toString());
     		String[] content = geno.toArray(new String[0]);
             Subject sub = new Subject(content);
@@ -204,21 +202,20 @@ public class DataFile {
                 Integer Ii = new Integer(j);
                 if (content[j].compareTo(PublicData.MissingGenotype) == 0) {
                     if (tempMap.containsKey(Ii)) {
-                        ArrayList tempArray = (ArrayList) tempMap.get(Ii);
+                        ArrayList<Integer> tempArray = tempMap.get(Ii);
                         tempArray.add(new Integer(i));
                     } else {
-                        ArrayList tempArray = new ArrayList();
+                        ArrayList<Integer> tempArray = NewIt.newArrayList();
                         tempArray.add(new Integer(i));
                         tempMap.put(Ii, tempArray);
                     }
                 }
             }
     	}
-        Set keys = tempMap.keySet();
+
         missing = new int[SNPID.length][];
-        for (Iterator e = keys.iterator(); e.hasNext();) {
-            Integer Ii = (Integer) e.next();
-            ArrayList tempArray = (ArrayList) tempMap.get(Ii);
+        for (Integer Ii:tempMap.keySet()) {
+            ArrayList<Integer> tempArray = tempMap.get(Ii);
             missing[Ii.intValue()] = new int[tempArray.size()];
             for (int i = 0; i < tempArray.size(); i++) {
                 missing[Ii.intValue()][i] = ((Integer) tempArray.get(i)).intValue();
@@ -231,6 +228,7 @@ public class DataFile {
             String[] ps = traits.toArray(new String[0]);
             sub.addScore(ps);
         }
+
         setPhenotypeIndex(si);
         double[] os = calculateDefaultMu();
         TraitSummary(os);
@@ -253,8 +251,7 @@ public class DataFile {
         GregorianCalendar calendar = new GregorianCalendar();
         Random rnd = new Random();
         rnd.setSeed(calendar.get(GregorianCalendar.SECOND));
-        String cs = imp.getCrossParameter();
-        TreeMap tempMap = new TreeMap();
+        TreeMap<Integer, ArrayList<Integer>> tempMap = NewIt.newTreeMap();
         int count = 0;
         int[][][] marker = imp.Markers();
         for (int i = 0; i < imp.IndividualNumber(); i++) {
@@ -275,10 +272,10 @@ public class DataFile {
                 Integer Ii = new Integer(k);
                 if (content[k].compareTo(PublicData.MissingGenotype) == 0) {
                     if (tempMap.containsKey(Ii)) {
-                        ArrayList tempArray = (ArrayList) tempMap.get(Ii);
+                        ArrayList<Integer> tempArray = tempMap.get(Ii);
                         tempArray.add(new Integer(count));
                     } else {
-                        ArrayList tempArray = new ArrayList();
+                        ArrayList<Integer> tempArray = NewIt.newArrayList();
                         tempArray.add(new Integer(count));
                         tempMap.put(Ii, tempArray);
                     }
@@ -287,11 +284,9 @@ public class DataFile {
             count++;
         }
 
-        Set keys = tempMap.keySet();
         missing = new int[SNPID.length][];
-        for (Iterator e = keys.iterator(); e.hasNext();) {
-            Integer Ii = (Integer) e.next();
-            ArrayList tempArray = (ArrayList) tempMap.get(Ii);
+        for (Integer Ii:tempMap.keySet()) {
+            ArrayList<Integer> tempArray = tempMap.get(Ii);
             missing[Ii.intValue()] = new int[tempArray.size()];
             for (int i = 0; i < tempArray.size(); i++) {
                 missing[Ii.intValue()][i] = ((Integer) tempArray.get(i)).intValue();
@@ -334,8 +329,7 @@ public class DataFile {
         Random rnd = new Random();
         GregorianCalendar calendar = new GregorianCalendar();
         rnd.setSeed(calendar.get(GregorianCalendar.SECOND));
-        IMReaderAbstract.CrossParameter cs = imra.getCrossParameter();
-        TreeMap tempMap = new TreeMap();
+        TreeMap<Integer, ArrayList<Integer>> tempMap = NewIt.newTreeMap();
         int count = 0;
         String[][][] marker = imra.getMarkers();
         for (int i = 0; i < imra.IndividualNumber(); i++) {
@@ -354,10 +348,10 @@ public class DataFile {
                 Integer Ii = new Integer(k);
                 if (content[k].compareTo(PublicData.MissingGenotype) == 0) {
                     if (tempMap.containsKey(Ii)) {
-                        ArrayList tempArray = (ArrayList) tempMap.get(Ii);
+                        ArrayList<Integer> tempArray = tempMap.get(Ii);
                         tempArray.add(new Integer(count));
                     } else {
-                        ArrayList tempArray = new ArrayList();
+                        ArrayList<Integer> tempArray = NewIt.newArrayList();
                         tempArray.add(new Integer(count));
                         tempMap.put(Ii, tempArray);
                     }
@@ -366,11 +360,9 @@ public class DataFile {
             count++;
         }
 
-        Set keys = tempMap.keySet();
         missing = new int[SNPID.length][];
-        for (Iterator e = keys.iterator(); e.hasNext();) {
-            Integer Ii = (Integer) e.next();
-            ArrayList tempArray = (ArrayList) tempMap.get(Ii);
+        for (Integer Ii:tempMap.keySet()) {
+            ArrayList<Integer> tempArray = tempMap.get(Ii);
             missing[Ii.intValue()] = new int[tempArray.size()];
             for (int i = 0; i < tempArray.size(); i++) {
                 missing[Ii.intValue()][i] = ((Integer) tempArray.get(i)).intValue();
@@ -408,7 +400,7 @@ public class DataFile {
         System.arraycopy(s, 0, SNPID, 0, s.length - 1);
         // -------------------------------------------------------------------
 
-        TreeMap tempMap = new TreeMap();
+        TreeMap<Integer, ArrayList<Integer>> tempMap = NewIt.newTreeMap();
         int count = 0;
         while ((line = b.readLine()) != null) {
             String[] content = line.split(PublicData.delim);
@@ -419,10 +411,10 @@ public class DataFile {
                 Integer Ii = new Integer(i);
                 if (content[i].compareTo(PublicData.MissingGenotype) == 0) {
                     if (tempMap.containsKey(Ii)) {
-                        ArrayList tempArray = (ArrayList) tempMap.get(Ii);
+                        ArrayList<Integer> tempArray = tempMap.get(Ii);
                         tempArray.add(new Integer(count));
                     } else {
-                        ArrayList tempArray = new ArrayList();
+                        ArrayList<Integer> tempArray = NewIt.newArrayList();
                         tempArray.add(new Integer(count));
                         tempMap.put(Ii, tempArray);
                     }
@@ -430,11 +422,9 @@ public class DataFile {
             }
             count++;
         }
-        Set keys = tempMap.keySet();
         missing = new int[SNPID.length][];
-        for (Iterator e = keys.iterator(); e.hasNext();) {
-            Integer Ii = (Integer) e.next();
-            ArrayList tempArray = (ArrayList) tempMap.get(Ii);
+        for (Integer Ii:tempMap.keySet()) {
+            ArrayList<Integer> tempArray = tempMap.get(Ii);
             missing[Ii.intValue()] = new int[tempArray.size()];
             for (int i = 0; i < tempArray.size(); i++) {
                 missing[Ii.intValue()][i] = ((Integer) tempArray.get(i)).intValue();
@@ -461,7 +451,7 @@ public class DataFile {
             System.exit(0);
         }
         traitName = line.split(PublicData.delim);
-        List pl = new ArrayList();
+        ArrayList<String> pl = NewIt.newArrayList();
         while ((line = b.readLine()) != null) {
             pl.add(line);
         }
@@ -470,10 +460,8 @@ public class DataFile {
             return;
         }
 
-        Iterator e = pl.iterator();
         int c = 0;
-        for (; e.hasNext();) {
-            String p = (String) e.next();
+        for (String p:pl) {
             String[] ps = p.split(PublicData.delim);
             if (ps.length != traitName.length) {
                 System.err.println("The " + c + "th phenotype row does not match the total size of the phenotypes");
@@ -509,7 +497,7 @@ public class DataFile {
         return phenotypeFile;
     }
 
-    public void add(int idx, Object o) {
+    public void add(int idx, DataFile.Subject o) {
         sample.add(idx, o);
     }
 
@@ -518,8 +506,7 @@ public class DataFile {
         for (int i = 0; i < scrIndex.length; i++) {
             double sum = 0;
             int c = 0;
-            for (Iterator e = sample.iterator(); e.hasNext();) {
-                DataFile.Subject s = (DataFile.Subject) e.next();
+            for (DataFile.Subject s:sample) {
                 Double sscore = s.getDoubleScore(i);
                 if (sscore != null) {
                     sum += sscore;
@@ -584,7 +571,7 @@ public class DataFile {
         int negSub = ts.getTraitNegativeSubjects();
         double posScr = ts.getTraitPositiveScore();
         double negScr = ts.getTraitNegativeScore();
-        HashSet hs = new HashSet();
+        HashSet<Integer> hs = NewIt.newHashSet();
         for (int i = 0; i < markerIdx.length; i++) {
             if (missing[markerIdx[i]] == null) {
                 continue;
@@ -594,8 +581,8 @@ public class DataFile {
                 hs.add(subIdx);
             }
         }
-        for (Iterator e = hs.iterator(); e.hasNext();) {
-            int idx = ((Integer) e.next()).intValue();
+        for (Integer e:hs) {
+            int idx =  e.intValue();
             Subject s = (Subject) sample.get(idx);
             double scr = s.getDoubleScore(scrIdx);
             if (scr >= 0) {
@@ -613,12 +600,12 @@ public class DataFile {
     }
 
     public double defaultScore(int[] markerIdx, int[] scrIdx, int sI) throws DataFileException {
-        TraitStatistic ts = (TraitStatistic) traitStatistics.get(new Integer(sI));
+        TraitStatistic ts = traitStatistics.get(new Integer(sI));
         int posSub = ts.getTraitPositiveSubjects();
         int negSub = ts.getTraitNegativeSubjects();
         double posScr = ts.getTraitPositiveScore();
         double negScr = ts.getTraitNegativeScore();
-        HashSet hs = new HashSet();
+        HashSet<Integer> hs = NewIt.newHashSet();
         for (int i = 0; i < markerIdx.length; i++) {
             if (missing[markerIdx[i]] == null) {
                 continue;
@@ -628,8 +615,8 @@ public class DataFile {
                 hs.add(subIdx);
             }
         }
-        for (Iterator e = hs.iterator(); e.hasNext();) {
-            int idx = ((Integer) e.next()).intValue();
+        for (Integer  e:hs) {
+            int idx = e.intValue();
             Subject s = (Subject) sample.get(idx);
             double scr = s.getDoubleScore(scrIdx[sI]);
             if (scr >= 0) {
@@ -671,8 +658,8 @@ public class DataFile {
     }
 
     public void print() {
-        for (Iterator e = sample.iterator(); e.hasNext();) {
-            System.out.println(e.next());
+        for (DataFile.Subject e:sample) {
+            System.out.println(e);
         }
     }
 
@@ -691,19 +678,19 @@ public class DataFile {
         isPermutation = flag;
     }
 
-    public void setShuffledIDs(ArrayList shuffledids) {
+    public void setShuffledIDs(ArrayList<Integer> shuffledids) {
         if (isPermutation) {
             shuffledPhenoIDs = shuffledids;
             for (int i = 0; i < shuffledPhenoIDs.size(); i++) {
-                Subject sub1 = (Subject) sample.get(i);
-                Subject sub2 = (Subject) sample.get(((Integer) shuffledPhenoIDs.get(i)).intValue());
+                Subject sub1 = sample.get(i);
+                Subject sub2 = sample.get(shuffledPhenoIDs.get(i).intValue());
                 ArrayList<Double> s = sub2.getScore();
                 sub1.addShuffledScore(s);
             }
         }
     }
 
-    public ArrayList getSample() {
+    public ArrayList<DataFile.Subject> getSample() {
         return sample;
     }
 

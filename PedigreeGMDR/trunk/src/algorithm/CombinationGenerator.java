@@ -7,6 +7,7 @@ import java.util.Iterator;
 import java.util.Set;
 
 import publicAccess.PublicData;
+import util.NewIt;
 
 /**
  *
@@ -14,7 +15,7 @@ import publicAccess.PublicData;
  */
 public class CombinationGenerator {
 
-    private HashMap<Integer, List> combination = new HashMap();
+    private HashMap<Integer, ArrayList<String>> combination = NewIt.newHashMap();
 
     private int start;
     private int end;
@@ -31,11 +32,11 @@ public class CombinationGenerator {
         }
     }
 
-    public void fill(Integer order, List com) {
+    public void fill(Integer order, ArrayList<String> com) {
     	combination.put(order, com);
     }
 
-    public List get(Object o) {
+    public ArrayList<String> get(Integer o) {
         return combination.get(o);
     }
 
@@ -58,18 +59,16 @@ public class CombinationGenerator {
     }
 
     public void print() {
-        Set keys = combination.keySet();
-        for (Iterator i = keys.iterator(); i.hasNext();) {
-            List c = (List) i.next();
-            for (Iterator j = c.iterator(); j.hasNext();) {
-                System.out.println((String) j.next());
+        for (ArrayList<String> i : combination.values()) {
+            for (String s:i) {
+                System.out.println(s);
             }
             System.out.println();
         }
     }
 
-    public List combine(int[] a, int n, int m) {
-        List Comb = new ArrayList();
+    public ArrayList<String> combine(int[] a, int n, int m) {
+        ArrayList<String> Comb = NewIt.newArrayList();
         int[] order = new int[m + 1];
         for (int i = 0; i <= m; i++) {
             order[i] = i - 1;
