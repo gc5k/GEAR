@@ -1,6 +1,7 @@
-package mdrAlternative;
+package mdr.alternative;
 
-import mdrAlternative.CV;
+import mdr.alternative.CV;
+
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;

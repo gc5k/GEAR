@@ -1,4 +1,4 @@
-package mdrAlternative;
+package mdr.alternative;
 
 import mdr.Combination;
 import mdr.*;
@@ -103,7 +103,7 @@ public class DynamicSearch extends AbstractSearch {
                 }
             }
         }
-        modelMap.put(new Integer(or), localModel);
+//        modelMap.put(new Integer(or), localModel);
     }
 
     public void existOrder(int or) {

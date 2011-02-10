@@ -1,5 +1,7 @@
-package mdrAlternative;
+package mdr.alternative;
 
+import mdr.Combination;
+import mdr.*;
 import java.util.AbstractList;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -10,14 +12,10 @@ import java.util.TreeSet;
 
 import mdr.Cell;
 import mdr.data.DataFile;
-import mdrAlternative.DataSet;
-import mdrAlternative.DataSetException;
-import algorithm.Partition;
+import mdr.DataFileException;
 import algorithm.Subdivision;
+
 import mdr.Suite;
-
-import mdr.Combination;
-
 import publicAccess.ToolKit;
 import publicAccess.ToolKitException;
 
@@ -25,7 +23,7 @@ import publicAccess.ToolKitException;
  *
  * @author Guo-Bo Chen
  */
-public class AbstractCrossValidation extends AbstractList {
+public class CV extends AbstractList {
 
     protected ArrayList kFolderList = new ArrayList();
 
@@ -36,19 +34,96 @@ public class AbstractCrossValidation extends AbstractList {
     protected double[] offset;
 
     protected ArrayList testingList;
-    protected ArrayList testList;
     protected Combination model;
     protected HashMap fullModelResult;
     protected Set selectedPartition;
 
-    protected DataSet data;
-    protected Partition partitionInformation;
-///    protected Subdivision subdivision;
+    protected DataFile data;
+    protected Subdivision subdivision;
 
-    public AbstractCrossValidation(DataSet dr, Partition p, int[] idx, int[] sI, double[] os, Combination m, boolean ismoore) {
+    public void calculate() {
+        Set keys = model.keySet();
+        for (Iterator e = keys.iterator(); e.hasNext();) {
+            String key = (String) e.next();
+            Suite fullSuite = (Suite) model.get(key);
+            for (int i = 0; i < scrIdx.length; i++) {
+                CVOneTraitResult k_thResult = (CVOneTraitResult) get(i);
+                double thresholdRatio = 0;
+                try {
+                    thresholdRatio = data.getTraitRatio(i, SNPIndex);
+                } catch (DataFileException E) {
+                    E.printStackTrace(System.err);
+                }
+                fullSuite.summarize(scrIdx[i], offset[i]);
+                int fullposSubs = fullSuite.getPositiveSubjects(i);
+                int fullnegSubs = fullSuite.getNegativeSubjects(i);
+                double fullposScr = fullSuite.getPositiveScore(i);
+                double fullnegScr = fullSuite.getNegativeScore(i);
+                int fullModelStatus = ToolKit.Acertainment(fullposScr, fullnegScr, thresholdRatio);
+                Cell fullCell = new Cell(fullposSubs, fullnegSubs,
+                        fullposScr, fullnegScr, fullModelStatus);
+                fullModelResult.put(key, fullCell);
+                for (int j = 0; j<testingList.size(); j++) {
+                    CVPair cvPair = (CVPair) k_thResult.get(j);
+                    Combination testingModels = (Combination) testingList.get(j);
+                    int status;
+                    Cell trCell;
+                    Cell tCell;
+                    if (testingModels.containsKey(key)) {
+                        Suite testingSuite = (Suite) testingModels.get(key);
+                        testingSuite.summarize(scrIdx[i], offset[i]);
+                        int pos_Subs = testingSuite.getPositiveSubjects(i);
+                        int neg_Subs = testingSuite.getNegativeSubjects(i);
+                        double pos_Scr = testingSuite.getPositiveScore(i);
+                        double neg_Scr = testingSuite.getNegativeScore(i);
+                        status = ToolKit.Acertainment(fullposScr - pos_Scr, fullnegScr - neg_Scr, thresholdRatio);
+                        trCell = new Cell(fullposSubs - pos_Subs, fullnegSubs - neg_Subs, fullposScr - pos_Scr, fullnegScr - neg_Scr, status);
+                        tCell = new Cell(pos_Subs, neg_Subs, pos_Scr, neg_Scr, status);
+                    } else {
+                        status = ToolKit.Acertainment(fullposScr, fullnegScr, thresholdRatio);
+                        trCell = new Cell(fullposSubs, fullnegSubs, fullposScr, fullnegScr, status);
+                        tCell = new Cell(0, 0, 0, 0, -1);
+                    }
+                    cvPair.addTrainingModel(key, trCell);
+                    cvPair.addTestingModel(key, tCell);
+                }
+            }
+        }
+
+        for (int i = 0; i < scrIdx.length; i++) {
+            CVOneTraitResult k_thResult = (CVOneTraitResult) get(i);
+            for (int j = 0; j < testingList.size(); j++) {
+                CVPair cvPair = (CVPair) k_thResult.get(j);
+                double trAccu = 0;
+                try {
+                    trAccu = ToolKit.Accuracy(cvPair.getTraining());
+                } catch (ToolKitException E) {
+                    E.printStackTrace(System.err);
+                }
+                cvPair.setTrainingAccuracy(trAccu);
+                if (!isMooreMDR) {
+                    testingCalculate(i, j);
+                }
+            }
+        }
+    }
+
+    public void testingCalculate(int sI, int subdivision) {
+        addSelectedPartition(subdivision);
+        CVOneTraitResult k_thResult = (CVOneTraitResult) get(sI);
+        CVPair cvPair = (CVPair) k_thResult.get(subdivision);
+        double tAccu = 0;
+        try {
+            tAccu = ToolKit.Accuracy(cvPair.getTesting());
+        } catch (ToolKitException E) {
+            E.printStackTrace(System.err);
+        }
+        cvPair.setTestingAccuracy(tAccu);
+    }
+
+    public CV(DataFile dr, Subdivision sd, int[] idx, int[] sI, double[] os, Combination m, boolean ismoore) {
         data = dr;
-///        subdivision = sub;
-        partitionInformation = p;
+        subdivision = sd;
         SNPIndex = new int[idx.length];
         System.arraycopy(idx, 0, SNPIndex, 0, idx.length);
         scrIdx = new int[sI.length];
@@ -60,74 +135,92 @@ public class AbstractCrossValidation extends AbstractList {
         selectedPartition = new HashSet();
         fullModelResult = new HashMap();
         isMooreMDR = ismoore;
-
         testingList = new ArrayList();
-        for (int i =0; i<partitionInformation.size(); i++) {
+        for (int i =0; i<subdivision.getInterval(); i++) {
             Combination testingMap = new Combination();
             testingList.add(testingMap);
         }
-/*
-        testList = new ArrayList();
-        for (int i=0; i<subdivision.getInterval(); i++) {
-            Combination testMap = new Combination();
-            testList.add(testMap);           
-        }
-*/
+
         for( int i=0; i<scrIdx.length; i++) {
             CVOneTraitResult k_thResult = new CVOneTraitResult();
             for( int j=0; j<testingList.size(); j++) {
-///            for( int j=0; j<testList.size(); j++) {                
                 CVPair cvPair = new CVPair();
                 k_thResult.add(cvPair);
             }
             add(k_thResult);
-        }      
+        }        
     }
 
-    public void testingCalculate(int sI, int division) {
-        addSelectedPartition(division);
-        CVOneTraitResult k_thTraitResult = (CVOneTraitResult) get(sI);
-        CVPair cvPair = (CVPair) k_thTraitResult.get(division);
-        double tAccu = 0;
-        try {
-            tAccu = ToolKit.Accuracy(cvPair.getTesting());
-        } catch (ToolKitException E) {
-            E.printStackTrace(System.err);
-        }
-        cvPair.setTestingAccuracy(tAccu);
-    }
-
-    public void calculate() {
+    public void kFolder() {
         Set keys = model.keySet();
+        HashMap divisionMap = subdivision.getDivision();
         for (Iterator e = keys.iterator(); e.hasNext();) {
             String key = (String) e.next();
             Suite fullSuite = (Suite) model.get(key);
+            ArrayList temp_fullSuite = fullSuite.getSubjects();
+            for (Iterator e1 = temp_fullSuite.iterator(); e1.hasNext();) {
+                DataFile.Subject sub = (DataFile.Subject) e1.next();
+                Integer ID = sub.getIntegerID();
+                int d = ((Integer) divisionMap.get(ID)).intValue();
+                Combination suiteMap = (Combination) testingList.get(d);
+                Suite S = (Suite) suiteMap.get(key);
+                if (S == null) {
+                    S = new Suite(scrIdx.length);
+                    suiteMap.put(key, S);
+                }
+                S.add(sub);
+            }
+        }
+    }
+
+
+    public void kFolderSubdivision() {
+        Set keys = model.keySet();
+        HashMap division = subdivision.getDivision();
+        for (Iterator e = keys.iterator(); e.hasNext();) {
+            String key = (String) e.next();
+            Suite fullSuite = (Suite) model.get(key);
+            ArrayList temp_fullSuite = fullSuite.getSubjects();
+            for (Iterator e1 = temp_fullSuite.iterator(); e1.hasNext();) {
+                DataFile.Subject sub = (DataFile.Subject) e1.next();
+                Integer ID = sub.getIntegerID();
+                int d = ((Integer) division.get(ID)).intValue();
+                Combination suiteMap = (Combination) testingList.get(d);
+                Suite S = (Suite) suiteMap.get(key);
+                if (S == null) {
+                    S = new Suite(scrIdx.length);
+                    suiteMap.put(key, S);
+                }
+                S.add(sub);
+            }
+            
             for (int i = 0; i < scrIdx.length; i++) {
-                CVOneTraitResult k_thResult = (CVOneTraitResult) get(i);
+                CVOneTraitResult k_thTraitResult = (CVOneTraitResult) get(i);
                 double thresholdRatio = 0;
                 try {
-                    thresholdRatio = data.getTraitRatio(SNPIndex, scrIdx[i]);
-                } catch (DataSetException E) {
+                    thresholdRatio = data.getTraitRatio(i, SNPIndex);
+                } catch (DataFileException E) {
                     E.printStackTrace(System.err);
                 }
-                fullSuite.summarize(i, offset[i]);
-                int fullModelStatus = ToolKit.Acertainment(fullSuite.getPositiveScore(i), fullSuite.getNegativeScore(i), thresholdRatio);
-                Cell fullCell = new Cell(fullSuite.getPositiveSubjects(i), fullSuite.getNegativeSubjects(i),
-                        fullSuite.getPositiveScore(i), fullSuite.getNegativeScore(i), fullModelStatus);
-                fullModelResult.put(key, fullCell);
+                fullSuite.summarize(scrIdx[i], offset[i]);
                 int fullposSubs = fullSuite.getPositiveSubjects(i);
                 int fullnegSubs = fullSuite.getNegativeSubjects(i);
                 double fullposScr = fullSuite.getPositiveScore(i);
                 double fullnegScr = fullSuite.getNegativeScore(i);
+                int fullModelStatus = ToolKit.Acertainment(fullposScr, fullnegScr, thresholdRatio);
+                Cell fullCell = new Cell(fullposSubs, fullnegSubs,
+                        fullposScr, fullnegScr, fullModelStatus);
+                fullModelResult.put(key, fullCell);
+
                 for (int j = 0; j<testingList.size(); j++) {
-                    CVPair cvPair = (CVPair) k_thResult.get(j);
-                    Combination testingModels = (Combination) testingList.get(j);
+                    CVPair cvPair = (CVPair) k_thTraitResult.get(j);
+                    Combination testingModel = (Combination) testingList.get(j);
                     int status;
                     Cell trCell;
                     Cell tCell;
-                    if (testingModels.containsKey(key)) {
-                        Suite testingSuite = (Suite) testingModels.get(key);
-                        testingSuite.summarize(i, offset[i]);
+                    if (testingModel.containsKey(key)) {
+                        Suite testingSuite = (Suite) testingModel.get(key);
+                        testingSuite.summarize(scrIdx[i], offset[i]);
                         int pos_Subs = testingSuite.getPositiveSubjects(i);
                         int neg_Subs = testingSuite.getNegativeSubjects(i);
                         double pos_Scr = testingSuite.getPositiveScore(i);
@@ -156,113 +249,11 @@ public class AbstractCrossValidation extends AbstractList {
             }
         }
     }
-/*
-    public void kFolderSubdivision() {
-        Set keys = model.keySet();
-        HashMap division = subdivision.getDivision();
-        for (Iterator e = keys.iterator(); e.hasNext();) {
-            String key = (String) e.next();
-            Suite fullSuite = (Suite) model.get(key);
-            for (Iterator e1 = fullSuite.iterator(); e1.hasNext();) {
-                DataSet.Subject sub = (DataSet.Subject) e1.next();
-                Integer ID = sub.getIntegerID();
-                int d = ((Integer) division.get(ID)).intValue();
-                Combination suiteMap = (Combination) testList.get(d);
-                Suite S = (Suite) suiteMap.get(key);
-                if (S == null) {
-                    S = new Suite();
-                    suiteMap.put(key, S);
-                }
-                S.add(sub);
-            }
-            
-            for (int i = 0; i < scrIdx.length; i++) {
-                CVOneTraitResult k_thTraitResult = (CVOneTraitResult) get(i);
-                double thresholdRatio = 0;
-                try {
-                    thresholdRatio = data.getTraitRatio(SNPIndex, scrIdx[i]);
-                } catch (DataSetException E) {
-                    E.printStackTrace(System.err);
-                }
-                fullSuite.summarize(i, offset[i]);
-
-                int fullModelStatus = ToolKit.acertainment(fullSuite.getPositiveScore(), fullSuite.getNegativeScore(), thresholdRatio);
-                Cell fullCell = new Cell(fullSuite.getPositiveSubjects(), fullSuite.getNegativeSubjects(),
-                        fullSuite.getPositiveScore(), fullSuite.getNegativeScore(), fullModelStatus);
-                fullModelResult.put(key, fullCell);
-                int fullposSubs = fullSuite.getPositiveSubjects();
-                int fullnegSubs = fullSuite.getNegativeSubjects();
-                double fullposScr = fullSuite.getPositiveScore();
-                double fullnegScr = fullSuite.getNegativeScore();
-                for (int j = 0; j<testList.size(); j++) {
-                    CVPair cvPair = (CVPair) k_thTraitResult.get(j);
-                    Combination testingModel = (Combination) testList.get(j);
-                    int status;
-                    Cell trCell;
-                    Cell tCell;
-                    if (testingModel.containsKey(key)) {
-                        Suite testingSuite = (Suite) testingModel.get(key);
-                        testingSuite.summarize(scrIdx[i], offset[i]);
-                        int pos_Subs = testingSuite.getPositiveSubjects();
-                        int neg_Subs = testingSuite.getNegativeSubjects();
-                        double pos_Scr = testingSuite.getPositiveScore();
-                        double neg_Scr = testingSuite.getNegativeScore();
-                        status = ToolKit.acertainment(fullposScr - pos_Scr, fullnegScr - neg_Scr, thresholdRatio);
-                        trCell = new Cell(fullposSubs - pos_Subs, fullnegSubs - neg_Subs, fullposScr - pos_Scr, fullnegScr - neg_Scr, status);
-                        tCell = new Cell(pos_Subs, neg_Subs, pos_Scr, neg_Scr, status);
-                    } else {
-                        status = ToolKit.acertainment(fullposScr, fullnegScr, thresholdRatio);
-                        trCell = new Cell(fullposSubs, fullnegSubs, fullposScr, fullnegScr, status);
-                        tCell = new Cell(0, 0, 0, 0, -1);
-                    }
-                    cvPair.addTrainingModel(key, trCell);
-                    cvPair.addTestingModel(key, tCell);
-                    double trAccu = 0;
-                    try {
-                        trAccu = ToolKit.Accuracy(cvPair.getTraining());
-                    } catch (ToolKitException E) {
-                        E.printStackTrace(System.err);
-                    }
-                    cvPair.setTrainingAccuracy(trAccu);
-                    if (!isMooreMDR) {
-                        testingCalculate(i, j);
-                    }
-                }
-            }
-        }
-    }
-*/
-    public void kFolder() {
-        Set keys = model.keySet();
-        for (Iterator e = keys.iterator(); e.hasNext();) {
-            String key = (String) e.next();
-            Suite fullSuite = (Suite) model.get(key);
-            ArrayList temp_fullSuite = fullSuite.getSubjects();
-            for (Iterator e1 = temp_fullSuite.iterator(); e1.hasNext();) {
-                DataFile.Subject sub = (DataFile.Subject) e1.next();
-                Integer ID = sub.getIntegerID();
-                int count = 0;
-                for (Iterator e2 = partitionInformation.iterator(); e2.hasNext();) {
-                    HashSet IDs = (HashSet) e2.next();
-                    if (IDs.contains(ID)) {
-                        Combination suiteMap = (Combination) testingList.get(count);
-                        Suite S = (Suite) suiteMap.get(key);
-                        if (S == null) {
-                            S = new Suite(scrIdx.length);
-                            suiteMap.put(key, S);
-                        }
-                        S.add(sub);
-                    }
-                    count++;
-                }
-            }
-        }
-    }
-
+    
+    
     public void printKFolderData() {
         int c = 0;
         for (Iterator e = testingList.iterator(); e.hasNext();) {
-//        for (Iterator e = testList.iterator(); e.hasNext();) {        
             System.out.println("C=" + c++);
             HashMap tstMap = (HashMap) e.next();
             TreeSet tstkeyset = new TreeSet(tstMap.keySet());
@@ -272,7 +263,7 @@ public class AbstractCrossValidation extends AbstractList {
                 Suite tstSuite = (Suite) tstMap.get(key);
                 ArrayList temp_tstSuite = tstSuite.getSubjects();
                 for (Iterator le = temp_tstSuite.iterator(); le.hasNext();) {
-                    DataSet.Subject sub = (DataSet.Subject) le.next();
+                    DataFile.Subject sub = (DataFile.Subject) le.next();
                     System.out.println(sub);
                 }
             }
@@ -313,7 +304,7 @@ public class AbstractCrossValidation extends AbstractList {
 
     public boolean isMooreMDR() {
         return isMooreMDR;
-    }
+    }    
 
     public class CVPair {
 
@@ -363,26 +354,12 @@ public class AbstractCrossValidation extends AbstractList {
             return testingMap;
         }
     }
-
-    public class CVOneTraitResult extends AbstractList {
-
-        private ArrayList ResultList = new ArrayList();
-
-        public CVOneTraitResult() {
-        }
-
-        public void add(int idx, Object o) {
-            modCount++;
-            ResultList.add(idx, o);
-        }
-
-        public Object get(int idx) {
-            return ResultList.get(idx);
-        }
+    
+    public class CVOneTraitResult extends ArrayList {
 
         public void print() {
             int cv = 0;
-            for (Iterator e = ResultList.iterator(); e.hasNext();) {
+            for (Iterator e = this.iterator(); e.hasNext();) {
                 CVPair cvPair = (CVPair) e.next();
                 System.out.println("CV result " + cv + ", Tesint Accuracy " + cvPair.getTestingAccuracy() + ", Training Accuracy " + cvPair.getTrainingAccuracy());
                 HashMap trMap = cvPair.getTraining();
@@ -400,15 +377,6 @@ public class AbstractCrossValidation extends AbstractList {
                 }
                 cv++;
             }
-        }
-
-        public Object remove(int idx) {
-            modCount++;
-            return ResultList.remove(idx);
-        }
-
-        public int size() {
-            return ResultList.size();
         }
     }    
 }

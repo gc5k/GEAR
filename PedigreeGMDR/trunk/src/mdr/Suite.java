@@ -2,18 +2,18 @@
 package mdr;
 
 import mdr.data.DataFile;
-import mdrAlternative.DataSet;
 import java.util.ArrayList;
 import java.util.Iterator;
 
 import publicAccess.PublicData;
+import util.NewIt;
 
 /**
  *
  * @author Guo-Bo Chen
  */
 public class Suite {
-    protected ArrayList subjects;
+    protected ArrayList<DataFile.Subject> subjects;
     protected double[] threshold;
     protected int[] posSubjects;
     protected int[] negSubjects;
@@ -26,13 +26,13 @@ public class Suite {
         initial(s.getNumTraits());
     }
 
-    public Suite(ArrayList subs, int numTraits) {
+    public Suite(ArrayList<DataFile.Subject> subs, int numTraits) {
         subjects = subs;
         initial(numTraits);
     }
 
     public Suite(int numTraits) {
-        subjects = new ArrayList();
+        subjects = NewIt.newArrayList();
         initial(numTraits);
     }
     
@@ -61,7 +61,7 @@ public class Suite {
         return status[idx];
     }
 
-    public ArrayList getSubjects() {
+    public ArrayList<DataFile.Subject> getSubjects() {
         return subjects;
     }
 
@@ -131,8 +131,7 @@ public class Suite {
 
     public String toString() {
         StringBuffer sb = new StringBuffer();
-        for(Iterator e = subjects.iterator(); e.hasNext(); ) {
-            DataSet.Subject sub = (DataSet.Subject) e.next();
+        for(DataFile.Subject sub : subjects ) {
             System.out.println(sub);
         }
         return sb.toString();
