@@ -10,6 +10,8 @@ import java.util.Arrays;
 import java.util.Random;
 import java.util.regex.Pattern;
 
+import util.NewIt;
+
 public class FamilyGenerator {
 
 	boolean isNullHypothesis;
@@ -40,26 +42,26 @@ public class FamilyGenerator {
 
 	String[][] Allele;
 	int numLocus;
-	ArrayList Parents;
-	ArrayList Children;
-	ArrayList PCovariate;
-	ArrayList PPhenotype;
-	ArrayList CCovariate;
-	ArrayList CPhenotype;
-	ArrayList Traits;
-	ArrayList PTraits;
+	ArrayList<ArrayList<String[][]>> Parents;
+	ArrayList<ArrayList<String[][]>> Children;
+	ArrayList<ArrayList<Double>> PCovariate;
+	ArrayList<ArrayList<Double>> PPhenotype;
+	ArrayList<ArrayList<Double>> CCovariate;
+	ArrayList<ArrayList<Double>> CPhenotype;
+	ArrayList<ArrayList<Integer>> Traits;
+	ArrayList<ArrayList<Integer>> PTraits;
 	Random randomData;
 
 	FamilyGenerator(long sd) {
 		randomData = new Random(sd);
-		Parents = new ArrayList();
-		Children = new ArrayList();
-		CCovariate = new ArrayList();
-		CPhenotype = new ArrayList();
-		PCovariate = new ArrayList();
-		PPhenotype = new ArrayList();
-		Traits = new ArrayList();
-		PTraits = new ArrayList();
+		Parents = NewIt.newArrayList();
+		Children = NewIt.newArrayList();
+		CCovariate = NewIt.newArrayList();
+		CPhenotype = NewIt.newArrayList();
+		PCovariate = NewIt.newArrayList();
+		PPhenotype = NewIt.newArrayList();
+		Traits = NewIt.newArrayList();
+		PTraits = NewIt.newArrayList();
 	}
 
 	public static class Parameter {
@@ -100,7 +102,7 @@ public class FamilyGenerator {
 		private double[][] corMarkers;
 
 		public Parameter() {
-			lines = new ArrayList();
+			lines = NewIt.newArrayList();;
 		}
 
 		public void read(String file) throws IOException {
@@ -476,10 +478,10 @@ public class FamilyGenerator {
 		int cases = 0; // this variable is only used when number_case > 0
 		int controls = 0; // this variable is only used when number_case > 0
 		while (i < FamilySize) {
-			ArrayList p_temp = new ArrayList();
-			ArrayList p_trait = new ArrayList();
-			ArrayList p_covariate = new ArrayList();
-			ArrayList p_phenotype = new ArrayList();
+			ArrayList<String[][]> p_temp = NewIt.newArrayList();
+			ArrayList<Integer> p_trait = NewIt.newArrayList();
+			ArrayList<Double> p_covariate = NewIt.newArrayList();
+			ArrayList<Double> p_phenotype = NewIt.newArrayList();
 			int FamCategory = 0;
 
 			for (int j = 0; j < FamNum.length; j++) {
@@ -530,10 +532,10 @@ public class FamilyGenerator {
 				}
 			} while (!parent_proband_flag);
 
-			ArrayList c_temp = new ArrayList();
-			ArrayList c_trait = new ArrayList();
-			ArrayList c_covariate = new ArrayList();
-			ArrayList c_phenotype = new ArrayList();
+			ArrayList<String[][]> c_temp = NewIt.newArrayList();
+			ArrayList<Integer> c_trait = NewIt.newArrayList();
+			ArrayList<Double> c_covariate = NewIt.newArrayList();
+			ArrayList<Double> c_phenotype = NewIt.newArrayList();
 			int affect = 0;
 
 			for (int ii = 0; ii < Kid_Diff_Family[FamCategory]; ++ii) {
@@ -658,12 +660,12 @@ public class FamilyGenerator {
 			int ID = FID * 10;
 			int FA = ID;
 			int MO = ID + 1;
-			ArrayList temp = (ArrayList) Parents.get(i);
-			ArrayList pt_temp = (ArrayList) PTraits.get(i);
-			ArrayList pc_temp = (ArrayList) PCovariate.get(i);
-			ArrayList pp_temp = null;
+			ArrayList<String[][]> temp = Parents.get(i);
+			ArrayList<Integer> pt_temp = PTraits.get(i);
+			ArrayList<Double> pc_temp = PCovariate.get(i);
+			ArrayList<Double> pp_temp = null;
 			if (model.compareTo("B") != 0) {
-				pp_temp = (ArrayList) PPhenotype.get(i);
+				pp_temp = PPhenotype.get(i);
 			}
 			String[][] pair1 = (String[][]) (String[][]) temp.get(0);
 			String[][] pair2 = (String[][]) (String[][]) temp.get(1);
@@ -718,12 +720,12 @@ public class FamilyGenerator {
 
 			++ID;
 
-			ArrayList children = (ArrayList) Children.get(i);
-			ArrayList t_temp = (ArrayList) Traits.get(i);
-			ArrayList cc_temp = (ArrayList) CCovariate.get(i);
-			ArrayList cp_temp = null;
+			ArrayList<String[][]> children = Children.get(i);
+			ArrayList<Integer> t_temp = Traits.get(i);
+			ArrayList<Double> cc_temp = CCovariate.get(i);
+			ArrayList<Double> cp_temp = null;
 			if (model.compareTo("B") != 0) {
-				cp_temp = (ArrayList) CPhenotype.get(i);
+				cp_temp = CPhenotype.get(i);
 			}
 			for (int j = 0; j < children.size(); ++j) {
 				String[][] child = (String[][]) (String[][]) children.get(j);
@@ -785,16 +787,15 @@ public class FamilyGenerator {
 				}
 			}
 
-			ArrayList children = (ArrayList) Children.get(i);
-			ArrayList t_temp = (ArrayList) Traits.get(i);
-			ArrayList cc_temp = (ArrayList) CCovariate.get(i);
-			ArrayList cp_temp = null;
+			ArrayList<String[][]> children = Children.get(i);
+			ArrayList<Integer> t_temp = Traits.get(i);
+			ArrayList<Double> cc_temp = CCovariate.get(i);
+			ArrayList<Double> cp_temp = null;
 			if (model.compareTo("B") != 0) {
-				cp_temp = (ArrayList) CPhenotype.get(i);
+				cp_temp = CPhenotype.get(i);
 			}
 			for (int j = 0; j < children.size(); ++j) {
 				String[][] child = (String[][]) (String[][]) children.get(j);
-				int sex = (randomData.nextBoolean()) ? 1 : 0;
 				for (int k = 0; k < child.length; ++k) {
 					double rd = randomData.nextFloat();
 					if (rd > KidGenotypeMissingRate) {
@@ -882,13 +883,13 @@ public class FamilyGenerator {
 			pr.pheno_select_quantile[1] = -0.9;
 			pr.simu_replication = 2;
 			pr.family_size = 1000;
-			pr.number_case = 500;
+			pr.number_case = 0;
 			pr.FamNum = new int[1];
 			pr.FamNum[0] = 1000;
 			pr.AffParent = new int[1];
 			pr.AffParent[0] = 3;
 			pr.Kid = new int[1];
-			pr.Kid[0] = 1;
+			pr.Kid[0] = 2;
 			pr.AffKid = new int[1];
 			pr.AffKid[0] = -1;
 			pr.ParentMissingRate = new double[1][2];
