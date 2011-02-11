@@ -3,24 +3,25 @@ package family.pedigree;
 import java.util.Enumeration;
 import java.util.Hashtable;
 
+import util.NewIt;
+
 /**
  * stores the familyName and the members of a family from a pedigree file this class is not thread safe (untested)
  * 
- * @author Julian Maller
- * @author Guo-Bo Chen
+ * @author Guo-Bo Chen, chenguobo@gmail.com
  */
 public class FamilyUnit {
 //save phenotype information;
-    private Hashtable subjects;
+    private Hashtable<String, Subject> subjects;
     private String familyUnitName;
     private int mendErrors;
 
     public FamilyUnit() {
-        this.subjects = new Hashtable();
+        this.subjects = NewIt.newHashtable();
     }
 
     public FamilyUnit(String familyName) {
-        this.subjects = new Hashtable();
+        this.subjects = NewIt.newHashtable();
         this.familyUnitName = familyName;
     }
 
@@ -47,7 +48,7 @@ public class FamilyUnit {
      * 
      * @return subjects Hashtable
      */
-    public Hashtable getSubjects() {
+    public Hashtable<String, Subject> getSubjects() {
         return subjects;
     }
 
@@ -56,7 +57,7 @@ public class FamilyUnit {
      * 
      * @param subjects
      */
-    public void setSubjects(Hashtable subjects) {
+    public void setSubjects(Hashtable<String, Subject> subjects) {
         this.subjects = subjects;
     }
 
@@ -82,7 +83,7 @@ public class FamilyUnit {
      * 
      * @return enumeration memberlist
      */
-    public Enumeration getSubjectsList() {
+    public Enumeration<String> getSubjectsList() {
         return this.subjects.keys();
     }
 

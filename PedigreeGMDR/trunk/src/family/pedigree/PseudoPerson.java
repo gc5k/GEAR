@@ -2,11 +2,13 @@ package family.pedigree;
 
 import java.util.ArrayList;
 
+import util.NewIt;
+
 /**
  * stores the genotypes of each individual, and, furthermore, store the nontransmitted genotype of this individual. this
  * class is not thread safe (untested)
  * 
- * @author Guo-Bo Chen
+ * @author Guo-Bo Chen, chenguobo@gmail.com
  */
 public class PseudoPerson {
 
@@ -16,12 +18,12 @@ public class PseudoPerson {
     private String dadID;
     private int gender;
     private int affectedStatus;
-    private ArrayList pseudoGenotype;
+    private ArrayList<String> pseudoGenotype;
     private int numMarkers;
 
     PseudoPerson(int numMarkers) {
         this.numMarkers = numMarkers;
-        pseudoGenotype = new ArrayList();
+        pseudoGenotype = NewIt.newArrayList();
     }
 
     public void pseudoGenotypeClear() {
@@ -45,7 +47,7 @@ public class PseudoPerson {
         this.pseudopersonID = pid;
     }
 
-    public ArrayList getGenotype() {
+    public ArrayList<String> getGenotype() {
         return pseudoGenotype;
     }
 
@@ -123,15 +125,15 @@ public class PseudoPerson {
         this.affectedStatus = affectedStatus;
     }
 
-    public ArrayList getPseudoGenotype() {
+    public ArrayList<String> getPseudoGenotype() {
         return pseudoGenotype;
     }
-    
-    public ArrayList getPseudoGenotype(int[] subsetMarker) {
+
+    public ArrayList<String> getPseudoGenotype(int[] subsetMarker) {
     	if(subsetMarker.length == pseudoGenotype.size()) {
     		return pseudoGenotype;
     	} else {
-    		ArrayList sub = new ArrayList();
+    		ArrayList<String> sub = NewIt.newArrayList();
     		for(int i = 0; i < subsetMarker.length; i++) {
     			sub.add((String) pseudoGenotype.get(subsetMarker[i]));
     		}

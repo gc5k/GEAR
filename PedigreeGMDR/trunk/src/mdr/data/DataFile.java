@@ -182,17 +182,17 @@ public class DataFile {
 
     public DataFile() {}
 
-    public DataFile(ArrayList<String> mkInformation, ArrayList<ArrayList<String>> marker, ArrayList<Integer> statue, ArrayList<String> traitInformation, ArrayList<ArrayList<Double>> phenotype, int[] si) {
+    public DataFile(ArrayList<String> mkInformation, ArrayList<ArrayList<String>> marker, ArrayList<String> statue, ArrayList<String> traitInformation, ArrayList<ArrayList<String>> phenotype, int[] si) {
     	SNPID = mkInformation.toArray(new String[0]);
     	traitName = traitInformation.toArray(new String[0]);
     	initial1(marker, statue, phenotype, si);
     }
 
-    private void initial1(ArrayList<ArrayList<String>> marker, ArrayList<Integer> statue, ArrayList<ArrayList<Double>> phenotype, int[] si) {
+    private void initial1(ArrayList<ArrayList<String>> marker, ArrayList<String> statue, ArrayList<ArrayList<String>> phenotype, int[] si) {
         TreeMap<Integer, ArrayList<Integer>> tempMap = NewIt.newTreeMap();        
     	for (int i= 0; i < marker.size(); i++) {
     		ArrayList<String> geno = marker.get(i);
-    		geno.add((String) statue.get(i).toString());
+    		geno.add(statue.get(i));
     		String[] content = geno.toArray(new String[0]);
             Subject sub = new Subject(content);
             sub.setID(i);
@@ -224,7 +224,7 @@ public class DataFile {
 
         for (int i = 0; i < sample.size(); i++ ) {
             Subject sub = (Subject) sample.get(i);
-            ArrayList<Double> traits = phenotype.get(i);
+            ArrayList<String> traits = phenotype.get(i);
             String[] ps = traits.toArray(new String[0]);
             sub.addScore(ps);
         }

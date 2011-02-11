@@ -2,6 +2,8 @@ package family.pedigree;
 
 import java.util.ArrayList;
 
+import util.NewIt;
+
 /**
  * stores the genotypes of each individual. this class is not thread safe (untested)
  * 
@@ -15,7 +17,7 @@ public class Person {
     private String dadID;
     private int gender;
     private int affectedStatus;
-    private ArrayList genotype;
+    private ArrayList<String> genotype;
     private String reasonImAxed;
     // private Vector markers;
     // private byte[] alleles1;
@@ -35,7 +37,7 @@ public class Person {
         alleles = new byte[2][numMarkers];
         this.zeroed = new boolean[numMarkers];
         this.currMarker = 0;
-        this.genotype = new ArrayList();
+        this.genotype = NewIt.newArrayList();
     }
 
     /**
@@ -217,7 +219,7 @@ public class Person {
         zeroed = z;
     }
 
-    public void setGenotype(ArrayList marker) {
+    public void setGenotype(ArrayList<String> marker) {
         genotype = marker;
     }
 
@@ -225,15 +227,15 @@ public class Person {
         genotype.set(index, geno);
     }
 
-    public ArrayList getGenotype() {
+    public ArrayList<String> getGenotype() {
         return genotype;
     }
 
-    public ArrayList getGenotype(int[] subsetMarker) {
+    public ArrayList<String> getGenotype(int[] subsetMarker) {
     	if (subsetMarker.length == genotype.size()) {
     		return genotype;
     	} else {
-    		ArrayList sub = new ArrayList();
+    		ArrayList<String> sub = NewIt.newArrayList();
     		for (int i = 0; i < subsetMarker.length; i++) {
     			sub.add((String) genotype.get(subsetMarker[i]));
     		}

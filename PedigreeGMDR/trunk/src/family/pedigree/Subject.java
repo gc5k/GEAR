@@ -2,6 +2,8 @@ package family.pedigree;
 
 import java.util.ArrayList;
 
+import util.NewIt;
+
 /**
  * stores the phenotypic outcomes of each individual. this class is not thread safe (untested)
  * 
@@ -11,14 +13,14 @@ public class Subject {
 
     private String familyID;
     private String subjectID;
-    private ArrayList traits;
-    private ArrayList missing;
+    private ArrayList<String> traits;
+    private ArrayList<Boolean> missing;
     private int numTraits;
     private String missingData = ".";
 
     public Subject(int num) {
-        traits = new ArrayList();
-        missing = new ArrayList();
+        traits = NewIt.newArrayList();
+        missing = NewIt.newArrayList();
         numTraits = num;
     }
 
@@ -33,11 +35,11 @@ public class Subject {
         return numTraits;
     }
 
-    public ArrayList getTraits() {
+    public ArrayList<String> getTraits() {
         return traits;
     }
 
-    public ArrayList getmissing() {
+    public ArrayList<Boolean> getmissing() {
         return missing;
     }
 
