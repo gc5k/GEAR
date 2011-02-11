@@ -30,6 +30,7 @@ import java.util.Vector;
 import org._3pq.jgrapht.graph.SimpleGraph;
 
 import publicAccess.PublicData;
+import util.NewIt;
 import family.RabinowitzLairdAlgorithm.AbstractGenoDistribution;
 import family.imputation.*;
 import edu.mit.wi.haploview.Chromosome;
@@ -46,14 +47,13 @@ import edu.mit.wi.pedparser.PedigreeException;
  * and checkdata classes by Hui Gong
  * 
  * @author Julian Maller
- * @author Guo-Bo Chen
+ * @author Guo-Bo Chen, chenguobo@gmail.com
  */
 public class MDRPed {
 
-	private Hashtable famNonInformative;
-    private Hashtable famInformative;
-    private Hashtable families;
-    private Hashtable familystructure;
+    private Hashtable<String, Boolean> famInformative;
+    private Hashtable<String, Family> families;
+    private Hashtable<String, FamilyStruct> familystructure;
     private ArrayList axedPeople = new ArrayList();
 
     // stores the individuals found by parse() in allIndividuals. this is useful for outputting Pedigree information to
@@ -71,7 +71,7 @@ public class MDRPed {
     private int[] markerRatings;
     private int[] dups;
     private HashSet whitelist;
-    private ArrayList markerInfor;
+    private ArrayList<String> markerInfor;
     private ArrayList pedigrees;
     private ArrayList pedFileStrings;
     private ArrayList menderrortrace;
@@ -84,10 +84,9 @@ public class MDRPed {
     public MDRPed() {
 
         // hardcoded hapmap info
-        this.famInformative = new Hashtable();
-        this.famNonInformative = new Hashtable();
-        this.families = new Hashtable();
-        this.familystructure = new Hashtable();
+        this.famInformative = NewIt.newHashtable();
+        this.families = NewIt.newHashtable();
+        this.familystructure = NewIt.newHashtable();
         this.menderrortrace = new ArrayList();
         hapMapTranslate = new Hashtable(90, 1);
         hapMapTranslate.put("NA10846", "1334 NA10846 NA12144 NA12145 1 0");
@@ -462,7 +461,7 @@ public class MDRPed {
                         if (ind.getZeroed(i)) {
                             marker = new String(PublicData.MissingGenotype);
                             met = new MendErrorTrace(fid, iid,
-                                    (String) markerInfor.get(i), i);
+                                    markerInfor.get(i), i);
                             menderrortrace.add(met);
                         } else {
                             byte m1 = ind.getAllele(i, 0);
@@ -581,7 +580,7 @@ public class MDRPed {
                     fs.addObservedGenoSet(gSet);
                 } else {
                     if (gSet.getchildrenGenoMap().size() == 0) {
-                        error_report.add(new String("Family " + fs.getFamilyStructName() + " Locus " + (String) markerInfor.get(i)));
+                        error_report.add(new String("Family " + fs.getFamilyStructName() + " Locus " + markerInfor.get(i)));
                         b = new Boolean(false);
                         famInformative.put(fs.getFamilyStructName(), b);
                     }
@@ -605,7 +604,7 @@ public class MDRPed {
     /**
      * @return enumeration containing a list of familyID's in the families hashtable
      */
-    public Enumeration getFamList() {
+    public Enumeration<String> getFamList() {
         return this.families.keys();
     }
 
@@ -628,7 +627,7 @@ public class MDRPed {
     	int c = 0;
     	Enumeration famstrList = this.familystructure.keys();
     	while (famstrList.hasMoreElements()) {
-    		c += ((Boolean) famInformative.get(famstrList.nextElement())).booleanValue() ? 1 : 0;
+    		c += famInformative.get(famstrList.nextElement()).booleanValue() ? 1 : 0;
     	}
     	return c;
     }
@@ -639,7 +638,7 @@ public class MDRPed {
 		int ind = 0;
 		while (famstrList.hasMoreElements()) {
 			String F = (String) famstrList.nextElement();
-			if ( ((Boolean) (famInformative.get(F))).booleanValue()) {
+			if ( famInformative.get(F).booleanValue()) {
 				FID[ind++] = F;
 			}
 		}
@@ -653,7 +652,7 @@ public class MDRPed {
 		int ind = 0;
 		while (famstrList.hasMoreElements()) {
 			String F = (String) famstrList.nextElement();
-			if ( !((Boolean) (famInformative.get(F))).booleanValue()) {
+			if ( !famInformative.get(F).booleanValue()) {
 				FID[ind++] = F;
 			}
 		}
@@ -661,7 +660,7 @@ public class MDRPed {
 		return FID;
     }
 
-    public Hashtable getFamInformative() {
+    public Hashtable<String, Boolean> getFamInformative() {
         return this.famInformative;
     }
 
@@ -671,11 +670,11 @@ public class MDRPed {
      * @return Family identified by familyID in families hashtable
      */
     public Family getFamily(String familyID) {
-        return (Family) this.families.get(familyID);
+        return this.families.get(familyID);
     }
 
     public FamilyStruct getFamilyStruct(String familystrID) {
-        return (FamilyStruct) this.familystructure.get(familystrID);
+        return this.familystructure.get(familystrID);
     }
 
     /**
@@ -787,7 +786,7 @@ public class MDRPed {
 
         // reading the title line:get the marker number
         int c = 0;
-        ArrayList temp = new ArrayList();
+        ArrayList<String> temp = NewIt.newArrayList();
         while (tokenizer.hasMoreTokens()) {
             if (c++ < 6) {
                 tokenizer.nextToken();
@@ -917,7 +916,7 @@ public class MDRPed {
                 }
 
                 // check if the family exists already in the Hashtable
-                Family fam = (Family) this.families.get(ind.getFamilyID());
+                Family fam = this.families.get(ind.getFamilyID());
                 if (fam == null) {
                     // it doesnt exist, so create a new Family object
                     fam = new Family(ind.getFamilyID());
@@ -932,7 +931,7 @@ public class MDRPed {
                 this.allIndividuals.add(ind);
 
                 // check if the family exists already in the Hashtable
-                FamilyStruct famstr = (FamilyStruct) this.familystructure.get(per.getFamilyID());
+                FamilyStruct famstr = this.familystructure.get(per.getFamilyID());
                 if (famstr == null) {
                     // it doesn't exist, so create a new FamilyStruct object
                     famstr = new FamilyStruct(per.getFamilyID());
@@ -953,7 +952,7 @@ public class MDRPed {
         // now we check if anyone has a reference to a parent who isn't in the file, and if so, we remove the reference
         for (int i = 0; i < allIndividuals.size(); i++) {
             Individual currentInd = (Individual) allIndividuals.get(i);
-            Hashtable curFam = ((Family) (families.get(currentInd.getFamilyID()))).getMembers();
+            Hashtable curFam = families.get(currentInd.getFamilyID()).getMembers();
             if (!currentInd.getDadID().equals("0") && !(curFam.containsKey(currentInd.getDadID()))) {
                 currentInd.setDadID("0");
                 bogusParents = true;
@@ -1044,7 +1043,7 @@ public class MDRPed {
             }
 
             // check if the family exists already in the Hashtable
-            Family fam = (Family) this.families.get(ind.getFamilyID());
+            Family fam = this.families.get(ind.getFamilyID());
             if (fam == null) {
                 // it doesnt exist, so create a new Family object
                 fam = new Family(ind.getFamilyID());
@@ -1066,7 +1065,7 @@ public class MDRPed {
             if (colNum != tokenizer.countTokens()) {
                 // this line has a different number of columns
                 // should send some sort of error message
-                // TODO: add something which stores number of markers for all lines and checks that they're consistent
+                // add something which stores number of markers for all lines and checks that they're consistent
                 throw new MDRPedFileException(
                         "Line number mismatch in input file. line " + (k + 1));
             }
@@ -1264,7 +1263,7 @@ public class MDRPed {
                     ind.addMarker(allele1, allele2);
                 }
                 // check if the family exists already in the Hashtable
-                Family fam = (Family) this.families.get(ind.getFamilyID());
+                Family fam = this.families.get(ind.getFamilyID());
                 if (fam == null) {
                     // it doesnt exist, so create a new Family object
                     fam = new Family(ind.getFamilyID());
@@ -1450,21 +1449,22 @@ public class MDRPed {
         return tableData;
     }
 
-    public ArrayList getMarkerInformation() {
+    public ArrayList<String> getMarkerInformation() {
         return markerInfor;
     }
 
-    public ArrayList getMarkerInformation(int[] subsetMarker) {
+    public ArrayList<String> getMarkerInformation(int[] subsetMarker) {
     	if(subsetMarker.length == markerInfor.size() || subsetMarker == null) {
     		return markerInfor;
     	} else {
-    		ArrayList mk = new ArrayList();
+    		ArrayList<String> mk = NewIt.newArrayList();
     		for(int i = 0; i < subsetMarker.length; i++) {
-    			mk.add((String) markerInfor.get(subsetMarker[i]));
+    			mk.add(markerInfor.get(subsetMarker[i]));
     		}
     		return mk;
     	}
     }
+
     public int[] getMarkerRatings() {
         return markerRatings;
     }
@@ -1570,7 +1570,7 @@ public class MDRPed {
                         if (ind.getZeroed(i)) {
                             marker = new String(PublicData.MissingGenotype);
                             met = new MendErrorTrace(fid, iid,
-                                    (String) markerInfor.get(i), i);
+                                    markerInfor.get(i), i);
                             menderrortrace.add(met);
                         } else {
                             byte m1 = ind.getAllele(i, 0);

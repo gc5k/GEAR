@@ -9,10 +9,12 @@ import java.util.Enumeration;
 import java.util.Hashtable;
 import java.util.StringTokenizer;
 
+import util.NewIt;
+
 public class GMDRPhenoFile {
 
     private String titleLine;
-    private ArrayList traitInfor;
+    private ArrayList<String> traitInfor;
     private ArrayList traitFileStrings;
     private ArrayList traitStrings;
     private File phenoFile;
@@ -60,7 +62,7 @@ public class GMDRPhenoFile {
 
         // reading the title line:get the marker number
         int c = 0;
-        ArrayList temp = new ArrayList();
+        ArrayList<String> temp = NewIt.newArrayList();
         while (tokenizer.hasMoreTokens()) {
             if (c++ < 2) {
                 tokenizer.nextToken();
@@ -69,7 +71,7 @@ public class GMDRPhenoFile {
                 temp.add(trait);
             }
         }
-        traitInfor = (ArrayList) temp.clone();
+        traitInfor = new ArrayList<String>(temp);
     }
 
     public File getPhenoFile() {
@@ -160,7 +162,7 @@ public class GMDRPhenoFile {
         return traitInfor.size();
     }
 
-    public ArrayList getTraitName() {
+    public ArrayList<String> getTraitName() {
     	return traitInfor;
     }
     
@@ -169,6 +171,6 @@ public class GMDRPhenoFile {
             System.err.println("Could not find the phenotype at index " + index);
             System.exit(0);
         }
-        return (String) traitInfor.get(index);
+        return traitInfor.get(index);
     }
 }
