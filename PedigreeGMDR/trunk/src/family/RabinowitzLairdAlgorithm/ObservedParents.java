@@ -13,7 +13,7 @@ import publicAccess.PublicData;
  */
 public class ObservedParents extends AbstractGenoDistribution {
 
-    TreeMap parentGenoMap;
+    TreeMap<String, Integer> parentGenoMap;
 
     /**
      * construct ObservedParents
@@ -23,9 +23,9 @@ public class ObservedParents extends AbstractGenoDistribution {
      * @param parents
      *            genotypes of parents
      */
-    public ObservedParents(TreeMap children, TreeMap parents) {
+    public ObservedParents(TreeMap<String, Integer> children, TreeMap<String, Integer> parents) {
         super(children);
-        this.parentGenoMap = new TreeMap(parents);
+        this.parentGenoMap = new TreeMap<String, Integer>(parents);
         genotypeParents();
     }
 
@@ -45,7 +45,6 @@ public class ObservedParents extends AbstractGenoDistribution {
             {p2.charAt(0), p2.charAt(1)}
         };
         char allele[] = new char[2];
-        boolean flag = true;
 
         if (transmitted.compareTo(PublicData.MissingGenotype) == 0) {// missing data
 
@@ -150,7 +149,7 @@ public class ObservedParents extends AbstractGenoDistribution {
     }
 
     public void genotypeParents() {
-        parentGeno.add((String) parentGenoMap.firstKey());
-        parentGeno.add((String) parentGenoMap.lastKey());
+        parentGeno.add(parentGenoMap.firstKey());
+        parentGeno.add(parentGenoMap.lastKey());
     }
 }

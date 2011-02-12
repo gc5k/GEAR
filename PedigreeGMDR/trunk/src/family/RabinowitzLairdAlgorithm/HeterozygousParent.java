@@ -1,22 +1,21 @@
 package family.RabinowitzLairdAlgorithm;
 
 import java.util.ArrayList;
-import java.util.Iterator;
-import java.util.Set;
 import java.util.TreeMap;
 import java.util.TreeSet;
 
 import publicAccess.PublicData;
+import util.NewIt;
 
 /**
  * Class extends GenoDristribution Treat the situation of one heterozygous parent. However, it's still possible to
  * deduce the genotype of the other parent
  * 
- * @author Guobo Chen
+ * @author Guobo Chen, chenguobo@gmail.com
  */
 public class HeterozygousParent extends AbstractGenoDistribution {
 
-    TreeMap parentGenoMap;
+    TreeMap<String, Integer> parentGenoMap;
     String parentgeno1;
 
     /**
@@ -25,9 +24,9 @@ public class HeterozygousParent extends AbstractGenoDistribution {
      * @param parent
      *            the genotype of the heterozygous parent
      */
-    public HeterozygousParent(TreeMap children, TreeMap parent) {
+    public HeterozygousParent(TreeMap<String, Integer> children, TreeMap<String, Integer> parent) {
         super(children);
-        parentGenoMap = new TreeMap(parent);
+        parentGenoMap = new TreeMap<String, Integer>(parent);
         this.parentgeno1 = (String) parentGenoMap.firstKey();
         countChildrenAllele(childrenGenoMap);
         countAllele(childrenGenoMap);
@@ -123,22 +122,19 @@ public class HeterozygousParent extends AbstractGenoDistribution {
 
             if (tran.compareTo(parentgeno1) == 0) {
                 double rd = rnd.nextFloat();
-                Set GSet = childrenGenoMap.keySet();
-                Iterator it = GSet.iterator();
-                ArrayList GVec = new ArrayList();
-                for (; it.hasNext();) {
-                    String geno = (String) it.next();
+                ArrayList<String> GVec = NewIt.newArrayList();
+                for (String geno:childrenGenoMap.keySet()) {
                     if (tran.compareTo(geno) != 0) {
                         GVec.add(geno);
                     }
                 }
                 if (rd < 0.5) {
-                    nontran = new String((String) GVec.get(0));
+                    nontran = GVec.get(0);
                 } else {
-                    nontran = new String((String) GVec.get(1));
+                    nontran = GVec.get(1);
                 }
             } else {
-                nontran = new String(parentgeno1);
+                nontran = parentgeno1;
             }
         }
         add(nontran);
@@ -150,12 +146,10 @@ public class HeterozygousParent extends AbstractGenoDistribution {
      * Genotype the other parent if possible.
      */
     protected void genotypeParents() {
-        TreeSet PG2 = new TreeSet();
+        TreeSet<String> PG2 = NewIt.newTreeSet();
         if (numAllele() == 4) {// situation 16,17,18,19
 
-            Iterator it = alleleSet.iterator();
-            for (; it.hasNext();) {
-                String Callele = (String) it.next();
+            for (String Callele:alleleSet) {
                 if (!parentgeno1.contains(Callele.substring(0, 1))) {
                     PG2.add(new String(Callele));
                 }
@@ -167,19 +161,16 @@ public class HeterozygousParent extends AbstractGenoDistribution {
                  * two step to genotype the second parent step 1: get the first allele from the homozygous genotype in
                  * children's geno set. step 2: get the second allele which is neither of the first parent's alleles.
                  */
-                Set CSet = childrenGenoMap.keySet();
-                Iterator it = CSet.iterator();
-                for (; it.hasNext();) {
-                    String CG = (String) it.next();
+
+                for (String CG:childrenGenoMap.keySet()) {
                     if (!isHeterozygous(CG)) {// step 1
 
                         PG2.add(CG.substring(0, 1));
                         break;
                     }
                 }
-                Iterator Ait = alleleSet.iterator();
-                for (; Ait.hasNext();) {
-                    String Callele = (String) Ait.next();
+
+                for (String Callele:alleleSet) {
                     if (!parentgeno1.contains(Callele.substring(0, 1))) {// step 2
 
                         PG2.add(Callele);
@@ -190,12 +181,12 @@ public class HeterozygousParent extends AbstractGenoDistribution {
         } else if (numAllele() == 2) {
             if (numHomozygous(childrenGenoMap) == 2) {// situation 6, 7
 
-                PG2 = new TreeSet(getAlleleSet());
+                PG2 = new TreeSet<String>(getAlleleSet());
             }
         }
 
         if (PG2.size() > 0) {
-            String parentgeno2 = new String((String) PG2.first() + (String) PG2.last());
+            String parentgeno2 = PG2.first() + PG2.last();
             parentGeno.add(parentgeno1);
             parentGeno.add(parentgeno2);
         }
@@ -210,13 +201,12 @@ public class HeterozygousParent extends AbstractGenoDistribution {
     public String[] produceNontransmitted(String transmitted) {
         char nontran[] = new char[2];
         // System.out.println((String) parentGeno.get(1));
-        String p1 = (String) parentGeno.get(0);
-        String p2 = (String) parentGeno.get(1);
+        String p1 = parentGeno.get(0);
+        String p2 = parentGeno.get(1);
         char[][] PG = {{p1.charAt(0), p1.charAt(1)},
             {p2.charAt(0), p2.charAt(1)}
         };
         char allele[] = new char[2];
-        boolean flag = true;
 
         allele[0] = transmitted.charAt(0);
         allele[1] = transmitted.charAt(1);

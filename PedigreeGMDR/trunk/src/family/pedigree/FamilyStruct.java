@@ -15,12 +15,12 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Enumeration;
 import java.util.Hashtable;
-import java.util.Iterator;
 import java.util.Set;
 import java.util.TreeMap;
 import java.util.TreeSet;
 
 import publicAccess.PublicData;
+import util.NewIt;
 import family.RabinowitzLairdAlgorithm.AbstractGenoDistribution;
 import family.RabinowitzLairdAlgorithm.HeterozygousParent;
 import family.RabinowitzLairdAlgorithm.HomozygousParent;
@@ -35,18 +35,17 @@ import family.RabinowitzLairdAlgorithm.UnobservedParents;
  * Storing the familyName and the members of a family from a pedigree file.
  * This class is not thread safe (untested)
  * 
- * @author Julian Maller, extended by Guo-Bo Chen
+ * @author Julian Maller, extended by Guo-Bo Chen, chenguobo@gmail.com
  */
 public class FamilyStruct {
 //save observed genotypes;
-    private Hashtable persons;
-    private Hashtable pseudopersons;
+    private Hashtable<String, Person> persons;
+    private Hashtable<String, PseudoPerson> pseudopersons;
     private String familyStructName;
     private int mendErrors;
     private int numMarkers;
-    private ArrayList ObservedGenoSet;
-    private ArrayList ImputedGenoSet;
-    private ArrayList nontransmitted;
+    private ArrayList<GenoSet> ObservedGenoSet;
+    private ArrayList<GenoSet> ImputedGenoSet;
 
     /**
      * add a transmitted genoset into this family ( adds to transmitted ArrayList)
@@ -79,11 +78,9 @@ public class FamilyStruct {
         this.pseudopersons.put(pseudoper.getPseudoPersonID(), pseudoper);
     }
 
-    public void countAllele(TreeMap Geno, Set alleleSet) {
-        Set GSet = Geno.keySet();
-        Iterator it = GSet.iterator();
-        for (; it.hasNext();) {
-            String g = (String) it.next();
+    public void countAllele(TreeMap<String, Integer> Geno, Set<String> alleleSet) {
+
+        for (String g:Geno.keySet()) {
             alleleSet.add(g.substring(0, 1));
             alleleSet.add(g.substring(1, 2));
         }
@@ -106,19 +103,17 @@ public class FamilyStruct {
     }
 
     public FamilyStruct() {
-        this.persons = new Hashtable();
-        this.pseudopersons = new Hashtable();
-        this.ObservedGenoSet = new ArrayList();
-        this.ImputedGenoSet = new ArrayList();
-        this.nontransmitted = new ArrayList();
+        this.persons = NewIt.newHashtable();
+        this.pseudopersons = NewIt.newHashtable();
+        this.ObservedGenoSet = NewIt.newArrayList();
+        this.ImputedGenoSet = NewIt.newArrayList();
     }
 
     public FamilyStruct(String familyStructName) {
-        this.persons = new Hashtable();
-        this.pseudopersons = new Hashtable();
-        this.ObservedGenoSet = new ArrayList();
-        this.ImputedGenoSet = new ArrayList();
-        this.nontransmitted = new ArrayList();
+        this.persons = NewIt.newHashtable();
+        this.pseudopersons = NewIt.newHashtable();
+        this.ObservedGenoSet = NewIt.newArrayList();
+        this.ImputedGenoSet = NewIt.newArrayList();
         this.familyStructName = familyStructName;
     }
 
@@ -170,16 +165,16 @@ public class FamilyStruct {
      * 
      * @return enumeration memberlist
      */
-    public Enumeration getPersonList() {
+    public Enumeration<String> getPersonList() {
         return this.persons.keys();
     }
 
     public String[] getPersonListSorted() {
-    	Enumeration perstrList = getPersonList();
+    	Enumeration<String> perstrList = getPersonList();
     	String[] PID = new String[persons.size()];
 		int ind = 0;
 		while (perstrList.hasMoreElements()) {
-			PID[ind++] = (String) perstrList.nextElement();
+			PID[ind++] = perstrList.nextElement();
 		}
 		Arrays.sort(PID);
 		return PID;
@@ -190,7 +185,7 @@ public class FamilyStruct {
      * 
      * @return
      */
-    public ArrayList getObvservedGenoSet() {
+    public ArrayList<GenoSet> getObvservedGenoSet() {
         return ObservedGenoSet;
     }
 
@@ -199,7 +194,7 @@ public class FamilyStruct {
      *
      * @return
      */
-    public ArrayList getImputedGenoSet() {
+    public ArrayList<GenoSet> getImputedGenoSet() {
         return ImputedGenoSet;
     }
 
@@ -210,7 +205,7 @@ public class FamilyStruct {
      * @return
      */
     public GenoSet getObservedGenoSet(int i) {
-        return (GenoSet) ObservedGenoSet.get(i);
+        return ObservedGenoSet.get(i);
     }
 
     /**
@@ -221,18 +216,18 @@ public class FamilyStruct {
      * @return the person with matching personID
      */
     public Person getPerson(String personID) {
-        return (Person) this.persons.get(personID);
+        return this.persons.get(personID);
     }
 
     public PseudoPerson getPseudoPerson(String pseudopersonID) {
-        return (PseudoPerson) this.pseudopersons.get(pseudopersonID);
+        return this.pseudopersons.get(pseudopersonID);
     }
 
-    public Hashtable getPersons() {
+    public Hashtable<String, Person> getPersons() {
         return persons;
     }
 
-    public Hashtable getPseudoPersons() {
+    public Hashtable<String, PseudoPerson> getPseudoPersons() {
         return pseudopersons;
     }
 
@@ -253,19 +248,18 @@ public class FamilyStruct {
         }
     }
 
-    public boolean NontransmittedProc(ArrayList markerInfor, int[] subsetMarker)
+    public boolean NontransmittedProc(ArrayList<String> markerInfor, int[] subsetMarker)
             throws FamilyStructException {
         boolean Informative = true;
-        Enumeration perList;
         Person per;
         PseudoPerson pseudoper;
         String iid;
         String nontran_tran[];
-        perList = persons.keys();
+        Enumeration<String> perList = persons.keys();
         while (perList.hasMoreElements()) {
-            iid = (String) perList.nextElement();
-            per = (Person) (persons.get(iid));
-            pseudoper = (PseudoPerson) pseudopersons.get(iid);
+            iid = perList.nextElement();
+            per = persons.get(iid);
+            pseudoper = pseudopersons.get(iid);
             if (!hasAncestor(per.getPersonID())) {
                 continue;
             }
@@ -273,10 +267,10 @@ public class FamilyStruct {
         }
         for (int i = 0; i < subsetMarker.length; i++) {
             perList = persons.keys();
-            GenoSet genoset = (GenoSet) ImputedGenoSet.get(subsetMarker[i]);
+            GenoSet genoset = ImputedGenoSet.get(subsetMarker[i]);
             int numGenotypedParents = genoset.getNumTypedParents();
             AbstractGenoDistribution gDis;
-            TreeSet aSet = new TreeSet();
+            TreeSet<String> aSet = NewIt.newTreeSet();
             if (genoset.getNumParents() > 2) {
                 throw new FamilyStructException(
                         "Family " + familyStructName + " is not a nuclear family. It has more than 2 founders");
@@ -293,7 +287,7 @@ public class FamilyStruct {
                 countAllele(genoset.getchildrenGenoMap(), aSet);
                 countAllele(genoset.getparentsGenoMap(), aSet);
                 if (numGenotypedParents == 1) {
-                    String PG = (String) ((TreeMap) genoset.getparentsGenoMap()).firstKey();
+                    String PG = genoset.getparentsGenoMap().firstKey();
                     if (!AbstractGenoDistribution.isHeterozygous(PG)) // table 1
                     {
                         if (aSet.size() > 3) {
@@ -315,9 +309,9 @@ public class FamilyStruct {
                 }
             }
             while (perList.hasMoreElements()) {
-                iid = (String) perList.nextElement();
-                per = (Person) (persons.get(iid));
-                pseudoper = (PseudoPerson) pseudopersons.get(iid);
+                iid = perList.nextElement();
+                per = persons.get(iid);
+                pseudoper = pseudopersons.get(iid);
                 if (!hasAncestor(per.getPersonID())) {
                     continue;
                 }
@@ -340,17 +334,16 @@ public class FamilyStruct {
         persons.remove(id);
     }
 
-    public boolean RabinowitzProc(ArrayList markerInfor, int[] subsetMarker) throws FamilyStructException {
+    public boolean RabinowitzProc(ArrayList<String> markerInfor, int[] subsetMarker) throws FamilyStructException {
         boolean Informative = true;
-        Enumeration perList;
         Person per;
         PseudoPerson pseudoper;
         String iid;
-        perList = persons.keys();
+        Enumeration<String> perList = persons.keys();
         while (perList.hasMoreElements()) {
-            iid = (String) perList.nextElement();
-            per = (Person) (persons.get(iid));
-            pseudoper = (PseudoPerson) pseudopersons.get(iid);
+            iid = perList.nextElement();
+            per = persons.get(iid);
+            pseudoper = pseudopersons.get(iid);
             if (!hasAncestor(per.getPersonID())) {
                 continue;
             }
@@ -359,9 +352,9 @@ public class FamilyStruct {
 
         for (int i = 0; i < subsetMarker.length; i++) {
             perList = persons.keys();
-            GenoSet genoset = (GenoSet) ImputedGenoSet.get(subsetMarker[i]);
+            GenoSet genoset = ImputedGenoSet.get(subsetMarker[i]);
             AbstractGenoDistribution gDis;
-            TreeSet aSet = new TreeSet();
+            TreeSet<String> aSet = NewIt.newTreeSet();
             if (genoset.getNumParents() > 2) {
                 throw new FamilyStructException(
                         "Family " + familyStructName + " is not a nuclear family. It has more than 2 founders");
@@ -377,7 +370,7 @@ public class FamilyStruct {
                 countAllele(genoset.getchildrenGenoMap(), aSet);
                 countAllele(genoset.getparentsGenoMap(), aSet);
                 if (genoset.getNumTypedParents() == 1) {
-                    String PG = (String) ((TreeMap) genoset.getparentsGenoMap()).firstKey();
+                    String PG = (genoset.getparentsGenoMap()).firstKey();
                     if (!AbstractGenoDistribution.isHeterozygous(PG)) {// table 1                  
                         if (aSet.size() > 3) {
                             throw new FamilyStructException(
@@ -400,9 +393,9 @@ public class FamilyStruct {
             String[] controlGenotype = gDis.getNontransmitted();
             int index = 0;
             while (perList.hasMoreElements()) {
-                iid = (String) perList.nextElement();
-                per = (Person) (persons.get(iid));
-                pseudoper = (PseudoPerson) pseudopersons.get(iid);
+                iid = perList.nextElement();
+                per = persons.get(iid);
+                pseudoper = pseudopersons.get(iid);
                 if (!hasAncestor(per.getPersonID())) {
                     continue;
                 }
@@ -435,7 +428,7 @@ public class FamilyStruct {
      * 
      * @param persons
      */
-    public void setPersons(Hashtable persons) {
+    public void setPersons(Hashtable<String, Person> persons) {
         this.persons = persons;
     }
 

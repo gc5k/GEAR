@@ -541,12 +541,12 @@ public class MDRPed {
             FamilyStruct fs = (FamilyStruct) getFamilyStruct((String) fsList.nextElement());
             Boolean b = new Boolean(true);
             famInformative.put(fs.getFamilyStructName(), b);
-            TreeMap Ps;
-            TreeMap Ks;
+            TreeMap<String, Integer> Ps;
+            TreeMap<String, Integer> Ks;
             GenoSet gSet;
             for (int i = 0; i < getNumMarkers(); i++) {
-                Ps = new TreeMap();
-                Ks = new TreeMap();
+                Ps = NewIt.newTreeMap();
+                Ks = NewIt.newTreeMap();
                 Enumeration perList = fs.getPersonList();
                 while (perList.hasMoreElements()) {
                     Person per = fs.getPerson((String) perList.nextElement());
@@ -554,9 +554,7 @@ public class MDRPed {
                     if (fs.hasAncestor(per.getPersonID())) {
                         if (Ks.containsKey(genotype)) {
                             Integer c = ((Integer) Ks.get(genotype));
-                            int v = (c.intValue());
-                            v++;
-                            c = new Integer(v);
+                            c++;
                             Ks.put(genotype, c);
                         } else {
                             Integer c = new Integer(1);
@@ -565,9 +563,7 @@ public class MDRPed {
                     } else {
                         if (Ps.containsKey(genotype)) {
                             Integer c = ((Integer) Ps.get(genotype));
-                            int v = (c.intValue());
-                            v++;
-                            c = new Integer(v);
+                            c++;
                             Ps.put(genotype, c);
                         } else {
                             Integer c = new Integer(1);

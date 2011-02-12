@@ -1,20 +1,20 @@
 
 package family.imputation;
 
-import java.util.Iterator;
-import java.util.Set;
 import java.util.TreeMap;
 import java.util.TreeSet;
+
+import util.NewIt;
 /**
  *
- * @author Guo-Bo Chen
+ * @author Guo-Bo Chen, chenguobo@gmail.com
  */
 public class OneHeterozygousParent extends AbstractImputation{
-    TreeMap parentGenoMap;
+    TreeMap<String, Integer> parentGenoMap;
     String parentgeno1;
-    public OneHeterozygousParent(TreeMap children, TreeMap parent) {
+    public OneHeterozygousParent(TreeMap<String, Integer> children, TreeMap<String, Integer> parent) {
         super(children);
-        parentGenoMap = new TreeMap(parent);
+        parentGenoMap = new TreeMap<String, Integer>(parent);
         this.parentgeno1 = (String) parentGenoMap.firstKey();
         countChildrenAllele(childrenGenoMap);
         countAllele(childrenGenoMap);
@@ -27,14 +27,11 @@ public class OneHeterozygousParent extends AbstractImputation{
      * Genotype the other parent if possible.
      */
     protected void genotypeParents() {
-        TreeSet PG2 = new TreeSet();
+        TreeSet<String> PG2 = NewIt.newTreeSet();
         if (numAllele() == 4) {// situation 16,17,18,19
-
-            Iterator it = alleleSet.iterator();
-            for (; it.hasNext();) {
-                String Callele = (String) it.next();
-                if (!parentgeno1.contains(Callele.substring(0, 1))) {
-                    PG2.add(new String(Callele));
+            for (String it:alleleSet) {
+                if (!parentgeno1.contains(it.substring(0, 1))) {
+                    PG2.add(it);
                 }
             }
         } else if (numAllele() == 3) {
@@ -44,22 +41,18 @@ public class OneHeterozygousParent extends AbstractImputation{
                  * two step to genotype the second parent step 1: get the first allele from the homozygous genotype in
                  * children's geno set. step 2: get the second allele which is neither of the first parent's alleles.
                  */
-                Set CSet = childrenGenoMap.keySet();
-                Iterator it = CSet.iterator();
-                for (; it.hasNext();) {
-                    String CG = (String) it.next();
-                    if (!isHeterozygous(CG)) {// step 1
 
-                        PG2.add(CG.substring(0, 1));
+                for (String it:childrenGenoMap.keySet()) {
+                    if (!isHeterozygous(it)) {// step 1
+                        PG2.add(it.substring(0, 1));
                         break;
                     }
                 }
-                Iterator Ait = alleleSet.iterator();
-                for (; Ait.hasNext();) {
-                    String Callele = (String) Ait.next();
-                    if (!parentgeno1.contains(Callele.substring(0, 1))) {// step 2
 
-                        PG2.add(Callele);
+                for (String it:alleleSet) {
+                    if (!parentgeno1.contains(it.substring(0, 1))) {// step 2
+
+                        PG2.add(it);
                         break;
                     }
                 }
@@ -67,7 +60,7 @@ public class OneHeterozygousParent extends AbstractImputation{
         } else if (numAllele() == 2) {
             if (numHomozygous(childrenGenoMap) == 2) {// situation 6, 7
 
-                PG2 = new TreeSet(getAlleleSet());
+                PG2 = new TreeSet<String>(getAlleleSet());
             }
         }
 
