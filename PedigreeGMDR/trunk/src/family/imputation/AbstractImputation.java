@@ -2,37 +2,35 @@
 package family.imputation;
 
 import java.util.ArrayList;
-import java.util.Iterator;
-import java.util.Map;
-import java.util.Set;
 import java.util.TreeMap;
 import java.util.TreeSet;
 
 import publicAccess.PublicData;
+import util.NewIt;
 /**
  *
- * @author Guo-Bo Chen
+ * @author Guo-Bo Chen, chenguobo@gmail.com
  */
 public class AbstractImputation {
-    protected TreeMap childrenGenoMap;
-    protected TreeSet alleleSet;
-    protected TreeSet childrenalleleSet;
-    protected TreeSet parentalleleSet;
-    protected ArrayList parentGeno;
+    protected TreeMap<String, Integer> childrenGenoMap;
+    protected TreeSet<String> alleleSet;
+    protected TreeSet<String> childrenalleleSet;
+    protected TreeSet<String> parentalleleSet;
+    protected ArrayList<String> parentGeno;
 
-    public AbstractImputation(TreeMap children) {
-        childrenGenoMap = new TreeMap(children);
-        alleleSet = new TreeSet();
-        childrenalleleSet = new TreeSet();
-        parentalleleSet = new TreeSet();
-        parentGeno = new ArrayList();
+    public AbstractImputation(TreeMap<String, Integer> children) {
+        childrenGenoMap = new TreeMap<String, Integer>(children);
+        alleleSet = NewIt.newTreeSet();
+        childrenalleleSet = NewIt.newTreeSet();
+        parentalleleSet = NewIt.newTreeSet();
+        parentGeno = NewIt.newArrayList();
     }
 
     public String RandomAssign() {
         String geno = new String(PublicData.MissingGenotype);
         if (isParentGenotyped()) {
-            String p1 = (String) parentGeno.get(0);
-            String p2 = (String) parentGeno.get(1);
+            String p1 = parentGeno.get(0);
+            String p2 = parentGeno.get(1);
             char PG[][] = {{p1.charAt(0), p1.charAt(1)},
                 {p2.charAt(0), p2.charAt(1)}
             };
@@ -49,11 +47,9 @@ public class AbstractImputation {
             geno = new String(allele);
         } else {
             if (childrenGenoMap.size() > 0) {
-                Set GSet = childrenGenoMap.keySet();
-                Iterator it = GSet.iterator();
-                ArrayList Geno = new ArrayList();
-                for (; it.hasNext();) {
-                    Geno.add((String) it.next());
+                ArrayList<String> Geno = NewIt.newArrayList();
+                for (String it:childrenGenoMap.keySet()) {
+                    Geno.add(it);
                 }
                 int index = (new Double(Math.random() * childrenGenoMap.size())).intValue();
                 geno = new String((String) Geno.get(index));
@@ -66,21 +62,15 @@ public class AbstractImputation {
         return parentGeno.size() == 2 ? true : false;
     }
 
-    public void countChildrenAllele(Map Geno) {
-        Set GSet = Geno.keySet();
-        Iterator it = GSet.iterator();
-        for (; it.hasNext();) {
-            String g = (String) it.next();
+    public void countChildrenAllele(TreeMap<String, Integer> Geno) {
+        for (String g:Geno.keySet()) {
             childrenalleleSet.add(g.substring(0, 1));
             childrenalleleSet.add(g.substring(1, 2));
         }
     }
 
-    public void countParentAllele(TreeMap Geno) {
-        Set GSet = Geno.keySet();
-        Iterator it = GSet.iterator();
-        for (; it.hasNext();) {
-            String g = (String) it.next();
+    public void countParentAllele(TreeMap<String, Integer> Geno) {
+        for (String g:Geno.keySet()) {
             parentalleleSet.add(g.substring(0, 1));
             parentalleleSet.add(g.substring(1, 2));
         }
@@ -90,11 +80,8 @@ public class AbstractImputation {
      * @param Geno
      *            Iterator the geno, and put alleles into alleleSet.
      */
-    public void countAllele(Map Geno) {
-        Set GSet = Geno.keySet();
-        Iterator it = GSet.iterator();
-        for (; it.hasNext();) {
-            String g = (String) it.next();
+    public void countAllele(TreeMap<String, Integer> Geno) {
+        for (String g:Geno.keySet()) {
             alleleSet.add(g.substring(0, 1));
             alleleSet.add(g.substring(1, 2));
         }
@@ -120,12 +107,10 @@ public class AbstractImputation {
      * @param genoMap
      * @return count the number of homozygous with in genoMap
      */
-    public int numHomozygous(TreeMap genoMap) {
+    public int numHomozygous(TreeMap<String, Integer> genoMap) {
         int c = 0;
-        Set gSet = genoMap.keySet();
-        Iterator it = gSet.iterator();
-        for (; it.hasNext();) {
-            if (!isHeterozygous((String) it.next())) {
+        for (String g:genoMap.keySet()) {
+            if (!isHeterozygous(g)) {
                 c++;
             }
         }
@@ -136,12 +121,10 @@ public class AbstractImputation {
      * @param genoMap
      * @return count the number of heterozygous within the genoMap
      */
-    public int numHeterozygous(TreeMap genoMap) {
+    public int numHeterozygous(TreeMap<String, Integer> genoMap) {
         int c = 0;
-        Set gSet = genoMap.keySet();
-        Iterator it = gSet.iterator();
-        for (; it.hasNext();) {
-            if (isHeterozygous((String) it.next())) {
+        for (String g:genoMap.keySet()) {
+            if (isHeterozygous(g)) {
                 c++;
             }
         }
@@ -152,7 +135,7 @@ public class AbstractImputation {
     /**
      * @return the whole set of alleles.
      */
-    public TreeSet getAlleleSet() {
+    public TreeSet<String> getAlleleSet() {
         return alleleSet;
     }
 }

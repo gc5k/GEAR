@@ -2,28 +2,27 @@
 package family.RabinowitzLairdAlgorithm;
 
 import java.util.ArrayList;
-import java.util.Iterator;
-import java.util.Map;
 import java.util.Random;
 import java.util.Set;
 import java.util.TreeMap;
 import java.util.TreeSet;
 
 import publicAccess.PublicData;
+import util.NewIt;
 
 /**
  * An abstract class for Transmitted and Nontransmitted tables
  * 
- * @author Guobo Chen
+ * @author Guo-Bo Chen, chenguobo@gmail.com
  */
 public abstract class AbstractGenoDistribution {
 
-    protected TreeMap childrenGenoMap;
-    protected TreeMap nontransmitted;
-    protected TreeSet alleleSet;
-    protected TreeSet childrenalleleSet;
-    protected TreeSet parentalleleSet;
-    protected ArrayList parentGeno;
+    protected TreeMap<String, Integer> childrenGenoMap;
+    protected TreeMap<String, Integer> nontransmitted;
+    protected TreeSet<String> alleleSet;
+    protected TreeSet<String> childrenalleleSet;
+    protected TreeSet<String> parentalleleSet;
+    protected ArrayList<String> parentGeno;
 
     static public Random rnd;
     /**
@@ -33,13 +32,13 @@ public abstract class AbstractGenoDistribution {
      *            , is a TreeMap object containing numbers of different genotypes among the kids within the nuclear
      *            family.
      */
-    public AbstractGenoDistribution(TreeMap child) {
-        childrenGenoMap = new TreeMap(child);
-        nontransmitted = new TreeMap();
-        alleleSet = new TreeSet();
-        childrenalleleSet = new TreeSet();
-        parentalleleSet = new TreeSet();
-        parentGeno = new ArrayList();
+    public AbstractGenoDistribution(TreeMap<String, Integer> child) {
+        childrenGenoMap = new TreeMap<String,Integer>(child);
+        nontransmitted = NewIt.newTreeMap();
+        alleleSet = NewIt.newTreeSet();
+        childrenalleleSet = NewIt.newTreeSet();
+        parentalleleSet = NewIt.newTreeSet();
+        parentGeno = NewIt.newArrayList();
     }
 
     /**
@@ -69,22 +68,20 @@ public abstract class AbstractGenoDistribution {
 
     protected int getChildrenNum() {
         int sibs = 0;
-        Set CSet = childrenGenoMap.keySet();
-        Iterator it = CSet.iterator();
-        for (; it.hasNext();) {
-            sibs += ((Integer) childrenGenoMap.get(it.next())).intValue();
+        for (String it:childrenGenoMap.keySet()) {
+            sibs += childrenGenoMap.get(it).intValue();
         }
         return sibs;
     }
 
     protected String[] getChildrenGenotypeArray() {
-        Set CSet = childrenGenoMap.keySet();
+        Set<String> CSet = childrenGenoMap.keySet();
         String[] GenoSet = new String[CSet.size()];
         GenoSet = (String[]) CSet.toArray();
         return GenoSet;
     }
 
-    protected void Produce(String[] control, TreeMap cM, String[] genopool,
+    protected void Produce(String[] control, TreeMap<String, Integer> cM, String[] genopool,
             double[] freq) {
         for (int i = 0; i < control.length; i++) {
             double rd = rnd.nextFloat();
@@ -98,9 +95,7 @@ public abstract class AbstractGenoDistribution {
             control[i] = genopool[index];
             if (cM.containsKey(control[i])) {
                 Integer c = ((Integer) cM.get(control[i]));
-                int v = (c.intValue());
-                v++;
-                c = new Integer(v);
+                c++;
                 cM.put(control[i], c);
             } else {
                 Integer c = new Integer(1);
@@ -134,30 +129,27 @@ public abstract class AbstractGenoDistribution {
             geno = new String(allele);
         } else {
             if (childrenGenoMap.size() > 0) {
-                Set GSet = childrenGenoMap.keySet();
-                Iterator it = GSet.iterator();
-                ArrayList Geno = new ArrayList();
-                for (; it.hasNext();) {
-                    Geno.add((String) it.next());
+
+                ArrayList<String> Geno = NewIt.newArrayList();
+                for (String it:childrenGenoMap.keySet()) {
+                    Geno.add(it);
                 }
                 int index = (new Double(rnd.nextFloat() * childrenGenoMap.size())).intValue();
-                geno = new String((String) Geno.get(index));
+                geno = Geno.get(index);
             }
         }
         return geno;
     }
 
-    public void countChildrenAllele(Map Geno) {
-        Set GSet = Geno.keySet();
-        Iterator it = GSet.iterator();
-        for (; it.hasNext();) {
-            String g = (String) it.next();
+    public void countChildrenAllele(TreeMap<String, Integer> Geno) {
+
+        for (String g:Geno.keySet()) {
             childrenalleleSet.add(g.substring(0, 1));
             childrenalleleSet.add(g.substring(1, 2));
         }
     }
 
-    public TreeSet getChildrenAlleleSet() {
+    public TreeSet<String> getChildrenAlleleSet() {
         return childrenalleleSet;
     }
 
@@ -165,17 +157,14 @@ public abstract class AbstractGenoDistribution {
         return childrenalleleSet.size();
     }
 
-    public void countParentAllele(TreeMap Geno) {
-        Set GSet = Geno.keySet();
-        Iterator it = GSet.iterator();
-        for (; it.hasNext();) {
-            String g = (String) it.next();
+    public void countParentAllele(TreeMap<String, Integer> Geno) {
+        for (String g:Geno.keySet()) {
             parentalleleSet.add(g.substring(0, 1));
             parentalleleSet.add(g.substring(1, 2));
         }
     }
 
-    public Set getParentAlleleSet() {
+    public TreeSet<String> getParentAlleleSet() {
         return parentalleleSet;
     }
 
@@ -187,11 +176,8 @@ public abstract class AbstractGenoDistribution {
      * @param Geno
      *            Iterator the geno, and put alleles into alleleSet.
      */
-    public void countAllele(Map Geno) {
-        Set GSet = Geno.keySet();
-        Iterator it = GSet.iterator();
-        for (; it.hasNext();) {
-            String g = (String) it.next();
+    public void countAllele(TreeMap<String, Integer> Geno) {
+        for (String g:Geno.keySet()) {
             alleleSet.add(g.substring(0, 1));
             alleleSet.add(g.substring(1, 2));
         }
@@ -200,7 +186,7 @@ public abstract class AbstractGenoDistribution {
     /**
      * @return the whole set of alleles.
      */
-    public TreeSet getAlleleSet() {
+    public TreeSet<String> getAlleleSet() {
         return alleleSet;
     }
 
@@ -252,12 +238,10 @@ public abstract class AbstractGenoDistribution {
      * @param genoMap
      * @return count the number of homozygous with in genoMap
      */
-    public int numHomozygous(TreeMap genoMap) {
+    public int numHomozygous(TreeMap<String, Integer> genoMap) {
         int c = 0;
-        Set gSet = genoMap.keySet();
-        Iterator it = gSet.iterator();
-        for (; it.hasNext();) {
-            if (!isHeterozygous((String) it.next())) {
+        for (String g:genoMap.keySet()) {
+            if (!isHeterozygous(g)) {
                 c++;
             }
         }
@@ -268,12 +252,10 @@ public abstract class AbstractGenoDistribution {
      * @param genoMap
      * @return count the number of heterozygous within the genoMap
      */
-    public int numHeterozygous(TreeMap genoMap) {
+    public int numHeterozygous(TreeMap<String, Integer> genoMap) {
         int c = 0;
-        Set gSet = genoMap.keySet();
-        Iterator it = gSet.iterator();
-        for (; it.hasNext();) {
-            if (isHeterozygous((String) it.next())) {
+        for (String g:genoMap.keySet()) {
+            if (isHeterozygous(g)) {
                 c++;
             }
         }

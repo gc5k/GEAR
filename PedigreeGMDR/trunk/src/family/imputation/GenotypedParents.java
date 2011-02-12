@@ -1,22 +1,19 @@
 
 package family.imputation;
 
-import java.util.Iterator;
 import java.util.TreeMap;
-import java.util.TreeSet;
 
-import publicAccess.PublicData;
 
 /**
  *
- * @author Guo-Bo Chen
+ * @author Guo-Bo Chen, chenguobo@gmail.com
  */
 public class GenotypedParents extends AbstractImputation{
-    TreeMap parentGenoMap;
+    TreeMap<String, Integer> parentGenoMap;
 
-    public GenotypedParents(TreeMap children, TreeMap parents) {
+    public GenotypedParents(TreeMap<String, Integer> children, TreeMap<String, Integer> parents) {
         super(children);
-        this.parentGenoMap = new TreeMap(parents);
+        this.parentGenoMap = new TreeMap<String, Integer>(parents);
         genotypeParents();
     }
 

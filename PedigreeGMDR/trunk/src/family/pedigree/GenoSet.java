@@ -1,26 +1,29 @@
 package family.pedigree;
 
-import java.util.Iterator;
-import java.util.Set;
+
 import java.util.TreeMap;
 
 import publicAccess.PublicData;
-
+import util.NewIt;
+/**
+*
+* @author Guo-Bo Chen, chenguobo@gmail.com
+*/
 public class GenoSet {
 
-    TreeMap parentsGenoMap;
-    TreeMap childrenGenoMap;
-    TreeMap fullparentsGenoMap;
-    TreeMap fullchildrenGenoMap;
+    TreeMap<String, Integer> parentsGenoMap;
+    TreeMap<String, Integer> childrenGenoMap;
+    TreeMap<String, Integer> fullparentsGenoMap;
+    TreeMap<String, Integer> fullchildrenGenoMap;
     private int index;
     private int ungenotypedParents = 0;
     private int genotypedParents = 0;
     private int ungenotypedChildren = 0;
     private int genotypedChildren = 0;
 
-    GenoSet(TreeMap parents, TreeMap children, int index) {
-        fullparentsGenoMap = new TreeMap(parents);
-        fullchildrenGenoMap = new TreeMap(children);
+    GenoSet(TreeMap<String, Integer> parents, TreeMap<String, Integer> children, int index) {
+        fullparentsGenoMap = NewIt.newTreeMap();
+        fullchildrenGenoMap = NewIt.newTreeMap();
         parentsGenoMap = parents;
         childrenGenoMap = children;
         this.index = index;
@@ -31,10 +34,8 @@ public class GenoSet {
      * kick the untyped individuals from the genotypeMap;
      */
     private void initial() {
-        Set PG = parentsGenoMap.keySet();
-        Iterator pit = PG.iterator();
-        for (; pit.hasNext();) {
-            genotypedParents += ((Integer) parentsGenoMap.get(pit.next())).intValue();
+        for (String p: parentsGenoMap.keySet()) {
+            genotypedParents += parentsGenoMap.get(p).intValue();
         }
 
         if (parentsGenoMap.containsKey(PublicData.MissingGenotype)) {
@@ -43,20 +44,18 @@ public class GenoSet {
         }
         genotypedParents -= ungenotypedParents;
 
-        Set CG = childrenGenoMap.keySet();
-        Iterator cit = CG.iterator();
-        for (; cit.hasNext();) {
-            genotypedChildren += ((Integer) childrenGenoMap.get(cit.next())).intValue();
+        for (String c:childrenGenoMap.keySet()) {
+            genotypedChildren += childrenGenoMap.get(c).intValue();
         }
 
         if (childrenGenoMap.containsKey(PublicData.MissingGenotype)) {
-            ungenotypedChildren = ((Integer) childrenGenoMap.get(PublicData.MissingGenotype)).intValue();
+            ungenotypedChildren = childrenGenoMap.get(PublicData.MissingGenotype).intValue();
             childrenGenoMap.remove(PublicData.MissingGenotype);
         }
         genotypedChildren -= ungenotypedChildren;
     }
 
-    public TreeMap getfullparentsGenoMap() {
+    public TreeMap<String, Integer> getfullparentsGenoMap() {
         return fullparentsGenoMap;
     }
 
@@ -65,11 +64,11 @@ public class GenoSet {
      * 
      * @return
      */
-    public TreeMap getparentsGenoMap() {
+    public TreeMap<String, Integer> getparentsGenoMap() {
         return parentsGenoMap;
     }
 
-    public TreeMap getfullchildrenGenoMap() {
+    public TreeMap<String, Integer> getfullchildrenGenoMap() {
         return fullchildrenGenoMap;
     }
 
@@ -78,8 +77,8 @@ public class GenoSet {
      * 
      * @return
      */
-    public TreeMap getchildrenGenoMap() {
-        return (TreeMap) childrenGenoMap;
+    public TreeMap<String, Integer> getchildrenGenoMap() {
+        return childrenGenoMap;
     }
 
     public int getNumParents() {

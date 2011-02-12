@@ -2,14 +2,19 @@ package family.RabinowitzLairdAlgorithm;
 
 import java.util.TreeMap;
 
+import util.NewIt;
+/**
+*
+* @author Guo-Bo Chen, chenguobo@gmail.com
+*/
 public class Rabinowitz1 extends AbstractGenoDistribution {
 
-    TreeMap parentGenoMap;
+    TreeMap<String, Integer> parentGenoMap;
     String parentgeno1;
 
-    public Rabinowitz1(TreeMap child, TreeMap parent) {
+    public Rabinowitz1(TreeMap<String, Integer> child, TreeMap<String, Integer> parent) {
         super(child);
-        parentGenoMap = new TreeMap(parent);
+        parentGenoMap = new TreeMap<String, Integer>(parent);
         this.parentgeno1 = (String) parentGenoMap.firstKey();
         countChildrenAllele(childrenGenoMap);
         countAllele(childrenGenoMap);
@@ -26,7 +31,7 @@ public class Rabinowitz1 extends AbstractGenoDistribution {
 
     public String[] getNontransmitted() {
         String control[] = new String[getChildrenNum()];
-        TreeMap controlMap = new TreeMap();
+        TreeMap<String, Integer> controlMap = NewIt.newTreeMap();
         // how to deal with missing data???
 
         if (childrenGenoMap.size() == 1) {// situation 1

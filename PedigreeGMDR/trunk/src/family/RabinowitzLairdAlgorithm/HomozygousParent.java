@@ -8,11 +8,11 @@ import publicAccess.PublicData;
  * Class extends GenoDristribution Treat the situation of one heterozygous parent. However, it's still possible to
  * deduce the genotype of the other parent
  * 
- * @author Guobo Chen
+ * @author Guo-Bo Chen, chenguobo@gmail.com
  */
 public class HomozygousParent extends AbstractGenoDistribution {
 
-    TreeMap parentGenoMap;
+    TreeMap<String, Integer> parentGenoMap;
     String parentgeno1;
 
     /**
@@ -21,9 +21,9 @@ public class HomozygousParent extends AbstractGenoDistribution {
      * @param parent
      *            the genotype of the homozygous parent
      */
-    public HomozygousParent(TreeMap child, TreeMap parent) {
+    public HomozygousParent(TreeMap<String, Integer> child, TreeMap<String, Integer> parent) {
         super(child);
-        parentGenoMap = new TreeMap(parent);
+        parentGenoMap = new TreeMap<String, Integer>(parent);
         this.parentgeno1 = (String) parentGenoMap.firstKey();
         countAllele(childrenGenoMap);
         genotypeParents();
