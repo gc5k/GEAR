@@ -36,9 +36,7 @@ public class Rabinowitz0 extends AbstractGenoDistribution {
 
         if (cM.containsKey(geno)) {
             Integer c = ((Integer) cM.get(geno));
-            int v = (c.intValue());
-            v++;
-            c = new Integer(v);
+            c++;
             cM.put(geno, c);
         } else {
             Integer c = new Integer(1);

@@ -50,7 +50,7 @@ public class Rabinowitz2 extends AbstractGenoDistribution {
 			} else {// situation 4-1
 				// System.err.println("Rabinowitz Table2 s4-1");
 
-				String DeducedGeno1 = new String(ExtractUniqueAllele2Genotype(childrenGenoMap.firstKey(), parentgeno1));
+				String DeducedGeno1 = ExtractUniqueAllele2Genotype(childrenGenoMap.firstKey(), parentgeno1);
 				String[] genopool = new String[2];
 				genopool[0] = childrenGenoMap.firstKey();
 				genopool[1] = DeducedGeno1;
@@ -65,7 +65,7 @@ public class Rabinowitz2 extends AbstractGenoDistribution {
 				if (childrenGenoMap.containsKey(parentgeno1)) {// 5-1
 					// System.err.println("Rabinowitz Table2 s5-1");
 
-					String DeducedGeno1 = new String(ExtractUniqueAllele2Genotype(childrenGenoMap.firstKey(), childrenGenoMap.lastKey()));
+					String DeducedGeno1 = ExtractUniqueAllele2Genotype(childrenGenoMap.firstKey(), childrenGenoMap.lastKey());
 					String[] genopool = new String[3];
 					genopool[0] = childrenGenoMap.firstKey();
 					genopool[1] = childrenGenoMap.lastKey();
@@ -95,8 +95,8 @@ public class Rabinowitz2 extends AbstractGenoDistribution {
 							// System.err.println("Rabinowitz Table2 s7-2");
 
 							String[] genopool = new String[4];
-							String Deducedgeno1 = new String(ExtractUniqueAllele2Genotype(childrenGenoMap.firstKey(), parentgeno1));
-							String Deducedgeno2 = new String(ExtractUniqueAllele2Genotype(childrenGenoMap.lastKey(), parentgeno1));
+							String Deducedgeno1 = ExtractUniqueAllele2Genotype(childrenGenoMap.firstKey(), parentgeno1);
+							String Deducedgeno2 = ExtractUniqueAllele2Genotype(childrenGenoMap.lastKey(), parentgeno1);
 							genopool[0] = childrenGenoMap.firstKey();
 							genopool[1] = childrenGenoMap.lastKey();
 							genopool[2] = Deducedgeno1;
@@ -115,8 +115,8 @@ public class Rabinowitz2 extends AbstractGenoDistribution {
 						// System.err.println("Rabinowitz Table2 s7-1");
 
 						String[] genopool = new String[4];
-						String Deducedgeno1 = new String(ExtractUniqueAllele2Genotype(childrenGenoMap.firstKey(), parentgeno1));
-						String Deducedgeno2 = new String(ExtractUniqueAllele2Genotype(childrenGenoMap.lastKey(), parentgeno1));
+						String Deducedgeno1 = ExtractUniqueAllele2Genotype(childrenGenoMap.firstKey(), parentgeno1);
+						String Deducedgeno2 = ExtractUniqueAllele2Genotype(childrenGenoMap.lastKey(), parentgeno1);
 						genopool[0] = childrenGenoMap.firstKey();
 						genopool[1] = childrenGenoMap.lastKey();
 						genopool[2] = Deducedgeno1;
@@ -142,8 +142,8 @@ public class Rabinowitz2 extends AbstractGenoDistribution {
 					// System.err.println("Rabinowitz Table2 s6-1,6-2");
 
 					String[] genopool = new String[4];
-					String Deducedgeno1 = new String(ExtractUniqueAllele2Genotype(childrenGenoMap.firstKey(), parentgeno1));
-					String Deducedgeno2 = new String(ExtractUniqueAllele2Genotype(childrenGenoMap.lastKey(), parentgeno1));
+					String Deducedgeno1 = ExtractUniqueAllele2Genotype(childrenGenoMap.firstKey(), parentgeno1);
+					String Deducedgeno2 = ExtractUniqueAllele2Genotype(childrenGenoMap.lastKey(), parentgeno1);
 					genopool[0] = childrenGenoMap.firstKey();
 					genopool[1] = childrenGenoMap.lastKey();
 					genopool[2] = Deducedgeno1;
@@ -344,18 +344,16 @@ public class Rabinowitz2 extends AbstractGenoDistribution {
 	}
 
 	void shuffle(String[] control) {
-		Set CGSet = childrenGenoMap.keySet();
-		Iterator it = CGSet.iterator();
-		int[] CGSetSize = new int[CGSet.size()];
+		int[] CGSetSize = new int[childrenGenoMap.keySet().size()];
 		int index = 0;
 		int offset = 0;
-		for (; it.hasNext(); index++) {
-			String geno = (String) it.next();
+		for (String geno:childrenGenoMap.keySet()) {
 			CGSetSize[index] = ((Integer) childrenGenoMap.get(geno)).intValue();
 			for (int j = 0; j < CGSetSize[index]; j++) {
 				control[j + offset] = geno;
 			}
 			offset += CGSetSize[index];
+			index++;
 		}
 		int N = control.length;
 		for (int i = 0; i < N; i++) {
@@ -376,8 +374,7 @@ public class Rabinowitz2 extends AbstractGenoDistribution {
 					c++;
 					alleleMap.put(g.substring(i + 0, i + 1), c);
 				} else {
-					Integer c = new Integer(1);
-					alleleMap.put(new String(g.substring(i + 0, i + 1)), c);
+					alleleMap.put(new String(g.substring(i + 0, i + 1)), new Integer(1));
 				}
 			}
 		}

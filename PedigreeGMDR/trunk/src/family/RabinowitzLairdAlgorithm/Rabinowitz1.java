@@ -38,7 +38,7 @@ public class Rabinowitz1 extends AbstractGenoDistribution {
             // System.out.println("Table1 s1");
 
             String[] genopool = new String[1];
-            genopool[0] = (String) childrenGenoMap.firstKey();
+            genopool[0] = childrenGenoMap.firstKey();
             double[] freq = new double[1];
             freq[0] = 1.0;
             Produce(control, controlMap, genopool, freq);
@@ -46,8 +46,8 @@ public class Rabinowitz1 extends AbstractGenoDistribution {
             // System.out.println("Table1 s2,3");
 
             String[] genopool = new String[2];
-            genopool[0] = (String) childrenGenoMap.firstKey();
-            genopool[1] = (String) childrenGenoMap.lastKey();
+            genopool[0] = childrenGenoMap.firstKey();
+            genopool[1] = childrenGenoMap.lastKey();
             double[] freq = new double[2];
             freq[0] = 0.5;
             freq[1] = 1.0;

@@ -84,8 +84,14 @@ public class UngenotypedParents extends AbstractImputation {
             }
         }
         if (PG.get(0).size() == 2 && PG.get(1).size() == 2) {
-            parentGeno.add(new String((String) PG.get(0).first() + (String) PG.get(0).last()));
-            parentGeno.add(new String((String) PG.get(1).first() + (String) PG.get(1).last()));
+        	StringBuilder sb1 = new StringBuilder();
+        	sb1.append(PG.get(0).first());
+        	sb1.append(PG.get(0).last());
+            parentGeno.add(sb1.toString());
+        	StringBuilder sb2 = new StringBuilder();
+        	sb2.append(PG.get(0).first());
+        	sb2.append(PG.get(0).last());            
+            parentGeno.add(sb2.toString());
         // System.out.println( "P1"+(String) parentGeno.firstElement() );
         // System.out.println( "P2"+(String) parentGeno.lastElement() );
         }

@@ -18,7 +18,7 @@ public class GenotypedParents extends AbstractImputation{
     }
 
     public void genotypeParents() {
-        parentGeno.add((String) parentGenoMap.firstKey());
-        parentGeno.add((String) parentGenoMap.lastKey());
+        parentGeno.add(parentGenoMap.firstKey());
+        parentGeno.add(parentGenoMap.lastKey());
     }
 }

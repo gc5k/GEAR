@@ -15,7 +15,7 @@ public class OneHeterozygousParent extends AbstractImputation{
     public OneHeterozygousParent(TreeMap<String, Integer> children, TreeMap<String, Integer> parent) {
         super(children);
         parentGenoMap = new TreeMap<String, Integer>(parent);
-        this.parentgeno1 = (String) parentGenoMap.firstKey();
+        this.parentgeno1 = parentGenoMap.firstKey();
         countChildrenAllele(childrenGenoMap);
         countAllele(childrenGenoMap);
         countParentAllele(parentGenoMap);
@@ -65,7 +65,7 @@ public class OneHeterozygousParent extends AbstractImputation{
         }
 
         if (PG2.size() > 0) {
-            String parentgeno2 = new String((String) PG2.first() + (String) PG2.last());
+            String parentgeno2 = new String(PG2.first() + PG2.last());
             parentGeno.add(parentgeno1);
             parentGeno.add(parentgeno2);
         }

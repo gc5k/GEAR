@@ -51,7 +51,7 @@ public class AbstractImputation {
                 for (String it:childrenGenoMap.keySet()) {
                     Geno.add(it);
                 }
-                int index = (new Double(Math.random() * childrenGenoMap.size())).intValue();
+                int index = (int) Math.random() * childrenGenoMap.size();
                 geno = new String((String) Geno.get(index));
             }
         }
