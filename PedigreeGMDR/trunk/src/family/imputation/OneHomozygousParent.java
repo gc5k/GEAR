@@ -13,7 +13,7 @@ public class OneHomozygousParent extends AbstractImputation {
     public OneHomozygousParent(TreeMap<String, Integer> children, TreeMap<String, Integer> parent) {
         super(children);
         parentGenoMap = new TreeMap<String, Integer>(parent);
-        this.parentgeno1 = (String) parentGenoMap.firstKey();
+        this.parentgeno1 = parentGenoMap.firstKey();
         countAllele(childrenGenoMap);
         genotypeParents();
     }

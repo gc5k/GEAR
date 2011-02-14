@@ -68,16 +68,11 @@ public class UnobservedParents extends AbstractGenoDistribution {
 					double vk1 = childrenGenoMap.get(childrenGenoMap.firstKey()).doubleValue();
 					double vk2 = childrenGenoMap.get(childrenGenoMap.lastKey()).doubleValue();
 					double rd = rnd.nextFloat() * (vk1 + vk2);
-					if (rd < vk1) {
-						nontran = new String((String) childrenGenoMap.firstKey());
-					} else {
-						nontran = new String((String) childrenGenoMap.lastKey());
-					}
+					nontran = rd < vk1 ? childrenGenoMap.firstKey() : childrenGenoMap.lastKey();
 				}
 			} else {// situation 6, 7
 
-				nontran = new String((tran.compareTo((String) childrenGenoMap.firstKey()) != 0) ? (String) childrenGenoMap.firstKey()
-						: (String) childrenGenoMap.lastKey());
+				nontran = tran.compareTo(childrenGenoMap.firstKey()) != 0 ? childrenGenoMap.firstKey() : childrenGenoMap.lastKey();
 			}
 		} else {// situation 12
 
@@ -104,12 +99,12 @@ public class UnobservedParents extends AbstractGenoDistribution {
 		String geno;
 		if (numAllele() == 4 && childrenGenoMap.size() >= 3) {
 			// three genotype is sufficient to recreat parents'genotypes
-			geno = (String) it.next();// the first genotype
+			geno = it.next();// the first genotype
 
 			PG.get(0).add(new String(geno.substring(0, 1)));
 			PG.get(1).add(new String(geno.substring(1, 2)));
 
-			geno = (String) it.next();
+			geno = it.next();
 			if (!PG.get(0).contains(geno.substring(0, 1)) && !PG.get(0).contains(geno.substring(1, 2)) && !PG.get(1).contains(geno.substring(0, 1))
 					&& !PG.get(1).contains(geno.substring(1, 2))) {// for
 				// situation
@@ -117,14 +112,14 @@ public class UnobservedParents extends AbstractGenoDistribution {
 				// go to next genotype if this genotype does not match any
 				// allele being assigned in current stage.
 
-				geno = (String) it.next();
+				geno = it.next();
 			}
 			int index = 0;
 			if (PG.get(0).contains(geno.substring(0, 1)) || PG.get(0).contains(geno.substring(1, 2))) {
 				index = 1;
 			}
 			PG.get(index).add(new String((PG.get(1 - index).contains(geno.substring(0, 1))) ? geno.substring(1, 2) : geno.substring(0, 1)));
-			geno = (String) it.next();
+			geno = it.next();
 			PG.get(1 - index).add(new String((PG.get(index).contains(geno.substring(0, 1))) ? geno.substring(1, 2) : geno.substring(0, 1)));
 		}
 		if (numAllele() == 3) {
@@ -132,21 +127,18 @@ public class UnobservedParents extends AbstractGenoDistribution {
 				for (; it.hasNext();) {
 					geno = (String) it.next();
 					if (!isHeterozygous(geno)) {
-						PG.get(0).add(new String(geno.substring(0, 1)));
-						PG.get(1).add(new String(geno.substring(0, 1)));
+						PG.get(0).add(geno.substring(0, 1));
+						PG.get(1).add(geno.substring(0, 1));
 					}
 				}
 				// System.out.println((String) PG.get(0).first());
 				String HomoAllele = (String) PG.get(0).first();
-				TreeSet AS = getAlleleSet();
-				Iterator iit = AS.iterator();
 				int index = 0;
-				for (; iit.hasNext();) {
-					String al = (String) iit.next();
+				for (String al:getAlleleSet()) {
 					if (al.contains(HomoAllele.substring(0, 1))) {
 						continue;
 					}
-					PG.get(index++).add(new String(al));
+					PG.get(index++).add(al);
 				}
 			}
 		}
@@ -195,7 +187,8 @@ public class UnobservedParents extends AbstractGenoDistribution {
 			}
 		}
 
-		if (((L0[0][0] + L0[0][1]) > 0) && ((L0[1][0] + L0[1][1]) > 0)) {// found the allele in p1 and p2
+		if (((L0[0][0] + L0[0][1]) > 0) && ((L0[1][0] + L0[1][1]) > 0)) {
+			// found the allele in p1 and p2
 
 			K0 = 2;
 		} else if ((L0[0][0] + L0[0][1]) > 0) {// found the allele in p1;
@@ -206,7 +199,8 @@ public class UnobservedParents extends AbstractGenoDistribution {
 			K0 = 1;
 		}
 
-		if (((L1[0][0] + L1[0][1]) > 0) && ((L1[1][0] + L1[1][1]) > 0)) {// found the allele in p1 and p2
+		if (((L1[0][0] + L1[0][1]) > 0) && ((L1[1][0] + L1[1][1]) > 0)) {
+			// found the allele in p1 and p2
 
 			K1 = 2;
 		} else if ((L1[0][0] + L1[0][1]) > 0) {// found the allele in p1;
@@ -245,7 +239,7 @@ public class UnobservedParents extends AbstractGenoDistribution {
 			nontran[1] = temp;
 		}
 
-		String nontran_tran[] = { new String(nontran), transmitted};
+		String nontran_tran[] = { new String(nontran), transmitted };
 		return nontran_tran;
 	}
 }

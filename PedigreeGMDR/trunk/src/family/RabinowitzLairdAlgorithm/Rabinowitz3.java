@@ -102,10 +102,8 @@ public class Rabinowitz3 extends AbstractGenoDistribution {
 						allele[1][0] = genopool[1].charAt(1);
 						allele[1][1] = genopool[0].charAt(1);
 					}
-					String geno = new String(allele[0]);
-					genopool[2] = geno;
-					geno = new String(allele[1]);
-					genopool[3] = new String(geno);
+					genopool[2] = new String(allele[0]);
+					genopool[3] = new String(allele[1]);
 					double[] freq = new double[4];
 					freq[0] = 0.25;
 					freq[1] = 0.5;
@@ -196,7 +194,7 @@ public class Rabinowitz3 extends AbstractGenoDistribution {
 						tempgeno[ind++] = genopool[index];
 					}
 				}
-				String geno = new String(ExtractUniqueAllele2Genotype(tempgeno[0], tempgeno[1]));
+				String geno = ExtractUniqueAllele2Genotype(tempgeno[0], tempgeno[1]);
 				genopool[3] = geno;
 
 				double[] freq = new double[4];
@@ -367,13 +365,13 @@ public class Rabinowitz3 extends AbstractGenoDistribution {
 				}
 			}
 		}
-		String geno = new String();
+		StringBuilder geno = new StringBuilder();
 
 		for (String allele:alleleMap.keySet()) {
-			if (((Integer) alleleMap.get(allele) == 1)) {
-				geno += allele;
+			if ((alleleMap.get(allele)).intValue() == 1) {
+				geno.append(allele);
 			}
 		}
-		return geno;
+		return geno.toString();
 	}
 }
