@@ -2,10 +2,7 @@ package mdr.data;
 
 import java.util.ArrayList;
 import java.util.GregorianCalendar;
-import java.util.HashMap;
-import java.util.Iterator;
 import java.util.Random;
-import java.util.Set;
 import java.util.TreeMap;
 
 import mdr.data.DataFile;
@@ -20,7 +17,6 @@ import publicAccess.ToolKit;
  */
 public class ExDataFile extends DataFile {
 
-    protected ArrayList MarkerInfor;
     private IMPopulation imp;
     public ExDataFile(IMPopulation im, int[] scrIdx, double cM) {
         super();
@@ -44,8 +40,7 @@ public class ExDataFile extends DataFile {
         GregorianCalendar calendar = new GregorianCalendar();
         Random rnd = new Random();
         rnd.setSeed(calendar.get(GregorianCalendar.SECOND));
-        String cs = imp.getCrossParameter();
-        TreeMap tempMap = new TreeMap();
+        TreeMap<Integer, ArrayList<Integer>> tempMap = new TreeMap<Integer, ArrayList<Integer>>();
         int count = 0;
         int[][][] marker = imp.Markers();
         for (int i = 0; i < imp.IndividualNumber(); i++) {
@@ -66,27 +61,23 @@ public class ExDataFile extends DataFile {
             for (int k = 0; k < content.length; k++) {
                 Integer Ii = new Integer(k);
                 if (content[k].compareTo(PublicData.MissingGenotype) == 0) {
-                    if (tempMap.containsKey(Ii)) {
-                        ArrayList tempArray = (ArrayList) tempMap.get(Ii);
-                        tempArray.add(new Integer(count));
-                    } else {
-                        ArrayList tempArray = new ArrayList();
-                        tempArray.add(new Integer(count));
-                        tempMap.put(Ii, tempArray);
+                	ArrayList<Integer> tempArray = tempMap.get(Ii);
+                    if (tempArray == null) {
+                        tempArray = new ArrayList<Integer>();
+                        tempMap.put(Ii, tempArray);                        
                     }
+                    tempArray.add(new Integer(count));
                 }
             }
             count++;
         }
 
-        Set keys = tempMap.keySet();
         missing = new int[SNPID.length][];
-        for (Iterator e = keys.iterator(); e.hasNext();) {
-            Integer Ii = (Integer) e.next();
-            ArrayList tempArray = (ArrayList) tempMap.get(Ii);
+        for (Integer Ii:tempMap.keySet()) {
+            ArrayList<Integer> tempArray = tempMap.get(Ii);
             missing[Ii.intValue()] = new int[tempArray.size()];
             for (int i = 0; i < tempArray.size(); i++) {
-                missing[Ii.intValue()][i] = ((Integer) tempArray.get(i)).intValue();
+                missing[Ii.intValue()][i] = tempArray.get(i).intValue();
             }
         }
         c = 0;

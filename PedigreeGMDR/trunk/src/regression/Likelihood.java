@@ -66,9 +66,6 @@ public class Likelihood {
 
     public double LogLikelihoodNullCIM(LinearRegression lr) {
     	double LODLikelihood = 0;
-    	RealMatrix B = lr.estimate;
-    	RealMatrix X = lr.X();
-    	RealMatrix Y = lr.Y();
     	RealMatrix residual = lr.getResidual();
     	double mse = lr.mse;
    		for (int i = 0; i < residual.getRowDimension(); i++) {
@@ -110,9 +107,6 @@ public class Likelihood {
 
     public double LogLikelihoodNullIM(LinearRegression lr) {
     	double LODLikelihood = 0;
-    	RealMatrix B = lr.estimate;
-    	RealMatrix X = lr.X();
-    	RealMatrix Y = lr.Y();
     	RealMatrix residual = lr.getResidual();
     	double mse = lr.mse;
    		for (int i = 0; i < residual.getRowDimension(); i++) {

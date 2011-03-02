@@ -15,7 +15,7 @@ import publicAccess.PublicData;
  */
 public class Partition extends AbstractList {
 
-    ArrayList testingList = new ArrayList();    // list of partitions
+    ArrayList<HashSet<Integer>> testingList = new ArrayList<HashSet<Integer>>();    // list of partitions
     int populationSize;
     int interval;
     long seed;
@@ -33,7 +33,7 @@ public class Partition extends AbstractList {
         System.arraycopy(os, 0, offset, 0, os.length);
 
         for (int i = 0; i < interval; i++) {
-            testingList.add(new HashSet());
+            testingList.add(new HashSet<Integer>());
         }
     }
 
@@ -42,17 +42,13 @@ public class Partition extends AbstractList {
             randomPartition();
         } else if(method == PublicData.UnpairedPartition ) {
             unpairedPartition(idx);
-        } else {
-            pairedPartition();
         }
     }
 
     private void unpairedPartition(int idx) {
-        ArrayList affecteds = new ArrayList();
-        ArrayList unaffecteds = new ArrayList();
-        ArrayList temp_data = data.getSample();
-        for (Iterator i = temp_data.iterator(); i.hasNext();) {
-            DataFile.Subject sub = (DataFile.Subject) i.next();
+        ArrayList<Integer> affecteds = new ArrayList<Integer>();
+        ArrayList<Integer> unaffecteds = new ArrayList<Integer>();
+        for (DataFile.Subject sub:data.getSample()) {
             Double subscore = sub.getDoubleScore(idx);
             if (subscore != null) {
                 double scr = subscore - offset[idx];
@@ -70,42 +66,11 @@ public class Partition extends AbstractList {
         }
 
         for (int i = 0; i < affecteds.size(); ++i) {
-            ((HashSet) testingList.get(i % interval)).add(affecteds.get(i));
+            ((HashSet<Integer>) testingList.get(i % interval)).add(affecteds.get(i));
         }
 
         for (int i = 0; i < unaffecteds.size(); ++i) {
-            ((HashSet) testingList.get((i + affecteds.size()) % interval)).add(unaffecteds.get(i));
-        }
-    }
-
-    private void pairedPartition() {
-        ArrayList pairs = new ArrayList((populationSize + 1) / 2);
-
-        for (int i = 0; i < populationSize; i += 2) {
-            Object[] pair;
-            int j = i + 1;
-            if (j < populationSize) {
-                pair = new Object[2];
-                pair[0] = data.get(i);
-                pair[1] = data.get(i + 1);
-            } else {
-                pair = new Object[1];
-                pair[0] = data.get(i);
-            }
-            
-            pairs.add(pair);
-        }
-        Random rnd = new Random(seed);
-        if (rnd != null) {
-            Collections.shuffle(pairs, rnd);
-        }
-
-        for (int i = 0; i < pairs.size(); ++i) {
-            HashSet set = (HashSet) testingList.get(i % interval);
-            Object[] pair = (Object[]) pairs.get(i);
-            set.add(pair[0]);
-            if (pair.length > 1)
-                set.add(pair[1]);
+            ((HashSet<Integer>) testingList.get((i + affecteds.size()) % interval)).add(unaffecteds.get(i));
         }
     }
 
@@ -126,7 +91,7 @@ public class Partition extends AbstractList {
 
     public void add(int idx, Object o) {
         modCount++;
-        testingList.add(idx, o);
+        testingList.add(idx, (HashSet<Integer>) o);
     }
 
     public Object get(int idx) {

@@ -414,8 +414,8 @@ public class FamilyStruct {
         this.familyStructName = familyStructName;
     }
 
-    public void setNumMarkers(int numMarkers) {
-        this.numMarkers = numMarkers;
+    public void setNumMarkers(int nMarkers) {
+        numMarkers = nMarkers;
     }
 
     /**

@@ -30,7 +30,7 @@ public class PedigreeParameter {
 	protected long seed; // 15
 
 	public PedigreeParameter() {
-		lines = new ArrayList();
+		lines = new ArrayList<String>();
 	}
 
 	public void read(String file) throws IOException {
@@ -41,7 +41,6 @@ public class PedigreeParameter {
 	}
 
 	public void sweepComments() throws IOException {
-		boolean flag = true;
 		String line;
 		while ((line = buffer.readLine()) != null) {
 			if (Pattern.matches("^//.*", line)) {// empty line

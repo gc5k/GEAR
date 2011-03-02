@@ -1,7 +1,5 @@
 package regression;
 
-import im.GenomeScan;
-import im.population.IMPopulation;
 import java.util.ArrayList;
 import org.apache.commons.math.distribution.FDistribution;
 import org.apache.commons.math.distribution.FDistributionImpl;
@@ -99,7 +97,7 @@ public class LinearRegression {
 		}
 	}
 
-	public double[][] quasiResidual(ArrayList selectedMarker, int interval) {
+	public double[][] quasiResidual(ArrayList<Integer> selectedMarker, int interval) {
 		double[][] Y_res = new double[Response.getRowDimension()][1];
 		if (selectedMarker == null) {
 			for (int i = 0; i < Y_res.length; i++) {
@@ -117,7 +115,7 @@ public class LinearRegression {
 				Y_res[i][0] = Response.getEntry(i, 0);
 				for (int j = 0; j < estimate.getRowDimension(); j++) {
 					if (j != 0) {
-						int mi = ((Integer) selectedMarker.get(j - 1))
+						int mi = (selectedMarker.get(j - 1))
 								.intValue();
 						if (mi == interval || mi == (interval + 1)) {
 							continue;

@@ -546,11 +546,11 @@ public class DataFile {
 //            } else if (Math.abs(negScr) < PublicData.epsilon) {
 //                throw new DataFileException("Abnormal magnitude of the sum of the negative score " + negScr + "  at phenotype " + phenotype[i] + " .");
 //            }
-            double r = posScr / Math.abs(negScr) > 1 ? posScr / Math.abs(negScr) : Math.abs(negScr) / posScr;
+//            double r = posScr / Math.abs(negScr) > 1 ? posScr / Math.abs(negScr) : Math.abs(negScr) / posScr;
 //            if (r > PublicData.tooBigRatio) {
 //                throw new DataFileException("Abnormal ratio of positive score v.s. negative score.");
 //            }
-            r = posSub / Math.abs(negSub) > 1 ? posSub / Math.abs(negSub) : Math.abs(negSub) / posSub;
+//            r = posSub / Math.abs(negSub) > 1 ? posSub / Math.abs(negSub) : Math.abs(negSub) / posSub;
 //            if (r > PublicData.tooBigRatio) {
 //                throw new DataFileException("Abnormal ratio of subjects with positive score v.s. with negative score.");
 //            }
