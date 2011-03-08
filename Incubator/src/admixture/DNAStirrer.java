@@ -12,15 +12,18 @@ public class DNAStirrer {
 	private int model;
 	private int N; //population size
 	private int round;
-	private double[][] ancestral_snp_freq;
-	private double[] curr_snp_freq;
-	private double[] curr_snp_var;
+	private double[][] ancestral_snp_freq; //this one records the frequencies for the ancestral populations
+											// it should not be changed
+	private double[][] src_snp_freq; //this one records the frequencies of the populations in mating;
+									//the first row is the updated frequencies of the admixed population; 
+	private double[] curr_snp_freq; //the mixed frequency of the current population under random mating
+	private double[] curr_snp_var; //the mixed variance of the current population under random mating
 	private String[] snp_Name;
 
 	private double[][] pop_dna_org;
 	private double[] curr_dna_org;
 
-	private double[] pop_proportion;
+	private double[] pop_weight;
 
 	private double[][][] post_snp_prob;
 	private boolean genetic_drift;
@@ -40,6 +43,11 @@ public class DNAStirrer {
 	}
 
 	private void initial_test() {
+		src_snp_freq = new double[N_pop][N_snp];
+		for (int i = 0; i < N_pop; i++) {
+			Arrays.fill(src_snp_freq[i], 0.15 * (i + 1));
+		}
+
 		ancestral_snp_freq = new double[N_pop][N_snp];
 		for (int i = 0; i < N_pop; i++) {
 			Arrays.fill(ancestral_snp_freq[i], 0.15 * (i + 1));
@@ -54,34 +62,21 @@ public class DNAStirrer {
 			pop_dna_org[i][i] = 1;
 		}
 
-		pop_proportion = new double[N_pop];
-		pop_proportion[0] = 1;
-//		pop_proportion[1] = 0.2;
-//		pop_proportion[2] = 0.025;
+		pop_weight = new double[N_pop];
+		pop_weight[0] = 1;
+//		pop_weight[1] = 0.2;
+//		pop_weight[2] = 0.025;
 
-		post_snp_prob = new double[N][N_allele][N_pop];
+		post_snp_prob = new double[N_snp][N_allele][N_pop];
 	}
 
 	public void DNAStir() {
 		for (int i = 0; i < round; i++) {
-			visaApplication();// migrating law may change
-			double[][] M = matingMatrix();
+			double[][] M = visaOffice();
 
 			curr_snp_freq = new double[curr_snp_freq.length];
 			curr_dna_org = new double[curr_dna_org.length];
 			curr_snp_var = new double[curr_snp_var.length];
-
-			//update allele frequency
-			for (int j = 0; j < curr_snp_freq.length; j++) {
-				for (int k = 0; k < M.length; k++) {
-					for (int l = 0; l < M[k].length; l++) {
-						curr_snp_freq[j] += M[k][l]
-								* (ancestral_snp_freq[k][j] * ancestral_snp_freq[l][j] 
-								+ 0.5 * ancestral_snp_freq[k][j] * (1 - ancestral_snp_freq[l][j])
-								+ 0.5 * (1 - ancestral_snp_freq[k][j]) * ancestral_snp_freq[l][j]);
-					}
-				}
-			}
 
 			//update genomic composition
 			for (int j = 0; j < curr_dna_org.length; j++) {
@@ -93,18 +88,44 @@ public class DNAStirrer {
 				}
 			}
 
+			//update allele frequency
+			for (int j = 0; j < curr_snp_freq.length; j++) {
+				for (int k = 0; k < M.length; k++) {
+					for (int l = 0; l < M[k].length; l++) {
+						curr_snp_freq[j] += M[k][l]
+								* (src_snp_freq[k][j] * src_snp_freq[l][j] 
+								+ 0.5 * src_snp_freq[k][j] * (1 - src_snp_freq[l][j])
+								+ 0.5 * (1 - src_snp_freq[k][j]) * src_snp_freq[l][j]);
+					}
+				}
+			}
+
 			//update variance for alleles
 			for (int j = 0; j < curr_snp_var.length; j++) {
-				for (int k = 0; k < ancestral_snp_freq.length; k++) {
-					curr_snp_var[j] += curr_dna_org[k] * ancestral_snp_freq[k][j] * (1 -  ancestral_snp_freq[k][j]) / (2 * N);
+				for (int k = 0; k < src_snp_freq.length; k++) {
+					curr_snp_var[j] += curr_dna_org[k] * src_snp_freq[k][j] * (1 -  src_snp_freq[k][j]) / (2 * N);
 				}
 				curr_snp_var[j] = Math.sqrt(curr_snp_var[j]);
 			}
 
+			for (int j = 0; j < post_snp_prob.length; j++) {
+				double c0 = 0;
+				double c1 = 0;
+				for (int k = 0; k < curr_dna_org.length; k++) {
+					c0 += ancestral_snp_freq[k][j] * curr_dna_org[k];
+					c1 += (1-ancestral_snp_freq[k][j]) * curr_dna_org[k];
+				}
+				for (int k = 0; k < curr_dna_org.length; k++) {
+					post_snp_prob[j][0][k] = ancestral_snp_freq[k][j] * curr_dna_org[k]/c0;
+					post_snp_prob[j][1][k] = (1 - ancestral_snp_freq[k][j]) * curr_dna_org[k]/c1;
+				}
+			}
+			//update posterior probability that an allele is contributed by a certain population;
+			
 			if(i > 0 && genetic_drift) geneticDrift();
 			
 			if (DEBUG) {
-				System.out.println("round " + i + " current snp pool:");
+				System.out.println("====round " + i + "\n current snp pool:");
 				for (int j = 0; j < curr_snp_freq.length; j++) {
 					System.out.print(curr_snp_freq[j] + " ");
 				}
@@ -115,28 +136,27 @@ public class DNAStirrer {
 				}
 				System.out.println();
 
-				System.out.println("round " + i + " current dna composition:");
+				System.out.println(" current dna composition:");
 				for (int j = 0; j < curr_dna_org.length; j++) {
 					System.out.print(curr_dna_org[j] + " ");
 				}
 				System.out.println();
+				
+				System.out.println(" posterior snp probability:");
+				for (int j = 0; j < post_snp_prob.length; j++) {
+					System.out.println("snp:" + j);
+					for (int k = 0; k < post_snp_prob[j].length; k++) {
+						for (int l = 0; l < post_snp_prob[j][k].length; l++) {
+							System.out.print(post_snp_prob[j][k][l] + " ");
+						}
+						System.out.println();
+					}
+				}
+				System.out.println();
 			}
-			System.arraycopy(curr_snp_freq, 0, ancestral_snp_freq[0], 0, curr_snp_freq.length);
+			System.arraycopy(curr_snp_freq, 0, src_snp_freq[0], 0, curr_snp_freq.length);
 			System.arraycopy(curr_dna_org, 0, pop_dna_org[0], 0, curr_dna_org.length);			
 		}
-	}
-
-	private void visaApplication() {
-
-		//update pop_proportion here
-
-		// the criteria for application
-		// 1: constant migrating rate
-		for(int i = 0; i < pop_proportion.length; i++) {
-			pop_proportion[i] = pop_proportion[i];
-		}
-		// 2: policy varies
-		// for marry in model, the 2p1-1>0
 	}
 
 	private void geneticDrift() {
@@ -148,23 +168,36 @@ public class DNAStirrer {
 		}
 	}
 
-	private double[][] matingMatrix() {
+	private double[][] visaOffice() {
+		//update pop_weight here
+
+		// the criteria for application
+		// 1: constant migrating rate
+		for(int i = 0; i < pop_weight.length; i++) {
+			pop_weight[i] = pop_weight[i];
+		}
+		// 2: policy varies
+		// for marry in model, the 2p1-1>0
 		double[][] M = null;
 		if (model == AdmixtureConstant.Marry_In) {
-			M = new double[pop_proportion.length][pop_proportion.length];
-			M[0][0] = 1 - 2 * (1 - pop_proportion[0]);
+			M = new double[pop_weight.length][pop_weight.length];
+			M[0][0] = 1 - 2 * (1 - pop_weight[0]);
 			for (int i = 1; i < M[0].length; i++) {
-				M[0][i] = pop_proportion[i];
-				M[i][0] = pop_proportion[i];
+				M[0][i] = pop_weight[i];
+				M[i][0] = pop_weight[i];
 			}
 		} else if (model == AdmixtureConstant.Mirgrate_In) {
-			M = Tools.Generate_Matrix(pop_proportion);
+			M = Tools.Generate_Matrix(pop_weight);
 		}
 		return M;
 	}
 
 	public double[][] get_Frequency() {
-		return ancestral_snp_freq;
+		return src_snp_freq;
+	}
+
+	public double[] get_snp_panel() {
+		return curr_snp_freq;
 	}
 
 	public static void main(String[] args) {
