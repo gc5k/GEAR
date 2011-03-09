@@ -5,15 +5,14 @@ import java.util.Random;
 import jsc.distributions.Poisson;
 import jsc.distributions.Uniform;
 
-public class SequenceGenerator {
+public class HotSpot {
 
 	private boolean DEBUG = true;
 	private double len_Morgan; // length of the chromosome measured by Morgan
 	private int N_snp;
 	private Random rnd = new Random();
 	private double[] snp_panel;
-	private double[][][] posterior_probability;
-	private double[] LD; // reserve for the future
+
 	private double[][] rec_frac; // there two kinds of recombination fractions
 	// 1: free of recombination that each element equals 0.5, rec_frac=[0.5,0.5,0.5,...]
 	// it is generated in the method recombinationFree()
@@ -22,17 +21,7 @@ public class SequenceGenerator {
 
 	private int[][] rec_hotspot;
 
-	public SequenceGenerator(double[] sp, double[][][] pp) {
-		snp_panel = sp;
-		posterior_probability = pp;
-		N_snp = snp_panel.length;
-
-		len_Morgan = 1;
-		rec_frac = new double[2][N_snp];
-		rec_hotspot = new int[2][];
-	}
-
-	public SequenceGenerator(double[] sp) {
+	public HotSpot(double[] sp) {
 		snp_panel = sp;
 
 		N_snp = snp_panel.length;
@@ -127,7 +116,7 @@ public class SequenceGenerator {
 
 	public static void main(String[] args) {
 		double[] snp_freq = { 0.5, 0.5, 0.1, 0.1, 0.1 };
-		SequenceGenerator sg = new SequenceGenerator(snp_freq);
-		sg.GenerateChromosome(false);
+		HotSpot hs = new HotSpot(snp_freq);
+		hs.GenerateChromosome(false);
 	}
 }
