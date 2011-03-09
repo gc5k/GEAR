@@ -209,7 +209,7 @@ public class DNAStirrer {
 
 		System.out.println("========");
 		for (int i = 0; i < sf.length; i++) {
-			for (int j = 0; j < sf.length; j++) {
+			for (int j = 0; j < sf[i].length; j++) {
 				System.out.print(sf[i][j] + " ");
 			}
 			System.out.println();
