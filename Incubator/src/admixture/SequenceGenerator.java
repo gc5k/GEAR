@@ -2,9 +2,15 @@ package admixture;
 
 import java.util.Arrays;
 import java.util.Random;
+
+import arsenal.Tools;
 import jsc.distributions.Poisson;
 import jsc.distributions.Uniform;
 
+/**
+*
+* @author Guo-Bo Chen, chenguobo@gmail.com
+*/
 public class SequenceGenerator {
 
 	private boolean DEBUG = true;

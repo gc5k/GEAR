@@ -1,14 +1,21 @@
 package admixture;
 
 import java.util.Arrays;
+
+import arsenal.Tools;
 import jsc.distributions.Binomial;
+
+/**
+*
+* @author Guo-Bo Chen, chenguobo@gmail.com
+*/
 
 public class DNAStirrer {
 
 	private int N_snp; //number of snps
 	private int N_pop; //number of populations
 	private int N_allele; //n_allele = 2 for a biallelic locus
-	private boolean DEBUG = true;
+	private boolean DEBUG = false;
 	private int model;
 	private int N; //population size
 	private int round;
@@ -30,13 +37,13 @@ public class DNAStirrer {
 	private Binomial rnd;
 	private long seed = 100;
 
-	public DNAStirrer(int m, int s, int r, boolean gd) {
-		N = s;
+	public DNAStirrer(int m, int s, int ns, boolean gd) {//for test
+
 		model = m;
-		round = r;
+		N = s;
 		genetic_drift = gd;
 
-		N_snp = 10;
+		N_snp = ns;
 		N_pop = 1;
 		N_allele = 2;
 		initial_test();
@@ -70,7 +77,8 @@ public class DNAStirrer {
 		post_snp_prob = new double[N_snp][N_allele][N_pop];
 	}
 
-	public void DNAStir() {
+	public void DNAStir(int r) {
+		round = r;
 		for (int i = 0; i < round; i++) {
 			double[][] M = visaOffice();
 
@@ -192,20 +200,28 @@ public class DNAStirrer {
 		return M;
 	}
 
-	public double[][] get_Frequency() {
+	public double[][] MultiPopSNPFrequency() {
 		return src_snp_freq;
 	}
 
-	public double[] get_snp_panel() {
+	public double[] SNPPanel() {
 		return curr_snp_freq;
+	}
+
+	public double[][][] PostSNPAncestralProb() {
+		return post_snp_prob;
+	}
+	
+	public int NumberOfSNP() {
+		return N_snp;
 	}
 
 	public static void main(String[] args) {
 
-		DNAStirrer ds = new DNAStirrer(2, 10000, 2, true);
-		ds.DNAStir();
+		DNAStirrer ds = new DNAStirrer(2, 10000, 2, AdmixtureConstant.With_Genetic_Drift);
+		ds.DNAStir(10);
 
-		double[][] sf = ds.get_Frequency();
+		double[][] sf = ds.MultiPopSNPFrequency();
 
 		System.out.println("========");
 		for (int i = 0; i < sf.length; i++) {
