@@ -1,5 +1,9 @@
-package admixture;
+package arsenal;
 
+/**
+*
+* @author Guo-Bo Chen, chenguobo@gmail.com
+*/
 public class Tools {
 
 	static public double[][] Generate_Matrix(double[] vector) {

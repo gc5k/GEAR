@@ -2,16 +2,22 @@ package admixture;
 
 import java.util.Arrays;
 import java.util.Random;
+
+import arsenal.Tools;
 import jsc.distributions.Poisson;
 import jsc.distributions.Uniform;
 
+/**
+*
+* @author Guo-Bo Chen, chenguobo@gmail.com
+*/
+
 public class HotSpot {
 
-	private boolean DEBUG = true;
+	private boolean DEBUG = false;
 	private double len_Morgan; // length of the chromosome measured by Morgan
 	private int N_snp;
-	private Random rnd = new Random();
-	private double[] snp_panel;
+	private Random rnd = new Random(2010);
 
 	private double[][] rec_frac; // there two kinds of recombination fractions
 	// 1: free of recombination that each element equals 0.5, rec_frac=[0.5,0.5,0.5,...]
@@ -21,29 +27,23 @@ public class HotSpot {
 
 	private int[][] rec_hotspot;
 
-	public HotSpot(double[] sp) {
-		snp_panel = sp;
-
-		N_snp = snp_panel.length;
+	public HotSpot(int N_s) {
+		N_snp = N_s;
 
 		len_Morgan = 1;
 		rec_frac = new double[2][N_snp];
 		rec_hotspot = new int[2][];
 	}
 
-	public void GenerateChromosome(boolean rf) {
-
-		for(int i = 0; i < 10; i++) {
-			if (rf) {
-				recombinationFree();
-			} else {
-				recombination();
-			}
+	public void GenerateRecombination(boolean rf) {
+		if (rf) {
+			recombinationFree();
+		} else {
+			recombination();
 		}
 	}
 
 	private void recombinationFree() {
-
 		for (int i = 0; i < rec_frac.length; i++) {
 			rec_hotspot[i] = new int[1];
 			rec_hotspot[i][0] = 0;
@@ -84,18 +84,18 @@ public class HotSpot {
 		if(DEBUG) print();
 	}
 
-	private void generateFounderGenotype(int[][] pair) {
-		for (int i = 0; i < 2; i++) {
-			for (int k = 0; k < N_snp; k++) {
-				if (rnd.nextFloat() < snp_panel[k]) {
-					pair[k][i] = 0;
-				} else {
-					pair[k][i] = 1;
-				}
-			}
-		}
+	public void setSeed(long s) {
+		rnd.setSeed(s);
 	}
 
+	public double[] FatherRecombinationFraction() {
+		return rec_frac[0];
+	}
+
+	public double[] MotherRecombinationFraction() {
+		return rec_frac[1];
+	}
+	
 	private void print() {
 		if (DEBUG) {
 			for (int i = 0; i < rec_hotspot.length; i++) {
@@ -116,7 +116,7 @@ public class HotSpot {
 
 	public static void main(String[] args) {
 		double[] snp_freq = { 0.5, 0.5, 0.1, 0.1, 0.1 };
-		HotSpot hs = new HotSpot(snp_freq);
-		hs.GenerateChromosome(false);
+		HotSpot hs = new HotSpot(snp_freq.length);
+		hs.GenerateRecombination(AdmixtureConstant.free_recombination);
 	}
 }

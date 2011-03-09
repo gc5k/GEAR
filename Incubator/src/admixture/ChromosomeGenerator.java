@@ -1,10 +1,18 @@
 package admixture;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.Random;
 
+import admixture.chromosome.FamilySingleChromosome;
+
+/**
+*
+* @author Guo-Bo Chen, chenguobo@gmail.com
+*/
+
 public class ChromosomeGenerator {
-	private boolean DEBUG = true;
+	private boolean DEBUG = false;
 	private int N_snp;
 	private Random rnd = new Random(2011);
 	private double[] snp_panel;
@@ -18,37 +26,26 @@ public class ChromosomeGenerator {
 	
 	// Note: rec_frac[0] for paternal recombination, rec_frac[1] for maternal recombination;
 
-	private ArrayList<Family> habitat = new ArrayList<Family>();
-	public static class Family {
-		protected int[][][] p_g; // parents chromosomes;
-								 // p_g[0] for dad, p_g[1] for mom
-		protected int[][][] o_g; // offspring chromosomes;
-
-		public Family(int[][][]p, int[][][] o) {
-			p_g = p;
-			o_g = o;
-		}
-	}
-
 	public ChromosomeGenerator(double[] sp, double[][][] pp) {
 		snp_panel = sp;
 		post_prob = pp;
 
+		rec_frac = new double[2][];
 		N_snp = sp.length;
 	}
 
-	public void generatePedigree(int k, double[][] rf) {
-		rec_frac = rf;
+	public FamilySingleChromosome generateFamilySingleChromosome(int cID, int k, double[] father_rec_frac, double[] mother_rec_frac) {
+		rec_frac[0] = father_rec_frac;
+		rec_frac[1] = mother_rec_frac;		
 		int[][][] pg = new int[2][][];
-		pg[0] = generateFounderChr(false);
-		pg[1] = generateFounderChr(false);
+		pg[0] = generateFounderChr(AdmixtureConstant.Without_LD);
+		pg[1] = generateFounderChr(AdmixtureConstant.Without_LD);
 
 		int[][][] og = new int[k][][];
 		for (int i = 0; i < k; i++) {
 			og[i] = generateOffspringChr(pg);
 		}
-		Family f = new Family(pg, og);
-		habitat.add(f);
+		return new FamilySingleChromosome(pg, og);
 	}
 
 	private int[][] generateFounderChr(boolean ld) {
@@ -56,7 +53,9 @@ public class ChromosomeGenerator {
 		for (int i = 0; i < 2; i++) {
 			for (int k = 0; k < N_snp; k++) {
 				if(!ld) {
-					diploid[k][i] = rnd.nextFloat() < snp_panel[k] ? 0:1;
+					double d = rnd.nextFloat();
+					System.out.println(d);
+					diploid[i][k] = d < snp_panel[k] ? 0:1;
 				} else {
 					// when there is LD pattern;
 				}
@@ -82,7 +81,7 @@ public class ChromosomeGenerator {
 
 	public static void main(String[] args) {
 		double[] snp_freq = { 0.5, 0.5, 0.1, 0.1, 0.1 };
-		HotSpot hs = new HotSpot(snp_freq);
-		hs.GenerateChromosome(false);
+		HotSpot hs = new HotSpot(snp_freq.length);
+		hs.GenerateRecombination(AdmixtureConstant.free_recombination);
 	}
 }
