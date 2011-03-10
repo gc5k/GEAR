@@ -1,38 +1,43 @@
 package admixture;
 
 import java.util.Arrays;
-import java.util.Random;
 
 import arsenal.Tools;
+import arsenal.Sample;
+
 import jsc.distributions.Poisson;
-import jsc.distributions.Uniform;
+import jsc.distributions.Binomial;
 
 /**
-*
-* @author Guo-Bo Chen, chenguobo@gmail.com
-*/
+ * 
+ * @author Guo-Bo Chen, chenguobo@gmail.com
+ */
 
 public class HotSpot {
 
 	private boolean DEBUG = false;
 	private double len_Morgan; // length of the chromosome measured by Morgan
 	private int N_snp;
-	private Random rnd = new Random(2010);
-
-	private double[][] rec_frac; // there two kinds of recombination fractions
-	// 1: free of recombination that each element equals 0.5, rec_frac=[0.5,0.5,0.5,...]
+	private long seed = 2010;
+	private Binomial B;
+	private Poisson Po;
+	private double[] rec_frac; // there two kinds of recombination fractions
+	// 1: free of recombination that each element equals 0.5,
+	// rec_frac=[0.5,0.5,0.5,...]
 	// it is generated in the method recombinationFree()
-	// 2: cross over between snps: rec_frac looks like=[0, 0, 0, 1, 0, 0, 1, ...]
+	// 2: cross over between snps: rec_frac looks like=[0, 0, 0, 1, 0, 0, 1,
+	// ...]
 	// it is generated in the method recombination()
 
-	private int[][] rec_hotspot;
+	private int[] rec_hotspot;
 
 	public HotSpot(int N_s) {
 		N_snp = N_s;
 
 		len_Morgan = 1;
-		rec_frac = new double[2][N_snp];
-		rec_hotspot = new int[2][];
+
+		B = new Binomial(N_snp, 0.5);
+		Po = new Poisson(len_Morgan);
 	}
 
 	public void GenerateRecombination(boolean rf) {
@@ -43,74 +48,78 @@ public class HotSpot {
 		}
 	}
 
+	public long getSeed() {
+		return seed;
+	}
+
+	public void setSeed(long s) {
+		seed = s;
+		B.setSeed(s);
+		Po.setSeed(s);
+	}
+
 	private void recombinationFree() {
-		for (int i = 0; i < rec_frac.length; i++) {
-			rec_hotspot[i] = new int[1];
-			rec_hotspot[i][0] = 0;
-			Arrays.fill(rec_frac[i], 0.5);
+
+		int crossover;
+		do {
+			crossover = (int) B.random() - 1;
+		} while (crossover < 0);
+		rec_hotspot = new int[crossover + 2];
+		if (crossover > 0) {
+			int[] hs = Sample.SampleIndex(1, N_snp, crossover, AdmixtureConstant.Without_replacement);
+			System.arraycopy(hs, 0, rec_hotspot, 1, hs.length);
 		}
-		if (DEBUG) print();
+		rec_hotspot[0] = 0;
+		rec_hotspot[rec_hotspot.length - 1] = N_snp - 1;
+
+		if (DEBUG)
+			print();
 	}
 
 	private void recombination() {
 
 		Poisson p = new Poisson(len_Morgan);
-		Uniform u = new Uniform(1, N_snp - 1);
 
-		for (int i = 0; i < rec_hotspot.length; i++) {
-			if (rec_hotspot[i] != null) {
-				Tools.Fill_Matrix(rec_frac, i, rec_hotspot[i], 0);
-			}
-
-			int rec_event = 0;
-			do {
-				rec_event = (int) p.random();
-			} while (rec_event >= N_snp - 2);
-			rec_hotspot[i] = new int[rec_event + 1];
-
-			int c = 1;
-			while (c < rec_hotspot[i].length){
-				int idx = (int) u.random();
-				int index = Arrays.binarySearch(rec_hotspot[i], idx);
-				if (index < 0) {
-					rec_hotspot[i][c++] = idx;
-				}
-			};
-			Arrays.sort(rec_hotspot[i]);
-			Tools.Fill_Matrix(rec_frac, i, rec_hotspot[i], 1);
-			rec_frac[i][0] = 0.5;
+		if (rec_hotspot != null) {
+			Tools.Fill_Matrix(rec_frac, rec_hotspot, 0);
 		}
-		
-		if(DEBUG) print();
+
+		int crossover = 0;
+		do {
+			crossover = (int) p.random();
+		} while (crossover >= N_snp - 2);
+		rec_hotspot = new int[crossover + 2];
+		if (crossover > 0) {
+			int[] hs = Sample.SampleIndex(1, N_snp, crossover, AdmixtureConstant.Without_replacement);
+			System.arraycopy(hs, 0, rec_hotspot, 1, hs.length);
+		}
+		Arrays.sort(rec_hotspot);
+		Tools.Fill_Matrix(rec_frac, rec_hotspot, 1);
+		rec_frac[0] = 0.5;
+
+		if (DEBUG)
+			print();
 	}
 
-	public void setSeed(long s) {
-		rnd.setSeed(s);
+	public int[] getHotSpot() {
+		return rec_hotspot;
 	}
 
-	public double[] FatherRecombinationFraction() {
-		return rec_frac[0];
+	public double[] RecombinationFraction() {
+		return rec_frac;
 	}
 
-	public double[] MotherRecombinationFraction() {
-		return rec_frac[1];
-	}
-	
 	private void print() {
 		if (DEBUG) {
 			for (int i = 0; i < rec_hotspot.length; i++) {
-				for (int j = 0; j < rec_hotspot[i].length; j++) {
-					System.out.print(rec_hotspot[i][j] + " ");
-				}
-				System.out.println();
+				System.out.print(rec_hotspot[i] + " ");
 			}
-
+			System.out.println();
+			
 			for (int i = 0; i < rec_frac.length; i++) {
-				for (int j = 0; j < rec_frac[i].length; j++) {
-					System.out.print(rec_frac[i][j] + " ");
-				}
-				System.out.println();
+				System.out.print(rec_frac[i] + " ");
 			}
+			System.out.println();
 		}
 	}
 

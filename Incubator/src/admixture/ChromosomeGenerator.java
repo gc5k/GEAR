@@ -1,7 +1,5 @@
 package admixture;
 
-import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.Random;
 
 import admixture.chromosome.FamilySingleChromosome;
@@ -16,27 +14,25 @@ public class ChromosomeGenerator {
 	private int N_snp;
 	private Random rnd = new Random(2011);
 	private double[] snp_panel;
-	private double[][][] post_prob;
 	private double[] LD; // reserve for the future
-	private double[][] rec_frac; // there two kinds of recombination fractions
-	// 1: free of recombination that each element equals 0.5, rec_frac=[0.5,0.5,0.5,...]
+	private int[][] hotspot; // there two kinds of recombination fractions
+	// 1: free of recombination that each element equals 0.5, hotspot=[0.5,0.5,0.5,...]
 	// it is generated in the method recombinationFree()
-	// 2: cross over between snps: rec_frac looks like=[0, 0, 0, 1, 0, 0, 1, ...]
+	// 2: cross over between snps: hotspot looks like=[0, 0, 0, 1, 0, 0, 1, ...]
 	// it is generated in the method recombination()
 	
-	// Note: rec_frac[0] for paternal recombination, rec_frac[1] for maternal recombination;
+	// Note: hotspot[0] for paternal recombination, hotspot[1] for maternal recombination;
 
-	public ChromosomeGenerator(double[] sp, double[][][] pp) {
+	public ChromosomeGenerator(double[] sp) {
 		snp_panel = sp;
-		post_prob = pp;
 
-		rec_frac = new double[2][];
+		hotspot = new int[2][];
 		N_snp = sp.length;
 	}
 
-	public FamilySingleChromosome generateFamilySingleChromosome(int cID, int k, double[] father_rec_frac, double[] mother_rec_frac) {
-		rec_frac[0] = father_rec_frac;
-		rec_frac[1] = mother_rec_frac;		
+	public FamilySingleChromosome generateFamilySingleChromosome(int cID, int k, int[] father_hotspot, int[] mother_hotspot) {
+		hotspot[0] = father_hotspot;
+		hotspot[1] = mother_hotspot;		
 		int[][][] pg = new int[2][][];
 		pg[0] = generateFounderChr(AdmixtureConstant.Without_LD);
 		pg[1] = generateFounderChr(AdmixtureConstant.Without_LD);
@@ -54,7 +50,6 @@ public class ChromosomeGenerator {
 			for (int k = 0; k < N_snp; k++) {
 				if(!ld) {
 					double d = rnd.nextFloat();
-					System.out.println(d);
 					diploid[i][k] = d < snp_panel[k] ? 0:1;
 				} else {
 					// when there is LD pattern;
@@ -67,16 +62,20 @@ public class ChromosomeGenerator {
 	private int[][] generateOffspringChr(int[][][] pg) {//pg[0] for paternal chromosome, pg[1] for maternal.
 		int[][] diploid = new int[2][N_snp];
 		for (int i = 0; i < 2; ++i) {
-			int chromatid = 0;
-			for (int k = 0; k < N_snp; ++k) {
-				double rd = rnd.nextFloat();
-				if (rd < rec_frac[i][k]) {
-					chromatid = 1 - chromatid;
+			int chromatid = rnd.nextBoolean() ? 0 : 1;
+			for (int j = 0; j < hotspot[i].length-1; j++) {
+				chromatid = 1 - chromatid;
+				for (int k = hotspot[i][j]; k < hotspot[i][j+1]; k++) {
+					diploid[i][k] = pg[i][chromatid][k];
+					double ancestry = rnd.nextFloat();
 				}
-				diploid[i][k] = pg[i][chromatid][k];
 			}
 		}
 		return diploid;
+	}
+
+	public void setSeed(long s) {
+		rnd.setSeed(s);
 	}
 
 	public static void main(String[] args) {

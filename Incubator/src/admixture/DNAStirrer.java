@@ -32,7 +32,7 @@ public class DNAStirrer {
 
 	private double[] pop_weight;
 
-	private double[][][] post_snp_prob;
+	private double[][][] post_snp_prob;//post_snp_prob[locus][allele][ancestry]
 	private boolean genetic_drift;
 	private Binomial rnd;
 	private long seed = 100;
@@ -44,7 +44,7 @@ public class DNAStirrer {
 		genetic_drift = gd;
 
 		N_snp = ns;
-		N_pop = 1;
+		N_pop = 2;
 		N_allele = 2;
 		initial_test();
 	}
@@ -70,8 +70,8 @@ public class DNAStirrer {
 		}
 
 		pop_weight = new double[N_pop];
-		pop_weight[0] = 1;
-//		pop_weight[1] = 0.2;
+		pop_weight[0] = 0.8;
+		pop_weight[1] = 0.2;
 //		pop_weight[2] = 0.025;
 
 		post_snp_prob = new double[N_snp][N_allele][N_pop];

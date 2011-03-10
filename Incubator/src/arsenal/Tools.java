@@ -16,10 +16,10 @@ public class Tools {
 		return M;
 	}
 	
-	static public void Fill_Matrix(double[][] scr, int idx1, int[] idx, double v) {
-		
+	static public void Fill_Matrix(double[] scr, int[] idx, double v) {
+
 		for(int i = 0; i < idx.length; i++) {
-			scr[idx1][idx[i]] = v;
+			scr[idx[i]] = v;
 		}
 	}
 
