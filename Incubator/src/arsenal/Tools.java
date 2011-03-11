@@ -6,7 +6,7 @@ package arsenal;
 */
 public class Tools {
 
-	static public double[][] Generate_Matrix(double[] vector) {
+	public static double[][] Generate_Matrix(double[] vector) {
 		double[][] M = new double[vector.length][vector.length];
 		for(int i = 0; i < vector.length; i++) {
 			for(int j = 0; j < vector.length; j++) {
@@ -16,7 +16,7 @@ public class Tools {
 		return M;
 	}
 	
-	static public void Fill_Matrix(double[] scr, int[] idx, double v) {
+	public static void Fill_Matrix(double[] scr, int[] idx, double v) {
 
 		for(int i = 0; i < idx.length; i++) {
 			scr[idx[i]] = v;
