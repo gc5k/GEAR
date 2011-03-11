@@ -9,12 +9,17 @@ import org.apache.commons.lang3.ArrayUtils;
 */
 public class Sample {
 	public static long seed = 2011;
+	public static Random U = new Random(2011);
+	
+	public static void setSeed(long s) {
+		U.setSeed(s);
+	}
+
 	public static int[] SampleIndex(int start, int end, int n, boolean replacement) {
 		if(start > end) {
 			return null;
 		}
 		int[] idx = new int[n];
-		Random U = new Random();
 		if(replacement) {
 			for(int i = 0; i < idx.length; i++) {
 				idx[i] = (int) U.nextInt(end - start + 1) + start;

@@ -11,14 +11,13 @@ public class FamilySingleChromosome {
 	private double[][] ancestry_diploid_p; //[2][ancestry=num of ancetral populations]
 	private double[][] ancestry_diploid_o; //[kin number][ancestry=num of ancetral populations]
 
-	public FamilySingleChromosome(int[][][] p, int[][][] o) {
+	private boolean disease_linked;
+	private int chrID;
+	public FamilySingleChromosome(int ci, int[][][] p, int[][][] o, boolean d) {
+		chrID = ci;
 		p_g = p;
 		o_g = o;
-	}
-
-	public FamilySingleChromosome(int id, int num_kid) {
-		p_g = new int[2][][];
-		o_g = new int[num_kid][][];
+		disease_linked = d;
 	}
 
 	public void AddFatherChr(int[][] g) {
@@ -29,6 +28,9 @@ public class FamilySingleChromosome {
 		p_g[1] = g;
 	}
 
+	public boolean isDiseaseLinked() {
+		return disease_linked;
+	}
 	public void AscertainParentSingleChromosomeAncestry(double[][][] post_snp_ancestry) {
 		ancestry_haploid_p = new double[2][2][];
 		for (int i = 0; i < p_g.length; i++) {
@@ -74,6 +76,9 @@ public class FamilySingleChromosome {
 		return ancestry;
 	}
 
+	public int getChrID() {
+		return chrID;
+	}
 	public double[][] getParentChromosomeAncestry() {
 		return ancestry_diploid_p;
 	}
@@ -88,7 +93,7 @@ public class FamilySingleChromosome {
 		d[1] = p_g[pi][1][loci];
 		return d;
 	}
-	
+
 	public int[] OffspringGenotype(int oi, int loci ) {
 		int[] d = new int[2];
 		d[0] = o_g[oi][0][loci];
@@ -96,4 +101,11 @@ public class FamilySingleChromosome {
 		return d;
 	}
 
+	public int[][][] getParentChromosome() {
+		return p_g;
+	}
+	
+	public int[][][] getOffspingChromosome() {
+		return o_g;
+	}
 }

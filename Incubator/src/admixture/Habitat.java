@@ -29,4 +29,8 @@ public class Habitat {
 	public void AddFamilyPhenotype(FamilyPhenotype fp) {
 		FamPhenotype.add(fp);
 	}
+	
+	public void InsertFamilyPhenotype(int idx, FamilyPhenotype fp) {
+		FamPhenotype.add(fp);
+	}
 }

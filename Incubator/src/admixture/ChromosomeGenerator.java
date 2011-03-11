@@ -30,7 +30,7 @@ public class ChromosomeGenerator {
 		N_snp = sp.length;
 	}
 
-	public FamilySingleChromosome generateFamilySingleChromosome(int cID, int k, int[] father_hotspot, int[] mother_hotspot, double[][][] post_snp_ancestry) {
+	public FamilySingleChromosome generateFamilySingleChromosome(int cID, int k, int[] father_hotspot, int[] mother_hotspot, double[][][] post_snp_ancestry, boolean disease_linked) {
 		hotspot[0] = father_hotspot;
 		hotspot[1] = mother_hotspot;		
 		int[][][] pg = new int[2][][];
@@ -41,7 +41,7 @@ public class ChromosomeGenerator {
 		for (int i = 0; i < k; i++) {
 			og[i] = generateOffspringChr(pg);
 		}
-		FamilySingleChromosome fsc = new FamilySingleChromosome(pg, og);
+		FamilySingleChromosome fsc = new FamilySingleChromosome(cID, pg, og, disease_linked);
 		if(post_snp_ancestry != null) {
 			fsc.AscertainParentSingleChromosomeAncestry(post_snp_ancestry);
 			fsc.AscertainOffspringSingleChromosomeAncestry(post_snp_ancestry);
@@ -54,8 +54,7 @@ public class ChromosomeGenerator {
 		for (int i = 0; i < 2; i++) {
 			for (int k = 0; k < N_snp; k++) {
 				if(!ld) {
-					double d = rnd.nextFloat();
-					diploid[i][k] = d < snp_panel[k] ? 0:1;
+					diploid[i][k] = rnd.nextFloat() < snp_panel[k] ? 0:1;
 				} else {
 					// when there is LD pattern;
 				}
@@ -66,13 +65,16 @@ public class ChromosomeGenerator {
 
 	private int[][] generateOffspringChr(int[][][] pg) {//pg[0] for paternal chromosome, pg[1] for maternal.
 		int[][] diploid = new int[2][N_snp];
-		for (int i = 0; i < 2; ++i) {
+		for (int i = 0; i < hotspot.length; ++i) {
 			int chromatid = rnd.nextBoolean() ? 0 : 1;
-			for (int j = 0; j < hotspot[i].length-1; j++) {
+//			System.out.println("-----"+ chromatid);
+//			for (int j = 0; j < hotspot[i].length; j++) {
+//				System.out.println(" =" + hotspot[i][j]);
+//			}
+			for (int j = 0; j < hotspot[i].length - 1; j++) {
 				chromatid = 1 - chromatid;
 				for (int k = hotspot[i][j]; k < hotspot[i][j+1]; k++) {
 					diploid[i][k] = pg[i][chromatid][k];
-					double ancestry = rnd.nextFloat();
 				}
 			}
 		}
