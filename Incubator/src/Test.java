@@ -1,18 +1,13 @@
 import java.util.Arrays;
 
-import jsc.distributions.DiscreteUniform;
+import org.apache.commons.lang3.ArrayUtils;
 
 public class Test {
 
 	public static void main(String[] args) {
 		
-		StringBuffer sb = new StringBuffer();
-		for (int i = 0; i < 10; i++) {
-			sb.append(i);
-		}
-		System.out.println(sb.toString());
-		
-		String[] S={"aa", "bb", "cc"};
-		System.out.println(Arrays.binarySearch(S, "bb"));
+		int[] a = null;
+		a = ArrayUtils.add(a, 1);
+		System.out.println(a[0]);
 	}
 }
