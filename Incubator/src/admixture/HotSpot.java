@@ -1,8 +1,6 @@
 package admixture;
 
 import java.util.Arrays;
-
-import arsenal.Tools;
 import arsenal.Sample;
 
 import jsc.distributions.Poisson;
@@ -21,13 +19,6 @@ public class HotSpot {
 	private long seed = 2010;
 	private Binomial B;
 	private Poisson Po;
-	private double[] rec_frac; // there two kinds of recombination fractions
-	// 1: free of recombination that each element equals 0.5,
-	// rec_frac=[0.5,0.5,0.5,...]
-	// it is generated in the method recombinationFree()
-	// 2: cross over between snps: rec_frac looks like=[0, 0, 0, 1, 0, 0, 1,
-	// ...]
-	// it is generated in the method recombination()
 
 	private int[] rec_hotspot;
 
@@ -80,22 +71,17 @@ public class HotSpot {
 
 		Poisson p = new Poisson(len_Morgan);
 
-		if (rec_hotspot != null) {
-			Tools.Fill_Matrix(rec_frac, rec_hotspot, 0);
-		}
-
 		int crossover = 0;
 		do {
 			crossover = (int) p.random();
 		} while (crossover >= N_snp - 2);
+
 		rec_hotspot = new int[crossover + 2];
 		if (crossover > 0) {
 			int[] hs = Sample.SampleIndex(1, N_snp, crossover, AdmixtureConstant.Without_replacement);
 			System.arraycopy(hs, 0, rec_hotspot, 1, hs.length);
 		}
 		Arrays.sort(rec_hotspot);
-		Tools.Fill_Matrix(rec_frac, rec_hotspot, 1);
-		rec_frac[0] = 0.5;
 
 		if (DEBUG)
 			print();
@@ -105,19 +91,11 @@ public class HotSpot {
 		return rec_hotspot;
 	}
 
-	public double[] RecombinationFraction() {
-		return rec_frac;
-	}
 
 	private void print() {
 		if (DEBUG) {
 			for (int i = 0; i < rec_hotspot.length; i++) {
 				System.out.print(rec_hotspot[i] + " ");
-			}
-			System.out.println();
-			
-			for (int i = 0; i < rec_frac.length; i++) {
-				System.out.print(rec_frac[i] + " ");
 			}
 			System.out.println();
 		}

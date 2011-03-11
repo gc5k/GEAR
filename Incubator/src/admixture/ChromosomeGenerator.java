@@ -30,7 +30,7 @@ public class ChromosomeGenerator {
 		N_snp = sp.length;
 	}
 
-	public FamilySingleChromosome generateFamilySingleChromosome(int cID, int k, int[] father_hotspot, int[] mother_hotspot) {
+	public FamilySingleChromosome generateFamilySingleChromosome(int cID, int k, int[] father_hotspot, int[] mother_hotspot, double[][][] post_snp_ancestry) {
 		hotspot[0] = father_hotspot;
 		hotspot[1] = mother_hotspot;		
 		int[][][] pg = new int[2][][];
@@ -41,7 +41,12 @@ public class ChromosomeGenerator {
 		for (int i = 0; i < k; i++) {
 			og[i] = generateOffspringChr(pg);
 		}
-		return new FamilySingleChromosome(pg, og);
+		FamilySingleChromosome fsc = new FamilySingleChromosome(pg, og);
+		if(post_snp_ancestry != null) {
+			fsc.AscertainParentSingleChromosomeAncestry(post_snp_ancestry);
+			fsc.AscertainOffspringSingleChromosomeAncestry(post_snp_ancestry);
+		}
+		return fsc;
 	}
 
 	private int[][] generateFounderChr(boolean ld) {
