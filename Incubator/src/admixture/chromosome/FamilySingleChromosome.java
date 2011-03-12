@@ -121,6 +121,14 @@ public class FamilySingleChromosome {
 		return sb.toString();
 	}
 
+	public String getGenotypeStringParentChromosome(int idx) {
+		StringBuffer sb = new StringBuffer(" ");
+		for(int i = 0; i < p_g[idx][0].length; i++) {
+			sb.append(p_g[idx][0][i] + p_g[idx][1][i] + " ");
+		}
+		return sb.toString();
+	}
+
 	public String getStringOffspringChromosome(int idx) {
 		StringBuffer sb = new StringBuffer(" ");
 		for(int i = 0; i < o_g[idx][0].length; i++) {
@@ -129,6 +137,14 @@ public class FamilySingleChromosome {
 			} else {
 				sb.append(o_g[idx][1][i] + " " + o_g[idx][0][i] + " ");
 			}
+		}
+		return sb.toString();
+	}
+
+	public String getGenotypeStringOffspringChromosome(int idx) {
+		StringBuffer sb = new StringBuffer(" ");
+		for(int i = 0; i < o_g[idx][0].length; i++) {
+			sb.append(o_g[idx][0][i] + o_g[idx][1][i] + " ");
 		}
 		return sb.toString();
 	}
