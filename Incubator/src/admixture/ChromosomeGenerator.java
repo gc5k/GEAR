@@ -12,7 +12,7 @@ import admixture.chromosome.FamilySingleChromosome;
 public class ChromosomeGenerator {
 	private boolean DEBUG = false;
 	private int N_snp;
-	private Random rnd = new Random(2011);
+	private Random rnd;
 	private double[] snp_panel;
 	private double[] LD; // reserve for the future
 	private int[][] hotspot; // there two kinds of recombination fractions
@@ -25,7 +25,7 @@ public class ChromosomeGenerator {
 
 	public ChromosomeGenerator(double[] sp) {
 		snp_panel = sp;
-
+		rnd = new Random(2011);
 		hotspot = new int[2][];
 		N_snp = sp.length;
 	}
@@ -87,7 +87,8 @@ public class ChromosomeGenerator {
 
 	public static void main(String[] args) {
 		double[] snp_freq = { 0.5, 0.5, 0.1, 0.1, 0.1 };
-		HotSpot hs = new HotSpot(snp_freq.length);
+		HotSpot hs = new HotSpot();
+		hs.rev(snp_freq.length);
 		hs.GenerateRecombination(AdmixtureConstant.free_recombination);
 	}
 }

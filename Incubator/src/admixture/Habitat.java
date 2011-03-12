@@ -33,4 +33,12 @@ public class Habitat {
 	public void InsertFamilyPhenotype(int idx, FamilyPhenotype fp) {
 		FamPhenotype.add(fp);
 	}
+	
+	public ArrayList<FamilyGenome> getFamilyGenome() {
+		return FamGenome;
+	}
+
+	public ArrayList<FamilyPhenotype> getFamilyPhenotype() {
+		return FamPhenotype;
+	}	
 }

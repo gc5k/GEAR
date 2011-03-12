@@ -1,16 +1,18 @@
-
+import java.io.IOException;
 import java.util.ArrayList;
 import admixture.AdmixtureConstant;
 import admixture.ChromosomeGenerator;
 import admixture.DNAStirrer;
+import admixture.GenerateColony;
 import admixture.Habitat;
 import admixture.HotSpot;
 import admixture.chromosome.FamilyGenome;
 import admixture.phenotype.FamilyPhenotype;
-
 import admixture.phenotype.PhenotypeGenerator;
+import admixture.phenotype.QualityControl;
+
 /**
- *
+ * 
  * @author Guo-Bo Chen, chenguobo@gmail.com
  */
 
@@ -18,52 +20,57 @@ public class AdmixtureTest {
 
 	public static void main(String[] args) {
 
-		int disease_chr = -1;
-		String[] f = {"0000", "0101", "1111"};
-		double[] g_e = {1, 0.5, 1};
-		int[] chr = {1, 1};
-		int[] loci = {0, 1};
-		double mu =  0;
+////////// general components
+
+		long seed = 2011;
+		int disease_chr = 1;
+
+		// logistic regression
+		
+		String[] f = { "0000", "0101", "1111" };
+		double[] g_e = { 1, 0.5, 1 };
+		int[] chr = { 1, 1 };
+		int[] loci = { 0, 1 };
+		double mu = 0;
 		double dev = Math.sqrt(10);
 		PhenotypeGenerator pg = new PhenotypeGenerator(f, g_e, chr, loci, mu, dev);
+		HotSpot hs = new HotSpot();
 
-		Habitat Hab = new Habitat();
-		double[] disease_pop = {0.2, 0.5};
-
+		int N_chr = 2;
 		ArrayList<DNAStirrer> DNAPool = new ArrayList<DNAStirrer>();
 		ArrayList<ChromosomeGenerator> CG = new ArrayList<ChromosomeGenerator>();
-		for (int i = 0; i < 2; i++) {
-			DNAStirrer ds = new DNAStirrer(2, 10000, 5 * (i+1), AdmixtureConstant.Without_Genetic_Drift);
+		for (int i = 0; i < N_chr; i++) {
+			DNAStirrer ds = new DNAStirrer(2, 10000, 5 * (i + 1), AdmixtureConstant.Without_Genetic_Drift);
 			ds.DNAStir(1);
 			DNAPool.add(ds);
 			ChromosomeGenerator cg = new ChromosomeGenerator(ds.SNPPanel());
+			cg.setSeed(seed + i);
 			CG.add(cg);
 		}
-		HotSpot hs = new HotSpot(2010);
-		for (int i = 0; i < 1; i++) {
-			int num_kid = 2;
-			FamilyGenome fg = new FamilyGenome(i, num_kid);
+		double[] disease_rate = { 0.2, 0.5 };
+		GenerateColony GC = new GenerateColony(seed, disease_chr, disease_rate, hs, DNAPool,
+				CG, pg, AdmixtureConstant.free_recombination);
 
-			for (int j = 0; j < 2; j++) {
-				int chrID = j;
-				DNAStirrer ds = DNAPool.get(j);
-				ChromosomeGenerator cg = CG.get(j);
-				hs.rev(ds.NumberOfSNP());
-				hs.GenerateRecombination(AdmixtureConstant.free_recombination);
-				int[] f_hotspot = hs.getHotSpot();
-				hs.GenerateRecombination(AdmixtureConstant.free_recombination);
-				int[] m_hotspot = hs.getHotSpot();
+		// specific components
+		// family
+		int N_Fam = 10;
+		int N_Kid = 2;
+		int N_aff_Kid = 1;
 
-				fg.addFamilyChromosome(cg.generateFamilySingleChromosome(chrID, num_kid, f_hotspot, m_hotspot, ds.PostSNPAncestralProb(), disease_chr ==j));
-			}
-			fg.AscertainGenomeAncestry();
-//			fg.printAncestry();
-//			fg.printGenome();
-			FamilyPhenotype fp = pg.getGeneratePhenotypeAncestry(fg, disease_pop);
-//			fp.print();
-			Hab.AddFamilyGenome(fg);
-			Hab.AddFamilyPhenotype(fp);
+		// quality control
+		QualityControl qc = new QualityControl(N_aff_Kid, AdmixtureConstant.FamilyExactAffected);
+
+		GC.GenerateNewFamHab(N_Fam, N_Kid, qc);
+
+		int N_case = 5;
+		int N_control = 5;
+		QualityControl qc_c = new QualityControl(N_case, N_control, AdmixtureConstant.CaseControl);
+		GC.GenerateCCHab(N_case+ N_control, 1, qc_c);
+
+		try {
+			GC.print2file("ped.txt", "phe.txt");
+		} catch(IOException e) {
+			e.printStackTrace(System.err);
 		}
-		System.out.println();
 	}
 }

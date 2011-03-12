@@ -14,26 +14,26 @@ import jsc.distributions.Binomial;
 public class HotSpot {
 
 	private boolean DEBUG = false;
-	private double len_Morgan; // length of the chromosome measured by Morgan
-	private int N_snp;
+	private double len_Morgan = 1; // length of the chromosome measured by Morgan
+	private int N_snp = 1;
 	private long seed = 2010;
 	private Binomial B;
 	private Poisson Po;
 
 	private int[] rec_hotspot;
 
-	public HotSpot(long s) {
-		seed = s;
+	public HotSpot() {
+		B = new Binomial(N_snp, 0.5);
+		Po = new Poisson(len_Morgan);	
+		B.setSeed(seed);
+		Po.setSeed(seed);		
 	}
 
 	public void rev(int N_s) {
 		N_snp = N_s;
 		len_Morgan = 1;
-
-		B = new Binomial(N_snp, 0.5);
-		Po = new Poisson(len_Morgan);	
-		B.setSeed(seed);
-		Po.setSeed(seed);
+		
+		B.setN(N_s);	
 	}
 	
 	public void GenerateRecombination(boolean rf) {
@@ -60,7 +60,7 @@ public class HotSpot {
 		do {
 			crossover = (int) B.random() - 1;
 		} while (crossover < 0);
-		System.out.println("crossover :" + crossover);
+//		System.out.println("crossover :" + crossover);
 		rec_hotspot = new int[crossover + 2];
 		if (crossover > 0) {
 			int[] hs = Sample.SampleIndex(1, N_snp - 1, crossover, AdmixtureConstant.Without_replacement);
@@ -110,7 +110,7 @@ public class HotSpot {
 
 	public static void main(String[] args) {
 		double[] snp_freq = { 0.5, 0.5, 0.1, 0.1, 0.1 };
-		HotSpot hs = new HotSpot(2010);
+		HotSpot hs = new HotSpot();
 		hs.rev(snp_freq.length);
 		hs.GenerateRecombination(AdmixtureConstant.free_recombination);
 	}
