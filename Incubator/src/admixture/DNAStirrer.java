@@ -11,7 +11,8 @@ import jsc.distributions.Binomial;
 */
 
 public class DNAStirrer {
-
+	private int panelIdx;
+	
 	private int N_snp; //number of snps
 	private int N_pop; //number of populations
 	private int N_allele; //n_allele = 2 for a biallelic locus
@@ -37,10 +38,11 @@ public class DNAStirrer {
 	private Binomial rnd;
 	private long seed = 100;
 
-	public DNAStirrer(int m, int s, int ns, boolean gd) {//for test
 
+	public DNAStirrer(int pI, int m, int ps, int ns, boolean gd) {//for test
+		panelIdx = pI;
 		model = m;
-		N = s;
+		N = ps;
 		genetic_drift = gd;
 
 		N_snp = ns;
@@ -53,6 +55,12 @@ public class DNAStirrer {
 
 	private void initial_test() {
 		src_snp_freq = new double[N_pop][N_snp];
+		
+		snp_Name = new String[N_snp];
+		for (int i = 0; i < snp_Name.length; i++) {
+			snp_Name[i] = "snp_" + Integer.toString(panelIdx) + "-" + Integer.toString(i);
+		}
+
 		for (int i = 0; i < N_pop; i++) {
 			Arrays.fill(src_snp_freq[i], 0.5);
 		}
@@ -216,6 +224,10 @@ public class DNAStirrer {
 		return N_snp;
 	}
 
+	public String[] getSNPNames() {
+		return snp_Name;
+	}
+
 	public void setSeed(long s) {
 		seed = s;
 		rnd.setSeed(s);
@@ -223,7 +235,7 @@ public class DNAStirrer {
 
 	public static void main(String[] args) {
 
-		DNAStirrer ds = new DNAStirrer(2, 10000, 2, AdmixtureConstant.With_Genetic_Drift);
+		DNAStirrer ds = new DNAStirrer(0, 2, 10000, 2, AdmixtureConstant.With_Genetic_Drift);
 		ds.DNAStir(10);
 
 		double[][] sf = ds.MultiPopSNPFrequency();

@@ -125,6 +125,22 @@ public class FamilyGenome extends ArrayList<FamilySingleChromosome> {
 		return FamID;
 	}
 
+	public int getFatherID() {
+		return FamID*10000;
+	}
+	
+	public int getMotherID() {
+		return FamID*10000+1;
+	}
+	
+	public int getOffspringID(int idx) {
+		return FamID*10000+3+idx;
+	}
+
+	public int getIndividualID(int idx) {
+		return FamID*10000+idx;
+	}
+
 	public void printGenome() {
 		System.out.println("==FamID " + FamID);
 		for (Iterator<FamilySingleChromosome> i = this.iterator(); i.hasNext();) {

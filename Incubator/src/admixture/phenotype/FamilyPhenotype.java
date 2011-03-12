@@ -50,6 +50,38 @@ public class FamilyPhenotype {
 		}
 		return sb.toString();
 	}
+	
+	public int getFamilyID() {
+		return FamID;
+	}
+
+	public int getParentStatus(int idx) {
+		return p_status[idx];
+	}
+	
+	public int getOffspringStatus(int idx) {
+		return o_status[idx];
+	}
+
+	public int getFatherID() {
+		return FamID*10000;
+	}
+	
+	public int getMotherID() {
+		return FamID*10000+1;
+	}
+	
+	public int getOffspringID(int idx) {
+		return FamID*10000+3+idx;
+	}
+
+	public int getIndividualID(int idx) {
+		return FamID*10000+idx;
+	}
+	
+	public int getNumberPhenotype() {
+		return p_phe[0].length;
+	}
 
 	public void print() {
 		System.out.println("FamID " + FamID);
