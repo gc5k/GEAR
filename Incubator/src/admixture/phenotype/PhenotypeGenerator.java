@@ -8,14 +8,15 @@ import admixture.phenotype.FamilyPhenotype;
 
 public class PhenotypeGenerator {
 	
-	private boolean DEBUG = true;
+	private boolean DEBUG = false;
 	private int[] linked_chr;
 	private int[] linked_loci;
 	private String[] function_score;
 	private double dev_cov;
 	private double mu;
 	private double[] gene_effect;
-	private Random rnd = new Random(2010);
+	private long seed = 2011;
+	private Random rnd;
 	
 	public PhenotypeGenerator(String[] fs, double[] g_e, int[] c, int[] l, double u, double dev) {
 		function_score = fs;
@@ -24,6 +25,7 @@ public class PhenotypeGenerator {
 		linked_loci = l;
 		mu = u;
 		dev_cov = dev;		
+		rnd = new Random(seed);
 	}
 
 	public void setFunction_score() {
@@ -35,6 +37,10 @@ public class PhenotypeGenerator {
 
 	public void setLikedLoci(int[] loci) {
 		linked_loci = loci;
+	}
+
+	public void setSeed(long s) {
+		rnd.setSeed(s);
 	}
 
 	public FamilyPhenotype getGeneratePhenotypeLogistic(FamilyGenome fg) {
@@ -68,6 +74,7 @@ public class PhenotypeGenerator {
 	}
 	
 	public FamilyPhenotype getGeneratePhenotypeAncestry(FamilyGenome fg, double[] w) {
+		fg.AscertainGenomeAncestry();
 		double[][] p_p = new double[2][w.length];
 		int[] p_s = new int[2];
 		for(int i = 0; i < p_p.length; i++) {

@@ -46,13 +46,15 @@ public class DNAStirrer {
 		N_snp = ns;
 		N_pop = 2;
 		N_allele = 2;
+		rnd = new Binomial(N, 0.5);
+		rnd.setSeed(seed);
 		initial_test();
 	}
 
 	private void initial_test() {
 		src_snp_freq = new double[N_pop][N_snp];
 		for (int i = 0; i < N_pop; i++) {
-			Arrays.fill(src_snp_freq[i], 0.15 * (i + 1));
+			Arrays.fill(src_snp_freq[i], 0.5);
 		}
 
 		ancestral_snp_freq = new double[N_pop][N_snp];
@@ -168,8 +170,6 @@ public class DNAStirrer {
 	}
 
 	private void geneticDrift() {
-		rnd = new Binomial(2*N, 0.5);
-		rnd.setSeed(seed);
 		for(int i = 0; i < curr_snp_freq.length; i++) {
 			rnd.setP(curr_snp_freq[i]);
 			curr_snp_freq[i] = rnd.random()/(2*N);
@@ -214,6 +214,11 @@ public class DNAStirrer {
 	
 	public int NumberOfSNP() {
 		return N_snp;
+	}
+
+	public void setSeed(long s) {
+		seed = s;
+		rnd.setSeed(s);
 	}
 
 	public static void main(String[] args) {

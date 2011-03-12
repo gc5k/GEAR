@@ -16,4 +16,8 @@ public interface AdmixtureConstant {
 	static public boolean Without_replacement = false;
 	static public boolean With_LD = true;
 	static public boolean Without_LD = false;
+	
+	static public int FamilyExactAffected = 0;
+	static public int FamilyMoreThanAffected = 1;
+	static public int CaseControl = 2;
 }

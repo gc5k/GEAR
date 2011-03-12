@@ -113,6 +113,10 @@ public class FamilyGenome extends ArrayList<FamilySingleChromosome> {
 		add(fsc);
 	}
 
+	public void setFamilyChromosome(int idx, FamilySingleChromosome fsc) {
+		set(idx, fsc);
+	}
+	
 	public int getNumberOffspring() {
 		return numKid;
 	}
@@ -122,14 +126,16 @@ public class FamilyGenome extends ArrayList<FamilySingleChromosome> {
 	}
 
 	public void printGenome() {
-		System.out.println("FamID " + FamID);
+		System.out.println("==FamID " + FamID);
 		for (Iterator<FamilySingleChromosome> i = this.iterator(); i.hasNext();) {
 			FamilySingleChromosome fsc = i.next();
+			System.out.println("==Chr " + fsc.getChrID());
 			int[][][] g_p = fsc.getParentChromosome();
 			int[][][] g_o = fsc.getOffspingChromosome();
 			for (int j = 0; j < g_p.length; j++) {
 				System.out.println("Parent: " + j);
 				for (int k = 0; k < g_p[j].length; k++) {
+					System.out.print("Haploid: " + k + ", ");					
 					for (int l = 0; l < g_p[j][k].length; l++) {
 						System.out.print(g_p[j][k][l] + " ");
 					}
@@ -139,6 +145,7 @@ public class FamilyGenome extends ArrayList<FamilySingleChromosome> {
 			for (int j = 0; j < g_o.length; j++) {
 				System.out.println("Kid: " + j);
 				for (int k = 0; k < g_o[j].length; k++) {
+					System.out.print("Haploid: " + k + ", ");
 					for (int l = 0; l < g_o[j][k].length; l++) {
 						System.out.print(g_o[j][k][l] + " ");
 					}

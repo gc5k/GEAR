@@ -48,7 +48,7 @@ public class FamilySingleChromosome {
 	}
 
 	public void AscertainOffspringSingleChromosomeAncestry(double[][][] post_snp_ancestry) {
-		ancestry_haploid_o = new double[2][2][];
+		ancestry_haploid_o = new double[o_g.length][2][];
 		for (int i = 0; i < o_g.length; i++) {
 			for (int j = 0; j < o_g[i].length; j++) {
 				ancestry_haploid_o[i][j] = AscertainHaploidAncestry(o_g[i][j], post_snp_ancestry);
@@ -104,7 +104,39 @@ public class FamilySingleChromosome {
 	public int[][][] getParentChromosome() {
 		return p_g;
 	}
-	
+
+	public int[][] getFatherChromosome() {
+		return p_g[0];
+	}
+
+	public String getStringParentChromosome(int idx) {
+		StringBuffer sb = new StringBuffer(" ");
+		for(int i = 0; i < p_g[idx][0].length; i++) {
+			if(p_g[idx][0][i] > p_g[idx][1][i]) {
+				sb.append(p_g[idx][0][i] + " " + p_g[idx][1][i] + " ");
+			} else {
+				sb.append(p_g[idx][1][i] + " " + p_g[idx][0][i] + " ");
+			}
+		}
+		return sb.toString();
+	}
+
+	public String getStringOffspringChromosome(int idx) {
+		StringBuffer sb = new StringBuffer(" ");
+		for(int i = 0; i < o_g[idx][0].length; i++) {
+			if(o_g[idx][0][i] > o_g[idx][1][i]) {
+				sb.append(o_g[idx][0][i] + " " + o_g[idx][1][i] + " ");
+			} else {
+				sb.append(o_g[idx][1][i] + " " + o_g[idx][0][i] + " ");
+			}
+		}
+		return sb.toString();
+	}
+
+	public int[][] getMotherChromosome() {
+		return p_g[1];
+	}
+
 	public int[][][] getOffspingChromosome() {
 		return o_g;
 	}
