@@ -47,15 +47,45 @@ public class DNAStirrer {
 
 		N_snp = ns;
 		N_pop = 2;
-		N_allele = 2;
-		rnd = new Binomial(N, 0.5);
-		rnd.setSeed(seed);
+
+		initial();
 		initial_test();
 	}
 
-	private void initial_test() {
-		src_snp_freq = new double[N_pop][N_snp];
+	public DNAStirrer(AlleleFrequencyReader r, int m, int ps, boolean gd, double[] w) {
+		ancestral_snp_freq = r.getAlleleFreq();
+
+		model = m;
+		N = ps;
+		genetic_drift = gd;
 		
+		N_snp = r.getNumberSNP();
+		N_pop = r.getNumberPopulation();
+		snp_Name = r.getSNPName();
+		initial();
+		pop_weight = w;
+	}
+
+	private void initial() {
+		N_allele = 2;
+
+		curr_snp_freq = new double[N_snp];
+		curr_snp_var = new double[N_snp];
+		curr_dna_org = new double[N_pop];
+
+		src_snp_freq = new double[N_pop][N_snp];
+		post_snp_prob = new double[N_snp][N_allele][N_pop];
+
+		pop_dna_org = new double[N_pop][N_pop];
+		for (int i = 0; i < pop_dna_org.length; i++) {
+			pop_dna_org[i][i] = 1;
+		}		
+		rnd = new Binomial(N, 0.5);
+		rnd.setSeed(seed);
+		
+	}
+
+	private void initial_test() {
 		snp_Name = new String[N_snp];
 		for (int i = 0; i < snp_Name.length; i++) {
 			snp_Name[i] = "snp_" + Integer.toString(panelIdx) + "-" + Integer.toString(i);
@@ -70,21 +100,9 @@ public class DNAStirrer {
 			Arrays.fill(ancestral_snp_freq[i], 0.15 * (i + 1));
 		}
 
-		curr_snp_freq = new double[N_snp];
-		curr_snp_var = new double[N_snp];
-		curr_dna_org = new double[N_pop];
-
-		pop_dna_org = new double[N_pop][N_pop];
-		for (int i = 0; i < pop_dna_org.length; i++) {
-			pop_dna_org[i][i] = 1;
-		}
-
 		pop_weight = new double[N_pop];
 		pop_weight[0] = 0.8;
 		pop_weight[1] = 0.2;
-//		pop_weight[2] = 0.025;
-
-		post_snp_prob = new double[N_snp][N_allele][N_pop];
 	}
 
 	public void DNAStir(int r) {
