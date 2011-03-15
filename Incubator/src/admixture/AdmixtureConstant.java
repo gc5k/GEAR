@@ -20,4 +20,7 @@ public interface AdmixtureConstant {
 	static public int FamilyExactAffected = 0;
 	static public int FamilyMoreThanAffected = 1;
 	static public int CaseControl = 2;
+	static public int No_selection = 3;
+	
+	static public boolean printAllele = true;
 }
