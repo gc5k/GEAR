@@ -52,6 +52,7 @@ public class QualityControl {
 			case AdmixtureConstant.FamilyExactAffected: flag = Exact(fp); break;
 			case AdmixtureConstant.FamilyMoreThanAffected: flag = MoreThan(fp); break;
 			case AdmixtureConstant.CaseControl: flag = AcceptSubject(fp); break;
+			case AdmixtureConstant.No_selection: flag = true; break; 
 		}
 		return flag;
 	}

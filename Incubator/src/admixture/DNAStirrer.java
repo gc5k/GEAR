@@ -39,7 +39,7 @@ public class DNAStirrer {
 	private long seed = 100;
 
 
-	public DNAStirrer(int pI, int m, int ps, int ns, boolean gd) {//for test
+	public DNAStirrer(int pI, int m, int ps, int ns, boolean gd, double[] w) {//for test
 		panelIdx = pI;
 		model = m;
 		N = ps;
@@ -48,13 +48,13 @@ public class DNAStirrer {
 		N_snp = ns;
 		N_pop = 2;
 
+		pop_weight = new double[w.length];
+		System.arraycopy(w, 0, pop_weight, 0, w.length);
 		initial();
 		initial_test();
 	}
 
 	public DNAStirrer(AlleleFrequencyReader r, int m, int ps, boolean gd, double[] w) {
-		ancestral_snp_freq = r.getAlleleFreq();
-
 		model = m;
 		N = ps;
 		genetic_drift = gd;
@@ -62,8 +62,19 @@ public class DNAStirrer {
 		N_snp = r.getNumberSNP();
 		N_pop = r.getNumberPopulation();
 		snp_Name = r.getSNPName();
+
+		double[][] rsnp = r.getAlleleFreq();
+		ancestral_snp_freq = new double[N_pop][N_snp];
+		src_snp_freq = new double[N_pop][N_snp];
+		for(int i = 0; i < ancestral_snp_freq.length; i++) {
+			System.arraycopy(rsnp[i], 0, ancestral_snp_freq[i], 0, ancestral_snp_freq[i].length);
+			System.arraycopy(ancestral_snp_freq[i], 0, src_snp_freq[i], 0, src_snp_freq[i].length);
+		}
+
+		pop_weight = new double[w.length];
+		System.arraycopy(w, 0, pop_weight, 0, w.length);
+
 		initial();
-		pop_weight = w;
 	}
 
 	private void initial() {
@@ -73,13 +84,11 @@ public class DNAStirrer {
 		curr_snp_var = new double[N_snp];
 		curr_dna_org = new double[N_pop];
 
-		src_snp_freq = new double[N_pop][N_snp];
 		post_snp_prob = new double[N_snp][N_allele][N_pop];
-
 		pop_dna_org = new double[N_pop][N_pop];
 		for (int i = 0; i < pop_dna_org.length; i++) {
 			pop_dna_org[i][i] = 1;
-		}		
+		}
 		rnd = new Binomial(N, 0.5);
 		rnd.setSeed(seed);
 		
@@ -91,18 +100,12 @@ public class DNAStirrer {
 			snp_Name[i] = "snp_" + Integer.toString(panelIdx) + "-" + Integer.toString(i);
 		}
 
-		for (int i = 0; i < N_pop; i++) {
-			Arrays.fill(src_snp_freq[i], 0.5);
-		}
-
+		src_snp_freq = new double[N_pop][N_snp];
 		ancestral_snp_freq = new double[N_pop][N_snp];
 		for (int i = 0; i < N_pop; i++) {
 			Arrays.fill(ancestral_snp_freq[i], 0.15 * (i + 1));
+			Arrays.fill(src_snp_freq[i], 0.15 * (i + 1));
 		}
-
-		pop_weight = new double[N_pop];
-		pop_weight[0] = 0.8;
-		pop_weight[1] = 0.2;
 	}
 
 	public void DNAStir(int r) {
@@ -230,7 +233,7 @@ public class DNAStirrer {
 		return src_snp_freq;
 	}
 
-	public double[] SNPPanel() {
+	public double[] AdmixedSNPFrequencyPanel() {
 		return curr_snp_freq;
 	}
 
@@ -253,7 +256,8 @@ public class DNAStirrer {
 
 	public static void main(String[] args) {
 
-		DNAStirrer ds = new DNAStirrer(0, 2, 10000, 2, AdmixtureConstant.With_Genetic_Drift);
+		double[] w = {0.8, 0.2};
+		DNAStirrer ds = new DNAStirrer(0, 2, 10000, 2, AdmixtureConstant.With_Genetic_Drift, w);
 		ds.DNAStir(10);
 
 		double[][] sf = ds.MultiPopSNPFrequency();

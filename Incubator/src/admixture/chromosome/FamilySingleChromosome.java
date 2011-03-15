@@ -31,6 +31,7 @@ public class FamilySingleChromosome {
 	public boolean isDiseaseLinked() {
 		return disease_linked;
 	}
+
 	public void AscertainParentSingleChromosomeAncestry(double[][][] post_snp_ancestry) {
 		ancestry_haploid_p = new double[2][2][];
 		for (int i = 0; i < p_g.length; i++) {
