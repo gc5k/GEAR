@@ -1,27 +1,23 @@
+package admixture;
+
 import java.io.IOException;
 import java.util.ArrayList;
-import admixture.AdmixtureConstant;
-import admixture.ChromosomeGenerator;
-import admixture.DNAStirrer;
-import admixture.GenerateColony;
-import admixture.Habitat;
-import admixture.HotSpot;
-import admixture.chromosome.FamilyGenome;
-import admixture.phenotype.FamilyPhenotype;
+
 import admixture.phenotype.PhenotypeGenerator;
 import admixture.phenotype.QualityControl;
 
+
 /**
- * 
- * @author Guo-Bo Chen, chenguobo@gmail.com
- */
+*
+* @author Guo-Bo Chen, chenguobo@gmail.com
+*/
+public class GeneFlowModel {
 
-public class AdmixtureTest {
-
+	/**
+	 * @param args
+	 */
 	public static void main(String[] args) {
-
-		// //////// general components
-
+		// TODO Auto-generated method stub
 		long seed = 2013;
 		int disease_chr = 1;
 
@@ -36,22 +32,23 @@ public class AdmixtureTest {
 		PhenotypeGenerator pg = new PhenotypeGenerator(f, g_e, chr, loci, mu, dev);
 		HotSpot hs = new HotSpot();
 
-		int N_chr = 2;
+		double[] w = {0.975, 0.025};
+		String[] chr_file = {"allele_freq_chr1.txt", "allele_freq_chr2.txt"};
 		ArrayList<DNAStirrer> DNAPool = new ArrayList<DNAStirrer>();
 		ArrayList<ChromosomeGenerator> CG = new ArrayList<ChromosomeGenerator>();
-		for (int i = 0; i < N_chr; i++) {
-			DNAStirrer ds = new DNAStirrer(i, 1, 10000, 5 * (i + 1), AdmixtureConstant.Without_Genetic_Drift);
+		for (int i = 0; i < chr_file.length; i++) {
+			AlleleFrequencyReader afr = new AlleleFrequencyReader(chr_file[i]);
+			DNAStirrer ds = new DNAStirrer(afr, 1, 10000, AdmixtureConstant.Without_Genetic_Drift, w);
 			ds.DNAStir(1);
 			DNAPool.add(ds);
 			ChromosomeGenerator cg = new ChromosomeGenerator(ds.SNPPanel());
 			cg.setSeed(seed + i);
 			CG.add(cg);
 		}
-
+		
 		double[] disease_rate = { 0.2, 0.5 };
 		int N_phe = 2;
 		GenerateColony GC = new GenerateColony(N_phe, seed, disease_chr, disease_rate, hs, DNAPool, CG, pg, AdmixtureConstant.free_recombination);
-
 		// specific components
 		// family
 		int N_Fam = 100;
@@ -70,5 +67,6 @@ public class AdmixtureTest {
 		} catch (IOException e) {
 			e.printStackTrace(System.err);
 		}
+
 	}
 }
