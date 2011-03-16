@@ -73,7 +73,7 @@ public class ChromosomeGenerator {
 //			}
 			for (int j = 0; j < hotspot[i].length - 1; j++) {
 				chromatid = 1 - chromatid;
-				for (int k = hotspot[i][j]; k < hotspot[i][j+1]; k++) {
+				for (int k = hotspot[i][j]; k <= hotspot[i][j+1]; k++) {
 					diploid[i][k] = pg[i][chromatid][k];
 				}
 			}
