@@ -37,7 +37,7 @@ public class AdmixtureTest {
 		ArrayList<ChromosomeGenerator> CG = new ArrayList<ChromosomeGenerator>();
 		for (int i = 0; i < N_chr; i++) {
 
-			DNAStirrer ds = new DNAStirrer(i, 1, 10000, 100 * (i + 1), AdmixtureConstant.Without_Genetic_Drift, w);
+			DNAStirrer ds = new DNAStirrer(i, 1, 10000, 5 * (i + 1), AdmixtureConstant.Without_Genetic_Drift, w);
 			ds.DNAStir(1);
 			DNAPool.add(ds);
 			ChromosomeGenerator cg = new ChromosomeGenerator(ds.AdmixedSNPFrequencyPanel());

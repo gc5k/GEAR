@@ -15,6 +15,7 @@ import admixture.phenotype.QualityControl;
 
 public class GenerateColony {
 
+	private int N_chr;
 	private int N_phe;
 	private long seed;
 	private PhenotypeGenerator pg;
@@ -26,10 +27,11 @@ public class GenerateColony {
 	private int disease_chr;
 	private double[] disease_rate;
 	private boolean recombination_free;
-	private int CurrFam;
+	private static int CurrFam;
 	public GenerateColony (int np, long s, int dc, double[] dr, HotSpot h, ArrayList<DNAStirrer> dp, ArrayList<ChromosomeGenerator> cg,
 			PhenotypeGenerator p, boolean rf) {
 		N_phe = np;
+		N_chr = dp.size();
 		seed = s;
 		disease_chr = dc;
 		disease_rate = dr;
@@ -92,6 +94,30 @@ public class GenerateColony {
 		CurrFam += N_Fam;
 	}
 
+	public Habitat getFamHab() {
+		return FamHab;
+	}
+
+	public Habitat getCCHab() {
+		return CaseControlHab;
+	}
+	
+	public int getNumberChromosome() {
+		return N_chr;
+	}
+	
+	public int getNumberPhenotype() {
+		return N_phe;
+	}
+
+	public int getDiseaseLinkedChr() {
+		return disease_chr;
+	}
+
+	public ArrayList<DNAStirrer> getDNAPool() {
+		return DNAPool;
+	}
+
 	public void printGenotype2file(String ped, String phe, boolean isAllele) throws IOException {
 		PrintWriter pedout = new PrintWriter(new BufferedWriter(new FileWriter(ped)));
 		PrintWriter pheout = new PrintWriter(new BufferedWriter(new FileWriter(phe)));
@@ -99,7 +125,7 @@ public class GenerateColony {
 		ArrayList<FamilyPhenotype> FamP = FamHab.getFamilyPhenotype();
 		
 		pedout.print("FID ID FA MO SEX Affection ");
-		for(int i = 0; i < DNAPool.size(); i++) {
+		for(int i = 0; i < N_chr; i++) {
 			DNAStirrer ds = DNAPool.get(i);
 			String[] SN = ds.getSNPNames();
 			for(int j = 0; j < SN.length; j++) {
@@ -220,7 +246,7 @@ public class GenerateColony {
 		ArrayList<FamilyPhenotype> FamP = FamHab.getFamilyPhenotype();
 
 		pedout.print("FID ID FA MO SEX Affection ");
-		for(int i = 0; i < DNAPool.size(); i++) {
+		for(int i = 0; i < N_chr; i++) {
 			if(i == disease_chr) continue;
 			DNAStirrer ds = DNAPool.get(i);
 			String[] SN = ds.getSNPNames();

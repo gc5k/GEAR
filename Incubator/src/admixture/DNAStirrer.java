@@ -16,7 +16,7 @@ public class DNAStirrer {
 	private int N_snp; //number of snps
 	private int N_pop; //number of populations
 	private int N_allele; //n_allele = 2 for a biallelic locus
-	private boolean DEBUG = false;
+	private boolean DEBUG = true;
 	private int model;
 	private int N; //population size
 	private int round;

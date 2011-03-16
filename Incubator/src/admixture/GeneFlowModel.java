@@ -48,7 +48,8 @@ public class GeneFlowModel {
 
 		double[] disease_rate = { 0.2, 0.5 };
 		int N_phe = 3;
-		GenerateColony GC = new GenerateColony(N_phe, seed, disease_chr, disease_rate, hs, DNAPool, CG, pg, AdmixtureConstant.free_recombination);
+		GenerateColony GC = new GenerateColony(N_phe, seed, disease_chr, disease_rate,
+				hs, DNAPool, CG, pg, AdmixtureConstant.free_recombination);
 
 		// specific components
 		// family
