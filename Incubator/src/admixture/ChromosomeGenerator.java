@@ -14,6 +14,8 @@ public class ChromosomeGenerator {
 	private int N_snp;
 	private Random rnd;
 	private double[] snp_panel;
+	private double[][] ancestry_snp_panel;
+	private double[] ancestry;
 	private double[] LD; // reserve for the future
 	private int[][] hotspot; // there two kinds of recombination fractions
 	// 1: free of recombination that each element equals 0.5, hotspot=[0.5,0.5,0.5,...]
@@ -28,6 +30,29 @@ public class ChromosomeGenerator {
 		rnd = new Random(2011);
 		hotspot = new int[2][];
 		N_snp = sp.length;
+	}
+
+	public ChromosomeGenerator(double[][] sp, double[] anc) {
+		ancestry_snp_panel = sp;
+		ancestry = anc;
+		double[] a = new double[anc.length];
+		double s = 0;
+		for(int i = 0; i < anc.length ; i++) {
+			s += anc[i];
+			if( i == 0) {
+				a[i] = anc[i] + 0;
+			} else {
+				a[i] += anc[i] + a[i-1];
+			}
+		}
+		for(int i = 0; i < anc.length - 1; i++) {
+			ancestry[i] = a[i]/s;
+		}
+		ancestry[ancestry.length - 1] = 1;
+		
+		rnd = new Random(2011);
+		hotspot = new int[2][];
+		N_snp = ancestry_snp_panel[0].length;
 	}
 
 	public FamilySingleChromosome generateFamilySingleChromosome(int cID, int k, int[] father_hotspot, int[] mother_hotspot, double[][][] post_snp_ancestry, boolean disease_linked) {
@@ -49,16 +74,45 @@ public class ChromosomeGenerator {
 		return fsc;
 	}
 
+//	private int[][] generateFounderChr(boolean ld) {
+//		int[][] diploid = new int[2][N_snp];
+//		for (int i = 0; i < 2; i++) {
+//			for (int k = 0; k < N_snp; k++) {
+//				if(!ld) {
+//					diploid[i][k] = rnd.nextFloat() < snp_panel[k] ? 0:1;
+//				} else {
+//					// when there is LD pattern;
+//				}
+//			}
+//		}
+//		return diploid;
+//	}
+
 	private int[][] generateFounderChr(boolean ld) {
 		int[][] diploid = new int[2][N_snp];
-		for (int i = 0; i < 2; i++) {
-			for (int k = 0; k < N_snp; k++) {
-				if(!ld) {
-					diploid[i][k] = rnd.nextFloat() < snp_panel[k] ? 0:1;
-				} else {
-					// when there is LD pattern;
+		if(ancestry.length == 1) {
+			for (int i = 0; i < 2; i++) {
+				for (int k = 0; k < N_snp; k++) {
+					if(!ld) {
+						diploid[i][k] = rnd.nextFloat() < ancestry_snp_panel[0][k] ? 0:1;
+					} else {
+						// when there is LD pattern;
+					}
 				}
 			}
+		} else {
+			for (int i = 0; i < 2; i++) {
+				for (int k = 0; k < N_snp; k++) {
+					double r = rnd.nextFloat();
+					int idx = 0;
+					while(r>=ancestry[idx] && idx < ancestry.length) idx++;
+					if(!ld) {
+						diploid[i][k] = rnd.nextFloat() < ancestry_snp_panel[idx][k] ? 0:1;
+					} else {
+						// when there is LD pattern;
+					}
+				}
+			}			
 		}
 		return diploid;
 	}
