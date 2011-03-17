@@ -40,7 +40,7 @@ public class AdmixtureTest {
 			DNAStirrer ds = new DNAStirrer(i, 1, 10000, 5 * (i + 1), AdmixtureConstant.Without_Genetic_Drift, w);
 			ds.DNAStir(1);
 			DNAPool.add(ds);
-			ChromosomeGenerator cg = new ChromosomeGenerator(ds.AdmixedSNPFrequencyPanel());
+			ChromosomeGenerator cg = new ChromosomeGenerator(ds.AncestrySNPFreqencyPanel(), ds.CurrSNPOrigine());
 			cg.setSeed(seed + i);
 			CG.add(cg);
 		}

@@ -233,6 +233,14 @@ public class DNAStirrer {
 		return src_snp_freq;
 	}
 
+	public double[][] AncestrySNPFreqencyPanel() {
+		return ancestral_snp_freq;
+	}
+
+	public double[] CurrSNPOrigine() {
+		return curr_dna_org;
+	}
+	
 	public double[] AdmixedSNPFrequencyPanel() {
 		return curr_snp_freq;
 	}

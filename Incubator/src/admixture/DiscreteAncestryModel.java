@@ -34,7 +34,7 @@ public class DiscreteAncestryModel {
 			DNAStirrer ds = new DNAStirrer(afr, 1, 10000, AdmixtureConstant.Without_Genetic_Drift, AA_w);
 			ds.DNAStir(1);
 			AA_DNAPool.add(ds);
-			ChromosomeGenerator cg = new ChromosomeGenerator(ds.AdmixedSNPFrequencyPanel());
+			ChromosomeGenerator cg = new ChromosomeGenerator(ds.AncestrySNPFreqencyPanel(), ds.CurrSNPOrigine());
 			cg.setSeed(seed + i);
 			AA_CG.add(cg);
 		}
@@ -68,7 +68,7 @@ public class DiscreteAncestryModel {
 			DNAStirrer ds = new DNAStirrer(afr, 1, 10000, AdmixtureConstant.Without_Genetic_Drift, w);
 			ds.DNAStir(1);
 			EA_DNAPool.add(ds);
-			ChromosomeGenerator cg = new ChromosomeGenerator(ds.AdmixedSNPFrequencyPanel());
+			ChromosomeGenerator cg = new ChromosomeGenerator(ds.AncestrySNPFreqencyPanel(), ds.CurrSNPOrigine());
 			cg.setSeed(seed + i);
 			EA_CG.add(cg);
 		}
