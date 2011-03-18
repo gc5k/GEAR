@@ -70,8 +70,7 @@ public class HotSpot {
 		rec_hotspot[rec_hotspot.length - 1] = N_snp - 1;
 		Arrays.sort(rec_hotspot);
 
-		if (DEBUG)
-			print();
+		if (DEBUG) print();
 	}
 
 	private void recombination() {

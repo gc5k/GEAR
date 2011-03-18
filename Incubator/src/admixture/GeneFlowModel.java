@@ -41,7 +41,7 @@ public class GeneFlowModel {
 			DNAStirrer ds = new DNAStirrer(afr, 1, 10000, AdmixtureConstant.Without_Genetic_Drift, w);
 			ds.DNAStir(1);
 			DNAPool.add(ds);
-			ChromosomeGenerator cg = new ChromosomeGenerator(ds.AdmixedSNPFrequencyPanel());
+			ChromosomeGenerator cg = new ChromosomeGenerator(ds.AncestrySNPFreqencyPanel(), ds.CurrSNPOrigine());
 			cg.setSeed(seed + i);
 			CG.add(cg);
 		}
@@ -67,6 +67,7 @@ public class GeneFlowModel {
 		try {
 			GC.printGenotype2file("ped.txt", "phe.txt", !AdmixtureConstant.printAllele);
 			GC.printUnrelatedIndividual("PCA_geno.txt", "PCA_phe.txt", !AdmixtureConstant.printAllele, true);
+			GC.printFounder("Founder_ped.txt", "Founder_phe.txt", !AdmixtureConstant.printAllele, true);
 		} catch (IOException e) {
 			e.printStackTrace(System.err);
 		}

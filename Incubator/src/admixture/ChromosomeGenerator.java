@@ -34,7 +34,7 @@ public class ChromosomeGenerator {
 
 	public ChromosomeGenerator(double[][] sp, double[] anc) {
 		ancestry_snp_panel = sp;
-		ancestry = anc;
+		ancestry = new double[anc.length];
 		double[] a = new double[anc.length];
 		double s = 0;
 		for(int i = 0; i < anc.length ; i++) {
@@ -102,10 +102,10 @@ public class ChromosomeGenerator {
 			}
 		} else {
 			for (int i = 0; i < 2; i++) {
+				double r = rnd.nextFloat();
+				int idx = 0;
+				while(r>=ancestry[idx] && idx < ancestry.length) idx++;
 				for (int k = 0; k < N_snp; k++) {
-					double r = rnd.nextFloat();
-					int idx = 0;
-					while(r>=ancestry[idx] && idx < ancestry.length) idx++;
 					if(!ld) {
 						diploid[i][k] = rnd.nextFloat() < ancestry_snp_panel[idx][k] ? 0:1;
 					} else {
