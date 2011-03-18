@@ -1,12 +1,12 @@
 import java.io.IOException;
 import java.util.ArrayList;
 import admixture.AdmixtureConstant;
-import admixture.ChromosomeGenerator;
-import admixture.DNAStirrer;
-import admixture.GenerateColony;
-import admixture.HotSpot;
-import admixture.phenotype.PhenotypeGenerator;
-import admixture.phenotype.QualityControl;
+import admixture.population.GenerateColony;
+import admixture.population.genome.DNAStirrer;
+import admixture.population.genome.HotSpot;
+import admixture.population.genome.chromosome.ChromosomeGenerator;
+import admixture.population.phenotype.PhenotypeGenerator;
+import admixture.population.phenotype.QualityControl;
 
 /**
  * 

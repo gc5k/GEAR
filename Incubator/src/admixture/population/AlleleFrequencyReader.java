@@ -1,4 +1,4 @@
-package admixture;
+package admixture.population;
 
 import java.io.BufferedReader;
 import java.io.FileReader;

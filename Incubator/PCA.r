@@ -1,4 +1,4 @@
-mydata=read.table("ped.txt", header=T)
+mydata=read.table("PCA_ped.txt", header=T)
 UIdx=which(mydata[,3]==0)
 RIdx=which(mydata[,3]!=0)
 d=mydata[,-c(1:6)]
@@ -9,8 +9,8 @@ pca=prcomp(UD)
 plot(pca$x[,1], pca$x[,2])
 
 E=eigen(cor(UD))
-pc1=D%*%E$vector[,1]
-pc2=D%*%E$vector[,2]
+pc1=D[RIdx,]%*%E$vector[,1]
+pc2=D[RIdx,]%*%E$vector[,2]
 
 plot(pc1,pc2)
 

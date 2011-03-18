@@ -1,10 +1,10 @@
-package admixture.phenotype;
+package admixture.population.phenotype;
 
 import java.util.Arrays;
 import java.util.Random;
 
-import admixture.chromosome.FamilyGenome;
-import admixture.phenotype.FamilyPhenotype;
+import admixture.population.genome.chromosome.FamilyGenome;
+import admixture.population.phenotype.FamilyPhenotype;
 
 public class PhenotypeGenerator {
 	
@@ -98,8 +98,9 @@ public class PhenotypeGenerator {
 				o_p[i][j] = a[j];
 			}
 			if (DEBUG) { System.out.println("Kid " + i + " : disease rate " + mix_prob); }
-			o_s[i] = rnd.nextFloat()< mix_prob ? 1:0;
+			o_s[i] = rnd.nextFloat() < mix_prob ? 1:0;
 		}
+
 		FamilyPhenotype fp = new FamilyPhenotype(fg.getFamilyID(), p_p, p_s, o_p, o_s);
 		return fp;
 	}

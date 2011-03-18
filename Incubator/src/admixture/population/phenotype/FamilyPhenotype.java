@@ -1,4 +1,4 @@
-package admixture.phenotype;
+package admixture.population.phenotype;
 
 public class FamilyPhenotype {
 	private double[][] p_phe;

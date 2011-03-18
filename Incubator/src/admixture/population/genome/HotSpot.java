@@ -1,6 +1,8 @@
-package admixture;
+package admixture.population.genome;
 
 import java.util.Arrays;
+
+import admixture.AdmixtureConstant;
 import arsenal.Sample;
 
 import jsc.distributions.Poisson;

@@ -1,4 +1,4 @@
-package admixture.chromosome;
+package admixture.population.genome.chromosome;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -27,12 +27,26 @@ public class FamilyGenome extends ArrayList<FamilySingleChromosome> {
 		ancestry_chr_p = new double[NumChromosome()][][];
 		ancestry_chr_o = new double[NumChromosome()][][];
 		int chr = 0;
+		System.out.println(FamID);
 		for (Iterator<FamilySingleChromosome> i = this.iterator(); i.hasNext();) {
 			FamilySingleChromosome fsc = i.next();
-			double[][] a_p = fsc.getParentChromosomeAncestry();
-			double[][] a_o = fsc.getOffspringChromosomeAncestry();
-			ancestry_chr_p[chr] = a_p;
-			ancestry_chr_o[chr] = a_o;
+			ancestry_chr_p[chr] = fsc.getParentChromosomeAncestry();
+			ancestry_chr_o[chr] = fsc.getOffspringChromosomeAncestry();
+			for(int j = 0; j < 2; j++) {
+				System.out.print("Parent " + j + " ");
+				for(int k = 0; k < ancestry_chr_p[chr][j].length; k++) {
+					System.out.print(ancestry_chr_p[chr][j][k] + " " );
+				}
+				System.out.println();
+			}
+				
+			for(int j = 0; j < numKid; j++) {
+				System.out.print("Kid " + j + " ");
+				for(int k = 0; k < ancestry_chr_o[chr][j].length; k++) {
+					System.out.print(ancestry_chr_o[chr][j][k] + " ");
+				}
+				System.out.println();
+			}
 			chr++;
 		}
 	}
@@ -61,7 +75,7 @@ public class FamilyGenome extends ArrayList<FamilySingleChromosome> {
 		double fAnc[] = new double[an[0][idx].length];
 		int dlc = disease_linked_chr == null ? 0 : disease_linked_chr.length;
 		for (int i = 0; i < an.length; i++) {
-			if (dlc != 0 && Arrays.binarySearch(disease_linked_chr, i) < 0)
+			if (disease_linked_chr != null  && Arrays.binarySearch(disease_linked_chr, i) >= 0)
 				continue;
 			for (int j = 0; j < an[i][idx].length; j++) {
 				fAnc[j] += an[i][idx][j];

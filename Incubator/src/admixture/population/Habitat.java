@@ -1,8 +1,8 @@
-package admixture;
+package admixture.population;
 
 import java.util.ArrayList;
-import admixture.chromosome.FamilyGenome;
-import admixture.phenotype.FamilyPhenotype;
+import admixture.population.genome.chromosome.FamilyGenome;
+import admixture.population.phenotype.FamilyPhenotype;
 import arsenal.NewIt;
 /**
 *

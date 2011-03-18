@@ -1,4 +1,4 @@
-package admixture.phenotype;
+package admixture.population.phenotype;
 
 import admixture.AdmixtureConstant;
 

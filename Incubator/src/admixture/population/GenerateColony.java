@@ -1,4 +1,4 @@
-package admixture;
+package admixture.population;
 
 import java.io.BufferedWriter;
 import java.io.File;
@@ -7,11 +7,15 @@ import java.io.IOException;
 import java.io.PrintWriter;
 import java.util.ArrayList;
 
-import admixture.chromosome.FamilyGenome;
-import admixture.chromosome.FamilySingleChromosome;
-import admixture.phenotype.FamilyPhenotype;
-import admixture.phenotype.PhenotypeGenerator;
-import admixture.phenotype.QualityControl;
+import admixture.AdmixtureConstant;
+import admixture.population.genome.DNAStirrer;
+import admixture.population.genome.HotSpot;
+import admixture.population.genome.chromosome.ChromosomeGenerator;
+import admixture.population.genome.chromosome.FamilyGenome;
+import admixture.population.genome.chromosome.FamilySingleChromosome;
+import admixture.population.phenotype.FamilyPhenotype;
+import admixture.population.phenotype.PhenotypeGenerator;
+import admixture.population.phenotype.QualityControl;
 
 public class GenerateColony {
 
@@ -325,7 +329,7 @@ public class GenerateColony {
 			for(int i = 0; i < 2; i++) {
 				sp[i] = new StringBuffer();
 				sp[i].append(fp.getFamilyID() + " " + fp.getFamilyID() * 10000 + i + " ");
-				sp[i].append(0 + " " + 0 + " " + 1 + fp.getIndividualID(i));
+				sp[i].append(fp.getStringParentPhenotype(i));
 			}
 
 			for(int i = 0; i < sp.length; i++) {
