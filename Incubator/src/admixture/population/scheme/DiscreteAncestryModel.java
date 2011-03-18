@@ -1,11 +1,17 @@
-package admixture;
+package admixture.population.scheme;
 
 import java.io.IOException;
 import java.util.ArrayList;
 
-import admixture.phenotype.PhenotypeGenerator;
-import admixture.phenotype.QualityControl;
-import admixture.print.Print2File;
+import admixture.AdmixtureConstant;
+import admixture.population.AlleleFrequencyReader;
+import admixture.population.GenerateColony;
+import admixture.population.Print2File;
+import admixture.population.genome.DNAStirrer;
+import admixture.population.genome.HotSpot;
+import admixture.population.genome.chromosome.ChromosomeGenerator;
+import admixture.population.phenotype.PhenotypeGenerator;
+import admixture.population.phenotype.QualityControl;
 
 public class DiscreteAncestryModel {
 

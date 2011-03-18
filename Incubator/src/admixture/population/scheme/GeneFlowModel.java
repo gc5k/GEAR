@@ -1,10 +1,16 @@
-package admixture;
+package admixture.population.scheme;
 
 import java.io.IOException;
 import java.util.ArrayList;
 
-import admixture.phenotype.PhenotypeGenerator;
-import admixture.phenotype.QualityControl;
+import admixture.AdmixtureConstant;
+import admixture.population.AlleleFrequencyReader;
+import admixture.population.GenerateColony;
+import admixture.population.genome.DNAStirrer;
+import admixture.population.genome.HotSpot;
+import admixture.population.genome.chromosome.ChromosomeGenerator;
+import admixture.population.phenotype.PhenotypeGenerator;
+import admixture.population.phenotype.QualityControl;
 
 
 /**
@@ -32,7 +38,7 @@ public class GeneFlowModel {
 		PhenotypeGenerator pg = new PhenotypeGenerator(f, g_e, chr, loci, mu, dev);
 		HotSpot hs = new HotSpot();
 
-		String[] chr_file = {"allele_freq_chr1_simu.txt", "allele_freq_chr2_simu.txt"};
+		String[] chr_file = {"allele_freq_chr1.txt", "allele_freq_chr2.txt"};
 		double[] w = {0.8, 0.2};
 		ArrayList<DNAStirrer> DNAPool = new ArrayList<DNAStirrer>();
 		ArrayList<ChromosomeGenerator> CG = new ArrayList<ChromosomeGenerator>();
@@ -66,7 +72,7 @@ public class GeneFlowModel {
 
 		try {
 			GC.printGenotype2file("ped.txt", "phe.txt", !AdmixtureConstant.printAllele);
-			GC.printUnrelatedIndividual("PCA_geno.txt", "PCA_phe.txt", !AdmixtureConstant.printAllele, true);
+			GC.printUnrelatedIndividual("PCA_ped.txt", "PCA_phe.txt", !AdmixtureConstant.printAllele, true);
 			GC.printFounder("Founder_ped.txt", "Founder_phe.txt", !AdmixtureConstant.printAllele, true);
 		} catch (IOException e) {
 			e.printStackTrace(System.err);

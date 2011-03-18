@@ -1,7 +1,9 @@
-package admixture;
+package admixture.population.genome;
 
 import java.util.Arrays;
 
+import admixture.AdmixtureConstant;
+import admixture.population.AlleleFrequencyReader;
 import arsenal.Tools;
 import jsc.distributions.Binomial;
 
