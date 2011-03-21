@@ -27,26 +27,26 @@ public class FamilyGenome extends ArrayList<FamilySingleChromosome> {
 		ancestry_chr_p = new double[NumChromosome()][][];
 		ancestry_chr_o = new double[NumChromosome()][][];
 		int chr = 0;
-		System.out.println(FamID);
+//		System.out.println(FamID);
 		for (Iterator<FamilySingleChromosome> i = this.iterator(); i.hasNext();) {
 			FamilySingleChromosome fsc = i.next();
 			ancestry_chr_p[chr] = fsc.getParentChromosomeAncestry();
 			ancestry_chr_o[chr] = fsc.getOffspringChromosomeAncestry();
-			for(int j = 0; j < 2; j++) {
-				System.out.print("Parent " + j + " ");
-				for(int k = 0; k < ancestry_chr_p[chr][j].length; k++) {
-					System.out.print(ancestry_chr_p[chr][j][k] + " " );
-				}
-				System.out.println();
-			}
-				
-			for(int j = 0; j < numKid; j++) {
-				System.out.print("Kid " + j + " ");
-				for(int k = 0; k < ancestry_chr_o[chr][j].length; k++) {
-					System.out.print(ancestry_chr_o[chr][j][k] + " ");
-				}
-				System.out.println();
-			}
+//			for(int j = 0; j < 2; j++) {
+//				System.out.print("Parent " + j + " ");
+//				for(int k = 0; k < ancestry_chr_p[chr][j].length; k++) {
+//					System.out.print(ancestry_chr_p[chr][j][k] + " " );
+//				}
+//				System.out.println();
+//			}
+//				
+//			for(int j = 0; j < numKid; j++) {
+//				System.out.print("Kid " + j + " ");
+//				for(int k = 0; k < ancestry_chr_o[chr][j].length; k++) {
+//					System.out.print(ancestry_chr_o[chr][j][k] + " ");
+//				}
+//				System.out.println();
+//			}
 			chr++;
 		}
 	}
