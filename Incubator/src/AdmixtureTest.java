@@ -19,7 +19,7 @@ public class AdmixtureTest {
 		// //////// general components
 		long seed = 2011;
 		int disease_chr = 1;
-
+		boolean isNullHypothesis = true;
 		// logistic regression
 
 		String[] f = { "0000", "1010", "1111" };
@@ -47,7 +47,8 @@ public class AdmixtureTest {
 
 		double[] disease_rate = { 0.2, 0.5 };
 		int N_phe = 3;
-		GenerateColony GC = new GenerateColony(N_phe, seed, disease_chr, disease_rate, hs, DNAPool, CG, pg, AdmixtureConstant.free_recombination);
+		GenerateColony GC = new GenerateColony(N_phe, seed, disease_chr, disease_rate, hs, DNAPool,
+				CG, pg, AdmixtureConstant.free_recombination, isNullHypothesis);
 
 		// specific components
 		// family
@@ -55,7 +56,7 @@ public class AdmixtureTest {
 		int N_Kid = 2;
 		int N_aff_Kid = 1;
 		QualityControl qc = new QualityControl(N_aff_Kid, AdmixtureConstant.No_selection);
-		GC.GenerateNewFamHab(N_Fam, N_Kid, qc);
+		GC.GenerateFamHab(N_Fam, N_Kid, qc);
 
 		int N_case = 50;
 		int N_control = 50;
@@ -63,7 +64,8 @@ public class AdmixtureTest {
 		GC.GenerateCCHab(N_case + N_control, 1, qc_c);
 
 		try {
-			GC.printGenotype2file("ped.txt", "phe.txt", !AdmixtureConstant.printAllele);
+			GC.printGenotype2file("ped.txt", "phe.txt", !AdmixtureConstant.printAllele,
+					!AdmixtureConstant.printLinked);
 		} catch (IOException e) {
 			e.printStackTrace(System.err);
 		}

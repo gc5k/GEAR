@@ -16,10 +16,10 @@ import admixture.population.phenotype.QualityControl;
 public class DiscreteAncestryModel {
 
 	public static void main(String[] args) {
-		// TODO Auto-generated method stub
-		long seed = 2011;
-		int disease_chr = 1;
 
+		long seed = 2011;
+		int disease_chr = 0;
+		boolean isNullHypothesis = true;
 		// logistic regression
 
 		String[] f = { "0000", "1010", "1111" };
@@ -49,7 +49,7 @@ public class DiscreteAncestryModel {
 		
 		double[] AA_disease_rate = { 0.2};
 		GenerateColony AA_GenColony = new GenerateColony(N_phe, seed, disease_chr, AA_disease_rate, 
-				hs, AA_DNAPool, AA_CG, pg, AdmixtureConstant.free_recombination);
+				hs, AA_DNAPool, AA_CG, pg, AdmixtureConstant.free_recombination, isNullHypothesis);
 
 		// specific components
 		// family
@@ -57,7 +57,7 @@ public class DiscreteAncestryModel {
 		int AA_N_Kid = 2;
 		int AA_N_aff_Kid = 1;
 		QualityControl AA_qc = new QualityControl(AA_N_aff_Kid, AdmixtureConstant.FamilyExactAffected);
-		AA_GenColony.GenerateNewFamHab(AA_N_Fam, AA_N_Kid, AA_qc);
+		AA_GenColony.GenerateFamHab(AA_N_Fam, AA_N_Kid, AA_qc);
 
 		int AA_N_case = 50;
 		int AA_N_control = 50;
@@ -81,7 +81,7 @@ public class DiscreteAncestryModel {
 
 		double[] EA_disease_rate = { 0.5 };
 		GenerateColony EA_GenColony = new GenerateColony(N_phe, seed, disease_chr, EA_disease_rate,
-				hs, EA_DNAPool, EA_CG, pg, AdmixtureConstant.free_recombination);
+				hs, EA_DNAPool, EA_CG, pg, AdmixtureConstant.free_recombination, isNullHypothesis);
 
 		// specific components
 		// family
@@ -89,7 +89,7 @@ public class DiscreteAncestryModel {
 		int EA_N_Kid = 2;
 		int EA_N_aff_Kid = 1;
 		QualityControl EA_qc = new QualityControl(EA_N_aff_Kid, AdmixtureConstant.FamilyExactAffected);
-		EA_GenColony.GenerateNewFamHab(EA_N_Fam, EA_N_Kid, EA_qc);
+		EA_GenColony.GenerateFamHab(EA_N_Fam, EA_N_Kid, EA_qc);
 
 		int EA_N_case = 50;
 		int EA_N_control = 50;
@@ -100,9 +100,23 @@ public class DiscreteAncestryModel {
 		p2f.addColony(AA_GenColony);
 		p2f.addColony(EA_GenColony);
 		try {
-			p2f.printGenotype2file("ped.txt", "phe.txt", !AdmixtureConstant.printAllele);
-			p2f.printUnrelatedIndividual("PCA_geno.txt", "PCA_phe.txt", !AdmixtureConstant.printAllele, true);
-			p2f.printFounder("F_ped.txt", "F_phe.txt", !AdmixtureConstant.printAllele, true);
+			p2f.printGenotype2file("ped.txt", "phe.txt", !AdmixtureConstant.printAllele,
+					!AdmixtureConstant.printAllele);
+			p2f.printGenotype2file("L_ped.txt", "L_phe.txt", !AdmixtureConstant.printAllele,
+					AdmixtureConstant.printAllele);
+
+			p2f.printFamilyGenotype2file("Fam_ped.txt", "Fam_phe.txt", !AdmixtureConstant.printAllele,
+					!AdmixtureConstant.printAllele);
+			p2f.printFamilyGenotype2file("L_Fam_ped.txt", "L_Fam_phe.txt", !AdmixtureConstant.printAllele,
+					AdmixtureConstant.printAllele);
+			
+			p2f.printCCGenotype2file("CC_ped.txt", "CC_phe.txt", !AdmixtureConstant.printAllele,
+					!AdmixtureConstant.printAllele);
+			p2f.printCCGenotype2file("L_CC_ped.txt", "L_CC_phe.txt", !AdmixtureConstant.printAllele,
+					AdmixtureConstant.printAllele);
+						
+//			p2f.printUnrelatedIndividual("PCA_ped.txt", "PCA_phe.txt", !AdmixtureConstant.printAllele, true);
+//			p2f.printFounder("F_ped.txt", "F_phe.txt", !AdmixtureConstant.printAllele, true);
 		} catch (IOException e) {
 			e.printStackTrace(System.err);
 		}

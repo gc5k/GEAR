@@ -11,9 +11,7 @@ import arsenal.NewIt;
 public class Habitat {
 
 	private ArrayList<FamilyGenome> FamGenome;
-	private int NumChr;
 	private ArrayList<FamilyPhenotype> FamPhenotype;
-	private int NumPhe;
 	
 	public Habitat() {
 		FamGenome = NewIt.newArrayList();

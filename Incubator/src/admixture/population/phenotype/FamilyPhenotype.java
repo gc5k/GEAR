@@ -6,7 +6,6 @@ public class FamilyPhenotype {
 	private double[][] o_phe;
 	private int[] o_status;
 
-	private int num_kid;
 	private int FamID;
 
 	public FamilyPhenotype(int FI, double[][] p_p, int[] p_s, double[][] o_p, int[] o_s ) {

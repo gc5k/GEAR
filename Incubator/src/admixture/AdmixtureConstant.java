@@ -23,4 +23,5 @@ public interface AdmixtureConstant {
 	static public int No_selection = 3;
 	
 	static public boolean printAllele = true;
+	static public boolean printLinked = true;
 }
