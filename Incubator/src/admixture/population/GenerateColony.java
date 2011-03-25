@@ -130,16 +130,15 @@ public class GenerateColony {
 					DNAStirrer ds = DNAPool.get(j);
 					ChromosomeGenerator cg = ChrGenerator.get(j);
 					hs.rev(ds.NumberOfSNP());
-					hs.GenerateRecombination(AdmixtureConstant.free_recombination);
-					int[] f_hotspot = hs.getHotSpot();
-					hs.GenerateRecombination(AdmixtureConstant.free_recombination);
-					int[] m_hotspot = hs.getHotSpot();
+//					hs.GenerateRecombination(AdmixtureConstant.free_recombination);
+//					int[] f_hotspot = hs.getHotSpot();
+//					hs.GenerateRecombination(AdmixtureConstant.free_recombination);
+//					int[] m_hotspot = hs.getHotSpot();
 					if (r == 0) {
-						fg.addFamilyChromosome(cg.generateFamilySingleChromosome(chrID, N_Kid, f_hotspot, m_hotspot,
-								ds.PostSNPAncestralProb(), control_chr != j));
+						fg.addFamilyChromosome(cg.generateFamilySingleChromosome(chrID, N_Kid, hs,
+								control_chr != j));
 					} else {
-						fg.setFamilyChromosome(j, cg.generateFamilySingleChromosome(chrID, N_Kid, f_hotspot,
-								m_hotspot, ds.PostSNPAncestralProb(), control_chr != j));
+						fg.setFamilyChromosome(j, cg.generateFamilySingleChromosome(chrID, N_Kid, hs, control_chr != j));
 					}
 				}
 				if(!isNullHypothesis) {

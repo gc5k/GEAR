@@ -33,9 +33,9 @@ public class GeneFlowModel {
 		int N_Fam = 300;
 		int N_Kid = 2;
 		int N_aff_Kid = 1;
-		
-		int N_case = 0;
-		int N_control = 0;
+
+		int N_case = 100;
+		int N_control = 100;
 
 		// logistic regression
 		String[] f = { "0000", "1010", "1111" };
@@ -45,7 +45,7 @@ public class GeneFlowModel {
 		double mu = 0;
 		double dev = Math.sqrt(10);
 
-		double[] disease_rate = { 0.1, 0.3 };
+		double[] disease_rate = { 0, 0 };
 		int N_phe = 3;
 
 		String[] chr_file = {"allele_freq_chr1.txt", "allele_freq_chr2.txt"};
@@ -53,7 +53,6 @@ public class GeneFlowModel {
 
 		PhenotypeGenerator pg = new PhenotypeGenerator(f, g_e, chr, loci, mu, dev);
 		HotSpot hs = new HotSpot();
-
 
 		ArrayList<DNAStirrer> DNAPool = new ArrayList<DNAStirrer>();
 		ArrayList<ChromosomeGenerator> CG = new ArrayList<ChromosomeGenerator>();

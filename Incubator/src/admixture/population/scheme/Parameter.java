@@ -22,7 +22,7 @@ public class Parameter {
 	
 	private final String cmd_kid_num = "kn";
 	private int[] kid = new int[] { 2 };
-	
+
 	private final String cmd_aff_kid = "akn";
 	private int[] affectedKid = new int[] { 1 };
 	
@@ -46,7 +46,7 @@ public class Parameter {
 	
 	private final String cmd_linked_chr = "lc";
 	private int[] diseaseChr = new int[] { 1, 1 };
-	
+
 	private final String cmd_linked_locus = "ll";
 	private int[] diseaseLocus = new int[] { 1, 3 };
 
@@ -119,7 +119,7 @@ public class Parameter {
 			control_chr = Integer.parseInt(cl.getOptionValue(cmd_control_chr));
 		}
 		if(cl.hasOption(cmd_null_hypothesis)) {
-			isNullHypothesis = Boolean.parseBoolean(cl.getOptionValue(cmd_null_hypothesis));
+			isNullHypothesis = true;
 		}
 		if(cl.hasOption(cmd_fam_num)) {
 			String[] f = cl.getOptionValues(cmd_fam_num);
@@ -183,5 +183,19 @@ public class Parameter {
 		if(cl.hasOption(cmd_esd)) {
 			err = Double.parseDouble(cl.getOptionValue(cmd_esd));
 		}
+	}
+
+	public String toString() {
+		StringBuilder sb = new StringBuilder();
+		sb.append("seed=" + seed + "\n");
+		sb.append("control_chr=" + control_chr + "\n");
+		sb.append("is null hypothesis: " + isNullHypothesis + "\n");
+		return sb.toString();
+	}
+
+	public static void main(String[] args) {
+		Parameter p = new Parameter();
+		p.commandListenor(args);
+		System.out.println(p);
 	}
 }
