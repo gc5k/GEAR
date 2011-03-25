@@ -19,7 +19,9 @@ public class ChromosomeGenerator {
 	protected double[][] ancestry_snp_panel;
 	protected double[] ancestry;
 	protected double[] LD; // reserve for the future
+	protected HotSpot hs;
 	protected int[][] hotspot; // there two kinds of recombination fractions
+
 
 	// 1: free of recombination that each element equals 0.5, hotspot=[0.5,0.5,0.5,...]
 	// it is generated in the method recombinationFree()
@@ -55,12 +57,22 @@ public class ChromosomeGenerator {
 		N_snp = ancestry_snp_panel[0].length;
 	}
 
-	public FamilySingleChromosome generateFamilySingleChromosome(int cID, int k, int[] father_hotspot,
-			int[] mother_hotspot, double[][][] post_snp_ancestry, boolean disease_linked) {
-		hotspot[0] = father_hotspot;
-		hotspot[1] = mother_hotspot;
+	public FamilySingleChromosome generateFamilySingleChromosome(int cID, int k, HotSpot h, boolean disease_linked) {
+		hs = h;
 		parent_ancestry = new int[2][2][N_snp];
 		int[][][] pg = generateFounderChr(AdmixtureConstant.Without_LD);
+
+		offspring_ancestry = new int[k][2][N_snp];
+		int[][][] og = generateOffspringChr(pg, k);
+
+		FamilySingleChromosome fsc = new FamilySingleChromosome(cID, pg, og, disease_linked, parent_ancestry, offspring_ancestry, ancestry.length);
+		return fsc;
+	}
+
+	public FamilySingleChromosome generateFamilySingleChromosomeII(int cID, int k, int[] father_hotspot,
+			int[] mother_hotspot, int[][][] parent_anc, int[][][] p_g, boolean disease_linked) {
+		parent_ancestry = parent_anc;
+		int[][][] pg = p_g;
 
 		offspring_ancestry = new int[k][2][N_snp];
 		int[][][] og = generateOffspringChr(pg, k);
@@ -108,6 +120,10 @@ public class ChromosomeGenerator {
 	private int[][][] generateOffspringChr(int[][][] pg, int N_kid) {// pg[0] for paternal chromosome, pg[1] for maternal.
 		int[][][] diploid = new int[N_kid][2][N_snp];
 		for (int o = 0; o < N_kid; o++) {
+			hs.GenerateRecombination(AdmixtureConstant.free_recombination);
+			hotspot[0] = hs.getHotSpot();
+			hs.GenerateRecombination(AdmixtureConstant.free_recombination);
+			hotspot[1] = hs.getHotSpot();
 			for (int i = 0; i < hotspot.length; ++i) {
 				int chromatid = rnd.nextBoolean() ? 0 : 1;
 				for (int j = 0; j < hotspot[i].length - 1; j++) {
@@ -138,12 +154,12 @@ public class ChromosomeGenerator {
 		int[] mh = hs.getHotSpot();
 
 		ChromosomeGenerator CG = new ChromosomeGenerator(snp_freq, anc);
-		CG.generateFamilySingleChromosome(0, 2, fh,	mh, null, true);
+		CG.generateFamilySingleChromosome(0, 2, hs, true);
 		hs.GenerateRecombination(AdmixtureConstant.free_recombination);
 		fh = hs.getHotSpot();
 		hs.GenerateRecombination(AdmixtureConstant.free_recombination);
 		mh = hs.getHotSpot();
-		CG.generateFamilySingleChromosome(0, 2, fh,	mh, null, true);
+		CG.generateFamilySingleChromosome(0, 2, hs, true);
 		
 	}
 }

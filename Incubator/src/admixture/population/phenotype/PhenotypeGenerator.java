@@ -113,7 +113,7 @@ public class PhenotypeGenerator {
 
 			double mix_prob = Math.exp(logit) / (1 + Math.exp(logit));
 
-			double[] a = fg.ParentAncestry(i);
+			double[] a = fg.OffspringAncestry(i);
 			for (int j = 0; j < a.length; j++) {
 				mix_prob += a[j] * disease_rate[j];
 				o_p[i][j] = a[j];
