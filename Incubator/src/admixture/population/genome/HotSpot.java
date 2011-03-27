@@ -58,14 +58,14 @@ public class HotSpot {
 
 	private void recombinationFree() {
 
-		int crossover;
-		do {
-			crossover = (int) B.random() - 1;
-		} while (crossover < 0);
+		int crossover = N_snp/2;
+//		do {
+//			crossover = (int) B.random() - 1;
+//		} while (crossover < 0);
 //		System.out.println("crossover :" + crossover);
 		rec_hotspot = new int[crossover + 2];
 		if (crossover > 0) {
-			int[] hs = Sample.SampleIndex(1, N_snp - 1, crossover, AdmixtureConstant.Without_replacement);
+			int[] hs = Sample.SampleIndex(1, N_snp - 1, crossover);
 			System.arraycopy(hs, 0, rec_hotspot, 1, hs.length);
 		}
 		rec_hotspot[0] = 0;
@@ -86,7 +86,7 @@ public class HotSpot {
 
 		rec_hotspot = new int[crossover + 2];
 		if (crossover > 0) {
-			int[] hs = Sample.SampleIndex(1, N_snp, crossover, AdmixtureConstant.Without_replacement);
+			int[] hs = Sample.SampleIndex(1, N_snp, crossover);
 			System.arraycopy(hs, 0, rec_hotspot, 1, hs.length);
 		}
 		Arrays.sort(rec_hotspot);
@@ -112,7 +112,10 @@ public class HotSpot {
 	public static void main(String[] args) {
 		double[] snp_freq = { 0.5, 0.5, 0.1, 0.1, 0.1 };
 		HotSpot hs = new HotSpot();
-		hs.rev(snp_freq.length);
-		hs.GenerateRecombination(AdmixtureConstant.free_recombination);
+		hs.rev(10000);
+		for(int i = 0; i < 10000; i++) {
+			System.out.println(i);
+			hs.GenerateRecombination(AdmixtureConstant.free_recombination);
+		}
 	}
 }
