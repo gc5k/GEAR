@@ -1,42 +1,53 @@
 package arsenal;
 
 import java.util.Random;
-import jsc.distributions.DiscreteUniform;
-import org.apache.commons.lang3.ArrayUtils;
+
 /**
-*
-* @author Guo-Bo Chen, chenguobo@gmail.com
-*/
+ * 
+ * @author Guo-Bo Chen, chenguobo@gmail.com
+ */
 public class Sample {
 	public static long seed = 2011;
 	public static Random U = new Random(2011);
-	
+
 	public static void setSeed(long s) {
 		U.setSeed(s);
 	}
 
-	public static int[] SampleIndex(int start, int end, int n, boolean replacement) {
-		if(start > end) {
-			return null;
+	public static int[] SampleIndex(int start, int end, int n) {
+		int[] seq = new int[end - start + 1];
+		int[] index = new int[n];
+		for (int i = 0; i < seq.length; i++)
+			seq[i] = i + start;
+		int len = seq.length;
+		for(int i = 0; i < index.length; i++) {
+			int j = U.nextInt(len);
+			len--;			
+			index[i] = seq[j];
+			seq[j] = seq[len];
+			seq[len] = index[i];
 		}
-		int[] idx = new int[n];
-		if(replacement) {
-			for(int i = 0; i < idx.length; i++) {
-				idx[i] = (int) U.nextInt(end - start + 1) + start;
-			}
-		} else if ( n == (end - start + 1)) {
-			for(int i = 0; i < n; i++) {
-				idx[i] = start + i;
-			}
-		} else {
-			int[] url = new int[end - start + 1];
-			for(int i = 0; i < url.length; i++) url[i] = i + start;
-			for(int i = 0; i < n; i++) {
-				int j = (int) U.nextInt(url.length);
-				idx[i] = url[j];
-				url = ArrayUtils.remove(url, j);
-			}
+		return index;
+	}
+	
+	public static int[] SampleIndexWithReplacement(int start, int end, int n) {
+		int[] seq = new int[end - start + 1];
+		int[] index = new int[n];
+		for (int i = 0; i < seq.length; i++)
+			seq[i] = i + start;
+		int len = seq.length;
+		for(int i = 0; i < index.length; i++) {
+			int j = U.nextInt(len);
+			index[i] = seq[j];
 		}
-		return idx;
+		return index;
+	}
+	
+
+	public static void main(String[] args) {
+		for (int i = 0; i < 10000; i++) {
+			System.out.println(i);
+			SampleIndex(0, 10000, 50);
+		}
 	}
 }

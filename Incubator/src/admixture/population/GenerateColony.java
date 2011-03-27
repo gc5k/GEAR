@@ -6,8 +6,8 @@ import java.io.IOException;
 import java.io.PrintWriter;
 import java.util.ArrayList;
 
-import admixture.AdmixtureConstant;
 import admixture.population.genome.DNAStirrer;
+import admixture.population.genome.GeneFlow;
 import admixture.population.genome.HotSpot;
 import admixture.population.genome.chromosome.ChromosomeGenerator;
 import admixture.population.genome.chromosome.FamilyGenome;
@@ -18,20 +18,20 @@ import admixture.population.phenotype.QualityControl;
 
 public class GenerateColony {
 
-	private int n_chr;
-	private int n_phe;
-	private long seed;
-	private PhenotypeGenerator pheGenerator;
-	private HotSpot hs;
-	private Habitat FamHab;
-	private Habitat CaseControlHab;
-	private ArrayList<DNAStirrer> DNAPool;
-	private ArrayList<ChromosomeGenerator> ChrGenerator;
-	private int control_chr;
-	private double[] disease_rate;
-	private boolean recombinationFree;
-	private boolean isNullHypothesis;
-	private static int CurrFam = 0;
+	protected int n_chr;
+	protected int n_phe;
+	protected long seed;
+	protected PhenotypeGenerator pheGenerator;
+	protected HotSpot hs;
+	protected Habitat FamHab;
+	protected Habitat CaseControlHab;
+	protected ArrayList<DNAStirrer> DNAPool;
+	protected ArrayList<ChromosomeGenerator> ChrGenerator;
+	protected int control_chr;
+	protected double[] disease_rate;
+	protected boolean recombinationFree;
+	protected boolean isNullHypothesis;
+	protected static int CurrFam = 0;
 
 	public static class Builder {
 		private int n_phe = 1;
@@ -44,7 +44,7 @@ public class GenerateColony {
 		private PhenotypeGenerator pheGenerator;
 		private boolean recombinationFree = true;
 		private boolean isNullHypothesis = true;
-		
+		private ArrayList<GeneFlow> GF;
 		public Builder(double[] dr, HotSpot h, ArrayList<DNAStirrer> dp, ArrayList<ChromosomeGenerator> cg, PhenotypeGenerator p) {
 			disease_rate = new double[dr.length];
 			System.arraycopy(dr, 0, disease_rate, 0, dr.length);
@@ -63,7 +63,7 @@ public class GenerateColony {
 		public Builder recombinationFree(boolean rf) { recombinationFree = rf; return this;}
 		
 		public Builder isNullHypothesis(boolean isNull) { isNullHypothesis = isNull; return this;}
-		
+
 		public GenerateColony build() { return new GenerateColony(this); }
 	}
 
@@ -115,7 +115,7 @@ public class GenerateColony {
 		CaseControlHab = new Habitat();
 		generateFamilies(CaseControlHab, N_Fam, N_Kid, qc);
 	}
-	
+
 	private void generateFamilies(Habitat hab, int N_Fam, int N_Kid, QualityControl qc) {
 		for (int i = 0; i < N_Fam; i++) {
 			FamilyGenome fg = new FamilyGenome(CurrFam + i + 1, N_Kid);

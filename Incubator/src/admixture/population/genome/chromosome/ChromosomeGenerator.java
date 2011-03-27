@@ -69,6 +69,17 @@ public class ChromosomeGenerator {
 		return fsc;
 	}
 
+	public FamilySingleChromosome generateFamilySingleChromosome(int cID, int[][][] p_a, int[][][] p_g, int k, HotSpot h, boolean disease_linked) {
+		hs = h;
+		parent_ancestry = p_a;
+
+		offspring_ancestry = new int[k][2][N_snp];
+		int[][][] og = generateOffspringChr(p_g, k);
+
+		FamilySingleChromosome fsc = new FamilySingleChromosome(cID, p_g, og, disease_linked, parent_ancestry, offspring_ancestry, ancestry.length);
+		return fsc;		
+	}
+
 	public FamilySingleChromosome generateFamilySingleChromosomeII(int cID, int k, int[] father_hotspot,
 			int[] mother_hotspot, int[][][] parent_anc, int[][][] p_g, boolean disease_linked) {
 		parent_ancestry = parent_anc;

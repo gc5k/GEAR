@@ -36,21 +36,24 @@ public class GeneFlow {
 		}
 		hs = h;
 		hs.rev(N_snp);
-	}
-
-	public int[][] generateAnFounder(int idx) {
-		int[][] g = new int[2][N_snp];
-		for (int i = 0; i < 2; i++) {
-			for (int j = 0; j < N_snp; j++) {
-				g[i][j] = rnd.nextFloat() < ancestry_snp_panel[idx][j] ? 0 : 1;
-			}
-		}
-		return g;
-	}
-
-	public void founder() {
+		
 		pool = new int[founder_size][2][N_snp];
 		pool_ancestry = new int[founder_size][2][N_snp];
+		f_pool = new int[founder_size][2][N_snp];
+		f_pool_ancestry = new int[founder_size][2][N_snp];
+	}
+
+	public void generateAnFounder(int idx, int slot) {
+		for (int i = 0; i < 2; i++) {
+			for (int j = 0; j < N_snp; j++) {
+				f_pool[slot][i][j] = rnd.nextFloat() < ancestry_snp_panel[idx][j] ? 0 : 1;
+			}
+			Arrays.fill(f_pool_ancestry[slot][0], 1);
+		}
+	}
+
+	private void GenerateFounder() {
+
 		for (int i = 0; i < founder_size; i++) {
 			for (int j = 0; j < 2; j++) {
 				double r = rnd.nextFloat();
@@ -70,13 +73,9 @@ public class GeneFlow {
 	}
 
 	private void MakePool() {
-
 		int EA_size = EA_size();
 		int AA_size = founder_size - EA_size;
-		int[] AA_idx = Sample.SampleIndex(0, pool.length - 1, AA_size, false);
-
-		f_pool = new int[pool.length][2][N_snp];
-		f_pool_ancestry = new int[pool.length][2][N_snp];
+		int[] AA_idx = Sample.SampleIndex(0, pool.length - 1, AA_size);
 
 		for (int i = 0; i < AA_idx.length; i++) {
 			for (int j = 0; j < 2; j++) {
@@ -86,45 +85,29 @@ public class GeneFlow {
 		}
 
 		for (int i = 0; i < EA_size; i++) {
-			int[][] g = generateAnFounder(1);
-			System.arraycopy(g[0], 0, f_pool[i + AA_size][0], 0, g[0].length);
-			System.arraycopy(g[1], 0, f_pool[i + AA_size][1], 0, g[1].length);
-			Arrays.fill(f_pool[i + AA_size][0], 1);
-			Arrays.fill(f_pool[i + AA_size][1], 1);
+			generateAnFounder(1, i + AA_size);
 		}
 	}
 
-	public void mating() {
-		MakePool();
-		int[] idx = new int[f_pool.length];
-		for (int i = 0; i < idx.length; i++) {
-			idx[i] = i + 1;
-		}
-		Permutations ps = new Permutations(founder_size);
-		Permutation p = ps.randomPermutation();
-		int[] p_idx = p.toIntArray();
-		for(int i = 0; i < p_idx.length; i++) p_idx[i]--;
+	public void mating(int Round) {
+		GenerateFounder();
+		for (int round = 0; round < Round - 1; round++) {
+			
+			MakePool();
+			int[] p_idx = Sample.SampleIndex(0, founder_size-1, founder_size);
 
-		int[][][] pool = new int[f_pool.length][2][N_snp];
-		int count = 0;
-		for (int i = 0; i < f_pool.length / 2; i++) {
-			int idxf = p_idx[i*2];
-			int idxm = p_idx[i*2+1];
-			for(int j = 0; j < 2; j++) {
-				generateOffspringChr(count++, f_pool[idxf], f_pool[idxm], f_pool_ancestry[idxf], f_pool_ancestry[idxm]);
+			int count = 0;
+			for (int i = 0; i < f_pool.length / 2; i++) {
+				for (int j = 0; j < 2; j++) {
+					generateOffspringChr(count++, p_idx[i * 2], p_idx[i * 2 + 1]);
+				}
 			}
 		}
 	}
 
-	private void generateOffspringChr(int idx, int[][] fg, int[][] mg, int[][] fa, int[][] ma) {// pg[0] for paternal chromosome, pg[1] for
-																									// maternal.
-		int[][][] pg = new int[2][][];
-		pg[0] = fg;
-		pg[1] = mg;
-		int[][][] pa = new int[2][][];
-		pa[0] = fa;
-		pa[1] = ma;
-
+	private void generateOffspringChr(int idx, int idxf, int idxm) {
+		// maternal.
+		int[] IDX = {idxf, idxm};
 		hs.GenerateRecombination(AdmixtureConstant.free_recombination);
 		hotspot[0] = hs.getHotSpot();
 		hs.GenerateRecombination(AdmixtureConstant.free_recombination);
@@ -133,24 +116,23 @@ public class GeneFlow {
 			int chromatid = rnd.nextBoolean() ? 0 : 1;
 			for (int j = 0; j < hotspot[i].length - 1; j++) {
 				chromatid = 1 - chromatid;
-				for (int k = hotspot[i][j]; k <= hotspot[i][j + 1]; k++) {
-					pool[idx][i][k] = pg[i][chromatid][k];
-					pool_ancestry[idx][i][k] = pa[i][chromatid][k];
-				}
+				System.arraycopy(f_pool[IDX[i]][chromatid], hotspot[i][j], pool[idx][i], hotspot[i][j], hotspot[i][j+1] - hotspot[i][j] + 1);
+				System.arraycopy(f_pool_ancestry[IDX[i]][chromatid], hotspot[i][j], pool_ancestry[idx][i], hotspot[i][j], hotspot[i][j+1] - hotspot[i][j] + 1);				
 			}
 		}
+
 	}
 
 	public double[][] averageAncestry() {
 		double[][] a = new double[founder_size][pop_prop.length];
-		for(int i = 0; i < founder_size; i++) {
-			for(int j = 0; j < N_snp; j++) {
+		for (int i = 0; i < founder_size; i++) {
+			for (int j = 0; j < N_snp; j++) {
 				int org1 = pool_ancestry[i][0][j];
 				int org2 = pool_ancestry[i][1][j];
 				a[i][org1] += 0.5;
 				a[i][org2] += 0.5;
 			}
-			for(int j = 0; j < a[i].length; j++) {
+			for (int j = 0; j < a[i].length; j++) {
 				a[i][j] /= N_snp;
 			}
 		}
@@ -165,23 +147,32 @@ public class GeneFlow {
 		return (int) (founder_size * (pop_prop[1] - pop_prop[0]));
 	}
 
+	public void clean() {
+		pool = null;
+		pool_ancestry = null;
+		f_pool = null;
+		f_pool_ancestry = null;
+	}
+
+	public void printData(int Family, int kid, int cases, int controls) {
+		
+	}
+
 	public static void main(String[] args) {
-		double[][] snp = new double[2][100];
+		double[][] snp = new double[2][1000];
 
 		Arrays.fill(snp[0], 0.1);
 		Arrays.fill(snp[1], 0.8);
 
-		double[] r = { 0.8, 0.2 };
-		int ps = 100;
+		double[] r = { 0.975, 0.025 };
+		int ps = 5000;
 		HotSpot hs = new HotSpot();
-
+		
 		GeneFlow gf = new GeneFlow(ps, snp, r, hs);
-		gf.founder();
-//		gf.mating();
-//		gf.mating();
+		gf.mating(10);
 		double[][] a = gf.averageAncestry();
-		for(int i = 0; i < a.length; i++) {
-			for(int j = 0; j < a[i].length; j++) {
+		for (int i = 0; i < a.length; i++) {
+			for (int j = 0; j < a[i].length; j++) {
 				System.out.print(a[i][j] + " ");
 			}
 			System.out.println();
