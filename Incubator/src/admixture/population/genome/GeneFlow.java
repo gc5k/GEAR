@@ -4,10 +4,8 @@ import java.util.Arrays;
 import java.util.Random;
 
 import admixture.AdmixtureConstant;
+import admixture.population.AlleleFrequencyReader;
 import arsenal.Sample;
-
-import jsc.combinatorics.Permutation;
-import jsc.combinatorics.Permutations;
 
 public class GeneFlow {
 	private int[][][] pool;
@@ -25,6 +23,8 @@ public class GeneFlow {
 	private HotSpot hs;
 	private int[][] hotspot = new int[2][];
 
+	private int[] randomIndex;
+
 	public GeneFlow(int ps, double[][] sp, double[] pp, HotSpot h) {
 		founder_size = ps;
 		N_snp = sp[0].length;
@@ -37,6 +37,24 @@ public class GeneFlow {
 		hs = h;
 		hs.rev(N_snp);
 		
+		pool = new int[founder_size][2][N_snp];
+		pool_ancestry = new int[founder_size][2][N_snp];
+		f_pool = new int[founder_size][2][N_snp];
+		f_pool_ancestry = new int[founder_size][2][N_snp];
+	}
+
+	public GeneFlow(AlleleFrequencyReader afr, int ps, double[] pp, HotSpot h) {
+		founder_size = ps;
+		N_snp = afr.getNumberSNP();
+		ancestry_snp_panel = afr.getAlleleFreq();
+		pop_prop = new double[pp.length];
+		System.arraycopy(pp, 0, pop_prop, 0, pp.length);
+		for (int i = 0; i < pp.length - 1; i++) {
+			pop_prop[i + 1] = pp[i + 1] + pop_prop[i];
+		}
+		hs = h;
+		hs.rev(N_snp);
+
 		pool = new int[founder_size][2][N_snp];
 		pool_ancestry = new int[founder_size][2][N_snp];
 		f_pool = new int[founder_size][2][N_snp];
@@ -103,6 +121,8 @@ public class GeneFlow {
 				}
 			}
 		}
+		MakePool();
+		randomIndex = Sample.SampleIndex(0, founder_size-1, founder_size);
 	}
 
 	private void generateOffspringChr(int idx, int idxf, int idxm) {
@@ -139,6 +159,11 @@ public class GeneFlow {
 		return a;
 	}
 
+	public int NumberOfSNP() {
+		return N_snp;
+	}
+
+	@SuppressWarnings("unused")
 	private int PopulationSizeNextGeneration() {
 		return founder_size;
 	}
@@ -154,8 +179,30 @@ public class GeneFlow {
 		f_pool_ancestry = null;
 	}
 
-	public void printData(int Family, int kid, int cases, int controls) {
-		
+	public int[][] getAnIndividualInPool(int idx) {
+		if(idx<randomIndex.length) {
+			return f_pool[randomIndex[idx]];
+		} else {
+			return null;
+		}
+	}
+
+	public int[][] getAncestryInPool(int idx) {
+		if(idx<randomIndex.length) {
+			return f_pool_ancestry[randomIndex[idx]];
+		} else {
+			return null;
+		}
+	}
+
+	public int[][] sampleAnFounder(int pi) {
+		int[][] g = new int[2][N_snp];
+		for (int i = 0; i < 2; i++) {
+			for (int j = 0; j < N_snp; j++) {
+				g[i][j] = rnd.nextFloat() < ancestry_snp_panel[pi][j] ? 0 : 1;
+			}
+		}
+		return g;
 	}
 
 	public static void main(String[] args) {
@@ -165,11 +212,11 @@ public class GeneFlow {
 		Arrays.fill(snp[1], 0.8);
 
 		double[] r = { 0.975, 0.025 };
-		int ps = 5000;
+		int ps = 1000;
 		HotSpot hs = new HotSpot();
-		
+
 		GeneFlow gf = new GeneFlow(ps, snp, r, hs);
-		gf.mating(10);
+		gf.mating(9);
 		double[][] a = gf.averageAncestry();
 		for (int i = 0; i < a.length; i++) {
 			for (int j = 0; j < a[i].length; j++) {
@@ -178,4 +225,5 @@ public class GeneFlow {
 			System.out.println();
 		}
 	}
+
 }

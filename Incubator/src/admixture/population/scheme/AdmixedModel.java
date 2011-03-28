@@ -5,23 +5,15 @@ import java.util.ArrayList;
 
 import admixture.AdmixtureConstant;
 import admixture.population.AlleleFrequencyReader;
-import admixture.population.GenerateColony;
+import admixture.population.GeneFlowGenerateColony;
 import admixture.population.genome.DNAStirrer;
+import admixture.population.genome.GeneFlow;
 import admixture.population.genome.HotSpot;
 import admixture.population.genome.chromosome.ChromosomeGenerator;
 import admixture.population.phenotype.PhenotypeGenerator;
 import admixture.population.phenotype.QualityControl;
 
-
-/**
-*
-* @author Guo-Bo Chen, chenguobo@gmail.com
-*/
-public class GeneFlowModel {
-
-	/**
-	 * @param args
-	 */
+public class AdmixedModel {
 	public static void main(String[] args) {
 
 		long seed = 2012;
@@ -53,20 +45,25 @@ public class GeneFlowModel {
 
 		PhenotypeGenerator pg = new PhenotypeGenerator(f, g_e, chr, loci, mu, dev);
 		HotSpot hs = new HotSpot();
-
+		
 		ArrayList<DNAStirrer> DNAPool = new ArrayList<DNAStirrer>();
+		ArrayList<GeneFlow> GF = new ArrayList<GeneFlow>();
 		ArrayList<ChromosomeGenerator> CG = new ArrayList<ChromosomeGenerator>();
 		for (int i = 0; i < chr_file.length; i++) {
 			AlleleFrequencyReader afr = new AlleleFrequencyReader(chr_file[i]);
 			DNAStirrer ds = new DNAStirrer(afr, 1, 10000, AdmixtureConstant.Without_Genetic_Drift, w);
 			ds.DNAStir(1);
 			DNAPool.add(ds);
-			ChromosomeGenerator cg = new ChromosomeGenerator(ds.AncestrySNPFreqencyPanel(), ds.CurrSNPOrigine());
+			GeneFlow gf = new GeneFlow(afr, 1000, w, hs);
+			if(i==0) gf.mating(2);
+			GF.add(gf);
+			ChromosomeGenerator cg = new ChromosomeGenerator(afr.getAlleleFreq(), w);
 			cg.setSeed(seed + i);
 			CG.add(cg);
 		}
 
-		GenerateColony GC = new GenerateColony.Builder().diesaseRate(disease_rate).hotSpot(hs).numPhenotype(N_phe).ChrGenerator(CG).DNAPool(DNAPool).PheGenerator(pg)
+		GeneFlowGenerateColony GC = new GeneFlowGenerateColony.Builder().DNAPool(DNAPool).diesaseRate(disease_rate).hotSpot(hs).popProportion(w)
+										.numPhenotype(N_phe).ChrGenerator(CG).PheGenerator(pg).GeneFlow(GF)
 								.seed(seed).diseaseChr(control_chr).isNullHypothesis(isNullHypothesis).build();
 
 		QualityControl qc = new QualityControl(N_aff_Kid, AdmixtureConstant.FamilyExactAffected);
@@ -90,9 +87,6 @@ public class GeneFlowModel {
 					!AdmixtureConstant.printLinked);
 			GC.printCCGenotype2file("L_CC_ped.txt", "L_CC_phe.txt", !AdmixtureConstant.printAllele,
 					AdmixtureConstant.printLinked);
-//			GC.printUnrelatedIndividual("PCA_ped.txt", "PCA_phe.txt", !AdmixtureConstant.printAllele, true);
-//			GC.printFounder("F_ped.txt", "F_phe.txt", !AdmixtureConstant.printAllele, true);
-//			GC.printOffspringCC("KCC_ped.txt", "KCC_phe.txt", !AdmixtureConstant.printAllele);
 		} catch (IOException e) {
 			e.printStackTrace(System.err);
 		}

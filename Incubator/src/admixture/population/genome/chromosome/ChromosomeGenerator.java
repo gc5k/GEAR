@@ -69,14 +69,19 @@ public class ChromosomeGenerator {
 		return fsc;
 	}
 
-	public FamilySingleChromosome generateFamilySingleChromosome(int cID, int[][][] p_a, int[][][] p_g, int k, HotSpot h, boolean disease_linked) {
+	public FamilySingleChromosome generateFamilySingleChromosome(int cID, int[][] p_g, int[][] m_g, int[][] p_a, int[][] m_a, int k, HotSpot h, boolean disease_linked) {
 		hs = h;
-		parent_ancestry = p_a;
+		parent_ancestry = new int[2][][];
+		parent_ancestry[0] = p_a;
+		parent_ancestry[1] = m_a;
+		int[][][] pg = new int[2][][];
+		pg[0] = p_g;
+		pg[1] = m_g;
 
 		offspring_ancestry = new int[k][2][N_snp];
-		int[][][] og = generateOffspringChr(p_g, k);
+		int[][][] og = generateOffspringChr(pg, k);
 
-		FamilySingleChromosome fsc = new FamilySingleChromosome(cID, p_g, og, disease_linked, parent_ancestry, offspring_ancestry, ancestry.length);
+		FamilySingleChromosome fsc = new FamilySingleChromosome(cID, pg, og, disease_linked, parent_ancestry, offspring_ancestry, ancestry.length);
 		return fsc;		
 	}
 
