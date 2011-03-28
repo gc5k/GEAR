@@ -7,7 +7,6 @@ import java.io.PrintWriter;
 import java.util.ArrayList;
 
 import admixture.population.genome.DNAStirrer;
-import admixture.population.genome.GeneFlow;
 import admixture.population.genome.HotSpot;
 import admixture.population.genome.chromosome.ChromosomeGenerator;
 import admixture.population.genome.chromosome.FamilyGenome;
@@ -33,48 +32,59 @@ public class GenerateColony {
 	protected boolean isNullHypothesis;
 	protected static int CurrFam = 0;
 
-	public static class Builder {
+    protected static abstract class Init<T extends Init<T>> {
 		private int n_phe = 1;
 		private long seed = 2011;
 		private int control_chr = 0;
 		private double[] disease_rate;
 		private HotSpot hotspot;
-		private ArrayList<DNAStirrer> DNAPool;
-		private ArrayList<ChromosomeGenerator> ChrGenerator;
-		private PhenotypeGenerator pheGenerator;
+		private ArrayList<DNAStirrer> DNAPool = null;
+		private ArrayList<ChromosomeGenerator> ChrGenerator = null;
+		private PhenotypeGenerator pheGenerator = null;
 		private boolean recombinationFree = true;
 		private boolean isNullHypothesis = true;
-		private ArrayList<GeneFlow> GF;
-		public Builder(double[] dr, HotSpot h, ArrayList<DNAStirrer> dp, ArrayList<ChromosomeGenerator> cg, PhenotypeGenerator p) {
-			disease_rate = new double[dr.length];
-			System.arraycopy(dr, 0, disease_rate, 0, dr.length);
-			hotspot = h;
-			DNAPool = dp;
-			ChrGenerator = cg;
-			pheGenerator = p;
-		}
-		
-		public Builder numPhenotype(int np) { n_phe = np; return this;}
-		
-		public Builder seed(long s) { seed = s; return this;}
-		
-		public Builder diseaseChr(int dc) { control_chr = dc; return this;}
-		
-		public Builder recombinationFree(boolean rf) { recombinationFree = rf; return this;}
-		
-		public Builder isNullHypothesis(boolean isNull) { isNullHypothesis = isNull; return this;}
+        protected abstract T self();
+        
+        public T diesaseRate(double[] dr) { disease_rate = dr; return self();}
+        
+        public T hotSpot(HotSpot hs) { hotspot = hs; return self();}
+        
+        public T DNAPool(ArrayList<DNAStirrer> dp) { DNAPool = dp; return self();}
 
-		public GenerateColony build() { return new GenerateColony(this); }
-	}
+        public T ChrGenerator(ArrayList<ChromosomeGenerator> cg) { ChrGenerator = cg; return self(); }
 
-	public GenerateColony (Builder builder) {
+        public T PheGenerator(PhenotypeGenerator pg) { pheGenerator = pg; return self(); }
+
+		public T numPhenotype(int np) { n_phe = np; return self();}
+		
+		public T seed(long s) { seed = s; return self();}
+		
+		public T diseaseChr(int dc) { control_chr = dc; return self();}
+		
+		public T recombinationFree(boolean rf) { recombinationFree = rf; return self();}
+		
+		public T isNullHypothesis(boolean isNull) { isNullHypothesis = isNull; return self();}
+
+        public GenerateColony build() {
+            return new GenerateColony(this);
+        }
+    }
+
+    public static class Builder extends Init<Builder> {
+        @Override
+        protected Builder self() {
+            return this;
+        }   
+    }
+
+	public GenerateColony (Init<?> builder) {
 		disease_rate = builder.disease_rate;
 		hs = builder.hotspot;
 		DNAPool = builder.DNAPool;
 		ChrGenerator = builder.ChrGenerator;
 		pheGenerator = builder.pheGenerator;
 
-		n_chr = DNAPool.size();
+		n_chr = ChrGenerator.size();
 		
 		n_phe = builder.n_phe;
 		seed = builder.seed;
@@ -116,7 +126,7 @@ public class GenerateColony {
 		generateFamilies(CaseControlHab, N_Fam, N_Kid, qc);
 	}
 
-	private void generateFamilies(Habitat hab, int N_Fam, int N_Kid, QualityControl qc) {
+	protected void generateFamilies(Habitat hab, int N_Fam, int N_Kid, QualityControl qc) {
 		for (int i = 0; i < N_Fam; i++) {
 			FamilyGenome fg = new FamilyGenome(CurrFam + i + 1, N_Kid);
 			FamilyPhenotype fp;
@@ -130,10 +140,6 @@ public class GenerateColony {
 					DNAStirrer ds = DNAPool.get(j);
 					ChromosomeGenerator cg = ChrGenerator.get(j);
 					hs.rev(ds.NumberOfSNP());
-//					hs.GenerateRecombination(AdmixtureConstant.free_recombination);
-//					int[] f_hotspot = hs.getHotSpot();
-//					hs.GenerateRecombination(AdmixtureConstant.free_recombination);
-//					int[] m_hotspot = hs.getHotSpot();
 					if (r == 0) {
 						fg.addFamilyChromosome(cg.generateFamilySingleChromosome(chrID, N_Kid, hs,
 								control_chr != j));
