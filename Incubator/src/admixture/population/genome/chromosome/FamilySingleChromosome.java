@@ -11,42 +11,39 @@ public class FamilySingleChromosome {
 	private boolean disease_linked;
 	private int chrID;
 
-	public FamilySingleChromosome(int ci, int[][][] p, int[][][] o, boolean d) {
-		chrID = ci;
-		p_g = p;
-		o_g = o;
-		disease_linked = d;
-	}
-
-	public FamilySingleChromosome(int ci, int[][][] p, int[][][] o, boolean d, int[][][] hip, int[][][] hio, int N_anc) {
+	public FamilySingleChromosome(int ci, int[][][] p, int[][][] o, boolean d, int N_anc) {
 		chrID = ci;
 		p_g = p;
 		o_g = o;
 		disease_linked = d;
 
 		diploid_imprint_p = new double[2][N_anc];
-		for(int i = 0; i < hip.length; i++) {
-			for(int j = 0; j < hip[i][0].length; j++) {
-				int org1 = hip[i][0][j];
-				int org2 = hip[i][1][j];
+		for(int i = 0; i < p_g.length; i++) {
+			for(int j = 0; j < p_g[i][0].length; j++) {
+				int org1 = (int) (p_g[i][0][j]/2);
+				int org2 = (int) (p_g[i][1][j]/2);
+				p_g[i][0][j] = p_g[i][0][j]%2;
+				p_g[i][1][j] = p_g[i][1][j]%2;
 				diploid_imprint_p[i][org1] += 0.5;
 				diploid_imprint_p[i][org2] += 0.5;
 			}
 			for(int j = 0; j < diploid_imprint_p[i].length; j++) {
-				diploid_imprint_p[i][j] /= hip[0][0].length;
+				diploid_imprint_p[i][j] /= p_g[0][0].length;
 			}
 		}
 
-		diploid_imprint_o = new double[hio.length][N_anc];
-		for(int i = 0; i < hio.length; i++) {
-			for(int j = 0; j < hio[i][0].length; j++) {
-				int org1 = hio[i][0][j];
-				int org2 = hio[i][1][j];
+		diploid_imprint_o = new double[o_g.length][N_anc];
+		for(int i = 0; i < o_g.length; i++) {
+			for(int j = 0; j < o_g[i][0].length; j++) {
+				int org1 = (int) (o_g[i][0][j]/2);
+				int org2 = (int) (o_g[i][1][j]/2);
+				o_g[i][0][j] = o_g[i][0][j]%2;
+				o_g[i][1][j] = o_g[i][1][j]%2;
 				diploid_imprint_o[i][org1] += 0.5;
 				diploid_imprint_o[i][org2] += 0.5;
 			}
 			for(int j = 0; j < diploid_imprint_o[i].length; j++) {
-				diploid_imprint_o[i][j] /= hio[0][0].length;
+				diploid_imprint_o[i][j] /= o_g[0][0].length;
 			}
 		}
 	}

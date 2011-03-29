@@ -142,9 +142,9 @@ public class GenerateColony {
 					hs.rev(ds.NumberOfSNP());
 					if (r == 0) {
 						fg.addFamilyChromosome(cg.generateFamilySingleChromosome(chrID, N_Kid, hs,
-								control_chr != j));
+								j != control_chr ));
 					} else {
-						fg.setFamilyChromosome(j, cg.generateFamilySingleChromosome(chrID, N_Kid, hs, control_chr != j));
+						fg.setFamilyChromosome(j, cg.generateFamilySingleChromosome(chrID, N_Kid, hs, j != control_chr));
 					}
 				}
 				if(!isNullHypothesis) {
