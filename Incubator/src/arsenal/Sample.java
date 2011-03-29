@@ -27,7 +27,6 @@ public class Sample {
 			seq[j] = seq[len];
 			seq[len] = index[i];
 		}
-		seq = null;
 		return index;
 	}
 	
