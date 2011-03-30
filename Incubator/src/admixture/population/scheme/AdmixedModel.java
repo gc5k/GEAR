@@ -22,12 +22,12 @@ public class AdmixedModel {
 
 		// specific components
 		// family
-		int N_Fam = 100;
+		int N_Fam = 200;
 		int N_Kid = 2;
 		int N_aff_Kid = 1;
 
-		int N_case = 100;
-		int N_control = 100;
+		int N_case = 200;
+		int N_control = 200;
 
 		// logistic regression
 		String[] f = { "0000", "1010", "1111" };
@@ -41,7 +41,7 @@ public class AdmixedModel {
 		int N_phe = 3;
 
 		String[] chr_file = { "allele_freq_chr1.txt", "allele_freq_chr2.txt" };
-		double[] w = { 0.8, 0.2 };
+		double[] w = { 0.975, 0.025 };
 
 		PhenotypeGenerator pg = new PhenotypeGenerator(f, g_e, chr, loci, mu, dev);
 		HotSpot hs = new HotSpot();
@@ -63,16 +63,16 @@ public class AdmixedModel {
 		}
 
 		GeneFlowGenerateColony GC = new GeneFlowGenerateColony.Builder().DNAPool(DNAPool).diesaseRate(disease_rate)
-				.hotSpot(hs).popProportion(w).numPhenotype(N_phe).ChrGenerator(CG).PheGenerator(pg).GeneFlow(GF)
-				.seed(seed).diseaseChr(control_chr).isNullHypothesis(isNullHypothesis).build();
+				.hotSpot(hs).popProportion(w).numPhenotype(N_phe).ChrGenerator(CG).PheGenerator(pg).GeneFlow(GF).seed(
+						seed).diseaseChr(control_chr).isNullHypothesis(isNullHypothesis).build();
 
-		QualityControl qc = new QualityControl(N_aff_Kid, AdmixtureConstant.FamilyExactAffected);
-		GC.GenerateFamHab(N_Fam, N_Kid, qc);
-
-		QualityControl qc_c = new QualityControl(N_case, N_control, AdmixtureConstant.CaseControl);
-		GC.GenerateCCHab(N_case + N_control, 1, qc_c);
 		for (int rep = 0; rep < 10; rep++) {
-			
+			QualityControl qc = new QualityControl(N_aff_Kid, AdmixtureConstant.FamilyExactAffected);
+			QualityControl qc_c = new QualityControl(N_case, N_control, AdmixtureConstant.CaseControl);
+			GeneFlowGenerateColony.setCurrFamilyID(0);
+			GC.GenerateFamHab(N_Fam, N_Kid, qc);
+			GC.GenerateCCHab(N_case + N_control, 1, qc_c);
+
 			try {
 				StringBuilder Gsb = new StringBuilder("ped.txt");
 				Gsb.insert(0, rep);
