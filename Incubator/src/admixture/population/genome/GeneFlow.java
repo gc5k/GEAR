@@ -66,7 +66,7 @@ public class GeneFlow {
 	public void generateAnFounder(int idx, int slot) {
 		for (int i = 0; i < 2; i++) {
 			for (int j = 0; j < N_snp; j++) {
-				f_pool[slot][i][j] = rnd.nextFloat() < ancestry_snp_panel[idx][j] ? 0 : 1;
+				f_pool[slot][i][j] = rnd.nextFloat() < ancestry_snp_panel[idx][j] ? (idx * 2 + 0) : (idx * 2 + 1);
 			}
 			// Arrays.fill(f_pool_ancestry[slot][0], 1);
 		}
@@ -82,7 +82,7 @@ public class GeneFlow {
 					idx++;
 				for (int k = 0; k < N_snp; k++) {
 					if (!ld) {
-						pool[i][j][k] = rnd.nextFloat() < ancestry_snp_panel[idx][k] ? idx * 2 + 0 : idx * 2 + 1;
+						pool[i][j][k] = rnd.nextFloat() < ancestry_snp_panel[idx][k] ? (idx * 2 + 0) : (idx * 2 + 1);
 					} else {
 						// when there is LD pattern;
 					}
@@ -124,11 +124,6 @@ public class GeneFlow {
 			}
 		}
 		MakePool();
-		calculateAncestry();
-	}
-
-	public void calculateAncestry() {
-		
 	}
 
 	private void generateOffspringChr(int idx, int idxf, int idxm) {
@@ -186,15 +181,7 @@ public class GeneFlow {
 			return null;
 		}
 	}
-/*
-	public int[][] getAncestryInPool(int idx) {
-		if (idx < randomIndex.length) {
-			return f_pool_ancestry[randomIndex[idx]];
-		} else {
-			return null;
-		}
-	}
-*/
+
 	public int[][] sampleAnFounder(int pi) {
 		int[][] g = new int[2][N_snp];
 		for (int i = 0; i < 2; i++) {
