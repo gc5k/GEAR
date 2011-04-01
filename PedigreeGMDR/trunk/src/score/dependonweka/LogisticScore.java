@@ -1,4 +1,4 @@
-package score;
+package score.dependonweka;
 
 import java.lang.Integer;
 import java.lang.Math;

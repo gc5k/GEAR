@@ -8,7 +8,8 @@ import java.util.ArrayList;
 import java.util.Hashtable;
 import java.util.Random;
 import java.util.regex.Pattern;
-import score.CalEngineException;
+
+import score.dependonweka.CalEngineException;
 import edu.mit.wi.pedfile.PedFileException;
 import family.pedigree.GMDRData;
 import family.pedigree.GMDRPhenoFileException;

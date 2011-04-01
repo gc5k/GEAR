@@ -1,11 +1,5 @@
 package score;
 
-import java.io.BufferedReader;
-import java.io.FileReader;
-import java.io.IOException;
-import java.io.LineNumberReader;
-import java.util.*;
-
 import org.apache.commons.math.linear.*;
 
 public class LogisticRegression {
@@ -24,6 +18,7 @@ public class LogisticRegression {
 		for(int i = 0; i < Y.length; i++) {
 			Y[i] = y[i][0];
 		}
+		initial(x, intercept);
 	}
 
 	public LogisticRegression(double[] y, double[][] x, boolean intercept) {
@@ -128,10 +123,12 @@ public class LogisticRegression {
 		double[] Y = { 1, 1, 1, 1, 1, 0, 0, 0, 0, 0 };
 		double[][] X = { { 1, 15, 4 }, { 1, 30, 14 }, { 1, 31, 16 }, { 1, 31, 11 }, { 1, 32, 17 }, { 1, 29, 10 },
 				{ 1, 30, 8 }, { 1, 31, 12 }, { 1, 32, 6 }, { 1, 40, 7 } };
-		double[] be = { 0, 0, 0 };
-		LogisticRegression LogReg = new LogisticRegression(Y, X, false);
-//		LogReg.MLE();
-		String filename = "3uppercase_letter_cov_phe.txt";
+		for(int i = 0; i < 10; i++) {
+			LogisticRegression LogReg = new LogisticRegression(Y, X, false);
+			LogReg.MLE();
+		}
+/*		
+		String filename = "0.phe";
 		FileReader r = null;
 		try {
 			r = new FileReader(filename);
@@ -148,17 +145,18 @@ public class LogisticRegression {
 		} catch (IOException E) {
 			E.printStackTrace(System.err);
 		}
-		Vector Phe = new Vector();
-		Vector Cov = new Vector();
+		Vector<String> Phe = new Vector<String>();
+		Vector<String> Cov = new Vector<String>();
 		try {
 			while ((line = b.readLine()) != null) {
 				String[] fields = line.split("\t");
-				Cov.add(fields[0]);
-				Phe.add(fields[1]);
+				Cov.add(fields[2]);
+				Phe.add(fields[3]);
 			}
 		} catch (IOException E) {
 			E.printStackTrace(System.err);
 		}
+
 		double[] phe = new double[Phe.size()];
 		double[][] cov = new double[Cov.size()][1];
 		for(int i = 0; i < phe.length; i++) {
@@ -171,5 +169,6 @@ public class LogisticRegression {
 		for(int i = 0; i < res.length; i++) {
 			System.out.println(res[i]);
 		}
+		*/
 	}
 }
