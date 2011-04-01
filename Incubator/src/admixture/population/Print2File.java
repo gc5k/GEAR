@@ -64,7 +64,7 @@ public class Print2File {
 
 				for (int i = 0; i < sp.length; i++) {
 					sp[i] = new StringBuffer();
-					sp[i].append(fp.getFamilyID() + " " + fp.getFamilyID() * 10000 + i + " ");
+					sp[i].append(fp.getFamilyID() + " " + fp.getIndividualID(i) + " ");
 				}
 				sp[0].append(fp.getStringParentPhenotype(0));
 				sp[1].append(fp.getStringParentPhenotype(1));
@@ -83,8 +83,8 @@ public class Print2File {
 					sb[i] = new StringBuffer();
 					sb[i].append(fg.getFamilyID() + " " + fg.getIndividualID(i) + " ");
 				}
-				sb[0].append(0 + " " + 0 + " " + 1 + " " + fp.getParentStatus(0) + " ");
-				sb[1].append(0 + " " + 0 + " " + 2 + " " + fp.getParentStatus(1) + " ");
+				sb[0].append(0 + " " + 0 + " " + 1 + " " + (fp.getParentStatus(0) + 1) + " ");
+				sb[1].append(0 + " " + 0 + " " + 2 + " " + (fp.getParentStatus(1) + 1) + " ");
 
 				for (int i = 0; i < fp.getNumberOffspring(); i++) {
 					sb[2 + i].append(fg.getFatherID() + " " + fg.getMotherID() + " " + 1 + " "
@@ -128,7 +128,7 @@ public class Print2File {
 
 				for (int i = 0; i < fp.getNumberOffspring(); i++) {
 					sp[i] = new StringBuffer();
-					sp[i].append(fp.getFamilyID() + " " + fp.getFamilyID() * 10000 + i + " ");
+					sp[i].append(fp.getFamilyID() + " " + fp.getOffspringID(i) + " ");
 					sp[i].append(fp.getStringOffspringPhenotype(i));
 				}
 
@@ -141,7 +141,7 @@ public class Print2File {
 
 				for (int i = 0; i < fg.getNumberOffspring(); i++) {
 					sb[i] = new StringBuffer();
-					sb[i].append(fg.getFamilyID() + " " + fg.getIndividualID(i) + " ");
+					sb[i].append(fg.getFamilyID() + " " + fg.getOffspringID(i) + " ");
 					sb[i].append(0 + " " + 0 + " " + 1 + " " + fp.getOffspringStatus(i) + " ");
 				}
 
@@ -175,9 +175,6 @@ public class Print2File {
 
 		int colony_count = 0;
 		for (GenerateColony gc : colony) {
-			Habitat FamHab = gc.getFamHab();
-			ArrayList<FamilyGenome> FamG = FamHab.getFamilyGenome();
-			ArrayList<FamilyPhenotype> FamP = FamHab.getFamilyPhenotype();
 
 			ArrayList<DNAStirrer> DNAPool = gc.getDNAPool();
 			if (colony_count == 0) {
@@ -213,7 +210,7 @@ public class Print2File {
 
 				for (int i = 0; i < fp.getNumberOffspring(); i++) {
 					sp[i] = new StringBuffer();
-					sp[i].append(fp.getFamilyID() + " " + fp.getFamilyID() * 10000 + i + " ");
+					sp[i].append(fp.getFamilyID() + " " + fp.getOffspringID(i) + " ");
 					sp[i].append(fp.getStringOffspringPhenotype(i));
 				}
 
@@ -226,7 +223,7 @@ public class Print2File {
 
 				for (int i = 0; i < fg.getNumberOffspring(); i++) {
 					sb[i] = new StringBuffer();
-					sb[i].append(fg.getFamilyID() + " " + fg.getIndividualID(i) + " ");
+					sb[i].append(fg.getFamilyID() + " " + fg.getOffspringID(i) + " ");
 					sb[i].append(0 + " " + 0 + " " + 1 + " " + fp.getOffspringStatus(i) + " ");
 				}
 
@@ -296,7 +293,7 @@ public class Print2File {
 
 				for (int i = 0; i < sp.length; i++) {
 					sp[i] = new StringBuffer();
-					sp[i].append(fp.getFamilyID() + " " + fp.getFamilyID() * 10000 + i + " ");
+					sp[i].append(fp.getFamilyID() + " " + fp.getIndividualID(i) + " ");
 				}
 				sp[0].append(fp.getStringParentPhenotype(0));
 				sp[1].append(fp.getStringParentPhenotype(1));
@@ -315,8 +312,8 @@ public class Print2File {
 					sb[i] = new StringBuffer();
 					sb[i].append(fg.getFamilyID() + " " + fg.getIndividualID(i) + " ");
 				}
-				sb[0].append(0 + " " + 0 + " " + 1 + " " + fp.getParentStatus(0) + " ");
-				sb[1].append(0 + " " + 0 + " " + 2 + " " + fp.getParentStatus(1) + " ");
+				sb[0].append(0 + " " + 0 + " " + 1 + " " + (fp.getParentStatus(0) + 1) + " ");
+				sb[1].append(0 + " " + 0 + " " + 2 + " " + (fp.getParentStatus(1) + 1) + " ");
 
 				for (int i = 0; i < fp.getNumberOffspring(); i++) {
 					sb[2 + i].append(fg.getFatherID() + " " + fg.getMotherID() + " " + 1 + " "
@@ -395,7 +392,7 @@ public class Print2File {
 
 				for (int i = 0; i < sp.length; i++) {
 					sp[i] = new StringBuffer();
-					sp[i].append(fp.getFamilyID() + " " + fp.getFamilyID() * 10000 + i + " ");
+					sp[i].append(fp.getFamilyID() + " " + fp.getIndividualID(i) + " ");
 				}
 				sp[0].append(fp.getStringParentPhenotype(0));
 				sp[1].append(fp.getStringParentPhenotype(1));
@@ -419,8 +416,8 @@ public class Print2File {
 					sb[i] = new StringBuffer();
 					sb[i].append(fg.getFamilyID() + " " + fg.getIndividualID(i) + " ");
 				}
-				sb[0].append(0 + " " + 0 + " " + 1 + " " + fp.getParentStatus(0) + " ");
-				sb[1].append(0 + " " + 0 + " " + 2 + " " + fp.getParentStatus(1) + " ");
+				sb[0].append(0 + " " + 0 + " " + 1 + " " + (fp.getParentStatus(0) + 1) + " ");
+				sb[1].append(0 + " " + 0 + " " + 2 + " " + (fp.getParentStatus(1) + 1) + " ");
 
 				for (int i = 0; i < fp.getNumberOffspring(); i++) {
 					sb[2 + i].append(fg.getFatherID() + " " + fg.getMotherID() + " " + 1 + " "
@@ -469,7 +466,7 @@ public class Print2File {
 
 				for (int i = 0; i < fp.getNumberOffspring(); i++) {
 					sp[i] = new StringBuffer();
-					sp[i].append(fp.getFamilyID() + " " + fp.getFamilyID() * 10000 + i + " ");
+					sp[i].append(fp.getFamilyID() + " " + fp.getOffspringID(i) + " ");
 					sp[i].append(fp.getStringOffspringPhenotype(i));
 				}
 
@@ -483,7 +480,7 @@ public class Print2File {
 
 				for (int i = 0; i < fg.getNumberOffspring(); i++) {
 					sb[i] = new StringBuffer();
-					sb[i].append(fg.getFamilyID() + " " + fg.getIndividualID(i) + " ");
+					sb[i].append(fg.getFamilyID() + " " + fg.getOffspringID(i) + " ");
 					sb[i].append(0 + " " + 0 + " " + 1 + " " + fp.getOffspringStatus(i) + " ");
 				}
 
@@ -547,7 +544,7 @@ public class Print2File {
 
 				for (int i = 0; i < sp.length; i++) {
 					sp[i] = new StringBuffer();
-					sp[i].append(fp.getFamilyID() + " " + fp.getFamilyID() * 10000 + i + " ");
+					sp[i].append(fp.getFamilyID() + " " + fp.getIndividualID(i) + " ");
 				}
 				sp[0].append(fp.getStringParentPhenotype(0));
 				sp[1].append(fp.getStringParentPhenotype(1));
@@ -566,8 +563,8 @@ public class Print2File {
 					sb[i] = new StringBuffer();
 					sb[i].append(fg.getFamilyID() + " " + fg.getIndividualID(i) + " ");
 				}
-				sb[0].append(0 + " " + 0 + " " + 1 + " " + fp.getParentStatus(0) + " ");
-				sb[1].append(0 + " " + 0 + " " + 2 + " " + fp.getParentStatus(1) + " ");
+				sb[0].append(0 + " " + 0 + " " + 1 + " " + (fp.getParentStatus(0) + 1) + " ");
+				sb[1].append(0 + " " + 0 + " " + 2 + " " + (fp.getParentStatus(1) + 1) + " ");
 
 				int cnt = 0;
 				for (FamilySingleChromosome fsc : fg) {
@@ -604,8 +601,8 @@ public class Print2File {
 
 				for (int i = 0; i < 2; i++) {
 					sp[i] = new StringBuffer();
-					sp[i].append(fp.getFamilyID() + " " + fp.getFamilyID() * 10000 + i + " ");
-					sp[i].append(0 + " " + 0 + " " + 1 + fp.getIndividualID(i));
+					sp[i].append(fp.getFamilyID() + " " + fp.getIndividualID(i) + " ");
+					sp[i].append(0 + " " + 0 + " " + 1 + (fp.getParentStatus(i) + 1)+ " ");
 				}
 
 				for (int i = 0; i < sp.length; i++) {
@@ -619,7 +616,7 @@ public class Print2File {
 				for (int i = 0; i < 2; i++) {
 					sb[i] = new StringBuffer();
 					sb[i].append(fg.getFamilyID() + " " + fg.getIndividualID(i) + " ");
-					sb[i].append(0 + " " + 0 + " " + 1 + " " + fp.getParentStatus(i) + " ");
+					sb[i].append(0 + " " + 0 + " " + 1 + " " + (fp.getParentStatus(i) + 1) + " ");
 				}
 
 				for (FamilySingleChromosome fsc : fg) {
