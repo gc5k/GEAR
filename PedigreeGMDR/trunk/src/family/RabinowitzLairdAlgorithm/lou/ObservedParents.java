@@ -1,9 +1,11 @@
 /**
  * 
  */
-package family.RabinowitzLairdAlgorithm;
+package family.RabinowitzLairdAlgorithm.lou;
 
 import java.util.TreeMap;
+
+import family.RabinowitzLairdAlgorithm.AbstractGenoDistribution;
 import publicAccess.PublicData;
 
 /**

@@ -10,7 +10,7 @@ import java.util.regex.Pattern;
 
 import edu.mit.wi.pedfile.PedFileException;
 
-import score.CalEngineException;
+import score.dependonweka.CalEngineException;
 
 import family.RabinowitzLairdAlgorithm.AbstractGenoDistribution;
 import family.pedigree.GMDRData;

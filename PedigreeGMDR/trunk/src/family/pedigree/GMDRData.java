@@ -9,8 +9,10 @@ import java.util.Enumeration;
 import java.util.Hashtable;
 import java.util.Random;
 
-import score.CalEngine;
-import score.CalEngineException;
+import score.LinearRegression;
+import score.LogisticRegression;
+import score.dependonweka.CalEngine;
+import score.dependonweka.CalEngineException;
 import util.NewIt;
 import publicAccess.PublicData;
 import edu.mit.wi.pedfile.Family;
@@ -246,18 +248,21 @@ public class GMDRData {
 		for (int i = 0; i < T.size(); i++) {
 			Y[i][0] = ((Double) T.get(i)).doubleValue();
 		}
-
-		CalEngine CE = null;
-		try {
-			CE = new CalEngine(X, Y, adjust);
-		} catch (CalEngineException E) {
-			E.printStackTrace(System.err);
-			System.exit(0);
+	
+		double[][] r = null;
+		if(method == 0) {
+			LinearRegression LReg = new LinearRegression(Y, X, true);
+			LReg.MLE();
+			r = LReg.getResiduals2();
+		} else {
+			LogisticRegression LogReg1 = new LogisticRegression(Y, X, true);
+			LogReg1.MLE();
+			r = LogReg1.getResiduals2();
 		}
-		double[][] s = CE.GeneralScore(method);
+
 		for (int i = 0; i < P.size(); i++) {
 			PI = P.get(i);
-			ScoreHashTable.put(PI.getKey(), Double.toString(s[i][0]));
+			ScoreHashTable.put(PI.getKey(), Double.toString(r[i][0]));
 		}
 		ScoreTable.add(ScoreHashTable);
 		nameScore(PIndex, CIndex, adjust, method, includeFounder);
@@ -329,7 +334,7 @@ public class GMDRData {
 		return Matched;
 	}
 
-	public ArrayList getRabinowitzTable() {
+	public ArrayList<ArrayList<String>> getRabinowitzTable() {
 		return RabinowitzTable;
 	}
 

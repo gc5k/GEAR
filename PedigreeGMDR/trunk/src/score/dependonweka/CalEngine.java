@@ -1,4 +1,4 @@
-package score;
+package score.dependonweka;
 
 public class CalEngine {
 

@@ -1,4 +1,4 @@
-package score;
+package score.dependonweka;
 
 import weka.core.*;
 import weka.core.matrix.Matrix;

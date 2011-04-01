@@ -1,12 +1,11 @@
 package family.report;
 import java.util.ArrayList;
-import java.util.HashMap;
 
 import publicAccess.PublicData;
 import publicAccess.ToolKit;
+import util.NewIt;
 
 import org.apache.commons.math.MathException;
-import org.apache.commons.math.distribution.NormalDistribution;
 import org.apache.commons.math.distribution.NormalDistributionImpl;
 
 public class Report {
@@ -19,18 +18,18 @@ public class Report {
 	public Report() {
 		sum = new StringBuffer();
 		sum.append("model\tTA\tZ\tP-value\tTrA\tZ-score\tP-value" + System.getProperty("line.separator"));
-		test_statistics = new ArrayList();
+		test_statistics = NewIt.newArrayList();
 	}
 
 	public void NewRound(String m, boolean create_null) {
 		curr_model = m;
 		if(create_null) {
-			null_test_statistics = new ArrayList();
+			null_test_statistics = NewIt.newArrayList();
 		}
 	}
 
 	public void Add_test_statistic(double[] stat) {
-		ArrayList<Double> ts = new ArrayList();
+		ArrayList<Double> ts = NewIt.newArrayList();
 		for(int i = 0; i < stat.length; i++) {
 			ts.add(new Double(stat[i]));
 		}
@@ -38,7 +37,7 @@ public class Report {
 	}
 
 	public void Add_null_test_statistic(double[] stat) {
-		ArrayList<Double> ts = new ArrayList();
+		ArrayList<Double> ts = NewIt.newArrayList();
 		for(int i = 0; i < stat.length; i++) {
 			ts.add(new Double(stat[i]));
 		}
@@ -48,7 +47,7 @@ public class Report {
 	public void RoundSummary() {
 		double[][] stats = new double[null_test_statistics.size()][PublicData.NumOfStatistics];
 		for (int i = 0; i < stats.length; i++) {
-			ArrayList t = null_test_statistics.get(i);
+			ArrayList<Double> t = null_test_statistics.get(i);
 			for (int j = 0; j < stats[i].length; j++) {
 				stats[i][j] = ((Double) t.get(j)).doubleValue();
 			}
@@ -72,7 +71,7 @@ public class Report {
 		}
 		sum.append(System.getProperty("line.separator"));
 	}
-	
+
 	public String toString() {
 		return sum.toString();
 	}

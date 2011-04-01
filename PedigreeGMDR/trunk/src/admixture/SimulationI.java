@@ -1,19 +1,20 @@
-package family;
+package admixture;
 
 import java.io.IOException;
 import java.util.Random;
 
-import algorithm.CombinationGenerator;
-import algorithm.Subdivision;
-
-import family.RabinowitzLairdAlgorithm.AbstractGenoDistribution;
-import family.pedigree.GMDRData;
+import mdr.GMDRParameter;
 import mdr.data.DataFile;
 import mdr.moore.LinearMergeSearch;
-import mdr.GMDRParameter;
+import algorithm.CombinationGenerator;
+import algorithm.Subdivision;
+import family.PedigreeParameter;
+import family.RabinowitzLairdAlgorithm.AbstractGenoDistribution;
+import family.pedigree.GMDRData;
 import family.report.Report;
 
-public class RunPedSimulation {
+public class SimulationI {
+
 	public static void main(String[] args) throws IOException {
 		Report report = new Report();
 		int replication = args.length > 0 ? Integer.parseInt(args[0]) : 1;
@@ -64,11 +65,11 @@ public class RunPedSimulation {
 			}
 
 			boolean isRabinowitzProc = false;
-			GMDRData.rnd = new Random(pr.seed + i);
-			GMDRData GD = new GMDRData(pr.usingFounderGenotype, pr.usingChildrenGenotype, pr.isLouAlgorithm);
-			AbstractGenoDistribution.rnd = new Random(pr.seed + 1);
+			GMDRData.rnd = new Random(pr.getSeed() + i);
+			GMDRData GD = new GMDRData(pr.usingFounderGenotype(), pr.usingChildrenGenotype(), pr.isLouAlgorithm());
+			AbstractGenoDistribution.rnd = new Random(pr.getSeed() + 1);
 			GD.RevvingUp(pr.getPedigreeFile(), pr.getPhenotypeFile());
-			if (pr.isLouAlgorithm) {
+			if (pr.isLouAlgorithm()) {
 				GD.RabinowitzApproach();
 			}
 			GD.CreateTableII(isRabinowitzProc);
@@ -96,7 +97,7 @@ public class RunPedSimulation {
 				report.NewRound(as.getBestModelKey(j, 0), i == 0);
 				double[][] stats = as.singleBest(as.getBestModelKey(j, 0));
 				report.Add_test_statistic(stats[0]);
-				for (int k = 0; k < (i > 0 ? 0 : pr.replication); k++) {
+				for (int k = 0; k < (i > 0 ? 0 : pr.getReplication()); k++) {
 					System.out.println(k);
 					isRabinowitzProc = true;
 					GD.RabinowitzApproach();
@@ -108,7 +109,7 @@ public class RunPedSimulation {
 					CombinationGenerator cg1 = new CombinationGenerator(j, j, mdrData1.getMarkerNum());
 					cg1.generateCombination();
 					LinearMergeSearch as1;
-					Subdivision sd1 = new Subdivision(gmdrPr.getInterval(), gmdrPr.getSeed() + i * pr.replication + k,
+					Subdivision sd1 = new Subdivision(gmdrPr.getInterval(), gmdrPr.getSeed() + i * pr.getReplication() + k,
 							mdrData1);
 					sd1.RandomPartition();
 					as1 = new LinearMergeSearch(mdrData1, sd1, cg1, gmdrPr.getScoreIndex().length,

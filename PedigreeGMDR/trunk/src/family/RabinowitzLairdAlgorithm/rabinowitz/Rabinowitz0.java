@@ -1,6 +1,8 @@
-package family.RabinowitzLairdAlgorithm;
+package family.RabinowitzLairdAlgorithm.rabinowitz;
 
 import java.util.TreeMap;
+
+import family.RabinowitzLairdAlgorithm.AbstractGenoDistribution;
 
 import util.NewIt;
 //both parents' genotype were observed

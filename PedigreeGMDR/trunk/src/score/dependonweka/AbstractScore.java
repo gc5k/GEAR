@@ -1,4 +1,4 @@
-package score;
+package score.dependonweka;
 
 /**
  * A public interface, is inherited by all other generalized model methods.
