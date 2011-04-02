@@ -22,7 +22,7 @@ public class DiscreteAncestryModel {
 		boolean isNullHypothesis = true;
 		// logistic regression
 
-		String[] f = { "0000", "1010", "1111" };
+		String[] f = { "1111", "2121", "2222" };
 		double[] g_e = { 1, 0.5, 1 };
 		int[] chr = { 1, 1 };
 		int[] loci = { 0, 1 };

@@ -24,6 +24,8 @@ public class FamilySingleChromosome {
 				int org2 = (int) (p_g[i][1][j]/2);
 				p_g[i][0][j] = p_g[i][0][j]%2;
 				p_g[i][1][j] = p_g[i][1][j]%2;
+				p_g[i][0][j]++;
+				p_g[i][1][j]++;
 				diploid_imprint_p[i][org1] += 0.5;
 				diploid_imprint_p[i][org2] += 0.5;
 			}
@@ -39,6 +41,8 @@ public class FamilySingleChromosome {
 				int org2 = (int) (o_g[i][1][j]/2);
 				o_g[i][0][j] = o_g[i][0][j]%2;
 				o_g[i][1][j] = o_g[i][1][j]%2;
+				o_g[i][0][j]++;
+				o_g[i][1][j]++;
 				diploid_imprint_o[i][org1] += 0.5;
 				diploid_imprint_o[i][org2] += 0.5;
 			}
