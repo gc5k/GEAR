@@ -1,0 +1,22 @@
+Was the data simulated under the null hypothesis: false
+seed : 300
+replication of simulation : 5
+model : B
+Functional loci : 0,1
+Functional Genotype :1112,1211,1222,2212,
+Minor Allele Frequency :0.5,0.5,0.5,0.5,0.5,0.5,0.5,0.5,0.5,0.5,
+
+Recombination : 0.5,0.5,0.5,0.5,0.5,0.5,0.5,0.5,0.5,0.5,
+D': 0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,
+Intercept : -5.29
+Gene : 0.5
+Covariable : 1.0
+SD Cov : 3.16
+S.D. residual : 1.0
+phenotype selection quantile : -0.1,-0.9,
+family size : 1000
+number of cases (zero for family-based design) : 0
+Family number in different categories : 1000,
+Kids number (affected) in different categories : 2(-1),
+Parent genotype Missing Rate : 0.0 0.0,
+Genotype missing rate for kids : 0.0
