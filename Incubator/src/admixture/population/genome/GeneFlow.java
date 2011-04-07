@@ -112,7 +112,6 @@ public class GeneFlow {
 	public void mating(int Round) {
 		GenerateFounder();
 		for (int round = 0; round < Round - 1; round++) {
-
 			MakePool();
 			int[] p_idx = Sample.SampleIndex(0, founder_size - 1, founder_size);
 
@@ -186,7 +185,7 @@ public class GeneFlow {
 		int[][] g = new int[2][N_snp];
 		for (int i = 0; i < 2; i++) {
 			for (int j = 0; j < N_snp; j++) {
-				g[i][j] = rnd.nextFloat() < ancestry_snp_panel[pi][j] ? 0 : 1;
+				g[i][j] = rnd.nextFloat() < ancestry_snp_panel[pi][j] ? (pi * 2 + 0) : (pi * 2 + 1);
 			}
 		}
 		return g;
