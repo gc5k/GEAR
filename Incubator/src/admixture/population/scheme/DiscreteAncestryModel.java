@@ -42,7 +42,6 @@ public class DiscreteAncestryModel {
 		int AA_N_case = 50;
 		int AA_N_control = 50;
 
-
 		String[] AA_chr_file = { "AIM_AA_chr1.txt", "allele_freq_AA_chr2_simu.txt" };
 		double[] AA_w = { 1 };
 		ArrayList<DNAStirrer> AA_DNAPool = new ArrayList<DNAStirrer>();
