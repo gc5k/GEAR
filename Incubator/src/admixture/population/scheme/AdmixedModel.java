@@ -30,7 +30,7 @@ public class AdmixedModel {
 		int N_control = 200;
 
 		// logistic regression
-		String[] f = { "0000", "1010", "1111" };
+		String[] f = { "1111", "2121", "2222" };
 		double[] g_e = { 1, 0.5, 1 };
 		int[] chr = { 1, 1 };
 		int[] loci = { 0, 1 };
@@ -40,7 +40,7 @@ public class AdmixedModel {
 		double[] disease_rate = { 0, 0 };
 		int N_phe = 3;
 
-		String[] chr_file = { "allele_freq_chr1.txt", "allele_freq_chr2.txt" };
+		String[] chr_file = { "allele_freq_chr1_200snp.txt", "allele_freq_chr2.txt" };
 		double[] w = { 0.975, 0.025 };
 
 		PhenotypeGenerator pg = new PhenotypeGenerator(f, g_e, chr, loci, mu, dev);
@@ -66,7 +66,7 @@ public class AdmixedModel {
 				.hotSpot(hs).popProportion(w).numPhenotype(N_phe).ChrGenerator(CG).PheGenerator(pg).GeneFlow(GF).seed(
 						seed).diseaseChr(control_chr).isNullHypothesis(isNullHypothesis).build();
 
-		for (int rep = 0; rep < 10; rep++) {
+		for (int rep = 0; rep < 2; rep++) {
 			QualityControl qc = new QualityControl(N_aff_Kid, AdmixtureConstant.FamilyExactAffected);
 			QualityControl qc_c = new QualityControl(N_case, N_control, AdmixtureConstant.CaseControl);
 			GeneFlowGenerateColony.setCurrFamilyID(0);
