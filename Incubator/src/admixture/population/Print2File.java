@@ -88,7 +88,7 @@ public class Print2File {
 
 				for (int i = 0; i < fp.getNumberOffspring(); i++) {
 					sb[2 + i].append(fg.getFatherID() + " " + fg.getMotherID() + " " + 1 + " "
-							+ fp.getOffspringStatus(i) + " ");
+							+ (fp.getOffspringStatus(i) + 1) + " ");
 				}
 
 				for (FamilySingleChromosome fsc : fg) {
@@ -142,7 +142,7 @@ public class Print2File {
 				for (int i = 0; i < fg.getNumberOffspring(); i++) {
 					sb[i] = new StringBuffer();
 					sb[i].append(fg.getFamilyID() + " " + fg.getOffspringID(i) + " ");
-					sb[i].append(0 + " " + 0 + " " + 1 + " " + fp.getOffspringStatus(i) + " ");
+					sb[i].append(0 + " " + 0 + " " + 1 + " " + (fp.getOffspringStatus(i) + 1) + " ");
 				}
 
 				for (FamilySingleChromosome fsc : fg) {
@@ -224,7 +224,7 @@ public class Print2File {
 				for (int i = 0; i < fg.getNumberOffspring(); i++) {
 					sb[i] = new StringBuffer();
 					sb[i].append(fg.getFamilyID() + " " + fg.getOffspringID(i) + " ");
-					sb[i].append(0 + " " + 0 + " " + 1 + " " + fp.getOffspringStatus(i) + " ");
+					sb[i].append(0 + " " + 0 + " " + 1 + " " + (fp.getOffspringStatus(i) + 1) + " ");
 				}
 
 				for (FamilySingleChromosome fsc : fg) {
@@ -317,7 +317,7 @@ public class Print2File {
 
 				for (int i = 0; i < fp.getNumberOffspring(); i++) {
 					sb[2 + i].append(fg.getFatherID() + " " + fg.getMotherID() + " " + 1 + " "
-							+ fp.getOffspringStatus(i) + " ");
+							+ (fp.getOffspringStatus(i) + 1) + " ");
 				}
 
 				for (FamilySingleChromosome fsc : fg) {
@@ -421,7 +421,7 @@ public class Print2File {
 
 				for (int i = 0; i < fp.getNumberOffspring(); i++) {
 					sb[2 + i].append(fg.getFatherID() + " " + fg.getMotherID() + " " + 1 + " "
-							+ fp.getOffspringStatus(i) + " ");
+							+ (fp.getOffspringStatus(i) + 1) + " ");
 				}
 
 				int cnt = 0;
@@ -481,7 +481,7 @@ public class Print2File {
 				for (int i = 0; i < fg.getNumberOffspring(); i++) {
 					sb[i] = new StringBuffer();
 					sb[i].append(fg.getFamilyID() + " " + fg.getOffspringID(i) + " ");
-					sb[i].append(0 + " " + 0 + " " + 1 + " " + fp.getOffspringStatus(i) + " ");
+					sb[i].append(0 + " " + 0 + " " + 1 + " " + (fp.getOffspringStatus(i) + 1) + " ");
 				}
 
 				for (FamilySingleChromosome fsc : fg) {
