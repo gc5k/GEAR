@@ -4,19 +4,19 @@ import java.io.IOException;
 import java.util.Random;
 
 import mdr.GMDRParameter;
+import mdr.algorithm.CombinationGenerator;
+import mdr.algorithm.Subdivision;
 import mdr.data.DataFile;
+import mdr.moore.AbstractMergeSearch;
+import mdr.moore.HeteroLinearMergeSearch;
 import mdr.moore.LinearMergeSearch;
-import algorithm.CombinationGenerator;
-import algorithm.Subdivision;
 import family.PedigreeParameter;
 import family.RabinowitzLairdAlgorithm.AbstractGenoDistribution;
 import family.pedigree.ChenAlgorithm;
-import family.report.Report;
 
 public class SimulationI {
 
 	public static void main(String[] args) throws IOException {
-		Report report = new Report();
 		int replication = args.length > 0 ? Integer.parseInt(args[0]) : 1;
 		for (int i = 0; i < replication; i++) {
 			String PedFile = Integer.toString(i) + "L_ped.txt";
@@ -64,45 +64,31 @@ public class SimulationI {
 				gmdrPr.setSearchMethod(0);
 			}
 
-			boolean isRabinowitzProc = false;
 			ChenAlgorithm.rnd = new Random(pr.getSeed() + i);
 			ChenAlgorithm GD = new ChenAlgorithm();
 			AbstractGenoDistribution.rnd = new Random(pr.getSeed() + 1);
 			GD.RevvingUp(pr.getPedigreeFile(), pr.getPhenotypeFile());
-			// if (pr.isLouAlgorithm()) {
-			// GD.RabinowitzApproach();
-			// }
-			// GD.CreateTableII(isRabinowitzProc);
-			// if (pr.getScoreBuildMethod() >= 0) {
-			// GD.buildScore(pr.getPhenotypeIndex(), pr.getCovarianteIndex(),
-			// pr.isAdjustScore(), pr.getScoreBuildMethod(), pr
-			// .getScoreBuildWithFounder(), pr.getScoreBuildWithChildren());
-			// } else {
-			// GD.fetchScore(pr.getPhenotypeIndex(),
-			// pr.getScoreBuildWithFounder());
-			// }
-			// GD.CreateWorkingTable(isRabinowitzProc);
-			//
-			// DataFile mdrData = new DataFile(GD.getMarkerName(),
-			// GD.getWorkingGenoTable(), GD.getWorkingStatusTable(),
-			// GD.getTraitName(), GD
-			// .getWorkingScoreTable(), gmdrPr.getScoreIndex());
-			// Subdivision sd = new Subdivision(gmdrPr.getInterval(),
-			// gmdrPr.getSeed() + i, mdrData);
-			// sd.RandomPartition();
 
-			// CombinationGenerator cg = new
-			// CombinationGenerator(gmdrPr.getInterctionFrom(),
-			// gmdrPr.getInteractionEnd(),
-			// mdrData.getMarkerNum());
-			// cg.generateCombination();
-			// LinearMergeSearch as;
-			// as = new LinearMergeSearch(mdrData, sd, cg,
-			// gmdrPr.getScoreIndex().length, mdrData.getOffset(),
-			// gmdrPr.isMooreMDR());
-			// for (int j = gmdrPr.getInterctionFrom(); j <=
-			// gmdrPr.getInteractionEnd(); j++) {
-			// as.search(j);
+			if (pr.getScoreBuildMethod() >= 0) {
+				GD.buildScore(pr.getPhenotypeIndex(), pr.getCovarianteIndex(), pr.isAdjustScore(), pr.getScoreBuildMethod(), pr
+						.getScoreBuildWithFounder(), pr.getScoreBuildWithChildren());
+			} else {
+				GD.fetchScore(pr.getPhenotypeIndex(), pr.getScoreBuildWithFounder());
+			}
+
+			DataFile mdrData = new DataFile(GD.getMarkerName(), GD.getGenotype(), 
+					GD.getStatue(), GD.getScoreName(), GD.getScore2());
+			Subdivision sd = new Subdivision(gmdrPr.getInterval(), gmdrPr.getSeed() + i, mdrData.size());
+			sd.RandomPartition();
+
+			AbstractMergeSearch as = new HeteroLinearMergeSearch(mdrData, sd, gmdrPr.isMooreMDR());
+			for (int j = gmdrPr.getInterctionFrom(); j <= gmdrPr.getInteractionEnd(); j++) {
+				CombinationGenerator cg = new CombinationGenerator(j,
+						j,	mdrData.getNumMarker());
+				cg.generateCombination();
+				as.search(j, cg.get(new Integer(j)));
+			}
+			System.out.println();
 			// report.NewRound(as.getBestModelKey(j, 0), i == 0);
 			// double[][] stats = as.singleBest(as.getBestModelKey(j, 0));
 			// report.Add_test_statistic(stats[0]);

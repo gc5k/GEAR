@@ -3,39 +3,41 @@ package family.pedigree;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Enumeration;
 import java.util.Hashtable;
 import java.util.Random;
-import java.util.TreeSet;
 
-import score.LinearRegression;
-import score.LogisticRegression;
-import util.NewIt;
-import util.Sample;
-import publicAccess.PublicData;
 import family.pedigree.genotype.FamilyStruct;
 import family.pedigree.genotype.Person;
 import family.pedigree.phenotype.FamilyUnit;
 import family.pedigree.phenotype.Subject;
 
+import publicAccess.PublicData;
+
+import score.LinearRegression;
+import score.LogisticRegression;
+
+import util.NewIt;
+import util.Sample;
+
+import org.apache.commons.lang3.ArrayUtils;
+
 public class ChenAlgorithm {
+
 	public MDRPed PedData;
 	public GMDRPhenoFile PhenoData;
-	private byte[][][] genotype;
+
+	private byte[][] genotype;
+	private int numUnrelated;
+	private int numSibs;
+	private int[] numSib;
 	private byte[] status;
 	private double[] score;
 	private double[] permuted_score;
-	public ArrayList<ArrayList<String>> unMatched;
-	public ArrayList<ArrayList<String>> Matched;
 
-	// for offspring only
-	private ArrayList<ArrayList<String>> CovariateTable;// phenotypes of informative individuals
-	// excluded parents
-	private ArrayList<String> ScoreName;
+	private ArrayList<ArrayList<String>> CovariateTable;
+
+	private String[] scoreName = new String[1];
 	private ArrayList<PersonIndex> PersonTable;// The indexing file records the
-
-	private Hashtable<String, String> InformativePersonHash;
-	private Hashtable<String, String> UnrelatedPersonHash;
 
 	private int[] subsetMarker;
 	public static Random rnd;
@@ -105,20 +107,7 @@ public class ChenAlgorithm {
 		PhenoData = new GMDRPhenoFile();
 		PedData = new MDRPed();
 		CovariateTable = NewIt.newArrayList();
-
-		ScoreName = NewIt.newArrayList();
-		PersonTable =  NewIt.newArrayList();
-	}
-
-	/**
-	 * Impute missing genotypes
-	 */
-	public void GenotypeImputation() {
-		try {
-			PedData.GenotypeImputation();
-		} catch (MDRPedFileException e) {
-			e.printStackTrace(System.err);
-		}
+		PersonTable = NewIt.newArrayList();
 	}
 
 	/**
@@ -129,8 +118,7 @@ public class ChenAlgorithm {
 	 *            with predictor.
 	 * @throws CalEngineException
 	 */
-	public void buildScore(int PIndex, int[] CIndex, boolean adjust, int method, boolean includeFounder,
-			boolean includeChildren) {
+	public void buildScore(int PIndex, int[] CIndex, boolean adjust, int method, boolean includeFounder, boolean includeChildren) {
 		// method: 0 for regression, 1 for logistic
 		score = new double[PersonTable.size()];
 		PersonIndex PI;
@@ -151,9 +139,6 @@ public class ChenAlgorithm {
 				if (FamStr.hasAncestor(PI.getIndividualID())) {
 					continue;
 				}
-			}
-			if (unMatched.contains(PI.getIndividualID())) {
-				continue;
 			}
 			boolean flag = true;
 			double t = 0;
@@ -207,9 +192,9 @@ public class ChenAlgorithm {
 		for (int i = 0; i < T.size(); i++) {
 			Y[i][0] = ((Double) T.get(i)).doubleValue();
 		}
-	
+
 		double[] r = null;
-		if(method == 0) {
+		if (method == 0) {
 			LinearRegression LReg = new LinearRegression(Y, X, true);
 			LReg.MLE();
 			r = LReg.getResiduals1();
@@ -224,14 +209,29 @@ public class ChenAlgorithm {
 	}
 
 	private void nameScore(int PIndex, int[] CIndex, boolean adjust, int method, boolean includeFounder) {
-		String ln = new String();
-		ln += method == 1 ? "linear(" : "logistic(";
-		ln += PIndex == -1 ? "status->" : PhenoData.getTraitAtI(PIndex) + "->";
-		for (int i = 0; i < CIndex.length; i++) {
-			ln += PhenoData.getTraitAtI(CIndex[i]) + ",";
+		StringBuilder ln = new StringBuilder();
+		if(method == 1) {
+			ln.append("linear(" );
+		} else {
+			ln.append("logistic(");
 		}
-		ln += includeFounder ? "included founders)" : "excluded founders)";
-		ScoreName.add(ln);
+		if(PIndex == -1) {
+			ln.append("status->");
+		} else {
+			ln.append(PhenoData.getTraitAtI(PIndex));
+		}
+		ln.append("->");
+
+		for (int i = 0; i < CIndex.length; i++) {
+			ln.append(PhenoData.getTraitAtI(CIndex[i]) + ",");
+		}
+		
+		if(includeFounder) {
+			ln.append("included founders)");
+		} else {
+			ln.append("excluded founders)");
+		}
+		scoreName[0] = ln.toString();
 	}
 
 	/**
@@ -247,11 +247,6 @@ public class ChenAlgorithm {
 		double sum = 0;
 		score = new double[PersonTable.size()];
 		for (int i = 0; i < PersonTable.size(); i++) {
-			PersonIndex PI = PersonTable.get(i);
-			FamilyStruct FamStr = PedData.getFamilyStruct(PI.getFamilyID());
-			if (unMatched.contains(PI.getIndividualID()) && FamStr.containsPerson(PI.getIndividualID())) {
-				continue;
-			}
 			if (score_index == -1) {
 				if (status[i] == PublicData.MissingAffection) {
 					score[i] = rnd.nextInt(2);
@@ -274,36 +269,41 @@ public class ChenAlgorithm {
 			score[i.intValue()] = sum;
 		}
 		if (score_index == -1) {
-			ScoreName.add("status");
+			scoreName[0] = new String("status");
 		} else {
-			ScoreName.add(PhenoData.getTraitAtI(score_index));
+			scoreName[0] = new String(PhenoData.getTraitAtI(score_index));
 		}
 		return true;
 	}
 
 	public double[] getPermutationScore() {
 		permuted_score = new double[score.length];
-		int[] idx = Sample.SampleIndexWithReplacement(0, score.length-1, score.length);
-		for(int i = 0; i < idx.length; i++) {
+		int[] idx = Sample.SampleIndex(0, score.length - 1, score.length);
+		for (int i = 0; i < idx.length; i++) {
 			permuted_score[i] = score[idx[i]];
 		}
 		return permuted_score;
 	}
 
-	public ArrayList<ArrayList<String>> getUnMatched() {
-		return unMatched;
-	}
-
-	public ArrayList<ArrayList<String>> getMatched() {
-		return Matched;
+	public double[] getNestedPermutedScore() {
+		permuted_score = new double[score.length];
+		int[] un_related = Sample.SampleIndex(0, numUnrelated - 1, numUnrelated);
+		for (int i = 0; i < un_related.length; i++) {
+			permuted_score[i] = score[un_related[i]];
+		}
+		int c = numUnrelated;
+		for (int i = 0; i < numSib.length; i++) {
+			int[] si = Sample.SampleIndex(0, numSib[i] - 1, numSib[i]);
+			for (int j = 0; j < si.length; j++) {
+				permuted_score[numUnrelated + j] = score[c+si[j]];
+			}
+			c += si.length;
+		}
+		return permuted_score;
 	}
 
 	public ArrayList<ArrayList<String>> getCovariateTable() {
 		return CovariateTable;
-	}
-
-	public ArrayList<PersonIndex> getPersonIndexTable() {
-		return PersonTable;
 	}
 
 	/**
@@ -336,64 +336,71 @@ public class ChenAlgorithm {
 	public void RevvingUp(String ped, String phe) {
 		ParsePedFile(ped);
 		ParsePhenoFile(phe);
-		Match();
 		int[] m = new int[PedData.getNumMarkers()];
 		for (int i = 0; i < m.length; i++) {
 			m[i] = i;
 		}
 		SetChosenMarker(m);
-		
-		Hashtable<String, FamilyStruct> Fam = PedData.getFamilyStruct();
-		int N_unrelated = 0;
-		int N_sib = 0;
 
-		for(String fi:Fam.keySet()) {
+		Hashtable<String, FamilyStruct> Fam = PedData.getFamilyStruct();
+
+		for (String fi : Fam.keySet()) {
 			FamilyStruct fs = Fam.get(fi);
-			N_unrelated += fs.getNumFounders();
-			N_sib += fs.getNumSibs();
+			numUnrelated += fs.getNumFounders();
+			numSibs += fs.getNumSibs();
 		}
-		PersonTable.ensureCapacity(N_unrelated+N_sib);
-		CovariateTable.ensureCapacity(N_unrelated+N_sib);
-		genotype = new byte[N_unrelated+N_sib][][];
-		status = new byte[N_unrelated+N_sib];
-		TreeSet<String> ts = new TreeSet<String>(Fam.keySet());
+
+		PersonTable.ensureCapacity(numUnrelated + numSibs);
+		CovariateTable.ensureCapacity(numUnrelated + numSibs);
+		genotype = new byte[numUnrelated + numSibs][];
+		status = new byte[numUnrelated + numSibs];
 
 		int n_unrelated = 0;
 		int n_sib = 0;
 
 		ArrayList<PersonIndex> u_P = NewIt.newArrayList();
 		ArrayList<ArrayList<String>> u_C = NewIt.newArrayList();
-		
+
 		ArrayList<PersonIndex> s_P = NewIt.newArrayList();
 		ArrayList<ArrayList<String>> s_C = NewIt.newArrayList();
-		
-		for(String fi:ts) {
-			System.out.println(fi);
+
+		ArrayList<Integer> SibIdx = NewIt.newArrayList();
+
+		for (String fi : PedData.getFamListSorted()) {
 			FamilyStruct fs = Fam.get(fi);
 			FamilyUnit FamUnit = PhenoData.getFamilyUnit(fi);
 			String[] pi = fs.getPersonListSorted();
-			for(int i = 0; i < pi.length; i++) {
+			int si = 0;
+			for (int i = 0; i < pi.length; i++) {
 				Person per = fs.getPerson(pi[i]);
 				Subject sub = FamUnit.getSubject(pi[i]);
-				if(fs.hasAncestor(pi[i])) {
+				if (fs.hasAncestor(per)) {
+					si++;
 					s_P.add(new PersonIndex(fs.getFamilyStructName(), pi[i]));
-					genotype[n_sib+N_unrelated] = per.getGenotype();
-					status[n_sib+N_unrelated] = (byte) per.getAffectedStatus();
+					genotype[n_sib + numUnrelated] = per.getGenotypeScore();
+					status[n_sib + numUnrelated] = (byte) per.getAffectedStatus();
 					s_C.add(sub.getTraits());
 					n_sib++;
 				} else {
 					u_P.add(new PersonIndex(fs.getFamilyStructName(), pi[i]));
-					genotype[n_unrelated] = per.getGenotype();
+					genotype[n_unrelated] = per.getGenotypeScore();
 					status[n_unrelated] = (byte) per.getAffectedStatus();
 					u_C.add(sub.getTraits());
 					n_unrelated++;
 				}
 			}
+			if (si != 0)
+				SibIdx.add(new Integer(si));
 		}
 		PersonTable.addAll(u_P);
 		PersonTable.addAll(s_P);
 		CovariateTable.addAll(u_C);
 		CovariateTable.addAll(s_C);
+
+		numSib = ArrayUtils.toPrimitive(SibIdx.toArray(new Integer[0]));
+		
+		RLDriver RLD = new RLDriver();
+		RLD.TDT(Fam, PedData.getMarkerInformation(), m);
 	}
 
 	/**
@@ -438,108 +445,8 @@ public class ChenAlgorithm {
 		}
 	}
 
-	private boolean IsUnMatchedIndividual(String fid, String pid) {
-		for (ArrayList<String> tmp: unMatched) {
-			if (((String) tmp.get(0)).equals(fid) && ((String) tmp.get(1)).equals(pid)) {
-				return true; // individual #iid in family #fid does not have
-				// phenotype
-
-			}
-		}
-		return false;
-	}
-
-	/**
-	 * Check whether the individuals in the pedigree file match the one in the
-	 * phenotype file.
-	 * 
-	 * @return
-	 */
-	public boolean Match() {
-		Matched = NewIt.newArrayList();
-		unMatched = NewIt.newArrayList();
-		int i = 0;
-		Enumeration<String> famList = PedData.getFamStrList();
-		while (famList.hasMoreElements()) {
-			i++;
-			String fid = famList.nextElement();
-			FamilyStruct Fam = PedData.getFamilyStruct(fid);
-			Enumeration sibList = Fam.getPersonList();
-			FamilyUnit FamUnit = PhenoData.getFamilyUnit(fid);
-
-			while (sibList.hasMoreElements()) {
-				String iid = (String) sibList.nextElement();
-				Person ind = Fam.getPerson(iid);// marker
-
-				boolean flag = false;
-				Enumeration<String> subList = FamUnit.getSubjectsList();
-				while (subList.hasMoreElements()) {
-					String sid = (String) subList.nextElement();
-					Subject sub = FamUnit.getSubject(sid);
-					if (((String) sub.getSubjectID()).equals((String) ind.getPersonID())) {
-						flag = true;
-					}
-				}
-				ArrayList<String> temp = NewIt.newArrayList();
-				temp.add(fid);
-				temp.add(iid);
-
-				if (!flag) {
-					System.err.println("no such individual with ID " + iid + " in family " + fid
-							+ " in the phenotype file.");
-					unMatched.add(temp);
-				} else {
-					Matched.add(temp);
-				}
-			}
-		}
-		return true;
-	}
-
-	public void makeupWorkingTable() {
-		Hashtable<String, Boolean> faminformative = PedData.getFamInformative();
-		PersonIndex PI;
-		InformativePersonHash = NewIt.newHashtable();
-		UnrelatedPersonHash = NewIt.newHashtable();
-		for (int i = 0; i < PersonTable.size(); i++) {
-			PI = PersonTable.get(i);
-			if (((Boolean) faminformative.get(PI.getFamilyID())).booleanValue()) {// informative
-				InformativePersonHash.put(PI.getKey(), PI.IndividualID);
-			} else {
-				UnrelatedPersonHash.put(PI.getKey(), PI.IndividualID);
-			}
-		}
-	}
-
-	public void RabinowitzApproach() {
-		PedData.RabinowitzApproach(false, subsetMarker);
-	}
-
-	public void printMissingInformation() {
-		PersonIndex PI;
-		int countmiss = 0;
-		ArrayList<String> Discard = NewIt.newArrayList();
-		for (int i = 0; i < PersonTable.size(); i++) {
-			PI = PersonTable.get(i);
-			if (!InformativePersonHash.containsKey(PI.getKey())) {
-				countmiss++;
-				Discard.add(PI.getKey());
-				continue;
-			}
-		}
-
-		if (countmiss > 0) {
-			System.out.println("=================");
-			System.out.println("Discarded " + countmiss + " individuals.");
-			for (int i = 0; i < Discard.size(); i++) {
-				System.out.println((String) Discard.get(i));
-			}
-			System.out.println("=================");
-		}
-	}
-
-	public ArrayList<String> getMarkerName() {
-		return PedData.getMarkerInformation(subsetMarker);
+	public String[] getMarkerName() {
+		return PedData.getMarkerInformation(subsetMarker).toArray(new String[0]);
 	}
 
 	public ArrayList<String> getTraitName() {
@@ -552,8 +459,32 @@ public class ChenAlgorithm {
 			subsetMarker[i] = mi[i];
 		}
 	}
+
+	public byte[][] getGenotype() {
+		return genotype;
+	}
 	
+	public byte[] getStatue() {
+		return status;
+	}
+	
+	public double[] getScore() {
+		return score;
+	}
+	
+	public String[] getScoreName() {
+		return scoreName;
+	}
+
+	public double[][] getScore2() {
+		double[][] s = new double[score.length][1];
+		for(int i = 0; i < score.length; i++) {
+			s[i][0] = score[i];
+		}
+		return s;
+	}
+
 	public static void main(String[] args) {
-		
+
 	}
 }

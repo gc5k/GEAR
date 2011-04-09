@@ -23,6 +23,7 @@ public class Person {
     // private byte[] alleles1;
     // private byte[] alleles2;
     private byte[][] alleles;
+    private byte[][] nontransmitted;
     private double numGoodMarkers;
     private boolean[] zeroed;
     // this is used to keep track of the index of the last marker added
@@ -92,6 +93,7 @@ public class Person {
      */
     public void setMomID(String momID) {
         this.momID = momID;
+        if(momID.compareTo("0") != 0) nontransmitted = new byte[2][zeroed.length];
     }
 
     /**
@@ -227,6 +229,13 @@ public class Person {
     	alleles[0][index] = Byte.parseByte(geno.substring(0, 1));
     	alleles[1][index] = Byte.parseByte(geno.substring(1, 2));
     }
+    
+
+    public void setNonTransmittedGenotype(int index, String geno) {
+    	nontransmitted[0][index] = Byte.parseByte(geno.substring(0,1));
+    	nontransmitted[1][index] = Byte.parseByte(geno.substring(1,2));
+    }
+
 //
 //    public ArrayList<String> getGenotype() {
 //        return genotype;
@@ -252,5 +261,17 @@ public class Person {
     
     public byte[][] getGenotype() {
     	return alleles;
+    }
+    
+    public byte[] getGenotypeScore() {
+    	byte[] gs = new byte[getNumMarkers()];
+    	for(int i = 0; i < gs.length; i++) {
+    		gs[i] = (byte) (alleles[0][i] + alleles[1][i]);
+    	}
+    	return gs;
+    }
+
+    public byte[][] getNonTransmittedGenotype() {
+    	return nontransmitted;
     }
 }

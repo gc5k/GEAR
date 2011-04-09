@@ -1,7 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <ClassDiagram>
-    <Class name="family.RabinowitzLairdAlgorithm.HomozygousParent"
-        x="76" y="317">
+    <Class name="mdr.result.Cell" x="369" y="150">
         <AttributesDisplayFilter public-accepted="true"
             private-accepted="true" protected-accepted="true"
             default-accepted="true" static-accepted="false"/>
@@ -10,7 +9,7 @@
             default-accepted="false" static-accepted="false"
             accessors-accepted="false" constructors-accepted="false"/>
     </Class>
-    <Class name="family.RabinowitzLairdAlgorithm.Rabinowitz3" x="676" y="64">
+    <Class name="mdr.result.BestKFoldCVResult" x="642" y="381">
         <AttributesDisplayFilter public-accepted="true"
             private-accepted="true" protected-accepted="true"
             default-accepted="true" static-accepted="false"/>
@@ -19,8 +18,7 @@
             default-accepted="false" static-accepted="false"
             accessors-accepted="false" constructors-accepted="false"/>
     </Class>
-    <Class name="family.RabinowitzLairdAlgorithm.HeterozygousParent"
-        x="74" y="189">
+    <Class name="mdr.result.OneCVSet" x="660" y="53">
         <AttributesDisplayFilter public-accepted="true"
             private-accepted="true" protected-accepted="true"
             default-accepted="true" static-accepted="false"/>
@@ -29,8 +27,7 @@
             default-accepted="false" static-accepted="false"
             accessors-accepted="false" constructors-accepted="false"/>
     </Class>
-    <Class name="family.RabinowitzLairdAlgorithm.UnobservedParents"
-        x="439" y="440">
+    <Class name="mdr.result.Combination" x="380" y="61">
         <AttributesDisplayFilter public-accepted="true"
             private-accepted="true" protected-accepted="true"
             default-accepted="true" static-accepted="false"/>
@@ -39,7 +36,7 @@
             default-accepted="false" static-accepted="false"
             accessors-accepted="false" constructors-accepted="false"/>
     </Class>
-    <Class name="family.RabinowitzLairdAlgorithm.ObservedParents" x="92" y="83">
+    <Class name="mdr.result.Suite" x="177" y="149">
         <AttributesDisplayFilter public-accepted="true"
             private-accepted="true" protected-accepted="true"
             default-accepted="true" static-accepted="false"/>
@@ -48,7 +45,7 @@
             default-accepted="false" static-accepted="false"
             accessors-accepted="false" constructors-accepted="false"/>
     </Class>
-    <Class name="family.RabinowitzLairdAlgorithm.Rabinowitz1" x="716" y="272">
+    <Class name="mdr.result.SuiteException" x="68" y="151">
         <AttributesDisplayFilter public-accepted="true"
             private-accepted="true" protected-accepted="true"
             default-accepted="true" static-accepted="false"/>
@@ -57,7 +54,7 @@
             default-accepted="false" static-accepted="false"
             accessors-accepted="false" constructors-accepted="false"/>
     </Class>
-    <Class name="family.RabinowitzLairdAlgorithm.Rabinowitz2" x="621" y="144">
+    <Class name="mdr.result.OneTraitResult" x="584" y="179">
         <AttributesDisplayFilter public-accepted="true"
             private-accepted="true" protected-accepted="true"
             default-accepted="true" static-accepted="false"/>
@@ -66,9 +63,7 @@
             default-accepted="false" static-accepted="false"
             accessors-accepted="false" constructors-accepted="false"/>
     </Class>
-    <Class
-        name="family.RabinowitzLairdAlgorithm.AbstractGenoDistribution"
-        x="276" y="103">
+    <Class name="mdr.result.SavedModels" x="21" y="26">
         <AttributesDisplayFilter public-accepted="true"
             private-accepted="true" protected-accepted="true"
             default-accepted="true" static-accepted="false"/>
@@ -77,7 +72,7 @@
             default-accepted="false" static-accepted="false"
             accessors-accepted="false" constructors-accepted="false"/>
     </Class>
-    <Class name="family.RabinowitzLairdAlgorithm.Rabinowitz0" x="719" y="400">
+    <Class name="mdr.result.SingleTraitResult" x="470" y="41">
         <AttributesDisplayFilter public-accepted="true"
             private-accepted="true" protected-accepted="true"
             default-accepted="true" static-accepted="false"/>

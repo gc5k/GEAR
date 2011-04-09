@@ -3,9 +3,9 @@ package mdr;
 import java.util.HashMap;
 import java.util.HashSet;
 
-import algorithm.CombinationGenerator;
+import mdr.algorithm.CombinationGenerator;
+import mdr.algorithm.Subdivision;
 import mdr.data.DataFile;
-import algorithm.Subdivision;
 /**
  *
  * @author Guo-Bo Chen

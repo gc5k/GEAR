@@ -2,7 +2,12 @@ package family.pedigree;
 
 public class GMDRDataException extends Exception {
 
-    public GMDRDataException(String s) {
+    /**
+	 * 
+	 */
+	private static final long serialVersionUID = 1L;
+
+	public GMDRDataException(String s) {
         super(s);
     }
 }

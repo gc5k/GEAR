@@ -19,23 +19,12 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Enumeration;
 import java.util.Hashtable;
-import java.util.Iterator;
-import java.util.Set;
 import java.util.StringTokenizer;
-import java.util.TreeMap;
 
 import publicAccess.PublicData;
 import util.NewIt;
-import family.RabinowitzLairdAlgorithm.AbstractGenoDistribution;
-import family.imputation.*;
 import family.pedigree.genotype.FamilyStruct;
-import family.pedigree.genotype.FamilyStructException;
 import family.pedigree.genotype.Person;
-import family.pedigree.genotype.PseudoPerson;
-import edu.mit.wi.haploview.Chromosome;
-import edu.mit.wi.haploview.SNP;
-import edu.mit.wi.pedfile.MarkerResult;
-
 
 /**
  * Handles input and storage of Pedigree files this class is not thread safe
@@ -48,7 +37,6 @@ public class MDRPed {
 
 	private Hashtable<String, Boolean> famInformative;
 	private Hashtable<String, FamilyStruct> familystructure;
-	private ArrayList<Person> axedPeople = NewIt.newArrayList();
 
 	// stores the individuals found by parse() in allIndividuals. this is useful
 	// for outputting Pedigree information to
@@ -56,13 +44,9 @@ public class MDRPed {
 	private ArrayList<Person> allIndividuals;
 
 	// stores the individuals chosen by pedparser
-	private ArrayList<MarkerResult> results = null;
-	private String[][] hminfo;
 	// bogusParents is true if someone in the file referenced a parent not in
 	// the file
 	private boolean bogusParents = false;
-	private int[] markerRatings;
-	private int[] dups;
 	private ArrayList<String> markerInfor;
 	private ArrayList<String> pedigrees;
 	private ArrayList<MendErrorTrace> menderrortrace;
@@ -77,107 +61,6 @@ public class MDRPed {
 		this.famInformative = NewIt.newHashtable();
 		this.familystructure = NewIt.newHashtable();
 		this.menderrortrace = NewIt.newArrayList();
-	}
-
-	public void GenotypeImputation() throws MDRPedFileException {
-		Enumeration<String> fsList = this.familystructure.keys();
-		while (fsList.hasMoreElements()) {
-			FamilyStruct fs = (FamilyStruct) getFamilyStruct((String) fsList.nextElement());
-			for (int i = 0; i < getNumMarkers(); i++) {
-				System.out.println(fs.getFamilyStructName() + " " + i);
-				Imputation(fs, i);
-			}
-		}
-		GenotypeSummary(false);
-	}
-
-	protected void Imputation(FamilyStruct fs, int genoIdx) throws MDRPedFileException {
-		GenoSet gSet = fs.getObservedGenoSet(genoIdx);
-		AbstractImputation ai;
-		if ((gSet.getNumUntypedChildren() > 0) && (gSet.getNumUntypedChildren() < gSet.getNumChildren())) {
-			if (gSet.getNumTypedParents() == 2) {
-				ai = new GenotypedParents(gSet.getchildrenGenoMap(), gSet.getparentsGenoMap());
-			} else if (gSet.getNumParents() == 1) {
-				String pg = gSet.getfullchildrenGenoMap().firstKey();
-				if (!AbstractGenoDistribution.isHeterozygous(pg)) {
-					ai = new OneHomozygousParent(gSet.getchildrenGenoMap(), gSet.getparentsGenoMap());
-				} else {
-					ai = new OneHeterozygousParent(gSet.getchildrenGenoMap(), gSet.getparentsGenoMap());
-				}
-			} else {
-				ai = new UngenotypedParents(gSet.getchildrenGenoMap());
-			}
-
-			Enumeration<String> perList = fs.getPersonList();
-			while (perList.hasMoreElements()) {
-				Person per;
-				per = fs.getPerson(perList.nextElement());
-				String genotype = per.getGenotype(genoIdx);
-				if (fs.hasAncestor(per.getPersonID())) {
-					if (genotype.compareTo(PublicData.MissingGenotype) == 0) {
-						String ImputedGenotype = ai.RandomAssign();
-						per.setGenotype(genoIdx, ImputedGenotype);
-						System.out.println(fs.getFamilyStructName() + " " + per.getPersonID() + " " + genoIdx);
-					}
-				}
-			}
-		}
-	}
-
-	protected void GenotypeSummary(boolean IsObservedGenoSet) throws MDRPedFileException {
-		Enumeration<String> fsList = this.familystructure.keys();
-		ArrayList<String> error_report = NewIt.newArrayList();
-		while (fsList.hasMoreElements()) {
-			FamilyStruct fs = (FamilyStruct) getFamilyStruct((String) fsList.nextElement());
-			Boolean b = new Boolean(true);
-			famInformative.put(fs.getFamilyStructName(), b);
-			TreeMap<String, Integer> Ps;
-			TreeMap<String, Integer> Ks;
-			GenoSet gSet;
-			for (int i = 0; i < getNumMarkers(); i++) {
-				Ps = NewIt.newTreeMap();
-				Ks = NewIt.newTreeMap();
-				Enumeration<String> perList = fs.getPersonList();
-				while (perList.hasMoreElements()) {
-					Person per = fs.getPerson(perList.nextElement());
-					String genotype = per.getGenotype(i);
-					if (fs.hasAncestor(per.getPersonID())) {
-						if (Ks.containsKey(genotype)) {
-							Integer c = ((Integer) Ks.get(genotype));
-							c++;
-							Ks.put(genotype, c);
-						} else {
-							Integer c = new Integer(1);
-							Ks.put(new String(genotype), c);
-						}
-					} else {
-						if (Ps.containsKey(genotype)) {
-							Integer c = ((Integer) Ps.get(genotype));
-							c++;
-							Ps.put(genotype, c);
-						} else {
-							Integer c = new Integer(1);
-							Ps.put(new String(genotype), c);
-						}
-					}
-				}
-				gSet = new GenoSet(Ps, Ks, i);
-				if (IsObservedGenoSet) {
-					fs.addObservedGenoSet(gSet);
-				} else {
-					if (gSet.getchildrenGenoMap().size() == 0) {
-						error_report.add(new String("Family " + fs.getFamilyStructName() + " Locus " + markerInfor.get(i)));
-						b = new Boolean(false);
-						famInformative.put(fs.getFamilyStructName(), b);
-					}
-					fs.addImputedGenoSet(gSet);
-				}
-			}
-		}
-	}
-
-	public Enumeration<String> getFamStrList() {
-		return this.familystructure.keys();
 	}
 
 	public String[] getFamListSorted() {
@@ -266,11 +149,11 @@ public class MDRPed {
 		Enumeration<FamilyStruct> famList = familystructure.elements();
 		int numMarkers = 0;
 		while (famList.hasMoreElements()) {
-			FamilyStruct fam = (FamilyStruct) famList.nextElement();
-			Enumeration indList = fam.getPersonList();
+			FamilyStruct fam = famList.nextElement();
+			Enumeration<String> indList = fam.getPersonList();
 			Person per = null;
 			while (indList.hasMoreElements()) {
-				per = fam.getPerson((String) indList.nextElement());
+				per = fam.getPerson(indList.nextElement());
 				numMarkers = per.getNumMarkers();
 				if (numMarkers > 0) {
 					return numMarkers;
@@ -346,7 +229,6 @@ public class MDRPed {
 			throw new MDRPedFileException("Data format error: empty file");
 		}
 		Person per;
-		PseudoPerson pseudoper;
 		this.allIndividuals = NewIt.newArrayList();
 
 		for (int k = 0; k < numLines; k++) {
@@ -370,7 +252,7 @@ public class MDRPed {
 			}
 
 			per = new Person(numMarkers);
-			pseudoper = new PseudoPerson();
+//			pseudoper = new PseudoPerson();
 			if (numTokens < 6) {
 				throw new MDRPedFileException("Incorrect number of fields on line " + (k + 2));
 			}
@@ -382,20 +264,20 @@ public class MDRPed {
 				per.setDadID(tokenizer[2]);
 				per.setMomID(tokenizer[3]);
 
-				pseudoper.setFamilyID(tokenizer[0]);
-				pseudoper.setPseudoPersonID(tokenizer[1]);
-				pseudoper.setDadID(tokenizer[2]);
-				pseudoper.setMomID(tokenizer[3]);
+//				pseudoper.setFamilyID(tokenizer[0]);
+//				pseudoper.setPseudoPersonID(tokenizer[1]);
+//				pseudoper.setDadID(tokenizer[2]);
+//				pseudoper.setMomID(tokenizer[3]);
 
 				try {
 					int Gender = Integer.parseInt(tokenizer[4]);
 					int Status = Integer.parseInt(tokenizer[5]);
 
 					per.setGender(Gender);
-					per.setAffectedStatus(Status);
+					per.setAffectedStatus(Status - 1);
 
-					pseudoper.setGender(Gender);
-					pseudoper.setAffectedStatus(Status);
+//					pseudoper.setGender(Gender);
+//					pseudoper.setAffectedStatus(Status);
 				} catch (NumberFormatException nfe) {
 					throw new MDRPedFileException("Pedfile error: invalid gender or affected status on line " + (k + 2));
 				}
@@ -436,12 +318,12 @@ public class MDRPed {
 					familystructure.put(per.getFamilyID(), famstr);
 				}
 
-				if (famstr.getPersons().containsKey(per.getPersonID()) || famstr.getPseudoPersons().containsKey(pseudoper.getPseudoPersonID())) {
+				if (famstr.getPersons().containsKey(per.getPersonID())) {
 					throw new MDRPedFileException("Person " + per.getPersonID() + " in family " + per.getFamilyID() + " appears more than once.");
 				}
 
 				famstr.addPerson(per);
-				famstr.addPseudoPerson(pseudoper);
+//				famstr.addPseudoPerson(pseudoper);
 			}
 		}
 
@@ -449,7 +331,7 @@ public class MDRPed {
 		// file, and if so, we remove the reference
 		for (int i = 0; i < allIndividuals.size(); i++) {
 			Person currentInd = (Person) allIndividuals.get(i);
-			Hashtable curFam = familystructure.get(currentInd.getFamilyID()).getPersons();
+			Hashtable<String, Person> curFam = familystructure.get(currentInd.getFamilyID()).getPersons();
 			if (!currentInd.getDadID().equals("0") && !(curFam.containsKey(currentInd.getDadID()))) {
 				currentInd.setDadID("0");
 				bogusParents = true;
@@ -487,26 +369,6 @@ public class MDRPed {
 		return genotype;
 	}
 
-	public String[][] getHMInfo() {
-		return hminfo;
-	}
-
-	public ArrayList getResults() {
-		return results;
-	}
-
-	public void setResults(ArrayList res) {
-		results = res;
-	}
-
-	public ArrayList getAxedPeople() {
-		return axedPeople;
-	}
-
-	public boolean isBogusParents() {
-		return bogusParents;
-	}
-
 	public ArrayList<String> getMarkerInformation() {
 		return markerInfor;
 	}
@@ -523,76 +385,13 @@ public class MDRPed {
 		}
 	}
 
-	public int[] getMarkerRatings() {
-		return markerRatings;
-	}
-
-	public int[] getDups() {
-		return dups;
-	}
-
-	public void RabinowitzApproach(boolean forNontransmitted, int[] subsetMarker) {
-		Enumeration fsList = this.familystructure.keys();
-		boolean informative;
-		String fid;
-		while (fsList.hasMoreElements()) {
-			fid = (String) fsList.nextElement();
-			FamilyStruct fs = (FamilyStruct) getFamilyStruct(fid);
-			if (!((Boolean) famInformative.get(fid)).booleanValue()) {
-				// System.err.println("Omitted" + fs.getFamilyStructName());
-				continue;
-			}
-			try {
-				if (forNontransmitted) {
-					fs.NontransmittedProc(markerInfor, subsetMarker);
-				} else {
-					fs.RabinowitzProc(markerInfor, subsetMarker);
-				}
-			} catch (FamilyStructException E) {
-				System.err.println("Exception in family " + fs.getFamilyStructName() + " when in RabinowitzApproach.");
-			}
-		}
-	}
-
 	/**
 	 * return the record of menderrortrace(); Allele2Genotype should be invoked
 	 * precedingly;
 	 * 
 	 * @return
 	 */
-	public ArrayList getMendErrorTrace() {
+	public ArrayList<MendErrorTrace> getMendErrorTrace() {
 		return menderrortrace;
-	}
-
-	public void printFamilyStruct() {
-		String[] FID = new String[famInformative.size()];
-		int idx = 0;
-		Set keys = famInformative.keySet();
-		for (Iterator i = keys.iterator(); i.hasNext();) {
-			FID[idx++] = (String) i.next();
-		}
-		Arrays.sort(FID);
-
-		for (int i = 0; i < FID.length; i++) {
-			String fid = FID[i];
-			FamilyStruct fs = getFamilyStruct(fid);
-			Hashtable htPerson = fs.getPseudoPersons();
-			Enumeration pid = htPerson.keys();
-			String[] PID = new String[htPerson.size()];
-			idx = 0;
-			while (pid.hasMoreElements()) {
-				PID[idx++] = (String) pid.nextElement();
-			}
-			Arrays.sort(PID);
-			for (int j = 0; j < PID.length; j++) {
-				PseudoPerson ps = (PseudoPerson) htPerson.get(PID[j]);
-				System.out.print(ps.getPseudoPersonID() + "\t");
-				ArrayList mk = (ArrayList) ps.getGenotype();
-				for (int k = 0; k < mk.size(); k++) {
-					System.out.print(mk.get(k) + "\t");
-				}
-				System.out.println();
-			}
-		}
 	}
 }
