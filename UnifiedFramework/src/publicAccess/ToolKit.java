@@ -1,11 +1,10 @@
 package publicAccess;
 
 import java.util.HashMap;
-import java.util.Iterator;
-import java.util.Set;
-import java.util.TreeSet;
 
-import mdr.Cell;
+import util.NewIt;
+
+import mdr.result.Cell;
 /**
  *
  * @author Guo-Bo Chen
@@ -45,7 +44,7 @@ public class ToolKit {
         return sb.toString();
     }
     
-    public static int Acertainment (double posScr, double negScr, double threshold) {
+    public static int Acertainment (double posScr, double negScr) {
         int status = 0;
         if (negScr == 0) {
             if (posScr == 0) {
@@ -54,10 +53,10 @@ public class ToolKit {
                 status = 1;
             }
         } else {
-            if ((posScr / Math.abs(negScr)) == threshold) {
+            if ((posScr / Math.abs(negScr)) == 1) {
                 status = PublicData.tieValue;
             } else {
-                status = (posScr / Math.abs(negScr)) > threshold ? 1 : 0;
+                status = (posScr / Math.abs(negScr)) > 1 ? 1 : 0;
             }
         }
         return status;
@@ -152,18 +151,20 @@ public class ToolKit {
     	return tm;
     }
 
-    public static double Accuracy(HashMap model) throws ToolKitException {
+    public static double BalancedAccuracy(HashMap<String, Cell> model) {
+    	try {
         if (model == null) {
             throw new ToolKitException("It is an empty model.");
         }
+    	} catch (ToolKitException E) {
+    		E.printStackTrace(System.err);
+    	}
         double accuracy = 0;
         double truePos = 0;
         double trueNeg = 0;
         double falsePos = 0;
         double falseNeg = 0;
-        Set keys = model.keySet();
-        for (Iterator e = keys.iterator(); e.hasNext();) {
-            String key = (String) e.next();
+        for (String key : model.keySet()) {
             Cell cell = (Cell) model.get(key);
             if (cell.getStatus() == 1) {
                 truePos += cell.getPositiveScore();
@@ -177,13 +178,57 @@ public class ToolKit {
         }
         double denominator = truePos + trueNeg + falsePos + falseNeg;
         if(denominator == 0) {
-            throw new ToolKitException("denominator is zero.");
+            try {
+				throw new ToolKitException("denominator is zero.");
+			} catch (ToolKitException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
         }
-        accuracy = (truePos + trueNeg) / (denominator);
+        accuracy = truePos / (truePos + falseNeg) + trueNeg / (trueNeg + falseNeg);
         return accuracy;
     }
+//
+//    public static double Accuracy(HashMap<String, Cell> model) {
+//        if (model == null) {
+//            try {
+//				throw new ToolKitException("It is an empty model.");
+//			} catch (ToolKitException e) {
+//				// TODO Auto-generated catch block
+//				e.printStackTrace();
+//			}
+//        }
+//        double accuracy = 0;
+//        double truePos = 0;
+//        double trueNeg = 0;
+//        double falsePos = 0;
+//        double falseNeg = 0;
+//        for (String key : model.keySet()) {
+//            Cell cell = (Cell) model.get(key);
+//            if (cell.getStatus() == 1) {
+//                truePos += cell.getPositiveScore();
+//                falseNeg += Math.abs(cell.getNegativeScore());
+//            } else if (cell.getStatus() == 0) {
+//                trueNeg += Math.abs(cell.getNegativeScore());
+//                falsePos += cell.getPositiveScore();
+//            } else {
+//                //what's going on if for a negative status;
+//            }
+//        }
+//        double denominator = truePos + trueNeg + falsePos + falseNeg;
+//        if(denominator == 0) {
+//            try {
+//				throw new ToolKitException("denominator is zero.");
+//			} catch (ToolKitException e) {
+//				// TODO Auto-generated catch block
+//				e.printStackTrace();
+//			}
+//        }
+//        accuracy = (truePos + trueNeg) / (denominator);
+//        return accuracy;
+//    }
 
-    public static double IMAccuracy(HashMap model) throws ToolKitException {
+    public static double IMAccuracy(HashMap<String, Cell> model) throws ToolKitException {
         if (model == null) {
             throw new ToolKitException("It is an empty model.");
         }
@@ -192,9 +237,7 @@ public class ToolKit {
         double trueNeg = 0;
         double falsePos = 0;
         double falseNeg = 0;
-        Set keys = model.keySet();
-        for (Iterator e = keys.iterator(); e.hasNext();) {
-            String key = (String) e.next();
+        for (String key : model.keySet()) {
             Cell cell = (Cell) model.get(key);
             if (cell.getStatus() == 1) {
                 truePos += Math.abs(cell.getPositiveScore() - cell.getExpectedPostiveScore()) *
@@ -218,9 +261,8 @@ public class ToolKit {
         return accuracy;
     }
 
-    public static HashMap AccuracyLou(HashMap model, HashMap QTLProbabilityMatrix) throws ToolKitException {
-    	HashMap posteriorProbability = new HashMap();
-    	double accuracy = 0;
+    public static HashMap<String, Double> AccuracyLou(HashMap<String, Cell> model, HashMap<String, Double> QTLProbabilityMatrix) throws ToolKitException {
+    	HashMap<String, Double> posteriorProbability = NewIt.newHashMap();
         if (model == null) {
             throw new ToolKitException("It is an empty model.");
         }
@@ -230,9 +272,7 @@ public class ToolKit {
         double trueNeg = 0;
         double falsePos = 0;
         double falseNeg = 0;
-        Set keys = model.keySet();
-        for (Iterator e = keys.iterator(); e.hasNext();) {
-            String key = (String) e.next();
+        for (String key : model.keySet()) {
             Cell cell = (Cell) model.get(key);
             if (cell.getStatus() == 1) {
             	weightH += ((Double) QTLProbabilityMatrix.get(key)).doubleValue();
@@ -246,8 +286,7 @@ public class ToolKit {
                 //what's going on if for a negative status;
             }
         }
-        for (Iterator e = keys.iterator(); e.hasNext();) {
-        	String key = (String) e.next();
+        for (String key : model.keySet()) {
         	Cell cell = (Cell) model.get(key);
         	if (cell.getStatus() == 1) {
         		posteriorProbability.put(key, new Double(weightH));
@@ -260,7 +299,7 @@ public class ToolKit {
         return posteriorProbability;
     }
 
-    public static double CGBStatistic(HashMap model) throws ToolKitException {
+    public static double CGBStatistic(HashMap<String, Cell> model) throws ToolKitException {
         double cgbStatistic = 0;
 
         return cgbStatistic;

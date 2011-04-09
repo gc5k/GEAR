@@ -11,26 +11,14 @@ package family.pedigree.genotype;
  * whatsoever.  The Whitehead Institute can not be responsible for its
  * use, misuse, or functionality.
  */
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Enumeration;
 import java.util.Hashtable;
 import java.util.Set;
 import java.util.TreeMap;
-import java.util.TreeSet;
 
-import publicAccess.PublicData;
 import util.NewIt;
 import family.RabinowitzLairdAlgorithm.AbstractGenoDistribution;
-import family.RabinowitzLairdAlgorithm.lou.HeterozygousParent;
-import family.RabinowitzLairdAlgorithm.lou.HomozygousParent;
-import family.RabinowitzLairdAlgorithm.lou.ObservedParents;
-import family.RabinowitzLairdAlgorithm.lou.UnobservedParents;
-import family.RabinowitzLairdAlgorithm.rabinowitz.Rabinowitz0;
-import family.RabinowitzLairdAlgorithm.rabinowitz.Rabinowitz1;
-import family.RabinowitzLairdAlgorithm.rabinowitz.Rabinowitz2;
-import family.RabinowitzLairdAlgorithm.rabinowitz.Rabinowitz3;
-import family.pedigree.GenoSet;
 
 /**
  * Storing the familyName and the members of a family from a pedigree file. This class is not thread safe (untested)
@@ -44,26 +32,6 @@ public class FamilyStruct {
 	private String familyStructName;
 	private int mendErrors;
 	private int numMarkers;
-	private ArrayList<GenoSet> ObservedGenoSet;
-	private ArrayList<GenoSet> ImputedGenoSet;
-
-	/**
-	 * add a transmitted genoset into this family ( adds to transmitted ArrayList)
-	 * 
-	 * @param geno
-	 */
-	public void addObservedGenoSet(GenoSet geno) {
-		this.ObservedGenoSet.add(geno);
-	}
-
-	/**
-	 * add a genoset after imputation into this family ( adds to transmitted ArrayList)
-	 * 
-	 * @param geno
-	 */
-	public void addImputedGenoSet(GenoSet geno) {
-		this.ImputedGenoSet.add(geno);
-	}
 
 	/**
 	 * adds a member to this family (adds to persons ArrayList)
@@ -106,15 +74,11 @@ public class FamilyStruct {
 	public FamilyStruct() {
 		this.persons = NewIt.newHashtable();
 		this.pseudopersons = NewIt.newHashtable();
-		this.ObservedGenoSet = NewIt.newArrayList();
-		this.ImputedGenoSet = NewIt.newArrayList();
 	}
 
 	public FamilyStruct(String familyStructName) {
 		this.persons = NewIt.newHashtable();
 		this.pseudopersons = NewIt.newHashtable();
-		this.ObservedGenoSet = NewIt.newArrayList();
-		this.ImputedGenoSet = NewIt.newArrayList();
 		this.familyStructName = familyStructName;
 	}
 
@@ -200,34 +164,6 @@ public class FamilyStruct {
 	}
 
 	/**
-	 * get transmitted genoset
-	 * 
-	 * @return
-	 */
-	public ArrayList<GenoSet> getObvservedGenoSet() {
-		return ObservedGenoSet;
-	}
-
-	/**
-	 * get transmitted genoset after imputation
-	 * 
-	 * @return
-	 */
-	public ArrayList<GenoSet> getImputedGenoSet() {
-		return ImputedGenoSet;
-	}
-
-	/**
-	 * get transmtted genoset at position i
-	 * 
-	 * @param i
-	 * @return
-	 */
-	public GenoSet getObservedGenoSet(int i) {
-		return ObservedGenoSet.get(i);
-	}
-
-	/**
 	 * get the Person with personID
 	 * 
 	 * @param personID
@@ -250,6 +186,22 @@ public class FamilyStruct {
 		return pseudopersons;
 	}
 
+	public boolean hasAncestor(Person p) {
+		if (p != null) {
+			if (p.getDadID().equals("0") && p.getMomID().equals("0")) {
+				return false;
+			} else {
+				if (persons.containsKey(p.getDadID()) || persons.containsKey(p.getMomID())) {
+					return true;
+				} else {
+					return (hasAncestor(p.getDadID()) || hasAncestor(p.getMomID()));
+				}
+			}
+		} else {
+			return false;
+		}	
+	}
+
 	public boolean hasAncestor(String id) {
 		Person per = (Person) persons.get(id);
 		if (per != null) {
@@ -267,160 +219,8 @@ public class FamilyStruct {
 		}
 	}
 
-	public boolean NontransmittedProc(ArrayList<String> markerInfor, int[] subsetMarker) throws FamilyStructException {
-		boolean Informative = true;
-		Person per;
-		PseudoPerson pseudoper;
-		String iid;
-		String nontran_tran[];
-		Enumeration<String> perList = persons.keys();
-		while (perList.hasMoreElements()) {
-			iid = perList.nextElement();
-			per = persons.get(iid);
-			pseudoper = pseudopersons.get(iid);
-			if (!hasAncestor(per.getPersonID())) {
-				continue;
-			}
-			pseudoper.MakeSpace(subsetMarker.length);
-		}
-		for (int i = 0; i < subsetMarker.length; i++) {
-			perList = persons.keys();
-			GenoSet genoset = ImputedGenoSet.get(subsetMarker[i]);
-			int numGenotypedParents = genoset.getNumTypedParents();
-			AbstractGenoDistribution gDis;
-			TreeSet<String> aSet = NewIt.newTreeSet();
-			if (genoset.getNumParents() > 2) {
-				throw new FamilyStructException("Family " + familyStructName
-						+ " is not a nuclear family. It has more than 2 founders");
-			}
-			if (numGenotypedParents == 2) {
-				countAllele(genoset.getchildrenGenoMap(), aSet);
-				countAllele(genoset.getparentsGenoMap(), aSet);
-				if (aSet.size() > 4) {
-					throw new FamilyStructException("Marker " + markerInfor.get(subsetMarker[i])
-							+ " has more than 4 alleles.");
-				}
-				gDis = new ObservedParents(genoset.getchildrenGenoMap(), genoset.getparentsGenoMap());
-			} else {
-				countAllele(genoset.getchildrenGenoMap(), aSet);
-				countAllele(genoset.getparentsGenoMap(), aSet);
-				if (numGenotypedParents == 1) {
-					String PG = genoset.getparentsGenoMap().firstKey();
-					if (!AbstractGenoDistribution.isHeterozygous(PG)) // table 1
-					{
-						if (aSet.size() > 3) {
-							throw new FamilyStructException("Marker " + markerInfor.get(subsetMarker[i])
-									+ " has more than 3 alleles with one parent is homozygous.");
-						}
-						gDis = new HomozygousParent(genoset.getchildrenGenoMap(), genoset.getparentsGenoMap());
-					} else // table 2
-					{
-						if (aSet.size() > 4) {
-							throw new FamilyStructException("Marker " + markerInfor.get(subsetMarker[i])
-									+ " has more than 4 alleles with one parent is heterozygous.");
-						}
-						gDis = new HeterozygousParent(genoset.getchildrenGenoMap(), genoset.getparentsGenoMap());
-					}
-				} else // table 3
-				{
-					gDis = new UnobservedParents(genoset.getchildrenGenoMap());
-				}
-			}
-			while (perList.hasMoreElements()) {
-				iid = perList.nextElement();
-				per = persons.get(iid);
-				pseudoper = pseudopersons.get(iid);
-				if (!hasAncestor(per.getPersonID())) {
-					continue;
-				}
-				nontran_tran = getNonTransmitted(per.getGenotype(subsetMarker[i]), gDis);
-				pseudoper.addMarker(i, nontran_tran[0]);
-				if (nontran_tran[0].compareTo(PublicData.MissingGenotype) == 0) {
-					Informative = false;
-					System.err.println("Individual " + per.getPersonID() + ", in family " + per.getFamilyID()
-							+ ", failed to get the nontransmitted genotype for marker "
-							+ markerInfor.get(subsetMarker[i]));
-				} else {
-					if (per.getGenotype(subsetMarker[i]).compareTo(PublicData.MissingGenotype) == 0) {
-						per.setGenotype(subsetMarker[i], nontran_tran[1]);
-					}
-				}
-			}
-		}
-		return Informative;
-	}
-
 	public void removePerson(String id) {
 		persons.remove(id);
-	}
-
-	public boolean RabinowitzProc(ArrayList<String> markerInfor, int[] subsetMarker) throws FamilyStructException {
-		boolean Informative = true;
-		Person per;
-		PseudoPerson pseudoper;
-		String iid;
-		Enumeration<String> perList = persons.keys();
-		while (perList.hasMoreElements()) {
-			iid = perList.nextElement();
-			per = persons.get(iid);
-			pseudoper = pseudopersons.get(iid);
-			if (!hasAncestor(per.getPersonID())) {
-				continue;
-			}
-			pseudoper.MakeSpace(subsetMarker.length);
-		}
-
-		for (int i = 0; i < subsetMarker.length; i++) {
-			perList = persons.keys();
-			GenoSet genoset = ImputedGenoSet.get(subsetMarker[i]);
-			AbstractGenoDistribution gDis;
-			TreeSet<String> aSet = NewIt.newTreeSet();
-			if (genoset.getNumParents() > 2) {
-				throw new FamilyStructException("Family " + familyStructName
-						+ " is not a nuclear family. It has more than 2 founders");
-			}
-			if (genoset.getNumTypedParents() == 2) {
-				countAllele(genoset.getchildrenGenoMap(), aSet);
-				countAllele(genoset.getparentsGenoMap(), aSet);
-				if (aSet.size() > 4) {
-					throw new FamilyStructException("Marker " + markerInfor.get(subsetMarker[i])
-							+ " has more than 4 alleles.");
-				}
-				gDis = new Rabinowitz0(genoset.getchildrenGenoMap(), genoset.getparentsGenoMap());
-			} else {
-				countAllele(genoset.getchildrenGenoMap(), aSet);
-				countAllele(genoset.getparentsGenoMap(), aSet);
-				if (genoset.getNumTypedParents() == 1) {
-					String PG = (genoset.getparentsGenoMap()).firstKey();
-					if (!AbstractGenoDistribution.isHeterozygous(PG)) {// table 1
-						if (aSet.size() > 3) {
-							throw new FamilyStructException("Marker " + markerInfor.get(subsetMarker[i])
-									+ " has more than 3 alleles with one parent is homozygous.");
-						}
-						gDis = new Rabinowitz1(genoset.getchildrenGenoMap(), genoset.getparentsGenoMap());
-					} else {// table 2
-						if (aSet.size() > 4) {
-							throw new FamilyStructException("more than 4 alleles with one parent is heterozygous.");
-						}
-						gDis = new Rabinowitz2(genoset.getchildrenGenoMap(), genoset.getparentsGenoMap());
-					}
-				} else {// table 3
-					gDis = new Rabinowitz3(genoset.getchildrenGenoMap());
-				}
-			}
-			String[] controlGenotype = gDis.getNontransmitted();
-			int index = 0;
-			while (perList.hasMoreElements()) {
-				iid = perList.nextElement();
-				per = persons.get(iid);
-				pseudoper = pseudopersons.get(iid);
-				if (!hasAncestor(per.getPersonID())) {
-					continue;
-				}
-				pseudoper.addMarker(i, controlGenotype[index++]);
-			}
-		}
-		return Informative;
 	}
 
 	/**

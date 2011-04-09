@@ -7,7 +7,6 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Enumeration;
 import java.util.Hashtable;
-import java.util.StringTokenizer;
 
 import family.pedigree.phenotype.FamilyUnit;
 import family.pedigree.phenotype.Subject;
@@ -22,10 +21,9 @@ public class GMDRPhenoFile {
 	private File phenoFile;
 	private ArrayList<Subject> allSubjects;
 	private Hashtable<String, FamilyUnit> families;
-	private boolean bogusParents = false;
 
 	public GMDRPhenoFile() {
-		families = new Hashtable();
+		families = NewIt.newHashtable();
 	}
 
 	public void Initial(File infile) throws GMDRPhenoFileException, IOException {
@@ -72,7 +70,6 @@ public class GMDRPhenoFile {
 
 	public void parsePhenotype() throws GMDRPhenoFileException {
 		int colNum = -1;
-		int numTraits = 0;
 		if (traitStrings.size() < 2) {
 			throw new GMDRPhenoFileException("Pheno Data format error: empty file");
 		}
@@ -87,7 +84,6 @@ public class GMDRPhenoFile {
 			if (colNum < 1) {
 				// only check column number count for the first nonblank line
 				colNum = numTokens;
-				numTraits = (numTokens - 2);
 			}
 			if (numTokens < 2) {
 				throw new GMDRPhenoFileException("Incorrect number of fields in phefile. line " + (k + 1));
@@ -124,6 +120,7 @@ public class GMDRPhenoFile {
 			this.families.put(sub.getFamilyID(), fam);
 			this.allSubjects.add(sub);
 		}
+		traitStrings = null;
 	}
 
 	public FamilyUnit getFamilyUnit(String familyUnitID) {

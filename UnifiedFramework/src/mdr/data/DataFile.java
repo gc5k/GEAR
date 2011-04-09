@@ -1,129 +1,99 @@
 package mdr.data;
 
-import mdr.*;
 import java.io.BufferedReader;
 import java.io.FileReader;
 import java.io.IOException;
 import java.io.LineNumberReader;
-import java.util.AbstractList;
 import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.GregorianCalendar;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Random;
-import java.util.TreeMap;
 
 import publicAccess.PublicData;
+
 import util.NewIt;
-import im.reader.IMReaderAbstract;
-import im.population.IMPopulation;
 
 /**
  *
  * @author Guo-Bo Chen, chenguobo@gmail.com
  */
+
 public class DataFile {
 
     protected ArrayList<DataFile.Subject> sample = NewIt.newArrayList();
-    protected ArrayList<Integer> shuffledPhenoIDs;
     protected static boolean isPermutation = false;
     protected String markerFile;
     protected String phenotypeFile;
     protected String[] SNPID;
     protected String[] traitName;
-    protected int[][] missing;
-    protected static int[] scrIndex;
-    protected double[] offset;
-    protected HashMap<Integer, TraitStatistic> traitStatistics = NewIt.newHashMap();
 
-    public static class Subject extends AbstractList<String> {
+    protected static int currScrID = -1;
 
+    public static class Subject {
         int id;
-        private ArrayList<String> genotypes;
-        private Double status;
-        private Object mu;
-        private ArrayList<Double> score;
-        private ArrayList<Double> shuffledScore;
+        private byte[] genotypes;
+        private byte status;
+        private double[] score;
+        private double defaultScore;
+        
 
         public Subject(String[] content) {
             if (content[content.length - 1].equals(PublicData.MissingPhenotypeValue)) {
-                this.status = null;
+                this.status = -1;
             } else {
-                this.status = new Double(Double.parseDouble(content[content.length - 1]));
+                status = Byte.parseByte(content[content.length - 1]);
             }
-            genotypes = new ArrayList<String>(content.length - 1);
-            genotypes.addAll(Arrays.asList(content).subList(0, content.length - 1));
+            genotypes = new byte[content.length - 1];
+            for(int i = 0; i < genotypes.length; i++) {
+            	genotypes[i] = Byte.parseByte(content[i]);
+            }
+        }
+
+        public Subject(byte[] g, byte s) {
+        	genotypes = g;
+        	status = s;
+        }
+
+        private void setDefaultScore(double m) {
+        	defaultScore = status - m;
+        }
+
+        public void setScore(double s) {
+        	if(currScrID<0) {
+        		defaultScore = s;
+        	} else {
+        		score[currScrID] = s;
+        	}
+        }
+        
+        public void addScore(double[] s) {
+        	score = s;
         }
 
         public void addScore(String[] s) {
-            score = new ArrayList<Double>(s.length);
+            score = new double[s.length];
             for (int i = 0; i < s.length; i++) {
                 if (s[i].equals(PublicData.MissingPhenotypeValue)) {
-                    score.add(null);
+                    score[i] = Double.NaN;
                 } else {
-                    score.add(Double.parseDouble(s[i]));
+                    score[i] = Double.parseDouble(s[i]);
                 }
             }
         }
 
-        public void addShuffledScore(ArrayList<Double> s) {
-            shuffledScore = s;
+
+        public byte getGenotype(int idx) {
+            return genotypes[idx];
         }
 
-        public Object getGenotype(int idx) {
-            return genotypes.get(idx);
-        }
-
-        public ArrayList<Double> getScore() {
-            return score;
-        }
-
-        public Double getScore(int idx) {
-            if (scrIndex[idx] >= 0) {
-                return isPermutation ? shuffledScore.get(scrIndex[idx]) : score.get(scrIndex[idx]);
+        public double getSelectedScore() {
+        	if (currScrID < 0) {
+        		return defaultScore;
+        	} else if (score[currScrID] != Double.NaN) {
+                return score[currScrID];
             } else {
                 return status;
             }
         }
 
-        /**
-         * If the score does not exists, then null is returned.
-         * 
-         * @param idx
-         * @return
-         */
-        public Double getDoubleScore(int idx) {
-            if (scrIndex[idx] >= 0) {
-                return isPermutation ? shuffledScore.get(scrIndex[idx]) : score.get(scrIndex[idx]);
-            } else {
-                return status;
-            }
-        }
-
-        // cgb begin
-        public void iniMU(double mu) {
-            this.mu = new Double(mu);
-        }
-
-        public void iniMU(Object mu) {
-            this.mu = mu;
-        }
-
-        public Object getMU() {
-            return mu;
-        }
-
-        public double getMU_double() {
-            return getDouble(mu);
-        }
-
-        private static double getDouble(Object o) {
-            return ((Double) o).doubleValue();
-        }
-
-        // cgb end
-        public Object getStatus() {
+        public byte getStatus() {
             return status;
         }
 
@@ -132,21 +102,11 @@ public class DataFile {
         }
 
         public int size() {
-            return genotypes == null ? 0 : genotypes.size();
+            return genotypes == null ? 0 : genotypes.length;
         }
 
-        public String get(int idx) {
-            return genotypes == null ? null : genotypes.get(idx);
-        }
-
-        public void add(int index, String s) {
-            modCount++;
-            genotypes.add(index, s);
-        }
-
-        public String remove(int idx) {
-            modCount++;
-            return genotypes.remove(idx);
+        public byte get(int idx) {
+            return genotypes == null ? null : genotypes[idx];
         }
 
         protected void setID(int idx) {
@@ -170,11 +130,11 @@ public class DataFile {
         }
     }
 
-    public DataFile(String fileM, String fileP, int[] scrIdx) {
+    public DataFile(String fileM, String fileP) {
         markerFile = fileM;
         phenotypeFile = fileP;
         try {
-            initial(scrIdx);
+            initial();
         } catch (IOException E) {
             E.printStackTrace(System.err);
         }
@@ -182,207 +142,31 @@ public class DataFile {
 
     public DataFile() {}
 
-    public DataFile(ArrayList<String> mkInformation, ArrayList<ArrayList<String>> marker, ArrayList<String> statue, ArrayList<String> traitInformation, ArrayList<ArrayList<String>> phenotype, int[] si) {
-    	SNPID = mkInformation.toArray(new String[0]);
-    	traitName = traitInformation.toArray(new String[0]);
-    	initial1(marker, statue, phenotype, si);
+    public DataFile(String[] mkInformation, byte[][] marker, byte[] status, String[] traitInformation, double[][] phenotype) {
+    	SNPID = mkInformation;
+    	traitName = traitInformation;
+    	initial1(marker, status, phenotype);
     }
 
-    private void initial1(ArrayList<ArrayList<String>> marker, ArrayList<String> statue, ArrayList<ArrayList<String>> phenotype, int[] si) {
-        TreeMap<Integer, ArrayList<Integer>> tempMap = NewIt.newTreeMap();        
-    	for (int i= 0; i < marker.size(); i++) {
-    		ArrayList<String> geno = marker.get(i);
-    		geno.add(statue.get(i));
-    		String[] content = geno.toArray(new String[0]);
-            Subject sub = new Subject(content);
+    private void initial1(byte[][] marker, byte[] status, double[][] score) {
+    	double mu = 0;
+    	for (int i= 0; i < marker.length; i++) {
+    		byte[] g = marker[i];
+            Subject sub = new Subject(g, status[i]);
+            mu += status[i];
             sub.setID(i);
             sample.add(sub);
-            //count alleles;
-            for (int j = 0; j < content.length - 1; j++) {
-                Integer Ii = new Integer(j);
-                if (content[j].compareTo(PublicData.MissingGenotype) == 0) {
-                    if (tempMap.containsKey(Ii)) {
-                        ArrayList<Integer> tempArray = tempMap.get(Ii);
-                        tempArray.add(new Integer(i));
-                    } else {
-                        ArrayList<Integer> tempArray = NewIt.newArrayList();
-                        tempArray.add(new Integer(i));
-                        tempMap.put(Ii, tempArray);
-                    }
-                }
-            }
     	}
+    	mu /= status.length;
 
-        missing = new int[SNPID.length][];
-        for (Integer Ii:tempMap.keySet()) {
-            ArrayList<Integer> tempArray = tempMap.get(Ii);
-            missing[Ii.intValue()] = new int[tempArray.size()];
-            for (int i = 0; i < tempArray.size(); i++) {
-                missing[Ii.intValue()][i] = ((Integer) tempArray.get(i)).intValue();
-            }
-        }
-
-        for (int i = 0; i < sample.size(); i++ ) {
+        for (int i = 0; i < score.length; i++ ) {
             Subject sub = (Subject) sample.get(i);
-            ArrayList<String> traits = phenotype.get(i);
-            String[] ps = traits.toArray(new String[0]);
-            sub.addScore(ps);
+            sub.setDefaultScore(mu);
+            sub.addScore(score[i]);
         }
-
-        setPhenotypeIndex(si);
-        double[] os = calculateDefaultMu();
-        TraitSummary(os);
-        setScore(os);
-    }
-    
-
-    public DataFile(IMPopulation imp, int[] scrIdx) {
-        markerFile = "simulationMarker.txt";
-        phenotypeFile = "simulationPhenotype.txt";
-
-        //---------
-        //read the marker names
-        //---------
-        SNPID = new String[imp.MDRMarkerNumber()];
-        String[] m = imp.MDRMarkerName();
-        int c = 0;
-        System.arraycopy(m, 0, SNPID, c, m.length);
-
-        GregorianCalendar calendar = new GregorianCalendar();
-        Random rnd = new Random();
-        rnd.setSeed(calendar.get(GregorianCalendar.SECOND));
-        TreeMap<Integer, ArrayList<Integer>> tempMap = NewIt.newTreeMap();
-        int count = 0;
-        int[][][] marker = imp.Markers();
-        for (int i = 0; i < imp.IndividualNumber(); i++) {
-            int idx = i - marker.length * (i / marker.length);
-            String[] content = new String[imp.MarkerNumber() + 1]; //"+1" operation is to coordinate with the construction function of Subject, where the last one will be chopped off and set as status.
-            c = 0;
-            for (int k = 0; k < marker[idx].length; k++) {
-                for (int h = 0; h < marker[idx][k].length; h++) {
-                    content[c + h] = Integer.toString(marker[idx][k][h]);
-                }
-                c += marker[idx][k].length;
-            }
-            content[content.length - 1] = rnd.nextBoolean() ? new String("1") : new String("0");
-            Subject sub = new Subject(content);
-            sub.setID(count);
-            sample.add(sub);
-            for (int k = 0; k < content.length; k++) {
-                Integer Ii = new Integer(k);
-                if (content[k].compareTo(PublicData.MissingGenotype) == 0) {
-                    if (tempMap.containsKey(Ii)) {
-                        ArrayList<Integer> tempArray = tempMap.get(Ii);
-                        tempArray.add(new Integer(count));
-                    } else {
-                        ArrayList<Integer> tempArray = NewIt.newArrayList();
-                        tempArray.add(new Integer(count));
-                        tempMap.put(Ii, tempArray);
-                    }
-                }
-            }
-            count++;
-        }
-
-        missing = new int[SNPID.length][];
-        for (Integer Ii:tempMap.keySet()) {
-            ArrayList<Integer> tempArray = tempMap.get(Ii);
-            missing[Ii.intValue()] = new int[tempArray.size()];
-            for (int i = 0; i < tempArray.size(); i++) {
-                missing[Ii.intValue()][i] = ((Integer) tempArray.get(i)).intValue();
-            }
-        }
-        c = 0;
-        double[][] pheno = imp.getPhenotype();
-        for (int i = 0; i < pheno.length; i++) {
-            String[] ps = new String[pheno[i].length];
-            for (int j = 0; j < pheno[i].length; j++) {
-                ps[j] = Double.toString(pheno[i][j]);
-            }
-            Subject sub = (Subject) sample.get(c++);
-            sub.addScore(ps);
-        }
-
-        setPhenotypeIndex(scrIdx);
-        double[] os = calculateDefaultMu();
-        TraitSummary(os);
-        setScore(os);
     }
 
-    public DataFile(IMReaderAbstract imra, int[] scrIdx) {
-        markerFile = imra.getFile();
-        phenotypeFile = null;
-
-        //---------
-        //read the marker names
-        //---------
-        SNPID = new String[imra.MarkerNumber()];
-        String[][] m = imra.getMarkerName();
-        int c = 0;
-        for (int i = 0; i < m.length; i++) {
-            System.arraycopy(m[i], 0, SNPID, c, m[i].length);
-            c += m[i].length;
-        }
-        //-----------
-        //read markers
-        //-----------
-        Random rnd = new Random();
-        GregorianCalendar calendar = new GregorianCalendar();
-        rnd.setSeed(calendar.get(GregorianCalendar.SECOND));
-        TreeMap<Integer, ArrayList<Integer>> tempMap = NewIt.newTreeMap();
-        int count = 0;
-        String[][][] marker = imra.getMarkers();
-        for (int i = 0; i < imra.IndividualNumber(); i++) {
-            int idx = i - marker.length * (i / marker.length);
-            String[] content = new String[imra.MarkerNumber() + 1]; //"+1" operation is to coordinate with the construction function of Subject, where the last one will be chopped off and set as status.
-            c = 0;
-            for (int k = 0; k < marker[idx].length; k++) {
-                System.arraycopy(marker[idx][k], 0, content, c, marker[idx][k].length);
-                c += marker[idx][k].length;
-            }
-            content[content.length - 1] = rnd.nextBoolean() ? new String("1") : new String("0");
-            Subject sub = new Subject(content);
-            sub.setID(count);
-            sample.add(sub);
-            for (int k = 0; k < content.length; k++) {
-                Integer Ii = new Integer(k);
-                if (content[k].compareTo(PublicData.MissingGenotype) == 0) {
-                    if (tempMap.containsKey(Ii)) {
-                        ArrayList<Integer> tempArray = tempMap.get(Ii);
-                        tempArray.add(new Integer(count));
-                    } else {
-                        ArrayList<Integer> tempArray = NewIt.newArrayList();
-                        tempArray.add(new Integer(count));
-                        tempMap.put(Ii, tempArray);
-                    }
-                }
-            }
-            count++;
-        }
-
-        missing = new int[SNPID.length][];
-        for (Integer Ii:tempMap.keySet()) {
-            ArrayList<Integer> tempArray = tempMap.get(Ii);
-            missing[Ii.intValue()] = new int[tempArray.size()];
-            for (int i = 0; i < tempArray.size(); i++) {
-                missing[Ii.intValue()][i] = ((Integer) tempArray.get(i)).intValue();
-            }
-        }
-        c = 0;
-        String[][] pheno = imra.getPhenotype();
-        for (int i = 0; i < pheno.length; i++) {
-            String[] ps = pheno[i];
-            Subject sub = (Subject) sample.get(c++);
-            sub.addScore(ps);
-        }
-
-        setPhenotypeIndex(scrIdx);
-        double[] os = calculateDefaultMu();
-        TraitSummary(os);
-        setScore(os);
-    }
-
-    public void initial(int[] scrIdx) throws IOException {
+    public void initial() throws IOException {
         FileReader fr = new FileReader(markerFile);
         LineNumberReader l = new LineNumberReader(fr);
         BufferedReader b = new BufferedReader(l);
@@ -400,42 +184,16 @@ public class DataFile {
         System.arraycopy(s, 0, SNPID, 0, s.length - 1);
         // -------------------------------------------------------------------
 
-        TreeMap<Integer, ArrayList<Integer>> tempMap = NewIt.newTreeMap();
         int count = 0;
         while ((line = b.readLine()) != null) {
             String[] content = line.split(PublicData.delim);
             Subject sub = new Subject(content);
             sub.setID(count);
             sample.add(sub);
-            for (int i = 0; i < content.length - 1; i++) {
-                Integer Ii = new Integer(i);
-                if (content[i].compareTo(PublicData.MissingGenotype) == 0) {
-                    if (tempMap.containsKey(Ii)) {
-                        ArrayList<Integer> tempArray = tempMap.get(Ii);
-                        tempArray.add(new Integer(count));
-                    } else {
-                        ArrayList<Integer> tempArray = NewIt.newArrayList();
-                        tempArray.add(new Integer(count));
-                        tempMap.put(Ii, tempArray);
-                    }
-                }
-            }
+
             count++;
         }
-        missing = new int[SNPID.length][];
-        for (Integer Ii:tempMap.keySet()) {
-            ArrayList<Integer> tempArray = tempMap.get(Ii);
-            missing[Ii.intValue()] = new int[tempArray.size()];
-            for (int i = 0; i < tempArray.size(); i++) {
-                missing[Ii.intValue()][i] = ((Integer) tempArray.get(i)).intValue();
-            }
-        }
         addScore();
-
-        setPhenotypeIndex(scrIdx);
-        double[] os = calculateDefaultMu();
-        TraitSummary(os);
-        setScore(os);
     }
 
     protected void addScore() throws IOException {
@@ -450,8 +208,10 @@ public class DataFile {
             System.out.println("It's empty.");
             System.exit(0);
         }
+
         traitName = line.split(PublicData.delim);
         ArrayList<String> pl = NewIt.newArrayList();
+
         while ((line = b.readLine()) != null) {
             pl.add(line);
         }
@@ -471,26 +231,15 @@ public class DataFile {
         }
     }
 
-    public int getNumberTraits() {
-        return traitStatistics.size();
-    }
-
-    public double[] getOffset() {
-        return offset;
-    }
-
-    public void setPhenotypeIndex(int[] sI) {
-        scrIndex = new int[sI.length];
-        System.arraycopy(sI, 0, scrIndex, 0, sI.length);
-    }
-
-    public void setScore(double[] os) {
-        offset = new double[os.length];
-        System.arraycopy(os, 0, offset, 0, os.length);
-    }
-
     public String getMarkerFileName() {
         return markerFile;
+    }
+
+    public void setScore(double[] s) {
+    	for(int i = 0; i < size(); i++) {
+    		Subject sub = get(i);
+    		sub.setScore(s[i]);
+    	}
     }
 
     public String getPhenotypeFileName() {
@@ -501,139 +250,7 @@ public class DataFile {
         sample.add(idx, o);
     }
 
-    public double[] calculateDefaultMu() {
-        double[] defaultMu = new double[scrIndex.length];
-        for (int i = 0; i < scrIndex.length; i++) {
-            double sum = 0;
-            int c = 0;
-            for (DataFile.Subject s:sample) {
-                Double sscore = s.getDoubleScore(i);
-                if (sscore != null) {
-                    sum += sscore;
-                    c++;
-                }
-            }
-            defaultMu[i] = sum / c;
-        }
-        return defaultMu;
-    }
-
-    /**
-     * This method should be invoked when a new trait is selected for running.
-     */
-    public void TraitSummary(double[] os) {
-        for (int i = 0; i < scrIndex.length; i++) {
-            Integer I = new Integer(i);
-            TraitStatistic t = (TraitStatistic) traitStatistics.get(I);
-            if (t != null && Math.abs(t.getOffset() - os[i]) < PublicData.epsilon) {
-                continue;
-            }
-
-            TraitStatistic ts = new TraitStatistic(os[i], i, sample);
-            traitStatistics.put(I, ts);
-
-            int posSub = ts.getTraitPositiveSubjects();
-            int negSub = ts.getTraitNegativeSubjects();
-            double posScr = ts.getTraitPositiveScore();
-            double negScr = ts.getTraitNegativeScore();
-
-//            if (posSub == 0) {
-//                throw new DataFileException("Score " + phenotype[i] + "is abnormal that no any subject has a positive score.");
-//            } else if (negSub == 0) {
-//                throw new DataFileException("Score " + phenotype[i] + "is abnormal that no any subject has a negative score.");
-//            } else if (posScr < PublicData.epsilon) {
-//                throw new DataFileException("Abnormal magnitude of the sum of the positive score: " + posScr + " at phenotype " + phenotype[i] + " .");
-//            } else if (Math.abs(negScr) < PublicData.epsilon) {
-//                throw new DataFileException("Abnormal magnitude of the sum of the negative score " + negScr + "  at phenotype " + phenotype[i] + " .");
-//            }
-//            double r = posScr / Math.abs(negScr) > 1 ? posScr / Math.abs(negScr) : Math.abs(negScr) / posScr;
-//            if (r > PublicData.tooBigRatio) {
-//                throw new DataFileException("Abnormal ratio of positive score v.s. negative score.");
-//            }
-//            r = posSub / Math.abs(negSub) > 1 ? posSub / Math.abs(negSub) : Math.abs(negSub) / posSub;
-//            if (r > PublicData.tooBigRatio) {
-//                throw new DataFileException("Abnormal ratio of subjects with positive score v.s. with negative score.");
-//            }
-        }
-    }
-
-    /**
-     * Get the ratio of total positive scores to total negative scores.
-     * 
-     * @param scrIdx
-     * @param markerIdx
-     * @return
-     * @throws algorithm.DataFileException
-     */
-    public double getTraitRatio(int scrIdx, int[] markerIdx) throws DataFileException {
-        TraitStatistic ts = (TraitStatistic) traitStatistics.get(new Integer(scrIdx));
-        int posSub = ts.getTraitPositiveSubjects();
-        int negSub = ts.getTraitNegativeSubjects();
-        double posScr = ts.getTraitPositiveScore();
-        double negScr = ts.getTraitNegativeScore();
-        HashSet<Integer> hs = NewIt.newHashSet();
-        for (int i = 0; i < markerIdx.length; i++) {
-            if (missing[markerIdx[i]] == null) {
-                continue;
-            }
-            for (int j = 0; j < missing[markerIdx[i]].length; j++) {
-                Integer subIdx = new Integer(missing[markerIdx[i]][j]);
-                hs.add(subIdx);
-            }
-        }
-        for (Integer e:hs) {
-            int idx =  e.intValue();
-            Subject s = (Subject) sample.get(idx);
-            double scr = s.getDoubleScore(scrIdx);
-            if (scr >= 0) {
-                posScr -= scr;
-                posSub--;
-            } else {
-                negScr -= scr;
-                negSub--;
-            }
-        }
-        if (Math.abs(negScr) < PublicData.epsilon) {
-            throw new DataFileException("too small denominator.");
-        }
-        return posScr / Math.abs(negScr);
-    }
-
-    public double defaultScore(int[] markerIdx, int[] scrIdx, int sI) throws DataFileException {
-        TraitStatistic ts = traitStatistics.get(new Integer(sI));
-        int posSub = ts.getTraitPositiveSubjects();
-        int negSub = ts.getTraitNegativeSubjects();
-        double posScr = ts.getTraitPositiveScore();
-        double negScr = ts.getTraitNegativeScore();
-        HashSet<Integer> hs = NewIt.newHashSet();
-        for (int i = 0; i < markerIdx.length; i++) {
-            if (missing[markerIdx[i]] == null) {
-                continue;
-            }
-            for (int j = 0; j < missing[markerIdx[i]].length; j++) {
-                Integer subIdx = new Integer(missing[markerIdx[i]][j]);
-                hs.add(subIdx);
-            }
-        }
-        for (Integer  e:hs) {
-            int idx = e.intValue();
-            Subject s = (Subject) sample.get(idx);
-            double scr = s.getDoubleScore(scrIdx[sI]);
-            if (scr >= 0) {
-                posScr -= scr;
-                posSub--;
-            } else {
-                negScr -= scr;
-                negSub--;
-            }
-        }
-        if (posScr + Math.abs(negScr) < PublicData.epsilon) {
-            throw new DataFileException("too small denominator.");
-        }
-        return posScr / (posScr + Math.abs(negScr));
-    }
-
-    public int getMarkerNum() {
+    public int getNumMarker() {
         return SNPID.length;
     }
 
@@ -649,44 +266,17 @@ public class DataFile {
         return mkIdx;
     }
 
-    public Object get(int idx) {
+    public Subject get(int idx) {
         return sample.get(idx);
     }
 
-    public Object remove(int index) {
+    public Subject remove(int index) {
         return sample.remove(index);
     }
 
     public void print() {
         for (DataFile.Subject e:sample) {
             System.out.println(e);
-        }
-    }
-
-    public void printMissing() {
-        for (int i = 0; i < missing.length; i++) {
-            if (missing[i] != null) {
-                for (int j = 0; j < missing[i].length; j++) {
-                    System.out.print(missing[i][j] + "\t");
-                }
-                System.out.println();
-            }
-        }
-    }
-
-    public void switchPermutation(boolean flag) {
-        isPermutation = flag;
-    }
-
-    public void setShuffledIDs(ArrayList<Integer> shuffledids) {
-        if (isPermutation) {
-            shuffledPhenoIDs = shuffledids;
-            for (int i = 0; i < shuffledPhenoIDs.size(); i++) {
-                Subject sub1 = sample.get(i);
-                Subject sub2 = sample.get(shuffledPhenoIDs.get(i).intValue());
-                ArrayList<Double> s = sub2.getScore();
-                sub1.addShuffledScore(s);
-            }
         }
     }
 
@@ -697,7 +287,7 @@ public class DataFile {
     public int size() {
         return sample.size();
     }
-    
+
     public String getTraitName(int idx) {
     	return traitName[idx];
     }

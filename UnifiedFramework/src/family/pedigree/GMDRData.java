@@ -150,17 +150,6 @@ public class GMDRData {
 	}
 
 	/**
-	 * Impute missing genotypes
-	 */
-	public void GenotypeImputation() {
-		try {
-			PedData.GenotypeImputation();
-		} catch (MDRPedFileException e) {
-			e.printStackTrace(System.err);
-		}
-	}
-
-	/**
 	 * Build score with a selected response and predictor(s).
 	 * 
 	 * @param Adjust
@@ -426,7 +415,6 @@ public class GMDRData {
 
 		IsLoadPedFile = true;
 		Allele2Genotype();
-		GenotypeImputation();
 	}
 
 	/**
@@ -475,10 +463,8 @@ public class GMDRData {
 		Matched = NewIt.newArrayList();
 		unMatched = NewIt.newArrayList();
 		int i = 0;
-		Enumeration<String> famList = PedData.getFamStrList();
-		while (famList.hasMoreElements()) {
+		for(String fid:PedData.getFamListSorted()) {
 			i++;
-			String fid = famList.nextElement();
 			FamilyStruct Fam = PedData.getFamilyStruct(fid);
 			Enumeration sibList = Fam.getPersonList();
 			FamilyUnit FamUnit = PhenoData.getFamilyUnit(fid);
@@ -525,10 +511,6 @@ public class GMDRData {
 				UnrelatedPersonHash.put(PI.getKey(), PI.IndividualID);
 			}
 		}
-	}
-
-	public void RabinowitzApproach() {
-		PedData.RabinowitzApproach(false, subsetMarker);
 	}
 
 	/**
