@@ -21,7 +21,7 @@ public class OneCVSet {
     public OneCVSet(int i, String com) {
         cvIdx = i;
         model = com;
-        statistic = new double[MDRConstant.NumOfStatistics];
+        statistic = new double[MDRConstant.NumStats];
         trainingMap = NewIt.newHashMap();
         testingMap = NewIt.newHashMap();
     }

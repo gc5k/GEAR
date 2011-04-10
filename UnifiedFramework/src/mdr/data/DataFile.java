@@ -24,7 +24,7 @@ public class DataFile {
     protected String[] SNPID;
     protected String[] traitName;
 
-    protected static int currScrID = -1;
+    protected static int currScrIdx = -1;
 
     public static class Subject {
         int id;
@@ -56,10 +56,10 @@ public class DataFile {
         }
 
         public void setScore(double s) {
-        	if(currScrID<0) {
+        	if(currScrIdx<0) {
         		defaultScore = s;
         	} else {
-        		score[currScrID] = s;
+        		score[currScrIdx] = s;
         	}
         }
         
@@ -84,10 +84,10 @@ public class DataFile {
         }
 
         public double getSelectedScore() {
-        	if (currScrID < 0) {
+        	if (currScrIdx < 0) {
         		return defaultScore;
-        	} else if (score[currScrID] != Double.NaN) {
-                return score[currScrID];
+        	} else if (score[currScrIdx] != Double.NaN) {
+                return score[currScrIdx];
             } else {
                 return status;
             }
@@ -240,6 +240,10 @@ public class DataFile {
     		Subject sub = get(i);
     		sub.setScore(s[i]);
     	}
+    }
+
+    public static void setScoreIndex(int i) {
+    	currScrIdx = i;
     }
 
     public String getPhenotypeFileName() {

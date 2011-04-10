@@ -22,6 +22,7 @@ public class Person {
     // private Vector markers;
     // private byte[] alleles1;
     // private byte[] alleles2;
+    private int numMarker;
     private byte[][] alleles;
     private byte[][] nontransmitted;
     private double numGoodMarkers;
@@ -35,6 +36,7 @@ public class Person {
     public final static String DATA_MISSING = "0";
 
     public Person(int numMarkers) {
+    	numMarker = numMarkers;
         alleles = new byte[2][numMarkers];
         this.zeroed = new boolean[numMarkers];
         this.currMarker = 0;
@@ -161,7 +163,7 @@ public class Person {
      * @return integer count of markers
      */
     public int getNumMarkers() {
-        return this.alleles[0].length;
+        return numMarker;
     }
 
     public byte getAllele(int location, int index) {

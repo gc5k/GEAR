@@ -15,6 +15,7 @@ import family.RabinowitzLairdAlgorithm.rabinowitz.Rabinowitz2;
 import family.RabinowitzLairdAlgorithm.rabinowitz.Rabinowitz3;
 import family.pedigree.genotype.FamilyStruct;
 import family.pedigree.genotype.FamilyStructException;
+import family.pedigree.genotype.GenoSet;
 import family.pedigree.genotype.Person;
 
 /**

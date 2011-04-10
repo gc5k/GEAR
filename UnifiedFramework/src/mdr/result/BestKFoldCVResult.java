@@ -66,7 +66,7 @@ public class BestKFoldCVResult {
 	public void summarise() {
 		KFoldStatistic();
 		
-		bestModelStatistics = new double[MDRConstant.NumOfStatistics];
+		bestModelStatistics = new double[MDRConstant.NumStats];
 
 		Integer v = Collections.max(modelCount.values());
 		cvConsistency = v.intValue();
@@ -80,7 +80,7 @@ public class BestKFoldCVResult {
 			}
 		}
 
-		double[][] _bestModelStats = new double[majorKey.size()][MDRConstant.NumOfStatistics];
+		double[][] _bestModelStats = new double[majorKey.size()][MDRConstant.NumStats];
 		for (int i = 0; i < cvset.size(); i++) {
 			OneCVSet cvSet = get(i);
 			String key = cvSet.getModel();
@@ -88,12 +88,12 @@ public class BestKFoldCVResult {
 				continue;
 			}
 			int idx = majorKey.indexOf(key);
-			for (int j = 0; j < MDRConstant.NumOfStatistics; j++) {
+			for (int j = 0; j < MDRConstant.NumStats; j++) {
 				_bestModelStats[idx][j] += cvSet.getStatistic(j);
 			}
 		}
 
-		double[] bigStats = new double[MDRConstant.NumOfStatistics];
+		double[] bigStats = new double[MDRConstant.NumStats];
 		int idx = 0;
 		for (String key : majorKey) {
 			for (int j = 0; j < _bestModelStats[idx].length; j++) {
@@ -103,7 +103,7 @@ public class BestKFoldCVResult {
 			idx++;
 		}
 
-		for (int i = 0; i < MDRConstant.NumOfStatistics; i++) {
+		for (int i = 0; i < MDRConstant.NumStats; i++) {
 			int c = 0;
 			for (int j = 0; j < _bestModelStats.length; j++) {
 				if ((bigStats[i] - _bestModelStats[j][i]) < PublicData.epsilon) {
@@ -125,11 +125,11 @@ public class BestKFoldCVResult {
 	 * The statistics may be biased if there is heterogeneity 
 	 */
 	private void KFoldStatistic() {
-		KFoldMean = new double[MDRConstant.NumOfStatistics];
+		KFoldMean = new double[MDRConstant.NumStats];
 
 		for (int i = 0; i < cvset.size(); i++) {
 			OneCVSet cvSet = (OneCVSet) get(i);
-			for (int j = 0; j < MDRConstant.NumOfStatistics; j++) {
+			for (int j = 0; j < MDRConstant.NumStats; j++) {
 				KFoldMean[j] += cvSet.getStatistic(j);
 			}
 
@@ -143,7 +143,7 @@ public class BestKFoldCVResult {
 			}
 		}
 
-		for (int i = 0; i < MDRConstant.NumOfStatistics; i++) {
+		for (int i = 0; i < MDRConstant.NumStats; i++) {
 			KFoldMean[i] /= cvset.size();
 		}
 	}

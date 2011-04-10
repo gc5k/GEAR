@@ -1,4 +1,4 @@
-package publicAccess;
+package mdr.arsenal;
 
 /**
  *
@@ -6,7 +6,12 @@ package publicAccess;
  */
 public class ToolKitException extends Exception {
 
-    public ToolKitException() {
+    /**
+	 * 
+	 */
+	private static final long serialVersionUID = 1L;
+
+	public ToolKitException() {
     }
 
     public ToolKitException(String S) {

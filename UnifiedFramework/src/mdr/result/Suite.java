@@ -1,10 +1,10 @@
 
 package mdr.result;
 
+import mdr.MDRConstant;
 import mdr.data.DataFile;
 import java.util.ArrayList;
 
-import publicAccess.PublicData;
 import util.NewIt;
 
 /**
@@ -89,7 +89,7 @@ public class Suite {
             }
         } else {
             if ((posScore / Math.abs(negScore)) == 1) {
-                status = PublicData.tieValue;
+                status = MDRConstant.tieValue;
             } else {
                 status = (posScore / Math.abs(negScore)) > threshold ? 1 : 0;
             }

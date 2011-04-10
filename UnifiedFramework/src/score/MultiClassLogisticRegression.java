@@ -1,6 +1,5 @@
 package score;
 
-import java.util.*;
 import org.apache.commons.math.linear.*;
 
 public class MultiClassLogisticRegression {

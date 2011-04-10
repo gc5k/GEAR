@@ -113,14 +113,12 @@ public class FamilyGenerator {
 		}
 
 		public void sweepComments() throws IOException {
-			boolean flag = true;
 			String line;
 			while ((line = buffer.readLine()) != null) {
 				if (Pattern.matches("\\s*", line)) {// empty line
 					continue;
 				} else if (Pattern.matches("^//.*", line)) {// multiple line
 					// comments
-					flag = false;
 				} else {
 					lines.add(line);
 				}
@@ -868,9 +866,9 @@ public class FamilyGenerator {
 			if (pr.model.compareTo("B") == 0) {
 				pr.intercept = -5.29;
 				pr.dev = 3.16;
-				pr.cov = 1;
+				pr.cov = 0;
 				pr.err = 1;
-				pr.gene = 0.5;
+				pr.gene = 1;
 			} else {
 				pr.intercept = 0;
 				pr.dev = 1;
@@ -887,11 +885,11 @@ public class FamilyGenerator {
 			pr.FamNum = new int[1];
 			pr.FamNum[0] = 200;
 			pr.AffParent = new int[1];
-			pr.AffParent[0] = 3;
+			pr.AffParent[0] = -1;
 			pr.Kid = new int[1];
 			pr.Kid[0] = 2;
 			pr.AffKid = new int[1];
-			pr.AffKid[0] = 1;
+			pr.AffKid[0] = -1;
 			pr.ParentMissingRate = new double[1][2];
 			pr.ParentMissingRate[0][0] = 0;
 			pr.ParentMissingRate[0][1] = 0;

@@ -8,6 +8,7 @@ import java.util.Set;
 
 import mdr.MDRConstant;
 import mdr.algorithm.Subdivision;
+import mdr.arsenal.ToolKit;
 import mdr.data.DataFile;
 
 import mdr.result.BestKFoldCVResult;
@@ -17,7 +18,6 @@ import mdr.result.OneCVSet;
 import mdr.result.SavedModels;
 import mdr.result.Suite;
 
-import publicAccess.ToolKit;
 
 import util.NewIt;
 
@@ -117,12 +117,9 @@ public class LinearMergeSearch extends AbstractMergeSearch {
 		for (int i = 0; i < subdivision.getInterval(); i++) {
 			OneCVSet cvSet = new OneCVSet(i, currModel);
 			Combination testingModels = cvTestingSet.get(i);
-			int tr_status;
-			int t_status;
+			int tr_status = 0;
 			Cell trCell;
 			Cell tCell;
-			double[] trStatus = new double[model.size()];
-			double[] tStatus = new double[model.size()];
 			int idx = 0;
 			for (String cellKey : model.keySet()) {
 				Suite fullSuite = model.get(cellKey);
@@ -132,29 +129,30 @@ public class LinearMergeSearch extends AbstractMergeSearch {
 				double fullnegScr = fullSuite.getNegativeScore();
 				if (testingModels.containsKey(cellKey)) {
 					Suite testingSuite = testingModels.get(cellKey);
-					int pos_Subs = testingSuite.getPositiveSubjects();
-					int neg_Subs = testingSuite.getNegativeSubjects();
-					double pos_Scr = testingSuite.getPositiveScore();
-					double neg_Scr = testingSuite.getNegativeScore();
-					tr_status = ToolKit.Acertainment(fullposScr - pos_Scr, fullnegScr - neg_Scr);
-					t_status = ToolKit.Acertainment(pos_Scr, neg_Scr);
-					trCell = new Cell(fullposSubs - pos_Subs, fullnegSubs - neg_Subs, fullposScr - pos_Scr, fullnegScr - neg_Scr, tr_status);
-					tCell = new Cell(pos_Subs, neg_Subs, pos_Scr, neg_Scr, tr_status);
+					int posSubs = testingSuite.getPositiveSubjects();
+					int negSubs = testingSuite.getNegativeSubjects();
+					double posScr = testingSuite.getPositiveScore();
+					double negScr = testingSuite.getNegativeScore();
+					int trposSubs = fullposSubs - posSubs;
+					int trnegSubs = fullnegSubs - negSubs;
+					double trposScr = fullposScr - posScr;
+					double trnegScr = fullnegScr - negScr;
+					tr_status = ToolKit.Acertainment(trposScr, trnegScr);
+					trCell = new Cell(trposSubs, trnegSubs, trposScr, trnegScr, tr_status);
+					tCell = new Cell(posSubs, negSubs, posScr, negScr, tr_status);
 				} else {
 					tr_status = ToolKit.Acertainment(fullposScr, fullnegScr);
-					t_status = 1 - tr_status;
 					trCell = new Cell(fullposSubs, fullnegSubs, fullposScr, fullnegScr, tr_status);
 					tCell = new Cell(0, 0, 0, 0, -1);
 				}
 				cvSet.addTrainingModel(cellKey, trCell);
 				cvSet.addTestingModel(cellKey, tCell);
-				trStatus[idx] = tr_status;
-				tStatus[idx] = t_status;
 				idx++;
 			}
 			double trAccu = 0;
 			trAccu = ToolKit.BalancedAccuracy(cvSet.getTrainingSubdivision());
 			cvSet.setStatistic(MDRConstant.TrainingBalancedAccuIdx, trAccu);
+			System.out.println(currModel + " " + trAccu);
 			if (count == 0) {
 				currBestStats[i] = trAccu;
 				bestKFold.add(cvSet);
@@ -167,7 +165,6 @@ public class LinearMergeSearch extends AbstractMergeSearch {
 			}
 		}
 	}
-
 
 	private void summary() {
 		for (int j = 0; j < subdivision.getInterval(); j++) {
@@ -182,7 +179,7 @@ public class LinearMergeSearch extends AbstractMergeSearch {
 
 	public double[] calculateSingleBest(String modelName) {
 
-		double[] mean = new double[MDRConstant.NumOfStatistics];
+		double[] mean = new double[MDRConstant.NumStats];
 		for (int j = 0; j < subdivision.getInterval(); j++) {
 			OneCVSet cvSet = new OneCVSet(j, modelName);
 			Combination testingModels = (Combination) cvTestingSet.get(j);
@@ -202,14 +199,18 @@ public class LinearMergeSearch extends AbstractMergeSearch {
 				double fullnegScr = fullSuite.getNegativeScore();
 				if (testingModels.containsKey(cellKey)) {
 					Suite testingSuite = (Suite) testingModels.get(cellKey);
-					int pos_Subs = testingSuite.getPositiveSubjects();
-					int neg_Subs = testingSuite.getNegativeSubjects();
-					double pos_Scr = testingSuite.getPositiveScore();
-					double neg_Scr = testingSuite.getNegativeScore();
-					tr_status = ToolKit.Acertainment(fullposScr - pos_Scr, fullnegScr - neg_Scr);
-					t_status = ToolKit.Acertainment(pos_Scr, neg_Scr);
-					trCell = new Cell(fullposSubs - pos_Subs, fullnegSubs - neg_Subs, fullposScr - pos_Scr, fullnegScr - neg_Scr, tr_status);
-					tCell = new Cell(pos_Subs, neg_Subs, pos_Scr, neg_Scr, tr_status);
+					int posSubs = testingSuite.getPositiveSubjects();
+					int negSubs = testingSuite.getNegativeSubjects();
+					double posScr = testingSuite.getPositiveScore();
+					double negScr = testingSuite.getNegativeScore();
+					int trposSubs = fullposSubs - posSubs;
+					int trnegSubs = fullnegSubs - negSubs;
+					double trposScr = fullposScr - posScr;
+					double trnegScr = fullnegScr - negScr;
+					tr_status = ToolKit.Acertainment(trposScr, trnegScr);
+					t_status = ToolKit.Acertainment(posScr, negScr);
+					trCell = new Cell(trposSubs, trnegSubs, trposScr, trnegScr, tr_status);
+					tCell = new Cell(posSubs, negSubs, posScr, negScr, t_status);
 				} else {
 					tr_status = ToolKit.Acertainment(fullposScr, fullnegScr);
 					t_status = 1 - tr_status;
@@ -253,5 +254,9 @@ public class LinearMergeSearch extends AbstractMergeSearch {
 	public void summarise() {
 		// TODO Auto-generated method stub
 		
+	}
+	
+	public String toString() {
+		return bestKFold.getBestModel();
 	}
 }

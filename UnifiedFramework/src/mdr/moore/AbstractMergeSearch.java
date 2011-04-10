@@ -5,12 +5,12 @@ import java.util.HashMap;
 
 
 import mdr.algorithm.Subdivision;
+import mdr.arsenal.ToolKit;
 import mdr.data.DataFile;
 import mdr.result.BestKFoldCVResult;
 import mdr.result.Combination;
 import mdr.result.SavedModels;
 
-import publicAccess.ToolKit;
 
 import util.NewIt;
 
@@ -66,5 +66,5 @@ public abstract class AbstractMergeSearch {
     public abstract void search(int or, ArrayList<String> modelspace);
     protected abstract void assignKFold(String key, ArrayList<DataFile.Subject> subsample);
     public abstract void summarise();
-
+    public abstract String toString();
 }

@@ -41,10 +41,8 @@ public class UnobservedParents extends AbstractGenoDistribution {
 	public String[] getNontransmitted(final String transmitted) {
 		String nontran = new String(PublicData.MissingGenotype);
 		String tran = new String(transmitted);
-		boolean flag = true;
 
 		if (transmitted.compareTo(PublicData.MissingGenotype) == 0) {
-			flag = false;
 			tran = RandomAssign();
 			if (tran.compareTo(PublicData.MissingGenotype) == 0) {
 				String nontran_tran[] = { PublicData.MissingGenotype, PublicData.MissingGenotype };

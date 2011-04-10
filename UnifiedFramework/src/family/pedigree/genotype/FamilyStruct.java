@@ -28,10 +28,8 @@ import family.RabinowitzLairdAlgorithm.AbstractGenoDistribution;
 public class FamilyStruct {
 	// save observed genotypes;
 	private Hashtable<String, Person> persons;
-	private Hashtable<String, PseudoPerson> pseudopersons;
 	private String familyStructName;
 	private int mendErrors;
-	private int numMarkers;
 
 	/**
 	 * adds a member to this family (adds to persons ArrayList)
@@ -41,10 +39,6 @@ public class FamilyStruct {
 	 */
 	public void addPerson(Person per) {
 		this.persons.put(per.getPersonID(), per);
-	}
-
-	public void addPseudoPerson(PseudoPerson pseudoper) {
-		this.pseudopersons.put(pseudoper.getPseudoPersonID(), pseudoper);
 	}
 
 	public void countAllele(TreeMap<String, Integer> Geno, Set<String> alleleSet) {
@@ -63,22 +57,12 @@ public class FamilyStruct {
 		}
 	}
 
-	public boolean containsPseudoPerson(String id) {
-		if (pseudopersons.containsKey(id)) {
-			return true;
-		} else {
-			return false;
-		}
-	}
-
 	public FamilyStruct() {
 		this.persons = NewIt.newHashtable();
-		this.pseudopersons = NewIt.newHashtable();
 	}
 
 	public FamilyStruct(String familyStructName) {
 		this.persons = NewIt.newHashtable();
-		this.pseudopersons = NewIt.newHashtable();
 		this.familyStructName = familyStructName;
 	}
 
@@ -174,16 +158,8 @@ public class FamilyStruct {
 		return this.persons.get(personID);
 	}
 
-	public PseudoPerson getPseudoPerson(String pseudopersonID) {
-		return this.pseudopersons.get(pseudopersonID);
-	}
-
 	public Hashtable<String, Person> getPersons() {
 		return persons;
-	}
-
-	public Hashtable<String, PseudoPerson> getPseudoPersons() {
-		return pseudopersons;
 	}
 
 	public boolean hasAncestor(Person p) {
@@ -230,10 +206,6 @@ public class FamilyStruct {
 	 */
 	public void setFamilyName(String familyStructName) {
 		this.familyStructName = familyStructName;
-	}
-
-	public void setNumMarkers(int nMarkers) {
-		numMarkers = nMarkers;
 	}
 
 	/**

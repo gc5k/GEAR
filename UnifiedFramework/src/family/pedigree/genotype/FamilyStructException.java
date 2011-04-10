@@ -2,7 +2,12 @@ package family.pedigree.genotype;
 
 public class FamilyStructException extends Exception {
 
-    public FamilyStructException(String s) {
+    /**
+	 * 
+	 */
+	private static final long serialVersionUID = 1L;
+
+	public FamilyStructException(String s) {
         super(s);
     }
 }
