@@ -49,7 +49,6 @@ public class MDRPed {
 	private boolean bogusParents = false;
 	private ArrayList<String> markerInfor;
 	private ArrayList<String> pedigrees;
-	private ArrayList<MendErrorTrace> menderrortrace;
 	private String titleLine;
 	private File pedfile;
 	static int MissingAllele = 0;
@@ -60,7 +59,6 @@ public class MDRPed {
 		// hardcoded hapmap info
 		this.famInformative = NewIt.newHashtable();
 		this.familystructure = NewIt.newHashtable();
-		this.menderrortrace = NewIt.newArrayList();
 	}
 
 	public String[] getFamListSorted() {
@@ -314,7 +312,6 @@ public class MDRPed {
 				if (famstr == null) {
 					// it doesn't exist, so create a new FamilyStruct object
 					famstr = new FamilyStruct(per.getFamilyID());
-					famstr.setNumMarkers(numMarkers);
 					familystructure.put(per.getFamilyID(), famstr);
 				}
 
@@ -369,6 +366,9 @@ public class MDRPed {
 		return genotype;
 	}
 
+	public boolean hasBogusParents() {
+		return bogusParents;
+	}
 	public ArrayList<String> getMarkerInformation() {
 		return markerInfor;
 	}
@@ -383,15 +383,5 @@ public class MDRPed {
 			}
 			return mk;
 		}
-	}
-
-	/**
-	 * return the record of menderrortrace(); Allele2Genotype should be invoked
-	 * precedingly;
-	 * 
-	 * @return
-	 */
-	public ArrayList<MendErrorTrace> getMendErrorTrace() {
-		return menderrortrace;
 	}
 }

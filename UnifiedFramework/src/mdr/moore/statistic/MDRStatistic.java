@@ -1,6 +1,6 @@
 package mdr.moore.statistic;
 
-public class MDRStatistic implements Comparable {
+public class MDRStatistic implements Comparable<MDRStatistic> {
 	private double testing_accuracy;
 	private double training_accuracy;
 	private double testing_balanced_accuracy;
@@ -41,22 +41,20 @@ public class MDRStatistic implements Comparable {
 		return training_accuracy;
 	}
 	
-	public int compareTo(Object mdrstat) {
-		try {
-		if(! (mdrstat instanceof MDRStatistic)) {
-			throw new ClassCastException("Invalid MDRStatistic Object");
-		}
-		} catch (ClassCastException E) {
-			E.printStackTrace(System.err);
-		}
-		
+	public int compareTo(MDRStatistic mdrstat) {
 		double ta = ((MDRStatistic) mdrstat).getTestingAccuracy();
-		if(testing_accuracy > ta) {
+		if(testing_balanced_accuracy > ta) {
 			return 1;
-		} else if(testing_accuracy == ta){
+		} else if(testing_balanced_accuracy == ta){
 			return 0;
 		} else {
 			return -1;
 		}
+	}
+	
+	public String toString() {
+		StringBuilder sb = new StringBuilder();
+		sb.append(testing_balanced_accuracy);
+		return sb.toString();
 	}
 }

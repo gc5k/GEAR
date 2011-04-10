@@ -1,7 +1,9 @@
 package family.pedigree;
 
 import java.io.File;
+import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.io.PrintWriter;
 import java.util.ArrayList;
 import java.util.Hashtable;
 import java.util.Random;
@@ -398,7 +400,7 @@ public class ChenAlgorithm {
 		CovariateTable.addAll(s_C);
 
 		numSib = ArrayUtils.toPrimitive(SibIdx.toArray(new Integer[0]));
-		
+
 		RLDriver RLD = new RLDriver();
 		RLD.TDT(Fam, PedData.getMarkerInformation(), m);
 	}
@@ -484,6 +486,28 @@ public class ChenAlgorithm {
 		return s;
 	}
 
+	public void print2MDRFormat(String f) {
+		PrintWriter pedout = null;
+		try {
+			pedout = new PrintWriter(new File(f));
+		} catch (FileNotFoundException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace(System.err);
+		}
+		ArrayList<String> mk = PedData.getMarkerInformation();
+		for(int i = 0; i < mk.size(); i++) {
+			pedout.print(mk.get(i) + "\t");
+		}
+		pedout.println("status");
+		
+		for(int i = 0; i < genotype.length; i++) {
+			for(int j = 0; j < genotype[i].length; j++) {
+				pedout.print(genotype[i][j] + "\t");
+			}
+			pedout.println(status[i]);
+		}
+		pedout.close();
+	}
 	public static void main(String[] args) {
 
 	}

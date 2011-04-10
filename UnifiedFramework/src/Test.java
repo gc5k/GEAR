@@ -13,18 +13,19 @@ public class Test {
         Integer v = Collections.max(modelCount.values());
         System.out.println(v);
 		byte genotype = 3;
-		genotype = (byte)(genotype << 2);
-		genotype += 2;
-		genotype = (byte)(genotype << 2);
-		genotype += 3;
-		genotype = (byte)(genotype << 2);
-		genotype += 3;
+		
+		byte genotype1 = 1;
+		genotype += (byte)(genotype1 << 2);
+		byte genotype2 = 2;
+		byte genotype3 = 3;
+		genotype += (genotype2 << 4);
+		genotype += (genotype3 << 6);
 
-		int mask = 3;
+		byte mask = 3;
 		byte g = -1;
-		for(int i = 0; i < 8; i++) {
-			int gg = (g>>i) & mask;
-			System.out.println(i+ " " +gg);
+		for(int i = 0; i < 8; i += 2) {
+			byte gg = (byte) ((genotype>>i) & mask);
+			System.out.println(i+ " gg " +gg);
 		}
 
 		System.out.println((int)genotype);

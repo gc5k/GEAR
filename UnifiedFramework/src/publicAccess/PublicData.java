@@ -8,7 +8,6 @@ public class PublicData {
     public static boolean UniversalThreshould = true;
 //    public static int MissingAllele = 0;
     public static int MissingAllele = -1;
-    public static int tieValue = 1;
     public static double epsilon = 0.0000001;
     public static double tooBigRatio = 5;
     public static String MissingPhenotypeValue = ".";

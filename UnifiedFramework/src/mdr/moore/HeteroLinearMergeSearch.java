@@ -5,10 +5,10 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Set;
 
-import publicAccess.ToolKit;
 
 import mdr.MDRConstant;
 import mdr.algorithm.Subdivision;
+import mdr.arsenal.ToolKit;
 import mdr.data.DataFile;
 
 import mdr.moore.statistic.MDRStatistic;
@@ -55,7 +55,7 @@ public class HeteroLinearMergeSearch extends LinearMergeSearch {
 
 	public double[] calculateSingleBest(String modelName) {
 
-		double[] mean = new double[MDRConstant.NumOfStatistics];
+		double[] mean = new double[MDRConstant.NumStats];
 		for (int j = 0; j < subdivision.getInterval(); j++) {
 			OneCVSet cvSet = new OneCVSet(j, modelName);
 			Combination testingModels = (Combination) cvTestingSet.get(j);
@@ -109,9 +109,19 @@ public class HeteroLinearMergeSearch extends LinearMergeSearch {
 		mean[MDRConstant.TestingBalancedAccuIdx] /= subdivision.getInterval();
 		MDRStatistic mdrstat = new MDRStatistic();
 		heteroresult.put(modelName, mdrstat);
-		mdrstat.setTrainingAccuracy(mean[MDRConstant.TrainingBalancedAccuIdx]);
-		mdrstat.setTestingAccuracy(mean[MDRConstant.TestingBalancedAccuIdx]);
+		mdrstat.setTrainingBalancedAccuracy(mean[MDRConstant.TrainingBalancedAccuIdx]);
+		mdrstat.setTestingBalancedAccuracy(mean[MDRConstant.TestingBalancedAccuIdx]);
 		return mean;
 	}
 
+	public String toString() {
+		StringBuilder sb = new StringBuilder();
+		for(String m : heteroresult.keySet()) {
+			sb.append(m);
+			sb.append(" ");
+			sb.append(heteroresult.get(m));
+			sb.append("\n");
+		}
+		return sb.toString();
+	}
 }

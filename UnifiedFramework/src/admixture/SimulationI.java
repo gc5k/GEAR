@@ -19,8 +19,8 @@ public class SimulationI {
 	public static void main(String[] args) throws IOException {
 		int replication = args.length > 0 ? Integer.parseInt(args[0]) : 1;
 		for (int i = 0; i < replication; i++) {
-			String PedFile = Integer.toString(i) + "L_ped.txt";
-			String PhenoFile = Integer.toString(i) + "L_phe.txt";
+			String PedFile = Integer.toString(i) + ".ped";
+			String PhenoFile = Integer.toString(i) + ".phe";
 			String CovertPedFile = "Converted_" + Integer.toString(i) + ".ped";
 			String CovertPhenoFile = "Converted_" + Integer.toString(i) + ".phe";
 			String FamIDFile = "Family_ID_" + Integer.toString(i) + ".txt";
@@ -41,8 +41,8 @@ public class SimulationI {
 				pr.setFamilyIDFile(FamIDFile);
 				pr.setCovariateIndex("2");
 				pr.setPhenotypeIndex("1");
-				pr.setScoreBuildMethod(0);
-				pr.setAdjustScore(false);
+				pr.setScoreBuildMethod(1);
+				pr.setAdjustScore(true);
 				pr.setScoreBuildWithFounder(true);
 				pr.setScoreBuildWithChildren(true);
 				pr.setReplication(10);
@@ -56,7 +56,7 @@ public class SimulationI {
 				gmdrPr.setInteractionFrom(2);
 				int[] scrIdx = { 0 };
 				gmdrPr.setScoreIndex(scrIdx);
-				gmdrPr.setInterval(5);
+				gmdrPr.setInterval(10);
 				gmdrPr.setSeed(seed);
 				gmdrPr.setPartitionMethod(0);
 				gmdrPr.setMooreMDR(true);
@@ -68,7 +68,7 @@ public class SimulationI {
 			ChenAlgorithm GD = new ChenAlgorithm();
 			AbstractGenoDistribution.rnd = new Random(pr.getSeed() + 1);
 			GD.RevvingUp(pr.getPedigreeFile(), pr.getPhenotypeFile());
-
+//			GD.print2MDRFormat("MDR.txt");
 			if (pr.getScoreBuildMethod() >= 0) {
 				GD.buildScore(pr.getPhenotypeIndex(), pr.getCovarianteIndex(), pr.isAdjustScore(), pr.getScoreBuildMethod(), pr
 						.getScoreBuildWithFounder(), pr.getScoreBuildWithChildren());
@@ -88,40 +88,7 @@ public class SimulationI {
 				cg.generateCombination();
 				as.search(j, cg.get(new Integer(j)));
 			}
-			System.out.println();
-			// report.NewRound(as.getBestModelKey(j, 0), i == 0);
-			// double[][] stats = as.singleBest(as.getBestModelKey(j, 0));
-			// report.Add_test_statistic(stats[0]);
-			// for (int k = 0; k < (i > 0 ? 0 : pr.getReplication()); k++) {
-			// System.out.println(k);
-			// isRabinowitzProc = true;
-			// GD.RabinowitzApproach();
-			// GD.CreateTableII(isRabinowitzProc);
-			// GD.CreateWorkingTable(isRabinowitzProc);
-			// DataFile mdrData1 = new DataFile(GD.getMarkerName(),
-			// GD.getWorkingGenoTable(),
-			// GD.getWorkingStatusTable(), GD.getTraitName(),
-			// GD.getWorkingScoreTable(),
-			// gmdrPr.getScoreIndex());
-			// CombinationGenerator cg1 = new CombinationGenerator(j, j,
-			// mdrData1.getMarkerNum());
-			// cg1.generateCombination();
-			// LinearMergeSearch as1;
-			// Subdivision sd1 = new Subdivision(gmdrPr.getInterval(),
-			// gmdrPr.getSeed() + i * pr.getReplication() + k,
-			// mdrData1);
-			// sd1.RandomPartition();
-			// as1 = new LinearMergeSearch(mdrData1, sd1, cg1,
-			// gmdrPr.getScoreIndex().length,
-			// mdrData1.getOffset(), gmdrPr.isMooreMDR());
-			// as1.search(j);
-			// double[][] stats1 = as1.singleBest(as1.getBestModelKey(j, 0));
-			// report.Add_null_test_statistic(stats1[0]);
-			// }
-			// report.RoundSummary();
-			// }
-			// }
-			// System.out.println(report);
+			System.out.println(as.toString());
 		}
 	}
 }

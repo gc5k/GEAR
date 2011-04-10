@@ -1,4 +1,4 @@
-package family.pedigree;
+package family.pedigree.genotype;
 
 
 import java.util.TreeMap;
