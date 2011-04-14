@@ -15,33 +15,36 @@ import admixture.population.phenotype.QualityControl;
 
 public class AdmixedModel {
 	public static void main(String[] args) {
+		Parameter p = new Parameter();
+		p.commandListenor(args);
 
-		long seed = 2012;
-		int control_chr = 0;
-		boolean isNullHypothesis = false;
+		long seed = p.seed;
+		int control_chr = p.control_chr;
+		boolean isNullHypothesis = p.isNullHypothesis;
 
 		// specific components
 		// family
-		int N_Fam = 200;
-		int N_Kid = 2;
-		int N_aff_Kid = 1;
+		int N_Fam = p.family[0];
+		int N_Kid = p.kid[0];
+		int N_aff_Kid = p.affectedKid[0];
 
-		int N_case = 200;
-		int N_control = 200;
+		int N_case = p.cases[0];
+		int N_control = p.controls[0];
 
 		// logistic regression
-		String[] f = { "1111", "2121", "2222" };
-		double[] g_e = { 1, 0.5, 1 };
-		int[] chr = { 1, 1 };
-		int[] loci = { 0, 1 };
-		double mu = 0;
-		double dev = Math.sqrt(10);
+		String[] f = p.genotypeFunction;
+		double[] g_e = p.genotypeEffect;
+		int[] chr = p.diseaseChr;
+		int[] loci = p.diseaseLocus;
+		double mu = p.mu;
+		double dev = p.covariateEffect;
 
-		double[] disease_rate = { 0, 0 };
+		double[] prevalence = p.popPrevalence;
 		int N_phe = 3;
 
-		String[] chr_file = { "allele_freq_chr1_200snp.txt", "allele_freq_chr2.txt" };
-		double[] w = { 0.975, 0.025 };
+		String[] chr_file = p.AIM_file;
+		int[] AIM_number = p.aim;
+		double[] pop_proportion = p.popProportion;
 
 		PhenotypeGenerator pg = new PhenotypeGenerator(f, g_e, chr, loci, mu, dev);
 		HotSpot hs = new HotSpot();
@@ -50,20 +53,20 @@ public class AdmixedModel {
 		ArrayList<GeneFlow> GF = new ArrayList<GeneFlow>();
 		ArrayList<ChromosomeGenerator> CG = new ArrayList<ChromosomeGenerator>();
 		for (int i = 0; i < chr_file.length; i++) {
-			AlleleFrequencyReader afr = new AlleleFrequencyReader(chr_file[i]);
-			DNAStirrer ds = new DNAStirrer(afr, 1, 10000, AdmixtureConstant.Without_Genetic_Drift, w);
+			AlleleFrequencyReader afr = new AlleleFrequencyReader(chr_file[i], AIM_number[i]);
+			DNAStirrer ds = new DNAStirrer(afr, 1, 10000, AdmixtureConstant.Without_Genetic_Drift, pop_proportion);
 			ds.DNAStir(1);
 			DNAPool.add(ds);
-			GeneFlow gf = new GeneFlow(afr, 1000, w, hs);
-			gf.mating(9);
+			GeneFlow gf = new GeneFlow(afr, 1000, pop_proportion, hs);
+			gf.mating(p.generation);
 			GF.add(gf);
-			ChromosomeGenerator cg = new ChromosomeGenerator(afr.getAlleleFreq(), w);
+			ChromosomeGenerator cg = new ChromosomeGenerator(afr.getAlleleFreq(), pop_proportion);
 			cg.setSeed(seed + i);
 			CG.add(cg);
 		}
 
-		GeneFlowGenerateColony GC = new GeneFlowGenerateColony.Builder().DNAPool(DNAPool).diesaseRate(disease_rate)
-				.hotSpot(hs).popProportion(w).numPhenotype(N_phe).ChrGenerator(CG).PheGenerator(pg).GeneFlow(GF).seed(
+		GeneFlowGenerateColony GC = new GeneFlowGenerateColony.Builder().DNAPool(DNAPool).diesaseRate(prevalence)
+				.hotSpot(hs).popProportion(pop_proportion).numPhenotype(N_phe).ChrGenerator(CG).PheGenerator(pg).GeneFlow(GF).seed(
 						seed).diseaseChr(control_chr).isNullHypothesis(isNullHypothesis).build();
 
 		for (int rep = 0; rep < 2; rep++) {

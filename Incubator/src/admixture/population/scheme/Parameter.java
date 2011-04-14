@@ -9,58 +9,71 @@ import org.apache.commons.cli.PosixParser;
 
 public class Parameter {
 	private final String cmd_sd = "sd";
-	private long seed = 2011;
+	protected long seed = 2011;
 	
-	private final String cmd_control_chr = "cc";
-	private int control_chr = 0;
-	
-	private final String cmd_null_hypothesis = "nh";
-	private boolean isNullHypothesis = false;
+	private final String cmd_control_chr = "ctrlchr";
+	protected int control_chr = 0;
 
-	private final String cmd_fam_num = "fn";
-	private int[] family = new int[] { 100 };
-	
-	private final String cmd_kid_num = "kn";
-	private int[] kid = new int[] { 2 };
+	private final String cmd_null_hypothesis = "null";
+	protected boolean isNullHypothesis = false;
 
-	private final String cmd_aff_kid = "akn";
-	private int[] affectedKid = new int[] { 1 };
-	
-	private final String cmd_case_num = "cn";
-	private int[] cases = new int[] { 100 };
-	
-	private final String cmd_control_num = "cln";
-	private int[] controls = new int[] { 100 };
-	
-	private final String cmd_pop_prop = "pp";
-	private double[] popProportion = new double[] { 1 };
-	
-	private final String cmd_pop_disease_rate = "dr";
-	private double[] popDiseaseRate = new double[] { 0 };
+	private final String cmd_fam_num = "famnum";
+	protected int[] family = new int[] { 100 };
+
+	private final String cmd_kid_num = "kidnum";
+	protected int[] kid = new int[] { 2 };
+
+	private final String cmd_aff_kid = "afkidnum";
+	protected int[] affectedKid = new int[] { 1 };
+
+	private final String cmd_case_num = "cases";
+	protected int[] cases = new int[] { 100 };
+
+	private final String cmd_control_num = "ctrl";
+	protected int[] controls = new int[] { 100 };
+
+	private final String cmd_pop_prop = "popprop";
+	protected double[] popProportion = new double[] { 0.975, 0.25 };
+
+	private final String cmd_generation = "gr";
+	protected int generation = 9;
+
+	private final String cmd_pop_prevalence = "prv";
+	protected double[] popPrevalence = new double[] { 0.1, 0.2 };
 
 	private final String cmd_geno_fun = "gf";
-	private String[] genotypeFunction = new String[] { "0000", "1010", "1111" };
-	
+	protected String[] genotypeFunction = new String[] { "0000", "1010", "1111" };
+
 	private final String cmd_geno_effect = "ge";
-	private double[] genotypeEffect = new double[] { 1, 1, 1 };
+	protected double[] genotypeEffect = new double[] { 1, 1, 1 };
 	
 	private final String cmd_linked_chr = "lc";
-	private int[] diseaseChr = new int[] { 1, 1 };
+	protected int[] diseaseChr = new int[] { 1, 1 };
 
 	private final String cmd_linked_locus = "ll";
-	private int[] diseaseLocus = new int[] { 1, 3 };
+	protected int[] diseaseLocus = new int[] { 1, 3 };
+
 
 	private final String cmd_mu = "u";
-	private double mu = 0;
+	protected double mu = 0;
 	private final String cmd_cov_effect = "ce";
-	private double covariateEffect = 0;
-	private final String cmd_cov_sd = "sd";
-	private double covariateSD = 0;
+	protected double covariateEffect = 0;
+	private final String cmd_cov_sd = "csd";
+	protected double covariateSD = 0;
 	private final String cmd_esd = "rsd";
-	private double err = 1;
+	protected double err = 1;
 
+	private String cmd_file = "f";
+	protected String[] AIM_file = new String[] { "allele_freq_chr1_200snp.txt", "allele_freq_chr2.txt" };
+	
+	private String cmd_aim = "aim";
+	protected int[] aim = new int[] {0, 0};
+	
+	private final String cmd_rep = "rep";
+	protected int replication = 10;
 	private Options ops = new Options();
 	private CommandLineParser parser = new PosixParser();
+
 	public Parameter() {
 		commandInitial();
 	}
@@ -70,7 +83,7 @@ public class Parameter {
 				.withArgName("seed").create(cmd_sd));
 		ops.addOption(OptionBuilder.withLongOpt("control-chr").withDescription("control chromosome").hasArg()
 				.withArgName("control chromosome").create(cmd_control_chr));
-		ops.addOption(OptionBuilder.withLongOpt("isnullhypothesis").withDescription("generate the sample under the null hypothesis").hasArg(false)
+		ops.addOption(OptionBuilder.withLongOpt("nullhypothesis").withDescription("generate the sample under the null hypothesis").hasArg(false)
 				.withArgName("is null hypothesis").create(cmd_null_hypothesis));
 		ops.addOption(OptionBuilder.withLongOpt("family-size").withDescription("number of nuclear families").hasArgs()
 				.withArgName("family size").create(cmd_fam_num));
@@ -84,8 +97,10 @@ public class Parameter {
 				.withArgName("control number").create(cmd_control_num));
 		ops.addOption(OptionBuilder.withLongOpt("population-composition").withDescription("population percent").hasArgs()
 				.withArgName("population percentage").create(cmd_pop_prop));
+		ops.addOption(OptionBuilder.withLongOpt("generation").withDescription("generation before produce the mapping population").hasArgs()
+				.withArgName("successive generations for mating").create(cmd_generation));
 		ops.addOption(OptionBuilder.withLongOpt("disease-rate").withDescription("disease rate for each population").hasArgs()
-				.withArgName("disease rate").create(cmd_pop_disease_rate));
+				.withArgName("disease rate").create(cmd_pop_prevalence));
 		ops.addOption(OptionBuilder.withLongOpt("genotype-function").withDescription("functional genotypes").hasArgs()
 				.withArgName("affected genotypes").create(cmd_geno_fun));
 		ops.addOption(OptionBuilder.withLongOpt("genotype-effect").withDescription("effect for functional genotypes").hasArgs()
@@ -103,8 +118,16 @@ public class Parameter {
 				.withArgName("covariate sd").create(cmd_cov_sd));
 		ops.addOption(OptionBuilder.withLongOpt("residual-sd").withDescription("covariate standard deviation for generalized linear model").hasArg()
 				.withArgName("residual sd").create(cmd_cov_sd));
+		ops.addOption(OptionBuilder.withLongOpt("aim-file").withDescription("aim file").hasArgs()
+				.withArgName("aim frequency file").create(cmd_file));
+		ops.addOption(OptionBuilder.withLongOpt("aim-number").withDescription("aim number for each chromosome in simulation").hasArgs()
+				.withArgName("number of aim markers").create(cmd_aim));
+		
+		ops.addOption(OptionBuilder.withLongOpt("replication").withDescription("replications for simulation").hasArg()
+				.withArgName("replications").create(cmd_rep));
 	}
 
+	
 	public void commandListenor(String[] args) {
 		CommandLine cl = null;
 		try {
@@ -151,13 +174,16 @@ public class Parameter {
 			popProportion = new double[pp.length];
 			for(int i = 0; i < popProportion.length; i++) popProportion[i] = Double.parseDouble(pp[i]);
 		}
-		if(cl.hasOption(cmd_pop_disease_rate)) {
-			String[] pd = cl.getOptionValues(cmd_pop_disease_rate);
-			popDiseaseRate = new double[pd.length];
-			for(int i = 0; i < pd.length; i++) popDiseaseRate[i] = Double.parseDouble(pd[i]);
+		if(cl.hasOption(cmd_generation)) {
+			generation = Integer.parseInt(cl.getOptionValue(cmd_generation));
+		}
+		if(cl.hasOption(cmd_pop_prevalence)) {
+			String[] pd = cl.getOptionValues(cmd_pop_prevalence);
+			popPrevalence = new double[pd.length];
+			for(int i = 0; i < pd.length; i++) popPrevalence[i] = Double.parseDouble(pd[i]);
 		}
 		if(cl.hasOption(cmd_geno_fun)) {
-			String[] genotypeFunction = cl.getOptionValues(cmd_geno_fun);
+			genotypeFunction = cl.getOptionValues(cmd_geno_fun);
 		}
 		if(cl.hasOption(cmd_geno_effect)) {
 			String[] ge = cl.getOptionValues(cmd_geno_fun);
@@ -183,6 +209,18 @@ public class Parameter {
 		if(cl.hasOption(cmd_esd)) {
 			err = Double.parseDouble(cl.getOptionValue(cmd_esd));
 		}
+		if(cl.hasOption(cmd_rep)) {
+			replication = Integer.parseInt(cl.getOptionValue(cmd_rep));
+		}
+		if(cl.hasOption(cmd_file)) {
+			AIM_file = cl.getArgs();
+		}
+		if(cl.hasOption(cmd_aim)) {
+			String[] aim_num = cl.getOptionValues(cmd_aim);
+			for(int i = 0; i < aim_num.length; i++) {
+				aim[i] = Integer.parseInt(aim_num[i]);
+			}
+		}
 	}
 
 	public String toString() {
@@ -190,6 +228,87 @@ public class Parameter {
 		sb.append("seed=" + seed + "\n");
 		sb.append("control_chr=" + control_chr + "\n");
 		sb.append("is null hypothesis: " + isNullHypothesis + "\n");
+
+		sb.append("Family: ");
+		for(int i = 0, len = family.length; i<len; i++) {
+			sb.append(family[i] + " ");
+		}
+		sb.append(System.getProperty("line.separator"));
+
+		sb.append("Kid: ");
+		for(int i = 0, len = kid.length; i < len; i++) {
+			sb.append(kid[i] + " ");
+		}
+		sb.append(System.getProperty("line.separator"));
+
+		sb.append("Affected Kid: ");
+		for(int i = 0, len = affectedKid.length; i < len; i++) {
+			sb.append(affectedKid[i] + " ");
+		}
+		sb.append(System.getProperty("line.separator"));
+		
+		sb.append("Cases: ");
+		for(int i = 0, len = cases.length; i < len; i++) {
+			sb.append(cases[i] + " ");
+		}
+		sb.append(System.getProperty("line.separator"));
+		
+		sb.append("Controls: ");
+		for(int i = 0, len = controls.length; i < len; i++) {
+			sb.append(controls[i] + " ");
+		}
+		sb.append(System.getProperty("line.separator"));
+		
+		sb.append("Genotype Function: ");
+		for(int i = 0, len = genotypeFunction.length; i < len; i++) {
+			sb.append(genotypeFunction[i] + " ");
+		}
+		sb.append(System.getProperty("line.separator"));
+
+		sb.append("Genotype Affect: ");
+		for(int i = 0, len = genotypeEffect.length; i < len; i++) {
+			sb.append(genotypeEffect[i] + " ");
+		}
+		sb.append(System.getProperty("line.separator"));
+
+		sb.append("Disease Chromosome: ");
+		for(int i = 0, len = diseaseChr.length; i < len; i++) {
+			sb.append(diseaseChr[i] + " ");
+		}
+		sb.append(System.getProperty("line.separator"));
+
+		sb.append("Disease Locus: ");
+		for(int i = 0, len = diseaseLocus.length; i < len; i++) {
+			sb.append(diseaseLocus[i] + " ");
+		}
+		sb.append(System.getProperty("line.separator"));
+
+		sb.append("Mu: " + mu + System.getProperty("line.separator"));
+		sb.append("covariate effect: " + covariateEffect + System.getProperty("line.separator"));
+		sb.append("covariate sd: " + covariateSD + System.getProperty("line.separator"));
+		sb.append("residual sd: " + err + System.getProperty("line.separator"));
+
+		sb.append("Population Proportion: ");
+		for(int i = 0, len = popProportion.length; i < len; i++) {
+			sb.append(popProportion[i] + " ");
+		}
+		sb.append(System.getProperty("line.separator"));
+
+		sb.append("Generation: " + generation + System.getProperty("line.separator"));
+
+		sb.append("Population Disease Rate: ");
+		for(int i = 0, len = popPrevalence.length; i < len; i++) {
+			sb.append(popPrevalence[i] + " ");
+		}
+		sb.append(System.getProperty("line.separator"));
+
+		sb.append("AIM file: ");
+		for(int i = 0, len = AIM_file.length; i < len; i++) {
+			sb.append(AIM_file[i] + " ");
+		}
+		sb.append(System.getProperty("line.separator"));
+
+		sb.append("Replication: " + replication + System.getProperty("line.separator"));
 		return sb.toString();
 	}
 
@@ -197,5 +316,6 @@ public class Parameter {
 		Parameter p = new Parameter();
 		p.commandListenor(args);
 		System.out.println(p);
+//		System.out.println(System.getProperty("user.dir"));
 	}
 }
