@@ -48,6 +48,7 @@ public class GeneFlowModel {
 		int N_phe = 3;
 
 		String[] chr_file = { "allele_freq_chr1.txt", "allele_freq_chr2.txt" };
+		int[] AIM_number = {0, 0};
 		double[] w = { 0.8, 0.2 };
 
 		PhenotypeGenerator pg = new PhenotypeGenerator(f, g_e, chr, loci, mu, dev);
@@ -56,7 +57,7 @@ public class GeneFlowModel {
 		ArrayList<DNAStirrer> DNAPool = new ArrayList<DNAStirrer>();
 		ArrayList<ChromosomeGenerator> CG = new ArrayList<ChromosomeGenerator>();
 		for (int i = 0; i < chr_file.length; i++) {
-			AlleleFrequencyReader afr = new AlleleFrequencyReader(chr_file[i]);
+			AlleleFrequencyReader afr = new AlleleFrequencyReader(chr_file[i], AIM_number[i]);
 			DNAStirrer ds = new DNAStirrer(afr, 1, 10000, AdmixtureConstant.Without_Genetic_Drift, w);
 			ds.DNAStir(1);
 			DNAPool.add(ds);

@@ -18,7 +18,7 @@ public class DiscreteAncestryModel {
 	public static void main(String[] args) {
 
 		long seed = 2011;
-		int disease_chr = 0;
+		int control_chr = 0;
 		boolean isNullHypothesis = true;
 		// logistic regression
 
@@ -43,11 +43,12 @@ public class DiscreteAncestryModel {
 		int AA_N_control = 50;
 
 		String[] AA_chr_file = { "AIM_AA_chr1.txt", "allele_freq_AA_chr2_simu.txt" };
+		int[] AIM_number = {0, 0};
 		double[] AA_w = { 1 };
 		ArrayList<DNAStirrer> AA_DNAPool = new ArrayList<DNAStirrer>();
 		ArrayList<ChromosomeGenerator> AA_CG = new ArrayList<ChromosomeGenerator>();
 		for (int i = 0; i < AA_chr_file.length; i++) {
-			AlleleFrequencyReader afr = new AlleleFrequencyReader(AA_chr_file[i]);
+			AlleleFrequencyReader afr = new AlleleFrequencyReader(AA_chr_file[i], AIM_number[i]);
 			DNAStirrer ds = new DNAStirrer(afr, 1, 10000, AdmixtureConstant.Without_Genetic_Drift, AA_w);
 			ds.DNAStir(1);
 			AA_DNAPool.add(ds);
@@ -55,7 +56,7 @@ public class DiscreteAncestryModel {
 			cg.setSeed(seed + i);
 			AA_CG.add(cg);
 		}
-		GenerateColony AA_GenColony = new GenerateColony(N_phe, seed, disease_chr, AA_disease_rate, hs, AA_DNAPool,
+		GenerateColony AA_GenColony = new GenerateColony(N_phe, seed, control_chr, AA_disease_rate, hs, AA_DNAPool,
 				AA_CG, pg, AdmixtureConstant.free_recombination, isNullHypothesis);
 
 		// specify EA parameters
@@ -73,7 +74,7 @@ public class DiscreteAncestryModel {
 		ArrayList<DNAStirrer> EA_DNAPool = new ArrayList<DNAStirrer>();
 		ArrayList<ChromosomeGenerator> EA_CG = new ArrayList<ChromosomeGenerator>();
 		for (int i = 0; i < EA_chr_file.length; i++) {
-			AlleleFrequencyReader afr = new AlleleFrequencyReader(EA_chr_file[i]);
+			AlleleFrequencyReader afr = new AlleleFrequencyReader(EA_chr_file[i], AIM_number[i]);
 			DNAStirrer ds = new DNAStirrer(afr, 1, 10000, AdmixtureConstant.Without_Genetic_Drift, w);
 			ds.DNAStir(1);
 			EA_DNAPool.add(ds);
@@ -90,7 +91,7 @@ public class DiscreteAncestryModel {
 			QualityControl EA_qc = new QualityControl(EA_N_aff_Kid, AdmixtureConstant.FamilyExactAffected);
 			QualityControl EA_qc_c = new QualityControl(EA_N_case, EA_N_control, AdmixtureConstant.CaseControl);
 
-			GenerateColony EA_GenColony = new GenerateColony(N_phe, seed, disease_chr, EA_disease_rate, hs, EA_DNAPool,
+			GenerateColony EA_GenColony = new GenerateColony(N_phe, seed, control_chr, EA_disease_rate, hs, EA_DNAPool,
 					EA_CG, pg, AdmixtureConstant.free_recombination, isNullHypothesis);
 
 			GenerateColony.setCurrFamilyID(0);
