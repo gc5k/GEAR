@@ -1,5 +1,6 @@
 package admixture.population.scheme;
 
+import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 
@@ -17,34 +18,51 @@ public class DiscreteAncestryModel {
 
 	public static void main(String[] args) {
 
-		long seed = 2011;
-		int control_chr = 0;
-		boolean isNullHypothesis = true;
+		Parameter p = new Parameter();
+		p.commandListenor(args);
+		String unified = "unified";
+		File file = new File(p.dir + unified);
+		file.mkdir();
+		String dir_unified = p.dir + unified + System.getProperty("file.separator");
+		
+		String fam = "family";
+		file = new File(p.dir + fam);
+		file.mkdir();
+		String dir_fam = p.dir + fam + System.getProperty("file.separator");
+		
+		String c_c = "cc";
+		file = new File(p.dir + c_c);
+		file.mkdir();
+		String dir_cc = p.dir + c_c + System.getProperty("file.separator");
+		
+		long seed = p.seed;
+		int control_chr = p.control_chr;
+		boolean isNullHypothesis = p.isNullHypothesis;
 		// logistic regression
 
-		String[] f = { "1111", "2121", "2222" };
-		double[] g_e = { 1, 0.5, 1 };
-		int[] chr = { 1, 1 };
-		int[] loci = { 0, 1 };
-		double mu = 0;
-		double dev = Math.sqrt(10);
+		String[] f = p.genotypeFunction;
+		double[] g_e = p.genotypeEffect;
+		int[] chr = p.diseaseChr;
+		int[] loci = p.diseaseLocus;
+		double mu = p.mu;
+		double dev = p.covariateEffect;
 		PhenotypeGenerator pg = new PhenotypeGenerator(f, g_e, chr, loci, mu, dev);
 		HotSpot hs = new HotSpot();
 
 		int N_phe = 2;
 
 		// specify AA parameters
-		double[] AA_disease_rate = { 0.2 };
-		int AA_N_Fam = 100;
-		int AA_N_Kid = 2;
-		int AA_N_aff_Kid = 1;
+		double[] AA_disease_rate = new double[]{p.popPrevalence[0]};
+		int AA_N_Fam = p.family[0];
+		int AA_N_Kid = p.kid[0];
+		int AA_N_aff_Kid = p.affectedKid[0];
 
-		int AA_N_case = 50;
-		int AA_N_control = 50;
+		int AA_N_case = p.cases[0];
+		int AA_N_control = p.controls[0];
 
-		String[] AA_chr_file = { "AIM_AA_chr1.txt", "allele_freq_AA_chr2_simu.txt" };
-		int[] AIM_number = {0, 0};
-		double[] AA_w = { 1 };
+		String[] AA_chr_file = p.AIM_file[0];
+		int[] AIM_number = p.aim;
+		double[] AA_w = new double[] { p.popProportion[0] };
 		ArrayList<DNAStirrer> AA_DNAPool = new ArrayList<DNAStirrer>();
 		ArrayList<ChromosomeGenerator> AA_CG = new ArrayList<ChromosomeGenerator>();
 		for (int i = 0; i < AA_chr_file.length; i++) {
@@ -60,17 +78,17 @@ public class DiscreteAncestryModel {
 				AA_CG, pg, AdmixtureConstant.free_recombination, isNullHypothesis);
 
 		// specify EA parameters
-		double[] EA_disease_rate = { 0.5 };
-		int EA_N_Fam = 100;
-		int EA_N_Kid = 2;
-		int EA_N_aff_Kid = 1;
+		double[] EA_disease_rate = new double[]{ p.popPrevalence[1] };
+		int EA_N_Fam = p.family[1];
+		int EA_N_Kid = p.kid[1];
+		int EA_N_aff_Kid = p.affectedKid[1];
 
-		int EA_N_case = 50;
-		int EA_N_control = 50;
+		int EA_N_case = p.cases[1];
+		int EA_N_control = p.controls[1];
 
 		// generate EA
-		String[] EA_chr_file = { "AIM_EA_chr1.txt", "allele_freq_EA_chr2_simu.txt" };
-		double[] w = { 1 };
+		String[] EA_chr_file = p.AIM_file[1];
+		double[] w = new double[]{p.popProportion[1]};
 		ArrayList<DNAStirrer> EA_DNAPool = new ArrayList<DNAStirrer>();
 		ArrayList<ChromosomeGenerator> EA_CG = new ArrayList<ChromosomeGenerator>();
 		for (int i = 0; i < EA_chr_file.length; i++) {
@@ -105,40 +123,40 @@ public class DiscreteAncestryModel {
 			p2f.addColony(AA_GenColony);
 			p2f.addColony(EA_GenColony);
 			try {
-				StringBuilder Gsb = new StringBuilder("ped.txt");
-				Gsb.insert(0, rep);
-				StringBuilder Psb = new StringBuilder("phe.txt");
-				Psb.insert(0, rep);
-				StringBuilder L_Gsb = new StringBuilder("L_ped.txt");
-				L_Gsb.insert(0, rep);
-				StringBuilder L_Psb = new StringBuilder("L_phe.txt");
-				L_Psb.insert(0, rep);
+				StringBuilder Gsb = new StringBuilder(rep + "ped.txt");
+				Gsb.insert(0, dir_unified);
+				StringBuilder Psb = new StringBuilder(rep + "phe.txt");
+				Psb.insert(0, dir_unified);
+				StringBuilder L_Gsb = new StringBuilder(rep + "L_ped.txt");
+				L_Gsb.insert(0, dir_unified);
+				StringBuilder L_Psb = new StringBuilder(rep + "L_phe.txt");
+				L_Psb.insert(0, dir_unified);
 				p2f.printGenotype2file(Gsb.toString(), Psb.toString(), !AdmixtureConstant.printAllele,
 						!printLinked);
 				p2f.printGenotype2file(L_Gsb.toString(), L_Psb.toString(), AdmixtureConstant.printAllele,
 						printLinked);
 
-				StringBuilder F_Gsb = new StringBuilder("Fam_ped.txt");
-				F_Gsb.insert(0, rep);
-				StringBuilder F_Psb = new StringBuilder("Fam_phe.txt");
-				F_Psb.insert(0, rep);
-				StringBuilder L_F_Gsb = new StringBuilder("L_Fam_ped.txt");
-				L_F_Gsb.insert(0, rep);
-				StringBuilder L_F_Psb = new StringBuilder("L_Fam_phe.txt");
-				L_F_Psb.insert(0, rep);
+				StringBuilder F_Gsb = new StringBuilder(rep + "ped.txt");
+				F_Gsb.insert(0, dir_fam);
+				StringBuilder F_Psb = new StringBuilder(rep + "phe.txt");
+				F_Psb.insert(0, dir_fam);
+				StringBuilder L_F_Gsb = new StringBuilder(rep + "L_ped.txt");
+				L_F_Gsb.insert(0, dir_fam);
+				StringBuilder L_F_Psb = new StringBuilder(rep + "L_phe.txt");
+				L_F_Psb.insert(0, dir_fam);
 				p2f.printFamilyGenotype2file(F_Gsb.toString(), F_Psb.toString(), !AdmixtureConstant.printAllele,
 						!printLinked);
 				p2f.printFamilyGenotype2file(L_F_Gsb.toString(), L_F_Psb.toString(), AdmixtureConstant.printAllele,
 						printLinked);
 
-				StringBuilder C_Gsb = new StringBuilder("CC_ped.txt");
-				C_Gsb.insert(0, rep);
-				StringBuilder C_Psb = new StringBuilder("CC_phe.txt");
-				C_Psb.insert(0, rep);
-				StringBuilder L_C_Gsb = new StringBuilder("L_CC_ped.txt");
-				L_C_Gsb.insert(0, rep);
-				StringBuilder L_C_Psb = new StringBuilder("L_CC_phe.txt");
-				L_C_Psb.insert(0, rep);
+				StringBuilder C_Gsb = new StringBuilder(rep + "ped.txt");
+				C_Gsb.insert(0, dir_cc);
+				StringBuilder C_Psb = new StringBuilder(rep + "phe.txt");
+				C_Psb.insert(0, dir_cc);
+				StringBuilder L_C_Gsb = new StringBuilder(rep + "L_ped.txt");
+				L_C_Gsb.insert(0, dir_cc);
+				StringBuilder L_C_Psb = new StringBuilder(rep + "L_phe.txt");
+				L_C_Psb.insert(0, dir_cc);
 				p2f.printCCGenotype2file(C_Gsb.toString(), C_Psb.toString(), !AdmixtureConstant.printAllele,
 						!printLinked);
 				p2f.printCCGenotype2file(L_C_Gsb.toString(), L_C_Psb.toString(), AdmixtureConstant.printAllele,
