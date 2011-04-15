@@ -8,6 +8,10 @@ import org.apache.commons.cli.ParseException;
 import org.apache.commons.cli.PosixParser;
 
 public class Parameter {
+
+	private final String cmd_path = "dir";
+	protected String dir = System.getProperty("user.dir") + System.getProperty("file.separator");//System.getProperty("user.dir") + System.getProperty("file.separator");
+	
 	private final String cmd_sd = "sd";
 	protected long seed = 2011;
 	
@@ -64,7 +68,7 @@ public class Parameter {
 	protected double err = 1;
 
 	private String cmd_file = "f";
-	protected String[] AIM_file = new String[] { "allele_freq_chr1_200snp.txt", "allele_freq_chr2.txt" };
+	protected String[][] AIM_file = new String[][]{ { "allele_freq_chr1_200snp.txt", "allele_freq_chr2.txt" }};
 	
 	private String cmd_aim = "aim";
 	protected int[] aim = new int[] {0, 0};
@@ -79,6 +83,8 @@ public class Parameter {
 	}
 
 	public void commandInitial() {
+		ops.addOption(OptionBuilder.withLongOpt("working-dir").withDescription("working directory").hasArg()
+				.withArgName("working dir").create(cmd_path));		
 		ops.addOption(OptionBuilder.withLongOpt("seed").withDescription("seed for simulation").hasArg()
 				.withArgName("seed").create(cmd_sd));
 		ops.addOption(OptionBuilder.withLongOpt("control-chr").withDescription("control chromosome").hasArg()
@@ -134,6 +140,9 @@ public class Parameter {
 			cl = parser.parse(ops, args);
 		} catch (ParseException E) {
 			E.printStackTrace(System.err);
+		}
+		if(cl.hasOption(cmd_path)) {
+			dir = cl.getOptionValue(cmd_path);
 		}
 		if(cl.hasOption(cmd_sd)) {
 			seed = Long.parseLong(cl.getOptionValue(cmd_sd));
@@ -213,7 +222,11 @@ public class Parameter {
 			replication = Integer.parseInt(cl.getOptionValue(cmd_rep));
 		}
 		if(cl.hasOption(cmd_file)) {
-			AIM_file = cl.getArgs();
+			String[] file = cl.getArgs();
+			AIM_file = new String[file.length][];
+			for(int i = 0, len = file.length; i < len; i++) {
+				AIM_file[i] = file[i].split(",");
+			}
 		}
 		if(cl.hasOption(cmd_aim)) {
 			String[] aim_num = cl.getOptionValues(cmd_aim);
@@ -225,9 +238,10 @@ public class Parameter {
 
 	public String toString() {
 		StringBuilder sb = new StringBuilder();
-		sb.append("seed=" + seed + "\n");
-		sb.append("control_chr=" + control_chr + "\n");
-		sb.append("is null hypothesis: " + isNullHypothesis + "\n");
+		sb.append("working dir=" + dir + System.getProperty("line.separator"));
+		sb.append("seed=" + seed + System.getProperty("line.separator"));
+		sb.append("control_chr=" + control_chr + System.getProperty("line.separator"));
+		sb.append("is null hypothesis: " + isNullHypothesis + System.getProperty("line.separator"));
 
 		sb.append("Family: ");
 		for(int i = 0, len = family.length; i<len; i++) {
@@ -316,6 +330,8 @@ public class Parameter {
 		Parameter p = new Parameter();
 		p.commandListenor(args);
 		System.out.println(p);
-//		System.out.println(System.getProperty("user.dir"));
+		
+		System.setProperty("java.io.tempdir", "c:/cgb/");
+		System.out.println(System.getProperty("user.name"));
 	}
 }

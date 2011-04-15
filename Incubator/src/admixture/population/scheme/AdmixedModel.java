@@ -1,5 +1,6 @@
 package admixture.population.scheme;
 
+import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 
@@ -15,9 +16,24 @@ import admixture.population.phenotype.QualityControl;
 
 public class AdmixedModel {
 	public static void main(String[] args) {
+
 		Parameter p = new Parameter();
 		p.commandListenor(args);
-
+		String unified = "unified";
+		File file = new File(p.dir + unified);
+		file.mkdir();
+		String dir_unified = p.dir + unified + System.getProperty("file.separator");
+		
+		String fam = "family";
+		file = new File(p.dir + fam);
+		file.mkdir();
+		String dir_fam = p.dir + fam + System.getProperty("file.separator");
+		
+		String c_c = "cc";
+		file = new File(p.dir + c_c);
+		file.mkdir();
+		String dir_cc = p.dir + c_c + System.getProperty("file.separator");
+		
 		long seed = p.seed;
 		int control_chr = p.control_chr;
 		boolean isNullHypothesis = p.isNullHypothesis;
@@ -42,7 +58,7 @@ public class AdmixedModel {
 		double[] prevalence = p.popPrevalence;
 		int N_phe = 3;
 
-		String[] chr_file = p.AIM_file;
+		String[] chr_file = p.AIM_file[0];
 		int[] AIM_number = p.aim;
 		double[] pop_proportion = p.popProportion;
 
@@ -69,7 +85,7 @@ public class AdmixedModel {
 				.hotSpot(hs).popProportion(pop_proportion).numPhenotype(N_phe).ChrGenerator(CG).PheGenerator(pg).GeneFlow(GF).seed(
 						seed).diseaseChr(control_chr).isNullHypothesis(isNullHypothesis).build();
 
-		for (int rep = 0; rep < 2; rep++) {
+		for (int rep = 0; rep < p.replication; rep++) {
 			QualityControl qc = new QualityControl(N_aff_Kid, AdmixtureConstant.FamilyExactAffected);
 			QualityControl qc_c = new QualityControl(N_case, N_control, AdmixtureConstant.CaseControl);
 			GeneFlowGenerateColony.setCurrFamilyID(0);
@@ -77,40 +93,40 @@ public class AdmixedModel {
 			GC.GenerateCCHab(N_case + N_control, 1, qc_c);
 
 			try {
-				StringBuilder Gsb = new StringBuilder("ped.txt");
-				Gsb.insert(0, rep);
-				StringBuilder Psb = new StringBuilder("phe.txt");
-				Psb.insert(0, rep);
-				StringBuilder L_Gsb = new StringBuilder("L_ped.txt");
-				L_Gsb.insert(0, rep);
-				StringBuilder L_Psb = new StringBuilder("L_phe.txt");
-				L_Psb.insert(0, rep);
+				StringBuilder Gsb = new StringBuilder(rep + "ped.txt");
+				Gsb.insert(0, dir_unified);
+				StringBuilder Psb = new StringBuilder(rep + "phe.txt");
+				Psb.insert(0, dir_unified);
+				StringBuilder L_Gsb = new StringBuilder(rep + "L_ped.txt");
+				L_Gsb.insert(0, dir_unified);
+				StringBuilder L_Psb = new StringBuilder(rep + "L_phe.txt");
+				L_Psb.insert(0, dir_unified);
 				GC.printGenotype2file(Gsb.toString(), Psb.toString(), !AdmixtureConstant.printAllele,
 						!AdmixtureConstant.printLinked);
 				GC.printGenotype2file(L_Gsb.toString(), L_Psb.toString(), AdmixtureConstant.printAllele,
 						AdmixtureConstant.printLinked);
 
-				StringBuilder F_Gsb = new StringBuilder("Fam_ped.txt");
-				F_Gsb.insert(0, rep);
-				StringBuilder F_Psb = new StringBuilder("Fam_phe.txt");
-				F_Psb.insert(0, rep);
-				StringBuilder L_F_Gsb = new StringBuilder("L_Fam_ped.txt");
-				L_F_Gsb.insert(0, rep);
-				StringBuilder L_F_Psb = new StringBuilder("L_Fam_phe.txt");
-				L_F_Psb.insert(0, rep);
+				StringBuilder F_Gsb = new StringBuilder(rep + "ped.txt");
+				F_Gsb.insert(0, dir_fam);
+				StringBuilder F_Psb = new StringBuilder(rep + "phe.txt");
+				F_Psb.insert(0, dir_fam);
+				StringBuilder L_F_Gsb = new StringBuilder(rep + "L_ped.txt");
+				L_F_Gsb.insert(0, dir_fam);
+				StringBuilder L_F_Psb = new StringBuilder(rep + "L_phe.txt");
+				L_F_Psb.insert(0, dir_fam);
 				GC.printFamilyGenotype2file(F_Gsb.toString(), F_Psb.toString(), !AdmixtureConstant.printAllele,
 						!AdmixtureConstant.printLinked);
 				GC.printFamilyGenotype2file(L_F_Gsb.toString(), L_F_Psb.toString(), AdmixtureConstant.printAllele,
 						AdmixtureConstant.printLinked);
 
-				StringBuilder C_Gsb = new StringBuilder("CC_ped.txt");
-				C_Gsb.insert(0, rep);
-				StringBuilder C_Psb = new StringBuilder("CC_phe.txt");
-				C_Psb.insert(0, rep);
-				StringBuilder L_C_Gsb = new StringBuilder("L_CC_ped.txt");
-				L_C_Gsb.insert(0, rep);
-				StringBuilder L_C_Psb = new StringBuilder("L_CC_phe.txt");
-				L_C_Psb.insert(0, rep);
+				StringBuilder C_Gsb = new StringBuilder(rep + "ped.txt");
+				C_Gsb.insert(0, dir_cc);
+				StringBuilder C_Psb = new StringBuilder(rep + "phe.txt");
+				C_Psb.insert(0, dir_cc);
+				StringBuilder L_C_Gsb = new StringBuilder(rep + "L_ped.txt");
+				L_C_Gsb.insert(0, dir_cc);
+				StringBuilder L_C_Psb = new StringBuilder(rep + "L_phe.txt");
+				L_C_Psb.insert(0, dir_cc);
 				GC.printCCGenotype2file(C_Gsb.toString(), C_Psb.toString(), !AdmixtureConstant.printAllele,
 						!AdmixtureConstant.printLinked);
 				GC.printCCGenotype2file(L_C_Gsb.toString(), L_C_Psb.toString(), AdmixtureConstant.printAllele,
