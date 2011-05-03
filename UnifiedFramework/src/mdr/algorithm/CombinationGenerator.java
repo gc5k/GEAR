@@ -1,27 +1,23 @@
 package mdr.algorithm;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 
 import publicAccess.PublicData;
 import util.NewIt;
 
 /**
  *
- * @author Guo-Bo Chen
+ * @author Guo-Bo Chen, chenguobo@gmail.com
  */
 public class CombinationGenerator {
 
-    private HashMap<Integer, ArrayList<String>> combination = NewIt.newHashMap();
-
+	ArrayList<String> Comb;
     private int start;
-    private int end;
     private int N;
     private int[] a;
 
-    public CombinationGenerator(int s, int e, int n) {
+    public CombinationGenerator(int s, int n) {
         start = s;
-        end = e;
         N = n;
         a = new int[N];
         for (int i = 0; i < N; i++) {
@@ -29,43 +25,20 @@ public class CombinationGenerator {
         }
     }
 
-    public void fill(Integer order, ArrayList<String> com) {
-    	combination.put(order, com);
-    }
-
-    public ArrayList<String> get(Integer o) {
-        return combination.get(o);
-    }
-
     public int getStart() {
         return start;
     }
 
-    public int getEnd() {
-        return end;
-    }
-
-    public int size() {
-        return combination.size();
+    public ArrayList<String> getCombination() {
+    	return Comb;
     }
 
     public void generateCombination() {
-        for (int i = start; i <= end; i++) {
-            combination.put(new Integer(i), combine(a, N, i));
-        }
+    	combine(a, N, start);
     }
 
-    public void print() {
-        for (ArrayList<String> i : combination.values()) {
-            for (String s:i) {
-                System.out.println(s);
-            }
-            System.out.println();
-        }
-    }
-
-    public ArrayList<String> combine(int[] a, int n, int m) {
-        ArrayList<String> Comb = NewIt.newArrayList();
+    private ArrayList<String> combine(int[] a, int n, int m) {
+        Comb = NewIt.newArrayList();
         int[] order = new int[m + 1];
         for (int i = 0; i <= m; i++) {
             order[i] = i - 1;
@@ -73,18 +46,17 @@ public class CombinationGenerator {
         int count = 0;
         int k = m;
         boolean flag = true;
-        String combi;
+        StringBuilder combi;
         while (order[0] == -1) {
             if (flag) {
-                combi = new String();
+                combi = new StringBuilder();
                 for (int i = 1; i <= m; i++) {
+                    combi.append(Integer.toString(a[order[i]]));
                     if (i != m) {
-                        combi += (new Integer(a[order[i]])).toString() + PublicData.seperator;
-                    } else {
-                        combi += (new Integer(a[order[i]])).toString();
+                        combi.append(PublicData.seperator);
                     }
                 }
-                Comb.add(combi);
+                Comb.add(combi.toString());
                 count++;
                 flag = false;
             }

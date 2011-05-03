@@ -1,4 +1,4 @@
-package family.pedigree;
+package family.pedigree.file;
 
 /*
  * $Id: PedFile.java,v 3.21 2006/05/12 18:01:28 jmaller Exp $

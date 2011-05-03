@@ -2,9 +2,8 @@ package mdr.moore;
 
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.HashMap;
 import java.util.Set;
-
+import java.util.Map.Entry;
 
 import mdr.MDRConstant;
 import mdr.algorithm.Subdivision;
@@ -28,27 +27,41 @@ import util.NewIt;
 
 public class HeteroLinearMergeSearch extends LinearMergeSearch {
 
-	private HashMap<String, MDRStatistic> heteroresult = null;
+	private double[] statistic;
 
-	public HeteroLinearMergeSearch(DataFile dr, Subdivision sd, boolean ismooremdr) {
-		super(dr, sd, ismooremdr);
+	private MDRStatistic mdr_stat;
+	private String best_model;
+
+	public HeteroLinearMergeSearch(DataFile dr, Subdivision sd) {
+		super(dr, sd);
 	}
 
 	public void search(int or, ArrayList<String> modelspace) {
+		statistic = new double[MDRConstant.NumStats];
+		best_model = null;
+		mdr_stat = null;
+
 		order = or;
 		bestKFold = new BestKFoldCVResult(or, subdivision.getInterval());
 		count = 0;
 		Arrays.fill(currBestStats, 0);
+
 		heteroresult = NewIt.newHashMap();
 
+		ArrayList<DataFile.Subject> sample = data.getSample();
 		for (String modelName : modelspace) {
 			for (Combination testingModel : cvTestingSet) {
 				testingModel.clear();
 			}
 			model = new Combination();
 			SNPIndex = ToolKit.StringToIntArray(modelName);
-			mergeSearch(data.getSample(), null, 0);
-			calculateSingleBest(modelName);
+			linearSearch(sample);
+//			mergeSearch(data.getSample(), null, 0);
+			double[] t = calculateSingleBest(modelName);
+			if(t[MDRConstant.TestingBalancedAccuIdx] > statistic[MDRConstant.TestingBalancedAccuIdx]) {
+				statistic = t;
+				best_model = modelName;
+			}
 			count++;
 		}
 	}
@@ -99,9 +112,9 @@ public class HeteroLinearMergeSearch extends LinearMergeSearch {
 			double tAccu = 0;
 			trAccu = ToolKit.BalancedAccuracy(cvSet.getTrainingSubdivision());
 			mean[MDRConstant.TrainingBalancedAccuIdx] += trAccu;
+
 			tAccu = ToolKit.BalancedAccuracy(cvSet.getTestingSubdivision());
 			mean[MDRConstant.TestingBalancedAccuIdx] += tAccu;
-
 			cvSet.setStatistic(MDRConstant.TrainingBalancedAccuIdx, trAccu);
 			cvSet.setStatistic(MDRConstant.TestingBalancedAccuIdx, tAccu);
 		}
@@ -111,17 +124,44 @@ public class HeteroLinearMergeSearch extends LinearMergeSearch {
 		heteroresult.put(modelName, mdrstat);
 		mdrstat.setTrainingBalancedAccuracy(mean[MDRConstant.TrainingBalancedAccuIdx]);
 		mdrstat.setTestingBalancedAccuracy(mean[MDRConstant.TestingBalancedAccuIdx]);
+		if(mdr_stat == null) {
+			mdr_stat = mdrstat;
+			best_model = modelName;
+		} else {
+			if(mdr_stat.compareTo(mdrstat) < 0) {
+				best_model = modelName;
+				mdr_stat = mdrstat;
+			}
+		}
 		return mean;
+	}
+
+	public String getBestModelKey() {
+		return best_model;
+	}
+
+	public double[] getStats() {
+		return statistic;
 	}
 
 	public String toString() {
 		StringBuilder sb = new StringBuilder();
-		for(String m : heteroresult.keySet()) {
-			sb.append(m);
-			sb.append(" ");
-			sb.append(heteroresult.get(m));
-			sb.append("\n");
+		sb.append("model, ");
+		for(int i = 0; i < MDRConstant.NumStats; i++) {
+			sb.append(MDRConstant.TestStatistic[i] + ", ");
 		}
+		sb.append(System.getProperty("line.separator"));
+		for(Entry<String, MDRStatistic> entry : heteroresult.entrySet()) {
+			sb.append(entry.getKey());
+			sb.append(" ");
+			sb.append(entry.getValue());
+			sb.append(System.getProperty("line.separator"));
+		}
+		sb.append("===================");
+		sb.append(System.getProperty("line.separator"));
+		sb.append("best model: " + best_model);
+		sb.append(System.getProperty("line.separator"));
+		sb.append(mdr_stat);
 		return sb.toString();
 	}
 }

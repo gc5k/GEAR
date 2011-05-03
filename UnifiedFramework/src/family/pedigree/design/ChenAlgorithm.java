@@ -1,4 +1,4 @@
-package family.pedigree;
+package family.pedigree.design;
 
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -7,13 +7,17 @@ import java.io.PrintWriter;
 import java.util.ArrayList;
 import java.util.Hashtable;
 import java.util.Random;
+import java.util.Map.Entry;
 
+import family.RabinowitzLairdAlgorithm.AbstractGenoDistribution;
+import family.pedigree.file.GMDRPhenoFile;
+import family.pedigree.file.GMDRPhenoFileException;
+import family.pedigree.file.MDRPed;
+import family.pedigree.file.MDRPedFileException;
 import family.pedigree.genotype.FamilyStruct;
 import family.pedigree.genotype.Person;
 import family.pedigree.phenotype.FamilyUnit;
 import family.pedigree.phenotype.Subject;
-
-import publicAccess.PublicData;
 
 import score.LinearRegression;
 import score.LogisticRegression;
@@ -23,7 +27,7 @@ import util.Sample;
 
 import org.apache.commons.lang3.ArrayUtils;
 
-public class ChenAlgorithm {
+public final class ChenAlgorithm {
 
 	public MDRPed PedData;
 	public GMDRPhenoFile PhenoData;
@@ -120,58 +124,25 @@ public class ChenAlgorithm {
 	 *            with predictor.
 	 * @throws CalEngineException
 	 */
-	public void buildScore(int PIndex, int[] CIndex, boolean adjust, int method, boolean includeFounder, boolean includeChildren) {
+	public void buildScore(int PIndex, int[] CIndex, int method) {
 		// method: 0 for regression, 1 for logistic
 		score = new double[PersonTable.size()];
-		PersonIndex PI;
 		ArrayList<Double> T = NewIt.newArrayList();
 		ArrayList<ArrayList<Double>> C = NewIt.newArrayList();
 		ArrayList<PersonIndex> P = NewIt.newArrayList();
 
 		for (int i = 0; i < PersonTable.size(); i++) {
-			PI = PersonTable.get(i);
-			if (!includeFounder) {
-				FamilyStruct FamStr = PedData.getFamilyStruct(PI.getFamilyID());
-				if (!FamStr.hasAncestor(PI.getIndividualID())) {
-					continue;
-				}
-			}
-			if (!includeChildren) {
-				FamilyStruct FamStr = PedData.getFamilyStruct(PI.getFamilyID());
-				if (FamStr.hasAncestor(PI.getIndividualID())) {
-					continue;
-				}
-			}
-			boolean flag = true;
 			double t = 0;
 			ArrayList<Double> c = NewIt.newArrayList();
 			ArrayList<String> tempc = CovariateTable.get(i);
 			if (PIndex == -1) {// using affecting status as phenotype
-				if (status[i] == 0) {
-					flag = false;
-					continue;
-				} else {// after converting, 0 for unaffected; 1 for affected;
-					// -1 for unknown;
-					t = status[i] - 1;
-				}
+				t = status[i];
 			} else {
-				if (((String) tempc.get(PIndex)).compareTo(PublicData.MissingValue) == 0) {
-					flag = false;
-					continue;
-				} else {
-					t = Double.parseDouble((String) tempc.get(PIndex));
-				}
+				t = Double.parseDouble((String) tempc.get(PIndex));
 			}
-			if (adjust) {
+			if (CIndex != null) {
 				for (int j = 0; j < CIndex.length; j++) {
-					if (((String) tempc.get(CIndex[j])).compareTo(PublicData.MissingValue) == 0) {
-						flag = false;
-						break;
-					}
 					c.add((Double.parseDouble((String) tempc.get(CIndex[j]))));
-				}
-				if (!flag) {
-					continue;
 				}
 				C.add(c);
 			}
@@ -180,7 +151,7 @@ public class ChenAlgorithm {
 		}
 
 		double[][] X = null;
-		if (adjust) {
+		if (CIndex != null) {
 			X = new double[C.size()][CIndex.length];
 			for (int i = 0; i < C.size(); i++) {
 				ArrayList<Double> c = C.get(i);
@@ -207,32 +178,32 @@ public class ChenAlgorithm {
 		}
 
 		System.arraycopy(r, 0, score, 0, r.length);
-		nameScore(PIndex, CIndex, adjust, method, includeFounder);
+		nameScore(PIndex, CIndex, method);
 	}
 
-	private void nameScore(int PIndex, int[] CIndex, boolean adjust, int method, boolean includeFounder) {
-		StringBuilder ln = new StringBuilder();
-		if(method == 1) {
-			ln.append("linear(" );
+	private void nameScore(int PIndex, int[] CIndex, int method) {
+		StringBuilder ln = new StringBuilder(300);
+		if (method == 1) {
+			ln.append("linear(");
 		} else {
 			ln.append("logistic(");
 		}
-		if(PIndex == -1) {
+		if (PIndex == -1) {
 			ln.append("status->");
 		} else {
 			ln.append(PhenoData.getTraitAtI(PIndex));
 		}
 		ln.append("->");
 
-		for (int i = 0; i < CIndex.length; i++) {
-			ln.append(PhenoData.getTraitAtI(CIndex[i]) + ",");
-		}
-		
-		if(includeFounder) {
-			ln.append("included founders)");
+		if(CIndex != null) {
+			for (int i = 0; i < CIndex.length; i++) {
+				ln.append(PhenoData.getTraitAtI(CIndex[i]) + ",");
+			}
 		} else {
-			ln.append("excluded founders)");
+			ln.append(",");
 		}
+
+		ln.append("included all individuals)");
 		scoreName[0] = ln.toString();
 	}
 
@@ -244,31 +215,19 @@ public class ChenAlgorithm {
 	 *            Index of the score in the phenotype file
 	 * @return
 	 */
-	public boolean fetchScore(int score_index, boolean includeFounder) {
-		ArrayList<Integer> mi = NewIt.newArrayList();
+	public boolean fetchScore(int score_index) {
+
 		double sum = 0;
 		score = new double[PersonTable.size()];
 		for (int i = 0; i < PersonTable.size(); i++) {
 			if (score_index == -1) {
-				if (status[i] == PublicData.MissingAffection) {
-					score[i] = rnd.nextInt(2);
-				} else {
-					score[i] = status[i] - 1;
-				}
+				score[i] = status[i] - 1;
 			} else {
 				ArrayList<String> v = CovariateTable.get(i);
 				String s = (String) v.get(score_index);
-				if (s.compareTo(PublicData.MissingValue) == 0) {
-					mi.add(new Integer(i));
-					continue;
-				}
 				score[i] = Double.parseDouble(s);
 				sum += score[i];
 			}
-		}
-		sum /= (score.length - mi.size());
-		for (Integer i : mi) {
-			score[i.intValue()] = sum;
 		}
 		if (score_index == -1) {
 			scoreName[0] = new String("status");
@@ -278,11 +237,26 @@ public class ChenAlgorithm {
 		return true;
 	}
 
-	public double[] getPermutationScore() {
+	public double[] getPermutedScore(boolean isNested) {
 		permuted_score = new double[score.length];
-		int[] idx = Sample.SampleIndex(0, score.length - 1, score.length);
-		for (int i = 0; i < idx.length; i++) {
-			permuted_score[i] = score[idx[i]];
+		if (isNested) {
+			int[] un_related = Sample.SampleIndex(0, numUnrelated - 1, numUnrelated);
+			for (int i = 0; i < un_related.length; i++) {
+				permuted_score[i] = score[un_related[i]];
+			}
+			int c = numUnrelated;
+			for (int i = 0; i < numSib.length; i++) {
+				int[] si = Sample.SampleIndex(0, numSib[i] - 1, numSib[i]);
+				for (int j = 0; j < si.length; j++) {
+					permuted_score[numUnrelated + j] = score[c + si[j]];
+				}
+				c += si.length;
+			}
+		} else {
+			int[] idx = Sample.SampleIndex(0, score.length - 1, score.length);
+			for (int i = 0; i < idx.length; i++) {
+				permuted_score[i] = score[idx[i]];
+			}
 		}
 		return permuted_score;
 	}
@@ -297,7 +271,7 @@ public class ChenAlgorithm {
 		for (int i = 0; i < numSib.length; i++) {
 			int[] si = Sample.SampleIndex(0, numSib[i] - 1, numSib[i]);
 			for (int j = 0; j < si.length; j++) {
-				permuted_score[numUnrelated + j] = score[c+si[j]];
+				permuted_score[numUnrelated + j] = score[c + si[j]];
 			}
 			c += si.length;
 		}
@@ -346,8 +320,8 @@ public class ChenAlgorithm {
 
 		Hashtable<String, FamilyStruct> Fam = PedData.getFamilyStruct();
 
-		for (String fi : Fam.keySet()) {
-			FamilyStruct fs = Fam.get(fi);
+		for (Entry<String, FamilyStruct> entry : Fam.entrySet()) {
+			FamilyStruct fs = entry.getValue();
 			numUnrelated += fs.getNumFounders();
 			numSibs += fs.getNumSibs();
 		}
@@ -400,7 +374,8 @@ public class ChenAlgorithm {
 		CovariateTable.addAll(s_C);
 
 		numSib = ArrayUtils.toPrimitive(SibIdx.toArray(new Integer[0]));
-
+		
+		AbstractGenoDistribution.rnd = rnd;
 		RLDriver RLD = new RLDriver();
 		RLD.TDT(Fam, PedData.getMarkerInformation(), m);
 	}
@@ -465,22 +440,22 @@ public class ChenAlgorithm {
 	public byte[][] getGenotype() {
 		return genotype;
 	}
-	
-	public byte[] getStatue() {
+
+	public byte[] getStatus() {
 		return status;
 	}
-	
+
 	public double[] getScore() {
 		return score;
 	}
-	
+
 	public String[] getScoreName() {
 		return scoreName;
 	}
 
 	public double[][] getScore2() {
 		double[][] s = new double[score.length][1];
-		for(int i = 0; i < score.length; i++) {
+		for (int i = 0; i < score.length; i++) {
 			s[i][0] = score[i];
 		}
 		return s;
@@ -491,23 +466,23 @@ public class ChenAlgorithm {
 		try {
 			pedout = new PrintWriter(new File(f));
 		} catch (FileNotFoundException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace(System.err);
 		}
 		ArrayList<String> mk = PedData.getMarkerInformation();
-		for(int i = 0; i < mk.size(); i++) {
+		for (int i = 0; i < mk.size(); i++) {
 			pedout.print(mk.get(i) + "\t");
 		}
 		pedout.println("status");
-		
-		for(int i = 0; i < genotype.length; i++) {
-			for(int j = 0; j < genotype[i].length; j++) {
+
+		for (int i = 0; i < genotype.length; i++) {
+			for (int j = 0; j < genotype[i].length; j++) {
 				pedout.print(genotype[i][j] + "\t");
 			}
 			pedout.println(status[i]);
 		}
 		pedout.close();
 	}
+
 	public static void main(String[] args) {
 
 	}

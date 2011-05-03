@@ -1,6 +1,7 @@
 package mdr.arsenal;
 
 import java.util.HashMap;
+import java.util.Map.Entry;
 
 import publicAccess.PublicData;
 
@@ -167,8 +168,9 @@ public class ToolKit {
 		double trueNeg = 0;
 		double falsePos = 0;
 		double falseNeg = 0;
-		for (String key : model.keySet()) {
-			Cell cell = (Cell) model.get(key);
+		double unknown = 0;
+		for (Entry<String, Cell> entry: model.entrySet()) {
+			Cell cell = entry.getValue();
 			if (cell.getStatus() == 1) {
 				truePos += cell.getPositiveScore();
 				falseNeg += Math.abs(cell.getNegativeScore());
@@ -176,10 +178,15 @@ public class ToolKit {
 				trueNeg += Math.abs(cell.getNegativeScore());
 				falsePos += cell.getPositiveScore();
 			} else {
-				// what's going on if for a negative status;
+				unknown += Math.abs(cell.getNegativeScore()) + cell.getPositiveScore();
+				// what's to do if for a unknown status;
 			}
 		}
-		accuracy = 0.5 * (truePos / (truePos + falseNeg) + trueNeg / (trueNeg + falsePos));
+		if( ((trueNeg + falsePos + unknown) == 0) || (truePos + falseNeg + unknown) == 0 ) {
+			accuracy = 0;
+		} else {
+			accuracy = 0.5 * (truePos / (truePos + falseNeg + unknown/2) + trueNeg / (trueNeg + falsePos + unknown/2));
+		}
 		return accuracy;
 	}
 
