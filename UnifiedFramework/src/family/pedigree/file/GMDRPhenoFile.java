@@ -1,4 +1,4 @@
-package family.pedigree;
+package family.pedigree.file;
 
 import java.io.BufferedReader;
 import java.io.File;

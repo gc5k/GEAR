@@ -26,7 +26,6 @@ public class Person {
     private byte[][] alleles;
     private byte[][] nontransmitted;
     private double numGoodMarkers;
-    private boolean[] zeroed;
     // this is used to keep track of the index of the last marker added
     private int currMarker;
     public final static int FEMALE = 2;
@@ -38,7 +37,6 @@ public class Person {
     public Person(int numMarkers) {
     	numMarker = numMarkers;
         alleles = new byte[2][numMarkers];
-        this.zeroed = new boolean[numMarkers];
         this.currMarker = 0;
 //        this.genotype = NewIt.newArrayList();
     }
@@ -95,7 +93,7 @@ public class Person {
      */
     public void setMomID(String momID) {
         this.momID = momID;
-        if(momID.compareTo("0") != 0) nontransmitted = new byte[2][zeroed.length];
+        if(momID.compareTo("0") != 0) nontransmitted = new byte[2][numMarker];
     }
 
     /**
@@ -173,34 +171,10 @@ public class Person {
     public void addMarker(byte markera, byte markerb) {
         alleles[0][currMarker] = markera;
         alleles[1][currMarker] = markerb;
-        zeroed[currMarker] = false;
         currMarker++;
         if (!(markera == 0 || markerb == 0)) {
             numGoodMarkers++;
         }
-    }
-
-    /**
-     * checks to see if a marker has been zeroed out
-     * 
-     * @param location
-     *            - which marker to check
-     * @return true if marker is zeroed, false otherwise
-     */
-    public boolean getZeroed(int location) {
-        // return ((Boolean)zeroed.get(location)).booleanValue();
-        return zeroed[location];
-    }
-
-    /**
-     * sets the bit that this marker has been zeroed out for this indiv (e.g. because it has a mendel error)
-     * 
-     * @param i
-     *            - marker to be zeroed
-     */
-    public void zeroOutMarker(int i) {
-        // this.zeroed.set(i, new Boolean(true));
-        this.zeroed[i] = true;
     }
 
     public String getReasonImAxed() {
@@ -213,14 +187,6 @@ public class Person {
 
     public double getGenoPC() {
         return numGoodMarkers / alleles[0].length;
-    }
-
-    public boolean[] getZeroedArray() {
-        return zeroed;
-    }
-
-    public void setZeroedArray(boolean[] z) {
-        zeroed = z;
     }
 
 //    public void setGenotype(ArrayList<String> marker) {
@@ -261,10 +227,10 @@ public class Person {
         return sb.toString();
     }
     
-    public byte[][] getGenotype() {
+    public byte[][] getAllele() {
     	return alleles;
     }
-    
+
     public byte[] getGenotypeScore() {
     	byte[] gs = new byte[getNumMarkers()];
     	for(int i = 0; i < gs.length; i++) {

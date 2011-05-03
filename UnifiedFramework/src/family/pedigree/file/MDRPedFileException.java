@@ -1,4 +1,4 @@
-package family.pedigree;
+package family.pedigree.file;
 
 public class MDRPedFileException extends Exception {
 

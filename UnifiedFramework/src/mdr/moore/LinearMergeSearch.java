@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Set;
+import java.util.Map.Entry;
 
 
 import mdr.MDRConstant;
@@ -32,8 +33,8 @@ public class LinearMergeSearch extends AbstractMergeSearch {
 	protected Combination model;
 	protected int count;
 
-	public LinearMergeSearch(DataFile dr, Subdivision sd, boolean ismooremdr) {
-		super(dr, sd, ismooremdr);
+	public LinearMergeSearch(DataFile dr, Subdivision sd) {
+		super(dr, sd);
 	}
 
 	public void search(int or, ArrayList<String> modelspace) {
@@ -43,19 +44,40 @@ public class LinearMergeSearch extends AbstractMergeSearch {
 		Arrays.fill(currBestStats, 0);
 
 		savedModels = new SavedModels();
+		ArrayList<DataFile.Subject> sample = data.getSample();
 		for (String modelName : modelspace) {
 			for (Combination testingModel : cvTestingSet) {
 				testingModel.clear();
 			}
 			model = new Combination();
 			SNPIndex = ToolKit.StringToIntArray(modelName);
-			mergeSearch(data.getSample(), null, 0);
+//			mergeSearch(sample, null, 0);
+			linearSearch(sample);
 			calculate(modelName);
 			count++;
 		}
 		summary();
 	}
 
+	public void linearSearch(ArrayList<DataFile.Subject> subjects) {
+		for(DataFile.Subject sub : subjects) {
+			String geno = sub.getGenotype(SNPIndex);
+			Suite subset = model.get(geno);
+			if(subset == null) {
+				subset = new Suite();
+				model.put(geno, subset);
+			}
+			subset.add(sub);
+		}
+
+		for(Entry<String, Suite> entry : model.entrySet()) {
+			String geno = entry.getKey();
+			Suite s = entry.getValue();
+			s.summarize();
+			assignKFold(geno, s.getSubjects());
+		}
+	}
+	
 	public void mergeSearch(ArrayList<DataFile.Subject> subjects, String combination, int idxMarker) {
 		if (idxMarker < SNPIndex.length) {
 			HashMap<String, ArrayList<DataFile.Subject>> subsets = NewIt.newHashMap();

@@ -1,4 +1,4 @@
-package family.pedigree;
+package family.pedigree.design;
 
 import java.util.ArrayList;
 import java.util.Enumeration;
@@ -6,6 +6,7 @@ import java.util.Hashtable;
 import java.util.Set;
 import java.util.TreeMap;
 import java.util.TreeSet;
+import java.util.Map.Entry;
 
 import util.NewIt;
 import family.RabinowitzLairdAlgorithm.AbstractGenoDistribution;
@@ -29,10 +30,11 @@ public class RLDriver {
 	}
 
 	public void TDT(Hashtable<String, FamilyStruct> familystructure, ArrayList<String> markerInfor, int[] marker) {
-		Enumeration<String> fsList = familystructure.keys();
-		while (fsList.hasMoreElements()) {
-			String FID = (String) fsList.nextElement();
-			FamilyStruct fs = (FamilyStruct) familystructure.get(FID);
+//		Enumeration<String> fsList = familystructure.keys();
+//		while (fsList.hasMoreElements()) {
+		for(Entry<String, FamilyStruct> entry : familystructure.entrySet()) {
+			String FID = entry.getKey();
+			FamilyStruct fs = entry.getValue();
 			TreeMap<String, Integer> Ps;
 			TreeMap<String, Integer> Ks;
 			GenoSet gSet = null;

@@ -14,10 +14,9 @@ import mdr.data.DataFile;
 import mdr.moore.AbstractMergeSearch;
 import mdr.moore.HeteroLinearMergeSearch;
 import family.PedigreeParameter;
-import family.RabinowitzLairdAlgorithm.AbstractGenoDistribution;
 import family.pedigree.design.ChenAlgorithm;
 
-public class SimulationI {
+public class SimulationFam {
 
 	public static void main(String[] args) throws IOException {
 		int replication = args.length > 0 ? Integer.parseInt(args[0]) : 1;
@@ -53,7 +52,7 @@ public class SimulationI {
 
 			ChenAlgorithm.rnd = new Random(pr.getSeed() + i);
 			ChenAlgorithm chen = new ChenAlgorithm();
-			AbstractGenoDistribution.rnd = new Random(pr.getSeed() + 1);
+
 			chen.RevvingUp(pr.getPedigreeFile(), pr.getPhenotypeFile());
 //			GD.print2MDRFormat("MDR.txt");
 			if (pr.getScoreBuildMethod() >= 0) {
@@ -83,6 +82,7 @@ public class SimulationI {
 				Arrays.sort(p);
 				mdrData.setScore(chen.getScore());
 				as.search(j, cg.getCombination());
+				System.out.println(as);
 
 				SimulationPower sp = new SimulationPower(as.getMDRResult(), p);
 				sp.calculatePower();
