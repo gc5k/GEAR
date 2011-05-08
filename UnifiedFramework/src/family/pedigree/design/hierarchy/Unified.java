@@ -104,7 +104,7 @@ public final class Unified extends ChenBase {
 			for (int i = 0; i < numSib.length; i++) {
 				int[] si = Sample.SampleIndex(0, numSib[i] - 1, numSib[i]);
 				for (int j = 0; j < si.length; j++) {
-					permuted_score[numUnrelated + j] = score[c + si[j]];
+					permuted_score[c + j] = score[c + si[j]];
 				}
 				c += si.length;
 			}

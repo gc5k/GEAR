@@ -26,16 +26,15 @@ public class UnifiedGMDR {
 			String PhenoFile = Integer.toString(i) + "score.txt";
 
 			ChenInterface chen = null;
-			if(p.mode.compareTo("u") == 0) {
+			if (p.mode.compareTo("u") == 0) {
 				chen = new Unified(PedFile, PhenoFile);
-			} else if(p.mode.compareTo("f") == 0) {
+			} else if (p.mode.compareTo("f") == 0) {
 				chen = new SII(PedFile, PhenoFile);
 			}
 			chen.setSeed(p.seed);
 			chen.generateScore(p.response, p.predictor, p.linkfunction);
 
-			DataFile mdrData = new DataFile(chen.getMarkerName(), chen.getGenotype(), 
-					chen.getStatus(), chen.getScoreName(), chen.getScore2());
+			DataFile mdrData = new DataFile(chen.getMarkerName(), chen.getGenotype(), chen.getStatus(), chen.getScoreName(), chen.getScore2());
 			DataFile.setScoreIndex(0);
 
 			Subdivision sd = new Subdivision(p.cv, p.seed + i, mdrData.size());
