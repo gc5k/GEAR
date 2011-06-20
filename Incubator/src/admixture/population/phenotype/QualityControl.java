@@ -4,7 +4,7 @@ import admixture.AdmixtureConstant;
 
 public class QualityControl {
 	private int N_AffectedKids;
-
+	private int N_AffectedParents;
 	private int scheme; //0 for family 
 	private CC cc;
 	static class CC {
@@ -36,8 +36,9 @@ public class QualityControl {
 		}
 	}
 
-	public QualityControl(int ak, int sc) {
+	public QualityControl(int ak, Integer f, int sc) {
 		N_AffectedKids = ak;
+		N_AffectedParents = f.intValue();
 		scheme = sc;
 	}
 
@@ -64,12 +65,12 @@ public class QualityControl {
 
 	private boolean MoreThan(FamilyPhenotype fp) {
 		int s = fp.getNumberAffectedOffspring();
-		return s >= N_AffectedKids ? true:false;
+		return (s >= N_AffectedKids && fp.getNumberAffectedParent() >= N_AffectedParents) ? true:false;
 	}
 	
 	private boolean Exact(FamilyPhenotype fp) {
 		int s = fp.getNumberAffectedOffspring();
-		return s == N_AffectedKids ? true:false;
+		return (s == N_AffectedKids && fp.getNumberAffectedParent() >= N_AffectedParents) ? true:false;
 	}
 
 }

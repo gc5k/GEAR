@@ -7,12 +7,13 @@ import admixture.AdmixtureConstant;
 import admixture.population.AlleleFrequencyReader;
 import arsenal.Sample;
 
-public final class GeneFlow {
-	private int[][][] pool;
-	private int[][][] f_pool;
+public class GeneFlowByteFormat {
+	private byte[][][] pool;
+	private byte[][][] f_pool;
 
 	private double[][] ancestry_snp_panel;
 	int N_snp;
+	int n_dim;
 	private boolean ld = false;
 	private Random rnd = new Random(2011);
 	private double[] pop_prop;
@@ -23,7 +24,7 @@ public final class GeneFlow {
 
 	private int[] randomIndex;
 
-	public GeneFlow(int ps, double[][] sp, double[] pp, HotSpot h) {
+	public GeneFlowByteFormat(int ps, double[][] sp, double[] pp, HotSpot h) {
 		founder_size = ps;
 		N_snp = sp[0].length;
 		ancestry_snp_panel = sp;
@@ -37,13 +38,15 @@ public final class GeneFlow {
 		hs = h;
 		hs.rev(N_snp);
 
-		pool = new int[founder_size][2][N_snp];
-		// pool_ancestry = new int[founder_size][2][N_snp];
-		f_pool = new int[founder_size][2][N_snp];
-		// f_pool_ancestry = new int[founder_size][2][N_snp];
+		int n_dim = N_snp / 4;
+		if (N_snp % 4 > 0) {
+			n_dim++;
+		}
+		pool = new byte[founder_size][2][n_dim];
+		f_pool = new byte[founder_size][2][n_dim];
 	}
 
-	public GeneFlow(AlleleFrequencyReader afr, int ps, double[] pp, HotSpot h) {
+	public GeneFlowByteFormat(AlleleFrequencyReader afr, int ps, double[] pp, HotSpot h) {
 		founder_size = ps;
 		N_snp = afr.getNumberSNP();
 		ancestry_snp_panel = afr.getAlleleFreq();
@@ -57,19 +60,50 @@ public final class GeneFlow {
 		hs = h;
 		hs.rev(N_snp);
 
-		pool = new int[founder_size][2][N_snp];
-		// pool_ancestry = new int[founder_size][2][N_snp];
-		f_pool = new int[founder_size][2][N_snp];
-		// f_pool_ancestry = new int[founder_size][2][N_snp];
+		int n = N_snp / 4;
+		if (N_snp % 4 > 0) {
+			n++;
+		}
+		pool = new byte[founder_size][2][n];
+		f_pool = new byte[founder_size][2][n];
 	}
 
 	public void generateAnFounder(int idx, int slot) {
 		for (int i = 0; i < 2; i++) {
 			for (int j = 0; j < N_snp; j++) {
-				f_pool[slot][i][j] = rnd.nextFloat() < ancestry_snp_panel[idx][j] ? (idx * 2 + 0) : (idx * 2 + 1);
+				byte g = (byte) (rnd.nextFloat() < ancestry_snp_panel[idx][j] ? (idx * 2 + 0) : (idx * 2 + 1));
+				set_f_pool(slot, i, j, g);
 			}
 			// Arrays.fill(f_pool_ancestry[slot][0], 1);
 		}
+	}
+
+	private void set_f_pool(int slot, int haploid, int j, byte g) {
+		int loc = j / 4;
+		int shift = (j % 4) * 2;
+		f_pool[slot][haploid][loc] += g << shift;
+	}
+
+	private byte get_f_pool(int slot, int haploid, int j) {
+		int loc = j / 4;
+		int m_idx = j % 4;
+		int shift = m_idx * 2;
+		byte g = (byte) ((f_pool[slot][haploid][loc] >> shift) & 3);
+		return g;
+	}
+
+	private void set_pool(int slot, int haploid, int j, byte g) {
+		int loc = j / 4;
+		int shift = (j % 4) * 2;
+		f_pool[slot][haploid][loc] += g << shift;
+	}
+
+	private byte get_pool(int slot, int haploid, int j) {
+		int loc = j / 4;
+		int m_idx = j % 4;
+		int shift = m_idx * 2;
+		byte g = (byte) (pool[slot][haploid][loc] >> shift & 3);
+		return g;
 	}
 
 	private void GenerateFounder() {
@@ -82,7 +116,8 @@ public final class GeneFlow {
 					idx++;
 				for (int k = 0; k < N_snp; k++) {
 					if (!ld) {
-						pool[i][j][k] = rnd.nextFloat() < ancestry_snp_panel[idx][k] ? (idx * 2 + 0) : (idx * 2 + 1);
+						byte g = (byte) (rnd.nextFloat() < ancestry_snp_panel[idx][k] ? (idx * 2 + 0) : (idx * 2 + 1));
+						set_pool(i, j, k, g);
 					} else {
 						// when there is LD pattern;
 					}
@@ -100,7 +135,8 @@ public final class GeneFlow {
 		for (int i = 0; i < AA_idx.length; i++) {
 			for (int j = 0; j < 2; j++) {
 				System.arraycopy(pool[AA_idx[i]][j], 0, f_pool[i][j], 0, pool[AA_idx[i]][j].length);
-				// System.arraycopy(pool_ancestry[i][j], 0, f_pool_ancestry[i][j], 0, pool_ancestry[i][j].length);
+				// System.arraycopy(pool_ancestry[i][j], 0,
+				// f_pool_ancestry[i][j], 0, pool_ancestry[i][j].length);
 			}
 		}
 
@@ -136,10 +172,10 @@ public final class GeneFlow {
 			int chromatid = rnd.nextBoolean() ? 0 : 1;
 			for (int j = 0; j < hotspot[i].length - 1; j++) {
 				chromatid = 1 - chromatid;
-				System.arraycopy(f_pool[IDX[i]][chromatid], hotspot[i][j], pool[idx][i], hotspot[i][j],
-						hotspot[i][j + 1] - hotspot[i][j] + 1);
-//				System.arraycopy(f_pool_ancestry[IDX[i]][chromatid], hotspot[i][j], pool_ancestry[idx][i], hotspot[i][j], hotspot[i][j+1] -
-//						hotspot[i][j] + 1);
+				for (int k = hotspot[i][j]; k < hotspot[i][j + 1]; k++) {
+					int loc = k / 4;
+					pool[idx][i][loc] += get_f_pool(IDX[i], i, hotspot[i][j]);
+				}
 			}
 		}
 	}
@@ -148,8 +184,10 @@ public final class GeneFlow {
 		double[][] a = new double[founder_size][pop_prop.length];
 		for (int i = 0; i < founder_size; i++) {
 			for (int j = 0; j < N_snp; j++) {
-				int org1 = (int) (pool[i][0][j] / 2);
-				int org2 = (int) (pool[i][1][j] / 2);
+				byte g1 = get_pool(i, 0, j);
+				byte g2 = get_pool(i, 1, j);
+				int org1 = (int) (g1 / 2);
+				int org2 = (int) (g2 / 2);
 				a[i][org1] += 0.5;
 				a[i][org2] += 0.5;
 			}
@@ -169,11 +207,11 @@ public final class GeneFlow {
 		return founder_size;
 	}
 
-	private final int EA_size() {
+	private int EA_size() {
 		return (int) (founder_size * (pop_prop[1] - pop_prop[0]));
 	}
 
-	public int[][] getAnIndividualInPool(int idx) {
+	public byte[][] getAnIndividualInPool(int idx) {
 		if (idx < randomIndex.length) {
 			return f_pool[randomIndex[idx]];
 		} else {
@@ -181,11 +219,14 @@ public final class GeneFlow {
 		}
 	}
 
-	public int[][] sampleAnFounder(int pi) {
-		int[][] g = new int[2][N_snp];
+	public byte[][] sampleAnFounder(int pi) {
+		byte[][] g = new byte[2][N_snp];
 		for (int i = 0; i < 2; i++) {
 			for (int j = 0; j < N_snp; j++) {
-				g[i][j] = rnd.nextFloat() < ancestry_snp_panel[pi][j] ? (pi * 2 + 0) : (pi * 2 + 1);
+				int loc = j / 4;
+				int shift = (j % 4) * 2;
+				byte geno = (byte) (rnd.nextFloat() < ancestry_snp_panel[pi][j] ? (pi * 2 + 0) : (pi * 2 + 1));
+				g[i][loc] += geno << shift;
 			}
 		}
 		return g;
@@ -205,7 +246,7 @@ public final class GeneFlow {
 		int ps = 1000;
 		HotSpot hs = new HotSpot();
 
-		GeneFlow gf = new GeneFlow(ps, snp, r, hs);
+		GeneFlowByteFormat gf = new GeneFlowByteFormat(ps, snp, r, hs);
 		gf.mating(100);
 		double[][] a = gf.averageAncestry();
 		for (int i = 0; i < a.length; i++) {
@@ -215,5 +256,4 @@ public final class GeneFlow {
 			System.out.println();
 		}
 	}
-
 }

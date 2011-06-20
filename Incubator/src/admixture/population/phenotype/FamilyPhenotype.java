@@ -26,8 +26,16 @@ public class FamilyPhenotype {
 
 	public int getNumberAffectedOffspring() {
 		int s = 0; 
-		for (int i = 0; i < o_status.length; i++) {
+		for (int i = 0, len = o_status.length; i < len; i++) {
 			s += o_status[i];
+		}
+		return s;
+	}
+
+	public int getNumberAffectedParent() {
+		int s = 0;
+		for (int i = 0, len = p_status.length; i < len; i++) {
+			s += p_status[i];
 		}
 		return s;
 	}
