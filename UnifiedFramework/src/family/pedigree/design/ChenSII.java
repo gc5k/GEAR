@@ -206,7 +206,7 @@ public final class ChenSII {
 	}
 
 	/**
-	 * When score has alread been built outside PedGMDR, it can be imported
+	 * When score has already been built outside PedGMDR, it can be imported
 	 * directly
 	 * 
 	 * @param score_index

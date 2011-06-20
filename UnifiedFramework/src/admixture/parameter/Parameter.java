@@ -49,6 +49,9 @@ public class Parameter {
 	private final String cmd_perm_scheme = "ps";
 	public boolean permu_scheme = false;
 
+	private final String cmd_unrelated_only = "ur";
+	public boolean unrelated_only = false;
+	
 	private final String cmd_simu = "simu";
 	public int simu = 1;
 	
@@ -82,6 +85,7 @@ public class Parameter {
 		ops.addOption(OptionBuilder.withLongOpt("permutation").withDescription("replication for permutation").hasArg().withArgName("permutation")
 				.create(cmd_perm));
 		ops.addOption(OptionBuilder.withLongOpt("perm-scheme").withDescription("replication for permutation").create(cmd_perm_scheme));
+		ops.addOption(OptionBuilder.withLongOpt("unrelated").withDescription("use unrelated indivuduals only").create(cmd_unrelated_only));
 		ops.addOption(OptionBuilder.withLongOpt("simulation").withDescription("this parameter is for simulation").hasArg().withArgName(
 		"replications for simulation").create(cmd_simu));
 	}
@@ -127,6 +131,9 @@ public class Parameter {
 		}
 		if (cl.hasOption(cmd_perm_scheme)) {
 			permu_scheme = true;
+		}
+		if (cl.hasOption(cmd_unrelated_only)) {
+			unrelated_only = true;
 		}
 		if (cl.hasOption(cmd_min)) {
 			min = Integer.parseInt(cl.getOptionValue(cmd_min));
@@ -192,6 +199,10 @@ public class Parameter {
 		sb.append(permu_scheme);
 		sb.append(System.getProperty("line.separator"));
 		
+		sb.append("use unrelated individuals only: ");
+		sb.append(unrelated_only);
+		sb.append(System.getProperty("line.separator"));
+
 		sb.append("simulation replication: ");
 		sb.append(simu);
 		sb.append(System.getProperty("line.separator"));
