@@ -15,6 +15,7 @@ import power.SimulationPower;
 import family.pedigree.design.hierarchy.ChenInterface;
 import family.pedigree.design.hierarchy.SII;
 import family.pedigree.design.hierarchy.Unified;
+import family.pedigree.design.hierarchy.UnifiedUnrelated;
 
 public class UnifiedGMDR {
 	public static void main(String[] args) throws IOException {
@@ -27,7 +28,11 @@ public class UnifiedGMDR {
 
 			ChenInterface chen = null;
 			if (p.mode.compareTo("u") == 0) {
-				chen = new Unified(PedFile, PhenoFile);
+				if(p.unrelated_only) {
+					chen = new UnifiedUnrelated(PedFile, PhenoFile);
+				} else {
+					chen = new Unified(PedFile, PhenoFile);
+				}
 			} else if (p.mode.compareTo("f") == 0) {
 				chen = new SII(PedFile, PhenoFile);
 			}
