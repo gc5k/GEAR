@@ -4,7 +4,6 @@ import java.util.Arrays;
 import java.util.Random;
 
 import admixture.population.genome.chromosome.FamilyGenome;
-import admixture.population.phenotype.FamilyPhenotype;
 
 public class PhenotypeGenerator {
 
@@ -12,19 +11,21 @@ public class PhenotypeGenerator {
 	private int[] linked_chr;
 	private int[] linked_loci;
 	private String[] function_score;
-	private double dev_cov;
+	private double c_dev;
+	private double c_effect;
 	private double mu;
 	private double[] gene_effect;
 	private long seed = 2011;
 	private Random rnd;
 
-	public PhenotypeGenerator(String[] fs, double[] g_e, int[] c, int[] l, double u, double dev) {
+	public PhenotypeGenerator(String[] fs, double[] g_e, int[] c, int[] l, double u, double d_eff, double d_cov) {
 		function_score = fs;
 		gene_effect = g_e;
 		linked_chr = c;
 		linked_loci = l;
 		mu = u;
-		dev_cov = dev;
+		c_effect = d_eff;
+		c_dev = d_cov;
 		rnd = new Random(seed);
 	}
 
@@ -43,39 +44,6 @@ public class PhenotypeGenerator {
 		rnd.setSeed(s);
 	}
 
-	public FamilyPhenotype getGeneratePhenotypeLogistic(FamilyGenome fg) {
-		double[][] p_p = new double[2][1];
-		int[] p_s = new int[2];
-
-		for (int i = 0; i < p_p.length; i++) {
-			String g = fg.ParentGenotype(i, linked_chr, linked_loci);
-			int fun_idx = Arrays.binarySearch(function_score, g);
-			p_p[i][0] = mu + rnd.nextGaussian() * dev_cov;
-			if (fun_idx >= 0) {
-				p_p[i][0] += gene_effect[fun_idx];
-			}
-			double prob = Math.exp(p_p[i][0]) / (1 + Math.exp(p_p[i][0]));
-			p_s[i] = rnd.nextFloat() < prob ? 1 : 0;
-		}
-
-		double[][] o_p = new double[fg.getNumberOffspring()][1];
-		int[] o_s = new int[fg.getNumberOffspring()];
-
-		for (int i = 0; i < o_p.length; i++) {
-			String g = fg.OffspringGenotype(i, linked_chr, linked_loci);
-			int fun_idx = Arrays.binarySearch(function_score, g);
-			o_p[i][0] = mu + rnd.nextGaussian() * dev_cov;
-			if (fun_idx >= 0) {
-				o_p[i][0] += gene_effect[fun_idx];
-			}
-			double prob = Math.exp(o_p[i][0]) / (1 + Math.exp(o_p[i][0]));
-			o_s[i] = rnd.nextFloat() < prob ? 1 : 0;
-		}
-
-		FamilyPhenotype fp = new FamilyPhenotype(fg.getFamilyID(), p_p, p_s, o_p, o_s);
-		return fp;
-	}
-
 	public FamilyPhenotype getGeneratePhenotypeAdmixtureLogistic(FamilyGenome fg, double[] disease_rate) {
 		// covariate is not considered
 		fg.AscertainGenomeAncestry();
@@ -84,9 +52,10 @@ public class PhenotypeGenerator {
 		for (int i = 0; i < p_p.length; i++) {
 
 			String g = fg.ParentGenotype(i, linked_chr, linked_loci);
-			double logit = mu;
-			if (Arrays.binarySearch(function_score, g) >= 0)
-				logit += gene_effect[Arrays.binarySearch(function_score, g)];
+			double logit = mu + rnd.nextGaussian() * c_dev * c_effect;
+			int idx = Arrays.binarySearch(function_score, g);
+			if (idx >= 0)
+				logit += gene_effect[idx];
 
 			double mix_prob = Math.exp(logit) / (1 + Math.exp(logit));
 
@@ -107,9 +76,10 @@ public class PhenotypeGenerator {
 		int[] o_s = new int[fg.getNumberOffspring()];
 		for (int i = 0; i < o_p.length; i++) {
 			String g = fg.OffspringGenotype(i, linked_chr, linked_loci);
-			double logit = mu;
-			if (Arrays.binarySearch(function_score, g) >= 0)
-				logit += gene_effect[Arrays.binarySearch(function_score, g)];
+			double logit = mu + rnd.nextGaussian() * c_dev * c_effect;
+			int idx = Arrays.binarySearch(function_score, g);
+			if (idx >= 0)
+				logit += gene_effect[idx];
 
 			double mix_prob = Math.exp(logit) / (1 + Math.exp(logit));
 

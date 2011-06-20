@@ -84,7 +84,7 @@ public class AlleleFrequencyReader {
 			snpNames = new String[select];
 			for(int i = 0; i < select; i++) {
 				for(int j = 0; j < population.length; j++) {
-					AlleleFreq[i][j] = Allele_Freq[i][selectedSNP[j]];
+					AlleleFreq[j][i] = Allele_Freq[j][selectedSNP[i]];
 				}
 				snpNames[i] = _snpNames[selectedSNP[i]];
 			}

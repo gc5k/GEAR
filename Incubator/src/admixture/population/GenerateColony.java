@@ -305,7 +305,7 @@ public class GenerateColony {
 
 			for(int i = 0; i < fp.getNumberOffspring(); i++) {
 				sp[i] = new StringBuffer();
-				sp[i].append(fp.getFamilyID() + " " + fp.getFamilyID() * 10000 + i + " ");
+				sp[i].append(fp.getFamilyID() + " " + fp.getOffspringID(i) + " ");
 				sp[i].append(fp.getStringOffspringPhenotype(i));
 			}
 

@@ -20,8 +20,14 @@ public class DiscreteAncestryModel {
 
 		Parameter p = new Parameter();
 		p.commandListenor(args);
+		
+		String unifiedunrelated = "unrelated";
+		File file = new File(p.dir + unifiedunrelated);
+		file.mkdir();
+		String dir_unified_unrelated = p.dir + unifiedunrelated + System.getProperty("file.separator");
+
 		String unified = "unified";
-		File file = new File(p.dir + unified);
+		file = new File(p.dir + unified);
 		file.mkdir();
 		String dir_unified = p.dir + unified + System.getProperty("file.separator");
 		
@@ -45,14 +51,16 @@ public class DiscreteAncestryModel {
 		int[] chr = p.diseaseChr;
 		int[] loci = p.diseaseLocus;
 		double mu = p.mu;
-		double dev = p.covariateEffect;
-		PhenotypeGenerator pg = new PhenotypeGenerator(f, g_e, chr, loci, mu, dev);
+		double c_eff = p.covariateEffect;
+		double c_sd = p.covariateSD;
+		PhenotypeGenerator pg = new PhenotypeGenerator(f, g_e, chr, loci, mu, c_eff, c_sd);
 		HotSpot hs = new HotSpot();
 
 		int N_phe = 2;
 
 		// specify AA parameters
 		double[] AA_disease_rate = new double[]{p.popPrevalence[0]};
+		Integer AA_N_aff_parent = new Integer(p.affectedParent);
 		int AA_N_Fam = p.family[0];
 		int AA_N_Kid = p.kid[0];
 		int AA_N_aff_Kid = p.affectedKid[0];
@@ -79,6 +87,7 @@ public class DiscreteAncestryModel {
 
 		// specify EA parameters
 		double[] EA_disease_rate = new double[]{ p.popPrevalence[1] };
+		Integer EA_N_aff_parent = new Integer(p.affectedParent);
 		int EA_N_Fam = p.family[1];
 		int EA_N_Kid = p.kid[1];
 		int EA_N_aff_Kid = p.affectedKid[1];
@@ -102,11 +111,11 @@ public class DiscreteAncestryModel {
 		}
 
 		boolean printLinked = true;
-		for (int rep = 0; rep < 10; rep++) {
-			QualityControl AA_qc = new QualityControl(AA_N_aff_Kid, AdmixtureConstant.FamilyExactAffected);
+		for (int rep = 0; rep < p.simulation; rep++) {
+			QualityControl AA_qc = new QualityControl(AA_N_aff_Kid, AA_N_aff_parent, p.samplingScheme);
 			QualityControl AA_qc_c = new QualityControl(AA_N_case, AA_N_control, AdmixtureConstant.CaseControl);
 			
-			QualityControl EA_qc = new QualityControl(EA_N_aff_Kid, AdmixtureConstant.FamilyExactAffected);
+			QualityControl EA_qc = new QualityControl(EA_N_aff_Kid, EA_N_aff_parent, p.samplingScheme);
 			QualityControl EA_qc_c = new QualityControl(EA_N_case, EA_N_control, AdmixtureConstant.CaseControl);
 
 			GenerateColony EA_GenColony = new GenerateColony(N_phe, seed, control_chr, EA_disease_rate, hs, EA_DNAPool,
@@ -123,6 +132,19 @@ public class DiscreteAncestryModel {
 			p2f.addColony(AA_GenColony);
 			p2f.addColony(EA_GenColony);
 			try {
+				StringBuilder Gsb_u = new StringBuilder(rep + "ped.txt");
+				Gsb_u.insert(0, dir_unified_unrelated);
+				StringBuilder Psb_u = new StringBuilder(rep + "phe.txt");
+				Psb_u.insert(0, dir_unified_unrelated);
+				StringBuilder L_Gsb_u = new StringBuilder(rep + "L_ped.txt");
+				L_Gsb_u.insert(0, dir_unified_unrelated);
+				StringBuilder L_Psb_u = new StringBuilder(rep + "L_phe.txt");
+				L_Psb_u.insert(0, dir_unified_unrelated);
+				p2f.printGenotype2file(Gsb_u.toString(), Psb_u.toString(), !AdmixtureConstant.printAllele,
+						!AdmixtureConstant.printLinked);
+				p2f.printGenotype2file(L_Gsb_u.toString(), L_Psb_u.toString(), AdmixtureConstant.printAllele,
+						AdmixtureConstant.printLinked);
+				
 				StringBuilder Gsb = new StringBuilder(rep + "ped.txt");
 				Gsb.insert(0, dir_unified);
 				StringBuilder Psb = new StringBuilder(rep + "phe.txt");
@@ -162,8 +184,6 @@ public class DiscreteAncestryModel {
 				p2f.printCCGenotype2file(L_C_Gsb.toString(), L_C_Psb.toString(), AdmixtureConstant.printAllele,
 						printLinked);
 
-				// p2f.printUnrelatedIndividual("PCA_ped.txt", "PCA_phe.txt", !AdmixtureConstant.printAllele, true);
-				// p2f.printFounder("F_ped.txt", "F_phe.txt", !AdmixtureConstant.printAllele, true);
 			} catch (IOException e) {
 				e.printStackTrace(System.err);
 			}

@@ -19,8 +19,14 @@ public class AdmixedModel {
 
 		Parameter p = new Parameter();
 		p.commandListenor(args);
+		
+		String unifiedunrelated = "unrelated";
+		File file = new File(p.dir + unifiedunrelated);
+		file.mkdir();
+		String dir_unified_unrelated = p.dir + unifiedunrelated + System.getProperty("file.separator");
+
 		String unified = "unified";
-		File file = new File(p.dir + unified);
+		file = new File(p.dir + unified);
 		file.mkdir();
 		String dir_unified = p.dir + unified + System.getProperty("file.separator");
 		
@@ -40,6 +46,7 @@ public class AdmixedModel {
 
 		// specific components
 		// family
+		Integer N_aff_parent = new Integer(p.affectedParent);
 		int N_Fam = p.family[0];
 		int N_Kid = p.kid[0];
 		int N_aff_Kid = p.affectedKid[0];
@@ -53,7 +60,8 @@ public class AdmixedModel {
 		int[] chr = p.diseaseChr;
 		int[] loci = p.diseaseLocus;
 		double mu = p.mu;
-		double dev = p.covariateEffect;
+		double c_eff = p.covariateEffect;
+		double c_dev = p.covariateSD;
 
 		double[] prevalence = p.popPrevalence;
 		int N_phe = 3;
@@ -62,7 +70,7 @@ public class AdmixedModel {
 		int[] AIM_number = p.aim;
 		double[] pop_proportion = p.popProportion;
 
-		PhenotypeGenerator pg = new PhenotypeGenerator(f, g_e, chr, loci, mu, dev);
+		PhenotypeGenerator pg = new PhenotypeGenerator(f, g_e, chr, loci, mu, c_eff, c_dev);
 		HotSpot hs = new HotSpot();
 
 		ArrayList<DNAStirrer> DNAPool = new ArrayList<DNAStirrer>();
@@ -73,7 +81,7 @@ public class AdmixedModel {
 			DNAStirrer ds = new DNAStirrer(afr, 1, 10000, AdmixtureConstant.Without_Genetic_Drift, pop_proportion);
 			ds.DNAStir(1);
 			DNAPool.add(ds);
-			GeneFlow gf = new GeneFlow(afr, 1000, pop_proportion, hs);
+			GeneFlow gf = new GeneFlow(afr, 10000, pop_proportion, hs);
 			gf.mating(p.generation);
 			GF.add(gf);
 			ChromosomeGenerator cg = new ChromosomeGenerator(afr.getAlleleFreq(), pop_proportion);
@@ -85,14 +93,27 @@ public class AdmixedModel {
 				.hotSpot(hs).popProportion(pop_proportion).numPhenotype(N_phe).ChrGenerator(CG).PheGenerator(pg).GeneFlow(GF).seed(
 						seed).diseaseChr(control_chr).isNullHypothesis(isNullHypothesis).build();
 
-		for (int rep = 0; rep < p.replication; rep++) {
-			QualityControl qc = new QualityControl(N_aff_Kid, AdmixtureConstant.FamilyExactAffected);
+		for (int rep = 0; rep < p.simulation; rep++) {
+			QualityControl qc = new QualityControl(N_aff_Kid, N_aff_parent, p.samplingScheme);
 			QualityControl qc_c = new QualityControl(N_case, N_control, AdmixtureConstant.CaseControl);
 			GeneFlowGenerateColony.setCurrFamilyID(0);
 			GC.GenerateFamHab(N_Fam, N_Kid, qc);
 			GC.GenerateCCHab(N_case + N_control, 1, qc_c);
 
 			try {
+				StringBuilder Gsb_u = new StringBuilder(rep + "ped.txt");
+				Gsb_u.insert(0, dir_unified_unrelated);
+				StringBuilder Psb_u = new StringBuilder(rep + "phe.txt");
+				Psb_u.insert(0, dir_unified_unrelated);
+				StringBuilder L_Gsb_u = new StringBuilder(rep + "L_ped.txt");
+				L_Gsb_u.insert(0, dir_unified_unrelated);
+				StringBuilder L_Psb_u = new StringBuilder(rep + "L_phe.txt");
+				L_Psb_u.insert(0, dir_unified_unrelated);
+				GC.printGenotype2file(Gsb_u.toString(), Psb_u.toString(), !AdmixtureConstant.printAllele,
+						!AdmixtureConstant.printLinked);
+				GC.printGenotype2file(L_Gsb_u.toString(), L_Psb_u.toString(), AdmixtureConstant.printAllele,
+						AdmixtureConstant.printLinked);
+
 				StringBuilder Gsb = new StringBuilder(rep + "ped.txt");
 				Gsb.insert(0, dir_unified);
 				StringBuilder Psb = new StringBuilder(rep + "phe.txt");
@@ -132,9 +153,6 @@ public class AdmixedModel {
 				GC.printCCGenotype2file(L_C_Gsb.toString(), L_C_Psb.toString(), AdmixtureConstant.printAllele,
 						AdmixtureConstant.printLinked);
 
-				// GC.printUnrelatedIndividual("PCA_ped.txt", "PCA_phe.txt", !AdmixtureConstant.printAllele, true);
-				// GC.printFounder("F_ped.txt", "F_phe.txt", !AdmixtureConstant.printAllele, true);
-				// GC.printOffspringCC("KCC_ped.txt", "KCC_phe.txt", !AdmixtureConstant.printAllele);
 			} catch (IOException e) {
 				e.printStackTrace(System.err);
 			}
