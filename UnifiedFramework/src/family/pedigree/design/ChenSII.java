@@ -27,6 +27,11 @@ import util.Sample;
 
 import org.apache.commons.lang3.ArrayUtils;
 
+/**
+ * 
+ * @author Guo-Bo Chen, chenguobo@gmail.com
+ */
+
 public final class ChenSII {
 
 	public MDRPed PedData;

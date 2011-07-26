@@ -17,6 +17,11 @@ import family.PedigreeParameter;
 import family.RabinowitzLairdAlgorithm.AbstractGenoDistribution;
 import family.pedigree.design.ChenAlgorithm;
 
+/**
+ * 
+ * @author Guo-Bo Chen, chenguobo@gmail.com
+ */
+
 public class SimulationI {
 
 	public static void main(String[] args) throws IOException {

@@ -1,5 +1,8 @@
 package score.dependonweka;
-
+/**
+ * 
+ * @author Guo-Bo Chen, chenguobo@gmail.com
+ */
 import weka.core.*;
 import weka.core.matrix.Matrix;
 import weka.classifiers.functions.LinearRegression;

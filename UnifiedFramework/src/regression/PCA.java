@@ -8,6 +8,10 @@ import Jama.EigenvalueDecomposition;
 import Jama.Matrix;
 import util.DataOperator;
 
+/**
+ * 
+ * @author Guo-Bo Chen, chenguobo@gmail.com
+ */
 public class PCA {
 	private double[][] principalComponents;
 	private double[] variance;

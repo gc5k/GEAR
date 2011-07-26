@@ -1,5 +1,8 @@
 package family.pedigree.design.hierarchy;
-
+/**
+ * 
+ * @author Guo-Bo Chen, chenguobo@gmail.com
+ */
 public interface ChenInterface {
 	public static int Linear = 0;
 	public static int Logistc = 1;

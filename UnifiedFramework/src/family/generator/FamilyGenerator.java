@@ -12,6 +12,11 @@ import java.util.regex.Pattern;
 
 import util.NewIt;
 
+/**
+ * 
+ * @author Guo-Bo Chen, chenguobo@gmail.com
+ */
+
 public class FamilyGenerator {
 
 	boolean isNullHypothesis;

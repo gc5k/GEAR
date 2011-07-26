@@ -1,5 +1,9 @@
 package family.pedigree.file;
 
+/**
+ * 
+ * @author Guo-Bo Chen, chenguobo@gmail.com
+ */
 public class GMDRPhenoFileException extends Exception {
 
     /**

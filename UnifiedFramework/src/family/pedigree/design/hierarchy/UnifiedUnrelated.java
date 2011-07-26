@@ -14,6 +14,10 @@ import family.pedigree.genotype.Person;
 import family.pedigree.phenotype.FamilyUnit;
 import family.pedigree.phenotype.Subject;
 
+/**
+ * 
+ * @author Guo-Bo Chen, chenguobo@gmail.com
+ */
 public final class UnifiedUnrelated extends ChenBase {
 
 	public UnifiedUnrelated(String ped, String phe) {

@@ -1,9 +1,6 @@
-package admixture;
 
 import java.io.IOException;
 import java.util.Arrays;
-
-import org.apache.commons.cli.HelpFormatter;
 
 import admixture.parameter.Parameter;
 
@@ -20,16 +17,10 @@ import family.pedigree.design.hierarchy.Unified;
 import family.pedigree.design.hierarchy.UnifiedII;
 import family.pedigree.design.hierarchy.UnifiedUnrelated;
 
-/**
- * 
- * @author Guo-Bo Chen, chenguobo@gmail.com
- */
-
-public class UnifiedGMDR {
+public class UnifiedIITest {
 	public static void main(String[] args) throws IOException {
 		Parameter p = new Parameter();
 		p.commandListenor(args);
-
 
 		for (int i = 0; i < p.simu; i++) {
 			String PedFile = Integer.toString(i) + "L_ped.txt";
@@ -39,10 +30,8 @@ public class UnifiedGMDR {
 			if (p.mode.compareTo("u") == 0) {
 				if(p.unrelated_only) {
 					chen = new UnifiedUnrelated(PedFile, PhenoFile);
-				} else if (p.permu_fam){
-					chen = new UnifiedII(PedFile, PhenoFile);
 				} else {
-					chen = new Unified(PedFile, PhenoFile);
+					chen = new UnifiedII(PedFile, PhenoFile);
 				}
 			} else if (p.mode.compareTo("f") == 0) {
 				chen = new SII(PedFile, PhenoFile);

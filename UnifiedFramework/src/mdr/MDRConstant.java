@@ -1,5 +1,9 @@
 package mdr;
 
+/**
+ * 
+ * @author Guo-Bo Chen, chenguobo@gmail.com
+ */
 public interface MDRConstant {
     public static int LinearSearch = 0;
     public static int TreeSearch = 1;

@@ -2,7 +2,7 @@ package mdr.result;
 
 /**
  *
- * @author Guo-Bo Chen
+ * @author Guo-Bo Chen, chenguobo@gmail.com
  */
 public class SuiteException extends Exception {
 

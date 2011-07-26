@@ -6,7 +6,7 @@ import java.util.HashMap;
 
 /**
  *
- * @author Guo-Bo Chen
+ * @author Guo-Bo Chen, chenguobo@gmail.com
  */
 public class Combination extends HashMap<String, Suite> {
 

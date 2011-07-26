@@ -3,7 +3,10 @@ package statistics.FisherExactTest;
 import java.io.File;
 import java.io.IOException;
 import java.io.PrintWriter;
-
+/**
+ * 
+ * @author Guo-Bo Chen, chenguobo@gmail.com
+ */
 //--------------------
 //--------------------
 //----| a | b | n1

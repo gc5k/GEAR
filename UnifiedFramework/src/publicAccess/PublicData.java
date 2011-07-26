@@ -1,5 +1,8 @@
 package publicAccess;
-
+/**
+ * 
+ * @author Guo-Bo Chen, chenguobo@gmail.com
+ */
 public class PublicData {
 
     public static String MissingValue = ".";

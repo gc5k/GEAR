@@ -13,6 +13,10 @@ import family.pedigree.phenotype.Subject;
 
 import util.NewIt;
 
+/**
+ * 
+ * @author Guo-Bo Chen, chenguobo@gmail.com
+ */
 public class GMDRPhenoFile {
 
 	private String titleLine;

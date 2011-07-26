@@ -2,7 +2,7 @@ package mdr.arsenal;
 
 /**
  *
- * @author Guo-Bo Chen
+ * @author Guo-Bo Chen, chenguobo@gmail.com
  */
 public class ToolKitException extends Exception {
 

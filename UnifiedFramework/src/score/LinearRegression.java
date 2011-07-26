@@ -1,5 +1,9 @@
 package score;
 import org.apache.commons.math.linear.*;
+/**
+ * 
+ * @author Guo-Bo Chen, chenguobo@gmail.com
+ */
 public class LinearRegression {
 	double[] Y;
 	double[] P;

@@ -1,5 +1,8 @@
 package family.pedigree.genotype;
-
+/**
+ * 
+ * @author Guo-Bo Chen, chenguobo@gmail.com
+ */
 public class FamilyStructException extends Exception {
 
     /**

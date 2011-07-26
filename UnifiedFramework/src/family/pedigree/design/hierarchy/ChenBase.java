@@ -17,6 +17,10 @@ import family.pedigree.file.MDRPedFileException;
 
 import util.NewIt;
 
+/**
+ * 
+ * @author Guo-Bo Chen, chenguobo@gmail.com
+ */
 public class ChenBase implements ChenInterface {
 	
 	protected long seed = 2011;

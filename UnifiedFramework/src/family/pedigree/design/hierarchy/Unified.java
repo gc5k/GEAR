@@ -16,6 +16,11 @@ import family.pedigree.genotype.Person;
 import family.pedigree.phenotype.FamilyUnit;
 import family.pedigree.phenotype.Subject;
 
+/**
+ * 
+ * @author Guo-Bo Chen, chenguobo@gmail.com
+ */
+
 public final class Unified extends ChenBase {
 
 	public Unified(String ped, String phe) {
@@ -59,11 +64,12 @@ public final class Unified extends ChenBase {
 			FamilyStruct fs = Fam.get(fi);
 			FamilyUnit FamUnit = PhenoData.getFamilyUnit(fi);
 			String[] pi = fs.getPersonListSorted();
+			int len = pi.length;
 			int si = 0;
 			for (int i = 0; i < pi.length; i++) {
 				Person per = fs.getPerson(pi[i]);
 				Subject sub = FamUnit.getSubject(pi[i]);
-				if (fs.hasAncestor(per)) {
+				if (fs.hasAncestor(per) && len > 1) {//if there is only one individual in a family, I consider it as unrelated individual and pool it to the unrelated group
 					si++;
 					s_P.add(new PersonIndex(fs.getFamilyStructName(), pi[i]));
 					genotype[n_sib + numUnrelated] = per.getGenotypeScore();

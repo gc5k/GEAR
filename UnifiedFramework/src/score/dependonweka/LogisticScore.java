@@ -1,5 +1,8 @@
 package score.dependonweka;
-
+/**
+ * 
+ * @author Guo-Bo Chen, chenguobo@gmail.com
+ */
 import java.lang.Integer;
 import java.lang.Math;
 import weka.core.*;

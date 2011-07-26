@@ -1,5 +1,8 @@
 package score.dependonweka;
-
+/**
+ * 
+ * @author Guo-Bo Chen, chenguobo@gmail.com
+ */
 public class CalEngine {
 
     /**
