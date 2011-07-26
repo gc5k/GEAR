@@ -16,6 +16,11 @@ import mdr.moore.HeteroLinearMergeSearch;
 import family.PedigreeParameter;
 import family.pedigree.design.ChenAlgorithm;
 
+/**
+ * 
+ * @author Guo-Bo Chen, chenguobo@gmail.com
+ */
+
 public class SimulationFam {
 
 	public static void main(String[] args) throws IOException {

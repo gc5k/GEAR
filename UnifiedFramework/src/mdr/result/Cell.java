@@ -6,7 +6,7 @@ import mdr.data.DataFile;
 
 /**
  *
- * @author Guo-Bo Chen
+ * @author Guo-Bo Chen, chenguobo@gmail.com
  */
 public class Cell {
 

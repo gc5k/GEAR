@@ -1,10 +1,14 @@
 package family.RabinowitzLairdAlgorithm.rabinowitz;
 
 import java.util.TreeMap;
-
 import family.RabinowitzLairdAlgorithm.AbstractGenoDistribution;
-
 import util.NewIt;
+
+/**
+ * 
+ * @author Guo-Bo Chen, chenguobo@gmail.com
+ */
+
 //both parents' genotype were observed
 public class Rabinowitz0 extends AbstractGenoDistribution {
 

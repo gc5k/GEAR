@@ -10,7 +10,7 @@ import util.NewIt;
 
 /**
  *
- * @author Guo-Bo Chen
+ * @author Guo-Bo Chen, chenguobo@gmail.com
  */
 public class Subdivision {
     private HashMap<Integer, Integer> divisionMap;    // a map from subject IDs to interval IDs.

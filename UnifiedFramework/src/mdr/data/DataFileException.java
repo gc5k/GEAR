@@ -3,7 +3,7 @@ package mdr.data;
 
 /**
  *
- * @author Guo-Bo Chen
+ * @author Guo-Bo Chen, chenguobo@gmail.com
  */
 public class DataFileException extends Exception{
 

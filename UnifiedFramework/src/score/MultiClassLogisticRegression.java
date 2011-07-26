@@ -1,7 +1,10 @@
 package score;
 
 import org.apache.commons.math.linear.*;
-
+/**
+ * 
+ * @author Guo-Bo Chen, chenguobo@gmail.com
+ */
 public class MultiClassLogisticRegression {
 	int category;
 	double[][] Y;

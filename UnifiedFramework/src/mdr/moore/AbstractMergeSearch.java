@@ -17,7 +17,7 @@ import util.NewIt;
 
 /**
  *
- * @author Guo-Bo Chen
+ * @author Guo-Bo Chen, chenguobo@gmail.com
  */
 public abstract class AbstractMergeSearch {
 	protected int order;

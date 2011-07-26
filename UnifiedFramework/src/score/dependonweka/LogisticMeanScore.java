@@ -1,5 +1,8 @@
 package score.dependonweka;
-
+/**
+ * 
+ * @author Guo-Bo Chen, chenguobo@gmail.com
+ */
 import weka.core.matrix.Matrix;
 /**
  * It implements AbstractScore.  It is developed to calculated score by logistic regression when without adjustment.

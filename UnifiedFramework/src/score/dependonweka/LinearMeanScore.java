@@ -1,5 +1,8 @@
 package score.dependonweka;
-
+/**
+ * 
+ * @author Guo-Bo Chen, chenguobo@gmail.com
+ */
 import weka.core.matrix.Matrix;
 /**
  * This class implements AbstractScore.  It is utilized to calculate score with linear regression when without adjustment

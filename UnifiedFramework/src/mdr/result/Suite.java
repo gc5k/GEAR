@@ -9,7 +9,7 @@ import util.NewIt;
 
 /**
  *
- * @author Guo-Bo Chen
+ * @author Guo-Bo Chen, chenguobo@gmail.com
  */
 public class Suite {
     protected ArrayList<DataFile.Subject> subjects;

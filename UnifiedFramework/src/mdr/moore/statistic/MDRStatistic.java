@@ -1,5 +1,8 @@
 package mdr.moore.statistic;
-
+/**
+ * 
+ * @author Guo-Bo Chen, chenguobo@gmail.com
+ */
 public class MDRStatistic implements Comparable<MDRStatistic> {
 	private double testing_balanced_accuracy;
 	private double training_balanced_accuracy;
