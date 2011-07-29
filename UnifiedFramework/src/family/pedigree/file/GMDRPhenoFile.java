@@ -64,7 +64,7 @@ public class GMDRPhenoFile {
 		// reading the title line:get the marker number
 		traitInfor = NewIt.newArrayList();
 		for(int i = 2; i < tokenizer.length; i++) {
-				traitInfor.add(tokenizer[i]);
+			traitInfor.add(tokenizer[i]);
 		}
 	}
 
@@ -149,6 +149,14 @@ public class GMDRPhenoFile {
 
 	public ArrayList<String> getTraitName() {
 		return traitInfor;
+	}
+
+	public boolean containFamily(String fid) {
+		if(families.containsKey(fid)) {
+			return true;
+		} else {
+			return false;
+		}
 	}
 
 	public String getTraitAtI(int index) {

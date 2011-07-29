@@ -19,7 +19,6 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Enumeration;
 import java.util.Hashtable;
-import java.util.StringTokenizer;
 
 import publicAccess.PublicData;
 import util.NewIt;
@@ -33,7 +32,7 @@ import family.pedigree.genotype.Person;
  * @author Julian Maller
  * @author Guo-Bo Chen, chenguobo@gmail.com
  */
-public class MDRPed {
+public class PedigreeFile {
 
 	private Hashtable<String, Boolean> famInformative;
 	private Hashtable<String, FamilyStruct> familystructure;
@@ -47,7 +46,7 @@ public class MDRPed {
 	// bogusParents is true if someone in the file referenced a parent not in
 	// the file
 	private boolean bogusParents = false;
-	private ArrayList<SNP> markerInfor;
+//	private ArrayList<SNP> markerInfor;
 	private int num_marker;
 	private ArrayList<String> pedigrees;
 	private String titleLine = null;
@@ -56,7 +55,7 @@ public class MDRPed {
 	static int MissingAllele = 0;
 
 	// public static String MissingGenotype="00";
-	public MDRPed() {
+	public PedigreeFile() {
 
 		// hardcoded hapmap info
 		this.famInformative = NewIt.newHashtable();
@@ -140,30 +139,6 @@ public class MDRPed {
 		return familystructure;
 	}
 
-	/**
-	 * finds the first individual in the first family and returns the number of
-	 * markers for that individual
-	 * 
-	 * @return the number of markers
-	 */
-	public int getNumMarkers() {
-		Enumeration<FamilyStruct> famList = familystructure.elements();
-		int numMarkers = 0;
-		while (famList.hasMoreElements()) {
-			FamilyStruct fam = famList.nextElement();
-			Enumeration<String> indList = fam.getPersonList();
-			Person per = null;
-			while (indList.hasMoreElements()) {
-				per = fam.getPerson(indList.nextElement());
-				numMarkers = per.getNumMarkers();
-				if (numMarkers > 0) {
-					return numMarkers;
-				}
-			}
-		}
-		return 0;
-	}
-
 	public File GetPedFile() {
 		return pedfile;
 	}
@@ -193,31 +168,22 @@ public class MDRPed {
 			if (numLines < 2) {
 				throw new MDRPedFileException("Pedgree data format error: empty pedigree file");
 			}
-			StringTokenizer tokenizer = new StringTokenizer(titleLine, "\n\t\" \"");
-			int numTokens = tokenizer.countTokens();
+			String[] tokenizer = titleLine.split("\\s+");
+			int numTokens = tokenizer.length;
 
 			if (numTokens < 7) {
 				throw new MDRPedFileException("Pedgree format error: the title line is incorrect");
 			}
+			num_marker = numTokens - 6;
 
-			// reading the title line: get the marker number
-			int c = 0;
-			markerInfor = NewIt.newArrayList();
-			markerInfor.ensureCapacity(tokenizer.countTokens()-6);
-			while (tokenizer.hasMoreTokens()) {
-				if (c++ < 6) {
-					tokenizer.nextToken();
-				} else {
-					String marker = (String) tokenizer.nextToken();
-					markerInfor.add(new SNP(marker));
-				}
-			}
 			// System.out.println(markerInfor);
 		} else {
 			int numLines = pedigrees.size();
 			if (numLines < 1) {
 				throw new MDRPedFileException("Pedgree data format error: empty pedigree file");
 			}
+			String[] tokenizer = pedigrees.get(0).split("\\s+");
+			num_marker = (tokenizer.length - 6)/2;
 		}
 
 	}
@@ -229,7 +195,7 @@ public class MDRPed {
 	 * relatives in a pedigree, but is not that term of genetics.
 	 */
 	public void parseLinkage() throws MDRPedFileException {
-		int colNum = markerInfor.size() * 2 + 6;
+		int colNum = num_marker * 2 + 6;
 
 		int numMarkers = 0;
 		boolean genoError = false;
@@ -247,7 +213,7 @@ public class MDRPed {
 
 			if (numTokens % 2 == 0) {
 				numMarkers = (numTokens - 6) / 2;
-				if (numMarkers != markerInfor.size()) {
+				if (numMarkers != num_marker) {
 					new MDRPedFileException("Mismatched Colunm in pedfile. line " + (k + 2));
 				}
 			} else {
@@ -380,34 +346,12 @@ public class MDRPed {
 	public boolean hasBogusParents() {
 		return bogusParents;
 	}
-
-	public ArrayList<String> getMarkerInformation() {
-		ArrayList<String> m = NewIt.newArrayList();
-		m.ensureCapacity(markerInfor.size());
-		for(int i = 0; i < markerInfor.size(); i++) {
-			m.add(markerInfor.get(i).getName());
-		}
-		return m;
-	}
-
-	public ArrayList<String> getMarkerInformation(int[] subsetMarker) {
-		if (subsetMarker.length == markerInfor.size() || subsetMarker == null) {
-			return getMarkerInformation();
-		} else {
-			ArrayList<String> m = NewIt.newArrayList();
-			m.ensureCapacity(markerInfor.size());
-			for (int i = 0; i < subsetMarker.length; i++) {
-				m.add(markerInfor.get(subsetMarker[i]).getName());
-			}
-			return m;
-		}
-	}
-	
-	public void setHeader(boolean flag) {
-		header = flag;
-	}
 	
 	public int getNumMarker() {
 		return num_marker;
+	}
+
+	public void setHeader(boolean flag) {
+		header = flag;
 	}
 }

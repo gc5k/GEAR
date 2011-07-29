@@ -24,6 +24,9 @@ public class Parameter {
 	private final String cmd_ped = "ped";
 	public String pedigree = null;
 
+	private final String cmd_map = "map";
+	public String map = null;
+	
 	private final String cmd_phe = "phe";
 	public String phenotype = null;
 
@@ -67,6 +70,15 @@ public class Parameter {
 	private final String cmd_help = "help";
 	public boolean help = false;
 
+	private final String cmd_missing_phenotype = "missing_phenotype";
+	public static String missing_phenotype = "99";
+	
+	private final String cmd_missing_genotype = "missing_genotype";
+	public static String missing_genotype = "0";
+	
+	private final String cmd_status_shift = "1";
+	public static int status_shift = 0;
+	
 	private Options ops = new Options();
 	private CommandLineParser parser = new PosixParser();
 
@@ -81,9 +93,10 @@ public class Parameter {
 	public void commandInitial() {
 		ops.addOption(OptionBuilder.withDescription("u (default) for the unified framework and f for using sibs only.").hasArg().create(cmd_mode));
 		ops.addOption(OptionBuilder.withDescription("the format of the pedigree file is same as with PLink.").hasArg().create(cmd_ped));
+		ops.addOption(OptionBuilder.withDescription("the format of the map file is same as with PLink.").hasArg().create(cmd_map));
 		ops.addOption(OptionBuilder.withDescription("the format of phenotype file is same as with PLink.").hasArg().create(cmd_phe));
 		ops.addOption(OptionBuilder.withDescription("index for the response excluding the first two columns.").hasArg().create(cmd_res));
-		ops.addOption(OptionBuilder.withDescription("index(es) for the predictors.").hasArg().create(cmd_pred));
+		ops.addOption(OptionBuilder.withDescription("index(es) for the predictors.").hasArgs().create(cmd_pred));
 		ops.addOption(OptionBuilder.withDescription("method for adjustment of the phenotype, 0 (default) for linear regression, 1 for logistic regression.").hasArg().create(cmd_method));
 		ops.addOption(OptionBuilder.withDescription("fold of cross-validation, and default is 5.").hasArg().create(cmd_cv));
 		ops.addOption(OptionBuilder.withDescription("minimal order of the interaction being searched for.").hasArg().create(cmd_min));
@@ -94,6 +107,9 @@ public class Parameter {
 		ops.addOption(OptionBuilder.withDescription("hierachical permutation for families that founders are exchangeable within family and sibs are exchangeable within family.").create(cmd_perm_fam));
 		ops.addOption(OptionBuilder.withDescription("use unrelated indivuduals only, if '--md' is specified.").create(cmd_unrelated_only));
 		ops.addOption(OptionBuilder.withDescription("replications for simulation, and this parameter is for simulation only").hasArg().create(cmd_simu));
+		ops.addOption(OptionBuilder.withDescription("missing phenotype, default 99").hasArg().create(cmd_missing_phenotype));
+		ops.addOption(OptionBuilder.withDescription("missing genotype, default 0").hasArg().create(cmd_missing_genotype));
+		ops.addOption(OptionBuilder.withDescription("use this option if status was coded as 0 (unaffected)/1 (affected).").create(cmd_status_shift));		
 		ops.addOption(OptionBuilder.withDescription("help manual.").create(cmd_help));
 	}
 
@@ -113,6 +129,9 @@ public class Parameter {
 		}
 		if (cl.hasOption(cmd_ped)) {
 			pedigree = cl.getOptionValue(cmd_ped);
+		}
+		if (cl.hasOption(cmd_map)) {
+			map = cl.getOptionValue(cmd_map);
 		}
 		if (cl.hasOption(cmd_phe)) {
 			phenotype = cl.getOptionValue(cmd_phe);
@@ -157,6 +176,15 @@ public class Parameter {
 		}
 		if (cl.hasOption(cmd_max)) {
 			max = Integer.parseInt(cl.getOptionValue(cmd_max));
+		}
+		if (cl.hasOption(cmd_missing_phenotype)) {
+			missing_phenotype = cl.getOptionValue(cmd_missing_phenotype);
+		}
+		if (cl.hasOption(cmd_missing_genotype)) {
+			missing_genotype = cl.getOptionValue(cmd_missing_genotype);
+		}
+		if (cl.hasOption(cmd_status_shift)) {
+			status_shift = -1;
 		}
 		if (help) {
 			HelpFormatter formatter = new HelpFormatter();
@@ -217,6 +245,10 @@ public class Parameter {
 
 		sb.append("ped: ");
 		sb.append(pedigree);
+		sb.append(System.getProperty("line.separator"));
+
+		sb.append("map: ");
+		sb.append(map);
 		sb.append(System.getProperty("line.separator"));
 
 		sb.append("phe: ");
@@ -280,6 +312,6 @@ public class Parameter {
 		Parameter p = new Parameter();
 		p.commandListenor(args);
 
-//		System.out.println(p);
+		System.out.println(p);
 	}
 }

@@ -3,8 +3,6 @@ package admixture;
 import java.io.IOException;
 import java.util.Arrays;
 
-import org.apache.commons.cli.HelpFormatter;
-
 import admixture.parameter.Parameter;
 
 import mdr.MDRConstant;
@@ -19,6 +17,7 @@ import family.pedigree.design.hierarchy.SII;
 import family.pedigree.design.hierarchy.Unified;
 import family.pedigree.design.hierarchy.UnifiedII;
 import family.pedigree.design.hierarchy.UnifiedUnrelated;
+import family.plink.PLINKParser;
 
 /**
  * 
@@ -30,25 +29,25 @@ public class UnifiedGMDR {
 		Parameter p = new Parameter();
 		p.commandListenor(args);
 
-
 		for (int i = 0; i < p.simu; i++) {
 			String PedFile = Integer.toString(i) + "L_ped.txt";
 			String PhenoFile = Integer.toString(i) + "score.txt";
-
+			String MapFile = p.map;
+			PLINKParser pp = new PLINKParser(PedFile, PhenoFile, MapFile);
+			
+			long s = p.seed;
 			ChenInterface chen = null;
 			if (p.mode.compareTo("u") == 0) {
 				if(p.unrelated_only) {
-					chen = new UnifiedUnrelated(PedFile, PhenoFile);
+					chen = new UnifiedUnrelated(PedFile, MapFile, PhenoFile, s, p.response, p.predictor, p.linkfunction);
 				} else if (p.permu_fam){
-					chen = new UnifiedII(PedFile, PhenoFile);
+					chen = new UnifiedII(PedFile, MapFile, PhenoFile, s, p.response, p.predictor, p.linkfunction);
 				} else {
-					chen = new Unified(PedFile, PhenoFile);
+					chen = new Unified(PedFile, MapFile, PhenoFile, s, p.response, p.predictor, p.linkfunction);
 				}
 			} else if (p.mode.compareTo("f") == 0) {
-				chen = new SII(PedFile, PhenoFile);
+				chen = new SII(PedFile, MapFile, PhenoFile, s, p.response, p.predictor, p.linkfunction);
 			}
-			chen.setSeed(p.seed);
-			chen.generateScore(p.response, p.predictor, p.linkfunction);
 
 			DataFile mdrData = new DataFile(chen.getMarkerName(), chen.getGenotype(), chen.getStatus(), chen.getScoreName(), chen.getScore2());
 			DataFile.setScoreIndex(0);
