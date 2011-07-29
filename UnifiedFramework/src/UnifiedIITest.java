@@ -25,19 +25,19 @@ public class UnifiedIITest {
 		for (int i = 0; i < p.simu; i++) {
 			String PedFile = Integer.toString(i) + "L_ped.txt";
 			String PhenoFile = Integer.toString(i) + "score.txt";
-
+			String MapFile = p.map;
 			ChenInterface chen = null;
 			if (p.mode.compareTo("u") == 0) {
 				if(p.unrelated_only) {
-					chen = new UnifiedUnrelated(PedFile, PhenoFile);
+					chen = new UnifiedUnrelated(PedFile, MapFile, PhenoFile, p.seed, p.response, p.predictor, p.linkfunction);
+				} else if(p.permu_fam){
+					chen = new UnifiedII(PedFile, MapFile, PhenoFile, p.seed, p.response, p.predictor, p.linkfunction);
 				} else {
-					chen = new UnifiedII(PedFile, PhenoFile);
+					chen = new Unified(PedFile, MapFile, PhenoFile, p.seed, p.response, p.predictor, p.linkfunction);
 				}
 			} else if (p.mode.compareTo("f") == 0) {
-				chen = new SII(PedFile, PhenoFile);
+				chen = new SII(PedFile, MapFile, PhenoFile, p.seed, p.response, p.predictor, p.linkfunction);
 			}
-			chen.setSeed(p.seed);
-			chen.generateScore(p.response, p.predictor, p.linkfunction);
 
 			DataFile mdrData = new DataFile(chen.getMarkerName(), chen.getGenotype(), chen.getStatus(), chen.getScoreName(), chen.getScore2());
 			DataFile.setScoreIndex(0);

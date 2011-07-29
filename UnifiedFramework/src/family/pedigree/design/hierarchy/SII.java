@@ -3,7 +3,6 @@ package family.pedigree.design.hierarchy;
 import java.util.ArrayList;
 import java.util.Hashtable;
 import java.util.Random;
-import java.util.Map.Entry;
 
 import org.apache.commons.lang3.ArrayUtils;
 
@@ -22,72 +21,81 @@ import family.pedigree.phenotype.Subject;
  */
 public final class SII extends ChenBase {
 
-	public SII(String ped, String phe) {
-		super(ped, phe);
+	public SII(String ped, String map, String phe, long s, int pIdx, int[] cIdx, int m) {
+		super(ped, map, phe, s, pIdx, cIdx, m);
 	}
 
-	public void RevvingUp(String ped, String phe) {
-		ParsePedFile(ped);
-		ParsePhenoFile(phe);
-		int[] m = new int[PedData.getNumMarkers()];
+	public void RevvingUp() {
+
+		int[] m = new int[MapData.getMarkerNumber()];
 		for (int i = 0; i < m.length; i++) {
 			m[i] = i;
 		}
 		SetChosenMarker(m);
 
+		ChenBase.LineUpGenotypePhenotype lineup = new ChenBase.LineUpGenotypePhenotype();
 		Hashtable<String, FamilyStruct> Fam = PedData.getFamilyStruct();
 
-		for (Entry<String, FamilyStruct> entry : Fam.entrySet()) {
-			FamilyStruct fs = entry.getValue();
-			numSibs += fs.getNumSibs();
-		}
+		PersonTable.ensureCapacity(qualified_Sib);
 
-		PersonTable.ensureCapacity(numSibs);
-		CovariateTable.ensureCapacity(numSibs);
-		genotype = new byte[numSibs][];
-		status = new byte[numSibs];
+		if (phenotypeFile != null)
+			CovariateTable.ensureCapacity(qualified_Sib);
 
-		int n_sib = 0;
-
+		genotype = new byte[qualified_Sib][];
+		status = new byte[qualified_Sib];
 
 		ArrayList<PersonIndex> s_P = NewIt.newArrayList();
 		ArrayList<ArrayList<String>> s_C = NewIt.newArrayList();
 
 		ArrayList<Integer> SibIdx = NewIt.newArrayList();
 
+		int c = 0;
+		int s = 0;
 		for (String fi : PedData.getFamListSorted()) {
+			if (lineup.num_qualified[c][1] == 0) {
+				c++;
+				continue;
+			}
 			FamilyStruct fs = Fam.get(fi);
-			FamilyUnit FamUnit = PhenoData.getFamilyUnit(fi);
+			FamilyUnit FamUnit = phenotypeFile == null ? null : PhenoData.getFamilyUnit(fi);
 			String[] pi = fs.getPersonListSorted();
 			int si = 0;
+
 			for (int i = 0; i < pi.length; i++) {
+				if (!lineup.filter[c][i])
+					continue;
 				Person per = fs.getPerson(pi[i]);
-				Subject sub = FamUnit.getSubject(pi[i]);
+				Subject sub = phenotypeFile == null ? null : FamUnit.getSubject(pi[i]);
+
 				if (fs.hasAncestor(per)) {
-					si++;
 					s_P.add(new PersonIndex(fs.getFamilyStructName(), pi[i]));
-					genotype[n_sib] = per.getGenotypeScore();
-					status[n_sib] = (byte) per.getAffectedStatus();
-					s_C.add(sub.getTraits());
-					n_sib++;
+					genotype[s] = per.getGenotypeScore();
+					status[s] = (byte) per.getAffectedStatus();
+					if (sub != null)
+						s_C.add(sub.getTraits());
+					si++;
+					s++;
 				}
 			}
 			if (si != 0)
 				SibIdx.add(new Integer(si));
+			c++;
 		}
 		PersonTable.addAll(s_P);
-		CovariateTable.addAll(s_C);
+		if (phenotypeFile != null)
+			CovariateTable.addAll(s_C);
 
 		numSib = ArrayUtils.toPrimitive(SibIdx.toArray(new Integer[0]));
 
 		AbstractGenoDistribution.rnd = new Random(seed);
 		RLDriver RLD = new RLDriver();
-		RLD.TDT(Fam, PedData.getMarkerInformation(), m);
+		RLD.TDT(Fam, getMarkerName(), m);
 	}
 
 	public double[] getPermutedScore(boolean isNested) {
+
 		permuted_score = new double[score.length];
-		if(isNested) {
+		if (isNested) {
 			int c = 0;
 			for (int i = 0; i < numSib.length; i++) {
 				int[] si = Sample.SampleIndex(0, numSib[i] - 1, numSib[i]);
@@ -102,6 +110,7 @@ public final class SII extends ChenBase {
 				permuted_score[i] = score[idx[i]];
 			}
 		}
+
 		return permuted_score;
 	}
 }

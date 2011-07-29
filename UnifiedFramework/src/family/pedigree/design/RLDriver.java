@@ -1,6 +1,5 @@
 package family.pedigree.design;
 
-import java.util.ArrayList;
 import java.util.Enumeration;
 import java.util.Hashtable;
 import java.util.Set;
@@ -29,7 +28,7 @@ public class RLDriver {
 		
 	}
 
-	public void TDT(Hashtable<String, FamilyStruct> familystructure, ArrayList<String> markerInfor, int[] marker) {
+	public void TDT(Hashtable<String, FamilyStruct> familystructure, String[] markerInfor, int[] marker) {
 //		Enumeration<String> fsList = familystructure.keys();
 //		while (fsList.hasMoreElements()) {
 		for(Entry<String, FamilyStruct> entry : familystructure.entrySet()) {
@@ -86,7 +85,7 @@ public class RLDriver {
 						if (!AbstractGenoDistribution.isHeterozygous(PG)) {// table 1
 							if (aSet.size() > 3) {
 								try {
-									throw new FamilyStructException("Marker " + markerInfor.get(marker[i])
+									throw new FamilyStructException("Marker " + markerInfor[marker[i]]
 											+ " has more than 3 alleles with one parent is homozygous.");
 								} catch (FamilyStructException e) {
 									e.printStackTrace();

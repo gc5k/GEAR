@@ -21,7 +21,9 @@ public class PedigreeParameter {
 	protected boolean usingFounderGenotype; //1
 	protected boolean usingChildrenGenotype; //2
 	protected String ped_file; // 3
+	protected String map_file;
 	protected String phe_file; // 4
+
 	protected String converted_ped_file; // 5
 	protected String converted_phe_file; // 6
 	protected String id_file; // 7
@@ -111,6 +113,10 @@ public class PedigreeParameter {
 		return ped_file;
 	}
 	
+	public String getMapFile() {
+		return map_file;
+	}
+
 	public void setPhenotypeFile(String phe) {
 		phe_file = phe;
 	}

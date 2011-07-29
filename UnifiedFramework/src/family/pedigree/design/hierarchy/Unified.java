@@ -3,7 +3,6 @@ package family.pedigree.design.hierarchy;
 import java.util.ArrayList;
 import java.util.Hashtable;
 import java.util.Random;
-import java.util.Map.Entry;
 
 import org.apache.commons.lang3.ArrayUtils;
 
@@ -23,34 +22,27 @@ import family.pedigree.phenotype.Subject;
 
 public final class Unified extends ChenBase {
 
-	public Unified(String ped, String phe) {
-		super(ped, phe);
+	public Unified(String ped, String map, String phe, long s, int pIdx, int[] cIdx, int m) {
+		super(ped, map, phe, s, pIdx, cIdx, m);
 	}
 
-	protected void RevvingUp(String ped, String phe) {
-		ParsePedFile(ped);
-		ParsePhenoFile(phe);
-		int[] m = new int[PedData.getNumMarkers()];
+	protected void RevvingUp() {
+
+		int[] m = new int[MapData.getMarkerNumber()];
 		for (int i = 0; i < m.length; i++) {
 			m[i] = i;
 		}
 		SetChosenMarker(m);
 
+		ChenBase.LineUpGenotypePhenotype lineup = new ChenBase.LineUpGenotypePhenotype();
 		Hashtable<String, FamilyStruct> Fam = PedData.getFamilyStruct();
 
-		for (Entry<String, FamilyStruct> entry : Fam.entrySet()) {
-			FamilyStruct fs = entry.getValue();
-			numUnrelated += fs.getNumFounders();
-			numSibs += fs.getNumSibs();
-		}
+		PersonTable.ensureCapacity(qualified_Unrelated + qualified_Sib);
+		if(phenotypeFile != null) 
+			CovariateTable.ensureCapacity(qualified_Unrelated + qualified_Sib);
 
-		PersonTable.ensureCapacity(numUnrelated + numSibs);
-		CovariateTable.ensureCapacity(numUnrelated + numSibs);
-		genotype = new byte[numUnrelated + numSibs][];
-		status = new byte[numUnrelated + numSibs];
-
-		int n_unrelated = 0;
-		int n_sib = 0;
+		genotype = new byte[qualified_Unrelated + qualified_Sib][];
+		status = new byte[qualified_Unrelated + qualified_Sib];
 
 		ArrayList<PersonIndex> u_P = NewIt.newArrayList();
 		ArrayList<ArrayList<String>> u_C = NewIt.newArrayList();
@@ -60,53 +52,68 @@ public final class Unified extends ChenBase {
 
 		ArrayList<Integer> SibIdx = NewIt.newArrayList();
 
+		int c = 0;
+		int s = 0;
+		int un = 0;
 		for (String fi : PedData.getFamListSorted()) {
+			if ((lineup.num_qualified[c][0] + lineup.num_qualified[c][1]) == 0) {
+				c++;
+				continue;
+			}
 			FamilyStruct fs = Fam.get(fi);
-			FamilyUnit FamUnit = PhenoData.getFamilyUnit(fi);
+			FamilyUnit FamUnit = phenotypeFile == null ? null:PhenoData.getFamilyUnit(fi);
 			String[] pi = fs.getPersonListSorted();
-			int len = pi.length;
 			int si = 0;
+
 			for (int i = 0; i < pi.length; i++) {
+				if (!lineup.filter[c][i])
+					continue;
 				Person per = fs.getPerson(pi[i]);
-				Subject sub = FamUnit.getSubject(pi[i]);
-				if (fs.hasAncestor(per) && len > 1) {//if there is only one individual in a family, I consider it as unrelated individual and pool it to the unrelated group
-					si++;
+				Subject sub = phenotypeFile == null ? null : FamUnit.getSubject(pi[i]);
+
+				if (fs.hasAncestor(per)) {
 					s_P.add(new PersonIndex(fs.getFamilyStructName(), pi[i]));
-					genotype[n_sib + numUnrelated] = per.getGenotypeScore();
-					status[n_sib + numUnrelated] = (byte) per.getAffectedStatus();
-					s_C.add(sub.getTraits());
-					n_sib++;
+					genotype[s + qualified_Unrelated] = per.getGenotypeScore();
+					status[s + qualified_Unrelated] = (byte) per.getAffectedStatus();
+					if(phenotypeFile != null)
+						s_C.add(sub.getTraits());
+					si++;
+					s++;
 				} else {
 					u_P.add(new PersonIndex(fs.getFamilyStructName(), pi[i]));
-					genotype[n_unrelated] = per.getGenotypeScore();
-					status[n_unrelated] = (byte) per.getAffectedStatus();
-					u_C.add(sub.getTraits());
-					n_unrelated++;
+					genotype[un] = per.getGenotypeScore();
+					status[un] = (byte) per.getAffectedStatus();
+					if(phenotypeFile != null)
+						u_C.add(sub.getTraits());
+					un++;
 				}
 			}
 			if (si != 0)
 				SibIdx.add(new Integer(si));
+			c++;
 		}
 		PersonTable.addAll(u_P);
 		PersonTable.addAll(s_P);
-		CovariateTable.addAll(u_C);
-		CovariateTable.addAll(s_C);
+		if(phenotypeFile != null) {
+			CovariateTable.addAll(u_C);
+			CovariateTable.addAll(s_C);
+		}
 
 		numSib = ArrayUtils.toPrimitive(SibIdx.toArray(new Integer[0]));
 
 		AbstractGenoDistribution.rnd = new Random(seed);
 		RLDriver RLD = new RLDriver();
-		RLD.TDT(Fam, PedData.getMarkerInformation(), m);
+		RLD.TDT(Fam, getMarkerName(), m);
 	}
-	
+
 	public double[] getPermutedScore(boolean isNested) {
 		permuted_score = new double[score.length];
 		if (isNested) {
-			int[] un_related = Sample.SampleIndex(0, numUnrelated - 1, numUnrelated);
+			int[] un_related = Sample.SampleIndex(0, qualified_Unrelated - 1, qualified_Unrelated);
 			for (int i = 0; i < un_related.length; i++) {
 				permuted_score[i] = score[un_related[i]];
 			}
-			int c = numUnrelated;
+			int c = qualified_Unrelated;
 			for (int i = 0; i < numSib.length; i++) {
 				int[] si = Sample.SampleIndex(0, numSib[i] - 1, numSib[i]);
 				for (int j = 0; j < si.length; j++) {

@@ -30,22 +30,20 @@ public class RealDataAnalyzer {
 
 		String PedFile = p.pedigree;
 		String PhenoFile = p.phenotype;
-
+		String MapFile = p.map;
+		long s = p.seed;
 		ChenInterface chen = null;
 		if (p.mode.compareTo("u") == 0) {
 			if(p.unrelated_only) {
-				chen = new UnifiedUnrelated(PedFile, PhenoFile);
+				chen = new UnifiedUnrelated(PedFile, MapFile, PhenoFile, s, p.response, p.predictor, p.linkfunction);
 			} else if (p.permu_fam){
-				chen = new UnifiedII(PedFile, PhenoFile);
+				chen = new UnifiedII(PedFile, MapFile, PhenoFile, s, p.response, p.predictor, p.linkfunction);
 			} else {
-				chen = new Unified(PedFile, PhenoFile);
+				chen = new Unified(PedFile, MapFile, PhenoFile, s, p.response, p.predictor, p.linkfunction);
 			}
 		} else if (p.mode.compareTo("f") == 0) {
-			chen = new SII(PedFile, PhenoFile);
+			chen = new SII(PedFile, MapFile, PhenoFile, s, p.response, p.predictor, p.linkfunction);
 		}
-
-		chen.setSeed(p.seed);
-		chen.generateScore(p.response, p.predictor, p.linkfunction);
 
 		DataFile mdrData = new DataFile(chen.getMarkerName(), chen.getGenotype(), chen.getStatus(), chen.getScoreName(), chen.getScore2());
 		DataFile.setScoreIndex(0);
