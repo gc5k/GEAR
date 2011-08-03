@@ -16,6 +16,7 @@ import family.pedigree.design.hierarchy.SII;
 import family.pedigree.design.hierarchy.Unified;
 import family.pedigree.design.hierarchy.UnifiedII;
 import family.pedigree.design.hierarchy.UnifiedUnrelated;
+import family.plink.PLINKParser;
 
 public class UnifiedIITest {
 	public static void main(String[] args) throws IOException {
@@ -26,17 +27,20 @@ public class UnifiedIITest {
 			String PedFile = Integer.toString(i) + "L_ped.txt";
 			String PhenoFile = Integer.toString(i) + "score.txt";
 			String MapFile = p.map;
+			
+			PLINKParser pp = new PLINKParser(PedFile, PhenoFile, MapFile);
+			
 			ChenInterface chen = null;
 			if (p.mode.compareTo("u") == 0) {
 				if(p.unrelated_only) {
-					chen = new UnifiedUnrelated(PedFile, MapFile, PhenoFile, p.seed, p.response, p.predictor, p.linkfunction);
+					chen = new UnifiedUnrelated(pp.getPedigreeData(), pp.getPhenotypeData(), pp.getMapData(), p.seed, p.response, p.predictor, p.linkfunction);
 				} else if(p.permu_fam){
-					chen = new UnifiedII(PedFile, MapFile, PhenoFile, p.seed, p.response, p.predictor, p.linkfunction);
+					chen = new UnifiedII(pp.getPedigreeData(), pp.getPhenotypeData(), pp.getMapData(), p.seed, p.response, p.predictor, p.linkfunction);
 				} else {
-					chen = new Unified(PedFile, MapFile, PhenoFile, p.seed, p.response, p.predictor, p.linkfunction);
+					chen = new Unified(pp.getPedigreeData(), pp.getPhenotypeData(), pp.getMapData(), p.seed, p.response, p.predictor, p.linkfunction);
 				}
 			} else if (p.mode.compareTo("f") == 0) {
-				chen = new SII(PedFile, MapFile, PhenoFile, p.seed, p.response, p.predictor, p.linkfunction);
+				chen = new SII(pp.getPedigreeData(), pp.getPhenotypeData(), pp.getMapData(), p.seed, p.response, p.predictor, p.linkfunction);
 			}
 
 			DataFile mdrData = new DataFile(chen.getMarkerName(), chen.getGenotype(), chen.getStatus(), chen.getScoreName(), chen.getScore2());

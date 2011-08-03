@@ -3,6 +3,8 @@ package family.plink;
 import java.io.File;
 import java.io.IOException;
 
+import admixture.parameter.Parameter;
+
 import family.pedigree.file.GMDRPhenoFile;
 import family.pedigree.file.GMDRPhenoFileException;
 import family.pedigree.file.MDRPedFileException;
@@ -10,9 +12,9 @@ import family.pedigree.file.MapFile;
 import family.pedigree.file.PedigreeFile;
 
 public class PLINKParser {
-	protected MapFile MapData;
-	protected PedigreeFile PedData;
-	protected GMDRPhenoFile PhenoData;
+	protected MapFile mapData;
+	protected PedigreeFile pedData;
+	protected GMDRPhenoFile phenoData;
 
 	protected String pedigreeFile;
 	protected String phenotypeFile;
@@ -23,21 +25,22 @@ public class PLINKParser {
 		phenotypeFile = phe;
 		mapFile = map;
 
-		MapData = new MapFile(mapFile);
-		PhenoData = new GMDRPhenoFile();
-		PedData = new PedigreeFile();
+		mapData = new MapFile(mapFile);
+		phenoData = new GMDRPhenoFile();
+		pedData = new PedigreeFile();
+		pedData.setHeader(Parameter.header);
 		initial();
 	}
 
 	private void initial() {
 		if(mapFile != null) {
 			ParseMapFile();
-			PedData.setHeader(false);
+			pedData.setHeader(false);
 			ParsePedFile();
 		} else {
-			PedData.setHeader(true);
+			pedData.setHeader(true);
 			ParsePedFile();
-			MapData.setMarker(PedData.getNumMarker());
+			mapData.setMarker(pedData.getNumMarker());
 		}
 
 		if (phenotypeFile != null) {
@@ -47,7 +50,7 @@ public class PLINKParser {
 
 	public void ParseMapFile() {
 		if(mapFile != null) {
-			MapData.parseMap();
+			mapData.parseMap();
 		}
 	}
 	
@@ -61,8 +64,8 @@ public class PLINKParser {
 	public void ParsePedFile() {
 		File PedFile = new File(pedigreeFile);
 		try {
-			PedData.Initial(PedFile);
-			PedData.parseLinkage();
+			pedData.Initial(PedFile);
+			pedData.parseLinkage();
 		} catch (MDRPedFileException e) {
 			System.err.println("PedFile initial exception.");
 			e.printStackTrace(System.err);
@@ -82,8 +85,8 @@ public class PLINKParser {
 	public void ParsePhenoFile() {
 		File PheFile = new File(phenotypeFile);
 		try {
-			PhenoData.Initial(PheFile);
-			PhenoData.parsePhenotype();
+			phenoData.Initial(PheFile);
+			phenoData.parsePhenotype();
 		} catch (GMDRPhenoFileException e) {
 			System.err.println("Pheno file initialization exception.");
 			e.printStackTrace(System.err);
@@ -93,4 +96,15 @@ public class PLINKParser {
 		}
 	}
 
+	public PedigreeFile getPedigreeData() {
+		return pedData;
+	}
+	
+	public GMDRPhenoFile getPhenotypeData() {
+		return phenoData;
+	}
+	
+	public MapFile getMapData() {
+		return mapData;
+	}
 }

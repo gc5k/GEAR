@@ -10,6 +10,9 @@ import util.NewIt;
 import util.Sample;
 import family.RabinowitzLairdAlgorithm.AbstractGenoDistribution;
 import family.pedigree.design.RLDriver;
+import family.pedigree.file.GMDRPhenoFile;
+import family.pedigree.file.MapFile;
+import family.pedigree.file.PedigreeFile;
 import family.pedigree.genotype.FamilyStruct;
 import family.pedigree.genotype.Person;
 import family.pedigree.phenotype.FamilyUnit;
@@ -22,23 +25,17 @@ import family.pedigree.phenotype.Subject;
 
 public final class Unified extends ChenBase {
 
-	public Unified(String ped, String map, String phe, long s, int pIdx, int[] cIdx, int m) {
-		super(ped, map, phe, s, pIdx, cIdx, m);
+	public Unified(PedigreeFile ped, GMDRPhenoFile phe, MapFile map, long s, int pIdx, int[] cIdx, int m) {
+		super(ped, phe, map, s, pIdx, cIdx, m);
 	}
 
 	protected void RevvingUp() {
-
-		int[] m = new int[MapData.getMarkerNumber()];
-		for (int i = 0; i < m.length; i++) {
-			m[i] = i;
-		}
-		SetChosenMarker(m);
 
 		ChenBase.LineUpGenotypePhenotype lineup = new ChenBase.LineUpGenotypePhenotype();
 		Hashtable<String, FamilyStruct> Fam = PedData.getFamilyStruct();
 
 		PersonTable.ensureCapacity(qualified_Unrelated + qualified_Sib);
-		if(phenotypeFile != null) 
+		if(PhenoData != null) 
 			CovariateTable.ensureCapacity(qualified_Unrelated + qualified_Sib);
 
 		genotype = new byte[qualified_Unrelated + qualified_Sib][];
@@ -61,7 +58,7 @@ public final class Unified extends ChenBase {
 				continue;
 			}
 			FamilyStruct fs = Fam.get(fi);
-			FamilyUnit FamUnit = phenotypeFile == null ? null:PhenoData.getFamilyUnit(fi);
+			FamilyUnit FamUnit = PhenoData == null ? null:PhenoData.getFamilyUnit(fi);
 			String[] pi = fs.getPersonListSorted();
 			int si = 0;
 
@@ -69,13 +66,13 @@ public final class Unified extends ChenBase {
 				if (!lineup.filter[c][i])
 					continue;
 				Person per = fs.getPerson(pi[i]);
-				Subject sub = phenotypeFile == null ? null : FamUnit.getSubject(pi[i]);
+				Subject sub = PhenoData == null ? null : FamUnit.getSubject(pi[i]);
 
 				if (fs.hasAncestor(per)) {
 					s_P.add(new PersonIndex(fs.getFamilyStructName(), pi[i]));
 					genotype[s + qualified_Unrelated] = per.getGenotypeScore();
 					status[s + qualified_Unrelated] = (byte) per.getAffectedStatus();
-					if(phenotypeFile != null)
+					if(PhenoData != null)
 						s_C.add(sub.getTraits());
 					si++;
 					s++;
@@ -83,7 +80,7 @@ public final class Unified extends ChenBase {
 					u_P.add(new PersonIndex(fs.getFamilyStructName(), pi[i]));
 					genotype[un] = per.getGenotypeScore();
 					status[un] = (byte) per.getAffectedStatus();
-					if(phenotypeFile != null)
+					if(PhenoData != null)
 						u_C.add(sub.getTraits());
 					un++;
 				}
@@ -94,13 +91,16 @@ public final class Unified extends ChenBase {
 		}
 		PersonTable.addAll(u_P);
 		PersonTable.addAll(s_P);
-		if(phenotypeFile != null) {
+		if(PhenoData != null) {
 			CovariateTable.addAll(u_C);
 			CovariateTable.addAll(s_C);
 		}
 
 		numSib = ArrayUtils.toPrimitive(SibIdx.toArray(new Integer[0]));
-
+		int[] m = new int[MapData.getMarkerNumber()];
+		for (int i = 0; i < m.length; i++) {
+			m[i] = i;
+		}
 		AbstractGenoDistribution.rnd = new Random(seed);
 		RLDriver RLD = new RLDriver();
 		RLD.TDT(Fam, getMarkerName(), m);

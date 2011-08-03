@@ -20,6 +20,8 @@ import java.util.Arrays;
 import java.util.Enumeration;
 import java.util.Hashtable;
 
+import admixture.parameter.Parameter;
+
 import publicAccess.PublicData;
 import util.NewIt;
 import family.pedigree.genotype.FamilyStruct;
@@ -325,7 +327,7 @@ public class PedigreeFile {
 		// alphabetical input.
 		int[] genotype = new int[2];
 
-		if (allele.equalsIgnoreCase("N")) {
+		if (allele.compareTo(Parameter.missing_allele) == 0) {
 			genotype[0] = 0;
 		} else if (allele.equalsIgnoreCase("A")) {
 			genotype[0] = 1;

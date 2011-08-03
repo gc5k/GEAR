@@ -21,6 +21,8 @@ public class Parameter {
 	private final String cmd_mode = "md";
 	public String mode = "u";
 
+	private final String cmd_file = "file";
+
 	private final String cmd_ped = "ped";
 	public String pedigree = null;
 
@@ -29,6 +31,9 @@ public class Parameter {
 	
 	private final String cmd_phe = "phe";
 	public String phenotype = null;
+
+	private final String cmd_header = "header";
+	public static boolean header = false;
 
 	private final String cmd_res = "rps";
 	public int response = -1;
@@ -70,6 +75,9 @@ public class Parameter {
 	private final String cmd_help = "help";
 	public boolean help = false;
 
+	private final String cmd_missing_allele = "missing_allele";
+	public static String missing_allele = "0";
+
 	private final String cmd_missing_phenotype = "missing_phenotype";
 	public static String missing_phenotype = "99";
 	
@@ -92,6 +100,7 @@ public class Parameter {
 
 	public void commandInitial() {
 		ops.addOption(OptionBuilder.withDescription("u (default) for the unified framework and f for using sibs only.").hasArg().create(cmd_mode));
+		ops.addOption(OptionBuilder.withDescription("the format of the file is same as with PLink.").hasArg().create(cmd_file));		
 		ops.addOption(OptionBuilder.withDescription("the format of the pedigree file is same as with PLink.").hasArg().create(cmd_ped));
 		ops.addOption(OptionBuilder.withDescription("the format of the map file is same as with PLink.").hasArg().create(cmd_map));
 		ops.addOption(OptionBuilder.withDescription("the format of phenotype file is same as with PLink.").hasArg().create(cmd_phe));
@@ -108,7 +117,8 @@ public class Parameter {
 		ops.addOption(OptionBuilder.withDescription("use unrelated indivuduals only, if '--md' is specified.").create(cmd_unrelated_only));
 		ops.addOption(OptionBuilder.withDescription("replications for simulation, and this parameter is for simulation only").hasArg().create(cmd_simu));
 		ops.addOption(OptionBuilder.withDescription("missing phenotype, default 99").hasArg().create(cmd_missing_phenotype));
-		ops.addOption(OptionBuilder.withDescription("missing genotype, default 0").hasArg().create(cmd_missing_genotype));
+		ops.addOption(OptionBuilder.withDescription("missing genotype, default 00").hasArg().create(cmd_missing_genotype));
+		ops.addOption(OptionBuilder.withDescription("missing allele, default 0").hasArg().create(cmd_missing_allele));		
 		ops.addOption(OptionBuilder.withDescription("use this option if status was coded as 0 (unaffected)/1 (affected).").create(cmd_status_shift));		
 		ops.addOption(OptionBuilder.withDescription("help manual.").create(cmd_help));
 	}
@@ -126,6 +136,21 @@ public class Parameter {
 		}
 		if (cl.hasOption(cmd_mode)) {
 			mode = cl.getOptionValue(cmd_mode);
+		}
+		if (cl.hasOption(cmd_file)) {
+			StringBuffer sb1 = new StringBuffer();
+			StringBuffer sb2 = new StringBuffer();
+			sb1.append(cl.getOptionValue(cmd_file));
+			sb1.append(".ped");
+			
+			sb2.append(cl.getOptionValue(cmd_file));
+			sb2.append(".map");
+			
+			pedigree = sb1.toString();
+			map = sb2.toString();
+		}
+		if (cl.hasOption(cmd_header)) {
+			header = true;
 		}
 		if (cl.hasOption(cmd_ped)) {
 			pedigree = cl.getOptionValue(cmd_ped);
@@ -183,6 +208,9 @@ public class Parameter {
 		if (cl.hasOption(cmd_missing_genotype)) {
 			missing_genotype = cl.getOptionValue(cmd_missing_genotype);
 		}
+		if (cl.hasOption(cmd_missing_allele)) {
+			missing_allele = cl.getOptionValue(cmd_missing_allele);
+		}
 		if (cl.hasOption(cmd_status_shift)) {
 			status_shift = -1;
 		}
@@ -213,6 +241,9 @@ public class Parameter {
 				.create(cmd_res));
 		ops.addOption(OptionBuilder.withLongOpt("predictor").withDescription("index(es) for the predictors").hasArg().withArgName(
 				"predictor variable index(es)").create(cmd_pred));
+		ops.addOption(OptionBuilder.withLongOpt("header").withDescription("a header line in the pedigree file").hasArg().withArgName(
+		"flag for header").create(cmd_header));
+		
 		ops.addOption(OptionBuilder.withLongOpt("method").withDescription("method for adjustment").hasArg().withArgName(
 				"generalized linear regression").create(cmd_method));
 		ops.addOption(OptionBuilder.withLongOpt("cross-validation").withDescription("fold for cross-validation").hasArg().withArgName("fold for cv")
@@ -311,7 +342,6 @@ public class Parameter {
 	public static void main(String[] args) throws IOException {
 		Parameter p = new Parameter();
 		p.commandListenor(args);
-
 		System.out.println(p);
 	}
 }
