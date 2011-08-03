@@ -166,4 +166,5 @@ public class GMDRPhenoFile {
 		}
 		return traitInfor.get(index);
 	}
+
 }

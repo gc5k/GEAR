@@ -2,7 +2,6 @@ package family.pedigree.design.hierarchy;
 
 import java.io.File;
 import java.io.FileNotFoundException;
-import java.io.IOException;
 import java.io.PrintWriter;
 import java.util.ArrayList;
 import java.util.Hashtable;
@@ -14,8 +13,6 @@ import score.LinearRegression;
 import score.LogisticRegression;
 
 import family.pedigree.file.GMDRPhenoFile;
-import family.pedigree.file.GMDRPhenoFileException;
-import family.pedigree.file.MDRPedFileException;
 import family.pedigree.file.MapFile;
 import family.pedigree.file.PedigreeFile;
 import family.pedigree.file.SNP;
@@ -38,9 +35,9 @@ public abstract class ChenBase implements ChenInterface {
 	protected PedigreeFile PedData;
 	protected GMDRPhenoFile PhenoData;
 
-	protected String pedigreeFile;
-	protected String phenotypeFile;
-	protected String mapFile;
+//	protected String pedigreeFile;
+//	protected String phenotypeFile;
+//	protected String mapFile;
 	protected byte[][] genotype;
 	protected int qualified_Unrelated;
 	protected int qualified_Sib;
@@ -102,7 +99,7 @@ public abstract class ChenBase implements ChenInterface {
 				FamilyStruct fs = Fam.get(fi);
 				String[] pi = fs.getPersonListSorted();
 				filter[c] = new boolean[pi.length];
-				if (phenotypeFile != null && !PhenoData.containFamily(fi)) {  // if no phenotype for the whole family
+				if (PhenoData != null && !PhenoData.containFamily(fi)) {  // if no phenotype for the whole family
 					for (int i = 0; i < filter[c].length; i++) {
 						filter[c][i] = false;
 					}
@@ -143,7 +140,7 @@ public abstract class ChenBase implements ChenInterface {
 			} else {
 				f = (trait.get(pheIdx).compareTo(Parameter.missing_phenotype) == 0) ? false : true;
 			}
-			if(phenotypeFile == null) {
+			if(PhenoData == null) {
 				return f;
 			}
 			if (covIdx == null) {
@@ -161,25 +158,18 @@ public abstract class ChenBase implements ChenInterface {
 		}
 	}
 
-	public ChenBase(String ped, String mp, String phe, long s, int pIdx, int[] cIdx, int m) {
+	public ChenBase(PedigreeFile ped, GMDRPhenoFile phe, MapFile map, long s, int pIdx, int[] cIdx, int m) {
 
-		pedigreeFile = ped;
-		mapFile = mp;
-		phenotypeFile = phe;
-		PhenoData = new GMDRPhenoFile();
-		PedData = new PedigreeFile();
+		PedData = ped;
+		PhenoData = phe;
+		MapData = map;
+
 		CovariateTable = NewIt.newArrayList();
 		PersonTable = NewIt.newArrayList();
 		pheIdx = pIdx;
 		covIdx = cIdx;
 		method = m;
 		setSeed(s);
-		if (mapFile != null)
-			ParseMapFile();
-		ParsePedFile();
-		if (phenotypeFile != null) {
-			ParsePhenoFile();
-		}
 		RevvingUp();
 		generateScore();
 		
@@ -195,7 +185,7 @@ public abstract class ChenBase implements ChenInterface {
 				score[i] = status[i] - 1;
 			} else {
 				try {
-					if (phenotypeFile == null) {
+					if (PhenoData == null) {
 						throw new Exception();
 					} 
 				} catch (Exception E) {
@@ -359,59 +349,6 @@ public abstract class ChenBase implements ChenInterface {
 		return score;
 	}
 
-	public void ParseMapFile() {
-		MapData = new MapFile(mapFile);
-	}
-	
-	/**
-	 * Initialize basic implementation of the genotype file.
-	 * 
-	 * @param Ped
-	 *            the name of the pedigree file
-	 * @throws IOException
-	 */
-	public void ParsePedFile() {
-		File PedFile = new File(pedigreeFile);
-		try {
-			PedData.Initial(PedFile);
-			PedData.parseLinkage();
-		} catch (MDRPedFileException e) {
-			System.err.println("PedFile initial exception.");
-			e.printStackTrace(System.err);
-		} catch (IOException e) {
-			System.err.println("Pedgree file initialization exception.");
-			e.printStackTrace(System.err);
-		}
-	}
-
-	/**
-	 * Initialize basic implementation of the phenotype file.
-	 * 
-	 * @param Pheno
-	 *            the name of the pedigree file
-	 * @throws IOException
-	 */
-	public void ParsePhenoFile() {
-		File PheFile = new File(phenotypeFile);
-		try {
-			PhenoData.Initial(PheFile);
-			PhenoData.parsePhenotype();
-		} catch (GMDRPhenoFileException e) {
-			System.err.println("Pheno file initialization exception.");
-			e.printStackTrace(System.err);
-		} catch (IOException e) {
-			System.err.println("Pheno file initialization exception.");
-			e.printStackTrace(System.err);
-		}
-	}
-
-	public void SetChosenMarker(int[] mi) {
-		subsetMarker = new int[mi.length];
-		for (int i = 0; i < mi.length; i++) {
-			subsetMarker[i] = mi[i];
-		}
-	}
-
 	private void generateScore() {
 		if (method >= 0) {
 			buildScore(pheIdx, covIdx, method);
@@ -426,5 +363,4 @@ public abstract class ChenBase implements ChenInterface {
 		seed = s;
 		rnd.setSeed(s);
 	}
-
 }

@@ -47,7 +47,7 @@ public class MapFile {
 				// Skip genetic distance field at tokens[2].
 				float dis = Float.parseFloat(tokens[2]);
 				int pos = Integer.parseInt(tokens[3]);
-				snpList.add(new SNP(name, chr, dis, pos));
+				snpList.add(new SNP(chr, name, dis, pos));
 			}
 			reader.close();
 		} catch (IOException E) {

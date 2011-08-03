@@ -6,6 +6,7 @@ import java.util.HashMap;
 import java.util.Set;
 import java.util.Map.Entry;
 
+import admixture.parameter.Parameter;
 
 import mdr.MDRConstant;
 import mdr.algorithm.Subdivision;
@@ -18,7 +19,6 @@ import mdr.result.Combination;
 import mdr.result.OneCVSet;
 import mdr.result.SavedModels;
 import mdr.result.Suite;
-
 
 import util.NewIt;
 
@@ -51,7 +51,7 @@ public class LinearMergeSearch extends AbstractMergeSearch {
 			}
 			model = new Combination();
 			SNPIndex = ToolKit.StringToIntArray(modelName);
-//			mergeSearch(sample, null, 0);
+			// mergeSearch(sample, null, 0);
 			linearSearch(sample);
 			calculate(modelName);
 			count++;
@@ -60,24 +60,28 @@ public class LinearMergeSearch extends AbstractMergeSearch {
 	}
 
 	public void linearSearch(ArrayList<DataFile.Subject> subjects) {
-		for(DataFile.Subject sub : subjects) {
+		for (DataFile.Subject sub : subjects) {
 			String geno = sub.getGenotype(SNPIndex);
-			Suite subset = model.get(geno);
-			if(subset == null) {
-				subset = new Suite();
-				model.put(geno, subset);
+			if (geno.contains(Parameter.missing_genotype)) {
+				continue;
+			} else {
+				Suite subset = model.get(geno);
+				if (subset == null) {
+					subset = new Suite();
+					model.put(geno, subset);
+				}
+				subset.add(sub);
 			}
-			subset.add(sub);
 		}
 
-		for(Entry<String, Suite> entry : model.entrySet()) {
+		for (Entry<String, Suite> entry : model.entrySet()) {
 			String geno = entry.getKey();
 			Suite s = entry.getValue();
 			s.summarize();
 			assignKFold(geno, s.getSubjects());
 		}
 	}
-	
+
 	public void mergeSearch(ArrayList<DataFile.Subject> subjects, String combination, int idxMarker) {
 		if (idxMarker < SNPIndex.length) {
 			HashMap<String, ArrayList<DataFile.Subject>> subsets = NewIt.newHashMap();
@@ -113,7 +117,7 @@ public class LinearMergeSearch extends AbstractMergeSearch {
 	}
 
 	protected void assignKFold(String key, ArrayList<DataFile.Subject> subsample) {
-		//assign each individual to one's testing set 
+		// assign each individual to one's testing set
 		for (DataFile.Subject sub : subsample) {
 			Integer ID = sub.getIntegerID();
 			int d = dataPartitionMap.get(ID).intValue();
@@ -126,7 +130,7 @@ public class LinearMergeSearch extends AbstractMergeSearch {
 			S.add(sub);
 		}
 
-		//summarize the testing set
+		// summarize the testing set
 		for (Combination testingModels : cvTestingSet) {
 			if (testingModels.containsKey(key)) {
 				Suite testingSuite = testingModels.get(key);
@@ -275,9 +279,9 @@ public class LinearMergeSearch extends AbstractMergeSearch {
 	@Override
 	public void summarise() {
 		// TODO Auto-generated method stub
-		
+
 	}
-	
+
 	public String toString() {
 		return bestKFold.getBestModel();
 	}
