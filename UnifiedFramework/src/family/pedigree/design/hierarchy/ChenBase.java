@@ -35,9 +35,6 @@ public abstract class ChenBase implements ChenInterface {
 	protected PedigreeFile PedData;
 	protected GMDRPhenoFile PhenoData;
 
-//	protected String pedigreeFile;
-//	protected String phenotypeFile;
-//	protected String mapFile;
 	protected byte[][] genotype;
 	protected int qualified_Unrelated;
 	protected int qualified_Sib;
@@ -362,5 +359,15 @@ public abstract class ChenBase implements ChenInterface {
 	public void setSeed(long s) {
 		seed = s;
 		rnd.setSeed(s);
+	}
+	
+	@Override
+	public int getNumberMarker() {
+		return MapData.getMarkerNumber();
+	}
+
+	@Override
+	public MapFile getMapFile() {
+		return MapData;
 	}
 }

@@ -190,46 +190,6 @@ public class ToolKit {
 		return accuracy;
 	}
 
-	//
-	// public static double Accuracy(HashMap<String, Cell> model) {
-	// if (model == null) {
-	// try {
-	// throw new ToolKitException("It is an empty model.");
-	// } catch (ToolKitException e) {
-	// // TODO Auto-generated catch block
-	// e.printStackTrace();
-	// }
-	// }
-	// double accuracy = 0;
-	// double truePos = 0;
-	// double trueNeg = 0;
-	// double falsePos = 0;
-	// double falseNeg = 0;
-	// for (String key : model.keySet()) {
-	// Cell cell = (Cell) model.get(key);
-	// if (cell.getStatus() == 1) {
-	// truePos += cell.getPositiveScore();
-	// falseNeg += Math.abs(cell.getNegativeScore());
-	// } else if (cell.getStatus() == 0) {
-	// trueNeg += Math.abs(cell.getNegativeScore());
-	// falsePos += cell.getPositiveScore();
-	// } else {
-	// //what's going on if for a negative status;
-	// }
-	// }
-	// double denominator = truePos + trueNeg + falsePos + falseNeg;
-	// if(denominator == 0) {
-	// try {
-	// throw new ToolKitException("denominator is zero.");
-	// } catch (ToolKitException e) {
-	// // TODO Auto-generated catch block
-	// e.printStackTrace();
-	// }
-	// }
-	// accuracy = (truePos + trueNeg) / (denominator);
-	// return accuracy;
-	// }
-
 	public static double IMAccuracy(HashMap<String, Cell> model) throws ToolKitException {
 		if (model == null) {
 			throw new ToolKitException("It is an empty model.");

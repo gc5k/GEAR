@@ -1,4 +1,7 @@
 package family.pedigree.design.hierarchy;
+
+import family.pedigree.file.MapFile;
+
 /**
  * 
  * @author Guo-Bo Chen, chenguobo@gmail.com
@@ -16,4 +19,6 @@ public interface ChenInterface {
 	public double[][] getScore2();
 	public double[] getPermutedScore(boolean nested);
 	public void print2MDRFormat(String f);
+	public MapFile getMapFile();
+	public int getNumberMarker();
 }
