@@ -28,9 +28,15 @@ public class Parameter {
 
 	private final String cmd_map = "map";
 	public String map = null;
-	
+
 	private final String cmd_phe = "phe";
 	public String phenotype = null;
+
+	private final String cmd_includesnp = "includesnp";
+	public String[] includesnp = null;
+
+	private final String cmd_excludesnp = "excludesnp";
+	public String[] excludesnp = null;
 
 	private final String cmd_header = "header";
 	public static boolean header = false;
@@ -104,6 +110,8 @@ public class Parameter {
 		ops.addOption(OptionBuilder.withDescription("the format of the pedigree file is same as with PLink.").hasArg().create(cmd_ped));
 		ops.addOption(OptionBuilder.withDescription("the format of the map file is same as with PLink.").hasArg().create(cmd_map));
 		ops.addOption(OptionBuilder.withDescription("the format of phenotype file is same as with PLink.").hasArg().create(cmd_phe));
+		ops.addOption(OptionBuilder.withDescription("include snp").hasArgs().create(cmd_includesnp));
+		ops.addOption(OptionBuilder.withDescription("exclude snp").hasArgs().create(cmd_excludesnp));
 		ops.addOption(OptionBuilder.withDescription("index for the response excluding the first two columns.").hasArg().create(cmd_res));
 		ops.addOption(OptionBuilder.withDescription("index(es) for the predictors.").hasArgs().create(cmd_pred));
 		ops.addOption(OptionBuilder.withDescription("method for adjustment of the phenotype, 0 (default) for linear regression, 1 for logistic regression.").hasArg().create(cmd_method));
@@ -160,6 +168,12 @@ public class Parameter {
 		}
 		if (cl.hasOption(cmd_phe)) {
 			phenotype = cl.getOptionValue(cmd_phe);
+		}
+		if (cl.hasOption(cmd_includesnp)) {
+			includesnp = cl.getOptionValues(cmd_includesnp);
+		}
+		if (cl.hasOption(cmd_excludesnp)) {
+			excludesnp = cl.getOptionValues(cmd_excludesnp);
 		}
 		if (cl.hasOption(cmd_res)) {
 			response = Integer.parseInt(cl.getOptionValue(cmd_res)) - 1;

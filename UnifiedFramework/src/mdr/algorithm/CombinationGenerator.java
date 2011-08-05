@@ -76,4 +76,10 @@ public class CombinationGenerator {
         }
         return Comb;
     }
+    
+    public static void main(String[] args) {
+    	CombinationGenerator cg = new CombinationGenerator(2, 10000);
+    	cg.generateCombination();
+    	System.out.println("done");
+    }
 }
