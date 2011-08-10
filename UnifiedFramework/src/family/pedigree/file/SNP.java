@@ -48,4 +48,12 @@ public class SNP {
 	public float getDistance() {
 		return distance;
 	}
+	
+	public String toString() {
+		StringBuffer sb = new StringBuffer();
+		sb.append(name + " ");
+		sb.append(chr + " ");
+		sb.append(position);
+		return sb.toString();
+	}
 }

@@ -5,12 +5,13 @@ import java.util.Arrays;
 import java.util.Set;
 import java.util.Map.Entry;
 
+import family.mdr.MDRStatistic;
+
 import mdr.MDRConstant;
 import mdr.algorithm.Subdivision;
 import mdr.arsenal.ToolKit;
 import mdr.data.DataFile;
 
-import mdr.moore.statistic.MDRStatistic;
 
 import mdr.result.BestKFoldCVResult;
 import mdr.result.Cell;

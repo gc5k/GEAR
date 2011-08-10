@@ -7,11 +7,10 @@ import admixture.parameter.Parameter;
 import admixture.parameter.ParameterParser;
 
 import mdr.MDRConstant;
-import mdr.algorithm.CombinationGenerator;
 import mdr.algorithm.Subdivision;
 import mdr.data.DataFile;
 import family.mdr.AbstractMergeSearch;
-import family.mdr.HeteroLinearMergeSearch;
+import family.mdr.HeteroCombinationSearch;
 import power.SimulationPower;
 import family.pedigree.design.hierarchy.ChenInterface;
 import family.pedigree.design.hierarchy.SII;
@@ -53,26 +52,26 @@ public class RealDataAnalyzerII {
 
 		int[] includedMarkerIndex = ParameterParser.selectedSNP(chen.getMapFile(), p.includesnp);
 		int[] excludedMarkerIndex = ParameterParser.selectedSNP(chen.getMapFile(), p.excludesnp);
-		AbstractMergeSearch as = new HeteroLinearMergeSearch(mdrData, sd, includedMarkerIndex, excludedMarkerIndex, chen.getNumberMarker());
+		AbstractMergeSearch as = new HeteroCombinationSearch.Builder(mdrData, sd, chen.getMapFile(), includedMarkerIndex, excludedMarkerIndex).build();
+
 		for (int j = p.min; j <= p.max; j++) {
-			CombinationGenerator cg = new CombinationGenerator(j, mdrData.getNumMarker());
-			cg.generateCombination();
 
 			double[] pv = new double[p.permutation];
 			for (int k = 0; k < p.permutation; k++) {
 				mdrData.setScore(chen.getPermutedScore(p.permu_scheme));
-				as.search(j, cg.getCombination());
-				pv[k] = as.getStats()[MDRConstant.TestingBalancedAccuIdx];
+				as.search(j, 1);
+				pv[k] = as.getModelStats()[MDRConstant.TestingBalancedAccuIdx];
 			}
 
 			Arrays.sort(pv);
 			mdrData.setScore(chen.getScore());
-			as.search(j, cg.getCombination());
+			as.search(j, p.topN);
 			System.out.println(as);
 
 			SimulationPower sp = new SimulationPower(as.getMDRResult(), pv);
 			sp.calculatePower();
 			System.out.println(sp);
 		}
+		System.out.println();
 	}
 }

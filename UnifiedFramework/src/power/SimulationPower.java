@@ -7,9 +7,10 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map.Entry;
 
+import family.mdr.MDRStatistic;
+
 import util.NewIt;
 
-import mdr.moore.statistic.MDRStatistic;
 
 /**
  * 
@@ -111,7 +112,7 @@ public final class SimulationPower {
 		StringBuilder sb = new StringBuilder();
 		sb.append(threshold.length + " rounds of permutation:");
 		sb.append(System.getProperty("line.separator"));
-		sb.append("significant patterns at alpha = 0.05, threshold=" + t_005);
+		sb.append("significance level at alpha = 0.05, BTA threshold=" + String.format("%.4f", t_005));
 		sb.append(System.getProperty("line.separator"));
 		if (result_005.size() > 0) {
 			for (SimulationStatistic sr : result_005) {
@@ -121,7 +122,7 @@ public final class SimulationPower {
 			sb.append("null");
 			sb.append(System.getProperty("line.separator"));
 		}
-		sb.append("significant patterns at alpha = 0.01, threshold=" + t_001);
+		sb.append("significance level at alpha = 0.01, BTA threshold=" + String.format("%.4f", t_001));
 		sb.append(System.getProperty("line.separator"));
 		if (result_001.size() > 0) {
 			for (SimulationStatistic sr : result_001) {

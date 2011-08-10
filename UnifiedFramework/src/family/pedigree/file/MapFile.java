@@ -78,7 +78,15 @@ public class MapFile {
 		return snpList;
 	}
 	
+	public String getMarkerName(int i) {
+		return snpList.get(i).getName();
+	}
+	
 	public int getMarkerNumber() {
 		return snpList.size();
+	}
+	
+	public SNP getSNP(int i) {
+		return snpList.get(i);
 	}
 }
