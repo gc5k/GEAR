@@ -3,11 +3,12 @@ package mdr.moore;
 import java.util.ArrayList;
 import java.util.HashMap;
 
+import family.mdr.MDRStatistic;
+
 
 import mdr.algorithm.Subdivision;
 import mdr.arsenal.ToolKit;
 import mdr.data.DataFile;
-import mdr.moore.statistic.MDRStatistic;
 import mdr.result.BestKFoldCVResult;
 import mdr.result.Combination;
 import mdr.result.SavedModels;

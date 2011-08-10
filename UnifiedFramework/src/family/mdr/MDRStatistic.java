@@ -1,37 +1,47 @@
-package mdr.moore.statistic;
+package family.mdr;
 /**
  * 
  * @author Guo-Bo Chen, chenguobo@gmail.com
  */
 public class MDRStatistic implements Comparable<MDRStatistic> {
-	private double testing_balanced_accuracy;
-	private double training_balanced_accuracy;
-	
+
+	private double[] stats;  
+	//stats[0] for testing balanced accuracy; stats[1] for training balanced accuracy
 	public MDRStatistic() {
-		
+		stats = new double[2];
+	}
+	
+	public MDRStatistic(double tba, double trba) {
+		stats = new double[2];
+		stats[0] = tba;
+		stats[1] = trba;
 	}
 	
 	public void setTestingBalancedAccuracy(double tba) {
-		testing_balanced_accuracy = tba;
+		stats[0] = tba;
 	}
 	
 	public void setTrainingBalancedAccuracy(double trba) {
-		training_balanced_accuracy = trba;
+		stats[1] = trba;
 	}
 
 	public double getTestingBalancedAccuracy() {
-		return testing_balanced_accuracy;
+		return stats[0];
 	}
 
 	public double getTrainingBalancedAccuracy() {
-		return training_balanced_accuracy;
+		return stats[1];
 	}
 	
+	public double[] getStats() {
+		return stats;
+	}
+
 	public int compareTo(MDRStatistic mdrstat) {
 		double ta = mdrstat.getTestingBalancedAccuracy();
-		if(testing_balanced_accuracy > ta) {
+		if(stats[0] > ta) {
 			return 1;
-		} else if(testing_balanced_accuracy == ta){
+		} else if(stats[0] == ta){
 			return 0;
 		} else {
 			return -1;
@@ -40,7 +50,7 @@ public class MDRStatistic implements Comparable<MDRStatistic> {
 	
 	public String toString() {
 		StringBuilder sb = new StringBuilder();
-		sb.append(testing_balanced_accuracy + " " + training_balanced_accuracy);
+		sb.append(String.format("%.4f", stats[0]) + ", " + String.format("%.4f", stats[1]));
 		return sb.toString();
 	}
 }

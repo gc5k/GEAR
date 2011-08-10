@@ -1,145 +1,70 @@
 package family.mdr;
 
 import java.util.ArrayList;
-import java.util.Arrays;
+import java.util.HashMap;
 import java.util.Set;
-import java.util.Map.Entry;
-
-import publicAccess.PublicData;
 
 import mdr.MDRConstant;
 import mdr.algorithm.Subdivision;
 import mdr.arsenal.ToolKit;
 import mdr.data.DataFile;
-
-import mdr.moore.statistic.MDRStatistic;
-
-import mdr.result.BestKFoldCVResult;
 import mdr.result.Cell;
 import mdr.result.Combination;
 import mdr.result.OneCVSet;
 import mdr.result.Suite;
+import family.pedigree.file.MapFile;
 
-import util.NewIt;
-
-/**
- * 
- * @author Guo-Bo Chen, chenguobo@gmail.com
- */
-
-public class HeteroLinearMergeSearch extends LinearMergeSearch {
+public class HeteroCombinationSearch extends AbstractMergeSearch {
 
 	private double[] statistic;
-
-	private MDRStatistic mdr_stat;
-	private String best_model;
-
-	private int[] include_snp = null;
-	private int[] exclude_snp = null;
-	private int[] a;
-	private int end = 0;
-	private String includeComb = null;
-
-	public HeteroLinearMergeSearch(DataFile dr, Subdivision sd, int[] inSNP, int[] exSNP, int num_marker) {
-		super(dr, sd);
-		int len = num_marker;
-		if (inSNP != null) {
-			include_snp = new int[inSNP.length];
-			System.arraycopy(inSNP, 0, include_snp, 0, inSNP.length);
-			len -= inSNP.length;
-			StringBuffer s = new StringBuffer();
-			for(int i = 0; i < inSNP.length; i++) {
-				s.append(inSNP[i]);
-				if( i != inSNP.length - 1) {
-					s.append(PublicData.seperator);
-				}
-			}
-			includeComb = s.toString();
+	private TopN Top_N = null;
+	
+	public static class Builder {
+		private DataFile dr;
+		private Subdivision sd;
+		private MapFile mf;
+		int[] in_snp = null;
+		int[] ex_snp = null;
+		
+		int N = 1;
+		
+		public Builder(DataFile dr, Subdivision sd, MapFile mf, int[] in_snp, int[] ex_snp) {
+			this.dr = dr;
+			this.sd = sd;
+			this.mf = mf;
+			this.in_snp = in_snp;
+			this.ex_snp = ex_snp;
 		}
-		if (exSNP != null) {
-			exclude_snp = new int[exSNP.length];
-			System.arraycopy(exSNP, 0, exclude_snp, 0, exSNP.length);
-			len -= exSNP.length;
+		
+		public Builder topN(int n) {
+			this.N = n;
+			return this;
 		}
-		a = new int[len];
-		int idx = 0;
-		for (int i = 0; i < num_marker; i++) {
-			boolean flag = true;
-			if(include_snp != null) {
-				for (int j = 0; j < include_snp.length; j++) {
-					if (i == include_snp[j]) {
-						flag = false;
-						break;
-					}
-				}
-			}
-			if (!flag) continue;
-			if(exclude_snp != null) {
-				for (int j = 0; j < exclude_snp.length; j++) {
-					if (i == exclude_snp[j]) {
-						flag = false;
-						break;
-					}
-				}
-			}
-			if (flag) {
-				a[idx++] = i;
-			}
+
+		public HeteroCombinationSearch build() {
+			return new HeteroCombinationSearch(this);
 		}
-		end = a.length;
+	}
+	
+	public HeteroCombinationSearch(Builder builder) {
+		super(builder.dr, builder.sd, builder.mf, builder.in_snp, builder.ex_snp, builder.N);
 	}
 
-	public void search(int or, ArrayList<String> modelspace) {
+	public void search(int or, int N) {
 		statistic = new double[MDRConstant.NumStats];
-		best_model = null;
-		mdr_stat = null;
 
 		order = or;
-		bestKFold = new BestKFoldCVResult(or, subdivision.getInterval());
+		cg.revup(or);
 		count = 0;
-		Arrays.fill(currBestStats, 0);
+		topN = N;
 
-		heteroresult = NewIt.newHashMap();
+		Top_N = new TopN(topN);
 
-		int[] order = new int[or + 1];
-		for (int i = 0; i <= or; i++) {
-			order[i] = i - 1;
-		}
 		int count = 0;
 
-		int k = or;
-		
-		int len = or;
-		if (include_snp != null) {
-			len -= include_snp.length;
-		}
-		boolean flag = true;
-		StringBuilder combi;
-		while (order[0] == -1) {
-			if (flag) {
-				combi = includeComb == null ? new StringBuilder() : new StringBuilder(includeComb);
-
-				for (int i = 1; i <= len; i++) {
-					combi.append(PublicData.seperator);
-					combi.append(Integer.toString(a[order[i]]));
-				}
-				kernal(combi.toString());
+		for( ; cg.hasNext(); ) {
+				kernal(cg.next());
 				count++;
-				flag = false;
-			}
-			order[k]++;
-			if (order[k] == end) {
-				order[k--] = 0;
-				continue;
-			}
-			if (k < len) {
-				order[k + 1] = order[k];
-				k++;
-				continue;
-			}
-			if (k == len) {
-				flag = true;
-			}
 		}
 	}
 
@@ -155,7 +80,6 @@ public class HeteroLinearMergeSearch extends LinearMergeSearch {
 		double[] t = calculateSingleBest(modelName);
 		if (t[MDRConstant.TestingBalancedAccuIdx] > statistic[MDRConstant.TestingBalancedAccuIdx]) {
 			statistic = t;
-			best_model = modelName;
 		}
 		count++;
 	}
@@ -215,47 +139,58 @@ public class HeteroLinearMergeSearch extends LinearMergeSearch {
 		mean[MDRConstant.TrainingBalancedAccuIdx] /= subdivision.getInterval();
 		mean[MDRConstant.TestingBalancedAccuIdx] /= subdivision.getInterval();
 		MDRStatistic mdrstat = new MDRStatistic();
-		heteroresult.put(modelName, mdrstat);
+
 		mdrstat.setTrainingBalancedAccuracy(mean[MDRConstant.TrainingBalancedAccuIdx]);
 		mdrstat.setTestingBalancedAccuracy(mean[MDRConstant.TestingBalancedAccuIdx]);
-		if (mdr_stat == null) {
-			mdr_stat = mdrstat;
-			best_model = modelName;
+		if(count<topN) {
+			Top_N.add(modelName, mdrstat);
 		} else {
-			if (mdr_stat.compareTo(mdrstat) < 0) {
-				best_model = modelName;
-				mdr_stat = mdrstat;
+			if(mdrstat.compareTo(Top_N.getMinStat())>0) {
+				Top_N.add(modelName, mdrstat);
 			}
 		}
 		return mean;
-	}
-
-	public String getBestModelKey() {
-		return best_model;
 	}
 
 	public double[] getStats() {
 		return statistic;
 	}
 
+	public double[] getModelStats() {
+		MDRStatistic m = Top_N.getMDRStatistic(Top_N.getMaxKey());
+		return m.getStats();
+		
+	}
+	public HashMap<String, MDRStatistic> getMDRResult() {
+		return Top_N.getResult();
+	}
+
 	public String toString() {
 		StringBuilder sb = new StringBuilder();
-		sb.append("model, ");
+		sb.append("The top " + Top_N.getKeyListLength() + " models under " + order + " order interaction");
+		sb.append(System.getProperty("line.separator"));
+		sb.append("model(marker chr pos): ");
 		for (int i = 0; i < MDRConstant.NumStats; i++) {
-			sb.append(MDRConstant.TestStatistic[i] + ", ");
+			if( i != MDRConstant.NumStats - 1) {
+				sb.append(MDRConstant.TestStatistic[i] + ", ");
+			} else {
+				sb.append(MDRConstant.TestStatistic[i]);
+			}
 		}
 		sb.append(System.getProperty("line.separator"));
-		for (Entry<String, MDRStatistic> entry : heteroresult.entrySet()) {
-			sb.append(entry.getKey());
-			sb.append(" ");
-			sb.append(entry.getValue());
+		for (; Top_N.hasNext(); ) {
+			String key = Top_N.next();
+			int[] idx = ToolKit.StringToIntArray(key);
+			for (int j = 0; j < idx.length; j++) {
+				sb.append(mapData.getSNP(idx[j]));
+				if (j != idx.length - 1)
+					sb.append(", ");
+			}
+			sb.append(": ");
+			sb.append(Top_N.getMDRStatistic(key));
 			sb.append(System.getProperty("line.separator"));
 		}
-		sb.append("===================");
-		sb.append(System.getProperty("line.separator"));
-		sb.append("best model: " + best_model);
-		sb.append(System.getProperty("line.separator"));
-		sb.append(mdr_stat);
+		sb.append("------------------------");
 		return sb.toString();
 	}
 }
