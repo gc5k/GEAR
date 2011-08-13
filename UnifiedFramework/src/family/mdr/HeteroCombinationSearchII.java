@@ -15,7 +15,7 @@ import mdr.result.Suite;
 import family.mdr.selector.TopN;
 import family.pedigree.file.MapFile;
 
-public class HeteroCombinationSearch extends AbstractMergeSearch {
+public class HeteroCombinationSearchII extends AbstractMergeSearch {
 
 	private double[] statistic;
 	private TopN Top_N = null;
@@ -24,10 +24,10 @@ public class HeteroCombinationSearch extends AbstractMergeSearch {
 		private DataFile dr;
 		private Subdivision sd;
 		private MapFile mf;
-		private int[] in_snp = null;
-		private int[] ex_snp = null;
+		int[] in_snp = null;
+		int[] ex_snp = null;
 		
-		private int N = 1;
+		int N = 1;
 		private boolean mute = false;
 		public Builder(DataFile dr, Subdivision sd, MapFile mf, int[] in_snp, int[] ex_snp) {
 			this.dr = dr;
@@ -42,17 +42,17 @@ public class HeteroCombinationSearch extends AbstractMergeSearch {
 			return this;
 		}
 
-		public Builder mute(boolean flag) {
-			this.mute = flag;
+		public Builder mute(boolean m) {
+			this.mute = m;
 			return this;
 		}
 
-		public HeteroCombinationSearch build() {
-			return new HeteroCombinationSearch(this);
+		public HeteroCombinationSearchII build() {
+			return new HeteroCombinationSearchII(this);
 		}
 	}
 	
-	public HeteroCombinationSearch(Builder builder) {
+	public HeteroCombinationSearchII(Builder builder) {
 		super(builder.dr, builder.sd, builder.mf, builder.in_snp, builder.ex_snp, builder.N, builder.mute);
 	}
 
@@ -69,8 +69,22 @@ public class HeteroCombinationSearch extends AbstractMergeSearch {
 		int count = 0;
 
 		for( ; cg.hasNext(); ) {
-				kernal(cg.next());
-				count++;
+			String m = cg.next();
+			kernal(m);
+			count++;
+			if(!mute) {
+				int[] idx = ToolKit.StringToIntArray(m);
+				for (int j = 0; j < idx.length; j++) {
+					System.out.print(mapData.getSNP(idx[j]));
+					if (j != idx.length - 1)
+						System.out.print(", ");
+				}
+				System.out.print(":\t");
+				System.out.print(mdrstat);
+				System.out.print(":\t");
+				System.out.print(model.printModel(idx, mapData));
+				System.out.print(System.getProperty("line.separator"));
+			}
 		}
 	}
 
@@ -199,6 +213,4 @@ public class HeteroCombinationSearch extends AbstractMergeSearch {
 		sb.append("------------------------");
 		return sb.toString();
 	}
-
 }
-

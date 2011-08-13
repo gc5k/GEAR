@@ -5,11 +5,12 @@ import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
 import java.util.ArrayList;
-
+import java.util.HashSet;
 import util.NewIt;
 
 
 public class MapFile {
+
 	private static final String DELIMITER = "\\s+";
 	private ArrayList<SNP> snpList;
 	private ArrayList<Integer> badline;
@@ -88,5 +89,17 @@ public class MapFile {
 	
 	public SNP getSNP(int i) {
 		return snpList.get(i);
+	}
+	
+	public void setPolymorphism(ArrayList<HashSet<String>> p) {
+		if(p.size() != snpList.size()) {
+			System.err.println("map file and the pedigree file do not match.");
+			System.exit(0);
+		} else {
+			for(int i = 0; i < p.size(); i++) {
+				SNP snp = snpList.get(i);
+				snp.setAllele(p.get(i));
+			}
+		}
 	}
 }

@@ -1,13 +1,16 @@
-package family.mdr;
+package family.mdr.selector;
 
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Random;
 
+import family.mdr.MDRStatistic;
+
 import util.NewIt;
 
-public class TopN implements Iterator<String>{
+public class TopN implements Iterator<String> {
+	
 	private ArrayList<String> OrderKeyList = null;
 	private HashMap<String, MDRStatistic> ModelStats = null;
 	private String MaxKey = null;

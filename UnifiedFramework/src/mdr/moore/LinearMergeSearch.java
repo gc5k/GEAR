@@ -163,11 +163,11 @@ public class LinearMergeSearch extends AbstractMergeSearch {
 					int trnegSubs = fullnegSubs - negSubs;
 					double trposScr = fullposScr - posScr;
 					double trnegScr = fullnegScr - negScr;
-					tr_status = ToolKit.Acertainment(trposScr, trnegScr);
+					tr_status = Suite.Ascertainment(trposScr, trnegScr);
 					trCell = new Cell(trposSubs, trnegSubs, trposScr, trnegScr, tr_status);
 					tCell = new Cell(posSubs, negSubs, posScr, negScr, tr_status);
 				} else {
-					tr_status = ToolKit.Acertainment(fullposScr, fullnegScr);
+					tr_status = Suite.Ascertainment(fullposScr, fullnegScr);
 					trCell = new Cell(fullposSubs, fullnegSubs, fullposScr, fullnegScr, tr_status);
 					tCell = new Cell(0, 0, 0, 0, -1);
 				}
@@ -233,12 +233,12 @@ public class LinearMergeSearch extends AbstractMergeSearch {
 					int trnegSubs = fullnegSubs - negSubs;
 					double trposScr = fullposScr - posScr;
 					double trnegScr = fullnegScr - negScr;
-					tr_status = ToolKit.Acertainment(trposScr, trnegScr);
-					t_status = ToolKit.Acertainment(posScr, negScr);
+					tr_status = Suite.Ascertainment(trposScr, trnegScr);
+					t_status = Suite.Ascertainment(posScr, negScr);
 					trCell = new Cell(trposSubs, trnegSubs, trposScr, trnegScr, tr_status);
 					tCell = new Cell(posSubs, negSubs, posScr, negScr, t_status);
 				} else {
-					tr_status = ToolKit.Acertainment(fullposScr, fullnegScr);
+					tr_status = Suite.Ascertainment(fullposScr, fullnegScr);
 					t_status = 1 - tr_status;
 					trCell = new Cell(fullposSubs, fullnegSubs, fullposScr, fullnegScr, tr_status);
 					tCell = new Cell(0, 0, 0, 0, -1);

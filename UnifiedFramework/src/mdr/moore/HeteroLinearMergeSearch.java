@@ -94,12 +94,12 @@ public class HeteroLinearMergeSearch extends LinearMergeSearch {
 					int neg_Subs = testingSuite.getNegativeSubjects();
 					double pos_Scr = testingSuite.getPositiveScore();
 					double neg_Scr = testingSuite.getNegativeScore();
-					tr_status = ToolKit.Acertainment(fullposScr - pos_Scr, fullnegScr - neg_Scr);
-					t_status = ToolKit.Acertainment(pos_Scr, neg_Scr);
+					tr_status = Suite.Ascertainment(fullposScr - pos_Scr, fullnegScr - neg_Scr);
+					t_status = Suite.Ascertainment(pos_Scr, neg_Scr);
 					trCell = new Cell(fullposSubs - pos_Subs, fullnegSubs - neg_Subs, fullposScr - pos_Scr, fullnegScr - neg_Scr, tr_status);
 					tCell = new Cell(pos_Subs, neg_Subs, pos_Scr, neg_Scr, tr_status);
 				} else {
-					tr_status = ToolKit.Acertainment(fullposScr, fullnegScr);
+					tr_status = Suite.Ascertainment(fullposScr, fullnegScr);
 					trCell = new Cell(fullposSubs, fullnegSubs, fullposScr, fullnegScr, tr_status);
 					tCell = new Cell(0, 0, 0, 0, -1);
 				}

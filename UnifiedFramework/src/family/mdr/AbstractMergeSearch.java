@@ -38,8 +38,11 @@ public abstract class AbstractMergeSearch {
 	protected int count;
 
 	protected int topN = 5;
+	MDRStatistic mdrstat;
 
-	public AbstractMergeSearch(DataFile dr, Subdivision sd, MapFile mf, int[] in_snp, int[] ex_snp, int n) {
+	protected boolean mute = true;
+
+	public AbstractMergeSearch(DataFile dr, Subdivision sd, MapFile mf, int[] in_snp, int[] ex_snp, int n, boolean m) {
 		data = dr;
 		subdivision = sd;
 		mapData = mf;
@@ -50,6 +53,7 @@ public abstract class AbstractMergeSearch {
 		}
 		dataPartitionMap = subdivision.getDivision();
 		topN = n;
+		mute = false;
 	}
 
 	protected void linearSearch(ArrayList<DataFile.Subject> subjects) {
@@ -104,6 +108,9 @@ public abstract class AbstractMergeSearch {
 		}
 	}
 
+	public void setMute(boolean flag) {
+		mute = flag;
+	}
 	public abstract HashMap<String, MDRStatistic> getMDRResult();
 
 	public abstract double[] getModelStats();
