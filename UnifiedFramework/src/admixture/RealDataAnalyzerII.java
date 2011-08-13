@@ -1,6 +1,7 @@
 package admixture;
 
 import java.io.IOException;
+import java.io.PrintStream;
 import java.util.Arrays;
 
 import admixture.parameter.Parameter;
@@ -10,7 +11,7 @@ import mdr.MDRConstant;
 import mdr.algorithm.Subdivision;
 import mdr.data.DataFile;
 import family.mdr.AbstractMergeSearch;
-import family.mdr.HeteroCombinationSearch;
+import family.mdr.HeteroCombinationSearchII;
 import power.SimulationPower;
 import family.pedigree.design.hierarchy.ChenInterface;
 import family.pedigree.design.hierarchy.SII;
@@ -52,26 +53,47 @@ public class RealDataAnalyzerII {
 
 		int[] includedMarkerIndex = ParameterParser.selectedSNP(chen.getMapFile(), p.includesnp);
 		int[] excludedMarkerIndex = ParameterParser.selectedSNP(chen.getMapFile(), p.excludesnp);
-		AbstractMergeSearch as = new HeteroCombinationSearch.Builder(mdrData, sd, chen.getMapFile(), includedMarkerIndex, excludedMarkerIndex).build();
+		AbstractMergeSearch as = new HeteroCombinationSearchII.Builder(mdrData, sd, chen.getMapFile(), includedMarkerIndex, excludedMarkerIndex).mute(false).build();
 
+		PrintStream PW = new PrintStream("ugmdr.txt");
+		System.setOut(PW);
 		for (int j = p.min; j <= p.max; j++) {
-
+			RealDataAnalyzerII.PrintHeader(j);
 			double[] pv = new double[p.permutation];
 			for (int k = 0; k < p.permutation; k++) {
+				as.setMute(true);
 				mdrData.setScore(chen.getPermutedScore(p.permu_scheme));
 				as.search(j, 1);
 				pv[k] = as.getModelStats()[MDRConstant.TestingBalancedAccuIdx];
 			}
-
+			
 			Arrays.sort(pv);
+			double T = pv[(int) (pv.length * 0.95)];
+			as.setMute(false);
 			mdrData.setScore(chen.getScore());
-			as.search(j, p.topN);
-			System.out.println(as);
+			as.search(j, 1);
+//			System.out.println(as);
 
 			SimulationPower sp = new SimulationPower(as.getMDRResult(), pv);
 			sp.calculatePower();
 			System.out.println(sp);
 		}
+		System.out.println();
+		PW.close();
+	}
+
+	public static void PrintHeader(int order) {
+		System.out.print("The " + order + " order interaction");
+		System.out.print(System.getProperty("line.separator"));
+		System.out.print("model(marker chr pos): ");
+		for (int i = 0; i < MDRConstant.NumStats; i++) {
+			if( i != MDRConstant.NumStats - 1) {
+				System.out.print(MDRConstant.TestStatistic[i] + ", ");
+			} else {
+				System.out.print(MDRConstant.TestStatistic[i]);
+			}
+		}
+		System.out.print(": classfication (genotype, High-risk or Low-risk group, positive scores, positive subjects, negative score, negative subjects)");
 		System.out.println();
 	}
 }

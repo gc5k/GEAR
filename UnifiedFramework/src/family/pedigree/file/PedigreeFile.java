@@ -18,6 +18,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Enumeration;
+import java.util.HashSet;
 import java.util.Hashtable;
 
 import admixture.parameter.Parameter;
@@ -36,13 +37,13 @@ import family.pedigree.genotype.Person;
  */
 public class PedigreeFile {
 
+	private ArrayList<HashSet<String>> AlleleSet;
 	private Hashtable<String, Boolean> famInformative;
 	private Hashtable<String, FamilyStruct> familystructure;
 
 	// stores the individuals found by parse() in allIndividuals. this is useful
 	// for outputting Pedigree information to
 	// a file of another type.
-	private ArrayList<Person> allIndividuals;
 
 	// stores the individuals chosen by pedparser
 	// bogusParents is true if someone in the file referenced a parent not in
@@ -58,8 +59,7 @@ public class PedigreeFile {
 
 	// public static String MissingGenotype="00";
 	public PedigreeFile() {
-
-		// hardcoded hapmap info
+		AlleleSet = NewIt.newArrayList();
 		this.famInformative = NewIt.newHashtable();
 		this.familystructure = NewIt.newHashtable();
 	}
@@ -187,7 +187,10 @@ public class PedigreeFile {
 			String[] tokenizer = pedigrees.get(0).split("\\s+");
 			num_marker = (tokenizer.length - 6)/2;
 		}
-
+		AlleleSet.ensureCapacity(num_marker);
+		for(int i = 0; i < num_marker; i++) {
+			AlleleSet.add(new HashSet<String>());
+		}
 	}
 
 	/**
@@ -206,7 +209,6 @@ public class PedigreeFile {
 			throw new MDRPedFileException("Data format error: empty file");
 		}
 		Person per;
-		this.allIndividuals = NewIt.newArrayList();
 
 		for (int k = 0; k < numLines; k++) {
 			String[] tokenizer = pedigrees.get(k).split(PublicData.delim);
@@ -241,11 +243,6 @@ public class PedigreeFile {
 				per.setDadID(tokenizer[2]);
 				per.setMomID(tokenizer[3]);
 
-				// pseudoper.setFamilyID(tokenizer[0]);
-				// pseudoper.setPseudoPersonID(tokenizer[1]);
-				// pseudoper.setDadID(tokenizer[2]);
-				// pseudoper.setMomID(tokenizer[3]);
-
 				try {
 					int Gender = Integer.parseInt(tokenizer[4]);
 					int Status = Integer.parseInt(tokenizer[5]);
@@ -253,8 +250,6 @@ public class PedigreeFile {
 					per.setGender(Gender);
 					per.setAffectedStatus(Status);
 
-					// pseudoper.setGender(Gender);
-					// pseudoper.setAffectedStatus(Status);
 				} catch (NumberFormatException nfe) {
 					throw new MDRPedFileException("Pedfile error: invalid gender or affected status on line " + (k + 2));
 				}
@@ -271,7 +266,7 @@ public class PedigreeFile {
 						if (checker1[1] != checker2[1]) {
 							genoError = !genoError;
 						}
-
+						Polymorphism(j, alleleA, alleleB);
 						if (genoError) {
 							throw new MDRPedFileException("File input error on line " + (k + 2) + ", marker " + (per.getNumMarkers() + 2)
 									+ ".\nFor any marker, an individual's genotype must be only letters or only numbers.");
@@ -303,20 +298,6 @@ public class PedigreeFile {
 			}
 		}
 
-		// now we check if anyone has a reference to a parent who isn't in the
-		// file, and if so, we remove the reference
-		for (int i = 0; i < allIndividuals.size(); i++) {
-			Person currentInd = (Person) allIndividuals.get(i);
-			Hashtable<String, Person> curFam = familystructure.get(currentInd.getFamilyID()).getPersons();
-			if (!currentInd.getDadID().equals("0") && !(curFam.containsKey(currentInd.getDadID()))) {
-				currentInd.setDadID("0");
-				bogusParents = true;
-			}
-			if (!currentInd.getMomID().equals("0") && !(curFam.containsKey(currentInd.getMomID()))) {
-				currentInd.setMomID("0");
-				bogusParents = true;
-			}
-		}
 		pedigrees.clear();
 		pedigrees = null;
 	}
@@ -345,6 +326,18 @@ public class PedigreeFile {
 		return genotype;
 	}
 
+	private void Polymorphism(int i, String A, String B) {
+		if(A.compareTo(Parameter.missing_allele) != 0) {
+			AlleleSet.get(i).add(A);
+		} 
+		if(B.compareTo(Parameter.missing_allele) != 0){
+			AlleleSet.get(i).add(B);
+		}
+	}
+
+	public ArrayList<HashSet<String>> getPolymorphism() {
+		return AlleleSet;
+	}
 	public boolean hasBogusParents() {
 		return bogusParents;
 	}

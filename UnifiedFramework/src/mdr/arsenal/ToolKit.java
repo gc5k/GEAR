@@ -6,8 +6,6 @@ import java.util.Map.Entry;
 import publicAccess.PublicData;
 
 import util.NewIt;
-
-import mdr.MDRConstant;
 import mdr.result.Cell;
 
 /**
@@ -47,24 +45,6 @@ public class ToolKit {
 			sb.append(PublicData.seperator);
 		}
 		return sb.toString();
-	}
-
-	public static int Acertainment(double posScr, double negScr) {
-		int status = 0;
-		if (negScr == 0) {
-			if (posScr == 0) {
-				status = -1;
-			} else {
-				status = 1;
-			}
-		} else {
-			if ((posScr / Math.abs(negScr)) == 1) {
-				status = MDRConstant.tieValue;
-			} else {
-				status = (posScr / Math.abs(negScr)) > 1 ? 1 : 0;
-			}
-		}
-		return status;
 	}
 
 	public static double getPMCC(double[] point1, double[] point2) {

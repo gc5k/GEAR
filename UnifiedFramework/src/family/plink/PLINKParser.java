@@ -19,8 +19,8 @@ public class PLINKParser {
 	protected String pedigreeFile;
 	protected String phenotypeFile;
 	protected String mapFile;
-	
-	public PLINKParser (String ped, String phe, String map) {
+
+	public PLINKParser(String ped, String phe, String map) {
 		pedigreeFile = ped;
 		phenotypeFile = phe;
 		mapFile = map;
@@ -33,7 +33,7 @@ public class PLINKParser {
 	}
 
 	private void initial() {
-		if(mapFile != null) {
+		if (mapFile != null) {
 			ParseMapFile();
 			pedData.setHeader(false);
 			ParsePedFile();
@@ -42,18 +42,18 @@ public class PLINKParser {
 			ParsePedFile();
 			mapData.setMarker(pedData.getNumMarker());
 		}
-
+		mapData.setPolymorphism(pedData.getPolymorphism());
 		if (phenotypeFile != null) {
 			ParsePhenoFile();
 		}
 	}
 
 	public void ParseMapFile() {
-		if(mapFile != null) {
+		if (mapFile != null) {
 			mapData.parseMap();
 		}
 	}
-	
+
 	/**
 	 * Initialize basic implementation of the genotype file.
 	 * 
@@ -99,11 +99,11 @@ public class PLINKParser {
 	public PedigreeFile getPedigreeData() {
 		return pedData;
 	}
-	
+
 	public GMDRPhenoFile getPhenotypeData() {
 		return phenoData;
 	}
-	
+
 	public MapFile getMapData() {
 		return mapData;
 	}
