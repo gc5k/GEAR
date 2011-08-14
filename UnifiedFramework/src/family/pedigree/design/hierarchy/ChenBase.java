@@ -1,9 +1,7 @@
 package family.pedigree.design.hierarchy;
 
-import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.PrintWriter;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Hashtable;
 import java.util.Random;
 
@@ -12,12 +10,13 @@ import admixture.parameter.Parameter;
 import score.LinearRegression;
 import score.LogisticRegression;
 
+import family.mdr.data.PersonIndex;
 import family.pedigree.file.GMDRPhenoFile;
 import family.pedigree.file.MapFile;
 import family.pedigree.file.PedigreeFile;
 import family.pedigree.file.SNP;
-import family.pedigree.genotype.FamilyStruct;
-import family.pedigree.genotype.Person;
+import family.pedigree.genotype.BFamilyStruct;
+import family.pedigree.genotype.BPerson;
 import family.pedigree.phenotype.FamilyUnit;
 import family.pedigree.phenotype.Subject;
 
@@ -35,7 +34,7 @@ public abstract class ChenBase implements ChenInterface {
 	protected PedigreeFile PedData;
 	protected GMDRPhenoFile PhenoData;
 
-	protected byte[][] genotype;
+//	protected byte[][] genotype;
 	protected int qualified_Unrelated;
 	protected int qualified_Sib;
 	protected int[] numSib;
@@ -50,33 +49,8 @@ public abstract class ChenBase implements ChenInterface {
 
 	protected String[] scoreName = new String[1];
 	protected ArrayList<PersonIndex> PersonTable;// The indexing file records
-													// the
 
 	protected int[] subsetMarker;
-
-	public class PersonIndex {
-		String FamilyID;
-		String IndividualID;
-		String Key;
-
-		PersonIndex(String fid, String id) {
-			FamilyID = new String(fid);
-			IndividualID = new String(id);
-			Key = new String(fid + "->" + id);
-		}
-
-		public String getFamilyID() {
-			return FamilyID;
-		}
-
-		public String getIndividualID() {
-			return IndividualID;
-		}
-
-		public String getKey() {
-			return Key;
-		}
-	}
 
 	public class LineUpGenotypePhenotype {
 
@@ -88,12 +62,12 @@ public abstract class ChenBase implements ChenInterface {
 		}
 
 		private void qualification() {
-			Hashtable<String, FamilyStruct> Fam = PedData.getFamilyStruct();
+			Hashtable<String, BFamilyStruct> Fam = PedData.getFamilyStruct();
 			num_qualified = new int[Fam.size()][2];
 			filter = new boolean[Fam.size()][];
 			int c = 0;
 			for (String fi : PedData.getFamListSorted()) {
-				FamilyStruct fs = Fam.get(fi);
+				BFamilyStruct fs = Fam.get(fi);
 				String[] pi = fs.getPersonListSorted();
 				filter[c] = new boolean[pi.length];
 				if (PhenoData != null && !PhenoData.containFamily(fi)) {  // if no phenotype for the whole family
@@ -105,7 +79,7 @@ public abstract class ChenBase implements ChenInterface {
 
 					int cc = 0;
 					for (int i = 0; i < pi.length; i++) {
-						Person per = fs.getPerson(pi[i]);
+						BPerson per = fs.getPerson(pi[i]);
 						boolean f = FamUnit.containsSubject(pi[i]);
 						if (f) {
 							Subject sub = FamUnit.getSubject(pi[i]);
@@ -170,6 +144,7 @@ public abstract class ChenBase implements ChenInterface {
 		RevvingUp();
 		generateScore();
 		
+		group();
 	}
 
 	protected abstract void RevvingUp();
@@ -211,7 +186,7 @@ public abstract class ChenBase implements ChenInterface {
 			ArrayList<Double> c = NewIt.newArrayList();
 			ArrayList<String> tempc = CovariateTable.get(i);
 			if (pheIdx == -1) {// using affecting status as phenotype
-				t = Parameter.status_shift == -1 ? status[i] : status[i] -1;
+				t = status[i]+ Parameter.status_shift;
 			} else {
 				t = Double.parseDouble((String) tempc.get(pheIdx));
 			}
@@ -276,12 +251,6 @@ public abstract class ChenBase implements ChenInterface {
 		} else {
 			ln.append(",");
 		}
-		scoreName[0] = ln.toString();
-	}
-
-	@Override
-	public byte[][] getGenotype() {
-		return genotype;
 	}
 
 	@Override
@@ -299,52 +268,29 @@ public abstract class ChenBase implements ChenInterface {
 		return null;
 	}
 
-	@Override
-	public double[][] getScore2() {
-		double[][] s = new double[score.length][1];
-		for (int i = 0; i < score.length; i++) {
-			s[i][0] = score[i];
-		}
-		return s;
-	}
+//	@Override
+//	public double[][] getScore2() {
+//		double[][] s = new double[score.length][1];
+//		for (int i = 0; i < score.length; i++) {
+//			s[i][0] = score[i];
+//		}
+//		return s;
+//	}
 
-	@Override
-	public String[] getScoreName() {
-		return scoreName;
-	}
+//	@Override
+//	public String[] getScoreName() {
+//		return scoreName;
+//	}
 
 	@Override
 	public byte[] getStatus() {
 		return status;
 	}
 
-	@Override
-	public void print2MDRFormat(String f) {
-		PrintWriter pedout = null;
-		try {
-			pedout = new PrintWriter(new File(f));
-		} catch (FileNotFoundException e) {
-			e.printStackTrace(System.err);
-		}
-		String[] mk = getMarkerName();
-		for (int i = 0; i < mk.length; i++) {
-			pedout.print(mk[i] + "\t");
-		}
-		pedout.println("status");
-
-		for (int i = 0; i < genotype.length; i++) {
-			for (int j = 0; j < genotype[i].length; j++) {
-				pedout.print(genotype[i][j] + "\t");
-			}
-			pedout.println(status[i]);
-		}
-		pedout.close();
-	}
-
-	@Override
-	public double[] getScore() {
-		return score;
-	}
+//	@Override
+//	public double[] getScore() {
+//		return score;
+//	}
 
 	private void generateScore() {
 		if (method >= 0) {
@@ -369,5 +315,24 @@ public abstract class ChenBase implements ChenInterface {
 	@Override
 	public MapFile getMapFile() {
 		return MapData;
+	}
+	
+	public int SampleSize() {
+		return PersonTable.size();
+	}
+	
+	public ArrayList<PersonIndex> getSample() {
+		return PersonTable;
+	}
+	
+	private void group() {
+		ArrayList<Integer> g = NewIt.newArrayList();
+		for(int i = 0; i < PersonTable.size(); i++) {
+			g.add(i % Parameter.cv);
+		}
+		Collections.shuffle(g);
+		for(int i = 0; i < PersonTable.size(); i++) {
+			PersonTable.get(i).setGroup(g.get(i));
+		}
 	}
 }

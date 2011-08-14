@@ -7,9 +7,7 @@ import java.util.Arrays;
 import admixture.parameter.Parameter;
 import admixture.parameter.ParameterParser;
 
-import mdr.MDRConstant;
-import mdr.algorithm.Subdivision;
-import mdr.data.DataFile;
+import family.mdr.data.MDRConstant;
 import family.mdr.AbstractMergeSearch;
 import family.mdr.HeteroCombinationSearchII;
 import power.SimulationPower;
@@ -45,15 +43,9 @@ public class RealDataAnalyzerII {
 			chen = new SII(pp.getPedigreeData(), pp.getPhenotypeData(), pp.getMapData(), s, p.response, p.predictor, p.linkfunction);
 		}
 
-		DataFile mdrData = new DataFile(chen.getMarkerName(), chen.getGenotype(), chen.getStatus(), chen.getScoreName(), chen.getScore2());
-		DataFile.setScoreIndex(0);
-
-		Subdivision sd = new Subdivision(p.cv, p.seed, mdrData.size());
-		sd.RandomPartition();
-
 		int[] includedMarkerIndex = ParameterParser.selectedSNP(chen.getMapFile(), p.includesnp);
 		int[] excludedMarkerIndex = ParameterParser.selectedSNP(chen.getMapFile(), p.excludesnp);
-		AbstractMergeSearch as = new HeteroCombinationSearchII.Builder(mdrData, sd, chen.getMapFile(), includedMarkerIndex, excludedMarkerIndex).mute(false).build();
+		AbstractMergeSearch as = new HeteroCombinationSearchII.Builder(Parameter.cv, chen.getSample(), chen.getMapFile(), includedMarkerIndex, excludedMarkerIndex).mute(false).build();
 
 		PrintStream PW = new PrintStream("ugmdr.txt");
 		System.setOut(PW);
@@ -62,7 +54,7 @@ public class RealDataAnalyzerII {
 			double[] pv = new double[p.permutation];
 			for (int k = 0; k < p.permutation; k++) {
 				as.setMute(true);
-				mdrData.setScore(chen.getPermutedScore(p.permu_scheme));
+				chen.getPermutedScore(p.permu_scheme);
 				as.search(j, 1);
 				pv[k] = as.getModelStats()[MDRConstant.TestingBalancedAccuIdx];
 			}
@@ -70,7 +62,7 @@ public class RealDataAnalyzerII {
 			Arrays.sort(pv);
 			double T = pv[(int) (pv.length * 0.95)];
 			as.setMute(false);
-			mdrData.setScore(chen.getScore());
+			chen.RecoverScore();
 			as.search(j, 1);
 //			System.out.println(as);
 

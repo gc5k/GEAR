@@ -91,7 +91,7 @@ public class MapFile {
 		return snpList.get(i);
 	}
 	
-	public void setPolymorphism(ArrayList<HashSet<String>> p) {
+	public void setPolymorphism(ArrayList<String[]> p) {
 		if(p.size() != snpList.size()) {
 			System.err.println("map file and the pedigree file do not match.");
 			System.exit(0);

@@ -4,15 +4,12 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map.Entry;
 
+import family.mdr.data.MDRConstant;
+import family.mdr.data.PersonIndex;
+import family.mdr.result.Combination;
+import family.mdr.result.SavedModels;
+import family.mdr.result.Suite;
 import family.pedigree.file.MapFile;
-
-import admixture.parameter.Parameter;
-
-import mdr.algorithm.Subdivision;
-import mdr.data.DataFile;
-import mdr.result.Combination;
-import mdr.result.SavedModels;
-import mdr.result.Suite;
 
 import util.NewIt;
 
@@ -27,12 +24,11 @@ public abstract class AbstractMergeSearch {
 	protected ArrayList<Combination> cvTestingSet = NewIt.newArrayList();
 	// always keeps the K testing models of the current combination
 
-	protected HashMap<Integer, Integer> dataPartitionMap;
-	protected DataFile data;
+	protected ArrayList<PersonIndex> data;
 	protected SavedModels savedModels;
-	protected Subdivision subdivision;
 	protected MapFile mapData;
 
+	protected int cv;
 	protected int[] SNPIndex;
 	protected Combination model;
 	protected int count;
@@ -42,24 +38,23 @@ public abstract class AbstractMergeSearch {
 
 	protected boolean mute = true;
 
-	public AbstractMergeSearch(DataFile dr, Subdivision sd, MapFile mf, int[] in_snp, int[] ex_snp, int n, boolean m) {
+	public AbstractMergeSearch(int c, ArrayList<PersonIndex> dr, MapFile mf, int[] in_snp, int[] ex_snp, int n, boolean m) {
+		cv = c;
 		data = dr;
-		subdivision = sd;
 		mapData = mf;
 		cg = new CombinationGenerator(mf.getMarkerNumber(), in_snp, ex_snp);
-		for (int i = 0; i < subdivision.getInterval(); i++) {
+		for (int i = 0; i < cv; i++) {
 			Combination testingMap = new Combination();
 			cvTestingSet.add(testingMap);
 		}
-		dataPartitionMap = subdivision.getDivision();
 		topN = n;
 		mute = false;
 	}
 
-	protected void linearSearch(ArrayList<DataFile.Subject> subjects) {
-		for (DataFile.Subject sub : subjects) {
+	protected void linearSearch() {
+		for (PersonIndex sub : data) {
 			String geno = sub.getGenotype(SNPIndex);
-			if (geno.contains(Parameter.missing_genotype)) {
+			if (geno.contains(MDRConstant.missingGenotype)) {
 				continue;
 			} else {
 				Suite subset = model.get(geno);
@@ -85,11 +80,10 @@ public abstract class AbstractMergeSearch {
 		}
 	}
 
-	protected void assignKFold(String key, ArrayList<DataFile.Subject> subsample) {
+	protected void assignKFold(String key, ArrayList<PersonIndex> subsample) {
 		// assign each individual to one's testing set
-		for (DataFile.Subject sub : subsample) {
-			Integer ID = sub.getIntegerID();
-			int d = dataPartitionMap.get(ID).intValue();
+		for (PersonIndex sub : subsample) {
+			int d = sub.getGroup();
 			Combination suiteMap = cvTestingSet.get(d);
 			Suite S = suiteMap.get(key);
 			if (S == null) {
@@ -111,6 +105,7 @@ public abstract class AbstractMergeSearch {
 	public void setMute(boolean flag) {
 		mute = flag;
 	}
+
 	public abstract HashMap<String, MDRStatistic> getMDRResult();
 
 	public abstract double[] getModelStats();

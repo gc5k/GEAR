@@ -4,14 +4,12 @@ import java.io.IOException;
 import java.util.Arrays;
 
 import admixture.parameter.Parameter;
+import admixture.parameter.ParameterParser;
 
-import mdr.MDRConstant;
-import mdr.algorithm.CombinationGenerator;
-import mdr.algorithm.Subdivision;
-import mdr.data.DataFile;
-import mdr.moore.AbstractMergeSearch;
-import mdr.moore.HeteroLinearMergeSearch;
+import family.mdr.data.MDRConstant;
+import family.mdr.AbstractMergeSearch;
 import power.SimulationPower;
+import family.mdr.HeteroCombinationSearchII;
 import family.pedigree.design.hierarchy.ChenInterface;
 import family.pedigree.design.hierarchy.SII;
 import family.pedigree.design.hierarchy.Unified;
@@ -49,27 +47,22 @@ public class UnifiedGMDR {
 				chen = new SII(pp.getPedigreeData(), pp.getPhenotypeData(), pp.getMapData(), s, p.response, p.predictor, p.linkfunction);
 			}
 
-			DataFile mdrData = new DataFile(chen.getMarkerName(), chen.getGenotype(), chen.getStatus(), chen.getScoreName(), chen.getScore2());
-			DataFile.setScoreIndex(0);
 
-			Subdivision sd = new Subdivision(p.cv, p.seed + i, mdrData.size());
-			sd.RandomPartition();
-
-			AbstractMergeSearch as = new HeteroLinearMergeSearch(mdrData, sd);
+			int[] includedMarkerIndex = ParameterParser.selectedSNP(chen.getMapFile(), p.includesnp);
+			int[] excludedMarkerIndex = ParameterParser.selectedSNP(chen.getMapFile(), p.excludesnp);
+			AbstractMergeSearch as = new HeteroCombinationSearchII.Builder(Parameter.cv, chen.getSample(), chen.getMapFile(), includedMarkerIndex, excludedMarkerIndex).mute(false).build();
 			for (int j = p.min; j <= p.max; j++) {
-				CombinationGenerator cg = new CombinationGenerator(j, mdrData.getNumMarker());
-				cg.generateCombination();
 
 				double[] pv = new double[p.permutation];
 				for (int k = 0; k < p.permutation; k++) {
-					mdrData.setScore(chen.getPermutedScore(p.permu_scheme));
-					as.search(j, cg.getCombination());
-					pv[k] = as.getStats()[MDRConstant.TestingBalancedAccuIdx];
+					chen.getPermutedScore(p.permu_scheme);
+					as.search(j, 1);
+					pv[k] = as.getModelStats()[MDRConstant.TestingBalancedAccuIdx];
 				}
 
 				Arrays.sort(pv);
-				mdrData.setScore(chen.getScore());
-				as.search(j, cg.getCombination());
+				chen.RecoverScore();
+				as.search(j, 1);
 				System.out.println(as);
 
 				SimulationPower sp = new SimulationPower(as.getMDRResult(), pv);

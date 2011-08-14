@@ -7,12 +7,13 @@ import java.util.Random;
 import util.NewIt;
 import util.Sample;
 import family.RabinowitzLairdAlgorithm.AbstractGenoDistribution;
+import family.mdr.data.PersonIndex;
 import family.pedigree.design.RLDriver;
 import family.pedigree.file.GMDRPhenoFile;
 import family.pedigree.file.MapFile;
 import family.pedigree.file.PedigreeFile;
-import family.pedigree.genotype.FamilyStruct;
-import family.pedigree.genotype.Person;
+import family.pedigree.genotype.BFamilyStruct;
+import family.pedigree.genotype.BPerson;
 import family.pedigree.phenotype.FamilyUnit;
 import family.pedigree.phenotype.Subject;
 
@@ -30,13 +31,13 @@ public final class UnifiedUnrelated extends ChenBase {
 
 		ChenBase.LineUpGenotypePhenotype lineup = new ChenBase.LineUpGenotypePhenotype();
 
-		Hashtable<String, FamilyStruct> Fam = PedData.getFamilyStruct();
+		Hashtable<String, BFamilyStruct> Fam = PedData.getFamilyStruct();
 
 		PersonTable.ensureCapacity(qualified_Unrelated);
 		if(PhenoData != null)
 			CovariateTable.ensureCapacity(qualified_Unrelated);
 
-		genotype = new byte[qualified_Unrelated][];
+//		genotype = new byte[qualified_Unrelated][];
 		status = new byte[qualified_Unrelated];
 
 		ArrayList<PersonIndex> u_P = NewIt.newArrayList();
@@ -50,7 +51,7 @@ public final class UnifiedUnrelated extends ChenBase {
 				c++;
 				continue;
 			}
-			FamilyStruct fs = Fam.get(fi);
+			BFamilyStruct fs = Fam.get(fi);
 			FamilyUnit FamUnit = PhenoData == null ? null:PhenoData.getFamilyUnit(fi);
 			String[] pi = fs.getPersonListSorted();
 			int si = 0;
@@ -58,12 +59,12 @@ public final class UnifiedUnrelated extends ChenBase {
 			for (int i = 0; i < pi.length; i++) {
 				if (!lineup.filter[c][i])
 					continue;
-				Person per = fs.getPerson(pi[i]);
+				BPerson per = fs.getPerson(pi[i]);
 				Subject sub = PhenoData == null ? null : FamUnit.getSubject(pi[i]);
 
 				if (!fs.hasAncestor(per)) {
-					u_P.add(new PersonIndex(fs.getFamilyStructName(), pi[i]));
-					genotype[un] = per.getGenotypeScore();
+					u_P.add(new PersonIndex(fs.getFamilyStructName(), pi[i], per));
+//					genotype[un] = per.getGenotypeScore();
 					status[un] = (byte) per.getAffectedStatus();
 					if (PhenoData != null)
 						u_C.add(sub.getTraits());
@@ -84,15 +85,23 @@ public final class UnifiedUnrelated extends ChenBase {
 		}
 		AbstractGenoDistribution.rnd = new Random(seed);
 		RLDriver RLD = new RLDriver();
-		RLD.TDT(Fam, getMarkerName(), m);
+//		RLD.TDT(Fam, getMarkerName(), m);
 	}
 
 	public double[] getPermutedScore(boolean isNested) {
-		permuted_score = new double[score.length];
-		int[] idx = Sample.SampleIndex(0, score.length - 1, score.length);
+//		permuted_score = new double[score.length];
+		int[] idx = Sample.SampleIndex(0, PersonTable.size() - 1, PersonTable.size());
 		for (int i = 0; i < idx.length; i++) {
-			permuted_score[i] = score[idx[i]];
+			PersonTable.get(i).setPermutedScore(score[idx[i]]);
+//			permuted_score[i] = score[idx[i]];
 		}
 		return permuted_score;
+	}
+
+	@Override
+	public void RecoverScore() {
+		for (int i = 0; i < PersonTable.size(); i++) {
+			PersonTable.get(i).setPermutedScore(score[i]);
+		}
 	}
 }

@@ -2,7 +2,8 @@ package family.pedigree.file;
 
 import java.util.Arrays;
 import java.util.HashMap;
-import java.util.Set;
+
+import admixture.parameter.Parameter;
 
 import util.NewIt;
 
@@ -15,7 +16,6 @@ public class SNP {
 	private String name;
 	private float distance;
 	private int position;
-	private String[] allele = null;
 
 	private HashMap<String, String> genotypeHash = NewIt.newHashMap();
 
@@ -58,43 +58,34 @@ public class SNP {
 		return distance;
 	}
 
-	public void setAllele(Set<String> a) {
-		if (a.size() >= 3) {
+	public void setAllele(String[] a) {
+		if (a.length >= 3) {
 			System.err.println("more than 2 alleles for " + name);
 			System.exit(0);
-		} else if (a.size() == 1){
+		} else if (a[0].compareTo(Parameter.missing_allele)== 0|| a[1].compareTo(Parameter.missing_allele) == 0){
 			System.err.println("more than 2 alleles for " + name);
 			System.exit(0);
-		} else {
-			allele = (String[]) a.toArray(new String[a.size()]);
 		}
-		Arrays.sort(allele);
-		byte[] genotype = new byte[2];
-		for (int i = 0; i < 2; i++) {
-			if (allele[i].equalsIgnoreCase("A")) {
-				genotype[i] = 1;
-			} else if (allele[i].equalsIgnoreCase("C")) {
-				genotype[i] = 2;
-			} else if (allele[i].equalsIgnoreCase("G")) {
-				genotype[i] = 3;
-			} else if (allele[i].equalsIgnoreCase("T")) {
-				genotype[i] = 4;
-			}
-		}
+		Arrays.sort(a);
 		StringBuffer sb1 = new StringBuffer();
-		sb1.append(allele[0]);
-		sb1.append(allele[0]);
-		genotypeHash.put((new Integer(genotype[0] + genotype[0])).toString(), sb1.toString());
+		sb1.append(a[0]);
+		sb1.append(a[0]);
+		genotypeHash.put((new Integer(0)).toString(), sb1.toString());
 		
 		StringBuffer sb2 = new StringBuffer();
-		sb2.append(allele[0]);
-		sb2.append(allele[1]);
-		genotypeHash.put((new Integer(genotype[0] + genotype[1])).toString(), sb2.toString());
+		if (a[0].compareTo(a[1]) > 0) {
+			sb2.append(a[0]);
+			sb2.append(a[1]);
+		} else {
+			sb2.append(a[1]);
+			sb2.append(a[0]);
+		}
+		genotypeHash.put((new Integer(1)).toString(), sb2.toString());
 
 		StringBuffer sb3 = new StringBuffer();
-		sb3.append(allele[1]);
-		sb3.append(allele[1]);
-		genotypeHash.put((new Integer(genotype[1] + genotype[1])).toString(), sb3.toString());
+		sb3.append(a[1]);
+		sb3.append(a[1]);
+		genotypeHash.put((new Integer(2)).toString(), sb3.toString());
 
 	}
 
