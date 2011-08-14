@@ -2,15 +2,12 @@ package family.pedigree.design.hierarchy;
 
 import java.util.ArrayList;
 import java.util.Hashtable;
-import java.util.Random;
 
 import org.apache.commons.lang3.ArrayUtils;
 
 import util.NewIt;
 import util.Sample;
-import family.RabinowitzLairdAlgorithm.AbstractGenoDistribution;
 import family.mdr.data.PersonIndex;
-import family.pedigree.design.RLDriver;
 import family.pedigree.file.GMDRPhenoFile;
 import family.pedigree.file.MapFile;
 import family.pedigree.file.PedigreeFile;
@@ -124,7 +121,7 @@ public class UnifiedII extends ChenBase {
 		for (int i = 0; i < m.length; i++) {
 			m[i] = i;
 		}
-		AbstractGenoDistribution.rnd = new Random(seed);
+//		AbstractGenoDistribution.rnd = new Random(seed);
 //		RLDriver RLD = new RLDriver();
 //		RLD.TDT(Fam, getMarkerName(), m);
 	}
