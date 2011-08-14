@@ -4,14 +4,13 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Set;
 
-import mdr.MDRConstant;
-import mdr.algorithm.Subdivision;
-import mdr.arsenal.ToolKit;
-import mdr.data.DataFile;
-import mdr.result.Cell;
-import mdr.result.Combination;
-import mdr.result.OneCVSet;
-import mdr.result.Suite;
+import family.mdr.arsenal.ToolKit;
+import family.mdr.data.MDRConstant;
+import family.mdr.data.PersonIndex;
+import family.mdr.result.Cell;
+import family.mdr.result.Combination;
+import family.mdr.result.OneCVSet;
+import family.mdr.result.Suite;
 import family.mdr.selector.TopN;
 import family.pedigree.file.MapFile;
 
@@ -21,17 +20,18 @@ public class HeteroCombinationSearchII extends AbstractMergeSearch {
 	private TopN Top_N = null;
 	
 	public static class Builder {
-		private DataFile dr;
-		private Subdivision sd;
-		private MapFile mf;
-		int[] in_snp = null;
-		int[] ex_snp = null;
 		
-		int N = 1;
+		private int cv;
+		private ArrayList<PersonIndex> dr;
+		private MapFile mf;
+		private int[] in_snp = null;
+		private int[] ex_snp = null;
+		
+		private int N = 1;
 		private boolean mute = false;
-		public Builder(DataFile dr, Subdivision sd, MapFile mf, int[] in_snp, int[] ex_snp) {
+		public Builder(int cv, ArrayList<PersonIndex> dr, MapFile mf, int[] in_snp, int[] ex_snp) {
+			this.cv = cv;
 			this.dr = dr;
-			this.sd = sd;
 			this.mf = mf;
 			this.in_snp = in_snp;
 			this.ex_snp = ex_snp;
@@ -53,7 +53,7 @@ public class HeteroCombinationSearchII extends AbstractMergeSearch {
 	}
 	
 	public HeteroCombinationSearchII(Builder builder) {
-		super(builder.dr, builder.sd, builder.mf, builder.in_snp, builder.ex_snp, builder.N, builder.mute);
+		super(builder.cv, builder.dr, builder.mf, builder.in_snp, builder.ex_snp, builder.N, builder.mute);
 	}
 
 	public void search(int or, int N) {
@@ -89,13 +89,12 @@ public class HeteroCombinationSearchII extends AbstractMergeSearch {
 	}
 
 	private void kernal(String modelName) {
-		ArrayList<DataFile.Subject> sample = data.getSample();
 
 		cleanupTestingSet();
 
 		model = new Combination();
 		SNPIndex = ToolKit.StringToIntArray(modelName);
-		linearSearch(sample);
+		linearSearch();
 		// mergeSearch(data.getSample(), null, 0);
 		double[] t = calculateSingleBest(modelName);
 		if (t[MDRConstant.TestingBalancedAccuIdx] > statistic[MDRConstant.TestingBalancedAccuIdx]) {
@@ -107,7 +106,7 @@ public class HeteroCombinationSearchII extends AbstractMergeSearch {
 	public double[] calculateSingleBest(String modelName) {
 
 		double[] mean = new double[MDRConstant.NumStats];
-		for (int j = 0; j < subdivision.getInterval(); j++) {
+		for (int j = 0; j < cv; j++) {
 			OneCVSet cvSet = new OneCVSet(j, modelName);
 			Combination testingModels = (Combination) cvTestingSet.get(j);
 
@@ -156,8 +155,8 @@ public class HeteroCombinationSearchII extends AbstractMergeSearch {
 			cvSet.setStatistic(MDRConstant.TrainingBalancedAccuIdx, trAccu);
 			cvSet.setStatistic(MDRConstant.TestingBalancedAccuIdx, tAccu);
 		}
-		mean[MDRConstant.TrainingBalancedAccuIdx] /= subdivision.getInterval();
-		mean[MDRConstant.TestingBalancedAccuIdx] /= subdivision.getInterval();
+		mean[MDRConstant.TrainingBalancedAccuIdx] /= cv;
+		mean[MDRConstant.TestingBalancedAccuIdx] /= cv;
 		mdrstat = new MDRStatistic();
 
 		mdrstat.setTrainingBalancedAccuracy(mean[MDRConstant.TrainingBalancedAccuIdx]);

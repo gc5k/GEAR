@@ -239,6 +239,12 @@ public class Person {
     	return gs;
     }
 
+    public String getGenotypeString(int i) {
+
+    	return Integer.toString(alleles[0][i] + alleles[1][i]);
+
+    }
+
     public byte[][] getNonTransmittedGenotype() {
     	return nontransmitted;
     }

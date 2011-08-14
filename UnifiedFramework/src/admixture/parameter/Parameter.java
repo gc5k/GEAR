@@ -55,7 +55,7 @@ public class Parameter {
 	private String[] lf = new String[] { "0 for linear regression", "1 for logistic regression" };
 
 	private final String cmd_cv = "cv";
-	public int cv = 5;
+	public static int cv = 5;
 
 	private final String cmd_min = "min";
 	public int min = 1;

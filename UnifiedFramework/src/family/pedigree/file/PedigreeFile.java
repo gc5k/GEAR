@@ -1,16 +1,5 @@
 package family.pedigree.file;
 
-/*
- * $Id: PedFile.java,v 3.21 2006/05/12 18:01:28 jmaller Exp $
- * WHITEHEAD INSTITUTE
- * SOFTWARE COPYRIGHT NOTICE AGREEMENT
- * This software and its documentation are copyright 2002 by the
- * Whitehead Institute for Biomedical Research.  All rights are reserved.
- *
- * This software is supplied without any warranty or guaranteed support
- * whatsoever.  The Whitehead Institute can not be responsible for its
- * use, misuse, or functionality.
- */
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileReader;
@@ -18,28 +7,23 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Enumeration;
-import java.util.HashSet;
 import java.util.Hashtable;
 
 import admixture.parameter.Parameter;
 
 import publicAccess.PublicData;
 import util.NewIt;
-import family.pedigree.genotype.FamilyStruct;
-import family.pedigree.genotype.Person;
+import family.pedigree.genotype.BFamilyStruct;
+import family.pedigree.genotype.BPerson;
 
 /**
- * Handles input and storage of Pedigree files this class is not thread safe
- * (untested). modified from original Pedfile and checkdata classes by Hui Gong
- * 
- * @author Julian Maller
  * @author Guo-Bo Chen, chenguobo@gmail.com
  */
 public class PedigreeFile {
 
-	private ArrayList<HashSet<String>> AlleleSet;
+	private ArrayList<String[]> AlleleSet;
 	private Hashtable<String, Boolean> famInformative;
-	private Hashtable<String, FamilyStruct> familystructure;
+	private Hashtable<String, BFamilyStruct> familystructure;
 
 	// stores the individuals found by parse() in allIndividuals. this is useful
 	// for outputting Pedigree information to
@@ -49,7 +33,7 @@ public class PedigreeFile {
 	// bogusParents is true if someone in the file referenced a parent not in
 	// the file
 	private boolean bogusParents = false;
-//	private ArrayList<SNP> markerInfor;
+	// private ArrayList<SNP> markerInfor;
 	private int num_marker;
 	private ArrayList<String> pedigrees;
 	private String titleLine = null;
@@ -116,7 +100,7 @@ public class PedigreeFile {
 		return this.famInformative;
 	}
 
-	public FamilyStruct getFamilyStruct(String familystrID) {
+	public BFamilyStruct getFamilyStruct(String familystrID) {
 		return this.familystructure.get(familystrID);
 	}
 
@@ -128,16 +112,16 @@ public class PedigreeFile {
 	 *         families hashtable
 	 */
 	public int getNumIndividuals() {
-		Enumeration<FamilyStruct> famEnum = familystructure.elements();
+		Enumeration<BFamilyStruct> famEnum = familystructure.elements();
 		int total = 0;
 		while (famEnum.hasMoreElements()) {
-			FamilyStruct fam = famEnum.nextElement();
+			BFamilyStruct fam = famEnum.nextElement();
 			total += fam.getNumPersons();
 		}
 		return total;
 	}
 
-	public Hashtable<String, FamilyStruct> getFamilyStruct() {
+	public Hashtable<String, BFamilyStruct> getFamilyStruct() {
 		return familystructure;
 	}
 
@@ -185,11 +169,13 @@ public class PedigreeFile {
 				throw new MDRPedFileException("Pedgree data format error: empty pedigree file");
 			}
 			String[] tokenizer = pedigrees.get(0).split("\\s+");
-			num_marker = (tokenizer.length - 6)/2;
+			num_marker = (tokenizer.length - 6) / 2;
 		}
 		AlleleSet.ensureCapacity(num_marker);
-		for(int i = 0; i < num_marker; i++) {
-			AlleleSet.add(new HashSet<String>());
+		for (int i = 0; i < num_marker; i++) {
+			String[] a = new String[2];
+			a[0] = a[1] = Parameter.missing_allele;
+			AlleleSet.add(a);
 		}
 	}
 
@@ -203,12 +189,11 @@ public class PedigreeFile {
 		int colNum = num_marker * 2 + 6;
 
 		int numMarkers = 0;
-		boolean genoError = false;
 		int numLines = pedigrees.size();
 		if (numLines == 0) {
 			throw new MDRPedFileException("Data format error: empty file");
 		}
-		Person per;
+		BPerson per;
 
 		for (int k = 0; k < numLines; k++) {
 			String[] tokenizer = pedigrees.get(k).split(PublicData.delim);
@@ -230,7 +215,7 @@ public class PedigreeFile {
 				throw new MDRPedFileException("Column number mismatch in pedfile. line " + (k + 2));
 			}
 
-			per = new Person(numMarkers);
+			per = new BPerson(numMarkers);
 			// pseudoper = new PseudoPerson();
 			if (numTokens < 6) {
 				throw new MDRPedFileException("Incorrect number of fields on line " + (k + 2));
@@ -254,38 +239,26 @@ public class PedigreeFile {
 					throw new MDRPedFileException("Pedfile error: invalid gender or affected status on line " + (k + 2));
 				}
 
-				byte genotype1;
-				byte genotype2;
 				for (int j = 0; j < (tokenizer.length - 6) / 2; j++) {
 					try {
-						String alleleA = tokenizer[6 + j * 2];
-						String alleleB = tokenizer[6 + j * 2 + 1];
-						int[] checker1, checker2;
-						checker1 = checkGenotype(alleleA);
-						checker2 = checkGenotype(alleleB);
-						if (checker1[1] != checker2[1]) {
-							genoError = !genoError;
+						String[] allele = {tokenizer[6 + j * 2], tokenizer[6 + j * 2 + 1]};
+						boolean flag = (allele[0].compareTo(Parameter.missing_allele) != 0) && (allele[1].compareTo(Parameter.missing_allele) != 0);
+						if (flag) {
+							int[] code = recode(j, allele);
+							per.addMarker(flag, code[0], code[1], j);
+						} else {
+							per.addMarker(flag, 0, 0, j);
 						}
-						Polymorphism(j, alleleA, alleleB);
-						if (genoError) {
-							throw new MDRPedFileException("File input error on line " + (k + 2) + ", marker " + (per.getNumMarkers() + 2)
-									+ ".\nFor any marker, an individual's genotype must be only letters or only numbers.");
-						}
-						if (checker1[0] == PublicData.MissingAllele || checker2[0] == PublicData.MissingAllele) {
-							checker1[0] = checker2[0] = PublicData.MissingAllele;
-						}
-						genotype1 = (byte) checker1[0];
-						genotype2 = (byte) checker2[0];
-						per.addMarker(genotype1, genotype2);
+
 					} catch (NumberFormatException nfe) {
 						throw new MDRPedFileException("Pedigree file input error: invalid genotype on line " + (k + 2));
 					}
 				}
 				// check if the family exists already in the Hashtable
-				FamilyStruct famstr = familystructure.get(per.getFamilyID());
+				BFamilyStruct famstr = familystructure.get(per.getFamilyID());
 				if (famstr == null) {
 					// it doesn't exist, so create a new FamilyStruct object
-					famstr = new FamilyStruct(per.getFamilyID());
+					famstr = new BFamilyStruct(per.getFamilyID());
 					familystructure.put(per.getFamilyID(), famstr);
 				}
 
@@ -302,46 +275,70 @@ public class PedigreeFile {
 		pedigrees = null;
 	}
 
-	public int[] checkGenotype(String allele) throws MDRPedFileException {
-		// This method cleans up the genotype checking process for hap map and
-		// ped files & allows for both numerical and
-		// alphabetical input.
-		int[] genotype = new int[2];
-
-		if (allele.compareTo(Parameter.missing_allele) == 0) {
-			genotype[0] = 0;
-		} else if (allele.equalsIgnoreCase("A")) {
-			genotype[0] = 1;
-		} else if (allele.equalsIgnoreCase("C")) {
-			genotype[0] = 2;
-		} else if (allele.equalsIgnoreCase("G")) {
-			genotype[0] = 3;
-		} else if (allele.equalsIgnoreCase("T")) {
-			genotype[0] = 4;
+	private int[] recode(int idx, String[] allele) {
+		int[] code = { -1, -1 };
+		String[] ref = AlleleSet.get(idx);
+		if (ref[1] != Parameter.missing_allele) { // two detected alleles
+			for (int i = 0; i < 2; i++) {
+				for (int j = 0; j < 2; j++) {
+					if (allele[i].compareTo(ref[j]) == 0) {
+						code[i] = j;
+						break;
+					}
+				}
+			}
+			if (code[0] == -1 || code[1] == -1) {
+				System.err.println("more than 2 alleles in the marker column " + (idx + 1));
+			}
 		} else {
-			genotype[0] = Integer.parseInt(allele.trim());
-			genotype[1] = 1;
+			// less than two detected alleles
+			
+			if (allele[0].compareTo(allele[1]) == 0) {
+				// 1 when both alleles are same
+				if (ref[0].compareTo(Parameter.missing_allele)==0) {
+					// zero detected alleles
+					ref[0] = new String(allele[0]);
+					code[0] = code[1] = 0;
+				} else {
+					// one detected alleles
+					if (allele[0].compareTo(ref[0]) == 0) {
+						code[0] = code[1] = 0;
+					} else {
+						code[0] = code[1] = 1;
+						ref[1] = new String(allele[1]);
+					}
+				}
+			} else {
+				// 2 when both alleles are different
+				if (ref[0].compareTo(Parameter.missing_allele) == 0) {
+					// zero detected alleles
+					ref[0] = new String(allele[0]); ref[1] = new String(allele[1]);
+					code[0] = 0; code[1] = 1;
+				} else {
+					// one detected alleles
+					if (ref[0].compareTo(allele[0]) == 0) {
+						ref[1] = new String(allele[1]);
+						code[0] = 0; code[1] = 1;
+					} else if (ref[0].compareTo(allele[1]) == 0) {
+						ref[1] = new String(allele[0]);
+						code[0] = 1; code[1] = 0;
+					} else {
+						System.out.println("more than 3 alleles in marker column " + (idx + 1));
+					}
+				}
+			}
 		}
-
-		return genotype;
+		return code;
 	}
 
-	private void Polymorphism(int i, String A, String B) {
-		if(A.compareTo(Parameter.missing_allele) != 0) {
-			AlleleSet.get(i).add(A);
-		} 
-		if(B.compareTo(Parameter.missing_allele) != 0){
-			AlleleSet.get(i).add(B);
-		}
-	}
-
-	public ArrayList<HashSet<String>> getPolymorphism() {
+	public ArrayList<String[]> getPolymorphism() {
 		return AlleleSet;
 	}
+
 	public boolean hasBogusParents() {
 		return bogusParents;
 	}
-	
+
 	public int getNumMarker() {
 		return num_marker;
 	}
