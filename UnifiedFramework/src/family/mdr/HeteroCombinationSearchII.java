@@ -5,7 +5,6 @@ import java.util.HashMap;
 import java.util.Set;
 
 import family.mdr.arsenal.ToolKit;
-import family.mdr.data.MDRConstant;
 import family.mdr.data.PersonIndex;
 import family.mdr.result.Cell;
 import family.mdr.result.Combination;

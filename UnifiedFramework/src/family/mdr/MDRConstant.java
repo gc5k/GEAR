@@ -1,4 +1,4 @@
-package family.mdr.data;
+package family.mdr;
 
 /**
  * 

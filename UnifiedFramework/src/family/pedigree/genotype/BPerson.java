@@ -1,6 +1,6 @@
 package family.pedigree.genotype;
 
-import family.mdr.data.MDRConstant;
+import family.mdr.MDRConstant;
 
 /**
  * stores the genotypes of each individual. this class is not thread safe
@@ -20,6 +20,7 @@ public class BPerson {
 	private int genoLen;
 	private int[][] alleles;
 	private int intL = 32;
+	private int shift = 5;
 
 	public BPerson(int numMarkers) {
 		this.numMarkers = numMarkers;
@@ -150,15 +151,15 @@ public class BPerson {
 	}
 
 	public int isGenotype(int idx) {
-		int posByte = idx / intL;
-		int posBite = idx % intL;
+		int posByte = idx >> shift;
+		int posBite = idx - (idx >> shift << shift);
 		int f = alleles[0][posByte];
 		return 1 & f >> posBite;
 	}
 
 	public void addMarker(boolean flag, int a, int b, int idx) {
-		int posByte = idx / intL;
-		int posBite = idx % intL;
+		int posByte = idx >> shift;
+		int posBite = idx - (idx >> shift << shift);
 		int f = alleles[0][posByte];
 		int m = flag ? 1 : 0;
 		alleles[0][posByte] = f | (m << posBite);
@@ -172,12 +173,12 @@ public class BPerson {
 
 	public String getGenotypeString(int i) {
 		StringBuffer sb = new StringBuffer();
-		int posByte = i / intL;
-		int posBite = i % intL;
+		int posByte = i >> shift;
+		int posBite = i - (i >> shift << shift);
 		if (alleles[0][posByte] >> posBite == 0) {
 			sb.append(MDRConstant.missingGenotype);
 		} else {
-			sb.append((1&alleles[1][posByte] >> posBite) + (1& alleles[2][posByte] >> posBite));
+			sb.append((1 & alleles[1][posByte] >> posBite) + (1 & alleles[2][posByte] >> posBite));
 		}
 		return sb.toString();
 	}

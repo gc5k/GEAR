@@ -4,7 +4,6 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map.Entry;
 
-import family.mdr.data.MDRConstant;
 import family.mdr.data.PersonIndex;
 import family.mdr.result.Combination;
 import family.mdr.result.SavedModels;
