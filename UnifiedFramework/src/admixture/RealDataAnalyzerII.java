@@ -7,9 +7,9 @@ import java.util.Arrays;
 import admixture.parameter.Parameter;
 import admixture.parameter.ParameterParser;
 
-import family.mdr.data.MDRConstant;
 import family.mdr.AbstractMergeSearch;
 import family.mdr.HeteroCombinationSearchII;
+import family.mdr.MDRConstant;
 import power.SimulationPower;
 import family.pedigree.design.hierarchy.ChenInterface;
 import family.pedigree.design.hierarchy.SII;

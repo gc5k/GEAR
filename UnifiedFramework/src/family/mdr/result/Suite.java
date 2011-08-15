@@ -1,7 +1,8 @@
 
 package family.mdr.result;
 
-import family.mdr.data.MDRConstant;
+import family.mdr.MDRConstant;
+
 import java.util.ArrayList;
 
 import family.mdr.data.PersonIndex;

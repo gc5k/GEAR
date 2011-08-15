@@ -1,5 +1,6 @@
 package family.mdr.data;
 
+import family.mdr.MDRConstant;
 import family.pedigree.genotype.BPerson;
 
 public class PersonIndex {
