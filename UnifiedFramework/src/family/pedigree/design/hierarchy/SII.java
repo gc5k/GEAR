@@ -113,10 +113,10 @@ public final class SII extends ChenBase {
 		return permuted_score;
 	}
 
-	@Override
-	public void RecoverScore() {
-		for (int i = 0; i < PersonTable.size(); i++) {
-			PersonTable.get(i).setPermutedScore(score[i]);
-		}
-	}
+//	@Override
+//	public void RecoverScore() {
+//		for (int i = 0; i < PersonTable.size(); i++) {
+//			PersonTable.get(i).setPermutedScore(score[i]);
+//		}
+//	}
 }

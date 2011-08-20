@@ -14,7 +14,6 @@ import family.mdr.data.PersonIndex;
 import family.pedigree.file.GMDRPhenoFile;
 import family.pedigree.file.MapFile;
 import family.pedigree.file.PedigreeFile;
-import family.pedigree.file.SNP;
 import family.pedigree.genotype.BFamilyStruct;
 import family.pedigree.genotype.BPerson;
 import family.pedigree.phenotype.FamilyUnit;
@@ -252,16 +251,16 @@ public abstract class ChenBase implements ChenInterface {
 			ln.append(",");
 		}
 	}
-
-	@Override
-	public String[] getMarkerName() {
-		ArrayList<SNP> snpList = MapData.getMarkerList();
-		String[] m = new String[snpList.size()];
-		for (int i = 0; i < snpList.size(); i++) {
-			m[i] = snpList.get(i).getName();
-		}
-		return m;
-	}
+//
+//	@Override
+//	public String[] getMarkerName() {
+//		ArrayList<SNP> snpList = MapData.getMarkerList();
+//		String[] m = new String[snpList.size()];
+//		for (int i = 0; i < snpList.size(); i++) {
+//			m[i] = snpList.get(i).getName();
+//		}
+//		return m;
+//	}
 
 	@Override
 	public double[] getPermutedScore(boolean nested) {
@@ -333,6 +332,13 @@ public abstract class ChenBase implements ChenInterface {
 		Collections.shuffle(g);
 		for(int i = 0; i < PersonTable.size(); i++) {
 			PersonTable.get(i).setGroup(g.get(i));
+		}
+	}
+
+	@Override
+	public void RecoverScore() {
+		for (int i = 0; i < PersonTable.size(); i++) {
+			PersonTable.get(i).setPermutedScore(score[i]);
 		}
 	}
 }

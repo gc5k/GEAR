@@ -18,8 +18,8 @@ import org.apache.commons.cli.PosixParser;
 public class Parameter {
 	private final String sep = ",";
 
-	private final String cmd_mode = "md";
-	public String mode = "u";
+	private final String cmd_mode = "md";//u, f (sii), pi(ajhg2008);
+	public static String mode = "u";
 
 	private final String cmd_file = "file";
 
@@ -77,7 +77,7 @@ public class Parameter {
 
 	private final String cmd_unrelated_only = "ur";
 	public boolean unrelated_only = false;
-
+	
 	private final String cmd_simu = "simu";
 	public int simu = 1;
 
@@ -123,6 +123,7 @@ public class Parameter {
 		ops.addOption(OptionBuilder.withDescription("minimal order of the interaction being searched for.").hasArg().create(cmd_min));
 		ops.addOption(OptionBuilder.withDescription("maximal order of the interaction being searched for.").hasArg().create(cmd_max));
 		ops.addOption(OptionBuilder.withDescription("seed for the algorithms").hasArg().create(cmd_sd));
+		
 		ops.addOption(OptionBuilder.withDescription("replication for permutation.  Default is 100.").hasArg().create(cmd_perm));
 		ops.addOption(OptionBuilder.withDescription("only sibs are exchangeable when this option is turned on").create(cmd_perm_scheme));
 		ops.addOption(OptionBuilder.withDescription("hierachical permutation for families that founders are exchangeable within family and sibs are exchangeable within family.").create(cmd_perm_fam));

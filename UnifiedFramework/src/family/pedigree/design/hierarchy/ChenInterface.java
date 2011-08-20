@@ -14,7 +14,7 @@ public interface ChenInterface {
 	public static int Logistc = 1;
 
 	public void setSeed(long s);
-	public String[] getMarkerName();
+//	public String[] getMarkerName();
 //	public String[] getScoreName();
 //	public byte[][] getGenotype();
 	public byte[] getStatus();

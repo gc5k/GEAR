@@ -1,4 +1,4 @@
-package family.pedigree.genotype;
+package backup.family.pedigree.genotype;
 
 /*
  * $Id: Family.java,v 3.1 2006/04/10 18:29:51 djbender Exp $
@@ -11,30 +11,20 @@ package family.pedigree.genotype;
  * whatsoever.  The Whitehead Institute can not be responsible for its
  * use, misuse, or functionality.
  */
-
 import java.util.Arrays;
 import java.util.Enumeration;
 import java.util.Hashtable;
-import java.util.Set;
-import java.util.TreeMap;
-
-import admixture.parameter.Parameter;
-
-import family.RabinowitzLairdAlgorithm.AbstractGenoDistribution;
 import util.NewIt;
 
 /**
  * Storing the familyName and the members of a family from a pedigree file. This class is not thread safe (untested)
  * 
- * @author Guo-Bo Chen, chenguobo@gmail.com
+ * @author Julian Maller, extended by Guo-Bo Chen, chenguobo@gmail.com
  */
 public class BFamilyStruct {
 	// save observed genotypes;
-	protected Hashtable<String, BPerson> persons;
-	protected String familyStructName;
-
-	//this two variable were added so that accomodates Lou's Test
-    private Hashtable<String, BPerson> pseudopersons;
+	private Hashtable<String, BPerson> persons;
+	private String familyStructName;
 
 	/**
 	 * adds a member to this family (adds to persons ArrayList)
@@ -46,16 +36,13 @@ public class BFamilyStruct {
 		this.persons.put(per.getPersonID(), per);
 	}
 
-	public void addPseudoPerson(BPerson per) {
-		this.pseudopersons.put(per.getPersonID(), per);
+	public BFamilyStruct() {
+		this.persons = NewIt.newHashtable();
 	}
 
 	public BFamilyStruct(String familyStructName) {
 		this.persons = NewIt.newHashtable();
 		this.familyStructName = familyStructName;
-		if(Parameter.mode.compareTo("pi") == 0) {
-			this.pseudopersons = NewIt.newHashtable();
-		}
 	}
 
 	/**
@@ -107,10 +94,6 @@ public class BFamilyStruct {
 		return this.persons.get(personID);
 	}
 
-	public BPerson getPseudoPerson(String personID) {
-		return this.pseudopersons.get(personID);
-	}
-
 	public Hashtable<String, BPerson> getPersons() {
 		return persons;
 	}
@@ -128,7 +111,7 @@ public class BFamilyStruct {
 			}
 		} else {
 			return false;
-		}
+		}	
 	}
 
 	public boolean hasAncestor(String id) {
@@ -156,33 +139,5 @@ public class BFamilyStruct {
 			}
 		}
 		return i;
-	}
-	
-	public void countAllele(TreeMap<String, Integer> Geno, Set<String> alleleSet) {
-
-		for (String g : Geno.keySet()) {
-			alleleSet.add(g.substring(0, 1));
-			alleleSet.add(g.substring(1, 2));
-		}
-
-	}
-	
-	/**
-	 * Table 1: Conditional distribution of non-transmitted genotypes when one homozygous parents's genotype and children's genotypes are available at
-	 * marker locus i Table 2: Conditional contribution of non-transmitted genotypes when one heterozygous parent's genotype and children's genotype
-	 * are available at marker locus i Table 3: Conditional contribution of non-transmitted genotypes when only children's genotypes but no parent's
-	 * genotype are available at marker locus A
-	 * 
-	 * @param genotype
-	 *            , transmitted genotype at locus i of indiviudal j
-	 * @param genoset
-	 *            , configuration of parents' and children's genotypes.
-	 * @return non-transmitted genotype
-	 */
-	public String[] getNonTransmitted(String transmitted, AbstractGenoDistribution genodis) {
-		String nontran_tran[] = genodis.getNontransmitted(transmitted);
-		// System.out.println(nontran_tran[0] + "\t" + nontran_tran[1]);
-		return nontran_tran;
-
 	}
 }
