@@ -22,4 +22,5 @@ public interface MDRConstant {
 	public static Object seperator = ",";
     public static int tieValue = 1;
     public static String missingGenotype = "44";
+    public static String delim = "\\s+";
 }

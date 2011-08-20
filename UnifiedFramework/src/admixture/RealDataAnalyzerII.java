@@ -11,6 +11,7 @@ import family.mdr.AbstractMergeSearch;
 import family.mdr.HeteroCombinationSearchII;
 import family.mdr.MDRConstant;
 import power.SimulationPower;
+import family.pedigree.design.hierarchy.AJHG2008;
 import family.pedigree.design.hierarchy.ChenInterface;
 import family.pedigree.design.hierarchy.SII;
 import family.pedigree.design.hierarchy.Unified;
@@ -41,6 +42,8 @@ public class RealDataAnalyzerII {
 			}
 		} else if (p.mode.compareTo("f") == 0) {
 			chen = new SII(pp.getPedigreeData(), pp.getPhenotypeData(), pp.getMapData(), s, p.response, p.predictor, p.linkfunction);
+		} else if (p.mode.compareTo("pi") == 0) {
+			chen = new AJHG2008(pp.getPedigreeData(), pp.getPhenotypeData(), pp.getMapData(), s, p.response, p.predictor, p.linkfunction);
 		}
 
 		int[] includedMarkerIndex = ParameterParser.selectedSNP(chen.getMapFile(), p.includesnp);

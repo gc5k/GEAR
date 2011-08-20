@@ -5,8 +5,8 @@ import java.util.TreeMap;
 import java.util.TreeSet;
 
 import family.RabinowitzLairdAlgorithm.AbstractGenoDistribution;
+import family.mdr.MDRConstant;
 
-import publicAccess.PublicData;
 import util.NewIt;
 
 /**
@@ -48,13 +48,13 @@ public class HeterozygousParent extends AbstractGenoDistribution {
 	 * missing too.
 	 */
 	public String[] getNontransmitted(final String transmitted) {
-		String nontran = new String(PublicData.MissingGenotype);
+		String nontran = new String(MDRConstant.missingGenotype);
 		String tran = new String(transmitted);
 
-		if (transmitted.compareTo(PublicData.MissingGenotype) == 0) {
+		if (transmitted.compareTo(MDRConstant.missingGenotype) == 0) {
 			tran = RandomAssign();
-			if (tran.compareTo(PublicData.MissingGenotype) == 0) {
-				String nontran_tran[] = { PublicData.MissingGenotype, PublicData.MissingGenotype };
+			if (tran.compareTo(MDRConstant.missingGenotype) == 0) {
+				String nontran_tran[] = { MDRConstant.missingGenotype, MDRConstant.missingGenotype };
 				return nontran_tran;
 			}
 		}

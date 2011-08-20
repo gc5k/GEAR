@@ -3,8 +3,8 @@ package family.RabinowitzLairdAlgorithm.lou;
 import java.util.TreeMap;
 
 import family.RabinowitzLairdAlgorithm.AbstractGenoDistribution;
+import family.mdr.MDRConstant;
 
-import publicAccess.PublicData;
 
 /**
  * Class extends GenoDristribution Treat the situation of one heterozygous
@@ -46,10 +46,10 @@ public class HomozygousParent extends AbstractGenoDistribution {
 		String tran = new String(transmitted);
 		String pgeno;
 
-		if (transmitted.compareTo(PublicData.MissingGenotype) == 0) {
+		if (transmitted.compareTo(MDRConstant.missingGenotype) == 0) {
 			tran = RandomAssign();
-			if (tran.compareTo(PublicData.MissingGenotype) == 0) {
-				String nontran_tran[] = { PublicData.MissingGenotype, PublicData.MissingGenotype };
+			if (tran.compareTo(MDRConstant.missingGenotype) == 0) {
+				String nontran_tran[] = { MDRConstant.missingGenotype, MDRConstant.missingGenotype };
 				return nontran_tran;
 			}
 		}
@@ -67,5 +67,6 @@ public class HomozygousParent extends AbstractGenoDistribution {
 	}
 
 	protected void genotypeParents() {
+		
 	}
 }

@@ -11,8 +11,8 @@ import java.util.Hashtable;
 
 import admixture.parameter.Parameter;
 
-import publicAccess.PublicData;
 import util.NewIt;
+import family.mdr.MDRConstant;
 import family.pedigree.genotype.BFamilyStruct;
 import family.pedigree.genotype.BPerson;
 
@@ -25,13 +25,6 @@ public class PedigreeFile {
 	private Hashtable<String, Boolean> famInformative;
 	private Hashtable<String, BFamilyStruct> familystructure;
 
-	// stores the individuals found by parse() in allIndividuals. this is useful
-	// for outputting Pedigree information to
-	// a file of another type.
-
-	// stores the individuals chosen by pedparser
-	// bogusParents is true if someone in the file referenced a parent not in
-	// the file
 	private boolean bogusParents = false;
 	// private ArrayList<SNP> markerInfor;
 	private int num_marker;
@@ -196,7 +189,7 @@ public class PedigreeFile {
 		BPerson per;
 
 		for (int k = 0; k < numLines; k++) {
-			String[] tokenizer = pedigrees.get(k).split(PublicData.delim);
+			String[] tokenizer = pedigrees.get(k).split(MDRConstant.delim);
 
 			int numTokens = tokenizer.length;
 
@@ -265,9 +258,10 @@ public class PedigreeFile {
 				if (famstr.getPersons().containsKey(per.getPersonID())) {
 					throw new MDRPedFileException("Person " + per.getPersonID() + " in family " + per.getFamilyID() + " appears more than once.");
 				}
-
 				famstr.addPerson(per);
-				// famstr.addPseudoPerson(pseudoper);
+				if (Parameter.mode.compareTo("pi") == 0) {
+					famstr.addPseudoPerson(per);
+				}
 			}
 		}
 

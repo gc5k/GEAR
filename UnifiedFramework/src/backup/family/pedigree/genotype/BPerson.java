@@ -1,4 +1,4 @@
-package family.pedigree.genotype;
+package backup.family.pedigree.genotype;
 
 import family.mdr.MDRConstant;
 
@@ -19,8 +19,9 @@ public class BPerson {
 	protected int numMarkers;
 	protected int genoLen;
 	protected int[][] alleles;
-	protected final int intL = 32;
-	protected final int shift = 5;
+
+	protected int intL = 32;
+	protected int shift = 5;
 
 	public BPerson(int numMarkers) {
 		this.numMarkers = numMarkers;
@@ -30,22 +31,10 @@ public class BPerson {
 			genoLen = numMarkers / intL + 1;
 		}
 		alleles = new int[3][genoLen];
+		// this.genotype = NewIt.newArrayList();
 	}
 
-	public BPerson(BPerson p) {
-		familyID = p.getFamilyID();
-		personID = p.getPersonID() + "-";
-		momID = p.getMomID();
-		dadID = p.getDadID();
-		affectedStatus = p.getAffectedStatus();
-		this.numMarkers = p.getNumMarkers();
-		if (numMarkers % intL == 0) {
-			genoLen = numMarkers / intL;
-		} else {
-			genoLen = numMarkers / intL + 1;
-		}
-		alleles = new int[3][genoLen];
-	}
+
 	/**
 	 * gets the family ID
 	 * 
@@ -196,10 +185,4 @@ public class BPerson {
 		return sb.toString();
 	}
 
-    public void setNonTransmittedGenotype(int index, String geno) {
-    	int a = Integer.parseInt(geno.substring(0,1));
-    	int b = Integer.parseInt(geno.substring(1,2));
-    	boolean flag = geno.compareTo(MDRConstant.missingGenotype) == 0 ? false : true;
-    	addMarker(flag, a, b, index);
-    }
 }

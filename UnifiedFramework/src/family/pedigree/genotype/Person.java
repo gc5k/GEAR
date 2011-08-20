@@ -197,7 +197,6 @@ public class Person {
     	alleles[0][index] = Byte.parseByte(geno.substring(0, 1));
     	alleles[1][index] = Byte.parseByte(geno.substring(1, 2));
     }
-    
 
     public void setNonTransmittedGenotype(int index, String geno) {
     	nontransmitted[0][index] = Byte.parseByte(geno.substring(0,1));

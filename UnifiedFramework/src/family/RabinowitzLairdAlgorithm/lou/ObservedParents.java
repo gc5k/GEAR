@@ -6,7 +6,7 @@ package family.RabinowitzLairdAlgorithm.lou;
 import java.util.TreeMap;
 
 import family.RabinowitzLairdAlgorithm.AbstractGenoDistribution;
-import publicAccess.PublicData;
+import family.mdr.MDRConstant;
 
 /**
  * Class for observing both parental genotypes.
@@ -47,9 +47,8 @@ public class ObservedParents extends AbstractGenoDistribution {
 		char PG[][] = { { p1.charAt(0), p1.charAt(1) }, { p2.charAt(0), p2.charAt(1) } };
 		char allele[] = new char[2];
 
-		if (transmitted.compareTo(PublicData.MissingGenotype) == 0) {// missing
+		if (transmitted.compareTo(MDRConstant.missingGenotype) == 0) {// missing
 																		// data
-
 			int index1 = (rnd.nextFloat() > 0.5) ? 0 : 1;
 			int index2 = (rnd.nextFloat() > 0.5) ? 0 : 1;
 			if (PG[0][index1] <= PG[1][index2]) {
