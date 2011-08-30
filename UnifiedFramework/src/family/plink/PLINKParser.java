@@ -25,14 +25,14 @@ public class PLINKParser {
 		phenotypeFile = phe;
 		mapFile = map;
 
+		initial();
+	}
+
+	protected void initial() {
 		mapData = new MapFile(mapFile);
 		phenoData = new GMDRPhenoFile();
 		pedData = new PedigreeFile();
 		pedData.setHeader(Parameter.header);
-		initial();
-	}
-
-	private void initial() {
 		if (mapFile != null) {
 			ParseMapFile();
 			pedData.setHeader(false);
@@ -42,7 +42,8 @@ public class PLINKParser {
 			ParsePedFile();
 			mapData.setMarker(pedData.getNumMarker());
 		}
-		mapData.setPolymorphism(pedData.getPolymorphism());
+		mapData.setPolymorphism(pedData.getPolymorphism(), pedData.getAlleleFrequency());
+		pedData.cleanup();
 		if (phenotypeFile != null) {
 			ParsePhenoFile();
 		}
@@ -66,9 +67,6 @@ public class PLINKParser {
 		try {
 			pedData.Initial(PedFile);
 			pedData.parseLinkage();
-		} catch (MDRPedFileException e) {
-			System.err.println("PedFile initial exception.");
-			e.printStackTrace(System.err);
 		} catch (IOException e) {
 			System.err.println("Pedgree file initialization exception.");
 			e.printStackTrace(System.err);

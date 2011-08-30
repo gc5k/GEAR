@@ -18,8 +18,6 @@ import java.util.Hashtable;
 import java.util.Set;
 import java.util.TreeMap;
 
-import admixture.parameter.Parameter;
-
 import family.RabinowitzLairdAlgorithm.AbstractGenoDistribution;
 import util.NewIt;
 
@@ -34,7 +32,6 @@ public class BFamilyStruct {
 	protected String familyStructName;
 
 	//this two variable were added so that accomodates Lou's Test
-    private Hashtable<String, BPerson> pseudopersons;
 
 	/**
 	 * adds a member to this family (adds to persons ArrayList)
@@ -46,16 +43,13 @@ public class BFamilyStruct {
 		this.persons.put(per.getPersonID(), per);
 	}
 
-	public void addPseudoPerson(BPerson per) {
-		this.pseudopersons.put(per.getPersonID(), per);
-	}
+//	public void addPseudoPerson(BPerson per) {
+//		this.pseudopersons.put(per.getPersonID(), per);
+//	}
 
 	public BFamilyStruct(String familyStructName) {
 		this.persons = NewIt.newHashtable();
 		this.familyStructName = familyStructName;
-		if(Parameter.mode.compareTo("pi") == 0) {
-			this.pseudopersons = NewIt.newHashtable();
-		}
 	}
 
 	/**
@@ -107,9 +101,9 @@ public class BFamilyStruct {
 		return this.persons.get(personID);
 	}
 
-	public BPerson getPseudoPerson(String personID) {
-		return this.pseudopersons.get(personID);
-	}
+//	public BPerson getPseudoPerson(String personID) {
+//		return this.pseudopersons.get(personID);
+//	}
 
 	public Hashtable<String, BPerson> getPersons() {
 		return persons;
@@ -161,8 +155,9 @@ public class BFamilyStruct {
 	public void countAllele(TreeMap<String, Integer> Geno, Set<String> alleleSet) {
 
 		for (String g : Geno.keySet()) {
-			alleleSet.add(g.substring(0, 1));
-			alleleSet.add(g.substring(1, 2));
+			Integer geno = Integer.parseInt(g);
+			alleleSet.add(Integer.toString(geno&1));
+			alleleSet.add(Integer.toString(geno&2));
 		}
 
 	}

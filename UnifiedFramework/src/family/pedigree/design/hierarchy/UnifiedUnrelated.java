@@ -34,7 +34,6 @@ public final class UnifiedUnrelated extends ChenBase {
 		if(PhenoData != null)
 			CovariateTable.ensureCapacity(qualified_Unrelated);
 
-//		genotype = new byte[qualified_Unrelated][];
 		status = new byte[qualified_Unrelated];
 
 		ArrayList<PersonIndex> u_P = NewIt.newArrayList();
@@ -61,7 +60,6 @@ public final class UnifiedUnrelated extends ChenBase {
 
 				if (!fs.hasAncestor(per)) {
 					u_P.add(new PersonIndex(fs.getFamilyStructName(), pi[i], per));
-//					genotype[un] = per.getGenotypeScore();
 					status[un] = (byte) per.getAffectedStatus();
 					if (PhenoData != null)
 						u_C.add(sub.getTraits());
@@ -80,25 +78,14 @@ public final class UnifiedUnrelated extends ChenBase {
 		for (int i = 0; i < m.length; i++) {
 			m[i] = i;
 		}
-//		AbstractGenoDistribution.rnd = new Random(seed);
-//		RLDriver RLD = new RLDriver();
-//		RLD.TDT(Fam, getMarkerName(), m);
 	}
 
-	public double[] getPermutedScore(boolean isNested) {
-//		permuted_score = new double[score.length];
+	public void getPermutedScore(boolean isNested) {
+
 		int[] idx = Sample.SampleIndex(0, PersonTable.size() - 1, PersonTable.size());
 		for (int i = 0; i < idx.length; i++) {
 			PersonTable.get(i).setPermutedScore(score[idx[i]]);
-//			permuted_score[i] = score[idx[i]];
 		}
-		return permuted_score;
-	}
 
-//	@Override
-//	public void RecoverScore() {
-//		for (int i = 0; i < PersonTable.size(); i++) {
-//			PersonTable.get(i).setPermutedScore(score[i]);
-//		}
-//	}
+	}
 }

@@ -104,7 +104,7 @@ public final class Unified extends ChenBase {
 //		RLD.TDT(Fam, getMarkerName(), m);
 	}
 
-	public double[] getPermutedScore(boolean isNested) {
+	public void getPermutedScore(boolean isNested) {
 //		permuted_score = new double[score.length];
 		if (isNested) {
 			int[] un_related = Sample.SampleIndex(0, qualified_Unrelated - 1, qualified_Unrelated);
@@ -128,7 +128,6 @@ public final class Unified extends ChenBase {
 //				permuted_score[i] = score[idx[i]];
 			}
 		}
-		return permuted_score;
 	}
 
 //	@Override

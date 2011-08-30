@@ -91,7 +91,7 @@ public final class SII extends ChenBase {
 //		RLD.TDT(Fam, getMarkerName(), m);
 	}
 
-	public double[] getPermutedScore(boolean isNested) {
+	public void getPermutedScore(boolean isNested) {
 
 		if (isNested) {
 			int c = 0;
@@ -110,7 +110,6 @@ public final class SII extends ChenBase {
 			}
 		}
 
-		return permuted_score;
 	}
 
 //	@Override

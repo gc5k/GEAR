@@ -18,9 +18,9 @@ public class BPerson {
 	protected int affectedStatus;
 	protected int numMarkers;
 	protected int genoLen;
-	protected int[][] alleles;
-	protected final int intL = 32;
-	protected final int shift = 5;
+	protected byte[] alleles;
+	protected final int intL = 4;
+	protected final int shift = 2;
 
 	public BPerson(int numMarkers) {
 		this.numMarkers = numMarkers;
@@ -29,12 +29,12 @@ public class BPerson {
 		} else {
 			genoLen = numMarkers / intL + 1;
 		}
-		alleles = new int[3][genoLen];
+		alleles = new byte[genoLen];
 	}
 
 	public BPerson(BPerson p) {
 		familyID = p.getFamilyID();
-		personID = p.getPersonID() + "-";
+		personID = p.getPersonID() + "ajhg2008";
 		momID = p.getMomID();
 		dadID = p.getDadID();
 		affectedStatus = p.getAffectedStatus();
@@ -44,8 +44,9 @@ public class BPerson {
 		} else {
 			genoLen = numMarkers / intL + 1;
 		}
-		alleles = new int[3][genoLen];
+		alleles = new byte[genoLen];
 	}
+
 	/**
 	 * gets the family ID
 	 * 
@@ -163,43 +164,56 @@ public class BPerson {
 		return numMarkers;
 	}
 
-	public int isGenotype(int idx) {
+	public void addMarker(boolean flag, int a1, int a2, int idx) {
 		int posByte = idx >> shift;
-		int posBite = idx - (idx >> shift << shift);
-		int f = alleles[0][posByte];
-		return 1 & f >> posBite;
-	}
+		int posBite = (idx - (idx >> shift << shift)) << 1;
 
-	public void addMarker(boolean flag, int a, int b, int idx) {
-		int posByte = idx >> shift;
-		int posBite = idx - (idx >> shift << shift);
-		int f = alleles[0][posByte];
-		int m = flag ? 1 : 0;
-		alleles[0][posByte] = f | (m << posBite);
-
-		int a1 = alleles[1][posByte];
-		alleles[1][posByte] = a1 | (a << posBite);
-
-		int a2 = alleles[2][posByte];
-		alleles[2][posByte] = a2 | (b << posBite);
-	}
-
-	public String getGenotypeString(int i) {
-		StringBuffer sb = new StringBuffer();
-		int posByte = i >> shift;
-		int posBite = i - (i >> shift << shift);
-		if (alleles[0][posByte] >> posBite == 0) {
-			sb.append(MDRConstant.missingGenotype);
-		} else {
-			sb.append((1 & alleles[1][posByte] >> posBite) + (1 & alleles[2][posByte] >> posBite));
+		if (flag) {
+			if(a2 == a1) {// add 00 or 11
+				byte c = (byte) (((a1 << 1) + a2) << posBite);
+				alleles[posByte] = (byte) (alleles[posByte] | c);
+			} else {// add 10
+				byte c = (byte) (2<<posBite);
+				alleles[posByte] = (byte) (alleles[posByte] | c);
+			}
+		} else {// add 01
+			alleles[posByte] = (byte) (alleles[posByte] | (1 << posBite));
 		}
-		return sb.toString();
 	}
 
-    public void setNonTransmittedGenotype(int index, String geno) {
-    	int a = Integer.parseInt(geno.substring(0,1));
-    	int b = Integer.parseInt(geno.substring(1,2));
-    	boolean flag = geno.compareTo(MDRConstant.missingGenotype) == 0 ? false : true;
-    	addMarker(flag, a, b, index);
-    }
+	public String getGenotypeScoreString(int i) {
+		int posByte = i >> shift;
+		int posBite = (i - (i >> shift << shift)) << 1;
+		int g = (alleles[posByte] >> (posBite)) & 3;
+		if (g == 1) {//01
+			return MDRConstant.missingGenotype;
+		} else {
+			if (g == 2) {
+				return Integer.toString(1);
+			} else {
+				return Integer.toString(g);
+			}
+		}
+	}
+
+	public String getBiAlleleGenotypeString(int i) {
+		int posByte = i >> shift;
+		int posBite = (i - (i >> shift << shift)) << 1;
+		int g = (alleles[posByte] >> posBite) & 3;
+		if (g == 1) {//01
+			return MDRConstant.missingGenotype;
+		} else {
+			StringBuffer sb = new StringBuffer();
+			sb.append((alleles[posByte] >> (posBite + 1)) & 1);
+			sb.append(alleles[posByte] >> posBite & 1);
+			return sb.toString();
+		}
+	}
+
+	public void setNonTransmittedGenotype(int index, String geno) {
+		int a = Integer.parseInt(geno.substring(0, 1));
+		int b = Integer.parseInt(geno.substring(1, 2));
+		boolean flag = geno.compareTo(MDRConstant.missingGenotype) == 0 ? false : true;
+		addMarker(flag, a, b, index);
+	}
 }

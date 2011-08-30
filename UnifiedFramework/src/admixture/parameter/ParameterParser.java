@@ -7,7 +7,7 @@ import family.pedigree.file.MapFile;
 import family.pedigree.file.SNP;
 
 public class ParameterParser {
-	
+
 	public static int[] selectedSNP(MapFile mf, String[] selectedSNP) {
 		if(selectedSNP == null) {
 			return null;
