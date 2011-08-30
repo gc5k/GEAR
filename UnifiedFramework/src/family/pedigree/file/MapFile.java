@@ -10,11 +10,11 @@ import util.NewIt;
 
 public class MapFile {
 
-	private static final String DELIMITER = "\\s+";
-	private ArrayList<SNP> snpList;
-	private ArrayList<Integer> badline;
-	private String mf = null;
-	private File mapfile = null;
+	protected static final String DELIMITER = "\\s+";
+	protected ArrayList<SNP> snpList;
+	protected ArrayList<Integer> badline;
+	protected String mf = null;
+	protected File mapfile = null;
 
 	public MapFile(String m) {
 		mf = m;
@@ -90,14 +90,14 @@ public class MapFile {
 		return snpList.get(i);
 	}
 	
-	public void setPolymorphism(ArrayList<String[]> p) {
-		if(p.size() != snpList.size()) {
+	public void setPolymorphism(char[][] p, short[][] freq) {
+		if(p.length != snpList.size()) {
 			System.err.println("map file and the pedigree file do not match.");
 			System.exit(0);
 		} else {
-			for(int i = 0; i < p.size(); i++) {
+			for(int i = 0; i < p.length; i++) {
 				SNP snp = snpList.get(i);
-				snp.setAllele(p.get(i));
+				snp.setAllele(p[i], freq[i]);
 			}
 		}
 	}

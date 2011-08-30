@@ -33,20 +33,18 @@ public abstract class ChenBase implements ChenInterface {
 	protected PedigreeFile PedData;
 	protected GMDRPhenoFile PhenoData;
 
-//	protected byte[][] genotype;
 	protected int qualified_Unrelated;
 	protected int qualified_Sib;
 	protected int[] numSib;
 	protected byte[] status;
 	protected double[] score;
-	protected double[] permuted_score;
+//	protected double[] permuted_score;
 
 	protected int pheIdx;
 	protected int[] covIdx;
 	protected int method;
 	protected ArrayList<ArrayList<String>> CovariateTable;
 
-	protected String[] scoreName = new String[1];
 	protected ArrayList<PersonIndex> PersonTable;// The indexing file records
 
 	protected int[] subsetMarker;
@@ -144,11 +142,13 @@ public abstract class ChenBase implements ChenInterface {
 		generateScore();
 		
 		group();
+		
+		CovariateTable = null;
 	}
 
 	protected abstract void RevvingUp();
 
-	private void fetchScore(int pheIdx) {
+	protected void fetchScore(int pheIdx) {
 		double sum = 0;
 		score = new double[PersonTable.size()];
 		for (int i = 0; i < PersonTable.size(); i++) {
@@ -168,14 +168,9 @@ public abstract class ChenBase implements ChenInterface {
 				sum += score[i];
 			}
 		}
-		if (pheIdx == -1) {
-			scoreName[0] = new String("status");
-		} else {
-			scoreName[0] = new String(PhenoData.getTraitAtI(pheIdx));
-		}
 	}
 
-	private void buildScore(int pheIdx, int[] covIdx, int method) {
+	protected void buildScore(int pheIdx, int[] covIdx, int method) {
 		score = new double[PersonTable.size()];
 		ArrayList<Double> T = NewIt.newArrayList();
 		ArrayList<ArrayList<Double>> C = NewIt.newArrayList();
@@ -226,72 +221,19 @@ public abstract class ChenBase implements ChenInterface {
 		}
 
 		System.arraycopy(r, 0, score, 0, r.length);
-		nameScore(pheIdx, covIdx, method);
 	}
-
-	private void nameScore(int PIndex, int[] CIndex, int method) {
-		StringBuilder ln = new StringBuilder(300);
-		if (method == 1) {
-			ln.append("linear(");
-		} else {
-			ln.append("logistic(");
-		}
-		if (PIndex == -1) {
-			ln.append("status->");
-		} else {
-			ln.append(PhenoData.getTraitAtI(PIndex));
-		}
-		ln.append("->");
-
-		if (CIndex != null) {
-			for (int i = 0; i < CIndex.length; i++) {
-				ln.append(PhenoData.getTraitAtI(CIndex[i]) + ",");
-			}
-		} else {
-			ln.append(",");
-		}
-	}
-//
-//	@Override
-//	public String[] getMarkerName() {
-//		ArrayList<SNP> snpList = MapData.getMarkerList();
-//		String[] m = new String[snpList.size()];
-//		for (int i = 0; i < snpList.size(); i++) {
-//			m[i] = snpList.get(i).getName();
-//		}
-//		return m;
-//	}
 
 	@Override
-	public double[] getPermutedScore(boolean nested) {
-		return null;
+	public void getPermutedScore(boolean nested) {
+
 	}
-
-//	@Override
-//	public double[][] getScore2() {
-//		double[][] s = new double[score.length][1];
-//		for (int i = 0; i < score.length; i++) {
-//			s[i][0] = score[i];
-//		}
-//		return s;
-//	}
-
-//	@Override
-//	public String[] getScoreName() {
-//		return scoreName;
-//	}
 
 	@Override
 	public byte[] getStatus() {
 		return status;
 	}
 
-//	@Override
-//	public double[] getScore() {
-//		return score;
-//	}
-
-	private void generateScore() {
+	protected void generateScore() {
 		if (method >= 0) {
 			buildScore(pheIdx, covIdx, method);
 		} else {

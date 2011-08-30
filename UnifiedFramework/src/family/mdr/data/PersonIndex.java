@@ -6,14 +6,14 @@ import family.pedigree.genotype.BPerson;
 public class PersonIndex {
 
 	private String FamilyID;
-	private Integer IndividualID;
+	private String IndividualID;
 	private BPerson person;
 	private int group;
 	private double permutatedScore;
 	
 	public PersonIndex(String fid, String id, BPerson p) {
 		FamilyID = new String(fid);
-		IndividualID = new Integer(Integer.parseInt(id));
+		IndividualID = id;
 		person = p;
 	}
 
@@ -21,7 +21,7 @@ public class PersonIndex {
 		return FamilyID;
 	}
 
-	public Integer getIndividualID() {
+	public String getIndividualID() {
 		return IndividualID;
 	}
 	
@@ -48,7 +48,7 @@ public class PersonIndex {
 	public String getGenotype(int[] idx) {
 		StringBuffer sb = new StringBuffer();
 		for(int i = 0; i < idx.length; i++) {
-			sb.append(person.getGenotypeString(idx[i]));
+			sb.append(person.getGenotypeScoreString(idx[i]));
 			sb.append(MDRConstant.seperator);
 		}
 		return sb.toString();

@@ -17,6 +17,17 @@ import org.apache.commons.cli.PosixParser;
 
 public class Parameter {
 	private final String sep = ",";
+	private final String cmd_missing_allele = "missing_allele";
+	public static String missing_allele = "0";
+
+	private final String cmd_missing_phenotype = "missing_phenotype";
+	public static String missing_phenotype = "99";
+	
+	private final String cmd_missing_genotype = "missing_genotype";
+	public static String missing_genotype = "0";
+	
+	private final String cmd_status_shift = "1";
+	public static int status_shift = 0;
 
 	private final String cmd_mode = "md";//u, f (sii), pi(ajhg2008);
 	public static String mode = "u";
@@ -38,6 +49,12 @@ public class Parameter {
 	private final String cmd_excludesnp = "excludesnp";
 	public String[] excludesnp = null;
 
+	private final String cmd_snpfile = "snpfile";
+	public static String snpfile = null;
+	
+	private final String cmd_interactionsnp = "interactionsnp";
+	public static String[] interactionsnp = null;
+	
 	private final String cmd_topN = "topN";
 	public int topN = 5;
 
@@ -84,17 +101,7 @@ public class Parameter {
 	private final String cmd_help = "help";
 	public boolean help = false;
 
-	private final String cmd_missing_allele = "missing_allele";
-	public static String missing_allele = "0";
 
-	private final String cmd_missing_phenotype = "missing_phenotype";
-	public static String missing_phenotype = "99";
-	
-	private final String cmd_missing_genotype = "missing_genotype";
-	public static String missing_genotype = "0";
-	
-	private final String cmd_status_shift = "1";
-	public static int status_shift = 0;
 	
 	private Options ops = new Options();
 	private CommandLineParser parser = new PosixParser();
@@ -115,6 +122,8 @@ public class Parameter {
 		ops.addOption(OptionBuilder.withDescription("the format of phenotype file is same as with PLink.").hasArg().create(cmd_phe));
 		ops.addOption(OptionBuilder.withDescription("include snp").hasArgs().create(cmd_includesnp));
 		ops.addOption(OptionBuilder.withDescription("exclude snp").hasArgs().create(cmd_excludesnp));
+		ops.addOption(OptionBuilder.withDescription("interaction snp").hasArgs().create(cmd_interactionsnp));
+		ops.addOption(OptionBuilder.withDescription("interaction snp file").hasArg().create(cmd_snpfile));
 		ops.addOption(OptionBuilder.withDescription("only keep the results for the top N combinations").hasArg().create(cmd_topN));
 		ops.addOption(OptionBuilder.withDescription("index for the response excluding the first two columns.").hasArg().create(cmd_res));
 		ops.addOption(OptionBuilder.withDescription("index(es) for the predictors.").hasArgs().create(cmd_pred));
@@ -179,6 +188,12 @@ public class Parameter {
 		}
 		if (cl.hasOption(cmd_excludesnp)) {
 			excludesnp = cl.getOptionValues(cmd_excludesnp);
+		}
+		if (cl.hasOption(cmd_interactionsnp)) {
+			interactionsnp = cl.getOptionValues(cmd_interactionsnp);
+		}
+		if (cl.hasOption(cmd_snpfile)) {
+			snpfile = cl.getOptionValue(cmd_snpfile);
 		}
 		if (cl.hasOption(cmd_topN)) {
 			topN = Integer.parseInt(cl.getOptionValue(cmd_topN));

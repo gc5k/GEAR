@@ -20,7 +20,7 @@ public interface ChenInterface {
 	public byte[] getStatus();
 //	public double[] getScore();
 //	public double[][] getScore2();
-	public double[] getPermutedScore(boolean nested);
+	public void getPermutedScore(boolean nested);
 	public void RecoverScore();
 //	public void print2MDRFormat(String f);
 	public MapFile getMapFile();

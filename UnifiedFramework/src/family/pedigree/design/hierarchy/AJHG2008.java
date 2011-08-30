@@ -10,6 +10,10 @@ import java.util.Map.Entry;
 
 import org.apache.commons.lang3.ArrayUtils;
 
+import admixture.parameter.Parameter;
+
+import score.LinearRegression;
+import score.LogisticRegression;
 import util.NewIt;
 import util.Sample;
 
@@ -34,20 +38,18 @@ public class AJHG2008 extends ChenBase {
 
 	public AJHG2008(PedigreeFile ped, GMDRPhenoFile phe, MapFile map, long s, int pIdx, int[] cIdx, int m) {
 		super(ped, phe, map, s, pIdx, cIdx, m);
-		// TODO Auto-generated constructor stub
 	}
 
 	@Override
 	protected void RevvingUp() {
 		ChenBase.LineUpGenotypePhenotype lineup = new ChenBase.LineUpGenotypePhenotype();
 		Hashtable<String, BFamilyStruct> Fam = PedData.getFamilyStruct();
-
+		Hashtable<String, BFamilyStruct> fam_has_sib = NewIt.newHashtable();
 		PersonTable.ensureCapacity(qualified_Sib);
 
 		if (PhenoData != null)
 			CovariateTable.ensureCapacity(qualified_Sib);
 
-		// genotype = new byte[qualified_Sib][];
 		status = new byte[qualified_Sib];
 
 		ArrayList<PersonIndex> s_P = NewIt.newArrayList();
@@ -77,6 +79,7 @@ public class AJHG2008 extends ChenBase {
 					s_P.add(new PersonIndex(fs.getFamilyStructName(), pi[i], per));
 					BPerson pseudoper = new BPerson(per);
 					plist.add(pseudoper);
+					s_P.add(new PersonIndex(fs.getFamilyStructName(), pseudoper.getPersonID(), pseudoper));
 					status[s] = (byte) per.getAffectedStatus();
 					if (sub != null)
 						s_C.add(sub.getTraits());
@@ -89,6 +92,7 @@ public class AJHG2008 extends ChenBase {
 				for (int i = 0; i < plist.size(); i++) {
 					fs.addPerson(plist.get(i));
 				}
+				fam_has_sib.put(fs.getFamilyStructName(), fs);
 			}
 			c++;
 		}
@@ -103,29 +107,29 @@ public class AJHG2008 extends ChenBase {
 			m[i] = i;
 		}
 		AbstractGenoDistribution.rnd = new Random(seed);
-		NonTransmitted(Fam);
+		NonTransmitted(fam_has_sib);
 	}
 
-	public double[] getPermutedScore(boolean isNested) {
+	public void getPermutedScore(boolean isNested) {
 
 		if (isNested) {
 			int c = 0;
 			for (int i = 0; i < numSib.length; i++) {
-				int[] si = Sample.SampleIndex(0, numSib[i] - 1, numSib[i]);
-				for (int j = 0; j < si.length; j++) {
-					PersonTable.get(c + j).setPermutedScore(score[c + si[j]]);
+				if (AbstractGenoDistribution.rnd.nextBoolean()) {
+					int[] si = Sample.SampleIndex(0, numSib[i] - 1, numSib[i]);
+					for (int j = 0; j < si.length; j++) {
+						PersonTable.get(c + j * 2).setPermutedScore(score[c + j * 2 + 1]);
+						PersonTable.get(c + j * 2 + 1).setPermutedScore(score[c + j * 2]);
+					}
 				}
-				c += si.length;
+				c += numSib[i] * 2;
 			}
 		} else {
 			int[] idx = Sample.SampleIndex(0, PersonTable.size() - 1, PersonTable.size());
 			for (int i = 0; i < idx.length; i++) {
 				PersonTable.get(i).setPermutedScore(score[idx[i]]);
-				// permuted_score[i] = score[idx[i]];
 			}
 		}
-
-		return permuted_score;
 	}
 
 	private void NonTransmitted(Hashtable<String, BFamilyStruct> Fam) {
@@ -135,7 +139,7 @@ public class AJHG2008 extends ChenBase {
 		BPerson per;
 		BPerson pseudoper;
 		String iid;
-		String nontran_tran[];
+
 		for (int i = 0; i < MapData.getMarkerNumber(); i++) {
 			for (Entry<String, BFamilyStruct> entry : Fam.entrySet()) {
 				fam = entry.getValue();
@@ -144,58 +148,46 @@ public class AJHG2008 extends ChenBase {
 				int numGenotypedParents = genoset.getNumTypedParents();
 				AbstractGenoDistribution gDis;
 				TreeSet<String> aSet = new TreeSet<String>();
-				if (genoset.getNumParents() > 2) {
-					System.err.println("Family " + entry.getKey() + " is not a nuclear family. It has more than 2 founders");
-					System.exit(0);
-				}
 				if (numGenotypedParents == 2) {
 					fam.countAllele(genoset.getchildrenGenoMap(), aSet);
 					fam.countAllele(genoset.getparentsGenoMap(), aSet);
-					if (aSet.size() > 4) {
-						System.err.println("Marker " + i + " has more than 4 alleles.");
-						System.exit(0);
-					}
 					gDis = new ObservedParents(genoset.getchildrenGenoMap(), genoset.getparentsGenoMap());
 				} else {
 					fam.countAllele(genoset.getchildrenGenoMap(), aSet);
 					fam.countAllele(genoset.getparentsGenoMap(), aSet);
 					if (numGenotypedParents == 1) {
 						String PG = genoset.getparentsGenoMap().firstKey();
-						if (!AbstractGenoDistribution.isHeterozygous(PG)) {// table
-																			// 1
-							if (aSet.size() > 3) {
-								System.err.println("Marker " + i + " has more than 3 alleles with one parent is homozygous.");
-								System.exit(0);
-							}
+						if (!AbstractGenoDistribution.isHeterozygous(PG)) {
+							// table 1
 							gDis = new HomozygousParent(genoset.getchildrenGenoMap(), genoset.getparentsGenoMap());
 						} else {// table 2
-							if (aSet.size() > 4) {
-								System.err.println("Marker " + i + " has more than 4 alleles with one parent is heterozygous.");
-								System.exit(0);
-							}
 							gDis = new HeterozygousParent(genoset.getchildrenGenoMap(), genoset.getparentsGenoMap());
 						}
 					} else {// table 3
 						gDis = new UnobservedParents(genoset.getchildrenGenoMap());
 					}
 				}
+				perList = fam.getPersonList();
 				while (perList.hasMoreElements()) {
-					iid = (String) perList.nextElement();
-					per = fam.getPerson(iid);
-					pseudoper = fam.getPseudoPerson(iid);
-					if (fam.hasAncestor(per.getPersonID())) {
+					iid = perList.nextElement();
+					if (iid.contains("ajhg2008") || !fam.hasAncestor(iid)) {
 						continue;
 					}
-					nontran_tran = fam.getNonTransmitted(per.getGenotypeString(i), gDis);
-					boolean f = nontran_tran[0].compareTo(MDRConstant.missingGenotype) == 0 ? false : true;
+					per = fam.getPerson(iid);
+					StringBuffer sb = new StringBuffer(iid);
+					sb.append("ajhg2008");
+					pseudoper = fam.getPerson(sb.toString());
+					String g = per.getBiAlleleGenotypeString(i);
+					boolean f = g.compareTo(MDRConstant.missingGenotype) != 0;
+					String[] nontran_tran = new String[2];
 					if (f) {
+						nontran_tran = fam.getNonTransmitted(g, gDis);
 						int a1 = Integer.parseInt(nontran_tran[0].substring(0, 1));
 						int a2 = Integer.parseInt(nontran_tran[0].substring(1, 2));
 						pseudoper.addMarker(f, a1, a2, i);
 					} else {
 						pseudoper.addMarker(f, 0, 0, i);
 					}
-
 				}
 			}
 		}
@@ -203,17 +195,18 @@ public class AJHG2008 extends ChenBase {
 
 	protected GenoSet GenotypeSummary(BFamilyStruct fs, int idx) {
 
-		Boolean b = new Boolean(true);
 		TreeMap<String, Integer> Ps;
 		TreeMap<String, Integer> Ks;
-		GenoSet gSet;
 
 		Ps = NewIt.newTreeMap();
 		Ks = NewIt.newTreeMap();
 		Enumeration<String> perList = fs.getPersonList();
 		while (perList.hasMoreElements()) {
-			BPerson per = fs.getPerson((String) perList.nextElement());
-			String genotype = per.getGenotypeString(idx);
+			String iid = perList.nextElement();
+			if (iid.contains("ajhg2008"))
+				continue;
+			BPerson per = fs.getPerson(iid);
+			String genotype = per.getBiAlleleGenotypeString(idx);
 			if (fs.hasAncestor(per.getPersonID())) {
 				if (Ks.containsKey(genotype)) {
 					Integer c = ((Integer) Ks.get(genotype));
@@ -233,6 +226,84 @@ public class AJHG2008 extends ChenBase {
 			}
 		}
 		return new GenoSet(Ps, Ks, idx);
+	}
+
+	protected void fetchScore(int pheIdx) {
+		score = new double[PersonTable.size()];
+		for (int i = 0; i < PersonTable.size(); i += 2) {
+			if (pheIdx == -1) {
+				score[i] = status[i / 2] - Parameter.status_shift;
+				score[i + 1] = -1 * score[i];
+			} else {
+				try {
+					if (PhenoData == null) {
+						throw new Exception();
+					}
+				} catch (Exception E) {
+					System.err.println("no phenotype file");
+				}
+				ArrayList<String> v = CovariateTable.get(i / 2);
+				String s = v.get(pheIdx);
+				score[i] = Double.parseDouble(s);
+				score[i + 1] = -1 * score[i];
+			}
+		}
+	}
+
+	protected void buildScore(int pheIdx, int[] covIdx, int method) {
+		score = new double[PersonTable.size()];
+		ArrayList<Double> T = NewIt.newArrayList();
+		ArrayList<ArrayList<Double>> C = NewIt.newArrayList();
+
+		for (int i = 0; i < PersonTable.size(); i += 2) {
+			double t = 0;
+			ArrayList<Double> c = NewIt.newArrayList();
+			ArrayList<String> tempc = CovariateTable.get(i / 2);
+			if (pheIdx == -1) {// using affecting status as phenotype
+				t = status[i / 2] + Parameter.status_shift;
+			} else {
+				t = Double.parseDouble((String) tempc.get(pheIdx));
+			}
+			if (covIdx != null) {
+				for (int j = 0; j < covIdx.length; j++) {
+					c.add((Double.parseDouble((String) tempc.get(covIdx[j]))));
+				}
+				C.add(c);
+			}
+			T.add(new Double(t));
+		}
+
+		double[][] X = null;
+		if (covIdx != null) {
+			X = new double[C.size()][covIdx.length];
+			for (int i = 0; i < C.size(); i++) {
+				ArrayList<Double> c = C.get(i);
+				for (int j = 0; j < c.size(); j++) {
+					X[i][j] = ((Double) c.get(j)).doubleValue();
+				}
+			}
+		}
+
+		double[][] Y = new double[T.size()][1];
+		for (int i = 0; i < T.size(); i++) {
+			Y[i][0] = ((Double) T.get(i)).doubleValue();
+		}
+
+		double[] r = null;
+		if (method == 0) {
+			LinearRegression LReg = new LinearRegression(Y, X, true);
+			LReg.MLE();
+			r = LReg.getResiduals1();
+		} else {
+			LogisticRegression LogReg1 = new LogisticRegression(Y, X, true);
+			LogReg1.MLE();
+			r = LogReg1.getResiduals1();
+		}
+
+		for (int i = 0; i < r.length; i++) {
+			score[i * 2] = r[i];
+			score[i * 2 + 1] = -1 * r[i];
+		}
 	}
 
 }
