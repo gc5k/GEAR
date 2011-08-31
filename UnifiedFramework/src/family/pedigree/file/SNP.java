@@ -71,16 +71,12 @@ public class SNP {
 	}
 
 	public void setAllele(short[] freq) {
-		if(freq[0] <=freq[1]) {
-			snp[0] = (char) (snp[0] ^ snp[1]);
-			snp[1] = (char) (snp[0] ^ snp[1]);
-			snp[0] = (char) (snp[0] ^ snp[1]);
-		}
+
 		StringBuffer sb = new StringBuffer();
 		sb.append(snp[0]);
 		sb.append(snp[0]);
 		genotypeHash.put(new Integer(0).toString(), sb.toString());
-		
+
 		StringBuffer sb1 = new StringBuffer();
 		if(snp[0] <= snp[1]) {
 			sb1.append(snp[0]);
@@ -96,6 +92,15 @@ public class SNP {
 		sb3.append(snp[1]);
 		genotypeHash.put(new Integer(3).toString(), sb3.toString());
 
+		StringBuffer sb4 = new StringBuffer();
+		double d0 = freq[0];
+		double d1 = freq[1];
+		if(freq[0] < freq[1]) {
+			sb4.append(snp[0] + "(" + String.format("%.2f", d0/(d0+d1)) + "), " + snp[1] + "(" + String.format("%.2f", d1/(d0+d1)) + ")");
+		} else {
+			sb4.append(snp[1] + "(" + String.format("%.2f", d1/(d0+d1)) + "), " + snp[0] + "(" + String.format("%.2f", d0/(d0+d1)) + ")");
+		}
+		minor = sb4.toString();
 	}
 
 	public void setAllele(char[] a, short[] freq) {
@@ -142,6 +147,10 @@ public class SNP {
 
 	public String getPolymorphism(String g) {
 		return genotypeHash.get(g);
+	}
+	
+	public char[] getSNP() {
+		return snp;
 	}
 
 	public String toString() {

@@ -127,7 +127,7 @@ public abstract class ChenBase implements ChenInterface {
 	}
 
 	public ChenBase(PedigreeFile ped, GMDRPhenoFile phe, MapFile map, long s, int pIdx, int[] cIdx, int m) {
-
+		rnd.setSeed(Parameter.seed);
 		PedData = ped;
 		PhenoData = phe;
 		MapData = map;
@@ -271,7 +271,7 @@ public abstract class ChenBase implements ChenInterface {
 		for(int i = 0; i < PersonTable.size(); i++) {
 			g.add(i % Parameter.cv);
 		}
-		Collections.shuffle(g);
+		Collections.shuffle(g, rnd);
 		for(int i = 0; i < PersonTable.size(); i++) {
 			PersonTable.get(i).setGroup(g.get(i));
 		}

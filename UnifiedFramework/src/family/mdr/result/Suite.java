@@ -67,13 +67,12 @@ public class Suite {
 
             double sscore = s.getScore();
             if (sscore != Double.NaN) {
-                double scr = sscore;
-                if ((scr) >= 0) {
+                if ((sscore) >= 0) {
                     posSubjects++;
-                    posScore += scr;
+                    posScore += sscore;
                 } else {
                     negSubjects++;
-                    negScore += scr;
+                    negScore += sscore;
                 }
             }
         }
