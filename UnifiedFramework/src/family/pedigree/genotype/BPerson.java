@@ -181,6 +181,17 @@ public class BPerson {
 		}
 	}
 
+	public void addByteGenotype(int g, int idx) {
+		int posByte = idx >> shift;
+		int posBite = (idx - (idx >> shift << shift)) << 1;
+		
+		alleles[posByte] = (byte) (alleles[posByte] | (g << posBite));
+	}
+
+	public void addAllMarker(byte[] g) {
+		System.arraycopy(g, 0, alleles, 0, g.length);
+	}
+
 	public String getGenotypeScoreString(int i) {
 		int posByte = i >> shift;
 		int posBite = (i - (i >> shift << shift)) << 1;

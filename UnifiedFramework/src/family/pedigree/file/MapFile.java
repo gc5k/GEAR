@@ -101,4 +101,11 @@ public class MapFile {
 			}
 		}
 	}
+	
+	public void setPolymorphism(short[][] freq) {
+		for(int i = 0; i < freq.length; i++) {
+			SNP snp = snpList.get(i);
+			snp.setAllele(freq[i]);
+		}
+	}
 }

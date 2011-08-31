@@ -34,11 +34,16 @@ public class Parameter {
 
 	private final String cmd_file = "file";
 
+	private final String cmd_bfile = "bfile";
+	
 	private final String cmd_ped = "ped";
 	public String pedigree = null;
 
 	private final String cmd_map = "map";
 	public String map = null;
+
+	private final String cmd_fam = "fam";
+	public String fam = null;
 
 	private final String cmd_phe = "phe";
 	public String phenotype = null;
@@ -81,7 +86,7 @@ public class Parameter {
 	public int max = 1;
 
 	private final String cmd_sd = "sd";
-	public int seed = 2011;
+	public static int seed = 2011;
 
 	private final String cmd_perm = "pm";
 	public int permutation = 100;
@@ -116,7 +121,8 @@ public class Parameter {
 
 	public void commandInitial() {
 		ops.addOption(OptionBuilder.withDescription("u (default) for the unified framework and f for using sibs only.").hasArg().create(cmd_mode));
-		ops.addOption(OptionBuilder.withDescription("the format of the file is same as with PLink.").hasArg().create(cmd_file));		
+		ops.addOption(OptionBuilder.withDescription("the format of the file is same as with PLink.").hasArg().create(cmd_file));	
+		ops.addOption(OptionBuilder.withDescription("the format of the bfile is same as with PLink.").hasArg().create(cmd_bfile));
 		ops.addOption(OptionBuilder.withDescription("the format of the pedigree file is same as with PLink.").hasArg().create(cmd_ped));
 		ops.addOption(OptionBuilder.withDescription("the format of the map file is same as with PLink.").hasArg().create(cmd_map));
 		ops.addOption(OptionBuilder.withDescription("the format of phenotype file is same as with PLink.").hasArg().create(cmd_phe));
@@ -171,6 +177,24 @@ public class Parameter {
 			pedigree = sb1.toString();
 			map = sb2.toString();
 		}
+		if (cl.hasOption(cmd_bfile)) {
+			StringBuffer sb1 = new StringBuffer();
+			StringBuffer sb2 = new StringBuffer();
+			StringBuffer sb3 = new StringBuffer();
+			sb1.append(cl.getOptionValue(cmd_bfile));
+			sb1.append(".bed");
+			
+			sb2.append(cl.getOptionValue(cmd_bfile));
+			sb2.append(".bim");
+			
+			sb3.append(cl.getOptionValue(cmd_bfile));
+			sb3.append(".fam");
+			
+			pedigree = sb1.toString();
+			map = sb2.toString();
+			fam = sb3.toString();
+		}
+				
 		if (cl.hasOption(cmd_header)) {
 			header = true;
 		}

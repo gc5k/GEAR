@@ -105,6 +105,7 @@ public class HeteroCombinationSearchII extends AbstractMergeSearch {
 	public double[] calculateSingleBest(String modelName) {
 
 		double[] mean = new double[MDRConstant.NumStats];
+		double[][] m = new double[MDRConstant.NumStats][cv];
 		for (int j = 0; j < cv; j++) {
 			OneCVSet cvSet = new OneCVSet(j, modelName);
 			Combination testingModels = (Combination) cvTestingSet.get(j);
@@ -148,12 +149,15 @@ public class HeteroCombinationSearchII extends AbstractMergeSearch {
 			double tAccu = 0;
 			trAccu = ToolKit.BalancedAccuracy(cvSet.getTrainingSubdivision());
 			mean[MDRConstant.TrainingBalancedAccuIdx] += trAccu;
+			m[MDRConstant.TrainingBalancedAccuIdx][j] = trAccu;
 
 			tAccu = ToolKit.BalancedAccuracy(cvSet.getTestingSubdivision());
 			mean[MDRConstant.TestingBalancedAccuIdx] += tAccu;
+			m[MDRConstant.TestingBalancedAccuIdx][j] = tAccu;
 			cvSet.setStatistic(MDRConstant.TrainingBalancedAccuIdx, trAccu);
 			cvSet.setStatistic(MDRConstant.TestingBalancedAccuIdx, tAccu);
 		}
+		
 		mean[MDRConstant.TrainingBalancedAccuIdx] /= cv;
 		mean[MDRConstant.TestingBalancedAccuIdx] /= cv;
 		mdrstat = new MDRStatistic();

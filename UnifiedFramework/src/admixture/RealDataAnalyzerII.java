@@ -17,6 +17,7 @@ import family.pedigree.design.hierarchy.SII;
 import family.pedigree.design.hierarchy.Unified;
 import family.pedigree.design.hierarchy.UnifiedII;
 import family.pedigree.design.hierarchy.UnifiedUnrelated;
+import family.plink.PLINKBinaryParser;
 import family.plink.PLINKParser;
 
 /**
@@ -29,7 +30,14 @@ public class RealDataAnalyzerII {
 		Parameter p = new Parameter();
 		p.commandListenor(args);
 
-		PLINKParser pp = new PLINKParser(p.pedigree, p.phenotype, p.map);
+		PLINKParser pp;
+		if(p.fam == null) {
+			pp = new PLINKParser(p.pedigree, p.phenotype, p.map);
+		} else {
+			pp = new PLINKBinaryParser(p.pedigree, p.phenotype, p.map, p.fam);
+		}
+		pp.initial();
+
 		long s = p.seed;
 		ChenInterface chen = null;
 		if (p.mode.compareTo("u") == 0) {

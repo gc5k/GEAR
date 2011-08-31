@@ -1,6 +1,7 @@
 package family.pedigree.file;
 
 import java.io.BufferedReader;
+import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
 
@@ -13,6 +14,7 @@ public class BIMReader extends MapFile {
 	}
 	
 	public void parseMap() {
+		mapfile = new File(mf);
 		BufferedReader reader = null;
 		try {
 			reader = new BufferedReader(new FileReader(mapfile));

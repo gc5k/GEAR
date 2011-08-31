@@ -163,11 +163,15 @@ public class ToolKit {
 				// what's to do if for a unknown status;
 			}
 		}
-		if( ((trueNeg + falsePos + unknown) == 0) || (truePos + falseNeg + unknown) == 0 ) {
-			accuracy = 0;
-		} else {
-			accuracy = 0.5 * (truePos / (truePos + falseNeg + unknown/2) + trueNeg / (trueNeg + falsePos + unknown/2));
-		}
+		
+		accuracy = (truePos + trueNeg) / (truePos + trueNeg + falsePos + falseNeg + unknown);
+
+//		if ((truePos + falseNeg + unknown) != 0) {
+//			accuracy += 0.5 * (truePos / (truePos + falseNeg + unknown / 2));
+//		}
+//		if ((trueNeg + falsePos + unknown) != 0) {
+//			accuracy += 0.5 * (trueNeg / (trueNeg + falsePos + unknown / 2));
+//		}
 		return accuracy;
 	}
 

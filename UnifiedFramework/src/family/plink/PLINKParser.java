@@ -7,7 +7,6 @@ import admixture.parameter.Parameter;
 
 import family.pedigree.file.GMDRPhenoFile;
 import family.pedigree.file.GMDRPhenoFileException;
-import family.pedigree.file.MDRPedFileException;
 import family.pedigree.file.MapFile;
 import family.pedigree.file.PedigreeFile;
 
@@ -24,11 +23,9 @@ public class PLINKParser {
 		pedigreeFile = ped;
 		phenotypeFile = phe;
 		mapFile = map;
-
-		initial();
 	}
 
-	protected void initial() {
+	public void initial() {
 		mapData = new MapFile(mapFile);
 		phenoData = new GMDRPhenoFile();
 		pedData = new PedigreeFile();
@@ -65,8 +62,7 @@ public class PLINKParser {
 	public void ParsePedFile() {
 		File PedFile = new File(pedigreeFile);
 		try {
-			pedData.Initial(PedFile);
-			pedData.parseLinkage();
+			pedData.parseLinkage(PedFile, mapData.getMarkerNumber());
 		} catch (IOException e) {
 			System.err.println("Pedgree file initialization exception.");
 			e.printStackTrace(System.err);
@@ -83,11 +79,7 @@ public class PLINKParser {
 	public void ParsePhenoFile() {
 		File PheFile = new File(phenotypeFile);
 		try {
-			phenoData.Initial(PheFile);
-			phenoData.parsePhenotype();
-		} catch (GMDRPhenoFileException e) {
-			System.err.println("Pheno file initialization exception.");
-			e.printStackTrace(System.err);
+			phenoData.parsePhenotype(PheFile);
 		} catch (IOException e) {
 			System.err.println("Pheno file initialization exception.");
 			e.printStackTrace(System.err);

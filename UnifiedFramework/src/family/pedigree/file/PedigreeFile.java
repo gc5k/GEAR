@@ -4,7 +4,6 @@ import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Enumeration;
 import java.util.Hashtable;
@@ -26,7 +25,6 @@ public class PedigreeFile {
 	protected Hashtable<String, BFamilyStruct> familystructure;
 
 	protected int num_marker;
-	protected ArrayList<String> pedigrees;
 	protected String titleLine = null;
 	protected File pedfile;
 	protected boolean header = true;
@@ -77,52 +75,8 @@ public class PedigreeFile {
 	}
 
 	public void Initial(File infile) throws IOException {
-		pedigrees = NewIt.newArrayList();
-		BufferedReader reader = new BufferedReader(new FileReader(infile));
-		pedfile = infile;
-		String line;
-		while ((line = reader.readLine()) != null) {
-			if (line.length() == 0) {
-				// skip blank lines
-				continue;
-			}
-			if (line.startsWith("#")) {
-				// skip comments
-				continue;
-			}
-			pedigrees.add(line);
-		}
-		if (header) {
-			titleLine = (String) pedigrees.get(0);
-			pedigrees.remove(0);
 
-			int numLines = pedigrees.size();
 
-			if (numLines < 2) {
-				throw new IOException("Pedgree data format error: empty pedigree file");
-			}
-			String[] tokenizer = titleLine.split("\\s+");
-			int numTokens = tokenizer.length;
-
-			if (numTokens < 7) {
-				throw new IOException("Pedgree format error: the title line is incorrect");
-			}
-			num_marker = numTokens - 6;
-
-			// System.out.println(markerInfor);
-		} else {
-			int numLines = pedigrees.size();
-			if (numLines < 1) {
-				throw new IOException("Pedgree data format error: empty pedigree file");
-			}
-			String[] tokenizer = pedigrees.get(0).split("\\s+");
-			num_marker = (tokenizer.length - 6) / 2;
-		}
-		AlleleSet = new char[num_marker][2];
-		AlleleFreq = new short[num_marker][2];
-		for (int i = 0; i < num_marker; i++) {
-			AlleleSet[i][0] = AlleleSet[i][1] = Parameter.missing_allele.charAt(0);
-		}
 	}
 
 	/**
@@ -131,18 +85,23 @@ public class PedigreeFile {
 	 * families. Note that the "Linkage" here is the relationship between
 	 * relatives in a pedigree, but is not that term of genetics.
 	 */
-	public void parseLinkage() throws IOException {
+	public void parseLinkage(File infile, int numMarker) throws IOException {
+		num_marker = numMarker;
 		int colNum = num_marker * 2 + 6;
-
-		int numMarkers = 0;
-		int numLines = pedigrees.size();
-		if (numLines == 0) {
-			throw new IOException("Data format error: empty file");
+		AlleleSet = new char[num_marker][2];
+		AlleleFreq = new short[num_marker][2];
+		for (int i = 0; i < num_marker; i++) {
+			AlleleSet[i][0] = AlleleSet[i][1] = Parameter.missing_allele.charAt(0);
 		}
+		int numMarkers = 0;
+		BufferedReader reader = new BufferedReader(new FileReader(infile));
+		pedfile = infile;
+		String line;
 		BPerson per;
+		int k = 0;
+		while ((line = reader.readLine()) != null) {
 
-		for (int k = 0; k < numLines; k++) {
-			String[] tokenizer = pedigrees.get(k).split(MDRConstant.delim);
+			String[] tokenizer = line.split(MDRConstant.delim);
 
 			int numTokens = tokenizer.length;
 
@@ -213,10 +172,8 @@ public class PedigreeFile {
 				}
 				famstr.addPerson(per);
 			}
+			k++;
 		}
-
-		pedigrees.clear();
-		pedigrees = null;
 	}
 
 	private int[] recode(int idx, String[] allele) {
@@ -290,7 +247,7 @@ public class PedigreeFile {
 	public int getNumMarker() {
 		return num_marker;
 	}
-
+	
 	public void setHeader(boolean flag) {
 		header = flag;
 	}
