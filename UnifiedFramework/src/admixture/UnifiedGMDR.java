@@ -51,7 +51,7 @@ public class UnifiedGMDR {
 			int[] includedMarkerIndex = ParameterParser.selectedSNP(chen.getMapFile(), p.includesnp);
 			int[] excludedMarkerIndex = ParameterParser.selectedSNP(chen.getMapFile(), p.excludesnp);
 			AbstractMergeSearch as = new HeteroCombinationSearchII.Builder(Parameter.cv, chen.getSample(), chen.getMapFile(), includedMarkerIndex, excludedMarkerIndex).mute(false).build();
-			for (int j = p.min; j <= p.max; j++) {
+			for (int j = p.order; j <= p.order; j++) {
 
 				double[] pv = new double[p.permutation];
 				for (int k = 0; k < p.permutation; k++) {

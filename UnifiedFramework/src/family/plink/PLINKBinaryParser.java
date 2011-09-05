@@ -1,43 +1,47 @@
 package family.plink;
 
-import java.io.File;
 import java.io.IOException;
 
 import family.pedigree.file.BEDReader;
 import family.pedigree.file.BIMReader;
-import family.pedigree.file.GMDRPhenoFile;
+import family.pedigree.file.PhenotypeFile;
 
 public class PLINKBinaryParser extends PLINKParser {
 
 	protected String FamFile;
-	public PLINKBinaryParser(String ped, String phe, String map, String fam) {
-		super(ped, phe, map);
+	public PLINKBinaryParser(String ped, String map, String fam, String phe) {
+		super(ped, map, phe);
 		FamFile = fam;
-
 	}
 
 	@Override
-	public void initial() {
+	public void Parse() {
 		mapData = new BIMReader(mapFile);
-		phenoData = new GMDRPhenoFile();
+
+		if (phenotypeFile != null) {
+			phenoData = new PhenotypeFile();
+			ParsePhenoFile();
+		}
 		if (mapFile != null) {
 			ParseMapFile();
+			System.err.println(mapData.getMarkerNumber() + " markers.");
 			pedData = new BEDReader(FamFile, mapData.getMarkerNumber(), mapData);
 			pedData.setHeader(false);
 			ParsePedFile();
+			System.err.println(pedData.getNumIndividuals() + " individuals.");
 		}
 		mapData.setPolymorphism(pedData.getAlleleFrequency());
 		pedData.cleanup();
-		if (phenotypeFile != null) {
-			ParsePhenoFile();
+		if (phenoData != null) {
+			System.err.println(phenoData.getNumTraits() + " traits.");
 		}
 	}
 
 	@Override
 	public void ParsePedFile() {
-		File PedFile = new File(pedigreeFile);
+
 		try {
-			pedData.parseLinkage(PedFile, mapData.getMarkerNumber());
+			pedData.parseLinkage(pedigreeFile, mapData.getMarkerNumber());
 		} catch (IOException e) {
 			System.err.println("Pedgree file initialization exception.");
 			e.printStackTrace(System.err);

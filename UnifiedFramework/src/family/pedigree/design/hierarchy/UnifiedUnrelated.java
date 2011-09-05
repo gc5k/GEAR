@@ -6,7 +6,7 @@ import java.util.Hashtable;
 import util.NewIt;
 import util.Sample;
 import family.mdr.data.PersonIndex;
-import family.pedigree.file.GMDRPhenoFile;
+import family.pedigree.file.PhenotypeFile;
 import family.pedigree.file.MapFile;
 import family.pedigree.file.PedigreeFile;
 import family.pedigree.genotype.BFamilyStruct;
@@ -20,7 +20,7 @@ import family.pedigree.phenotype.Subject;
  */
 public final class UnifiedUnrelated extends ChenBase {
 
-	public UnifiedUnrelated(PedigreeFile ped, GMDRPhenoFile phe, MapFile map, long s, int pIdx, int[] cIdx, int m) {
+	public UnifiedUnrelated(PedigreeFile ped, PhenotypeFile phe, MapFile map, long s, int pIdx, int[] cIdx, int m) {
 		super(ped, phe, map, s, pIdx, cIdx, m);
 	}
 

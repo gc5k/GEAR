@@ -14,7 +14,7 @@ public interface MDRConstant {
     public static int TestingBalancedAccuIdx = 0;
     public static int TrainingBalancedAccuIdx = 1;
     
-    public static String[] TestStatistic = {"BTA (Balanced Testing Accuracy)", "BTrA (Balanced Training Accuracy)"};
+    public static String[] TestStatistic = {"TA (Testing Accuracy)", "TrA (Training Accuracy)"};
 
     public static int RandomPartition = 0;
     public static int UnpairedPartition = 1;

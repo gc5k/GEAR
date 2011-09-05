@@ -28,6 +28,7 @@ public class BEDReader extends PedigreeFile {
 		this.mapData = mapdata;
 	}
 
+	@Override
 	public void initial() throws IOException {
 		Famid = NewIt.newArrayList();
 		Individualid = NewIt.newArrayList();
@@ -66,17 +67,16 @@ public class BEDReader extends PedigreeFile {
 	}
 
 	@Override
-	public void parseLinkage(File infile, int numMarker) throws IOException {
+	public void parseLinkage(String infile, int numMarker) throws IOException {
 		initial();
 		pedfile = infile;
 		num_marker = numMarker;
 		BufferedInputStream in = null;
 
 		try {
-			in = new BufferedInputStream(new FileInputStream(pedfile));
+			in = new BufferedInputStream(new FileInputStream(new File(pedfile)));
 		} catch (FileNotFoundException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+			System.err.println("cannot open pedigree file.");
 		}
 		byte[] magic = new byte[3];
 		int n = in.read(magic, 0, 3);
@@ -85,6 +85,7 @@ public class BEDReader extends PedigreeFile {
 		} else {
 			individual_major(in);
 		}
+		in.close();
 	}
 
 	private void individual_major(BufferedInputStream in) throws IOException {
@@ -102,7 +103,7 @@ public class BEDReader extends PedigreeFile {
 			per.addAllMarker(geno);
 			int c = 0;
 			while (c < num_marker) {
-				int posByte = c / 4;
+				int posByte = c >> 2;
 				int posBite = (c - (c >> 2 << 2)) << 1;
 				int g = (geno[posByte] >> (posBite)) & 3;
 				if (g == 0) {
@@ -137,16 +138,13 @@ public class BEDReader extends PedigreeFile {
 				int posByte = j >> 2;
 				int posBite = (j - (j >> 2 << 2)) << 1;
 				int g1 = (g[posByte] >> posBite) & 3;
-				if(i == 0) {
-					System.err.println(Integer.toBinaryString(g1));
-				}
 				if (g1 == 0) {
 					AlleleFreq[i][0] += 2;
 				} else if (g1 == 2) {
 					AlleleFreq[i][0]++;
 					AlleleFreq[i][1]++;
 				} else if (g1 == 3) {
-					AlleleFreq[i][1] +=2;
+					AlleleFreq[i][1] += 2;
 				}
 				per.addByteGenotype(g1, i);
 			}

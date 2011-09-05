@@ -26,9 +26,9 @@ import family.RabinowitzLairdAlgorithm.lou.ObservedParents;
 import family.RabinowitzLairdAlgorithm.lou.UnobservedParents;
 import family.mdr.MDRConstant;
 import family.mdr.data.PersonIndex;
-import family.pedigree.file.GMDRPhenoFile;
 import family.pedigree.file.MapFile;
 import family.pedigree.file.PedigreeFile;
+import family.pedigree.file.PhenotypeFile;
 import family.pedigree.genotype.BFamilyStruct;
 import family.pedigree.genotype.BPerson;
 import family.pedigree.phenotype.FamilyUnit;
@@ -36,7 +36,7 @@ import family.pedigree.phenotype.Subject;
 
 public class AJHG2008 extends ChenBase {
 
-	public AJHG2008(PedigreeFile ped, GMDRPhenoFile phe, MapFile map, long s, int pIdx, int[] cIdx, int m) {
+	public AJHG2008(PedigreeFile ped, PhenotypeFile phe, MapFile map, long s, int pIdx, int[] cIdx, int m) {
 		super(ped, phe, map, s, pIdx, cIdx, m);
 	}
 
@@ -232,7 +232,7 @@ public class AJHG2008 extends ChenBase {
 		score = new double[PersonTable.size()];
 		for (int i = 0; i < PersonTable.size(); i += 2) {
 			if (pheIdx == -1) {
-				score[i] = status[i / 2] - Parameter.status_shift;
+				score[i] = status[i / 2] + Parameter.status_shift;
 				score[i + 1] = -1 * score[i];
 			} else {
 				try {
