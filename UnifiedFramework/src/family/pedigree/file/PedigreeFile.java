@@ -26,7 +26,7 @@ public class PedigreeFile {
 
 	protected int num_marker;
 	protected String titleLine = null;
-	protected File pedfile;
+	protected String pedfile;
 	protected boolean header = true;
 
 	// public static String MissingGenotype="00";
@@ -70,11 +70,7 @@ public class PedigreeFile {
 		return familystructure;
 	}
 
-	public File GetPedFile() {
-		return pedfile;
-	}
-
-	public void Initial(File infile) throws IOException {
+	public void initial() throws IOException {
 
 
 	}
@@ -85,7 +81,8 @@ public class PedigreeFile {
 	 * families. Note that the "Linkage" here is the relationship between
 	 * relatives in a pedigree, but is not that term of genetics.
 	 */
-	public void parseLinkage(File infile, int numMarker) throws IOException {
+	public void parseLinkage(String infile, int numMarker) throws IOException {
+		initial();
 		num_marker = numMarker;
 		int colNum = num_marker * 2 + 6;
 		AlleleSet = new char[num_marker][2];
@@ -94,7 +91,7 @@ public class PedigreeFile {
 			AlleleSet[i][0] = AlleleSet[i][1] = Parameter.missing_allele.charAt(0);
 		}
 		int numMarkers = 0;
-		BufferedReader reader = new BufferedReader(new FileReader(infile));
+		BufferedReader reader = new BufferedReader(new FileReader(new File(infile)));
 		pedfile = infile;
 		String line;
 		BPerson per;
@@ -176,7 +173,7 @@ public class PedigreeFile {
 		}
 	}
 
-	private int[] recode(int idx, String[] allele) {
+	protected int[] recode(int idx, String[] allele) {
 		int[] code = { -1, -1 };
 		char[] ref = AlleleSet[idx];
 		if (ref[1] != Parameter.missing_allele.charAt(0)) { 

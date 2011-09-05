@@ -15,11 +15,12 @@ import util.NewIt;
  */
 public class Suite {
     protected ArrayList<PersonIndex> subjects;
-    protected double threshold = 1;
+    protected static double threshold = 1;
     protected int posSubjects;
     protected int negSubjects;
     protected double posScore;
     protected double negScore;
+    protected double meanScore;
     protected int status;
 
     public Suite(Suite s) {
@@ -32,6 +33,10 @@ public class Suite {
 
     public Suite() {
         subjects = NewIt.newArrayList();
+    }
+
+    public static void setThreshold(double T) {
+    	threshold = T;
     }
 
     public void add(PersonIndex s) {
@@ -75,7 +80,9 @@ public class Suite {
                     negScore += sscore;
                 }
             }
+
         }
+        meanScore = (posScore + negScore)/(posSubjects + negSubjects);
     }
 
     public void ascertainment() {
@@ -91,10 +98,10 @@ public class Suite {
 				s = 1;
 			}
 		} else {
-			if ((ps / Math.abs(ns)) == 1) {
+			if ((ps / Math.abs(ns)) == threshold) {
 				s = MDRConstant.tieValue;
 			} else {
-				s = (ps / Math.abs(ns)) > 1 ? 1 : 0;
+				s = (ps / Math.abs(ns)) > threshold ? 1 : 0;
 			}
 		}
 		return s;
@@ -115,6 +122,10 @@ public class Suite {
     public int getPositiveSubjects() {
         return posSubjects;
     }
+    
+    public double getMeanScore() {
+    	return meanScore;
+    }
 
     public String toString() {
     	ascertainment();
@@ -126,10 +137,7 @@ public class Suite {
         } else {
         	sb.append("NA, ");
         }
-        sb.append(String.format("%.2f", posScore) + "," + String.format("%d", posSubjects) + "," + String.format("%.2f", negScore) + "," + String.format("%d", -1*negSubjects));
-//        for(DataFile.Subject sub : subjects ) {
-//            System.out.println(sub);
-//        }
+        sb.append(String.format("%.2f", posScore) + "," + String.format("%d", posSubjects) + "," + String.format("%.2f", negScore) + "," + String.format("%d", -1*negSubjects) + "," + String.format("%.4f", meanScore));
         return sb.toString();
     }
 }

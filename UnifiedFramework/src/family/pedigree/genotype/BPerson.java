@@ -18,9 +18,10 @@ public class BPerson {
 	protected int affectedStatus;
 	protected int numMarkers;
 	protected int genoLen;
-	protected byte[] alleles;
-	protected final int intL = 4;
-	protected final int shift = 2;
+	protected int[] alleles;
+	protected final int intL = 16;
+	protected final int shift = 4;
+	protected final int mask = 15;
 
 	public BPerson(int numMarkers) {
 		this.numMarkers = numMarkers;
@@ -29,7 +30,7 @@ public class BPerson {
 		} else {
 			genoLen = numMarkers / intL + 1;
 		}
-		alleles = new byte[genoLen];
+		alleles = new int[genoLen];
 	}
 
 	public BPerson(BPerson p) {
@@ -44,7 +45,7 @@ public class BPerson {
 		} else {
 			genoLen = numMarkers / intL + 1;
 		}
-		alleles = new byte[genoLen];
+		alleles = new int[genoLen];
 	}
 
 	/**
@@ -170,26 +171,32 @@ public class BPerson {
 
 		if (flag) {
 			if(a2 == a1) {// add 00 or 11
-				byte c = (byte) (((a1 << 1) + a2) << posBite);
-				alleles[posByte] = (byte) (alleles[posByte] | c);
+				int c = ((a1 << 1) + a2) << posBite;
+				alleles[posByte] |= c;
 			} else {// add 10
-				byte c = (byte) (2<<posBite);
-				alleles[posByte] = (byte) (alleles[posByte] | c);
+				int c = (byte) (2<<posBite);
+				alleles[posByte] |= c;
 			}
 		} else {// add 01
-			alleles[posByte] = (byte) (alleles[posByte] | (1 << posBite));
+			alleles[posByte] |= (1 << posBite);
 		}
 	}
 
 	public void addByteGenotype(int g, int idx) {
 		int posByte = idx >> shift;
 		int posBite = (idx - (idx >> shift << shift)) << 1;
-		
-		alleles[posByte] = (byte) (alleles[posByte] | (g << posBite));
+
+		alleles[posByte] = alleles[posByte] | (g << posBite);
 	}
 
 	public void addAllMarker(byte[] g) {
-		System.arraycopy(g, 0, alleles, 0, g.length);
+
+		for(int i = 0; i < g.length; i++) {
+			int posByte = i >> 2;  // one int holds 4 bytes.
+			int posBiteShift = (i -(i >> 2 << 2)) << 3;
+			alleles[posByte] |= (g[i] << posBiteShift);
+		}
+
 	}
 
 	public String getGenotypeScoreString(int i) {

@@ -63,6 +63,13 @@ public class MapFile {
 		}
 	}
 	
+	public void addSNP(String chr, String name, float dis, int pos) {
+		if(snpList == null) {
+			snpList = NewIt.newArrayList();
+		}
+		snpList.add(new SNP(chr, name, dis, pos));
+	}
+
 	public void setMarker(int l) {
 		snpList = NewIt.newArrayList();
 		snpList.ensureCapacity(l);

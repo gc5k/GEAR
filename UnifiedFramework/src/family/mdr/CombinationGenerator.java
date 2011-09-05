@@ -1,5 +1,6 @@
 package family.mdr;
 
+import java.util.Arrays;
 import java.util.Iterator;
 import java.math.BigInteger;
 
@@ -14,6 +15,7 @@ public class CombinationGenerator implements Iterator<String> {
 	private int offset = 0;
 	private int[] in_snp = null;
 	private int[] ex_snp = null;
+	private int[] outlier = null;
 	private int n;
 	private int r;
 	private int len;
@@ -22,14 +24,28 @@ public class CombinationGenerator implements Iterator<String> {
 
 	public CombinationGenerator(int n, int[] include_snp, int[] exclude_snp) {
 		this.n = n;
-
+		int L = 0;
 		if (include_snp != null) {
 			in_snp = include_snp;
 			offset = in_snp.length;
+			L += in_snp.length;
 		}
 
 		if (exclude_snp != null) {
 			ex_snp = exclude_snp;
+			L += ex_snp.length;
+		}
+		if (L > 0) {
+			outlier = new int[L];
+			if(in_snp != null && ex_snp != null) {
+				System.arraycopy(in_snp, 0, outlier, 0, in_snp.length);
+				System.arraycopy(ex_snp, 0, outlier, in_snp.length, ex_snp.length);
+			} else if(in_snp != null && ex_snp == null) {
+				System.arraycopy(in_snp, 0, outlier, 0, in_snp.length);
+			} else if(in_snp == null && ex_snp != null) {
+				System.arraycopy(ex_snp, 0, outlier, 0, ex_snp.length);
+			}
+			Arrays.sort(outlier);
 		}
 
 	}
@@ -39,6 +55,7 @@ public class CombinationGenerator implements Iterator<String> {
 		r = R;
 		len = n;
 		comb = new int[R];
+
 		if (in_snp != null) {
 			len -= in_snp.length;
 			r -= in_snp.length;
@@ -53,49 +70,40 @@ public class CombinationGenerator implements Iterator<String> {
 			}
 			header = sb.toString();
 		}
-		
-		if (ex_snp != null) {
-			len -= ex_snp.length;
-		}
 
 		if (r < 0 || len < 0 || r > len) {
 			System.err.println("impossible to draw " + r + " from " + len + " factors");
 			throw new IllegalArgumentException();
 		}
-
+		
 		a = new int[r];
-
-		int idx = 0;
-		seq = new int[len];
-		for (int i = 0; i < n; i++) {
-			boolean flag = true;
-			if (in_snp != null) {
-				for (int j = 0; j < in_snp.length; j++) {
-					if (i == in_snp[j]) {
-						flag = false;
-						break;
-					}
-				}
+		
+		if (outlier != null) {
+			seq = new int[len-outlier.length];
+		} else {
+			seq = new int[len];
+		}
+		int c = 0;
+		if(outlier != null) {
+			for (int i = 0; i < len; i++) {
+				int idx = Arrays.binarySearch(outlier, i);
+				if (idx >= 0 ) seq[c++] = i;
 			}
-			if (!flag)
-				continue;
-			if (ex_snp != null) {
-				for (int j = 0; j < ex_snp.length; j++) {
-					if (i == ex_snp[j]) {
-						flag = false;
-						break;
-					}
-				}
-			}
-			if (flag) {
-				seq[idx++] = i;
+		} else {
+			for (int i = 0; i < len; i++) {
+				seq[i] = i;
 			}
 		}
 
-		BigInteger nFact = getFactorial(len);
-		BigInteger rFact = getFactorial(r);
-		BigInteger nminusrFact = getFactorial(len - r);
-		total = nFact.divide(rFact.multiply(nminusrFact));
+		BigInteger nFact = BigInteger.ONE;
+		for (int i = 0; i < r; i++) {
+			nFact = nFact.multiply(new BigInteger(Integer.toString(len-i)));
+		}
+		for (int i = 1; i <= r; i++) {
+			nFact = nFact.divide(new BigInteger(Integer.toBinaryString(i)));
+		}
+
+		total = nFact;
 		reset();
 	}
 
@@ -104,14 +112,6 @@ public class CombinationGenerator implements Iterator<String> {
 			a[i] = i;
 		}
 		numLeft = new BigInteger(total.toString());
-	}
-
-	private static BigInteger getFactorial(int n) {
-		BigInteger fact = BigInteger.ONE;
-		for (int i = n; i > 1; i--) {
-			fact = fact.multiply(new BigInteger(Integer.toString(i)));
-		}
-		return fact;
 	}
 
 	@Override
@@ -137,8 +137,8 @@ public class CombinationGenerator implements Iterator<String> {
 		}
 
 		numLeft = numLeft.subtract(BigInteger.ONE);
+
 		return getComb(a);
-		// return getString(a);
 	}
 
 	@Override
@@ -149,34 +149,41 @@ public class CombinationGenerator implements Iterator<String> {
 	private String getComb(int[] s) {
 		StringBuffer sb = new StringBuffer();
 		if (header != null) {
-			sb.append(header + PublicData.seperator);
+			sb.append(header);
+			sb.append(PublicData.seperator);
 		}
 		for (int i = 0; i < s.length; i++) {
 			comb[i + offset] = seq[s[i]];
 			if(i != s.length - 1) {
-				sb.append(seq[s[i]] + PublicData.seperator);
+				sb.append(seq[s[i]]);
+				sb.append(PublicData.seperator);
 			} else {
 				sb.append(seq[s[i]]);
 			}
 		}
 		return sb.toString();
-
 	}
 
 	/**
 	 * @param args
 	 */
 	public static void main(String[] args) {
-		int[] in = {0};
-		int[] ex = {2};
+		System.out.println("CombinationGeneratorII");
+		int[] in = null;
+		int[] ex = null;
 		long t = System.currentTimeMillis();
-		int len = 10;
+		int len = 1000000;
 		CombinationGenerator cg = new CombinationGenerator(len, in, ex);
-		cg.revup(11);
+		System.out.println(System.currentTimeMillis());
+		long t1 = System.currentTimeMillis();
+		cg.revup(1);
+		long t2 = System.currentTimeMillis();
+		System.out.println("start:" + (t2 - t1));
 		for (; cg.hasNext();) {
-			System.out.println(cg.next());
+			String g = cg.next();
+//			System.out.println(g);
 		}
-		System.out.println(System.currentTimeMillis() - t);
+		System.out.println(System.currentTimeMillis() - t2);
 		System.out.println("done");
 	}
 }

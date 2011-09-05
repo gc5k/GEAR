@@ -8,7 +8,7 @@ import org.apache.commons.lang3.ArrayUtils;
 import util.NewIt;
 import util.Sample;
 import family.mdr.data.PersonIndex;
-import family.pedigree.file.GMDRPhenoFile;
+import family.pedigree.file.PhenotypeFile;
 import family.pedigree.file.MapFile;
 import family.pedigree.file.PedigreeFile;
 import family.pedigree.genotype.BFamilyStruct;
@@ -23,7 +23,7 @@ import family.pedigree.phenotype.Subject;
 
 public final class Unified extends ChenBase {
 
-	public Unified(PedigreeFile ped, GMDRPhenoFile phe, MapFile map, long s, int pIdx, int[] cIdx, int m) {
+	public Unified(PedigreeFile ped, PhenotypeFile phe, MapFile map, long s, int pIdx, int[] cIdx, int m) {
 		super(ped, phe, map, s, pIdx, cIdx, m);
 	}
 
@@ -36,7 +36,6 @@ public final class Unified extends ChenBase {
 		if(PhenoData != null) 
 			CovariateTable.ensureCapacity(qualified_Unrelated + qualified_Sib);
 
-//		genotype = new byte[qualified_Unrelated + qualified_Sib][];
 		status = new byte[qualified_Unrelated + qualified_Sib];
 
 		ArrayList<PersonIndex> u_P = NewIt.newArrayList();
@@ -68,7 +67,6 @@ public final class Unified extends ChenBase {
 
 				if (fs.hasAncestor(per)) {
 					s_P.add(new PersonIndex(fs.getFamilyStructName(), pi[i], per));
-//					genotype[s + qualified_Unrelated] = per.getGenotypeScore();
 					status[s + qualified_Unrelated] = (byte) per.getAffectedStatus();
 					if(PhenoData != null)
 						s_C.add(sub.getTraits());
@@ -76,7 +74,6 @@ public final class Unified extends ChenBase {
 					s++;
 				} else {
 					u_P.add(new PersonIndex(fs.getFamilyStructName(), pi[i], per));
-//					genotype[un] = per.getGenotypeScore();
 					status[un] = (byte) per.getAffectedStatus();
 					if(PhenoData != null)
 						u_C.add(sub.getTraits());
@@ -95,29 +92,21 @@ public final class Unified extends ChenBase {
 		}
 
 		numSib = ArrayUtils.toPrimitive(SibIdx.toArray(new Integer[0]));
-		int[] m = new int[MapData.getMarkerNumber()];
-		for (int i = 0; i < m.length; i++) {
-			m[i] = i;
-		}
-//		AbstractGenoDistribution.rnd = new Random(seed);
-//		RLDriver RLD = new RLDriver();
-//		RLD.TDT(Fam, getMarkerName(), m);
+
 	}
 
 	public void getPermutedScore(boolean isNested) {
-//		permuted_score = new double[score.length];
+
 		if (isNested) {
 			int[] un_related = Sample.SampleIndex(0, qualified_Unrelated - 1, qualified_Unrelated);
 			for (int i = 0; i < un_related.length; i++) {
 				PersonTable.get(i).setPermutedScore(score[un_related[i]]);
-//				permuted_score[i] = score[un_related[i]];
 			}
 			int c = qualified_Unrelated;
 			for (int i = 0; i < numSib.length; i++) {
 				int[] si = Sample.SampleIndex(0, numSib[i] - 1, numSib[i]);
 				for (int j = 0; j < si.length; j++) {
 					PersonTable.get(c+j).setPermutedScore(score[c + si[j]]);
-//					permuted_score[c + j] = score[c + si[j]];
 				}
 				c += si.length;
 			}
@@ -125,7 +114,6 @@ public final class Unified extends ChenBase {
 			int[] idx = Sample.SampleIndex(0, PersonTable.size() - 1, PersonTable.size());
 			for (int i = 0; i < idx.length; i++) {
 				PersonTable.get(i).setPermutedScore(score[idx[i]]);
-//				permuted_score[i] = score[idx[i]];
 			}
 		}
 	}

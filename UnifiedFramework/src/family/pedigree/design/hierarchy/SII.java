@@ -8,7 +8,7 @@ import org.apache.commons.lang3.ArrayUtils;
 import util.NewIt;
 import util.Sample;
 import family.mdr.data.PersonIndex;
-import family.pedigree.file.GMDRPhenoFile;
+import family.pedigree.file.PhenotypeFile;
 import family.pedigree.file.MapFile;
 import family.pedigree.file.PedigreeFile;
 import family.pedigree.genotype.BFamilyStruct;
@@ -22,7 +22,7 @@ import family.pedigree.phenotype.Subject;
  */
 public final class SII extends ChenBase {
 
-	public SII(PedigreeFile ped, GMDRPhenoFile phe, MapFile map, long s, int pIdx, int[] cIdx, int m) {
+	public SII(PedigreeFile ped, PhenotypeFile phe, MapFile map, long s, int pIdx, int[] cIdx, int m) {
 		super(ped, phe, map, s, pIdx, cIdx, m);
 	}
 
@@ -36,7 +36,6 @@ public final class SII extends ChenBase {
 		if (PhenoData != null)
 			CovariateTable.ensureCapacity(qualified_Sib);
 
-//		genotype = new byte[qualified_Sib][];
 		status = new byte[qualified_Sib];
 
 		ArrayList<PersonIndex> s_P = NewIt.newArrayList();
@@ -64,7 +63,6 @@ public final class SII extends ChenBase {
 
 				if (fs.hasAncestor(per)) {
 					s_P.add(new PersonIndex(fs.getFamilyStructName(), pi[i], per));
-//					genotype[s] = per.getGenotypeScore();
 					status[s] = (byte) per.getAffectedStatus();
 					if (sub != null)
 						s_C.add(sub.getTraits());
@@ -81,14 +79,6 @@ public final class SII extends ChenBase {
 			CovariateTable.addAll(s_C);
 
 		numSib = ArrayUtils.toPrimitive(SibIdx.toArray(new Integer[0]));
-
-		int[] m = new int[MapData.getMarkerNumber()];
-		for (int i = 0; i < MapData.getMarkerNumber(); i++) {
-			m[i] = i;
-		}
-//		AbstractGenoDistribution.rnd = new Random(seed);
-//		RLDriver RLD = new RLDriver();
-//		RLD.TDT(Fam, getMarkerName(), m);
 	}
 
 	public void getPermutedScore(boolean isNested) {
@@ -106,16 +96,8 @@ public final class SII extends ChenBase {
 			int[] idx = Sample.SampleIndex(0, PersonTable.size() - 1, PersonTable.size());
 			for (int i = 0; i < idx.length; i++) {
 				PersonTable.get(i).setPermutedScore(score[idx[i]]);
-//				permuted_score[i] = score[idx[i]];
 			}
 		}
-
 	}
 
-//	@Override
-//	public void RecoverScore() {
-//		for (int i = 0; i < PersonTable.size(); i++) {
-//			PersonTable.get(i).setPermutedScore(score[i]);
-//		}
-//	}
 }

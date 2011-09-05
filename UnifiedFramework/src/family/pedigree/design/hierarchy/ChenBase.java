@@ -11,9 +11,9 @@ import score.LinearRegression;
 import score.LogisticRegression;
 
 import family.mdr.data.PersonIndex;
-import family.pedigree.file.GMDRPhenoFile;
 import family.pedigree.file.MapFile;
 import family.pedigree.file.PedigreeFile;
+import family.pedigree.file.PhenotypeFile;
 import family.pedigree.genotype.BFamilyStruct;
 import family.pedigree.genotype.BPerson;
 import family.pedigree.phenotype.FamilyUnit;
@@ -31,14 +31,14 @@ public abstract class ChenBase implements ChenInterface {
 	public static Random rnd = new Random();
 	protected MapFile MapData;
 	protected PedigreeFile PedData;
-	protected GMDRPhenoFile PhenoData;
+	protected PhenotypeFile PhenoData;
 
 	protected int qualified_Unrelated;
 	protected int qualified_Sib;
 	protected int[] numSib;
 	protected byte[] status;
 	protected double[] score;
-//	protected double[] permuted_score;
+	// protected double[] permuted_score;
 
 	protected int pheIdx;
 	protected int[] covIdx;
@@ -67,7 +67,24 @@ public abstract class ChenBase implements ChenInterface {
 				BFamilyStruct fs = Fam.get(fi);
 				String[] pi = fs.getPersonListSorted();
 				filter[c] = new boolean[pi.length];
-				if (PhenoData != null && !PhenoData.containFamily(fi)) {  // if no phenotype for the whole family
+				if (PhenoData == null) {
+					int cc = 0;
+					for (int i = 0; i < pi.length; i++) {
+						BPerson per = fs.getPerson(pi[i]);
+						int s = per.getAffectedStatus();
+						boolean f = ((s + Parameter.status_shift) == 1 || (s + Parameter.status_shift) == 0) ? true : false;
+
+						filter[c][cc++] = f;
+						if (!f)
+							continue;
+						if (fs.hasAncestor(per)) {
+							num_qualified[c][1]++;
+						} else {
+							num_qualified[c][0]++;
+						}
+					}
+				} else if (!PhenoData.containFamily(fi)) {
+					// if no phenotype for the whole family
 					for (int i = 0; i < filter[c].length; i++) {
 						filter[c][i] = false;
 					}
@@ -104,13 +121,11 @@ public abstract class ChenBase implements ChenInterface {
 		protected boolean filterItUp(String fid, String pid, byte s, ArrayList<String> trait) {
 			boolean f = true;
 			if (pheIdx == -1) {
-				f = (s != (1 + Parameter.status_shift) && s != (2 + Parameter.status_shift)) ? false : true;
+				f = ((s + Parameter.status_shift) == 0 || (s + Parameter.status_shift) == 1) ? true : false;
 			} else {
 				f = (trait.get(pheIdx).compareTo(Parameter.missing_phenotype) == 0) ? false : true;
 			}
-			if(PhenoData == null) {
-				return f;
-			}
+
 			if (covIdx == null) {
 				return f;
 			} else {
@@ -126,7 +141,7 @@ public abstract class ChenBase implements ChenInterface {
 		}
 	}
 
-	public ChenBase(PedigreeFile ped, GMDRPhenoFile phe, MapFile map, long s, int pIdx, int[] cIdx, int m) {
+	public ChenBase(PedigreeFile ped, PhenotypeFile phe, MapFile map, long s, int pIdx, int[] cIdx, int m) {
 		rnd.setSeed(Parameter.seed);
 		PedData = ped;
 		PhenoData = phe;
@@ -140,9 +155,9 @@ public abstract class ChenBase implements ChenInterface {
 		setSeed(s);
 		RevvingUp();
 		generateScore();
-		
+
 		group();
-		
+
 		CovariateTable = null;
 	}
 
@@ -150,6 +165,10 @@ public abstract class ChenBase implements ChenInterface {
 
 	protected void fetchScore(int pheIdx) {
 		double sum = 0;
+		if(PersonTable.size() < 10) {
+			System.err.println("too few effective individuals (" + PersonTable.size() + ") for the selected trait.");
+			System.exit(0);
+		}
 		score = new double[PersonTable.size()];
 		for (int i = 0; i < PersonTable.size(); i++) {
 			if (pheIdx == -1) {
@@ -158,7 +177,7 @@ public abstract class ChenBase implements ChenInterface {
 				try {
 					if (PhenoData == null) {
 						throw new Exception();
-					} 
+					}
 				} catch (Exception E) {
 					System.err.println("no phenotype file");
 				}
@@ -170,7 +189,41 @@ public abstract class ChenBase implements ChenInterface {
 		}
 	}
 
+	protected void buildScoreII() {
+		if(PersonTable.size() < 10) {
+			System.err.println("too few effective individuals (" + PersonTable.size() + ") for the selected trait.");
+			System.exit(0);
+		}
+		score = new double[PersonTable.size()];
+		ArrayList<Double> T = NewIt.newArrayList();
+
+		for (int i = 0; i < PersonTable.size(); i++) {
+			double t = 0;
+			t = status[i] + Parameter.status_shift;
+			T.add(new Double(t));
+		}
+
+		double[][] X = null;
+
+		double[][] Y = new double[T.size()][1];
+		for (int i = 0; i < T.size(); i++) {
+			Y[i][0] = ((Double) T.get(i)).doubleValue();
+		}
+
+		double[] r = null;
+
+		LinearRegression LReg = new LinearRegression(Y, X, true);
+		LReg.MLE();
+		r = LReg.getResiduals1();
+
+		System.arraycopy(r, 0, score, 0, r.length);
+	}
+
 	protected void buildScore(int pheIdx, int[] covIdx, int method) {
+		if(PersonTable.size() < 10) {
+			System.err.println("too few effective individuals (" + PersonTable.size() + ") for the selected trait.");
+			System.exit(0);
+		}
 		score = new double[PersonTable.size()];
 		ArrayList<Double> T = NewIt.newArrayList();
 		ArrayList<ArrayList<Double>> C = NewIt.newArrayList();
@@ -180,7 +233,7 @@ public abstract class ChenBase implements ChenInterface {
 			ArrayList<Double> c = NewIt.newArrayList();
 			ArrayList<String> tempc = CovariateTable.get(i);
 			if (pheIdx == -1) {// using affecting status as phenotype
-				t = status[i]+ Parameter.status_shift;
+				t = status[i] + Parameter.status_shift;
 			} else {
 				t = Double.parseDouble((String) tempc.get(pheIdx));
 			}
@@ -234,10 +287,14 @@ public abstract class ChenBase implements ChenInterface {
 	}
 
 	protected void generateScore() {
-		if (method >= 0) {
-			buildScore(pheIdx, covIdx, method);
+		if (PhenoData != null) {
+			if (method >= 0) {
+				buildScore(pheIdx, covIdx, method);
+			} else {
+				fetchScore(pheIdx);
+			}
 		} else {
-			fetchScore(pheIdx);
+			buildScoreII();
 		}
 
 	}
@@ -247,7 +304,7 @@ public abstract class ChenBase implements ChenInterface {
 		seed = s;
 		rnd.setSeed(s);
 	}
-	
+
 	@Override
 	public int getNumberMarker() {
 		return MapData.getMarkerNumber();
@@ -257,22 +314,22 @@ public abstract class ChenBase implements ChenInterface {
 	public MapFile getMapFile() {
 		return MapData;
 	}
-	
+
 	public int SampleSize() {
 		return PersonTable.size();
 	}
-	
+
 	public ArrayList<PersonIndex> getSample() {
 		return PersonTable;
 	}
-	
+
 	private void group() {
 		ArrayList<Integer> g = NewIt.newArrayList();
-		for(int i = 0; i < PersonTable.size(); i++) {
+		for (int i = 0; i < PersonTable.size(); i++) {
 			g.add(i % Parameter.cv);
 		}
 		Collections.shuffle(g, rnd);
-		for(int i = 0; i < PersonTable.size(); i++) {
+		for (int i = 0; i < PersonTable.size(); i++) {
 			PersonTable.get(i).setGroup(g.get(i));
 		}
 	}

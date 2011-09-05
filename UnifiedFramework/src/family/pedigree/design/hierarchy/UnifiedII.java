@@ -8,9 +8,9 @@ import org.apache.commons.lang3.ArrayUtils;
 import util.NewIt;
 import util.Sample;
 import family.mdr.data.PersonIndex;
-import family.pedigree.file.GMDRPhenoFile;
 import family.pedigree.file.MapFile;
 import family.pedigree.file.PedigreeFile;
+import family.pedigree.file.PhenotypeFile;
 import family.pedigree.genotype.BFamilyStruct;
 import family.pedigree.genotype.BPerson;
 import family.pedigree.phenotype.FamilyUnit;
@@ -26,7 +26,7 @@ public class UnifiedII extends ChenBase {
 	private int[] singleton;
 	private int[][] founder;
 
-	public UnifiedII(PedigreeFile ped, GMDRPhenoFile phe, MapFile map, long s, int pIdx, int[] cIdx, int m) {
+	public UnifiedII(PedigreeFile ped, PhenotypeFile phe, MapFile map, long s, int pIdx, int[] cIdx, int m) {
 		super(ped, phe, map, s, pIdx, cIdx, m);
 	}
 
@@ -40,7 +40,6 @@ public class UnifiedII extends ChenBase {
 		if(PhenoData != null)
 			CovariateTable.ensureCapacity(qualified_Unrelated + qualified_Sib);
 
-//		genotype = new byte[qualified_Unrelated + qualified_Sib][];
 		status = new byte[qualified_Unrelated + qualified_Sib];
 
 		ArrayList<PersonIndex> u_P = NewIt.newArrayList();
@@ -75,7 +74,6 @@ public class UnifiedII extends ChenBase {
 
 				if (fs.hasAncestor(per)) {
 					s_P.add(new PersonIndex(fs.getFamilyStructName(), pi[i], per));
-//					genotype[s + qualified_Unrelated] = per.getGenotypeScore();
 					status[s + qualified_Unrelated] = (byte) per.getAffectedStatus();
 					if(PhenoData != null)
 						s_C.add(sub.getTraits());
@@ -83,7 +81,6 @@ public class UnifiedII extends ChenBase {
 					s++;
 				} else {
 					u_P.add(new PersonIndex(fs.getFamilyStructName(), pi[i], per));
-//					genotype[un] = per.getGenotypeScore();
 					status[un] = (byte) per.getAffectedStatus();
 					if(PhenoData != null)
 						u_C.add(sub.getTraits());
@@ -117,29 +114,19 @@ public class UnifiedII extends ChenBase {
 		for (int i = 0; i < founder.length; i++) {
 			founder[i] = ArrayUtils.toPrimitive(FounderIdx.get(i).toArray(new Integer[0]));
 		}
-		int[] m = new int[MapData.getMarkerNumber()];
-		for (int i = 0; i < m.length; i++) {
-			m[i] = i;
-		}
-//		AbstractGenoDistribution.rnd = new Random(seed);
-//		RLDriver RLD = new RLDriver();
-//		RLD.TDT(Fam, getMarkerName(), m);
 	}
 
 	public void getPermutedScore(boolean isNested) {
-//		permuted_score = new double[score.length];
 		if (isNested) {
 			int[] un_related = Sample.sample(singleton);// singleton
 			for (int i = 0; i < un_related.length; i++) {
 				PersonTable.get(i).setPermutedScore(score[un_related[i]]);
-//				permuted_score[singleton[i]] = score[un_related[i]];
 			}
 
 			for (int i = 0; i < founder.length; i++) {// founders
 				int[] f = Sample.sample(founder[i]);
 				for (int j = 0; j < f.length; j++) {
 					PersonTable.get(founder[i][j]).setPermutedScore(score[f[j]]);
-//					permuted_score[founder[i][j]] = score[f[j]];
 				}
 			}
 
@@ -148,7 +135,6 @@ public class UnifiedII extends ChenBase {
 				int[] si = Sample.SampleIndex(0, numSib[i] - 1, numSib[i]);
 				for (int j = 0; j < si.length; j++) {
 					PersonTable.get(c+j).setPermutedScore(score[c + si[j]]);
-//					permuted_score[c + j] = score[c + si[j]];
 				}
 				c += si.length;
 			}
@@ -156,15 +142,7 @@ public class UnifiedII extends ChenBase {
 			int[] idx = Sample.SampleIndex(0, PersonTable.size() - 1, PersonTable.size());
 			for (int i = 0; i < idx.length; i++) {
 				PersonTable.get(i).setPermutedScore(score[idx[i]]);
-//				permuted_score[i] = score[idx[i]];
 			}
 		}
 	}
-
-//	@Override
-//	public void RecoverScore() {
-//		for (int i = 0; i < PersonTable.size(); i++) {
-//			PersonTable.get(i).setPermutedScore(score[i]);
-//		}
-//	}
 }

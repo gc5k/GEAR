@@ -5,31 +5,35 @@ import java.io.IOException;
 
 import admixture.parameter.Parameter;
 
-import family.pedigree.file.GMDRPhenoFile;
-import family.pedigree.file.GMDRPhenoFileException;
 import family.pedigree.file.MapFile;
 import family.pedigree.file.PedigreeFile;
+import family.pedigree.file.PhenotypeFile;
 
 public class PLINKParser {
-	protected MapFile mapData;
-	protected PedigreeFile pedData;
-	protected GMDRPhenoFile phenoData;
+	protected MapFile mapData = null;
+	protected PedigreeFile pedData = null;
+	protected PhenotypeFile phenoData = null;
 
 	protected String pedigreeFile;
 	protected String phenotypeFile;
 	protected String mapFile;
 
-	public PLINKParser(String ped, String phe, String map) {
+	public PLINKParser(String ped, String map, String phe) {
 		pedigreeFile = ped;
-		phenotypeFile = phe;
 		mapFile = map;
+		phenotypeFile = phe;
 	}
 
-	public void initial() {
+	public void Parse() {
 		mapData = new MapFile(mapFile);
-		phenoData = new GMDRPhenoFile();
+
 		pedData = new PedigreeFile();
 		pedData.setHeader(Parameter.header);
+
+		if (phenotypeFile != null) {
+			phenoData = new PhenotypeFile();
+			ParsePhenoFile();
+		}
 		if (mapFile != null) {
 			ParseMapFile();
 			pedData.setHeader(false);
@@ -41,9 +45,6 @@ public class PLINKParser {
 		}
 		mapData.setPolymorphism(pedData.getPolymorphism(), pedData.getAlleleFrequency());
 		pedData.cleanup();
-		if (phenotypeFile != null) {
-			ParsePhenoFile();
-		}
 	}
 
 	public void ParseMapFile() {
@@ -60,9 +61,9 @@ public class PLINKParser {
 	 * @throws IOException
 	 */
 	public void ParsePedFile() {
-		File PedFile = new File(pedigreeFile);
+
 		try {
-			pedData.parseLinkage(PedFile, mapData.getMarkerNumber());
+			pedData.parseLinkage(pedigreeFile, mapData.getMarkerNumber());
 		} catch (IOException e) {
 			System.err.println("Pedgree file initialization exception.");
 			e.printStackTrace(System.err);
@@ -90,7 +91,7 @@ public class PLINKParser {
 		return pedData;
 	}
 
-	public GMDRPhenoFile getPhenotypeData() {
+	public PhenotypeFile getPhenotypeData() {
 		return phenoData;
 	}
 

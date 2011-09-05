@@ -5,9 +5,10 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
-import java.util.ArrayList;
 import java.util.Enumeration;
 import java.util.Hashtable;
+
+import admixture.parameter.Parameter;
 
 import family.pedigree.phenotype.FamilyUnit;
 import family.pedigree.phenotype.Subject;
@@ -18,52 +19,14 @@ import util.NewIt;
  * 
  * @author Guo-Bo Chen, chenguobo@gmail.com
  */
-public class GMDRPhenoFile {
+public class PhenotypeFile {
 
 	private File phenoFile;
 	private Hashtable<String, FamilyUnit> families;
-	
-	public GMDRPhenoFile() {
+	private String[] traits;
+	public PhenotypeFile() {
 		families = NewIt.newHashtable();
 	}
-
-//	public void Initial(File infile) throws GMDRPhenoFileException, IOException {
-//		traitStrings = NewIt.newArrayList();
-//		BufferedReader reader = new BufferedReader(new FileReader(infile));
-//		phenoFile = infile;
-//		String line;
-//		while ((line = reader.readLine()) != null) {
-//			if (line.length() == 0) {
-//				// skip blank lines
-//				continue;
-//			}
-//			if (line.startsWith("#")) {
-//				// skip comments
-//				continue;
-//			}
-//			traitStrings.add(line);
-//		}
-//		titleLine = (String) traitStrings.get(0);
-//		traitStrings.remove(0);
-//		int numLines = traitStrings.size();
-//
-//		if (numLines < 2) {
-//			throw new GMDRPhenoFileException("Phenotype data format error: empty file");
-//		}
-//		String[] tokenizer = titleLine.split("\\s+");
-//
-//		int numTokens = tokenizer.length;
-//
-//		if (numTokens < 2) {
-//			throw new GMDRPhenoFileException("Phenotype data format error: the title line is incorrect");
-//		}
-//
-//		// reading the title line:get the marker number
-//		traitInfor = NewIt.newArrayList();
-//		for(int i = 2; i < tokenizer.length; i++) {
-//			traitInfor.add(tokenizer[i]);
-//		}
-//	}
 
 	public File getPhenoFile() {
 		return phenoFile;
@@ -75,7 +38,6 @@ public class GMDRPhenoFile {
 		try {
 			reader = new BufferedReader(new FileReader(infile));
 		} catch (FileNotFoundException e) {
-
 			e.printStackTrace();
 		}
 		phenoFile = infile;
@@ -95,7 +57,10 @@ public class GMDRPhenoFile {
 			}
 			
 			if(k == 0) {
-				colNum = line.split("\\s+").length - 2;
+				String[] t = line.split("\\s+");
+				colNum = t.length - 2;
+				traits = new String[colNum];
+				System.arraycopy(t, 2, traits, 0, traits.length);
 				k++;
 				continue;
 			}
@@ -138,6 +103,8 @@ public class GMDRPhenoFile {
 			fam.addSubject(sub);
 			this.families.put(sub.getFamilyID(), fam);
 		}
+		Parameter.findCovar_Number(traits);
+		
 	}
 
 	public FamilyUnit getFamilyUnit(String familyUnitID) {
@@ -150,6 +117,10 @@ public class GMDRPhenoFile {
 
 	public int getNumFamilyUnits() {
 		return families.size();
+	}
+
+	public int getNumTraits() {
+		return traits.length;
 	}
 
 	public boolean containFamily(String fid) {

@@ -21,17 +21,18 @@ public class Combination extends HashMap<String, Suite> {
 	 */
 	private static final long serialVersionUID = 1L;
 
+	
 	public String printModel(int[] idx, MapFile mf) {
 		StringBuffer sb = new StringBuffer();
 		for(Entry<String, Suite> entry: this.entrySet()) {
 			String key = entry.getKey();
 			String[] g = key.split(PublicData.seperator);
-			sb.append("Genotype-");
+			sb.append("Geno:");
 			for(int i = 0; i < idx.length; i++) {
 				SNP snp = mf.getSNP(idx[i]);
-				sb.append(snp.getPolymorphism(g[i])+",");
+				sb.append(snp.getPolymorphism(g[i])+", ");
 			}
-			sb.append(" " + entry.getValue() + "; ");
+			sb.append(" " + entry.getValue() + ", ");
 		}
 		return sb.toString();
 	}
