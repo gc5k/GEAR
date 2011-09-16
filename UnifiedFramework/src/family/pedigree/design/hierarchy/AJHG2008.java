@@ -24,7 +24,7 @@ import family.RabinowitzLairdAlgorithm.lou.HeterozygousParent;
 import family.RabinowitzLairdAlgorithm.lou.HomozygousParent;
 import family.RabinowitzLairdAlgorithm.lou.ObservedParents;
 import family.RabinowitzLairdAlgorithm.lou.UnobservedParents;
-import family.mdr.MDRConstant;
+import family.mdr.arsenal.MDRConstant;
 import family.mdr.data.PersonIndex;
 import family.pedigree.file.MapFile;
 import family.pedigree.file.PedigreeFile;

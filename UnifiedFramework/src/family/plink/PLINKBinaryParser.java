@@ -25,12 +25,12 @@ public class PLINKBinaryParser extends PLINKParser {
 		if (mapFile != null) {
 			ParseMapFile();
 			System.err.println(mapData.getMarkerNumber() + " markers.");
-			pedData = new BEDReader(FamFile, mapData.getMarkerNumber(), mapData);
+			pedData = new BEDReader(FamFile, snpFilter.getWorkingSNP().length, mapData);
 			pedData.setHeader(false);
 			ParsePedFile();
 			System.err.println(pedData.getNumIndividuals() + " individuals.");
 		}
-		mapData.setPolymorphism(pedData.getAlleleFrequency());
+//		mapData.setPolymorphism(pedData.getAlleleFrequency());
 		pedData.cleanup();
 		if (phenoData != null) {
 			System.err.println(phenoData.getNumTraits() + " traits.");
@@ -39,9 +39,8 @@ public class PLINKBinaryParser extends PLINKParser {
 
 	@Override
 	public void ParsePedFile() {
-
 		try {
-			pedData.parseLinkage(pedigreeFile, mapData.getMarkerNumber());
+			pedData.parseLinkage(pedigreeFile, mapData.getMarkerNumberOriginal(), snpFilter.getWorkingSNP());
 		} catch (IOException e) {
 			System.err.println("Pedgree file initialization exception.");
 			e.printStackTrace(System.err);

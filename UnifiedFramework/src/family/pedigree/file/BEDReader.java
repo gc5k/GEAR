@@ -8,6 +8,7 @@ import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Arrays;
 
 import util.NewIt;
 
@@ -67,10 +68,9 @@ public class BEDReader extends PedigreeFile {
 	}
 
 	@Override
-	public void parseLinkage(String infile, int numMarker) throws IOException {
+	public void parseLinkage(String infile, int numMarkerInFile, int[] WSNP) throws IOException {
 		initial();
 		pedfile = infile;
-		num_marker = numMarker;
 		BufferedInputStream in = null;
 
 		try {
@@ -81,47 +81,40 @@ public class BEDReader extends PedigreeFile {
 		byte[] magic = new byte[3];
 		int n = in.read(magic, 0, 3);
 		if (magic[2] == 1) {
-			snp_major(in);
+			snp_major(in, numMarkerInFile, WSNP);
 		} else {
-			individual_major(in);
+			individual_major(in, numMarkerInFile, WSNP);
 		}
 		in.close();
 	}
 
-	private void individual_major(BufferedInputStream in) throws IOException {
+	private void individual_major(BufferedInputStream in, int numMarkerInFile, int[] WSNP) throws IOException {
 		int L = 0;
-		if (num_marker % 4 == 0) {
-			L = num_marker / 4;
+		if (numMarkerInFile % 4 == 0) {
+			L = numMarkerInFile / 4;
 		} else {
-			L = num_marker / 4 + 1;
+			L = numMarkerInFile / 4 + 1;
+		}
+		int exL = 0;
+		if (WSNP.length % 4 == 0) {
+			exL = WSNP.length / 4;
+		} else {
+			exL = WSNP.length / 4 + 1;
 		}
 		byte[] geno = new byte[L];
+		byte[] extract_geno = new byte[exL];
 		for (int i = 0; i < n_individual; i++) {
 			int n = in.read(geno, 0, L);
 			BFamilyStruct bf = familystructure.get(Famid.get(i));
 			BPerson per = bf.getPerson(Individualid.get(i));
-			per.addAllMarker(geno);
-			int c = 0;
-			while (c < num_marker) {
-				int posByte = c >> 2;
-				int posBite = (c - (c >> 2 << 2)) << 1;
-				int g = (geno[posByte] >> (posBite)) & 3;
-				if (g == 0) {
-					AlleleFreq[c][0] += 2;
-				} else if (g == 2) {
-					AlleleFreq[c][0]++;
-					AlleleFreq[c][1]++;
-				} else if (g == 3) {
-					AlleleFreq[c][1] += 2;
-				}
-				c++;
-			}
+			extract_geno = extractGenotype(geno, numMarkerInFile, WSNP);
+			per.addAllMarker(extract_geno);			
 		}
 		Famid = null;
 		Individualid = null;
 	}
 
-	private void snp_major(BufferedInputStream in) throws IOException {
+	private void snp_major(BufferedInputStream in, int numMarkerInFile, int[] WSNP) throws IOException {
 		int L = 0;
 		if (n_individual % 4 == 0) {
 			L = n_individual / 4;
@@ -130,8 +123,12 @@ public class BEDReader extends PedigreeFile {
 		}
 		byte[] g = new byte[L];
 
-		for (int i = 0; i < num_marker; i++) {
+		int c = 0;
+		for (int i = 0; i < numMarkerInFile; i++) {
 			int n = in.read(g, 0, L);
+			int idx = Arrays.binarySearch(WSNP, i);
+			if (idx < 0)
+				continue;
 			for (int j = 0; j < n_individual; j++) {
 				BFamilyStruct bf = familystructure.get(Famid.get(j));
 				BPerson per = bf.getPerson(Individualid.get(j));
@@ -139,15 +136,50 @@ public class BEDReader extends PedigreeFile {
 				int posBite = (j - (j >> 2 << 2)) << 1;
 				int g1 = (g[posByte] >> posBite) & 3;
 				if (g1 == 0) {
-					AlleleFreq[i][0] += 2;
+					AlleleFreq[c][0] += 2;
 				} else if (g1 == 2) {
-					AlleleFreq[i][0]++;
-					AlleleFreq[i][1]++;
+					AlleleFreq[c][0]++;
+					AlleleFreq[c][1]++;
 				} else if (g1 == 3) {
-					AlleleFreq[i][1] += 2;
+					AlleleFreq[c][1] += 2;
 				}
-				per.addByteGenotype(g1, i);
+				per.addByteGenotype(g1, c);
 			}
+			c++;
 		}
+	}
+
+	private byte[] extractGenotype(byte[] g, int numMarkerInFile, int[] WSNP) {
+
+		int exL = 0;
+		if (WSNP.length % 4 == 0) {
+			exL = WSNP.length / 4;
+		} else {
+			exL = WSNP.length / 4 + 1;
+		}
+		byte[] Exg = new byte[exL];
+		int c = 0;
+		for (int i = 0; i < numMarkerInFile; i++) {
+			int idx = Arrays.binarySearch(WSNP, i);
+			if (idx < 0)
+				continue;
+			int posByte = i >> 2;
+			int posBite = (i - (i >> 2 << 2)) << 1;
+			int g1 = (g[posByte] >> posBite) & 3;
+
+			int ExposByte = c >> 2;
+			int ExposBite = (c - (c >> 2 << 2)) << 1;
+			Exg[ExposByte] |= g1 << ExposBite;
+			if (g1 == 0) {
+				AlleleFreq[c][0] += 2;
+			} else if (g1 == 2) {
+				AlleleFreq[c][0]++;
+				AlleleFreq[c][1]++;
+			} else if (g1 == 3) {
+				AlleleFreq[c][1] += 2;
+			}
+			c++;
+		}
+		return Exg;
 	}
 }

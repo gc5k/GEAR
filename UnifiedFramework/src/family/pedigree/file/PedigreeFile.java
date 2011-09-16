@@ -11,7 +11,7 @@ import java.util.Hashtable;
 import admixture.parameter.Parameter;
 
 import util.NewIt;
-import family.mdr.MDRConstant;
+import family.mdr.arsenal.MDRConstant;
 import family.pedigree.genotype.BFamilyStruct;
 import family.pedigree.genotype.BPerson;
 
@@ -81,10 +81,9 @@ public class PedigreeFile {
 	 * families. Note that the "Linkage" here is the relationship between
 	 * relatives in a pedigree, but is not that term of genetics.
 	 */
-	public void parseLinkage(String infile, int numMarker) throws IOException {
+	public void parseLinkage(String infile, int numMarkerInFile, int[] WSNP) throws IOException {
 		initial();
-		num_marker = numMarker;
-		int colNum = num_marker * 2 + 6;
+		num_marker = WSNP.length;
 		AlleleSet = new char[num_marker][2];
 		AlleleFreq = new short[num_marker][2];
 		for (int i = 0; i < num_marker; i++) {
@@ -99,29 +98,13 @@ public class PedigreeFile {
 		while ((line = reader.readLine()) != null) {
 
 			String[] tokenizer = line.split(MDRConstant.delim);
-
 			int numTokens = tokenizer.length;
-
-			if (numTokens % 2 == 0) {
-				numMarkers = (numTokens - 6) / 2;
-				if (numMarkers != num_marker) {
-					new IOException("Mismatched Colunm in pedfile. line " + (k + 2));
-				}
-			} else {
-				new IOException("Mismatched Column in pedfile. line " + (k + 2));
+			numMarkers = (numTokens - 6) / 2;
+			if (numMarkers != numMarkerInFile) {
+				throw new IllegalArgumentException("Mismatched Colunm in ped file at line " + (k + 1));
 			}
 
-			if (colNum != numTokens) {
-				// this line has a different number of columns
-				// should send some sort of error message
-				throw new IOException("Column number mismatch in pedfile. line " + (k + 2));
-			}
-
-			per = new BPerson(numMarkers);
-			// pseudoper = new PseudoPerson();
-			if (numTokens < 6) {
-				throw new IOException("Incorrect number of fields on line " + (k + 2));
-			}
+			per = new BPerson(num_marker);
 
 			if (tokenizer.length > 6) {
 
@@ -138,23 +121,27 @@ public class PedigreeFile {
 					per.setAffectedStatus(Status);
 
 				} catch (NumberFormatException nfe) {
-					throw new IOException("Pedfile error: invalid gender or affected status on line " + (k + 2));
+					throw new IOException("Pedfile error: invalid gender or affected status on line " + (k + 1));
 				}
 
+				int c = 0;
 				for (int j = 0; j < (tokenizer.length - 6) / 2; j++) {
+					int idx = Arrays.binarySearch(WSNP, j);
+					if(idx < 0) continue;
 					try {
 						String[] allele = { tokenizer[6 + j * 2], tokenizer[6 + j * 2 + 1] };
 						boolean flag = (allele[0].compareTo(Parameter.missing_allele) != 0) && (allele[1].compareTo(Parameter.missing_allele) != 0);
 						if (flag) {
-							int[] code = recode(j, allele);
-							per.addMarker(flag, code[0], code[1], j);
-							AlleleFreq[j][code[0]]++; AlleleFreq[j][code[1]]++;
+							int[] code = recode(c, allele);
+							per.addMarker(flag, code[0], code[1], c);
+							AlleleFreq[c][code[0]]++; AlleleFreq[c][code[1]]++;
 						} else {
-							per.addMarker(flag, 0, 0, j);
+							per.addMarker(flag, 0, 0, c);
 						}
 					} catch (NumberFormatException nfe) {
-						throw new IOException("Pedigree file input error: invalid genotype on line " + (k + 2));
+						throw new IllegalArgumentException("Pedigree file input error: invalid genotype on line " + (k + 1));
 					}
+					c++;
 				}
 				// check if the family exists already in the Hashtable
 				BFamilyStruct famstr = familystructure.get(per.getFamilyID());

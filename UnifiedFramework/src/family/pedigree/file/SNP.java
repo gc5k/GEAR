@@ -7,14 +7,14 @@ import admixture.parameter.Parameter;
  * @author Guo-Bo Chen chenguobo@gmail.com
  * Thanks Jelai Wang.
  */
-public class SNP {
+public class SNP implements Comparable<SNP>{
 	private String chr = "";
 	private String name = "";
 	private float distance = 0;
 	private int position = 0;
 	private String minor;
 	private char[] snp;
-	private short[] freq;
+	private double[] freq;
 
 	public SNP(String n) {
 		name = n;
@@ -65,12 +65,6 @@ public class SNP {
 		return distance;
 	}
 
-	public void setAllele(short[] freq) {
-		this.freq = new short[freq.length];
-		System.arraycopy(freq, 0, this.freq, 0, freq.length);
-//		System.err.println(name + " " + chr + " " + position + " " + freq[0] + " " + freq[1] + " " + snp[0] + " " + snp[1]);
-	}
-
 	public void setAllele(char[] a, short[] freq) {
 		if (a.length >= 3) {
 			System.err.println("more than 2 alleles for " + name);
@@ -83,9 +77,19 @@ public class SNP {
 		snp = new char[2];
 		System.arraycopy(a, 0, snp, 0, 2);
 
-		this.freq = new short[freq.length];
+		this.freq = new double[freq.length];
 		System.arraycopy(freq, 0, this.freq, 0, freq.length);
+	}
 
+	public void setAllele(double[] freq) {
+		this.freq = new double[freq.length];
+		System.arraycopy(freq, 0, this.freq, 0, freq.length);
+//		System.err.println(name + " " + chr + " " + position + " " + freq[0] + " " + freq[1] + " " + snp[0] + " " + snp[1]);
+	}
+
+	public void setAllelePolymorphism(char[] a) {
+		snp = new char[2];
+		System.arraycopy(a, 0, snp, 0, 2);
 	}
 
 	public String getPolymorphism(String g) {
@@ -139,5 +143,16 @@ public class SNP {
 			sb.append(minor);
 		}
 		return sb.toString();
+	}
+
+	@Override
+	public int compareTo(SNP snp) {
+		if(snp.chr.compareTo(this.chr) == 0) {
+			return snp.getPosition() - position;
+		} else if (snp.chr.compareTo(this.chr) < 0){
+			return Integer.MIN_VALUE;
+		} else {
+			return Integer.MAX_VALUE;
+		}
 	}
 }

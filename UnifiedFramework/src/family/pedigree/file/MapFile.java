@@ -5,19 +5,36 @@ import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.HashMap;
+
 import util.NewIt;
 
 
 public class MapFile {
 
 	protected static final String DELIMITER = "\\s+";
-	protected ArrayList<SNP> snpList;
+	protected ArrayList<SNP> snpList = NewIt.newArrayList();
+	protected HashMap<String, Integer> chrSNPCount = NewIt.newHashMap();
 	protected ArrayList<Integer> badline;
+	protected int[] WSNP;
+	protected int numMarkerOriginal;
 	protected String mf = null;
 	protected File mapfile = null;
 
 	public MapFile(String m) {
 		mf = m;
+	}
+
+	public void setWSNP(int[] WSNP) {
+		this.WSNP = WSNP;
+		ArrayList<SNP> filterSNP = NewIt.newArrayList();
+		filterSNP.ensureCapacity(WSNP.length);
+		for(int i = 0; i < WSNP.length; i++) {
+			SNP snp = snpList.get(WSNP[i]);
+			filterSNP.add(snp);
+		}
+		snpList = null;
+		snpList = filterSNP;
 	}
 
 	public void parseMap() {
@@ -27,9 +44,8 @@ public class MapFile {
 		try {
 			reader = new BufferedReader(new FileReader(mapfile));
 		} catch (IOException E) {
-			System.err.println("can't open map file\n");
+			throw new IllegalArgumentException("could not open map file");
 		}
-		snpList = NewIt.newArrayList();
 
 		String line = null;
 		try {
@@ -47,7 +63,7 @@ public class MapFile {
 				// Skip genetic distance field at tokens[2].
 				float dis = Float.parseFloat(tokens[2]);
 				int pos = Integer.parseInt(tokens[3]);
-				snpList.add(new SNP(chr, name, dis, pos));
+				addSNP(chr, name, dis, pos);
 			}
 			reader.close();
 		} catch (IOException E) {
@@ -61,23 +77,40 @@ public class MapFile {
 			}
 			System.exit(0);
 		}
+		numMarkerOriginal = snpList.size();
 	}
-	
-	public void addSNP(String chr, String name, float dis, int pos) {
-		if(snpList == null) {
-			snpList = NewIt.newArrayList();
+
+	public HashMap<String, Integer> getChrSNPCount() {
+		return chrSNPCount;
+	}
+
+	private void count(String chr) {
+		if(chrSNPCount.containsKey(chr)) {
+			Integer c = chrSNPCount.get(chr);
+			c++;
+			chrSNPCount.put(chr, c);
+		} else {
+			chrSNPCount.put(chr, new Integer(1));
 		}
+	}
+
+	public void addSNP(String chr, String name, float dis, int pos) {
+		count(chr);
 		snpList.add(new SNP(chr, name, dis, pos));
 	}
 
+	public void addSNP(String chr, String name, float dis, int pos, char a1, char a2) {
+		count(chr);
+		snpList.add(new SNP(chr, name, dis, pos, a1, a2));
+	}
+
 	public void setMarker(int l) {
-		snpList = NewIt.newArrayList();
 		snpList.ensureCapacity(l);
 		for(int i = 0; i < l; i++ ) {
 			StringBuilder sb = new StringBuilder();
 			sb.append("snp");
 			sb.append(i);
-			snpList.add(new SNP(sb.toString(), "-1", -1f, -1));
+			addSNP(sb.toString(), "-1", -1f, -1);
 		}
 	}
 	
@@ -89,6 +122,10 @@ public class MapFile {
 		return snpList.get(i).getName();
 	}
 	
+	public int getMarkerNumberOriginal() {
+		return numMarkerOriginal;
+	}
+
 	public int getMarkerNumber() {
 		return snpList.size();
 	}
@@ -108,11 +145,18 @@ public class MapFile {
 			}
 		}
 	}
-	
-	public void setPolymorphism(short[][] freq) {
+
+	public void setAlleleFrequency(double[][] freq) {
 		for(int i = 0; i < freq.length; i++) {
 			SNP snp = snpList.get(i);
 			snp.setAllele(freq[i]);
+		}
+	}
+
+	public void setPolymorphismMarker(char[][] p) {
+		for(int i = 0; i < p.length; i++) {
+			SNP snp = snpList.get(i);
+			snp.setAllelePolymorphism(p[i]);
 		}
 	}
 }

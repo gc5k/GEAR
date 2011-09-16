@@ -1,6 +1,7 @@
 package family.pedigree.design.hierarchy;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.Hashtable;
 import java.util.Random;
@@ -60,6 +61,7 @@ public abstract class ChenBase implements ChenInterface {
 
 		private void qualification() {
 			Hashtable<String, BFamilyStruct> Fam = PedData.getFamilyStruct();
+
 			num_qualified = new int[Fam.size()][2];
 			filter = new boolean[Fam.size()][];
 			int c = 0;
@@ -67,10 +69,27 @@ public abstract class ChenBase implements ChenInterface {
 				BFamilyStruct fs = Fam.get(fi);
 				String[] pi = fs.getPersonListSorted();
 				filter[c] = new boolean[pi.length];
+
+				// filter_family
+				if (Parameter.exfamFlag) {
+					if (Arrays.binarySearch(Parameter.ex_family, fi) >= 0) {
+						for (int i = 0; i < filter[c].length; i++) {
+							filter[c][i] = false;
+						}
+						c++;
+						continue;
+					}
+				}
+
 				if (PhenoData == null) {
 					int cc = 0;
 					for (int i = 0; i < pi.length; i++) {
 						BPerson per = fs.getPerson(pi[i]);
+						boolean hf = hardFilter(per);
+						if (!hf) {
+							filter[c][cc++] = hf;
+							continue;
+						}
 						int s = per.getAffectedStatus();
 						boolean f = ((s + Parameter.status_shift) == 1 || (s + Parameter.status_shift) == 0) ? true : false;
 
@@ -90,10 +109,14 @@ public abstract class ChenBase implements ChenInterface {
 					}
 				} else {
 					FamilyUnit FamUnit = PhenoData.getFamilyUnit(fi);
-
 					int cc = 0;
 					for (int i = 0; i < pi.length; i++) {
 						BPerson per = fs.getPerson(pi[i]);
+						boolean hf = hardFilter(per);
+						if (!hf) {
+							filter[c][cc++] = hf;
+							continue;
+						}
 						boolean f = FamUnit.containsSubject(pi[i]);
 						if (f) {
 							Subject sub = FamUnit.getSubject(pi[i]);
@@ -139,6 +162,20 @@ public abstract class ChenBase implements ChenInterface {
 			 */
 
 		}
+
+		protected boolean hardFilter(BPerson p) {
+			boolean flag = true;
+			if (Parameter.filter_maleFlag) {
+				return flag = p.getGender() == 1 ? true : false;
+			}
+			if (Parameter.filter_femaleFlag) {
+				return flag = p.getGender() == 2 ? true : false;
+			}
+			if (Parameter.ex_nosexFlag) {
+				return flag = (p.getGender() == 1 || p.getGender() == 2) ? true : false;
+			}
+			return flag;
+		}
 	}
 
 	public ChenBase(PedigreeFile ped, PhenotypeFile phe, MapFile map, long s, int pIdx, int[] cIdx, int m) {
@@ -165,7 +202,7 @@ public abstract class ChenBase implements ChenInterface {
 
 	protected void fetchScore(int pheIdx) {
 		double sum = 0;
-		if(PersonTable.size() < 10) {
+		if (PersonTable.size() < 10) {
 			System.err.println("too few effective individuals (" + PersonTable.size() + ") for the selected trait.");
 			System.exit(0);
 		}
@@ -190,7 +227,7 @@ public abstract class ChenBase implements ChenInterface {
 	}
 
 	protected void buildScoreII() {
-		if(PersonTable.size() < 10) {
+		if (PersonTable.size() < 10) {
 			System.err.println("too few effective individuals (" + PersonTable.size() + ") for the selected trait.");
 			System.exit(0);
 		}
@@ -220,7 +257,7 @@ public abstract class ChenBase implements ChenInterface {
 	}
 
 	protected void buildScore(int pheIdx, int[] covIdx, int method) {
-		if(PersonTable.size() < 10) {
+		if (PersonTable.size() < 10) {
 			System.err.println("too few effective individuals (" + PersonTable.size() + ") for the selected trait.");
 			System.exit(0);
 		}

@@ -5,7 +5,7 @@ import java.util.TreeMap;
 import java.util.TreeSet;
 
 import family.RabinowitzLairdAlgorithm.AbstractGenoDistribution;
-import family.mdr.MDRConstant;
+import family.mdr.arsenal.MDRConstant;
 
 import util.NewIt;
 

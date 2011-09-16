@@ -6,7 +6,7 @@ package family.RabinowitzLairdAlgorithm.lou;
 import java.util.TreeMap;
 
 import family.RabinowitzLairdAlgorithm.AbstractGenoDistribution;
-import family.mdr.MDRConstant;
+import family.mdr.arsenal.MDRConstant;
 
 /**
  * Class for observing both parental genotypes.

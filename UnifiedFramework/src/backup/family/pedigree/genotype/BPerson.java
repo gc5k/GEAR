@@ -1,6 +1,6 @@
 package backup.family.pedigree.genotype;
 
-import family.mdr.MDRConstant;
+import family.mdr.arsenal.MDRConstant;
 
 /**
  * stores the genotypes of each individual. this class is not thread safe

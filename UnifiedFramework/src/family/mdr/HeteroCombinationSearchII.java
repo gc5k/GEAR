@@ -4,8 +4,12 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Set;
 
+import admixture.parameter.Parameter;
+
 import util.NewIt;
 
+import family.mdr.arsenal.MDRConstant;
+import family.mdr.arsenal.MDRStatistic;
 import family.mdr.arsenal.ToolKit;
 import family.mdr.data.PersonIndex;
 import family.mdr.result.Cell;
@@ -21,23 +25,29 @@ public class HeteroCombinationSearchII extends AbstractMergeSearch {
 		private int cv;
 		private ArrayList<PersonIndex> dr;
 		private MapFile mf;
-		private int[] in_snp = null;
-		private int[] ex_snp = null;
-
+		private int[] wseq = null;
+		private int[] bgseq = null;
+		private int[][] wseq2 = null;
 		private int N = 1;
 		private boolean mute = false;
 
-		public Builder(int cv, ArrayList<PersonIndex> dr, MapFile mf,
-				int[] in_snp, int[] ex_snp) {
+		public Builder(int cv, ArrayList<PersonIndex> dr, MapFile mf) {
 			this.cv = cv;
 			this.dr = dr;
 			this.mf = mf;
-			this.in_snp = in_snp;
-			this.ex_snp = ex_snp;
 		}
 
-		public Builder topN(int n) {
-			this.N = n;
+		public Builder wseq(int[] wseq) {
+			this.wseq = wseq;
+			return this;
+		}
+		
+		public Builder wseqw(int[][] wseq2) {
+			this.wseq2 = wseq2;
+			return this;
+		}
+		public Builder bgseq(int[] bgseq) {
+			this.bgseq = bgseq;
 			return this;
 		}
 
@@ -52,8 +62,8 @@ public class HeteroCombinationSearchII extends AbstractMergeSearch {
 	}
 
 	public HeteroCombinationSearchII(Builder builder) {
-		super(builder.cv, builder.dr, builder.mf, builder.in_snp,
-				builder.ex_snp, builder.N, builder.mute);
+		super(builder.cv, builder.dr, builder.mf, builder.wseq,
+				builder.bgseq, builder.N, builder.mute);
 	}
 
 	public void search(int or, int N) {
@@ -68,6 +78,7 @@ public class HeteroCombinationSearchII extends AbstractMergeSearch {
 
 		for (; cg.hasNext();) {
 			String m = cg.next();
+			if (rnd.nextDouble() > Parameter.thin) continue;
 			kernal(m);
 			count++;
 			if (!mute) {
