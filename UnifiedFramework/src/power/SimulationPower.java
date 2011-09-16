@@ -7,7 +7,7 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map.Entry;
 
-import family.mdr.MDRStatistic;
+import family.mdr.arsenal.MDRStatistic;
 
 import util.NewIt;
 

@@ -6,6 +6,7 @@ import java.util.Map.Entry;
 
 import publicAccess.PublicData;
 
+import family.mdr.arsenal.MDRConstant;
 import family.pedigree.file.MapFile;
 import family.pedigree.file.SNP;
 
@@ -26,7 +27,7 @@ public class Combination extends HashMap<String, Suite> {
 		StringBuffer sb = new StringBuffer();
 		for(Entry<String, Suite> entry: this.entrySet()) {
 			String key = entry.getKey();
-			String[] g = key.split(PublicData.seperator);
+			String[] g = key.split(MDRConstant.seperator);
 			sb.append("Geno:");
 			for(int i = 0; i < idx.length; i++) {
 				SNP snp = mf.getSNP(idx[i]);

@@ -5,15 +5,19 @@ import java.io.IOException;
 
 import admixture.parameter.Parameter;
 
+import family.mdr.filter.SNPFilter;
+import family.mdr.filter.SNPFilterI;
+import family.mdr.filter.SNPFilterInterface;
 import family.pedigree.file.MapFile;
 import family.pedigree.file.PedigreeFile;
 import family.pedigree.file.PhenotypeFile;
 
 public class PLINKParser {
+
 	protected MapFile mapData = null;
 	protected PedigreeFile pedData = null;
 	protected PhenotypeFile phenoData = null;
-
+	protected SNPFilterInterface snpFilter;
 	protected String pedigreeFile;
 	protected String phenotypeFile;
 	protected String mapFile;
@@ -43,7 +47,8 @@ public class PLINKParser {
 			ParsePedFile();
 			mapData.setMarker(pedData.getNumMarker());
 		}
-		mapData.setPolymorphism(pedData.getPolymorphism(), pedData.getAlleleFrequency());
+//		mapData.setPolymorphism(pedData.getPolymorphism(), pedData.getAlleleFrequency());
+		mapData.setPolymorphismMarker(pedData.getPolymorphism());
 		pedData.cleanup();
 	}
 
@@ -51,6 +56,14 @@ public class PLINKParser {
 		if (mapFile != null) {
 			mapData.parseMap();
 		}
+		if (Parameter.x) {
+			snpFilter = new SNPFilterI(mapData);
+		} else {
+			snpFilter = new SNPFilter(mapData);
+		}
+		snpFilter.Select();
+		int[] WSNP = snpFilter.getWorkingSNP();
+		mapData.setWSNP(WSNP);
 	}
 
 	/**
@@ -63,7 +76,7 @@ public class PLINKParser {
 	public void ParsePedFile() {
 
 		try {
-			pedData.parseLinkage(pedigreeFile, mapData.getMarkerNumber());
+			pedData.parseLinkage(pedigreeFile, mapData.getMarkerNumberOriginal(), snpFilter.getWorkingSNP());
 		} catch (IOException e) {
 			System.err.println("Pedgree file initialization exception.");
 			e.printStackTrace(System.err);
@@ -97,5 +110,13 @@ public class PLINKParser {
 
 	public MapFile getMapData() {
 		return mapData;
+	}
+
+	public SNPFilterInterface getSNPFilter() {
+		return snpFilter;
+	}
+
+	public void setAlleleFrequency(double[][] freq) {
+		mapData.setAlleleFrequency(freq);
 	}
 }

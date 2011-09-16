@@ -9,7 +9,7 @@ import java.util.ArrayList;
 import admixture.parameter.Parameter;
 
 import util.NewIt;
-import family.mdr.MDRConstant;
+import family.mdr.arsenal.MDRConstant;
 import family.pedigree.genotype.BFamilyStruct;
 import family.pedigree.genotype.BPerson;
 

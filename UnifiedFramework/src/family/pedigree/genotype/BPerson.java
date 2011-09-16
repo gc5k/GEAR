@@ -1,6 +1,6 @@
 package family.pedigree.genotype;
 
-import family.mdr.MDRConstant;
+import family.mdr.arsenal.MDRConstant;
 
 /**
  * stores the genotypes of each individual. this class is not thread safe
@@ -170,11 +170,11 @@ public class BPerson {
 		int posBite = (idx - (idx >> shift << shift)) << 1;
 
 		if (flag) {
-			if(a2 == a1) {// add 00 or 11
+			if (a2 == a1) {// add 00 or 11
 				int c = ((a1 << 1) + a2) << posBite;
 				alleles[posByte] |= c;
 			} else {// add 10
-				int c = (byte) (2<<posBite);
+				int c = 2 << posBite;
 				alleles[posByte] |= c;
 			}
 		} else {// add 01
@@ -186,15 +186,15 @@ public class BPerson {
 		int posByte = idx >> shift;
 		int posBite = (idx - (idx >> shift << shift)) << 1;
 
-		alleles[posByte] = alleles[posByte] | (g << posBite);
+		alleles[posByte] |= g << posBite;
 	}
 
 	public void addAllMarker(byte[] g) {
 
-		for(int i = 0; i < g.length; i++) {
-			int posByte = i >> 2;  // one int holds 4 bytes.
-			int posBiteShift = (i -(i >> 2 << 2)) << 3;
-			alleles[posByte] |= (g[i] << posBiteShift);
+		for (int i = 0; i < g.length; i++) {
+			int posByte = i >> 2; // one int holds 4 bytes.
+			int posBiteShift = (i - (i >> 2 << 2)) << 3;
+			alleles[posByte] |= g[i] << posBiteShift;
 		}
 
 	}
@@ -203,7 +203,7 @@ public class BPerson {
 		int posByte = i >> shift;
 		int posBite = (i - (i >> shift << shift)) << 1;
 		int g = (alleles[posByte] >> (posBite)) & 3;
-		if (g == 1) {//01
+		if (g == 1) {// 01
 			return MDRConstant.missingGenotype;
 		} else {
 			if (g == 2) {
@@ -214,11 +214,19 @@ public class BPerson {
 		}
 	}
 
+	public int getAlleleArrayLength() {
+		return genoLen;
+	}
+
+	public int[] getAlleleArray() {
+		return alleles;
+	}
+
 	public String getBiAlleleGenotypeString(int i) {
 		int posByte = i >> shift;
 		int posBite = (i - (i >> shift << shift)) << 1;
 		int g = (alleles[posByte] >> posBite) & 3;
-		if (g == 1) {//01
+		if (g == 1) {// 01
 			return MDRConstant.missingGenotype;
 		} else {
 			StringBuffer sb = new StringBuffer();

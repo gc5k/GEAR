@@ -1,4 +1,4 @@
-package family.mdr;
+package family.mdr.arsenal;
 
 import org.apache.commons.math.MathException;
 import org.apache.commons.math.distribution.FDistributionImpl;

@@ -21,7 +21,6 @@ public class BIMReader extends MapFile {
 		} catch (IOException E) {
 			System.err.println("can't open map file\n");
 		}
-		snpList = NewIt.newArrayList();
 
 		String line = null;
 		try {
@@ -39,7 +38,7 @@ public class BIMReader extends MapFile {
 				// Skip genetic distance field at tokens[2].
 				float dis = Float.parseFloat(tokens[2]);
 				int pos = Integer.parseInt(tokens[3]);
-				snpList.add(new SNP(chr, name, dis, pos, tokens[4].charAt(0), tokens[5].charAt(0)));
+				addSNP(chr, name, dis, pos, tokens[4].charAt(0), tokens[5].charAt(0));
 			}
 			reader.close();
 		} catch (IOException E) {
@@ -53,6 +52,7 @@ public class BIMReader extends MapFile {
 			}
 			System.exit(0);
 		}
+		numMarkerOriginal = snpList.size();
 	}
 
 }

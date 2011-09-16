@@ -2,10 +2,7 @@ package family.mdr.arsenal;
 
 import java.util.HashMap;
 import java.util.Map.Entry;
-
 import family.mdr.result.Cell;
-
-import publicAccess.PublicData;
 
 import util.NewIt;
 
@@ -16,7 +13,7 @@ import util.NewIt;
 public class ToolKit {
 
 	public static int[] StringToIntArray(String s) {
-		String[] unit = s.split(PublicData.seperator);
+		String[] unit = s.split(MDRConstant.seperator);
 		int[] value = new int[unit.length];
 		for (int i = 0; i < unit.length; i++) {
 			value[i] = Integer.parseInt(unit[i]);
@@ -43,7 +40,7 @@ public class ToolKit {
 			if (i == (array.length - 1)) {
 				continue;
 			}
-			sb.append(PublicData.seperator);
+			sb.append(MDRConstant.seperator);
 		}
 		return sb.toString();
 	}

@@ -2,7 +2,7 @@ package family.mdr.result;
 
 import java.util.HashMap;
 
-import family.mdr.MDRConstant;
+import family.mdr.arsenal.MDRConstant;
 import util.NewIt;
 
 /**

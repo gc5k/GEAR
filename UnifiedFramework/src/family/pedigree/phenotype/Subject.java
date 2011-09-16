@@ -14,21 +14,15 @@ public class Subject {
     private String familyID;
     private String subjectID;
     private ArrayList<String> traits;
-    private ArrayList<Boolean> missing;
     private int numTraits;
-    private String missingData = ".";
 
     public Subject(int num) {
         traits = NewIt.newArrayList();
-        missing = NewIt.newArrayList();
         numTraits = num;
     }
 
     public void AddTrait(final String t) {
         traits.add(t);
-        if (t.equals(missingData)) {
-            missing.add(new Boolean(true));
-        }
     }
 
     public int getNumberofTraits() {
@@ -37,10 +31,6 @@ public class Subject {
 
     public ArrayList<String> getTraits() {
         return traits;
-    }
-
-    public ArrayList<Boolean> getmissing() {
-        return missing;
     }
 
     public void setFamilyID(String FID) {

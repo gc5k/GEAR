@@ -2,8 +2,15 @@ package family.mdr;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Random;
 import java.util.Map.Entry;
 
+import admixture.parameter.Parameter;
+
+import family.mdr.arsenal.MDRConstant;
+import family.mdr.arsenal.MDRStatistic;
+import family.mdr.arsenal.ModelGenerator;
+import family.mdr.arsenal.ModelGeneratorII;
 import family.mdr.data.PersonIndex;
 import family.mdr.result.Combination;
 import family.mdr.result.Suite;
@@ -18,7 +25,7 @@ import util.NewIt;
 
 public abstract class AbstractMergeSearch {
 	protected int order;
-	protected CombinationGenerator cg;
+	protected ModelGenerator cg;
 	protected ArrayList<Combination> cvTestingSet = NewIt.newArrayList();
 	// always keeps the K testing models of the current combination
 
@@ -36,13 +43,30 @@ public abstract class AbstractMergeSearch {
 	protected MDRStatistic bestStat;
 
 	protected boolean mute = true;
-
+	protected Random rnd = new Random(Parameter.seed);
+	
 	public AbstractMergeSearch(int c, ArrayList<PersonIndex> dr, MapFile mf,
-			int[] in_snp, int[] ex_snp, int n, boolean m) {
+			int[][] wseq, int[] bgSNP, int n, boolean m) {
 		cv = c;
 		data = dr;
 		mapData = mf;
-		cg = new CombinationGenerator(mf.getMarkerNumber(), in_snp, ex_snp);
+		cg = new ModelGeneratorII(wseq, bgSNP);
+
+		for (int i = 0; i < cv; i++) {
+			Combination testingMap = new Combination();
+			cvTestingSet.add(testingMap);
+		}
+		topN = n;
+	}
+		
+	
+	public AbstractMergeSearch(int c, ArrayList<PersonIndex> dr, MapFile mf,
+			int[] wseq, int[] bgSNP, int n, boolean m) {
+		cv = c;
+		data = dr;
+		mapData = mf;
+		cg = new ModelGenerator(wseq, bgSNP);
+
 		for (int i = 0; i < cv; i++) {
 			Combination testingMap = new Combination();
 			cvTestingSet.add(testingMap);

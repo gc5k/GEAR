@@ -7,9 +7,9 @@ import admixture.parameter.Parameter;
 import admixture.parameter.ParameterParser;
 
 import family.mdr.AbstractMergeSearch;
-import family.mdr.MDRConstant;
 import power.SimulationPower;
 import family.mdr.HeteroCombinationSearchII;
+import family.mdr.arsenal.MDRConstant;
 import family.pedigree.design.hierarchy.ChenInterface;
 import family.pedigree.design.hierarchy.SII;
 import family.pedigree.design.hierarchy.Unified;
@@ -50,7 +50,7 @@ public class UnifiedGMDR {
 
 			int[] includedMarkerIndex = ParameterParser.selectedSNP(chen.getMapFile(), p.includesnp);
 			int[] excludedMarkerIndex = ParameterParser.selectedSNP(chen.getMapFile(), p.excludesnp);
-			AbstractMergeSearch as = new HeteroCombinationSearchII.Builder(Parameter.cv, chen.getSample(), chen.getMapFile(), includedMarkerIndex, excludedMarkerIndex).mute(false).build();
+			AbstractMergeSearch as = new HeteroCombinationSearchII.Builder(Parameter.cv, chen.getSample(), chen.getMapFile()).wseq(includedMarkerIndex).bgseq(excludedMarkerIndex).mute(false).build();
 			for (int j = p.order; j <= p.order; j++) {
 
 				double[] pv = new double[p.permutation];

@@ -1,10 +1,10 @@
 
 package family.mdr.result;
 
-import family.mdr.MDRConstant;
 
 import java.util.ArrayList;
 
+import family.mdr.arsenal.MDRConstant;
 import family.mdr.data.PersonIndex;
 
 import util.NewIt;
