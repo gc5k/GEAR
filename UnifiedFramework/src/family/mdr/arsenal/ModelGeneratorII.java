@@ -6,23 +6,39 @@ import admixture.parameter.Parameter;
 
 public class ModelGeneratorII extends ModelGenerator {
 
-	private int[][] interactionSeq;
+	private int[][] wseq2;
 
-	public ModelGeneratorII(int[][] interactionSeq, int[] bgseq) {
+	public ModelGeneratorII(int[][] wseq2, int[] bgseq) {
 		super(bgseq);
-		this.interactionSeq = interactionSeq;
+		this.wseq2 = wseq2;
 	}
 
 	@Override
 	public void revup(int R) {
-
-		comb = new int[interactionSeq.length];
-		r = interactionSeq.length;
+		int L = 0;
+		if(bgSNP != null) {
+			L += bgSNP.length;
+		}
+		comb = new int[wseq2.length + L];
+		r = wseq2.length;
 		a = new int[r];
-
+		if (bgSNP != null) {
+			r = R - bgSNP.length;
+			System.arraycopy(bgSNP, 0, comb, 0, bgSNP.length);
+			StringBuilder sb = new StringBuilder();
+			for(int i = 0; i < bgSNP.length; i++) {
+				if(i != bgSNP.length -1) {
+					sb.append(bgSNP[i]);
+					sb.append(MDRConstant.seperator);
+				} else {
+					sb.append(bgSNP[i]);
+				}
+			}
+			header = sb.toString();
+		}
 		BigInteger nFact = BigInteger.ONE;
 		for (int i = 0; i < r; i++) {
-			nFact = nFact.multiply(new BigInteger(Integer.toString(interactionSeq[i].length)));
+			nFact = nFact.multiply(new BigInteger(Integer.toString(wseq2[i].length)));
 		}
 
 		total = nFact;
@@ -63,7 +79,7 @@ public class ModelGeneratorII extends ModelGenerator {
 		}
 
 		int i = r - 1;
-		while (a[i] == interactionSeq[i].length - 1) {
+		while (a[i] == wseq2[i].length - 1) {
 			i--;
 		}
 		a[i] = a[i] + 1;
@@ -88,12 +104,12 @@ public class ModelGeneratorII extends ModelGenerator {
 			sb.append(MDRConstant.seperator);
 		}
 		for (int i = 0; i < s.length; i++) {
-			comb[i + offset] = interactionSeq[i][s[i]];
+			comb[i + offset] = wseq2[i][s[i]];
 			if (i != s.length - 1) {
-				sb.append(interactionSeq[i][s[i]]);
+				sb.append(wseq2[i][s[i]]);
 				sb.append(MDRConstant.seperator);
 			} else {
-				sb.append(interactionSeq[i][s[i]]);
+				sb.append(wseq2[i][s[i]]);
 			}
 		}
 		return sb.toString();
@@ -103,7 +119,6 @@ public class ModelGeneratorII extends ModelGenerator {
 	 * @param args
 	 */
 	public static void main(String[] args) {
-		// TODO Auto-generated method stub
 		int[][] seq = { { 1, 2, 3 }, { 4, 5, 6, 12 }, { 7, 8, 9, 11 } };
 		ModelGenerator MG = new ModelGeneratorII(seq, null);
 		MG.revup(seq.length);

@@ -10,7 +10,9 @@ import admixture.parameter.ParameterParser;
 import family.mdr.AbstractMergeSearch;
 import family.mdr.HeteroCombinationSearchII;
 import family.mdr.arsenal.MDRConstant;
-import family.mdr.filter.SNPFilterII;
+import family.mdr.arsenal.ModelGenerator;
+import family.mdr.arsenal.ModelGeneratorII;
+import family.mdr.filter.softfilter.SoftSNPFilter;
 import family.pedigree.design.hierarchy.AJHG2008;
 import family.pedigree.design.hierarchy.ChenInterface;
 import family.pedigree.design.hierarchy.SII;
@@ -68,11 +70,16 @@ public class RealDataAnalyzerII {
 		af.CalculateAlleleFrequency();
 		pp.setAlleleFrequency(af.getAlleleFrequency());
 
-		int[] includedMarkerIndex = ParameterParser.selectedSNP(chen.getMapFile(), p.includesnp);
-		int[] excludedMarkerIndex = ParameterParser.selectedSNP(chen.getMapFile(), p.excludesnp);
-		SNPFilterII snpFilterII = new SNPFilterII(pp.getSNPFilter());
-		AbstractMergeSearch as = new HeteroCombinationSearchII.Builder(Parameter.cv, chen.getSample(), chen.getMapFile()).wseq(snpFilterII.getwseq()).
-				bgseq(snpFilterII.getBgSNP()).mute(false).build();
+		SoftSNPFilter snpFilterII = new SoftSNPFilter(pp.getSNPFilter());
+		AbstractMergeSearch as;
+		ModelGenerator mg;
+		if (Parameter.x) {
+			mg = new ModelGeneratorII(snpFilterII.getWSeq2(), snpFilterII.getBgSeq());
+		} else {
+			mg = new ModelGenerator(snpFilterII.getWSeq(), snpFilterII.getBgSeq());
+		}
+		as = new HeteroCombinationSearchII.Builder(Parameter.cv, chen.getSample(), chen.getMapFile()).
+		ModelGenerator(mg).mute(false).build();
 
 		PrintStream PW = new PrintStream("ugmdr.txt");
 		System.setOut(PW);

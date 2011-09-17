@@ -46,26 +46,11 @@ public abstract class AbstractMergeSearch {
 	protected Random rnd = new Random(Parameter.seed);
 	
 	public AbstractMergeSearch(int c, ArrayList<PersonIndex> dr, MapFile mf,
-			int[][] wseq, int[] bgSNP, int n, boolean m) {
+			ModelGenerator mg, int n, boolean m) {
 		cv = c;
 		data = dr;
 		mapData = mf;
-		cg = new ModelGeneratorII(wseq, bgSNP);
-
-		for (int i = 0; i < cv; i++) {
-			Combination testingMap = new Combination();
-			cvTestingSet.add(testingMap);
-		}
-		topN = n;
-	}
-		
-	
-	public AbstractMergeSearch(int c, ArrayList<PersonIndex> dr, MapFile mf,
-			int[] wseq, int[] bgSNP, int n, boolean m) {
-		cv = c;
-		data = dr;
-		mapData = mf;
-		cg = new ModelGenerator(wseq, bgSNP);
+		cg = mg;
 
 		for (int i = 0; i < cv; i++) {
 			Combination testingMap = new Combination();
