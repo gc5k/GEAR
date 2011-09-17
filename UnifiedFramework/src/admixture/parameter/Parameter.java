@@ -222,7 +222,7 @@ public class Parameter {
 		ops.addOption(OptionBuilder.withDescription("specify the file containing included snps when detecting interaction").hasArg().create(
 				cmd_snp_f));
 
-		ops.addOption(OptionBuilder.withDescription("specify interacting snps").hasArgs().create(cmd_x));
+		ops.addOption(OptionBuilder.withDescription("specify interacting snps").create(cmd_x));
 
 		ops.addOption(OptionBuilder.withDescription("specify excluded families").hasArgs().create(cmd_ex_fam));
 		ops.addOption(OptionBuilder.withDescription("specify the file containing excluded family ids").hasArg().create(cmd_ex_fam_file));
@@ -390,6 +390,7 @@ public class Parameter {
 				throw new IllegalArgumentException("could not open " + fpheno);
 			}
 		}
+
 		if (cl.hasOption(cmd_covar)) {
 			String[] p = cl.getOptionValues(cmd_covar);
 			HashSet<Integer> idx = NewIt.newHashSet();
@@ -501,10 +502,18 @@ public class Parameter {
 						}
 					}
 				}
-				xincludesnp = (String[]) insnp.toArray(new String[0]);
-				xinsnpPair = (String[]) insnp.toArray(new String[0]);
+				if (insnp.size() > 0) {
+					xincludesnp = (String[]) insnp.toArray(new String[0]);
+					snpFlag = true;
+				} 
+				if (insnppair.size() > 0) {
+					xinsnpPair = (String[]) insnppair.toArray(new String[0]);
+					snpPairFlag = true;
+				}
+
 			}
 		}
+
 		if (cl.hasOption(cmd_bgsnp)) {
 			String[] bg = cl.getOptionValues(cmd_bgsnp);
 			HashSet<String> bgSet = NewIt.newHashSet();
@@ -684,6 +693,7 @@ public class Parameter {
 			}
 			chrFlag = true;
 		}
+
 		if (cl.hasOption(cmd_snpwindow)) {
 			String[] s = cl.getOptionValues("snpwindow");
 			snpwindow = new String[s.length];
@@ -701,9 +711,6 @@ public class Parameter {
 		}
 		if (cl.hasOption(cmd_header)) {
 			header = true;
-		}
-		if (cl.hasOption(cmd_x)) {
-			x = true;
 		}
 		// if (cl.hasOption(cmd_topN)) {
 		// topN = Integer.parseInt(cl.getOptionValue(cmd_topN));
