@@ -2,13 +2,15 @@ package util;
 
 import java.util.Random;
 
+import admixture.parameter.Parameter;
+
 /**
  * 
  * @author Guo-Bo Chen, chenguobo@gmail.com
  */
 public class Sample {
 	public static long seed = 2011;
-	public static Random U = new Random(2011);
+	public static Random U = new Random(Parameter.seed);
 
 	public static void setSeed(long s) {
 		U.setSeed(s);

@@ -24,7 +24,7 @@ package statistics.FisherExactTest;
  */
 
 public class FisherExact {
-    private static final boolean DEBUG = false;
+    private static final boolean DEBUG = true;
     private double[] f;
     int maxSize;
 
@@ -293,7 +293,7 @@ public class FisherExact {
     public static void main(String[] args) {
 
         int[][] argInts = new int[15][4];
-        argInts[0] = new int[]{2, 3, 6, 4};
+        argInts[0] = new int[]{3, 1, 1, 15};
         argInts[1] = new int[]{2, 1, 3, 0};
         argInts[2] = new int[]{3, 0, 2, 1};
         argInts[3] = new int[]{1, 2, 0, 3};
