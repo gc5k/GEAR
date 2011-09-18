@@ -4,7 +4,6 @@ import java.io.IOException;
 import java.util.Arrays;
 
 import admixture.parameter.Parameter;
-import admixture.parameter.ParameterParser;
 
 import family.mdr.AbstractMergeSearch;
 import power.SimulationPower;
@@ -19,6 +18,8 @@ import family.pedigree.design.hierarchy.Unified;
 import family.pedigree.design.hierarchy.UnifiedII;
 import family.pedigree.design.hierarchy.UnifiedUnrelated;
 import family.plink.PLINKParser;
+import family.popstat.AlleleFrequency;
+import family.popstat.GenotypeMatrix;
 
 /**
  * 
@@ -50,8 +51,13 @@ public class UnifiedGMDR {
 				chen = new SII(pp.getPedigreeData(), pp.getPhenotypeData(), pp.getMapData(), s, p.response, p.predictor, p.linkfunction);
 			}
 
+			GenotypeMatrix GM = new GenotypeMatrix(chen);
+			AlleleFrequency af = new AlleleFrequency(GM);
+			af.CalculateAlleleFrequency();
+			pp.setAlleleFrequency(af.getAlleleFrequency());
 
-			SoftSNPFilter snpFilterII = new SoftSNPFilter(pp.getSNPFilter());
+			SoftSNPFilter snpFilterII = new SoftSNPFilter(pp.getSNPFilter(), af);
+
 			AbstractMergeSearch as;
 			ModelGenerator mg;
 			if (Parameter.x) {

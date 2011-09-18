@@ -5,7 +5,6 @@ import java.io.PrintStream;
 import java.util.Arrays;
 
 import admixture.parameter.Parameter;
-import admixture.parameter.ParameterParser;
 
 import family.mdr.AbstractMergeSearch;
 import family.mdr.HeteroCombinationSearchII;
@@ -72,7 +71,13 @@ public class Test {
 		AF.CalculateAlleleFrequency();
 		System.out.println(AF);
 
-		SoftSNPFilter snpFilterII = new SoftSNPFilter(pp.getSNPFilter());
+		GenotypeMatrix GM = new GenotypeMatrix(chen);
+		AlleleFrequency af = new AlleleFrequency(GM);
+		af.CalculateAlleleFrequency();
+		pp.setAlleleFrequency(af.getAlleleFrequency());
+
+		SoftSNPFilter snpFilterII = new SoftSNPFilter(pp.getSNPFilter(), af);
+
 		AbstractMergeSearch as;
 		ModelGenerator mg;
 		if (Parameter.x) {

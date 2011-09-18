@@ -5,7 +5,6 @@ import java.io.PrintStream;
 import java.util.Arrays;
 
 import admixture.parameter.Parameter;
-import admixture.parameter.ParameterParser;
 
 import family.mdr.AbstractMergeSearch;
 import family.mdr.HeteroCombinationSearchII;
@@ -68,15 +67,18 @@ public class RealDataAnalyzerII {
 		GenotypeMatrix GM = new GenotypeMatrix(chen);
 		AlleleFrequency af = new AlleleFrequency(GM);
 		af.CalculateAlleleFrequency();
+		System.err.println(af);
 		pp.setAlleleFrequency(af.getAlleleFrequency());
 
-		SoftSNPFilter snpFilterII = new SoftSNPFilter(pp.getSNPFilter());
+		SoftSNPFilter softFilter = new SoftSNPFilter(pp.getSNPFilter(), af);
+		softFilter.Filter();
+		
 		AbstractMergeSearch as;
 		ModelGenerator mg;
 		if (Parameter.x) {
-			mg = new ModelGeneratorII(snpFilterII.getWSeq2(), snpFilterII.getBgSeq());
+			mg = new ModelGeneratorII(softFilter.getWSeq2(), softFilter.getBgSeq());
 		} else {
-			mg = new ModelGenerator(snpFilterII.getWSeq(), snpFilterII.getBgSeq());
+			mg = new ModelGenerator(softFilter.getWSeq(), softFilter.getBgSeq());
 		}
 		as = new HeteroCombinationSearchII.Builder(Parameter.cv, chen.getSample(), chen.getMapFile()).
 		ModelGenerator(mg).mute(false).build();

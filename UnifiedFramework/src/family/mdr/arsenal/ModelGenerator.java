@@ -38,6 +38,10 @@ public class ModelGenerator implements Iterator<String> {
 			if (R < bgSNP.length) {
 				R = bgSNP.length;
 			}
+		} else {
+			if (R > seq.length) {
+				throw new IllegalArgumentException ("the number of qualified snps were fewer than the order of interaction.");
+			}
 		}
 		len = seq.length;
 		comb = new int[R];

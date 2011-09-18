@@ -29,13 +29,13 @@ import util.NewIt;
 public class Parameter {
 
 	private final String incommand_separator = ",";
-	private final String cmd_missing_allele = "missing_allele";
+	private final String cmd_missing_allele = "missingallele";
 	public static String missing_allele = "0";
 
-	private final String cmd_missing_phenotype = "missing_phenotype";
+	private final String cmd_missing_phenotype = "missingphenotype";
 	public static String missing_phenotype = "-9";
 
-	private final String cmd_missing_genotype = "missing_genotype";
+	private final String cmd_missing_genotype = "missinggenotype";
 	public static String missing_genotype = "0";
 
 	private final String cmd_status_shift = "1";
@@ -84,6 +84,10 @@ public class Parameter {
 	public static int[] predictor = null;
 	private final String cmd_covar_name = "covarname";
 	public static String[] predictor_name = null;
+	
+	private final String cmd_method = "model";
+	public int linkfunction = 0;
+	private String[] lf = new String[] { "0 for linear regression", "1 for logistic regression" };
 	// phenotype set end
 
 	// individual selection start
@@ -134,7 +138,7 @@ public class Parameter {
 	public static boolean xsnpFlag = false;
 	public static boolean xsnpPairFlag = false;
 	   //end it
-	
+
 	private final String cmd_bgsnp = "bgsnp";
 	public static boolean bgsnpFlag = false;
 	public static String[] bgsnp = null;
@@ -143,29 +147,39 @@ public class Parameter {
 	public static boolean x = false;
 	// snp selection end
 
+	//soft snp selection 
+	private final String cmd_maf = "maf";
+	public static double maf = -1;
+	public static boolean mafFlag = false;
+	
+	private final String cmd_geno = "geno";
+	public static double geno = 2;
+	public static boolean genoFlag = false;
+	
 	private final String cmd_header = "header";
 	public static boolean header = false;
 
-	private final String cmd_method = "model";
-	public int linkfunction = 0;
-	private String[] lf = new String[] { "0 for linear regression", "1 for logistic regression" };
-
-	private final String cmd_cv = "cv";
-	public static int cv = 5;
-
-	private final String cmd_order = "order";
-	public static int order = 1;
-
+	//sampling & partitioning start
 	private final String cmd_thin = "thin";
 	public static double thin = 1.0;
 	
 	private final String cmd_slice = "slice";
 	public static int sliceN = 1;
 	public static int slice = 1;
+	//sampling & partitioning end
+	
+	//mdr options start
+	private final String cmd_cv = "cv";
+	public static int cv = 5;
+	
+	private final String cmd_order = "order";
+	public static int order = 1;
 
-	private final String cmd_sd = "seed";
+	private final String cmd_seed = "seed";
 	public static int seed = 2011;
-
+	//mdr option end
+	
+	
 	private final String cmd_perm = "permut";
 	public int permutation = 100;
 
@@ -242,9 +256,9 @@ public class Parameter {
 		ops.addOption(OptionBuilder.withDescription("specify the order of interaction.").hasArg().create(cmd_order));
 		ops.addOption(OptionBuilder.withDescription("specify the random sample fraction.").hasArg().create(cmd_thin));
 		ops.addOption(OptionBuilder.withDescription("specify partition of the searching space.").hasArg().create(cmd_slice));
-		// ops.addOption(OptionBuilder.withDescription("minimal order of the interaction being searched for.").hasArg().create(cmd_min));
-		// ops.addOption(OptionBuilder.withDescription("maximal order of the interaction being searched for.").hasArg().create(cmd_max));
-		ops.addOption(OptionBuilder.withDescription("seed for the algorithms").hasArg().create(cmd_sd));
+		ops.addOption(OptionBuilder.withDescription("specify the minor allele frequency for inclusion.").hasArg().create(cmd_maf));
+		ops.addOption(OptionBuilder.withDescription("specify missing genotype rate for inclusion.").hasArg().create(cmd_geno));
+		ops.addOption(OptionBuilder.withDescription("seed for the algorithms").hasArg().create(cmd_seed));
 
 		ops.addOption(OptionBuilder.withDescription("replication for permutation.  Default is 100.").hasArg().create(cmd_perm));
 		ops.addOption(OptionBuilder.withDescription("only sibs are exchangeable when this option is turned on").create(cmd_perm_scheme));
@@ -701,7 +715,7 @@ public class Parameter {
 			for (int i = 0; i < s.length; i++) {
 				String[] ss = s[i].split(incommand_separator);
 				if(ss.length != 3) {
-					throw new IllegalArgumentException("bad parameter for -snpwindow: " + s[i]);
+					throw new IllegalArgumentException("bad parameter for --snpwindow: " + s[i]);
 				}
 				snpwindow[i] = ss[0];
 				snp_window[i][0] = Double.parseDouble(ss[1]) * -1000;
@@ -709,6 +723,23 @@ public class Parameter {
 			}
 			snpwindowFlag = true;
 		}
+		
+		if (cl.hasOption(cmd_maf)) {
+			maf = Double.parseDouble(cl.getOptionValue(cmd_maf));
+			if (maf < 0) {
+				throw new IllegalArgumentException("bad parameter for --maf: " + maf);
+			}
+			mafFlag = true;
+		}
+		
+		if (cl.hasOption(cmd_geno)) {
+			geno = Double.parseDouble(cl.getOptionValue(cmd_geno));
+			if (geno < 0) {
+				throw new IllegalArgumentException("bad parameter for --geno: " + geno);
+			}
+			genoFlag = true;
+		}
+
 		if (cl.hasOption(cmd_header)) {
 			header = true;
 		}
@@ -725,8 +756,8 @@ public class Parameter {
 		if (cl.hasOption(cmd_cv)) {
 			cv = Integer.parseInt(cl.getOptionValue(cmd_cv));
 		}
-		if (cl.hasOption(cmd_sd)) {
-			seed = Integer.parseInt(cl.getOptionValue(cmd_sd));
+		if (cl.hasOption(cmd_seed)) {
+			seed = Integer.parseInt(cl.getOptionValue(cmd_seed));
 		}
 		if (cl.hasOption(cmd_simu)) {
 			simu = Integer.parseInt(cl.getOptionValue(cmd_simu));
