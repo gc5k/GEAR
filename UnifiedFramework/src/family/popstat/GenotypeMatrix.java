@@ -9,20 +9,28 @@ import family.pedigree.design.hierarchy.ChenInterface;
 public class GenotypeMatrix {
 
 	protected int[][] genotypeMat;
+	protected int lenMat;
+	protected int lenMatF;
 	protected final int shift = 4;
 	protected int numMarker = 0;
+	protected ArrayList<PersonIndex> pidx;
 
 	public GenotypeMatrix(ChenInterface cb) {
-		initial(cb);
+		pidx = cb.getSample();
+		initial();
 	}
-	
-	private void initial(ChenInterface cb) {
-		ArrayList<PersonIndex> pidx = cb.getSample();
+
+	protected void initial() {
+
 		genotypeMat = new int[pidx.size()][];
-		for(int i = 0; i < pidx.size(); i++) {
-			genotypeMat[i] = pidx.get(i).getPerson().getAlleleArray();
+		int c1 = 0;
+		for (PersonIndex pi : pidx) {
+			if (!pi.isPseudo()) {
+				genotypeMat[c1++] = pi.getPerson().getAlleleArray();
+			}
 		}
 		numMarker = pidx.get(0).getPerson().getNumMarkers();
+
 	}
 
 	public int getNumMarker() {
@@ -33,7 +41,7 @@ public class GenotypeMatrix {
 		int posByte = i >> shift;
 		int posBite = (i - (i >> shift << shift)) << 1;
 		int g = (genotypeMat[idx][posByte] >> (posBite)) & 3;
-		if (g == 1) {//01
+		if (g == 1) {// 01
 			return 2;
 		} else {
 			if (g == 2) {
@@ -43,24 +51,24 @@ public class GenotypeMatrix {
 			}
 		}
 	}
-	
+
 	public int[] getBiAlleleGenotype(int idx, int i) {
 		int posByte = i >> shift;
 		int posBite = (i - (i >> shift << shift)) << 1;
 		int g = (genotypeMat[idx][posByte] >> posBite) & 3;
-		int[] b = {2, 2};
+		int[] b = { 2, 2 };
 		if (g != 1) {
 			b[0] = (g >> 1) & 1;
 			b[1] = g & 1;
 		}
 		return b;
 	}
-	
+
 	public String getGenotypeScoreString(int idx, int i) {
 		int posByte = i >> shift;
 		int posBite = (i - (i >> shift << shift)) << 1;
 		int g = (genotypeMat[idx][posByte] >> (posBite)) & 3;
-		if (g == 1) {//01
+		if (g == 1) {// 01
 			return MDRConstant.missingGenotype;
 		} else {
 			if (g == 2) {
@@ -78,13 +86,13 @@ public class GenotypeMatrix {
 	public void Test() {
 		long t1 = System.currentTimeMillis();
 		System.err.println(t1);
-		for(int i = 0; i < genotypeMat.length; i++) {
-			for(int j = 0; j < numMarker; j++) {
+		for (int i = 0; i < genotypeMat.length; i++) {
+			for (int j = 0; j < numMarker; j++) {
 				getBiAlleleGenotype(i, j);
 			}
 		}
 		long t2 = System.currentTimeMillis();
-		System.err.println(t2-t1);
+		System.err.println(t2 - t1);
 
 	}
 }

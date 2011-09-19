@@ -8,13 +8,18 @@ public class PersonIndex {
 	private String FamilyID;
 	private String IndividualID;
 	private BPerson person;
+	private boolean pseudo;
+	private boolean isFounder;
 	private int group;
 	private double permutatedScore;
 	
-	public PersonIndex(String fid, String id, BPerson p) {
-		FamilyID = new String(fid);
-		IndividualID = id;
-		person = p;
+	public PersonIndex(String FamilyID, String IndividualID, BPerson person, boolean pseudo, boolean isFounder) {
+		this.FamilyID = FamilyID;
+		this.IndividualID = IndividualID;
+		this.person = person;
+		
+		this.pseudo = pseudo;
+		this.isFounder = isFounder;
 	}
 
 	public String getFamilyID() {
@@ -45,6 +50,14 @@ public class PersonIndex {
 		return group;
 	}
 	
+	public boolean isPseudo() {
+		return pseudo;
+	}
+	
+	public boolean isFounder() {
+		return isFounder;
+	}
+
 	public String getGenotype(int[] idx) {
 		StringBuffer sb = new StringBuffer();
 		for(int i = 0; i < idx.length; i++) {
