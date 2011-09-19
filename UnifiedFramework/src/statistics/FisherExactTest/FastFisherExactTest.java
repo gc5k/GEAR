@@ -5,6 +5,8 @@ public class FastFisherExactTest {
 	private double Pobs;
 	private double Pexcess;
 	private double Pdificit;
+	private double Phwe;
+	private double Pw;
 	
 	private int N;
 	private int NAB;
@@ -15,8 +17,10 @@ public class FastFisherExactTest {
 		this.NA = NA;
 
 		Pobs = base();
+
 		Pexcess();
 		Pdificit();
+		Phwe += Pobs;
 	}
 
 	private double base() {
@@ -58,13 +62,16 @@ public class FastFisherExactTest {
 	public void Pexcess() {
 		Pexcess = Pobs;
 		double f = Pobs;
-		for (int i = NAB; i <= NA; i += 2) {
+		for (int i = NAB; i <= NA - 2 ; i += 2) {
 			
 			int NAA = (NA - i) / 2;
 			int NBB = (2 * N - NA - i) / 2;
 			f = f * 4 * NAA * NBB / ((i + 2) * (i + 1));
 			Pexcess += f;
-
+			if ( Pobs >= f) {
+				Phwe += f;
+			}
+			Pw += f;
 		}
 	}
 	
@@ -73,9 +80,13 @@ public class FastFisherExactTest {
 		double f = Pobs;
 		for (int i = NAB; i >= 0; i -= 2) {
 			int NAA = (NA - i) / 2;
-			int NBB = (2 * N - NA - 2) / 2;
+			int NBB = (2 * N - NA - i) / 2;
 			f = f * i * (i - 1) / (4 * (NAA + 1) * (NBB + 1));
 			Pdificit += f;
+			if ( Pobs >= f) {
+				Phwe += f;
+			}
+			Pw += f;
 		}
 	}
 	
@@ -88,19 +99,27 @@ public class FastFisherExactTest {
 	}
 
 	public double HDP() {
-		return Pexcess < Pdificit ? Pexcess : -1 * Pdificit;
+		return Phwe;
+	}
+
+	public double getPW() {
+		return Pw + Pobs;
+	}
+	
+	public double getPobs() {
+		return Pobs;
 	}
 
 	public static void main(String[] args) {
 		FastFisherExactTest f0 = new FastFisherExactTest(20, 0, 8);
-		System.out.println(f0.HDP());
+		System.out.println(f0.getPobs() + " " + f0.getPW() + " " + f0.HDP());
 		FastFisherExactTest f2 = new FastFisherExactTest(20, 2, 8);
-		System.out.println(f2.HDP());
+		System.out.println(f2.getPobs() + " " + f2.getPW() + " " + f2.HDP());
 		FastFisherExactTest f4 = new FastFisherExactTest(20, 4, 8);
-		System.out.println(f4.HDP());
+		System.out.println(f4.getPobs() + " " + f4.getPW() + " " + f4.HDP());
 		FastFisherExactTest f6 = new FastFisherExactTest(20, 6, 8);
-		System.out.println(f6.HDP());
+		System.out.println(f6.getPobs() + " " + f6.getPW() + " " + f6.HDP());
 		FastFisherExactTest f8 = new FastFisherExactTest(20, 8, 8);
-		System.out.println(f8.HDP());
+		System.out.println(f8.getPobs() + " " + f8.getPW() + " " + f8.HDP());
 	}
 }

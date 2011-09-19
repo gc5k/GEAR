@@ -2,18 +2,22 @@ package family.popstat;
 
 import statistics.FisherExactTest.FastFisherExactTest;
 
+import org.apache.commons.math.MathException;
+import org.apache.commons.math.stat.inference.ChiSquareTest;
+import org.apache.commons.math.stat.inference.ChiSquareTestImpl;
+
 public class AlleleFrequency {
 	private GenotypeMatrix G;
 	private int numMarker;
 	private double[][] allelefreq;
 	private double[][] genotypefreq;
-	private double[] hw;
+	private double[][] hw;
 	public AlleleFrequency(GenotypeMatrix g) {
 		G = g;
 		numMarker = g.numMarker;
 		allelefreq = new double[numMarker][3];
 		genotypefreq = new double[numMarker][4];
-		hw = new double[numMarker];
+		hw = new double[numMarker][2];
 	}
 
 	public void CalculateAlleleFrequency() {
@@ -52,8 +56,35 @@ public class AlleleFrequency {
 			}
 
 			FastFisherExactTest ff = new FastFisherExactTest(N, NAB, NA);
-			hw[i] = ff.HDP();
+			hw[i][0] = ff.HDP();
+			hw[i][1] = chiHWE(N, NAB, NA);
+
 		}
+	}
+
+	public double chiHWE(int N, int NAB, int NA) {
+		int n = N;
+		int na = NA;
+		int nb = 2 * N - na;
+
+		long[] O = { (na - NAB)/2, NAB, (nb - NAB)/2 };
+		double n_d = n * 1.0;
+		double na_d = na * 1.0;
+		double nb_d = nb * 1.0;
+		double[] E = { na_d * na_d / (4 * n), na_d * nb_d * 2 / (4*n), nb_d * nb_d / (4*n) };
+
+		ChiSquareTestImpl chi = new ChiSquareTestImpl();
+		double p = 0;
+		try {
+			p = chi.chiSquareTest(E, O);
+		} catch (IllegalArgumentException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (MathException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} 
+		return p;
 	}
 	
 	public double[][] getAlleleFrequency() {
@@ -69,7 +100,7 @@ public class AlleleFrequency {
 			sb.append(String.format("%.3f", allelefreq[i][0]) + " " + String.format("%.3f", allelefreq[i][1]) + " " + String.format("%.3f", allelefreq[i][2])
 					+ "; " + String.format("%.3f", genotypefreq[i][0]) 
 				+ " " + String.format("%.3f", genotypefreq[i][1]) + " " + String.format("%.3f", genotypefreq[i][2]) + " " + String.format("%.3f", genotypefreq[i][3]));
-			sb.append(" hw " + String.format("%.3f", hw[i]));
+			sb.append(" hw.fisher " + String.format("%.3f", hw[i][0]) + " hw.chi " + String.format("%.3f", hw[i][1]));
 			sb.append(System.getProperty("line.separator"));
 		}
 		return sb.toString();

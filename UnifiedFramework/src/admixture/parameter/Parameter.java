@@ -156,6 +156,10 @@ public class Parameter {
 	public static double geno = 2;
 	public static boolean genoFlag = false;
 	
+	private final String cmd_hwe = "hwe";
+	public static double hwe = -1;
+	public static boolean hweFlag = false;
+	
 	private final String cmd_header = "header";
 	public static boolean header = false;
 
@@ -258,6 +262,7 @@ public class Parameter {
 		ops.addOption(OptionBuilder.withDescription("specify partition of the searching space.").hasArg().create(cmd_slice));
 		ops.addOption(OptionBuilder.withDescription("specify the minor allele frequency for inclusion.").hasArg().create(cmd_maf));
 		ops.addOption(OptionBuilder.withDescription("specify missing genotype rate for inclusion.").hasArg().create(cmd_geno));
+		ops.addOption(OptionBuilder.withDescription("specify the p value of departure from Hardy-Weinberg Equilibrium for inclusion").hasArg().create(cmd_hwe));
 		ops.addOption(OptionBuilder.withDescription("seed for the algorithms").hasArg().create(cmd_seed));
 
 		ops.addOption(OptionBuilder.withDescription("replication for permutation.  Default is 100.").hasArg().create(cmd_perm));
@@ -738,6 +743,14 @@ public class Parameter {
 				throw new IllegalArgumentException("bad parameter for --geno: " + geno);
 			}
 			genoFlag = true;
+		}
+		
+		if (cl.hasOption(cmd_hwe)) {
+			hwe = Double.parseDouble(cl.getOptionValue(cmd_hwe));
+			if (hwe < 0) {
+				throw new IllegalArgumentException("bad parameter for --hwe: " + hwe);
+			}
+			hweFlag = true;
 		}
 
 		if (cl.hasOption(cmd_header)) {
