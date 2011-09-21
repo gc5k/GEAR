@@ -4,12 +4,9 @@ package family.mdr.result;
 import java.util.HashMap;
 import java.util.Map.Entry;
 
-import publicAccess.PublicData;
-
 import family.mdr.arsenal.MDRConstant;
 import family.pedigree.file.MapFile;
 import family.pedigree.file.SNP;
-
 
 /**
  *

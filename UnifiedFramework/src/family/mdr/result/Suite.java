@@ -4,6 +4,8 @@ package family.mdr.result;
 
 import java.util.ArrayList;
 
+import admixture.parameter.Parameter;
+
 import family.mdr.arsenal.MDRConstant;
 import family.mdr.data.PersonIndex;
 
@@ -99,7 +101,7 @@ public class Suite {
 			}
 		} else {
 			if ((ps / Math.abs(ns)) == threshold) {
-				s = MDRConstant.tieValue;
+				s = Parameter.tie;
 			} else {
 				s = (ps / Math.abs(ns)) > threshold ? 1 : 0;
 			}

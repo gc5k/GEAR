@@ -181,6 +181,9 @@ public class Parameter {
 
 	private final String cmd_seed = "seed";
 	public static int seed = 2011;
+	
+	private final String cmd_tie = "tie";
+	public static int tie = 1;
 	//mdr option end
 	
 	
@@ -264,7 +267,8 @@ public class Parameter {
 		ops.addOption(OptionBuilder.withDescription("specify missing genotype rate for inclusion.").hasArg().create(cmd_geno));
 		ops.addOption(OptionBuilder.withDescription("specify the p value of departure from Hardy-Weinberg Equilibrium for inclusion").hasArg().create(cmd_hwe));
 		ops.addOption(OptionBuilder.withDescription("seed for the algorithms").hasArg().create(cmd_seed));
-
+		ops.addOption(OptionBuilder.withDescription("specify the classification for a tie genotype").hasArg().create(cmd_tie));
+		
 		ops.addOption(OptionBuilder.withDescription("replication for permutation.  Default is 100.").hasArg().create(cmd_perm));
 		ops.addOption(OptionBuilder.withDescription("only sibs are exchangeable when this option is turned on").create(cmd_perm_scheme));
 		ops.addOption(OptionBuilder.withDescription(
@@ -771,6 +775,9 @@ public class Parameter {
 		}
 		if (cl.hasOption(cmd_seed)) {
 			seed = Integer.parseInt(cl.getOptionValue(cmd_seed));
+		}
+		if (cl.hasOption(cmd_tie)) {
+			tie = Integer.parseInt(cl.getOptionValue(cmd_tie));
 		}
 		if (cl.hasOption(cmd_simu)) {
 			simu = Integer.parseInt(cl.getOptionValue(cmd_simu));

@@ -212,6 +212,14 @@ public class SNPFilter implements SNPFilterInterface {
 				WSNP[c++] = V.intValue();
 			}
 			Arrays.sort(WSNP);
+		} else if (excludedSNPSet.size() > 0 ) {
+			WSNP = new int[snpList.size() - excludedSNPSet.size()];
+			int c = 0;
+			for (int i = 0; i < snpList.size(); i++) {
+				if (!excludedSNPSet.contains(new Integer(i))) {
+					WSNP[c++] = i;
+				}
+			}
 		} else {
 			WSNP = new int[snpList.size()];
 			for (int i = 0; i < snpList.size(); i++) {

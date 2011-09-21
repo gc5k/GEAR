@@ -34,16 +34,24 @@ public class SoftSNPFilter {
 			double [][] allelefreq = al.getAlleleFrequency();
 			for (int i = 0; i < wseq.length; i++) {
 				int idx = wseq[i];
+				boolean flag = true;
 				if (Parameter.genoFlag) {
 					if (allelefreq[idx][2] <= Parameter.geno) {
 						qualifiedSNPSet.add(new Integer(idx));
+					} else {
+						flag = false;
 					}
 				}
 				if (Parameter.mafFlag) {
 					double f = allelefreq[idx][0] < allelefreq[idx][1] ? allelefreq[idx][0]:allelefreq[idx][1];
 					if (f > Parameter.maf) {
 						qualifiedSNPSet.add(new Integer(idx));
+					} else {
+						flag = false;
 					}
+				}
+				if (flag) {
+					qualifiedSNPSet.add(new Integer(idx));
 				}
 			}
 			
