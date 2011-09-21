@@ -10,12 +10,12 @@ import admixture.parameter.Parameter;
 import family.mdr.arsenal.MDRConstant;
 import family.mdr.arsenal.MDRStatistic;
 import family.mdr.arsenal.ModelGenerator;
-import family.mdr.arsenal.ModelGeneratorII;
 import family.mdr.data.PersonIndex;
 import family.mdr.result.Combination;
 import family.mdr.result.Suite;
 import family.pedigree.file.MapFile;
 
+import statistics.FisherExactTest.MDRTruncatedExactTest;
 import util.NewIt;
 
 /**
@@ -108,6 +108,7 @@ public abstract class AbstractMergeSearch {
 			System.err.println("Denominator is zero.");
 		}
 		Suite.setThreshold(T);
+
 		double mean = (Tp + Tn)/N;
 		Vt -= N * mean * mean;
 		mdrStat.setVt(Vt);
@@ -126,9 +127,11 @@ public abstract class AbstractMergeSearch {
 			if(group == 1) {
 				nP += s.getPositiveSubjects() + s.getNegativeSubjects();
 				mP += s.getMeanScore() * ( s.getPositiveSubjects() + s.getNegativeSubjects());
-			} else {
+			} else if (group == 0){
 				nN += s.getNegativeSubjects() + s.getPositiveSubjects();
 				mN += s.getMeanScore() * ( s.getPositiveSubjects() + s.getNegativeSubjects());
+			} else {
+				
 			}
 			for (Combination testingModels : cvTestingSet) {
 				if (testingModels.containsKey(geno)) {
@@ -152,6 +155,8 @@ public abstract class AbstractMergeSearch {
 		mdrStat.setNneg(nN);
 		double Vx = nP * (meanPos - mean) * (meanPos - mean) + nN * (meanNeg - mean) * (meanNeg - mean);
 		mdrStat.setVx(Vx);
+		MDRTruncatedExactTest et = new MDRTruncatedExactTest(model);
+		System.err.println("Exact: " + et.getOneTailP());
 	}
 
 	protected void cleanupTestingSet() {

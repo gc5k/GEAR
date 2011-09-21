@@ -20,7 +20,6 @@ public interface MDRConstant {
     public static int UnpairedPartition = 1;
     public static int PairedPartition = 2;
 	public static String seperator = ",";
-    public static int tieValue = 1;
     public static String missingGenotype = "44";
     public static String delim = "\\s+";
 }

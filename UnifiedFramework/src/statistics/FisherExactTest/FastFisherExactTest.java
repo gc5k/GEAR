@@ -14,7 +14,11 @@ public class FastFisherExactTest {
 	public FastFisherExactTest(int N, int NAB, int NA) {
 		this.N = N;
 		this.NAB = NAB;
-		this.NA = NA;
+		if (2 * NA > N) {
+			this.NA = 2 * N - NA;
+		} else {
+			this.NA = NA;
+		}
 
 		Pobs = base();
 
@@ -111,15 +115,18 @@ public class FastFisherExactTest {
 	}
 
 	public static void main(String[] args) {
-		FastFisherExactTest f0 = new FastFisherExactTest(20, 0, 8);
+		//this data was used to test the program, the results were same like the one presented in Am. J. Hum. Genet. 76:887¨C883, 2005
+		FastFisherExactTest f0 = new FastFisherExactTest(100, 5, 21);
 		System.out.println(f0.getPobs() + " " + f0.getPW() + " " + f0.HDP());
-		FastFisherExactTest f2 = new FastFisherExactTest(20, 2, 8);
+		FastFisherExactTest f2 = new FastFisherExactTest(100, 7, 21);
 		System.out.println(f2.getPobs() + " " + f2.getPW() + " " + f2.HDP());
-		FastFisherExactTest f4 = new FastFisherExactTest(20, 4, 8);
+		FastFisherExactTest f4 = new FastFisherExactTest(100, 9, 21);
 		System.out.println(f4.getPobs() + " " + f4.getPW() + " " + f4.HDP());
-		FastFisherExactTest f6 = new FastFisherExactTest(20, 6, 8);
+		FastFisherExactTest f6 = new FastFisherExactTest(100, 11, 21);
 		System.out.println(f6.getPobs() + " " + f6.getPW() + " " + f6.HDP());
-		FastFisherExactTest f8 = new FastFisherExactTest(20, 8, 8);
+		FastFisherExactTest f8 = new FastFisherExactTest(100, 13, 21);
 		System.out.println(f8.getPobs() + " " + f8.getPW() + " " + f8.HDP());
+		FastFisherExactTest f10 = new FastFisherExactTest(100, 15, 21);
+		System.out.println(f10.getPobs() + " " + f10.getPW() + " " + f10.HDP());
 	}
 }
