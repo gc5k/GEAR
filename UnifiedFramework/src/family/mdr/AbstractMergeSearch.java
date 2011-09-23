@@ -8,10 +8,10 @@ import java.util.Map.Entry;
 import admixture.parameter.Parameter;
 
 import family.mdr.arsenal.MDRConstant;
-import family.mdr.arsenal.MDRStatistic;
 import family.mdr.arsenal.ModelGenerator;
 import family.mdr.data.PersonIndex;
 import family.mdr.result.Combination;
+import family.mdr.result.MDRStatistic;
 import family.mdr.result.Suite;
 import family.pedigree.file.MapFile;
 
@@ -156,7 +156,8 @@ public abstract class AbstractMergeSearch {
 		double Vx = nP * (meanPos - mean) * (meanPos - mean) + nN * (meanNeg - mean) * (meanNeg - mean);
 		mdrStat.setVx(Vx);
 		MDRTruncatedExactTest et = new MDRTruncatedExactTest(model);
-		System.err.println("Exact: " + et.getOneTailP());
+		mdrStat.setTruncatedFisherP(et.getOneTailP());
+//		System.err.println("Exact: " + et.getOneTailP());
 	}
 
 	protected void cleanupTestingSet() {

@@ -96,14 +96,16 @@ public class MDRTruncatedExactTest {
 		if (isHigh) {
 			n1 = (int) Math.ceil((PosSubs + NegSubs) * T);
 			int n2 = PosSubs + NegSubs - n1;
-			if ((n1 / n2) * 1.0 == T && Parameter.tie == 0) {
+				
+			if (n2 != 0 && (n1 / n2) * 1.0 == T && Parameter.tie == 0) {
 				n1++;
 				n2--;
 			}
 		} else {
 			n1 = (int) Math.ceil((PosSubs + NegSubs) * T);
 			int n2 = PosSubs + NegSubs - n1;
-			if ((n1 / n2) * 1.0 == T && Parameter.tie == 1) {
+			
+			if (n2 != 0 && (n1 / n2) * 1.0 == T && Parameter.tie == 1) {
 				n1--;
 				n2++;
 			}

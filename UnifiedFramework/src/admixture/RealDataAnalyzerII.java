@@ -127,6 +127,7 @@ public class RealDataAnalyzerII {
 				System.out.print(MDRConstant.TestStatistic[i]);
 			}
 		}
+		System.out.print("Truncated Fisher's Exact Test" + ", ");
 		System.out
 				.print(": classfication (genotype, High-risk or Low-risk group, positive scores, positive subjects, negative score, negative subjects)");
 		System.out.println();
