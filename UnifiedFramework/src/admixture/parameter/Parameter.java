@@ -113,8 +113,10 @@ public class Parameter {
 
 	// snp selection
 	private final String cmd_chr = "chr";
-	public static String[] chr = null;
-	public static boolean chrFlag = false;
+	public static String[] in_chr = null;
+	public static String[] ex_chr = null;
+	public static boolean inchrFlag = false;
+	public static boolean exchrFlag = false;
 
 	private final String cmd_snpwindow = "snpwindow";
 	public static String[] snpwindow = null;
@@ -242,7 +244,7 @@ public class Parameter {
 		ops.addOption(OptionBuilder.withDescription("specify the background snp").hasArgs().create(cmd_bgsnp));
 		ops.addOption(OptionBuilder.withDescription("specify the file containing included snps when detecting interaction").hasArg().create(
 				cmd_snp_f));
-
+		ops.addOption(OptionBuilder.withDescription("select chromosomes").hasArgs().create(cmd_chr));
 		ops.addOption(OptionBuilder.withDescription("specify interacting snps").create(cmd_x));
 
 		ops.addOption(OptionBuilder.withDescription("specify excluded families").hasArgs().create(cmd_ex_fam));
@@ -253,7 +255,7 @@ public class Parameter {
 		ops.addOption(OptionBuilder.withDescription("include females only").create(cmd_filter_female));
 		ops.addOption(OptionBuilder.withDescription("include unknown sex ").create(cmd_ex_nosex));
 
-		ops.addOption(OptionBuilder.withDescription("select chromosomes").hasArgs().create(cmd_chr));
+
 		ops.addOption(OptionBuilder.withDescription("specify response by number.").hasArg().create(cmd_res_number));
 		ops.addOption(OptionBuilder.withDescription("specify response by name.").hasArg().create(cmd_res_name));
 
@@ -706,15 +708,29 @@ public class Parameter {
 		}
 
 		if (cl.hasOption(cmd_chr)) {
-			chr = cl.getOptionValues(cmd_chr);
+
+			String[] chr = cl.getOptionValues(cmd_chr);
 			HashSet<String> chrSet = NewIt.newHashSet();
+			HashSet<String> exSet = NewIt.newHashSet();
 			for (int i = 0; i < chr.length; i++) {
-				chrSet.add(chr[i]);
+				if(chr[i].startsWith("-")) {
+					exSet.add(chr[i]);
+				} else {
+					chrSet.add(chr[i]);
+				}
 			}
-			if (chr.length != chrSet.size()) {
+			if (chr.length != chrSet.size() + exSet.size()) {
 				throw new IllegalArgumentException("bad parameter for --chr");
 			}
-			chrFlag = true;
+			if(chrSet.size() > 0) {
+				in_chr = (String[]) chrSet.toArray(new String[0]);
+				inchrFlag = true;
+			}
+			if(exSet.size() > 0) {
+				ex_chr = (String[]) exSet.toArray(new String[0]);
+				exchrFlag = true;
+			}
+			
 		}
 
 		if (cl.hasOption(cmd_snpwindow)) {

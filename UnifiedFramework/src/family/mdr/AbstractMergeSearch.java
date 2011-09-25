@@ -15,7 +15,7 @@ import family.mdr.result.MDRStatistic;
 import family.mdr.result.Suite;
 import family.pedigree.file.MapFile;
 
-import statistics.FisherExactTest.MDRTruncatedExactTest;
+import statistics.FisherExactTest.mdrExactTest.MDRTruncatedExactTest;
 import util.NewIt;
 
 /**
@@ -156,7 +156,8 @@ public abstract class AbstractMergeSearch {
 		double Vx = nP * (meanPos - mean) * (meanPos - mean) + nN * (meanNeg - mean) * (meanNeg - mean);
 		mdrStat.setVx(Vx);
 		MDRTruncatedExactTest et = new MDRTruncatedExactTest(model);
-		mdrStat.setTruncatedFisherP(et.getOneTailP());
+		mdrStat.setTruncatedFisherOneTailP(et.getOneTailP());
+		mdrStat.setTruncatedFisherTwoTailP(et.getTwoTailP());
 //		System.err.println("Exact: " + et.getOneTailP());
 	}
 
