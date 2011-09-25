@@ -28,7 +28,7 @@ public class Combination extends HashMap<String, Suite> {
 			sb.append("Geno:");
 			for(int i = 0; i < idx.length; i++) {
 				SNP snp = mf.getSNP(idx[i]);
-				sb.append(snp.getPolymorphism(g[i])+", ");
+				sb.append(snp.getPolymorphism(g[i])+",");
 			}
 			sb.append(" " + entry.getValue() + ", ");
 		}

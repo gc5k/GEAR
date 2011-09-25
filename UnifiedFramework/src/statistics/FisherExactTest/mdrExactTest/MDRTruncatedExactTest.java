@@ -1,4 +1,4 @@
-package statistics.FisherExactTest;
+package statistics.FisherExactTest.mdrExactTest;
 
 import java.util.Map.Entry;
 
@@ -24,12 +24,13 @@ public class MDRTruncatedExactTest {
 	private double pobs;
 	private double pInt;
 	private double pOneTail;
+	private double pTwoTails;
 
 	private int[][] confusion = { { 0, 0 }, { 0, 0 } };
 
 	// definition of the confusion table
 	// | Hgroup | Lgroup
-	// --------------------------
+	// ---------------------------
 	// HGeno | a (HPos) | b (LPos)|
 	// --------------------------
 	// LGeno | c (HNeg) | d (LNeg)|
@@ -46,12 +47,12 @@ public class MDRTruncatedExactTest {
 			Suite s = entry.getValue();
 			if (Suite.Ascertainment(s.getPositiveSubjects(), s.getNegativeSubjects()) == 1) {
 				H++;
-				HPos += s.getPositiveSubjects();
-				HNeg += s.getNegativeSubjects();
+				confusion[0][0] += s.getPositiveSubjects();
+				confusion[1][0] += s.getNegativeSubjects();
 			} else if (Suite.Ascertainment(s.getPositiveSubjects(), s.getNegativeSubjects()) == 0) {
 				L++;
-				LPos += s.getPositiveSubjects();
-				LNeg += s.getNegativeSubjects();
+				confusion[0][1] += s.getPositiveSubjects();
+				confusion[1][1] += s.getNegativeSubjects();
 			} else {
 
 			}
@@ -73,21 +74,21 @@ public class MDRTruncatedExactTest {
 				c2++;
 			}
 		}
-		T = 1.0 * (HPos + LPos) / (HNeg + LNeg);
+		T = 1.0 * (confusion[0][0] + confusion[0][1]) / (confusion[1][0] + confusion[1][1]);
 		if (H >= L) {
 			for (int i = 0; i < HSub.length; i++) {
-				confusion[0][0] += getNumSubject(true, HSub[i][0], HSub[i][1], T/(1 + T));
+				HPos += getNumSubject(true, HSub[i][0], HSub[i][1], T / (1 + T));
 			}
-			confusion[1][0] = (HPos + HNeg) - confusion[0][0];
-			confusion[0][1] = (HPos + LPos) - confusion[0][0];
-			confusion[1][1] = (HNeg + LNeg) - confusion[1][0];
+			HNeg = confusion[1][0] + confusion[0][0] - HPos;
+			LPos = confusion[0][1] + confusion[0][0] - HPos;
+			LNeg = confusion[1][1] + confusion[1][0] - HNeg;
 		} else {
 			for (int i = 0; i < LSub.length; i++) {
-				confusion[1][1] += getNumSubject(false, LSub[i][0], LSub[i][1], 1.0/(1+ T));
+				LNeg += getNumSubject(false, LSub[i][0], LSub[i][1], 1.0 / (1 + T));
 			}
-			confusion[1][0] = (HNeg + LNeg) - confusion[1][1];
-			confusion[0][1] = (LPos + LNeg) - confusion[1][1];
-			confusion[0][0] = (HPos + HNeg) - confusion[1][0];
+			LPos = confusion[0][1] + confusion[1][1] - LNeg;
+			HNeg = confusion[1][0] + confusion[1][1] - LNeg;
+			HPos = confusion[0][0] + confusion[1][0] - HNeg;
 		}
 	}
 
@@ -96,16 +97,16 @@ public class MDRTruncatedExactTest {
 		if (isHigh) {
 			n1 = (int) Math.ceil((PosSubs + NegSubs) * T);
 			int n2 = PosSubs + NegSubs - n1;
-				
-			if (n2 != 0 && (n1 / n2) * 1.0 == T && Parameter.tie == 0) {
+
+			if (n1 * 1.0 == T * n2 && Parameter.tie == 0) {
 				n1++;
 				n2--;
 			}
 		} else {
 			n1 = (int) Math.ceil((PosSubs + NegSubs) * T);
 			int n2 = PosSubs + NegSubs - n1;
-			
-			if (n2 != 0 && (n1 / n2) * 1.0 == T && Parameter.tie == 1) {
+
+			if (n1 * 1.0 == T * n2 && Parameter.tie == 1) {
 				n1--;
 				n2++;
 			}
@@ -151,29 +152,48 @@ public class MDRTruncatedExactTest {
 		return pOneTail;
 	}
 
+	public double getTwoTailP() {
+		return pTwoTails;
+	}
+
 	public void ExactTest() {
 		base();
-		int upper = confusion[0][1] < confusion[1][0] ? confusion[0][1] : confusion[1][0];
+
+		int upper = LPos < HNeg ? LPos : HNeg;
+		upper += HPos - 1;
+
+		double[] pwhole = new double[upper - HPos + 1];
+
+		int i = HPos;
+		int j = 0;
+
 		double p = pbase;
-		ptruncated += pbase;
-		if (HPos <= confusion[0][0]) {
-			pInt += pbase;
-		}
-		for (int i = confusion[0][0]; i <= confusion[0][0] + upper - 1; i++) {
+
+		do {
+			pwhole[j] = p;
+			ptruncated += p;
+			if (i < confusion[0][0]) {
+				pInt += p;
+			}
+			if (i == confusion[0][0]) {
+				pobs = p;
+			}
 			int a = i;
 			int b = confusion[0][0] + confusion[0][1] - a;
 			int c = confusion[0][0] + confusion[1][0] - a;
 			int d = confusion[1][1] + confusion[0][1] - b;
 			p = p * b * c / ((a + 1) * (d + 1));
-			if (i < HPos) {
-				pInt += p;
+			i++;
+			j++;
+		} while (i <= upper);
+
+		for (i = 0; i < pwhole.length; i++) {
+			if (pobs >= pwhole[i]) {
+				pTwoTails += pwhole[i];
 			}
-			if (i == HPos - 1) {
-				pobs = p;
-			}
-			ptruncated += p;
 		}
+
 		pOneTail = 1 - pInt / ptruncated;
-		pobs = pobs / ptruncated;
+		pTwoTails = pTwoTails / ptruncated;
 	}
 }

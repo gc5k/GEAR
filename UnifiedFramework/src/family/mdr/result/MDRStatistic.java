@@ -18,7 +18,8 @@ public class MDRStatistic implements Comparable<MDRStatistic> {
 	private double FValue;
 	private double PF;
 	
-	private double TruncatedFisherP;
+	private double TruncatedFisherOneTailP;
+	private double TruncatedFisherTwoTailP;
 	//stats[0] for testing balanced accuracy; stats[1] for training balanced accuracy
 	public MDRStatistic() {
 		stats = new double[2];
@@ -62,8 +63,12 @@ public class MDRStatistic implements Comparable<MDRStatistic> {
 		Nneg = Nn;
 	}
 
-	public void setTruncatedFisherP(double p) {
-		TruncatedFisherP = p;
+	public void setTruncatedFisherOneTailP(double p) {
+		TruncatedFisherOneTailP = p;
+	}
+
+	public void setTruncatedFisherTwoTailP(double p) {
+		TruncatedFisherTwoTailP = p;
 	}
 
 	public double getTestingBalancedAccuracy() {
@@ -131,7 +136,9 @@ public class MDRStatistic implements Comparable<MDRStatistic> {
 	public String toString() {
 		StringBuilder sb = new StringBuilder();
 		F();
-		sb.append(String.format("%.4f", stats[0]) + ", " + String.format("%.4f", stats[1]) +  ", " + String.format("%.4f", TruncatedFisherP) + ", " + String.format("%.4f", Vt) +  ", " + String.format("%.4f", Vx) + ", " + N + ", " + String.format("%.4f", mean) + ", " + String.format("%.4f", FValue) + ", " + String.format("%.4E", PF));
+		sb.append(String.format("%.4f", stats[0]) + ", " + String.format("%.4f", stats[1]) +  ", " 
+				+ String.format("%.4f", TruncatedFisherOneTailP) + ", " + String.format("%.4f", TruncatedFisherTwoTailP) 
+				+ ", " + String.format("%.4f", Vt) +  ", " + String.format("%.4f", Vx) + ", " + N + ", " + String.format("%.4f", mean) + ", " + String.format("%.4f", FValue) + ", " + String.format("%.4E", PF));
 		return sb.toString();
 	}
 }

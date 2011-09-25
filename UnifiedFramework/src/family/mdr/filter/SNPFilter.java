@@ -43,7 +43,7 @@ public class SNPFilter implements SNPFilterInterface {
 			selectBackgroundSNP();
 		}
 
-		if (Parameter.chrFlag) {
+		if (Parameter.inchrFlag || Parameter.exchrFlag) {
 			selectChromosome();
 		}
 
@@ -75,12 +75,25 @@ public class SNPFilter implements SNPFilterInterface {
 
 	private void selectChromosome() {
 
-		for (int i = 0; i < snpList.size(); i++) {
-			SNP snp = snpList.get(i);
-			String chr = snp.getChromosome();
-			int idx = ArrayUtils.indexOf(Parameter.chr, chr);
-			if (idx >= 0) {
-				includeSNP(i);
+		if (Parameter.inchrFlag) {
+			for (int i = 0; i < snpList.size(); i++) {
+				SNP snp = snpList.get(i);
+				String chr = snp.getChromosome();
+				int idx = ArrayUtils.indexOf(Parameter.in_chr, chr);
+				if (idx >= 0) {
+					includeSNP(i);
+				}
+			}
+		}
+		
+		if (Parameter.exchrFlag) {
+			for (int i = 0; i < snpList.size(); i++) {
+				SNP snp = snpList.get(i);
+				String chr = snp.getChromosome();
+				int idx = ArrayUtils.indexOf(Parameter.ex_chr, chr);
+				if (idx >= 0) {
+					excludeSNP(i);
+				}
 			}
 		}
 	}

@@ -52,7 +52,7 @@ public class SNPFilterI implements SNPFilterInterface {
 			selectBackgroundSNP();
 		}
 
-		if (Parameter.chrFlag) {
+		if (Parameter.inchrFlag) {
 			selectChromosome();
 		}
 
@@ -89,7 +89,7 @@ public class SNPFilterI implements SNPFilterInterface {
 	private void selectChromosome() {
 
 		ArrayList<HashSet<Integer>> chrSNPSet = NewIt.newArrayList();
-		int L = Parameter.chr.length;
+		int L = Parameter.in_chr.length;
 		for (int i = 0; i < L; i++) {
 			HashSet<Integer> chrSet = NewIt.newHashSet(); 
 			chrSNPSet.add(chrSet);
@@ -98,7 +98,7 @@ public class SNPFilterI implements SNPFilterInterface {
 		for (int i = 0; i < snpList.size(); i++) {
 			SNP snp = snpList.get(i);
 			String chr = snp.getChromosome();
-			int idx = ArrayUtils.indexOf(Parameter.chr, chr);
+			int idx = ArrayUtils.indexOf(Parameter.in_chr, chr);
 			if (idx >= 0) {
 				includeSNP(i);
 				HashSet<Integer> chrSet = chrSNPSet.get(idx);
@@ -109,7 +109,7 @@ public class SNPFilterI implements SNPFilterInterface {
 		chrSNP = new int[L][];
 		for (int i = 0; i < L; i++) {
 			HashSet<Integer> chrSet = chrSNPSet.get(i);
-			if(chrSet.size() == 0) throw new IllegalArgumentException("could not find chromosome " + Parameter.chr[i]);
+			if(chrSet.size() == 0) throw new IllegalArgumentException("could not find chromosome " + Parameter.in_chr[i]);
 			snpArrays.add(chrSet);
 			chrSNP[i] = new int[chrSet.size()];
 			int c = 0;

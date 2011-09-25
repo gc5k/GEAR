@@ -6,6 +6,8 @@ import java.util.Set;
 
 import admixture.parameter.Parameter;
 
+import statistics.FisherExactTest.mdrExactTest.MDRTestingExactTest;
+import statistics.FisherExactTest.mdrExactTest.MDRTrainingExactTest;
 import util.NewIt;
 
 import family.mdr.arsenal.MDRConstant;
@@ -27,7 +29,6 @@ public class HeteroCombinationSearchII extends AbstractMergeSearch {
 		private ArrayList<PersonIndex> dr;
 		private MapFile mf;
 		private ModelGenerator mg;
-		private int[][] wseq2 = null;
 		private int N = 1;
 		private boolean mute = false;
 
@@ -36,7 +37,7 @@ public class HeteroCombinationSearchII extends AbstractMergeSearch {
 			this.dr = dr;
 			this.mf = mf;
 		}
-		
+
 		public Builder ModelGenerator(ModelGenerator mg) {
 			this.mg = mg;
 			return this;
@@ -69,7 +70,8 @@ public class HeteroCombinationSearchII extends AbstractMergeSearch {
 
 		for (; cg.hasNext();) {
 			String m = cg.next();
-			if (rnd.nextDouble() > Parameter.thin) continue;
+			if (rnd.nextDouble() > Parameter.thin)
+				continue;
 			kernal(m);
 			count++;
 			if (!mute) {
@@ -114,12 +116,10 @@ public class HeteroCombinationSearchII extends AbstractMergeSearch {
 			Cell trCell;
 			Cell tCell;
 			Set<String> cellKeys = model.keySet();
-			double[] trStatus = new double[cellKeys.size()];
-			double[] tStatus = new double[cellKeys.size()];
+
 			int idx = 0;
 			for (String cellKey : cellKeys) {
 				int tr_status = -1;
-				int t_status = -1;
 				Suite fullSuite = model.get(cellKey);
 				int fullposSubs = fullSuite.getPositiveSubjects();
 				int fullnegSubs = fullSuite.getNegativeSubjects();
@@ -131,26 +131,23 @@ public class HeteroCombinationSearchII extends AbstractMergeSearch {
 					int neg_Subs = testingSuite.getNegativeSubjects();
 					double pos_Scr = testingSuite.getPositiveScore();
 					double neg_Scr = testingSuite.getNegativeScore();
-					tr_status = Suite.Ascertainment(fullposScr - pos_Scr,
-							fullnegScr - neg_Scr);
-					t_status = Suite.Ascertainment(pos_Scr, neg_Scr);
-					trCell = new Cell(fullposSubs - pos_Subs, fullnegSubs
-							- neg_Subs, fullposScr - pos_Scr, fullnegScr
-							- neg_Scr, tr_status);
-					tCell = new Cell(pos_Subs, neg_Subs, pos_Scr, neg_Scr,
-							tr_status);
+					tr_status = Suite.Ascertainment(fullposScr - pos_Scr, fullnegScr - neg_Scr);
+					trCell = new Cell(fullposSubs - pos_Subs, fullnegSubs - neg_Subs, fullposScr - pos_Scr, fullnegScr - neg_Scr, tr_status);
+					tCell = new Cell(pos_Subs, neg_Subs, pos_Scr, neg_Scr, tr_status);
 				} else {
 					tr_status = Suite.Ascertainment(fullposScr, fullnegScr);
-					trCell = new Cell(fullposSubs, fullnegSubs, fullposScr,
-							fullnegScr, tr_status);
+					trCell = new Cell(fullposSubs, fullnegSubs, fullposScr, fullnegScr, tr_status);
 					tCell = new Cell(0, 0, 0, 0, -1);
 				}
 				cvSet.addTrainingModel(cellKey, trCell);
 				cvSet.addTestingModel(cellKey, tCell);
-				trStatus[idx] = tr_status;
-				tStatus[idx] = t_status;
+
 				idx++;
 			}
+
+			MDRTrainingExactTest mdrTrET = new MDRTrainingExactTest(cvSet.getTrainingSubdivision());
+			MDRTestingExactTest mdrTET = new MDRTestingExactTest(cvSet.getTestingSubdivision());
+
 			double trAccu = 0;
 			double tAccu = 0;
 			trAccu = ToolKit.BalancedAccuracy(cvSet.getTrainingSubdivision());
@@ -158,7 +155,7 @@ public class HeteroCombinationSearchII extends AbstractMergeSearch {
 
 			tAccu = ToolKit.BalancedAccuracy(cvSet.getTestingSubdivision());
 			mean[MDRConstant.TestingBalancedAccuIdx] += tAccu;
-
+			System.err.println(modelName + " " + trAccu + " " + mdrTrET.getOneTailP()+ ", " + tAccu + " " + mdrTET.getOneTailP());
 			cvSet.setStatistic(MDRConstant.TrainingBalancedAccuIdx, trAccu);
 			cvSet.setStatistic(MDRConstant.TestingBalancedAccuIdx, tAccu);
 		}
@@ -166,11 +163,8 @@ public class HeteroCombinationSearchII extends AbstractMergeSearch {
 		mean[MDRConstant.TrainingBalancedAccuIdx] /= cv;
 		mean[MDRConstant.TestingBalancedAccuIdx] /= cv;
 
-
-		mdrStat
-				.setTrainingBalancedAccuracy(mean[MDRConstant.TrainingBalancedAccuIdx]);
-		mdrStat
-				.setTestingBalancedAccuracy(mean[MDRConstant.TestingBalancedAccuIdx]);
+		mdrStat.setTrainingBalancedAccuracy(mean[MDRConstant.TrainingBalancedAccuIdx]);
+		mdrStat.setTestingBalancedAccuracy(mean[MDRConstant.TestingBalancedAccuIdx]);
 	}
 
 	public double[] getModelStats() {
