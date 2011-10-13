@@ -18,6 +18,8 @@ public class MDRStatistic implements Comparable<MDRStatistic> {
 	private double FValue;
 	private double PF;
 	
+	private double TrainingP;
+	private double TestingP;
 	private double TruncatedFisherOneTailP;
 	private double TruncatedFisherTwoTailP;
 	//stats[0] for testing balanced accuracy; stats[1] for training balanced accuracy
@@ -31,6 +33,22 @@ public class MDRStatistic implements Comparable<MDRStatistic> {
 		stats[1] = trba;
 	}
 	
+	public void setTrainingPValue(double p) {
+		TrainingP = p;
+	}
+	
+	public double getTrainingPValue() {
+		return TrainingP;
+	}
+	
+	public void setTestingPValue(double p) {
+		TestingP = p;
+	}
+	
+	public double getTestingPValue() {
+		return TestingP;
+	}
+
 	public void setTestingBalancedAccuracy(double tba) {
 		stats[0] = tba;
 	}
@@ -128,7 +146,6 @@ public class MDRStatistic implements Comparable<MDRStatistic> {
 		try {
 			PF = 1 - F.cumulativeProbability(FValue);
 		} catch (MathException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 	}
@@ -136,9 +153,9 @@ public class MDRStatistic implements Comparable<MDRStatistic> {
 	public String toString() {
 		StringBuilder sb = new StringBuilder();
 		F();
-		sb.append(String.format("%.4f", stats[0]) + ", " + String.format("%.4f", stats[1]) +  ", " 
-				+ String.format("%.4f", TruncatedFisherOneTailP) + ", " + String.format("%.4f", TruncatedFisherTwoTailP) 
-				+ ", " + String.format("%.4f", Vt) +  ", " + String.format("%.4f", Vx) + ", " + N + ", " + String.format("%.4f", mean) + ", " + String.format("%.4f", FValue) + ", " + String.format("%.4E", PF));
+		sb.append( N + ", " + String.format("%.4f", stats[0]) + ", " + String.format("%.4f", stats[1])
+//				+ String.format("%.4f", TruncatedFisherOneTailP) + ", " + String.format("%.4f", TruncatedFisherTwoTailP) 
+				+ ", " + String.format("%.4f", Vt) +  ", " + String.format("%.4f", Vx) + ", " + String.format("%.4f", Vx/Vt));
 		return sb.toString();
 	}
 }

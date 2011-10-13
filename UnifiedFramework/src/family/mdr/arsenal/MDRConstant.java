@@ -13,7 +13,7 @@ public interface MDRConstant {
     public static int NumStats = 2;
     public static int TestingBalancedAccuIdx = 0;
     public static int TrainingBalancedAccuIdx = 1;
-    
+
     public static String[] TestStatistic = {"TA (Testing Accuracy)", "TrA (Training Accuracy)"};
 
     public static int RandomPartition = 0;

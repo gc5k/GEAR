@@ -1,14 +1,14 @@
 package family.mdr;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.Set;
+import java.util.Map.Entry;
 
 import admixture.parameter.Parameter;
 
 import statistics.FisherExactTest.mdrExactTest.MDRTestingExactTest;
 import statistics.FisherExactTest.mdrExactTest.MDRTrainingExactTest;
-import util.NewIt;
+import statistics.FisherExactTest.mdrExactTest.MDRTruncatedExactTest;
 
 import family.mdr.arsenal.MDRConstant;
 import family.mdr.arsenal.ModelGenerator;
@@ -75,6 +75,26 @@ public class HeteroCombinationSearchII extends AbstractMergeSearch {
 			kernal(m);
 			count++;
 			if (!mute) {
+				boolean flag = true;
+				if (Parameter.epFlag ) {
+					if (mdrStat.getTestingBalancedAccuracy() < Parameter.threshold_permu) {
+						flag = false;
+					}
+				} else {
+					if (Parameter.trainingFlag) {
+						if (mdrStat.getTrainingBalancedAccuracy() < Parameter.threshold_training ) {
+							flag = false;
+						}
+					}
+					if (Parameter.testingFlag) {
+						if (mdrStat.getTestingBalancedAccuracy() < Parameter.threshold_testing) {
+							flag = false;
+						}
+					}
+				}
+				if (!flag ) {
+					continue;
+				}
 				int[] idx = ToolKit.StringToIntArray(m);
 				System.out.print(m + ", ");
 				for (int j = 0; j < idx.length; j++) {
@@ -91,7 +111,7 @@ public class HeteroCombinationSearchII extends AbstractMergeSearch {
 		}
 	}
 
-	private void kernal(String modelName) {
+	public void kernal(String modelName) {
 
 		cleanupTestingSet();
 
@@ -104,6 +124,109 @@ public class HeteroCombinationSearchII extends AbstractMergeSearch {
 			bestStat = mdrStat;
 		}
 		count++;
+	}
+
+	protected void linearSearch() {
+
+		model = new Combination();
+		mdrStat = new MDRStatistic();
+		double Tp = 0;
+		double Tn = 0;
+		double T = 1;
+		int N = 0;
+		double Vt = 0;
+
+		for (PersonIndex sub : data) {
+			String geno = sub.getGenotype(SNPIndex);
+			if (geno.contains(MDRConstant.missingGenotype)) {
+				continue;
+			} else {
+
+				double s = sub.getScore();
+				N++;
+				Vt += s * s;
+				if (s > 0) {
+					Tp += s;
+				} else {
+					Tn += s;
+				}
+
+				Suite subset = model.get(geno);
+				if (subset == null) {
+					subset = new Suite();
+					model.put(geno, subset);
+				}
+				subset.add(sub);
+
+				int d = sub.getGroup();
+				Combination suiteMap = cvTestingSet.get(d);
+				Suite S = suiteMap.get(geno);
+				if (S == null) {
+					S = new Suite();
+					suiteMap.put(geno, S);
+				}
+				S.add(sub);
+			}
+		}
+		try {
+			T /= -1 * Tp / Tn;
+		} catch (Exception E) {
+			System.err.println("Denominator is zero.");
+		}
+		Suite.setThreshold(T);
+
+		double mean = (Tp + Tn) / N;
+		Vt -= N * mean * mean;
+		mdrStat.setVt(Vt);
+		mdrStat.setN(N);
+
+		int nP = 0;
+		int nN = 0;
+		double mP = 0;
+		double mN = 0;
+
+		for (Entry<String, Suite> entry : model.entrySet()) {
+			String geno = entry.getKey();
+			Suite s = entry.getValue();
+			s.summarize();
+			int group = Suite.Ascertainment(s.getPositiveScore(), s.getNegativeScore());
+			if (group == 1) {
+				nP += s.getPositiveSubjects() + s.getNegativeSubjects();
+				mP += s.getMeanScore() * (s.getPositiveSubjects() + s.getNegativeSubjects());
+				s.setStatus(group);
+			} else if (group == 0) {
+				nN += s.getNegativeSubjects() + s.getPositiveSubjects();
+				mN += s.getMeanScore() * (s.getPositiveSubjects() + s.getNegativeSubjects());
+				s.setStatus(group);
+			} else {
+
+			}
+			for (Combination testingModels : cvTestingSet) {
+				if (testingModels.containsKey(geno)) {
+					Suite testingSuite = testingModels.get(geno);
+					testingSuite.summarize();
+				}
+			}
+		}
+
+		double meanPos = 0;
+		double meanNeg = 0;
+		if (mP != 0 && mN != 0) {
+			meanPos = mP / nP;
+			meanNeg = mN / nN;
+		} else if (mP != 0 && mN == 0) {
+			meanPos = mP / nP;
+		} else if (mP == 0 && mN != 0) {
+			meanNeg = mN / nN;
+		}
+		mdrStat.setNpos(nP);
+		mdrStat.setNneg(nN);
+		double Vx = nP * (meanPos - mean) * (meanPos - mean) + nN * (meanNeg - mean) * (meanNeg - mean);
+		mdrStat.setVx(Vx);
+//		MDRTruncatedExactTest et = new MDRTruncatedExactTest(model);
+//		mdrStat.setTruncatedFisherOneTailP(et.getOneTailP());
+//		mdrStat.setTruncatedFisherTwoTailP(et.getTwoTailP());
+//		System.err.println("Exact: " + et.getOneTailP());
 	}
 
 	public void calculateSingleBest(String modelName) {
@@ -144,7 +267,7 @@ public class HeteroCombinationSearchII extends AbstractMergeSearch {
 
 				idx++;
 			}
-
+			
 			MDRTrainingExactTest mdrTrET = new MDRTrainingExactTest(cvSet.getTrainingSubdivision());
 			MDRTestingExactTest mdrTET = new MDRTestingExactTest(cvSet.getTestingSubdivision());
 
@@ -155,7 +278,7 @@ public class HeteroCombinationSearchII extends AbstractMergeSearch {
 
 			tAccu = ToolKit.BalancedAccuracy(cvSet.getTestingSubdivision());
 			mean[MDRConstant.TestingBalancedAccuIdx] += tAccu;
-			System.err.println(modelName + " " + trAccu + " " + mdrTrET.getOneTailP()+ ", " + tAccu + " " + mdrTET.getOneTailP());
+//			System.err.println(modelName + " " + trAccu + " " + mdrTrET.getOneTailP()+ ", " + tAccu + " " + mdrTET.getOneTailP());
 			cvSet.setStatistic(MDRConstant.TrainingBalancedAccuIdx, trAccu);
 			cvSet.setStatistic(MDRConstant.TestingBalancedAccuIdx, tAccu);
 		}
@@ -167,15 +290,6 @@ public class HeteroCombinationSearchII extends AbstractMergeSearch {
 		mdrStat.setTestingBalancedAccuracy(mean[MDRConstant.TestingBalancedAccuIdx]);
 	}
 
-	public double[] getModelStats() {
-		return bestStat.getStats();
-	}
-
-	public HashMap<String, MDRStatistic> getMDRResult() {
-		HashMap<String, MDRStatistic> m = NewIt.newHashMap();
-		m.put(bestModel, bestStat);
-		return m;
-	}
 
 	public String toString() {
 		StringBuilder sb = new StringBuilder();

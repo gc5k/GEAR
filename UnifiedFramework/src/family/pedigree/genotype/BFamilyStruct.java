@@ -12,7 +12,6 @@ package family.pedigree.genotype;
  * use, misuse, or functionality.
  */
 
-import java.util.Arrays;
 import java.util.Enumeration;
 import java.util.Hashtable;
 import java.util.Set;
@@ -86,7 +85,7 @@ public class BFamilyStruct {
 		while (perstrList.hasMoreElements()) {
 			PID[ind++] = perstrList.nextElement();
 		}
-		Arrays.sort(PID);
+//		Arrays.sort(PID);
 		return PID;
 	}
 

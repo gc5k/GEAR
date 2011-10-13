@@ -19,7 +19,6 @@ public class Combination extends HashMap<String, Suite> {
 	 */
 	private static final long serialVersionUID = 1L;
 
-	
 	public String printModel(int[] idx, MapFile mf) {
 		StringBuffer sb = new StringBuffer();
 		for(Entry<String, Suite> entry: this.entrySet()) {

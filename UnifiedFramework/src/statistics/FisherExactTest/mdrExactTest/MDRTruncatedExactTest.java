@@ -45,11 +45,11 @@ public class MDRTruncatedExactTest {
 	private void initial() {
 		for (Entry<String, Suite> entry : model.entrySet()) {
 			Suite s = entry.getValue();
-			if (Suite.Ascertainment(s.getPositiveSubjects(), s.getNegativeSubjects()) == 1) {
+			if (s.getStatus() == 1) {
 				H++;
 				confusion[0][0] += s.getPositiveSubjects();
 				confusion[1][0] += s.getNegativeSubjects();
-			} else if (Suite.Ascertainment(s.getPositiveSubjects(), s.getNegativeSubjects()) == 0) {
+			} else if (s.getStatus() == 0) {
 				L++;
 				confusion[0][1] += s.getPositiveSubjects();
 				confusion[1][1] += s.getNegativeSubjects();
@@ -64,11 +64,11 @@ public class MDRTruncatedExactTest {
 		int c2 = 0;
 		for (Entry<String, Suite> entry : model.entrySet()) {
 			Suite s = entry.getValue();
-			if (Suite.Ascertainment(s.getPositiveSubjects(), s.getNegativeSubjects()) == 1) {
+			if (s.getStatus() == 1) {
 				HSub[c1][0] = s.getPositiveSubjects();
 				HSub[c1][1] = s.getNegativeSubjects();
 				c1++;
-			} else if (Suite.Ascertainment(s.getPositiveSubjects(), s.getNegativeSubjects()) == 0) {
+			} else if (s.getStatus() == 0) {
 				LSub[c2][0] = s.getPositiveSubjects();
 				LSub[c2][1] = s.getNegativeSubjects();
 				c2++;

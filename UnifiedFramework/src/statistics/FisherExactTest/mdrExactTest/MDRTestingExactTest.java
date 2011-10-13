@@ -10,8 +10,8 @@ public class MDRTestingExactTest {
 
 	private int H; // number of high risk groups
 	private int L; // number of low risk groups
-	private int[][] HSub;
-	private int[][] LSub;
+//	private int[][] HSub;
+//	private int[][] LSub;
 
 	private double pbase;
 	private double pOneTail;
@@ -44,26 +44,29 @@ public class MDRTestingExactTest {
 				confusion[0][1] += cell.getPositiveSubjects();
 				confusion[1][1] += cell.getNegativeSubjects();
 			} else {
-
+				confusion[0][1] += cell.getPositiveSubjects();
+				confusion[1][0] += cell.getNegativeSubjects();
 			}
 		}
-		HSub = new int[H][2];
-		LSub = new int[L][2];
-
-		int c1 = 0;
-		int c2 = 0;
-		for (Entry<String, Cell> entry : classes.entrySet()) {
-			Cell cell = entry.getValue();
-			if (cell.getStatus() == 1) {
-				HSub[c1][0] = (int) cell.getPositiveSubjects();
-				HSub[c1][1] = (int) cell.getNegativeSubjects();
-				c1++;
-			} else if (cell.getStatus() == 0) {
-				LSub[c2][0] = (int) cell.getPositiveSubjects();
-				LSub[c2][1] = (int) cell.getNegativeSubjects();
-				c2++;
-			}
-		}
+//		HSub = new int[H][2];
+//		LSub = new int[L][2];
+//
+//		int c1 = 0;
+//		int c2 = 0;
+//		for (Entry<String, Cell> entry : classes.entrySet()) {
+//			Cell cell = entry.getValue();
+//			if (cell.getStatus() == 1) {
+//				HSub[c1][0] = (int) cell.getPositiveSubjects();
+//				HSub[c1][1] = (int) cell.getNegativeSubjects();
+//				c1++;
+//			} else if (cell.getStatus() == 0) {
+//				LSub[c2][0] = (int) cell.getPositiveSubjects();
+//				LSub[c2][1] = (int) cell.getNegativeSubjects();
+//				c2++;
+//			} else {
+//				
+//			}
+//		}
 	}
 
 	private void base() {

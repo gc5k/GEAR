@@ -28,6 +28,7 @@ import util.NewIt;
 
 public class Parameter {
 
+	private final String delim = "\\s+";
 	private final String incommand_separator = ",";
 	private final String cmd_missing_allele = "missingallele";
 	public static String missing_allele = "0";
@@ -41,8 +42,14 @@ public class Parameter {
 	private final String cmd_status_shift = "1";
 	public static int status_shift = 0;
 
-	private final String cmd_mode = "md";// u, f (sii), pi(ajhg2008);
-	public static String mode = "u";
+	private final String cmd_model = "model"; // cc for case control,
+	// u1 for the unified method in which the founders are exchangeable to each
+	// other,
+	// u2 for the unified method in which the founders are exchangeable but
+	// within family;
+	// fam1 for ajhg2008
+	// fam2 for sii
+	public static String model = "u";
 
 	// file set start
 	private final String cmd_file = "file";
@@ -84,10 +91,9 @@ public class Parameter {
 	public static int[] predictor = null;
 	private final String cmd_covar_name = "covarname";
 	public static String[] predictor_name = null;
-	
-	private final String cmd_method = "model";
+
+	private final String cmd_reg = "reg";
 	public int linkfunction = 0;
-	private String[] lf = new String[] { "0 for linear regression", "1 for logistic regression" };
 	// phenotype set end
 
 	// individual selection start
@@ -133,13 +139,13 @@ public class Parameter {
 	public static String[] exsnpPair = null;
 	public static boolean snpPairFlag = false;
 
-	   //this set only used when the option x is specified;
+	// this set only used when the option x is specified;
 	public static String[] xincludesnp = null;
 	public static String[] xinsnpPair = null;
 
 	public static boolean xsnpFlag = false;
 	public static boolean xsnpPairFlag = false;
-	   //end it
+	// end it
 
 	private final String cmd_bgsnp = "bgsnp";
 	public static boolean bgsnpFlag = false;
@@ -149,63 +155,93 @@ public class Parameter {
 	public static boolean x = false;
 	// snp selection end
 
-	//soft snp selection 
+	// soft snp selection
 	private final String cmd_maf = "maf";
 	public static double maf = -1;
 	public static boolean mafFlag = false;
-	
+
 	private final String cmd_geno = "geno";
 	public static double geno = 2;
 	public static boolean genoFlag = false;
-	
+
 	private final String cmd_hwe = "hwe";
 	public static double hwe = -1;
 	public static boolean hweFlag = false;
-	
+
 	private final String cmd_header = "header";
 	public static boolean header = false;
 
-	//sampling & partitioning start
+	// sampling & partitioning start
 	private final String cmd_thin = "thin";
 	public static double thin = 1.0;
-	
+
 	private final String cmd_slice = "slice";
 	public static int sliceN = 1;
 	public static int slice = 1;
-	//sampling & partitioning end
-	
-	//mdr options start
+	// sampling & partitioning end
+
+	// mdr options start
 	private final String cmd_cv = "cv";
 	public static int cv = 5;
-	
+	public static boolean cvFlag = true;
+
+	private final String cmd_trgroup = "trgroup";
+	public static double trgroup = 0.7;
+	public static boolean trgroupFlag = false;
+
+	private final String cmd_ttfile = "ttfile";
+	public static boolean ttfileFlag = false;
+	public static String[][] ttArray = null;
+
+	private final String cmd_trsex = "trsex";
+	public static boolean trsexFlag = false;
+	public static int trsex = 0;
+	// private final String cmd_border = "border";
+	// public static String border_fid;
+	// public static String border_iid;
+	// public static boolean borderFlag = false;
+	// public static boolean reverseborderFlag = false;
+
 	private final String cmd_order = "order";
 	public static int order = 1;
 
 	private final String cmd_seed = "seed";
 	public static int seed = 2011;
-	
+
 	private final String cmd_tie = "tie";
 	public static int tie = 1;
-	//mdr option end
-	
-	
-	private final String cmd_perm = "permut";
-	public int permutation = 100;
+	// mdr option end
+
+	private final String cmd_perm = "perm";
+	public static int perm = 100;
+	public static boolean permFlag = false;
+
+	private final String cmd_ep = "ep";
+	public static double ep = 0.05;
+	public static boolean epFlag = false;
 
 	private final String cmd_perm_scheme = "ps";
-	public boolean permu_scheme = false;
+	public static boolean permu_scheme = false;
 
-	private final String cmd_perm_fam = "pf";
-	public boolean permu_fam = false;
-
-	private final String cmd_unrelated_only = "ur";
-	public boolean unrelated_only = false;
+	// private final String cmd_unrelated_only = "ur";
+	// public boolean unrelated_only = false;
 
 	private final String cmd_simu = "simu";
 	public int simu = 1;
 
+	private final String cmd_training = "training";
+	public static double threshold_training = 0.0;
+	public static boolean trainingFlag = false;
+
+	private final String cmd_testing = "testing";
+	public static double threshold_testing = 0.0;
+	public static boolean testingFlag = false;
+
 	private final String cmd_help = "help";
 	public boolean help = false;
+
+	public static double threshold_permu = 0;
+	public static boolean permuFlag = false;
 
 	private Options ops = new Options();
 	private CommandLineParser parser = new PosixParser();
@@ -219,7 +255,7 @@ public class Parameter {
 	}
 
 	public void commandInitial() {
-		ops.addOption(OptionBuilder.withDescription("u (default) for the unified framework and f for using sibs only.").hasArg().create(cmd_mode));
+		ops.addOption(OptionBuilder.withDescription("u (default) for the unified framework and f for using sibs only.").hasArg().create(cmd_model));
 
 		ops.addOption(OptionBuilder.withDescription("specify the .ped and .map files").hasArg().create(cmd_file));
 		ops.addOption(OptionBuilder.withDescription("specify the .ped file.").hasArg().create(cmd_ped));
@@ -242,8 +278,8 @@ public class Parameter {
 
 		ops.addOption(OptionBuilder.withDescription("include snps in detecting interaction").hasArgs().create(cmd_snp));
 		ops.addOption(OptionBuilder.withDescription("specify the background snp").hasArgs().create(cmd_bgsnp));
-		ops.addOption(OptionBuilder.withDescription("specify the file containing included snps when detecting interaction").hasArg().create(
-				cmd_snp_f));
+		ops.addOption(OptionBuilder.withDescription("specify the file containing included snps when detecting interaction").hasArg()
+				.create(cmd_snp_f));
 		ops.addOption(OptionBuilder.withDescription("select chromosomes").hasArgs().create(cmd_chr));
 		ops.addOption(OptionBuilder.withDescription("specify interacting snps").create(cmd_x));
 
@@ -255,34 +291,39 @@ public class Parameter {
 		ops.addOption(OptionBuilder.withDescription("include females only").create(cmd_filter_female));
 		ops.addOption(OptionBuilder.withDescription("include unknown sex ").create(cmd_ex_nosex));
 
-
 		ops.addOption(OptionBuilder.withDescription("specify response by number.").hasArg().create(cmd_res_number));
 		ops.addOption(OptionBuilder.withDescription("specify response by name.").hasArg().create(cmd_res_name));
 
 		ops.addOption(OptionBuilder.withDescription(
-				"method for adjustment of the phenotype, 0 (default) for linear regression, 1 for logistic regression.").hasArg().create(cmd_method));
+				"method for adjustment of the phenotype, 0 (default) for linear regression, 1 for logistic regression.").hasArg().create(cmd_reg));
 		ops.addOption(OptionBuilder.withDescription("fold of cross-validation, and default is 5.").hasArg().create(cmd_cv));
+		ops.addOption(OptionBuilder.withDescription("specify the proportion of the training set.").hasArg().create(cmd_trgroup));
+		ops.addOption(OptionBuilder.withDescription("specify the file containing the training set.").hasArg().create(cmd_ttfile));
+		ops.addOption(OptionBuilder.withDescription("specify the gender as the training set.").hasArg().create(cmd_trsex));
+		// ops.addOption(OptionBuilder.withDescription("specify start of the training set.").hasArgs().create(cmd_border));
 		ops.addOption(OptionBuilder.withDescription("specify the order of interaction.").hasArg().create(cmd_order));
 		ops.addOption(OptionBuilder.withDescription("specify the random sample fraction.").hasArg().create(cmd_thin));
 		ops.addOption(OptionBuilder.withDescription("specify partition of the searching space.").hasArg().create(cmd_slice));
 		ops.addOption(OptionBuilder.withDescription("specify the minor allele frequency for inclusion.").hasArg().create(cmd_maf));
 		ops.addOption(OptionBuilder.withDescription("specify missing genotype rate for inclusion.").hasArg().create(cmd_geno));
-		ops.addOption(OptionBuilder.withDescription("specify the p value of departure from Hardy-Weinberg Equilibrium for inclusion").hasArg().create(cmd_hwe));
+		ops.addOption(OptionBuilder.withDescription("specify the p value of departure from Hardy-Weinberg Equilibrium for inclusion").hasArg()
+				.create(cmd_hwe));
 		ops.addOption(OptionBuilder.withDescription("seed for the algorithms").hasArg().create(cmd_seed));
 		ops.addOption(OptionBuilder.withDescription("specify the classification for a tie genotype").hasArg().create(cmd_tie));
-		
+
 		ops.addOption(OptionBuilder.withDescription("replication for permutation.  Default is 100.").hasArg().create(cmd_perm));
+		ops.addOption(OptionBuilder.withDescription("replication for permutation.  Default is 100.").hasArg().create(cmd_ep));
 		ops.addOption(OptionBuilder.withDescription("only sibs are exchangeable when this option is turned on").create(cmd_perm_scheme));
-		ops.addOption(OptionBuilder.withDescription(
-				"hierachical permutation for families that founders are exchangeable within family and sibs are exchangeable within family.").create(
-				cmd_perm_fam));
-		ops.addOption(OptionBuilder.withDescription("use unrelated indivuduals only, if '--md' is specified.").create(cmd_unrelated_only));
+
+		// ops.addOption(OptionBuilder.withDescription("use unrelated indivuduals only, if '--md' is specified.").create(cmd_unrelated_only));
 		ops.addOption(OptionBuilder.withDescription("replications for simulation, and this parameter is for simulation only").hasArg().create(
 				cmd_simu));
 		ops.addOption(OptionBuilder.withDescription("missing phenotype, default 99").hasArg().create(cmd_missing_phenotype));
 		ops.addOption(OptionBuilder.withDescription("missing genotype, default 00").hasArg().create(cmd_missing_genotype));
 		ops.addOption(OptionBuilder.withDescription("missing allele, default 0").hasArg().create(cmd_missing_allele));
 		ops.addOption(OptionBuilder.withDescription("use this option if status was coded as 1 (unaffected)/2 (affected).").create(cmd_status_shift));
+		ops.addOption(OptionBuilder.withDescription("threshold of training accuracy for output").hasArg().create(cmd_training));
+		ops.addOption(OptionBuilder.withDescription("threshold of testing accuracy for output").hasArg().create(cmd_testing));
 		ops.addOption(OptionBuilder.withDescription("help manual.").create(cmd_help));
 	}
 
@@ -300,8 +341,25 @@ public class Parameter {
 		if (cl.hasOption(cmd_x)) {
 			x = true;
 		}
-		if (cl.hasOption(cmd_mode)) {
-			mode = cl.getOptionValue(cmd_mode);
+		if (cl.hasOption(cmd_model)) {
+			model = cl.getOptionValue(cmd_model);
+			boolean flag = false;
+			if (model.compareTo("cc") == 0) {
+				flag = true;
+			} else if (model.compareTo("u1") == 0) {
+				flag = true;
+			} else if (model.compareTo("u2") == 0) {
+				flag = true;
+			} else if (model.compareTo("fam1") == 0) {
+				flag = true;
+			} else if (model.compareTo("fam2") == 0) {
+				flag = true;
+			}
+			if (flag) {
+				permu_scheme = true;
+			} else {
+				throw new IllegalArgumentException("bad parameter for option --model.");
+			}
 		}
 		// file
 		if (cl.hasOption(cmd_file)) {
@@ -530,7 +588,7 @@ public class Parameter {
 				if (insnp.size() > 0) {
 					xincludesnp = (String[]) insnp.toArray(new String[0]);
 					snpFlag = true;
-				} 
+				}
 				if (insnppair.size() > 0) {
 					xinsnpPair = (String[]) insnppair.toArray(new String[0]);
 					snpPairFlag = true;
@@ -542,10 +600,10 @@ public class Parameter {
 		if (cl.hasOption(cmd_bgsnp)) {
 			String[] bg = cl.getOptionValues(cmd_bgsnp);
 			HashSet<String> bgSet = NewIt.newHashSet();
-			for(int i = 0; i < bg.length; i++) {
+			for (int i = 0; i < bg.length; i++) {
 				bgSet.add(bg[i]);
 			}
-			if(bgSet.size() != bg.length) {
+			if (bgSet.size() != bg.length) {
 				throw new IllegalArgumentException("bad parameter for bgsnp");
 			}
 			bgsnp = cl.getOptionValues(cmd_bgsnp);
@@ -591,7 +649,7 @@ public class Parameter {
 					excludesnp = (String[]) exsnp.toArray(new String[0]);
 				}
 			} else {
-				
+
 			}
 		}
 
@@ -713,7 +771,7 @@ public class Parameter {
 			HashSet<String> chrSet = NewIt.newHashSet();
 			HashSet<String> exSet = NewIt.newHashSet();
 			for (int i = 0; i < chr.length; i++) {
-				if(chr[i].startsWith("-")) {
+				if (chr[i].startsWith("-")) {
 					exSet.add(chr[i]);
 				} else {
 					chrSet.add(chr[i]);
@@ -722,15 +780,15 @@ public class Parameter {
 			if (chr.length != chrSet.size() + exSet.size()) {
 				throw new IllegalArgumentException("bad parameter for --chr");
 			}
-			if(chrSet.size() > 0) {
+			if (chrSet.size() > 0) {
 				in_chr = (String[]) chrSet.toArray(new String[0]);
 				inchrFlag = true;
 			}
-			if(exSet.size() > 0) {
+			if (exSet.size() > 0) {
 				ex_chr = (String[]) exSet.toArray(new String[0]);
 				exchrFlag = true;
 			}
-			
+
 		}
 
 		if (cl.hasOption(cmd_snpwindow)) {
@@ -739,7 +797,7 @@ public class Parameter {
 			snp_window = new double[s.length][2];
 			for (int i = 0; i < s.length; i++) {
 				String[] ss = s[i].split(incommand_separator);
-				if(ss.length != 3) {
+				if (ss.length != 3) {
 					throw new IllegalArgumentException("bad parameter for --snpwindow: " + s[i]);
 				}
 				snpwindow[i] = ss[0];
@@ -748,7 +806,7 @@ public class Parameter {
 			}
 			snpwindowFlag = true;
 		}
-		
+
 		if (cl.hasOption(cmd_maf)) {
 			maf = Double.parseDouble(cl.getOptionValue(cmd_maf));
 			if (maf < 0) {
@@ -756,7 +814,7 @@ public class Parameter {
 			}
 			mafFlag = true;
 		}
-		
+
 		if (cl.hasOption(cmd_geno)) {
 			geno = Double.parseDouble(cl.getOptionValue(cmd_geno));
 			if (geno < 0) {
@@ -764,7 +822,7 @@ public class Parameter {
 			}
 			genoFlag = true;
 		}
-		
+
 		if (cl.hasOption(cmd_hwe)) {
 			hwe = Double.parseDouble(cl.getOptionValue(cmd_hwe));
 			if (hwe < 0) {
@@ -783,12 +841,77 @@ public class Parameter {
 			response = Integer.parseInt(cl.getOptionValue(cmd_res_number)) - 1;
 		}
 
-		if (cl.hasOption(cmd_method)) {
-			linkfunction = Integer.parseInt(cl.getOptionValue(cmd_method));
+		if (cl.hasOption(cmd_reg)) {
+			linkfunction = Integer.parseInt(cl.getOptionValue(cmd_reg));
 		}
 		if (cl.hasOption(cmd_cv)) {
 			cv = Integer.parseInt(cl.getOptionValue(cmd_cv));
+			cvFlag = true;
 		}
+		if (cl.hasOption(cmd_trgroup)) {
+			trgroup = Double.parseDouble(cl.getOptionValue(cmd_trgroup));
+			trgroupFlag = true;
+		}
+		if (cl.hasOption(cmd_trsex)) {
+			trsex = Integer.parseInt(cl.getOptionValue(cmd_trsex));
+			if (trsex != 1 && trsex != 2) {
+				throw new IllegalArgumentException("unknown value for option --trsex");
+			}
+			trsexFlag = true;
+		}
+		if (cl.hasOption(cmd_ttfile)) {
+			String tf = cl.getOptionValue(cmd_ttfile);
+			File ttfile = new File(tf);
+			if (!ttfile.exists()) {
+				throw new IllegalArgumentException("could not open ttfile " + tf);
+			}
+
+			ArrayList<String> Farray = NewIt.newArrayList();
+			ArrayList<String> Iarray = NewIt.newArrayList();
+			BufferedReader reader = null;
+			try {
+				reader = new BufferedReader(new FileReader(new File(tf)));
+			} catch (IOException E) {
+				throw new IllegalArgumentException("failed in reading " + tf);
+			}
+			String line = null;
+			try {
+				while ((line = reader.readLine()) != null) {
+					String[] l = line.split(delim);
+					Farray.add(l[0]);
+					Iarray.add(l[1]);
+				}
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
+
+			ttArray = new String[2][Farray.size()];
+			ttArray[0] = (String[]) Farray.toArray(new String[0]);
+			ttArray[1] = (String[]) Iarray.toArray(new String[0]);
+			ttfileFlag = true;
+		}
+		// if (cl.hasOption(cmd_border)) {
+		// String[] h = cl.getOptionValues(cmd_border);
+		// if (h.length != 2) {
+		// throw new
+		// IllegalArgumentException("bad parameter for option --border.");
+		// }
+		// boolean rflag = false;
+		// if (h[0].startsWith("-")) {
+		// border_fid = h[0].substring(1, h[0].length());
+		// rflag = true;
+		// } else {
+		// border_fid = h[0];
+		// }
+		// if (h[1].startsWith("-")) {
+		// border_iid = h[1].substring(1, h[1].length());
+		// rflag = true;
+		// } else {
+		// border_iid = h[1];
+		// }
+		// borderFlag = true;
+		// reverseborderFlag = rflag;
+		// }
 		if (cl.hasOption(cmd_seed)) {
 			seed = Integer.parseInt(cl.getOptionValue(cmd_seed));
 		}
@@ -799,19 +922,22 @@ public class Parameter {
 			simu = Integer.parseInt(cl.getOptionValue(cmd_simu));
 		}
 		if (cl.hasOption(cmd_perm)) {
-			permutation = Integer.parseInt(cl.getOptionValue(cmd_perm));
+			perm = Integer.parseInt(cl.getOptionValue(cmd_perm));
+			permFlag = true;
+		}
+		if (cl.hasOption(cmd_ep)) {
+			ep = Double.parseDouble(cl.getOptionValue(cmd_ep));
+			if (ep >= 1 || ep < 0) {
+				throw new IllegalArgumentException("bad parameter for option --ep.");
+			}
+			epFlag = true;
 		}
 		if (cl.hasOption(cmd_perm_scheme)) {
 			permu_scheme = true;
 		}
-		if (cl.hasOption(cmd_perm_fam)) {// when --pf is pronounced,
-			// permu_scheme is turned on.
-			permu_fam = true;
-			permu_scheme = true;
-		}
-		if (cl.hasOption(cmd_unrelated_only)) {
-			unrelated_only = true;
-		}
+		// if (cl.hasOption(cmd_unrelated_only)) {
+		// unrelated_only = true;
+		// }
 		if (cl.hasOption(cmd_order)) {
 			order = Integer.parseInt(cl.getOptionValue(cmd_order));
 		}
@@ -834,6 +960,14 @@ public class Parameter {
 		}
 		if (cl.hasOption(cmd_status_shift)) {
 			status_shift = -1;
+		}
+		if (cl.hasOption(cmd_training)) {
+			threshold_training = Double.parseDouble(cl.getOptionValue(cmd_training));
+			trainingFlag = true;
+		}
+		if (cl.hasOption(cmd_testing)) {
+			threshold_testing = Double.parseDouble(cl.getOptionValue(cmd_testing));
+			testingFlag = true;
 		}
 		if (help) {
 			HelpFormatter formatter = new HelpFormatter();
@@ -873,6 +1007,11 @@ public class Parameter {
 				predictor[i] = idx.get(i).intValue();
 			}
 		}
+	}
+
+	public static void setPermutationThreshold(double p) {
+		threshold_permu = p;
+		permuFlag = true;
 	}
 
 	public static void main(String[] args) throws IOException {

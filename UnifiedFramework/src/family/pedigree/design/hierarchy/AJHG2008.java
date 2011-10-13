@@ -250,6 +250,7 @@ public class AJHG2008 extends ChenBase {
 		}
 	}
 
+	@Override
 	protected void buildScore(int pheIdx, int[] covIdx, int method) {
 		score = new double[PersonTable.size()];
 		ArrayList<Double> T = NewIt.newArrayList();
@@ -306,4 +307,37 @@ public class AJHG2008 extends ChenBase {
 		}
 	}
 
+	@Override
+	protected void buildScoreII() {
+		if (PersonTable.size() < 10) {
+			System.err.println("too few effective individuals (" + PersonTable.size() + ") for the selected trait.");
+			System.exit(0);
+		}
+		score = new double[PersonTable.size()];
+		ArrayList<Double> T = NewIt.newArrayList();
+
+		for (int i = 0; i < PersonTable.size()/2; i++) {
+			double t = 0;
+			t = status[i] + Parameter.status_shift;
+			T.add(new Double(t));
+		}
+
+		double[][] X = null;
+
+		double[][] Y = new double[T.size()][1];
+		for (int i = 0; i < T.size(); i++) {
+			Y[i][0] = ((Double) T.get(i)).doubleValue();
+		}
+
+		double[] r = null;
+
+		LinearRegression LReg = new LinearRegression(Y, X, true);
+		LReg.MLE();
+		r = LReg.getResiduals1();
+
+		for (int i = 0; i < r.length; i++) {
+			score[i * 2] = r[i];
+			score[i * 2 + 1] = -1 * r[i];
+		}
+	}
 }
