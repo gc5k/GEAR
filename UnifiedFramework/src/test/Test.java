@@ -12,7 +12,6 @@ import family.mdr.arsenal.MDRConstant;
 import family.mdr.arsenal.ModelGenerator;
 import family.mdr.arsenal.ModelGeneratorII;
 import family.mdr.filter.softfilter.SoftSNPFilter;
-import power.SimulationPower;
 import family.pedigree.design.hierarchy.AJHG2008;
 import family.pedigree.design.hierarchy.ChenInterface;
 import family.pedigree.design.hierarchy.SII;
@@ -50,19 +49,17 @@ public class Test {
 
 		long s = Parameter.seed;
 		ChenInterface chen = null;
-		if (Parameter.mode.compareTo("u") == 0) {
-			if (p.unrelated_only) {
-				chen = new UnifiedUnrelated(pp.getPedigreeData(), pp.getPhenotypeData(), pp.getMapData(), s, p.response, Parameter.predictor,
+		if (Parameter.model.compareTo("cc") == 0) {
+			chen = new UnifiedUnrelated(pp.getPedigreeData(), pp.getPhenotypeData(), pp.getMapData(), s, Parameter.response, Parameter.predictor,
 						p.linkfunction);
-			} else if (p.permu_fam) {
-				chen = new UnifiedII(pp.getPedigreeData(), pp.getPhenotypeData(), pp.getMapData(), s, p.response, Parameter.predictor, p.linkfunction);
-			} else {
-				chen = new Unified(pp.getPedigreeData(), pp.getPhenotypeData(), pp.getMapData(), s, p.response, Parameter.predictor, p.linkfunction);
-			}
-		} else if (Parameter.mode.compareTo("f") == 0) {
-			chen = new SII(pp.getPedigreeData(), pp.getPhenotypeData(), pp.getMapData(), s, p.response, Parameter.predictor, p.linkfunction);
-		} else if (Parameter.mode.compareTo("pi") == 0) {
-			chen = new AJHG2008(pp.getPedigreeData(), pp.getPhenotypeData(), pp.getMapData(), s, p.response, Parameter.predictor, p.linkfunction);
+		} else if (Parameter.model.compareTo("u1") == 0) {
+			chen = new Unified(pp.getPedigreeData(), pp.getPhenotypeData(), pp.getMapData(), s, Parameter.response, Parameter.predictor, p.linkfunction);
+		} else if (Parameter.model.compareTo("u2") == 0) {
+			chen = new UnifiedII(pp.getPedigreeData(), pp.getPhenotypeData(), pp.getMapData(), s, Parameter.response, Parameter.predictor, p.linkfunction);	
+		} else if (Parameter.model.compareTo("fam1") == 0) {
+			chen = new AJHG2008(pp.getPedigreeData(), pp.getPhenotypeData(), pp.getMapData(), s, Parameter.response, Parameter.predictor, p.linkfunction);
+		} else if (Parameter.model.compareTo("fam2") == 0) {
+			chen = new SII(pp.getPedigreeData(), pp.getPhenotypeData(), pp.getMapData(), s, Parameter.response, Parameter.predictor, p.linkfunction);
 		}
 
 		GenotypeMatrix gm = new GenotypeMatrix(chen);

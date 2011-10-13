@@ -46,7 +46,8 @@ public class MDRTrainingExactTest {
 				confusion[0][1] += cell.getPositiveSubjects();
 				confusion[1][1] += cell.getNegativeSubjects();
 			} else {
-
+//				confusion[0][1] += cell.getPositiveSubjects();
+//				confusion[1][0] += cell.getNegativeSubjects();
 			}
 		}
 		HSub = new int[H][2];
@@ -64,22 +65,24 @@ public class MDRTrainingExactTest {
 				LSub[c2][0] = (int) cell.getPositiveSubjects();
 				LSub[c2][1] = (int) cell.getNegativeSubjects();
 				c2++;
+			} else {
+
 			}
 		}
 		T = 1.0 * (confusion[0][0] + confusion[0][1]) / (confusion[1][0] + confusion[1][1]);
 		if (H >= L) {
 			for (int i = 0; i < HSub.length; i++) {
-				HPos += getNumSubject(true, HSub[i][0], HSub[i][1], T/(1 + T));
+				HPos += getNumSubject(true, HSub[i][0], HSub[i][1], T / (1 + T));
 			}
 			HNeg = confusion[1][0] + confusion[0][0] - HPos;
 			LPos = confusion[0][1] + confusion[0][0] - HPos;
 			LNeg = confusion[1][1] + confusion[1][0] - HNeg;
 		} else {
 			for (int i = 0; i < LSub.length; i++) {
-				LNeg += getNumSubject(false, LSub[i][0], LSub[i][1], 1.0/(1+ T));
+				LNeg += getNumSubject(false, LSub[i][0], LSub[i][1], 1.0 / (1 + T));
 			}
 			LPos = confusion[0][1] + confusion[1][1] - LNeg;
-			HNeg = confusion[1][0] + confusion[1][1] - LNeg ;
+			HNeg = confusion[1][0] + confusion[1][1] - LNeg;
 			HPos = confusion[0][0] + confusion[1][0] - HNeg;
 		}
 	}
@@ -89,7 +92,7 @@ public class MDRTrainingExactTest {
 		if (isHigh) {
 			n1 = (int) Math.ceil((PosSubs + NegSubs) * T);
 			int n2 = PosSubs + NegSubs - n1;
-				
+
 			if (n1 * 1.0 == T * n2 && Parameter.tie == 0) {
 				n1++;
 				n2--;
@@ -97,7 +100,7 @@ public class MDRTrainingExactTest {
 		} else {
 			n1 = (int) Math.ceil((PosSubs + NegSubs) * T);
 			int n2 = PosSubs + NegSubs - n1;
-			
+
 			if (n1 * 1.0 == T * n2 && Parameter.tie == 1) {
 				n1--;
 				n2++;
@@ -105,7 +108,7 @@ public class MDRTrainingExactTest {
 		}
 		return n1;
 	}
-	
+
 	private void base() {
 
 		double p = 0;
@@ -172,9 +175,10 @@ public class MDRTrainingExactTest {
 			int c = confusion[0][0] + confusion[1][0] - a;
 			int d = confusion[1][1] + confusion[0][1] - b;
 			p = p * b * c / ((a + 1) * (d + 1));
-			i++; j++;
+			i++;
+			j++;
 
-		} while(i <= upper);
+		} while (i <= upper);
 
 		pOneTail = 1 - pInt / ptruncated;
 	}

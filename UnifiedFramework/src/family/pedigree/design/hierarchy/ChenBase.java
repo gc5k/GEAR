@@ -2,7 +2,6 @@ package family.pedigree.design.hierarchy;
 
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collections;
 import java.util.Hashtable;
 import java.util.Random;
 
@@ -12,6 +11,7 @@ import score.LinearRegression;
 import score.LogisticRegression;
 
 import family.mdr.data.PersonIndex;
+import family.mdr.partition.Partition;
 import family.pedigree.file.MapFile;
 import family.pedigree.file.PedigreeFile;
 import family.pedigree.file.PhenotypeFile;
@@ -361,13 +361,20 @@ public abstract class ChenBase implements ChenInterface {
 	}
 
 	private void group() {
-		ArrayList<Integer> g = NewIt.newArrayList();
-		for (int i = 0; i < PersonTable.size(); i++) {
-			g.add(i % Parameter.cv);
+		ArrayList<Integer> g = null;
+		if (Parameter.trgroupFlag) {
+			g = Partition.TTPartition(PersonTable.size());
+		} else if (Parameter.ttfileFlag){
+			g = Partition.ttFilePartition(PersonTable);
+		} else if (Parameter.trsexFlag){
+			g = Partition.SexPartition(PersonTable);
+		} else if (Parameter.cvFlag) {
+			g = Partition.CVPartition(PersonTable.size());
 		}
-		Collections.shuffle(g, rnd);
+
 		for (int i = 0; i < PersonTable.size(); i++) {
-			PersonTable.get(i).setGroup(g.get(i));
+			PersonIndex pi = PersonTable.get(i);
+			pi.setGroup(g.get(i).intValue());
 		}
 	}
 

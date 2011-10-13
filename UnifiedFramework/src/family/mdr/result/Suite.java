@@ -21,7 +21,7 @@ public class Suite {
     protected double posScore;
     protected double negScore;
     protected double meanScore;
-    protected int status;
+    protected int status = -1;
 
     public Suite(Suite s) {
         subjects = s.getSubjects();
@@ -37,6 +37,10 @@ public class Suite {
 
     public static void setThreshold(double T) {
     	threshold = T;
+    }
+
+    public static double getThreshold() {
+    	return threshold;
     }
 
     public void add(PersonIndex s) {

@@ -4,6 +4,7 @@ import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Enumeration;
 import java.util.Hashtable;
@@ -23,6 +24,7 @@ public class PedigreeFile {
 	protected char[][] AlleleSet;
 	protected short[][] AlleleFreq;
 	protected Hashtable<String, BFamilyStruct> familystructure;
+	protected ArrayList<String> FamID;
 
 	protected int num_marker;
 	protected String titleLine = null;
@@ -32,6 +34,7 @@ public class PedigreeFile {
 	// public static String MissingGenotype="00";
 	public PedigreeFile() {
 		this.familystructure = NewIt.newHashtable();
+		FamID = NewIt.newArrayList();
 	}
 
 	public String[] getFamListSorted() {
@@ -41,7 +44,7 @@ public class PedigreeFile {
 		while (famstrList.hasMoreElements()) {
 			FID[ind++] = famstrList.nextElement();
 		}
-		Arrays.sort(FID);
+//		Arrays.sort(FID);
 		return FID;
 	}
 
@@ -71,7 +74,6 @@ public class PedigreeFile {
 	}
 
 	public void initial() throws IOException {
-
 
 	}
 

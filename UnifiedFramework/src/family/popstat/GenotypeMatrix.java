@@ -4,6 +4,7 @@ import java.util.ArrayList;
 
 import family.mdr.arsenal.MDRConstant;
 import family.mdr.data.PersonIndex;
+import family.pedigree.design.hierarchy.AJHG2008;
 import family.pedigree.design.hierarchy.ChenInterface;
 
 public class GenotypeMatrix {
@@ -14,15 +15,21 @@ public class GenotypeMatrix {
 	protected final int shift = 4;
 	protected int numMarker = 0;
 	protected ArrayList<PersonIndex> pidx;
-
+	protected boolean isAJHG2008;
+	
 	public GenotypeMatrix(ChenInterface cb) {
 		pidx = cb.getSample();
+		isAJHG2008 = cb instanceof AJHG2008;
 		initial();
 	}
 
 	protected void initial() {
+		if (isAJHG2008) {
+			genotypeMat = new int[pidx.size()/2][];
+		} else {
+			genotypeMat = new int[pidx.size()][];
+		}
 
-		genotypeMat = new int[pidx.size()][];
 		int c1 = 0;
 		for (PersonIndex pi : pidx) {
 			if (!pi.isPseudo()) {
