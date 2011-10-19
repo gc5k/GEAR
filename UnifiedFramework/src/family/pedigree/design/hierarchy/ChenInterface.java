@@ -14,15 +14,10 @@ public interface ChenInterface {
 	public static int Logistc = 1;
 
 	public void setSeed(long s);
-//	public String[] getMarkerName();
-//	public String[] getScoreName();
-//	public byte[][] getGenotype();
+	public void recoverSeed();
 	public byte[] getStatus();
-//	public double[] getScore();
-//	public double[][] getScore2();
 	public void getPermutedScore(boolean nested);
 	public void RecoverScore();
-//	public void print2MDRFormat(String f);
 	public MapFile getMapFile();
 	public int getNumberMarker();
 	public int SampleSize();

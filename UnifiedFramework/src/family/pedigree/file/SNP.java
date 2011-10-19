@@ -71,8 +71,8 @@ public class SNP implements Comparable<SNP>{
 			System.exit(0);
 		} else if (a[0] == Parameter.missing_allele.charAt(0)
 				|| a[1] == Parameter.missing_allele.charAt(0)) {
-			System.err.println("more than 2 alleles for " + name);
-			System.exit(0);
+//			System.err.println("more than 2 alleles for " + name);
+//			System.exit(0);
 		}
 		snp = new char[2];
 		System.arraycopy(a, 0, snp, 0, 2);
@@ -131,13 +131,13 @@ public class SNP implements Comparable<SNP>{
 			d0 = freq[0];
 		}
 		if (d0 < d1) {
-			sb.append(snp[0] + "(" + String.format("%.2f", d0 / (d0 + d1))
-					+ "), " + snp[1] + "("
-					+ String.format("%.2f", d1 / (d0 + d1)) + ")");
+			sb.append(snp[0] + "(" + String.format("%.2f", d0 / (d0 + d1)) + ")");
+//					+ "), " + snp[1] + "("
+//					+ String.format("%.2f", d1 / (d0 + d1)) + ")");
 		} else {
-			sb.append(snp[1] + "(" + String.format("%.2f", d1 / (d0 + d1))
-					+ "), " + snp[0] + "("
-					+ String.format("%.2f", d0 / (d0 + d1)) + ")");
+			sb.append(snp[1] + "(" + String.format("%.2f", d1 / (d0 + d1)) + ")");
+//					+ "), " + snp[0] + "("
+//					+ String.format("%.2f", d0 / (d0 + d1)) + ")");
 		}
 		if (minor != null) {
 			sb.append(minor);

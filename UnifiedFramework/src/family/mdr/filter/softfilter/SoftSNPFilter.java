@@ -44,7 +44,7 @@ public class SoftSNPFilter {
 				}
 				if (Parameter.mafFlag) {
 					double f = allelefreq[idx][0] < allelefreq[idx][1] ? allelefreq[idx][0]:allelefreq[idx][1];
-					if (f > Parameter.maf) {
+					if (f > Parameter.maf && f != 0) {
 						qualifiedSNPSet.add(new Integer(idx));
 					} else {
 						flag = false;

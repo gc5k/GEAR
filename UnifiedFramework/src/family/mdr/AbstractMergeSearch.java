@@ -11,7 +11,6 @@ import family.mdr.arsenal.MDRConstant;
 import family.mdr.arsenal.ModelGenerator;
 import family.mdr.data.PersonIndex;
 import family.mdr.result.Combination;
-import family.mdr.result.MDRStatistic;
 import family.mdr.result.Suite;
 import family.pedigree.file.MapFile;
 

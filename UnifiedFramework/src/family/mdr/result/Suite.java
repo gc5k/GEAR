@@ -141,7 +141,8 @@ public class Suite {
         } else {
         	sb.append("NA, ");
         }
-        sb.append(String.format("%.2f", posScore) + "," + String.format("%d", posSubjects) + "," + String.format("%.2f", negScore) + "," + String.format("%d", -1*negSubjects) + "," + String.format("%.4f", meanScore));
+//        sb.append(String.format("%.2f", posScore) + "," + String.format("%d", posSubjects) + "," + String.format("%.2f", negScore) + "," + String.format("%d", -1*negSubjects) + "," + String.format("%.4f", meanScore));
+        sb.append(String.format("%.2f", posScore) + "," + String.format("%d", posSubjects) + "," + String.format("%.2f", negScore) + "," + String.format("%d", -1*negSubjects));        
         return sb.toString();
     }
 }

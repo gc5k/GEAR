@@ -2,13 +2,11 @@ package test;
 
 import java.io.IOException;
 import java.io.PrintStream;
-import java.util.Arrays;
-
 import admixture.parameter.Parameter;
 
 import family.mdr.AbstractMergeSearch;
-import family.mdr.HeteroCombinationSearchII;
-import family.mdr.arsenal.MDRConstant;
+import family.mdr.HeteroCombinationSearchP;
+import family.mdr.TTMDR;
 import family.mdr.arsenal.ModelGenerator;
 import family.mdr.arsenal.ModelGeneratorII;
 import family.mdr.filter.softfilter.SoftSNPFilter;
@@ -39,8 +37,9 @@ public class Test {
 			pp = new PLINKParser(Parameter.ped, Parameter.map, Parameter.pheno);
 		} else if (Parameter.bfileFlag) {
 			pp = new PLINKBinaryParser(Parameter.bed, Parameter.bim, Parameter.fam, Parameter.pheno);
-		} else if (Parameter.tfileFlag) {
-			pp = new PLINKTransposeParser(Parameter.tped, Parameter.tfam, Parameter.map, Parameter.pheno);
+			// } else if (Parameter.tfileFlag) {
+			// pp = new PLINKTransposeParser(Parameter.tped, Parameter.tfam,
+			// Parameter.map, Parameter.pheno);
 		} else {
 			System.err.println("did not specify files.");
 			System.exit(0);
@@ -49,88 +48,56 @@ public class Test {
 
 		long s = Parameter.seed;
 		ChenInterface chen = null;
-		if (Parameter.model.compareTo("cc") == 0) {
+		if (Parameter.ccFlag) {
 			chen = new UnifiedUnrelated(pp.getPedigreeData(), pp.getPhenotypeData(), pp.getMapData(), s, Parameter.response, Parameter.predictor,
-						p.linkfunction);
-		} else if (Parameter.model.compareTo("u1") == 0) {
-			chen = new Unified(pp.getPedigreeData(), pp.getPhenotypeData(), pp.getMapData(), s, Parameter.response, Parameter.predictor, p.linkfunction);
-		} else if (Parameter.model.compareTo("u2") == 0) {
-			chen = new UnifiedII(pp.getPedigreeData(), pp.getPhenotypeData(), pp.getMapData(), s, Parameter.response, Parameter.predictor, p.linkfunction);	
-		} else if (Parameter.model.compareTo("fam1") == 0) {
-			chen = new AJHG2008(pp.getPedigreeData(), pp.getPhenotypeData(), pp.getMapData(), s, Parameter.response, Parameter.predictor, p.linkfunction);
-		} else if (Parameter.model.compareTo("fam2") == 0) {
+					p.linkfunction);
+		} else if (Parameter.uiFlag) {
+			chen = new Unified(pp.getPedigreeData(), pp.getPhenotypeData(), pp.getMapData(), s, Parameter.response, Parameter.predictor,
+					p.linkfunction);
+		} else if (Parameter.uiiFlag) {
+			chen = new UnifiedII(pp.getPedigreeData(), pp.getPhenotypeData(), pp.getMapData(), s, Parameter.response, Parameter.predictor,
+					p.linkfunction);
+		} else if (Parameter.piFlag) {
+			chen = new AJHG2008(pp.getPedigreeData(), pp.getPhenotypeData(), pp.getMapData(), s, Parameter.response, Parameter.predictor,
+					p.linkfunction);
+		} else if (Parameter.piiFlag) {
 			chen = new SII(pp.getPedigreeData(), pp.getPhenotypeData(), pp.getMapData(), s, Parameter.response, Parameter.predictor, p.linkfunction);
 		}
-
-		GenotypeMatrix gm = new GenotypeMatrix(chen);
-//		gm.Test();
-		AlleleFrequency AF = new AlleleFrequency(gm);
-		AF.CalculateAlleleFrequency();
-		System.out.println(AF);
 
 		GenotypeMatrix GM = new GenotypeMatrix(chen);
 		AlleleFrequency af = new AlleleFrequency(GM);
 		af.CalculateAlleleFrequency();
+		System.err.println(af);
 		pp.setAlleleFrequency(af.getAlleleFrequency());
 
-		SoftSNPFilter snpFilterII = new SoftSNPFilter(pp.getSNPFilter(), af);
+		SoftSNPFilter softFilter = new SoftSNPFilter(pp.getSNPFilter(), af);
+		softFilter.Filter();
 
 		AbstractMergeSearch as;
 		ModelGenerator mg;
 		if (Parameter.x) {
-			mg = new ModelGeneratorII(snpFilterII.getWSeq2(), snpFilterII.getBgSeq());
+			mg = new ModelGeneratorII(softFilter.getWSeq2(), softFilter.getBgSeq());
 		} else {
-			mg = new ModelGenerator(snpFilterII.getWSeq(), snpFilterII.getBgSeq());
+			mg = new ModelGenerator(softFilter.getWSeq(), softFilter.getBgSeq());
 		}
-		as = new HeteroCombinationSearchII.Builder(Parameter.cv, chen.getSample(), chen.getMapFile()).
-		ModelGenerator(mg).mute(false).build();
-		
-//		PrintStream PW = new PrintStream("ugmdr.txt");
-//		System.setOut(PW);
-//		for (int j = p.order; j <= p.order; j++) {
-//			System.err.println("order:" + j);
-//			Test.PrintHeader(j);
-//			// double[] pv = new double[p.permutation];
-//			// for (int k = 0; k < p.permutation; k++) {
-//			// System.err.println("permu:" + k);
-//			// as.setMute(true);
-//			// chen.getPermutedScore(p.permu_scheme);
-//			// as.search(j, 1);
-//			// pv[k] = as.getModelStats()[MDRConstant.TestingBalancedAccuIdx];
-//			// }
-//			//
-//			// Arrays.sort(pv);
-//			// double T = pv[(int) (pv.length * 0.95)];
-//			as.setMute(false);
-//			chen.RecoverScore();
-//			long t1 = System.currentTimeMillis();
-//			System.err.println(t1);
-//			as.search(j, 1);
-//			long t2 = System.currentTimeMillis();
-//			System.err.println(t2 - t1);
-//			// System.out.println(as);
-//
-//			// SimulationPower sp = new SimulationPower(as.getMDRResult(), pv);
-//			// sp.calculatePower();
-//			// System.out.println(sp);
-//		}
-//		System.out.println();
-//		PW.close();
-	}
+		if (Parameter.trgroupFlag) {
+			as = new TTMDR(2, chen.getSample(), chen.getMapFile(), mg, 1, false);
+		} else {
+			as = new HeteroCombinationSearchP.Builder(Parameter.cv, chen.getSample(), chen.getMapFile()).ModelGenerator(mg).mute(false).chen(chen)
+					.build();
+		}
 
-	public static void PrintHeader(int order) {
-		System.out.print("The " + order + " order interaction");
-		System.out.print(System.getProperty("line.separator"));
-		System.out.print("model code, model(marker chr pos minor allele major allele): ");
-		for (int i = 0; i < MDRConstant.NumStats; i++) {
-			if (i != MDRConstant.NumStats - 1) {
-				System.out.print(MDRConstant.TestStatistic[i] + ", ");
-			} else {
-				System.out.print(MDRConstant.TestStatistic[i]);
-			}
+		for (int j = Parameter.order; j <= Parameter.order; j++) {
+			StringBuilder sb = new StringBuilder(Parameter.out);
+			sb.append(j);
+			sb.append(".txt");
+			PrintStream PW = new PrintStream(sb.toString());
+			System.setOut(PW);
+			System.err.println("order:" + j);
+			as.setMute(false);
+			chen.RecoverScore();
+			as.search(j, 1);
+			PW.close();
 		}
-		System.out
-				.print(": classfication (genotype, High-risk or Low-risk group, positive scores, positive subjects, negative score, negative subjects)");
-		System.out.println();
 	}
 }

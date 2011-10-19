@@ -9,6 +9,8 @@ import java.util.Arrays;
 import java.util.Enumeration;
 import java.util.Hashtable;
 
+import org.apache.commons.lang3.ArrayUtils;
+
 import admixture.parameter.Parameter;
 
 import util.NewIt;
@@ -128,7 +130,7 @@ public class PedigreeFile {
 
 				int c = 0;
 				for (int j = 0; j < (tokenizer.length - 6) / 2; j++) {
-					int idx = Arrays.binarySearch(WSNP, j);
+					int idx = ArrayUtils.indexOf(WSNP, j);
 					if(idx < 0) continue;
 					try {
 						String[] allele = { tokenizer[6 + j * 2], tokenizer[6 + j * 2 + 1] };

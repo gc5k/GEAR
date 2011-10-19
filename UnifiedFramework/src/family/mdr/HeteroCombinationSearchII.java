@@ -6,9 +6,9 @@ import java.util.Map.Entry;
 
 import admixture.parameter.Parameter;
 
-import statistics.FisherExactTest.mdrExactTest.MDRTestingExactTest;
-import statistics.FisherExactTest.mdrExactTest.MDRTrainingExactTest;
-import statistics.FisherExactTest.mdrExactTest.MDRTruncatedExactTest;
+//import statistics.FisherExactTest.mdrExactTest.MDRTestingExactTest;
+//import statistics.FisherExactTest.mdrExactTest.MDRTrainingExactTest;
+//import statistics.FisherExactTest.mdrExactTest.MDRTruncatedExactTest;
 
 import family.mdr.arsenal.MDRConstant;
 import family.mdr.arsenal.ModelGenerator;
@@ -16,7 +16,6 @@ import family.mdr.arsenal.ToolKit;
 import family.mdr.data.PersonIndex;
 import family.mdr.result.Cell;
 import family.mdr.result.Combination;
-import family.mdr.result.MDRStatistic;
 import family.mdr.result.OneCVSet;
 import family.mdr.result.Suite;
 import family.pedigree.file.MapFile;
@@ -124,6 +123,7 @@ public class HeteroCombinationSearchII extends AbstractMergeSearch {
 			bestStat = mdrStat;
 		}
 		count++;
+
 	}
 
 	protected void linearSearch() {
@@ -240,7 +240,6 @@ public class HeteroCombinationSearchII extends AbstractMergeSearch {
 			Cell tCell;
 			Set<String> cellKeys = model.keySet();
 
-			int idx = 0;
 			for (String cellKey : cellKeys) {
 				int tr_status = -1;
 				Suite fullSuite = model.get(cellKey);
@@ -265,11 +264,10 @@ public class HeteroCombinationSearchII extends AbstractMergeSearch {
 				cvSet.addTrainingModel(cellKey, trCell);
 				cvSet.addTestingModel(cellKey, tCell);
 
-				idx++;
 			}
 			
-			MDRTrainingExactTest mdrTrET = new MDRTrainingExactTest(cvSet.getTrainingSubdivision());
-			MDRTestingExactTest mdrTET = new MDRTestingExactTest(cvSet.getTestingSubdivision());
+//			MDRTrainingExactTest mdrTrET = new MDRTrainingExactTest(cvSet.getTrainingSubdivision());
+//			MDRTestingExactTest mdrTET = new MDRTestingExactTest(cvSet.getTestingSubdivision());
 
 			double trAccu = 0;
 			double tAccu = 0;
@@ -290,6 +288,21 @@ public class HeteroCombinationSearchII extends AbstractMergeSearch {
 		mdrStat.setTestingBalancedAccuracy(mean[MDRConstant.TestingBalancedAccuIdx]);
 	}
 
+	public void PrintHeader() {
+		System.out.print(System.getProperty("line.separator"));
+		System.out.print("model code, model(marker chr pos minor allele major allele): ");
+		for (int i = 0; i < MDRConstant.NumStats; i++) {
+			if (i != MDRConstant.NumStats - 1) {
+				System.out.print(MDRConstant.TestStatistic[i] + ", ");
+			} else {
+				System.out.print(MDRConstant.TestStatistic[i]);
+			}
+		}
+		System.out.print(", Truncated Fisher's Exact Test" + ", ");
+		System.out
+				.print(": classfication (genotype, High-risk or Low-risk group, positive scores, positive subjects, negative score, negative subjects)");
+		System.out.println();
+	}
 
 	public String toString() {
 		StringBuilder sb = new StringBuilder();
