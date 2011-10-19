@@ -5,7 +5,7 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Random;
 
-import family.mdr.result.MDRStatistic;
+import family.mdr.MDRStatistic;
 
 import util.NewIt;
 

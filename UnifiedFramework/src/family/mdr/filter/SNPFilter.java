@@ -85,7 +85,7 @@ public class SNPFilter implements SNPFilterInterface {
 				}
 			}
 		}
-		
+
 		if (Parameter.exchrFlag) {
 			for (int i = 0; i < snpList.size(); i++) {
 				SNP snp = snpList.get(i);
@@ -148,6 +148,13 @@ public class SNPFilter implements SNPFilterInterface {
 					includeSNP(i);
 				}
 			}
+			for (int i = 0; i < in_range.length; i++) {
+				if (in_range[i][0] > in_range[i][1]) {
+					in_range[i][0] = in_range[i][0]^in_range[i][1];
+					in_range[i][1] = in_range[i][0]^in_range[i][1];
+					in_range[i][0] = in_range[i][0]^in_range[i][1];
+				}
+			}
 		}
 
 		if (Parameter.exsnpPair != null) {
@@ -161,6 +168,13 @@ public class SNPFilter implements SNPFilterInterface {
 					int dim2 = (idx - (idx >> 1 << 1));
 					ex_range[dim1][dim2] = i;
 					excludeSNP(i);
+				}
+			}
+			for (int i = 0; i < ex_range.length; i++) {
+				if (ex_range[i][0] > ex_range[i][1]) {
+					ex_range[i][0] = ex_range[i][0]^ex_range[i][1];
+					ex_range[i][1] = ex_range[i][0]^ex_range[i][1];
+					ex_range[i][0] = ex_range[i][0]^ex_range[i][1];
 				}
 			}
 		}
@@ -217,19 +231,26 @@ public class SNPFilter implements SNPFilterInterface {
 
 	private void makeWSNPList() {
 
-		if (selectedSNPSet.size() > 0 ) {
-			WSNP = new int[selectedSNPSet.size()];
-			int c = 0;
-			for (Iterator<Integer> e = selectedSNPSet.iterator(); e.hasNext();) {
-				Integer V = e.next();
-				WSNP[c++] = V.intValue();
+		if (selectedSNPSet.size() > 0) {
+			if (selectedSNPSet.size() > bgSNPSet.size()) {
+				WSNP = new int[selectedSNPSet.size()];
+				int c = 0;
+				for (Iterator<Integer> e = selectedSNPSet.iterator(); e.hasNext();) {
+					Integer V = e.next();
+					WSNP[c++] = V.intValue();
+				}
+			} else if (Parameter.order > bgSNPSet.size()) {
+				WSNP = new int[snpList.size()];
+				for (int i = 0; i < snpList.size(); i++) {
+					WSNP[i] = i;
+				}
 			}
 			Arrays.sort(WSNP);
-		} else if (excludedSNPSet.size() > 0 ) {
+		} else if (excludedSNPSet.size() > 0) {
 			WSNP = new int[snpList.size() - excludedSNPSet.size()];
 			int c = 0;
 			for (int i = 0; i < snpList.size(); i++) {
-				if (!excludedSNPSet.contains(new Integer(i))) {
+				if (!excludedSNPSet.contains(i)) {
 					WSNP[c++] = i;
 				}
 			}
@@ -245,7 +266,7 @@ public class SNPFilter implements SNPFilterInterface {
 			wseq = new int[WSNP.length - bgseq.length];
 			int c1 = 0, c2 = 0;
 			for (int i = 0; i < WSNP.length; i++) {
-				if (bgSNPSet.contains(new Integer(WSNP[i]))) {
+				if (bgSNPSet.contains(WSNP[i])) {
 					bgseq[c1++] = i;
 				} else {
 					wseq[c2++] = i;
@@ -271,27 +292,26 @@ public class SNPFilter implements SNPFilterInterface {
 	}
 
 	private boolean includeSNP(int i) {
-		Integer I = new Integer(i);
-		if (selectedSNPSet.contains(I)) {
+		if (selectedSNPSet.contains(i)) {
 			return true;
 		} else {
-			selectedSNPSet.add(I);
+			selectedSNPSet.add(i);
 			return false;
 		}
 	}
 
 	private boolean excludeSNP(int i) {
-		Integer I = new Integer(i);
-		if (excludedSNPSet.contains(I)) {
+
+		if (excludedSNPSet.contains(i)) {
 			return true;
 		} else {
-			excludedSNPSet.add(I);
+			excludedSNPSet.add(i);
 			return false;
 		}
 	}
 
 	public int[] getWorkingSNP() {
-			return WSNP;
+		return WSNP;
 	}
 
 	@Override
@@ -306,7 +326,6 @@ public class SNPFilter implements SNPFilterInterface {
 
 	@Override
 	public int[][] getWSeq2() {
-		// TODO Auto-generated method stub
 		return null;
 	}
 }

@@ -50,16 +50,16 @@ public class RealDataAnalyzerII {
 
 		long s = Parameter.seed;
 		ChenInterface chen = null;
-		if (Parameter.model.compareTo("cc") == 0) {
+		if (Parameter.ccFlag) {
 			chen = new UnifiedUnrelated(pp.getPedigreeData(), pp.getPhenotypeData(), pp.getMapData(), s, Parameter.response, Parameter.predictor,
 						p.linkfunction);
-		} else if (Parameter.model.compareTo("u1") == 0) {
+		} else if (Parameter.uiFlag) {
 			chen = new Unified(pp.getPedigreeData(), pp.getPhenotypeData(), pp.getMapData(), s, Parameter.response, Parameter.predictor, p.linkfunction);
-		} else if (Parameter.model.compareTo("u2") == 0) {
+		} else if (Parameter.uiiFlag) {
 			chen = new UnifiedII(pp.getPedigreeData(), pp.getPhenotypeData(), pp.getMapData(), s, Parameter.response, Parameter.predictor, p.linkfunction);	
-		} else if (Parameter.model.compareTo("fam1") == 0) {
+		} else if (Parameter.piFlag) {
 			chen = new AJHG2008(pp.getPedigreeData(), pp.getPhenotypeData(), pp.getMapData(), s, Parameter.response, Parameter.predictor, p.linkfunction);
-		} else if (Parameter.model.compareTo("fam2") == 0) {
+		} else if (Parameter.piiFlag) {
 			chen = new SII(pp.getPedigreeData(), pp.getPhenotypeData(), pp.getMapData(), s, Parameter.response, Parameter.predictor, p.linkfunction);
 		}
 
@@ -85,9 +85,11 @@ public class RealDataAnalyzerII {
 			as = new HeteroCombinationSearchII.Builder(Parameter.cv, chen.getSample(), chen.getMapFile()).ModelGenerator(mg).mute(false).build();
 		}
 
-		PrintStream PW = new PrintStream("ugmdr.txt");
-		System.setOut(PW);
 		for (int j = Parameter.order; j <= Parameter.order; j++) {
+			StringBuilder sb = new StringBuilder(Parameter.out);
+			sb.append(j); sb.append(".txt");
+			PrintStream PW = new PrintStream(sb.toString());
+			System.setOut(PW);
 			if (Parameter.permFlag) {
 				double[] pv = new double[Parameter.perm];
 				for (int k = 0; k < Parameter.perm; k++) {
@@ -114,9 +116,9 @@ public class RealDataAnalyzerII {
 			as.setMute(false);
 			chen.RecoverScore();
 			as.search(j, 1);
+			System.out.println();
+			PW.close();
 		}
-		System.out.println();
-		PW.close();
 	}
 
 	public static void PrintHeader(int order) {

@@ -10,14 +10,14 @@ public class AlleleFrequency {
 	private int numMarker;
 	private double[][] allelefreq;
 	private double[][] genotypefreq;
-	private double[][] hw;
+//	private double[][] hw;
 
 	public AlleleFrequency(GenotypeMatrix g) {
 		G = g;
 		numMarker = g.numMarker;
 		allelefreq = new double[numMarker][3];
 		genotypefreq = new double[numMarker][4];
-		hw = new double[numMarker][2];
+//		hw = new double[numMarker][2];
 	}
 
 	public void CalculateAlleleFrequency() {
@@ -33,9 +33,6 @@ public class AlleleFrequency {
 		}
 
 		for (int i = 0; i < numMarker; i++) {
-			int N = (int) (genotypefreq[i][0] + genotypefreq[i][1] + genotypefreq[i][2]);
-			int NAB = (int) (genotypefreq[i][1]);
-			int NA = (int) (allelefreq[i][0] < allelefreq[i][1] ? allelefreq[i][0] : allelefreq[i][1]);
 
 			double a = allelefreq[i][0] + allelefreq[i][1] + allelefreq[i][2];
 			if (a > 0) {
@@ -56,9 +53,9 @@ public class AlleleFrequency {
 				genotypefreq[i][3] = 1;
 			}
 
-			FastFisherExactTest ff = new FastFisherExactTest(N, NAB, NA);
-			hw[i][0] = ff.HDP();
-			hw[i][1] = chiHWE(N, NAB, NA);
+//			FastFisherExactTest ff = new FastFisherExactTest(N, NAB, NA);
+//			hw[i][0] = ff.HDP();
+//			hw[i][1] = chiHWE(N, NAB, NA);
 
 		}
 	}
@@ -79,10 +76,8 @@ public class AlleleFrequency {
 		try {
 			p = chi.chiSquareTest(E, O);
 		} catch (IllegalArgumentException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		} catch (MathException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 		return p;
@@ -102,7 +97,7 @@ public class AlleleFrequency {
 					+ String.format("%.3f", allelefreq[i][2]) + "; " + String.format("%.3f", genotypefreq[i][0]) + " "
 					+ String.format("%.3f", genotypefreq[i][1]) + " " + String.format("%.3f", genotypefreq[i][2]) + " "
 					+ String.format("%.3f", genotypefreq[i][3]));
-			sb.append(" hw.fisher " + String.format("%.3f", hw[i][0]) + " hw.chi " + String.format("%.3f", hw[i][1]));
+	//		sb.append(" hw.fisher " + String.format("%.3f", hw[i][0]) + " hw.chi " + String.format("%.3f", hw[i][1]));
 			sb.append(System.getProperty("line.separator"));
 		}
 		return sb.toString();

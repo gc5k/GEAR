@@ -11,6 +11,7 @@ public class ModelGeneratorII extends ModelGenerator {
 	public ModelGeneratorII(int[][] wseq2, int[] bgseq) {
 		super(bgseq);
 		this.wseq2 = wseq2;
+		Parameter.order = wseq2.length + bgseq.length;
 	}
 
 	@Override

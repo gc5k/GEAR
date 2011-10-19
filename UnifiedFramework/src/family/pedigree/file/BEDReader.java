@@ -10,6 +10,8 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 
+import org.apache.commons.lang3.ArrayUtils;
+
 import util.NewIt;
 
 import family.pedigree.genotype.BFamilyStruct;
@@ -126,7 +128,7 @@ public class BEDReader extends PedigreeFile {
 		int c = 0;
 		for (int i = 0; i < numMarkerInFile; i++) {
 			int n = in.read(g, 0, L);
-			int idx = Arrays.binarySearch(WSNP, i);
+			int idx = ArrayUtils.indexOf(WSNP, i);
 			if (idx < 0)
 				continue;
 			for (int j = 0; j < n_individual; j++) {
@@ -160,7 +162,7 @@ public class BEDReader extends PedigreeFile {
 		byte[] Exg = new byte[exL];
 		int c = 0;
 		for (int i = 0; i < numMarkerInFile; i++) {
-			int idx = Arrays.binarySearch(WSNP, i);
+			int idx = ArrayUtils.indexOf(WSNP, i);
 			if (idx < 0)
 				continue;
 			int posByte = i >> 2;

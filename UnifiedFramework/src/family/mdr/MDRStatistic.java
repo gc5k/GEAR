@@ -1,4 +1,4 @@
-package family.mdr.result;
+package family.mdr;
 
 import org.apache.commons.math.MathException;
 import org.apache.commons.math.distribution.FDistributionImpl;
@@ -9,6 +9,9 @@ import org.apache.commons.math.distribution.FDistributionImpl;
 public class MDRStatistic implements Comparable<MDRStatistic> {
 
 	private double[] stats;
+	private double meanT = Double.NaN;
+	private double seT = Double.NaN;
+	private double pT = Double.NaN;
 	private double Vt;
 	private double Vx;
 	private int N;
@@ -53,6 +56,18 @@ public class MDRStatistic implements Comparable<MDRStatistic> {
 		stats[0] = tba;
 	}
 	
+	public void setTestingBalancedAccuracyMeanT(double meanT) {
+		this.meanT = meanT;
+	}
+	
+	public void setTestingBalancedAccuracyseT(double seT) {
+		this.seT = seT;
+	}
+
+	public void setTestingBalancedAccuracyPT(double pT) {
+		this.pT = pT;
+	}
+
 	public void setTrainingBalancedAccuracy(double trba) {
 		stats[1] = trba;
 	}
@@ -153,9 +168,12 @@ public class MDRStatistic implements Comparable<MDRStatistic> {
 	public String toString() {
 		StringBuilder sb = new StringBuilder();
 		F();
-		sb.append( N + ", " + String.format("%.4f", stats[0]) + ", " + String.format("%.4f", stats[1])
-//				+ String.format("%.4f", TruncatedFisherOneTailP) + ", " + String.format("%.4f", TruncatedFisherTwoTailP) 
-				+ ", " + String.format("%.4f", Vt) +  ", " + String.format("%.4f", Vx) + ", " + String.format("%.4f", Vx/Vt));
+		sb.append(N + ", ");
+		sb.append(String.format("%.4f", Vx/Vt) + ", ");
+		sb.append(String.format("%.4f", stats[0]) + "(" + String.format("%.4f", meanT) + ", " 
+				+ String.format("%.4f", seT)+ ", " + String.format("%.4f", pT) + "), ");
+		sb.append(String.format("%.4f", stats[1]));
+
 		return sb.toString();
 	}
 }

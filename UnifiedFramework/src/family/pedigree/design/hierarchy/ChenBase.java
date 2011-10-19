@@ -5,6 +5,8 @@ import java.util.Arrays;
 import java.util.Hashtable;
 import java.util.Random;
 
+import org.apache.commons.lang3.ArrayUtils;
+
 import admixture.parameter.Parameter;
 
 import score.LinearRegression;
@@ -21,6 +23,7 @@ import family.pedigree.phenotype.FamilyUnit;
 import family.pedigree.phenotype.Subject;
 
 import util.NewIt;
+import util.Sample;
 
 /**
  * 
@@ -72,7 +75,7 @@ public abstract class ChenBase implements ChenInterface {
 
 				// filter_family
 				if (Parameter.exfamFlag) {
-					if (Arrays.binarySearch(Parameter.ex_family, fi) >= 0) {
+					if (ArrayUtils.indexOf(Parameter.ex_family, fi) >= 0) {
 						for (int i = 0; i < filter[c].length; i++) {
 							filter[c][i] = false;
 						}
@@ -383,5 +386,11 @@ public abstract class ChenBase implements ChenInterface {
 		for (int i = 0; i < PersonTable.size(); i++) {
 			PersonTable.get(i).setPermutedScore(score[i]);
 		}
+	}
+
+	@Override
+	public void recoverSeed() {
+		rnd.setSeed(seed);
+		Sample.setSeed(seed);
 	}
 }

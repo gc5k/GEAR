@@ -115,7 +115,7 @@ public class AJHG2008 extends ChenBase {
 		if (isNested) {
 			int c = 0;
 			for (int i = 0; i < numSib.length; i++) {
-				if (AbstractGenoDistribution.rnd.nextBoolean()) {
+				if (rnd.nextBoolean()) {
 					int[] si = Sample.SampleIndex(0, numSib[i] - 1, numSib[i]);
 					for (int j = 0; j < si.length; j++) {
 						PersonTable.get(c + j * 2).setPermutedScore(score[c + j * 2 + 1]);
@@ -130,6 +130,7 @@ public class AJHG2008 extends ChenBase {
 				PersonTable.get(i).setPermutedScore(score[idx[i]]);
 			}
 		}
+
 	}
 
 	private void NonTransmitted(Hashtable<String, BFamilyStruct> Fam) {

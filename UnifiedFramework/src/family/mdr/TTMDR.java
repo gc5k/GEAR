@@ -15,7 +15,6 @@ import family.mdr.arsenal.ToolKit;
 import family.mdr.data.PersonIndex;
 import family.mdr.result.Cell;
 import family.mdr.result.Combination;
-import family.mdr.result.MDRStatistic;
 import family.mdr.result.OneCVSet;
 import family.mdr.result.Suite;
 import family.pedigree.file.MapFile;
