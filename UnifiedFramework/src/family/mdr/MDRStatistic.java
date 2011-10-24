@@ -67,6 +67,10 @@ public class MDRStatistic implements Comparable<MDRStatistic> {
 	public void setTestingBalancedAccuracyPT(double pT) {
 		this.pT = pT;
 	}
+	
+	public double getTestingBalancedPT() {
+		return this.pT;
+	}
 
 	public void setTrainingBalancedAccuracy(double trba) {
 		stats[1] = trba;
@@ -80,6 +84,10 @@ public class MDRStatistic implements Comparable<MDRStatistic> {
 		Vx = vx;
 	}
 	
+	public double getVc() {
+		return Vx/Vt;
+	}
+
 	public void setN(int n) {
 		N = n;
 	}
@@ -169,9 +177,13 @@ public class MDRStatistic implements Comparable<MDRStatistic> {
 		StringBuilder sb = new StringBuilder();
 		F();
 		sb.append(N + ", ");
-		sb.append(String.format("%.4f", Vx/Vt) + ", ");
+		sb.append(String.format("%.4f", Vx/Vt) + "(");
+		sb.append(String.format("%.4f", Vx));
+		sb.append(", ");
+		sb.append(String.format("%.4f", Vt));
+		sb.append("), ");
 		sb.append(String.format("%.4f", stats[0]) + "(" + String.format("%.4f", meanT) + ", " 
-				+ String.format("%.4f", seT)+ ", " + String.format("%.4f", pT) + "), ");
+				+ String.format("%.4f", seT)+ ", " + String.format("%.4E", pT) + "), ");
 		sb.append(String.format("%.4f", stats[1]));
 
 		return sb.toString();

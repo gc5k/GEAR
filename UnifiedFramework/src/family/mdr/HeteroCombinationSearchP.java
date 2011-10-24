@@ -2,6 +2,7 @@ package family.mdr;
 
 import java.io.FileNotFoundException;
 import java.io.PrintStream;
+import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Set;
@@ -60,24 +61,25 @@ public class HeteroCombinationSearchP extends AbstractMergeSearch {
 			return this;
 		}
 
-		public Builder chen (ChenInterface chen) {
+		public Builder chen(ChenInterface chen) {
 			this.chen = chen;
 			return this;
 		}
-	
+
 		public HeteroCombinationSearchP build() {
 			return new HeteroCombinationSearchP(this);
 		}
 	}
-	
+
 	public HeteroCombinationSearchP(Builder builder) {
 
 		super(builder.cv, builder.dr, builder.mf, builder.mg, builder.N, builder.mute);
 		this.chen = builder.chen;
-		if(Parameter.permFlag) {
+		if (Parameter.permFlag) {
 			roundBest = new double[Parameter.perm];
 			Arrays.fill(roundBest, 0);
 		}
+
 	}
 
 	@Override
@@ -282,15 +284,22 @@ public class HeteroCombinationSearchP extends AbstractMergeSearch {
 		order = or;
 		PrintHeader();
 		bestStat = new MDRStatistic();
-	
+
 		cg.revup(or);
 		count = 0;
 		topN = N;
 
 		int count = 0;
 
+		long t0 = System.currentTimeMillis();
+		int c = 0;
 		for (; cg.hasNext();) {
 			String m = cg.next();
+			c++;
+			if (Parameter.testdrive && c == Parameter.testUnit) {
+				testdrive(t0);
+				System.exit(1);
+			}
 			if (rnd.nextDouble() > Parameter.thin)
 				continue;
 			chen.RecoverScore();
@@ -302,21 +311,26 @@ public class HeteroCombinationSearchP extends AbstractMergeSearch {
 			if (!mute) {
 				boolean flag = true;
 				if (Parameter.epFlag) {
-					if (mdrStat.getTestingBalancedAccuracy() < Parameter.threshold_permu) {
+					if (Parameter.permFlag && mdrStat.getTestingBalancedPT() > Parameter.ep) {
 						flag = false;
 					}
-				} else {
-					if (Parameter.trainingFlag) {
-						if (mdrStat.getTrainingBalancedAccuracy() < Parameter.threshold_training) {
-							flag = false;
-						}
-					}
-					if (Parameter.testingFlag) {
-						if (mdrStat.getTestingBalancedAccuracy() < Parameter.threshold_testing) {
-							flag = false;
-						}
+				}
+				if (flag && Parameter.trainingFlag) {
+					if (mdrStat.getTrainingBalancedAccuracy() < Parameter.threshold_training) {
+						flag = false;
 					}
 				}
+				if (flag && Parameter.testingFlag) {
+					if (mdrStat.getTestingBalancedAccuracy() < Parameter.threshold_testing) {
+						flag = false;
+					}
+				}
+				if (flag && Parameter.vcFlag) {
+					if (mdrStat.getVc() < Parameter.vc) {
+						flag = false;
+					}
+				}
+
 				if (!flag) {
 					continue;
 				}
@@ -429,8 +443,8 @@ public class HeteroCombinationSearchP extends AbstractMergeSearch {
 			permuvalue[i] = Pmean[MDRConstant.TestingBalancedAccuIdx];
 			tSq += Pmean[MDRConstant.TestingBalancedAccuIdx] * Pmean[MDRConstant.TestingBalancedAccuIdx];
 			tSum += Pmean[MDRConstant.TestingBalancedAccuIdx];
-			
-			if(roundBest[i] < permuvalue[i]) {
+
+			if (roundBest[i] < permuvalue[i]) {
 				roundBest[i] = permuvalue[i];
 			}
 		}
@@ -446,16 +460,20 @@ public class HeteroCombinationSearchP extends AbstractMergeSearch {
 		} catch (MathException e) {
 			e.printStackTrace();
 		}
-		
+
 	}
 
 	private void calculateThreshold() {
-		if(roundBest == null) {
+		if (roundBest == null) {
 			return;
 		}
 		Arrays.sort(roundBest);
 		StringBuilder sb = new StringBuilder(Parameter.out);
-		sb.append(order); sb.append(".thres");
+		sb.append(order);
+		sb.append(".thres");
+		if (Parameter.sliceFlag) {
+			sb.append(".slice" + Parameter.slice + "." + Parameter.sliceN);
+		}
 		PrintStream PW = null;
 		try {
 			PW = new PrintStream(sb.toString());
@@ -473,9 +491,9 @@ public class HeteroCombinationSearchP extends AbstractMergeSearch {
 	}
 
 	public void PrintHeader() {
-		System.out.print("model" + "; ");
+		System.out.print("model" + ", ");
 		System.out.print("effective individuals, ");
-		System.out.print("Vx" + ", ");
+		System.out.print("vc(vx, vt)" + ", ");
 		for (int i = 0; i < MDRConstant.NumStats; i++) {
 			if (i != MDRConstant.NumStats - 1) {
 				System.out.print(MDRConstant.TestStatistic[i] + ", ");
@@ -495,14 +513,24 @@ public class HeteroCombinationSearchP extends AbstractMergeSearch {
 				}
 			}
 			System.out
-					.print("classfication (genotype, High-risk or Low-risk group, positive scores, positive subjects, negative score, negative subjects)");
+					.print("classification (genotype, risk group, positive scores, positive subjects, negative score, negative subjects)");
 		}
 		System.out.println();
 	}
 
+	public void testdrive(long t0) {
+		long t1 = System.currentTimeMillis();
+		long t = t1 - t0;
+		BigInteger bi = cg.getTotal();
+		double b0 = bi.longValue();
+		b0 /= Parameter.testUnit;
+		b0 *= t;
+		b0 /= 3600000;
+		System.err.println("Estimated time (hour) to complete the whole analysis: " + String.format("%.4f", b0));
+	}
+
 	@Override
 	public String toString() {
-		// TODO Auto-generated method stub
 		return null;
 	}
 

@@ -36,8 +36,8 @@ public class Parameter {
 	private final String cmd_missing_phenotype = "missingphenotype";
 	public static String missing_phenotype = "-9";
 
-	private final String cmd_missing_genotype = "missinggenotype";
-	public static String missing_genotype = "0";
+//	private final String cmd_missing_genotype = "missinggenotype";
+//	public static String missing_genotype = "0";
 
 	private final String cmd_status_shift = "ss";
 	public static int status_shift = 0;
@@ -87,12 +87,12 @@ public class Parameter {
 	// bfile set end
 
 	// tfile set start
-	private final String cmd_tfile = "tfile";
-	public static boolean tfileFlag = false;
-	private final String cmd_tped = "tped";
-	public static String tped = null;
-	private final String cmd_tfam = "tfam";
-	public static String tfam = null;
+//	private final String cmd_tfile = "tfile";
+//	public static boolean tfileFlag = false;
+//	private final String cmd_tped = "tped";
+//	public static String tped = null;
+//	private final String cmd_tfam = "tfam";
+//	public static String tfam = null;
 	// tfile set end
 
 	// phenotype set start
@@ -114,7 +114,7 @@ public class Parameter {
 	// individual selection start
 	private final String cmd_ex_fam = "exfam";
 	public static String[] ex_family = null;
-	private final String cmd_ex_fam_file = "exfamfile";
+	private final String cmd_ex_fam_file = "exfamf";
 	public static boolean exfamFlag = false;
 /*
 	private final String cmd_ex_ind = "exind";
@@ -122,10 +122,10 @@ public class Parameter {
 	private final String cmd_ex_ind_file = "exindfile";
 	public static boolean exindFlag = false;
 */
-	private final String cmd_filter_male = "filtermale";
+	private final String cmd_filter_male = "male";
 	public static boolean filter_maleFlag = false;
 
-	private final String cmd_filter_female = "filterfemale";
+	private final String cmd_filter_female = "female";
 	public static boolean filter_femaleFlag = false;
 
 	private final String cmd_ex_nosex = "exnosex";
@@ -179,9 +179,9 @@ public class Parameter {
 	public static double geno = 2;
 	public static boolean genoFlag = false;
 
-	private final String cmd_hwe = "hwe";
-	public static double hwe = -1;
-	public static boolean hweFlag = false;
+//	private final String cmd_hwe = "hwe";
+//	public static double hwe = -1;
+//	public static boolean hweFlag = false;
 
 	private final String cmd_header = "header";
 	public static boolean header = false;
@@ -193,6 +193,7 @@ public class Parameter {
 	private final String cmd_slice = "slice";
 	public static int sliceN = 1;
 	public static int slice = 1;
+	public static boolean sliceFlag = false;
 	// sampling & partitioning end
 
 	// mdr options start
@@ -200,15 +201,15 @@ public class Parameter {
 	public static int cv = 5;
 	public static boolean cvFlag = true;
 
-	private final String cmd_trgroup = "trgroup";
+//	private final String cmd_trgroup = "trgroup";
 	public static double trgroup = 0.7;
 	public static boolean trgroupFlag = false;
 
-	private final String cmd_ttfile = "ttfile";
+//	private final String cmd_ttfile = "ttfile";
 	public static boolean ttfileFlag = false;
 	public static String[][] ttArray = null;
 
-	private final String cmd_trsex = "trsex";
+//	private final String cmd_trsex = "trsex";
 	public static boolean trsexFlag = false;
 	public static int trsex = 0;
 	// private final String cmd_border = "border";
@@ -231,24 +232,29 @@ public class Parameter {
 	public static int perm = 100;
 	public static boolean permFlag = false;
 
-	private final String cmd_ep = "ep";
-	public static double ep = 0.05;
-	public static boolean epFlag = false;
 
-	private final String cmd_perm_scheme = "ps";
+//	private final String cmd_perm_scheme = "ps";
 	public static boolean permu_scheme = true;
 
 	private final String cmd_verbose = "verbose";
 	public static boolean verboseFlag = false;
 
-	private final String cmd_simu = "simu";
-	public int simu = 1;
+//	private final String cmd_simu = "simu";
+//	public int simu = 1;
 
-	private final String cmd_training = "training";
+	private final String cmd_Vc = "vc";
+	public static double vc = 0.05;
+	public static boolean vcFlag = false;
+
+	private final String cmd_ep = "p";
+	public static double ep = 0.05;
+	public static boolean epFlag = false;
+
+	private final String cmd_training = "train";
 	public static double threshold_training = 0.0;
 	public static boolean trainingFlag = false;
 
-	private final String cmd_testing = "testing";
+	private final String cmd_testing = "test";
 	public static double threshold_testing = 0.0;
 	public static boolean testingFlag = false;
 
@@ -258,9 +264,18 @@ public class Parameter {
 	private final String cmd_help = "help";
 	public boolean help = false;
 
-	public static double threshold_permu = 0;
-	public static boolean permuFlag = false;
+	private final String cmd_testdrive = "time";
+	public static int testUnit = 1000;
+	public static boolean testdrive = false;
 
+	private final String cmd_version = "version";
+	public static String version = "\n" +
+								   "************************************************************\n" +
+			                       "    GMDR 1.0 released 13/11/2011\n" +
+			                       "    Developed by Guo-Bo Chen, guobo.chen@uq.edu.au\n" +
+			                       "    Queensland Brain Institute, University of Queensland\n" +
+			                       "    St Lucia, Queensland 4067, Australia\n" +
+			                       "************************************************************\n";
 	private Options ops = new Options();
 	private CommandLineParser parser = new PosixParser();
 
@@ -289,9 +304,9 @@ public class Parameter {
 		ops.addOption(OptionBuilder.withDescription("specify the .bim file.").hasArg().create(cmd_bim));
 		ops.addOption(OptionBuilder.withDescription("specify the .fam file.").hasArg().create(cmd_fam));
 
-		ops.addOption(OptionBuilder.withDescription("specify the .tped and .tfam files").hasArg().create(cmd_tfile));
-		ops.addOption(OptionBuilder.withDescription("specify the .tped file.").hasArg().create(cmd_tped));
-		ops.addOption(OptionBuilder.withDescription("specify the .tfam file.").hasArg().create(cmd_tfam));
+//		ops.addOption(OptionBuilder.withDescription("specify the .tped and .tfam files").hasArg().create(cmd_tfile));
+//		ops.addOption(OptionBuilder.withDescription("specify the .tped file.").hasArg().create(cmd_tped));
+//		ops.addOption(OptionBuilder.withDescription("specify the .tfam file.").hasArg().create(cmd_tfam));
 
 		ops.addOption(OptionBuilder.withDescription("specify the phenotype file.").hasArg().create(cmd_pheno));
 		ops.addOption(OptionBuilder.withDescription("specify 1 or more covariates by number.").hasArgs().create(cmd_covar));
@@ -320,36 +335,39 @@ public class Parameter {
 		ops.addOption(OptionBuilder.withDescription(
 				"method for adjustment of the phenotype, 0 (default) for linear regression, 1 for logistic regression.").hasArg().create(cmd_reg));
 		ops.addOption(OptionBuilder.withDescription("fold of cross-validation, and default is 5.").hasArg().create(cmd_cv));
-		ops.addOption(OptionBuilder.withDescription("specify the proportion of the training set.").hasArg().create(cmd_trgroup));
-		ops.addOption(OptionBuilder.withDescription("specify the file containing the training set.").hasArg().create(cmd_ttfile));
-		ops.addOption(OptionBuilder.withDescription("specify the gender as the training set.").hasArg().create(cmd_trsex));
+//		ops.addOption(OptionBuilder.withDescription("specify the proportion of the training set.").hasArg().create(cmd_trgroup));
+//		ops.addOption(OptionBuilder.withDescription("specify the file containing the training set.").hasArg().create(cmd_ttfile));
+//		ops.addOption(OptionBuilder.withDescription("specify the gender as the training set.").hasArg().create(cmd_trsex));
 		// ops.addOption(OptionBuilder.withDescription("specify start of the training set.").hasArgs().create(cmd_border));
 		ops.addOption(OptionBuilder.withDescription("specify the order of interaction.").hasArg().create(cmd_order));
 		ops.addOption(OptionBuilder.withDescription("specify the random sample fraction.").hasArg().create(cmd_thin));
 		ops.addOption(OptionBuilder.withDescription("specify partition of the searching space.").hasArg().create(cmd_slice));
 		ops.addOption(OptionBuilder.withDescription("specify the minor allele frequency for inclusion.").hasArg().create(cmd_maf));
 		ops.addOption(OptionBuilder.withDescription("specify missing genotype rate for inclusion.").hasArg().create(cmd_geno));
-		ops.addOption(OptionBuilder.withDescription("specify the p value of departure from Hardy-Weinberg Equilibrium for inclusion").hasArg()
-				.create(cmd_hwe));
+//		ops.addOption(OptionBuilder.withDescription("specify the p value of departure from Hardy-Weinberg Equilibrium for inclusion").hasArg()
+//				.create(cmd_hwe));
 		ops.addOption(OptionBuilder.withDescription("seed for the algorithms").hasArg().create(cmd_seed));
 		ops.addOption(OptionBuilder.withDescription("specify the classification for a tie genotype").hasArg().create(cmd_tie));
 
-		ops.addOption(OptionBuilder.withDescription("replication for permutation.  Default is 100.").hasArg().create(cmd_perm));
-		ops.addOption(OptionBuilder.withDescription("replication for permutation.  Default is 100.").hasArg().create(cmd_ep));
-		ops.addOption(OptionBuilder.withDescription("only sibs are exchangeable when this option is turned on").create(cmd_perm_scheme));
+		ops.addOption(OptionBuilder.withDescription("replication for permutation.").hasArg().create(cmd_perm));
+		ops.addOption(OptionBuilder.withDescription("output threshold for empirical p value.").hasArg().create(cmd_ep));
+//		ops.addOption(OptionBuilder.withDescription("only sibs are exchangeable when this option is turned on").create(cmd_perm_scheme));
 
 		// ops.addOption(OptionBuilder.withDescription("use unrelated indivuduals only, if '--md' is specified.").create(cmd_unrelated_only));
-		ops.addOption(OptionBuilder.withDescription("replications for simulation, and this parameter is for simulation only").hasArg().create(
-				cmd_simu));
+//		ops.addOption(OptionBuilder.withDescription("replications for simulation, and this parameter is for simulation only").hasArg().create(
+//				cmd_simu));
 		ops.addOption(OptionBuilder.withDescription("missing phenotype, default -9").hasArg().create(cmd_missing_phenotype));
-		ops.addOption(OptionBuilder.withDescription("missing genotype, default 00").hasArg().create(cmd_missing_genotype));
+//		ops.addOption(OptionBuilder.withDescription("missing genotype, default 00").hasArg().create(cmd_missing_genotype));
 		ops.addOption(OptionBuilder.withDescription("missing allele, default 0").hasArg().create(cmd_missing_allele));
 		ops.addOption(OptionBuilder.withDescription("use this option if status was coded as 1 (unaffected)/2 (affected).").create(cmd_status_shift));
+		ops.addOption(OptionBuilder.withDescription("threshold of variance explained for output").hasArg().create(cmd_Vc));
 		ops.addOption(OptionBuilder.withDescription("threshold of training accuracy for output").hasArg().create(cmd_training));
 		ops.addOption(OptionBuilder.withDescription("threshold of testing accuracy for output").hasArg().create(cmd_testing));
 		ops.addOption(OptionBuilder.withDescription("specify the root for output files.").hasArg().create(cmd_out));
 		ops.addOption(OptionBuilder.withDescription("print the result in verbose form.").create(cmd_verbose));
+		ops.addOption(OptionBuilder.withDescription("give an evaluation for computation time").create(cmd_testdrive));
 		ops.addOption(OptionBuilder.withDescription("help manual.").create(cmd_help));
+		ops.addOption(OptionBuilder.withDescription("version.").create(cmd_version));		
 	}
 
 	public void commandListenor(String[] args) {
@@ -439,35 +457,35 @@ public class Parameter {
 		}
 
 		// tfile
-		if (cl.hasOption(cmd_tfile)) {
-			StringBuffer sb1 = new StringBuffer();
-			StringBuffer sb2 = new StringBuffer();
-			sb1.append(cl.getOptionValue(cmd_tfile));
-			sb1.append(".tped");
-
-			sb2.append(cl.getOptionValue(cmd_tfile));
-			sb2.append(".tfam");
-
-			tped = sb1.toString();
-			tfam = sb2.toString();
-		}
-		if (cl.hasOption(cmd_tped)) {
-			tped = cl.getOptionValue(cmd_tped);
-		}
-		if (cl.hasOption(cmd_tfam)) {
-			tfam = cl.getOptionValue(cmd_tfam);
-		}
-		if (tped != null && tfam != null) {
-			File fped = new File(tped);
-			if (!fped.exists()) {
-				throw new IllegalArgumentException("could not open " + tped);
-			}
-			File ffam = new File(tfam);
-			if (!ffam.exists()) {
-				throw new IllegalArgumentException("could not open " + tfam);
-			}
-			tfileFlag = true;
-		}
+//		if (cl.hasOption(cmd_tfile)) {
+//			StringBuffer sb1 = new StringBuffer();
+//			StringBuffer sb2 = new StringBuffer();
+//			sb1.append(cl.getOptionValue(cmd_tfile));
+//			sb1.append(".tped");
+//
+//			sb2.append(cl.getOptionValue(cmd_tfile));
+//			sb2.append(".tfam");
+//
+//			tped = sb1.toString();
+//			tfam = sb2.toString();
+//		}
+//		if (cl.hasOption(cmd_tped)) {
+//			tped = cl.getOptionValue(cmd_tped);
+//		}
+//		if (cl.hasOption(cmd_tfam)) {
+//			tfam = cl.getOptionValue(cmd_tfam);
+//		}
+//		if (tped != null && tfam != null) {
+//			File fped = new File(tped);
+//			if (!fped.exists()) {
+//				throw new IllegalArgumentException("could not open " + tped);
+//			}
+//			File ffam = new File(tfam);
+//			if (!ffam.exists()) {
+//				throw new IllegalArgumentException("could not open " + tfam);
+//			}
+//			tfileFlag = true;
+//		}
 
 		// bfile
 		if (cl.hasOption(cmd_bfile)) {
@@ -878,7 +896,6 @@ public class Parameter {
 				ex_chr = (String[]) exSet.toArray(new String[0]);
 				exchrFlag = true;
 			}
-
 		}
 
 		if (cl.hasOption(cmd_snpwindow)) {
@@ -916,14 +933,14 @@ public class Parameter {
 			}
 			genoFlag = true;
 		}
-
-		if (cl.hasOption(cmd_hwe)) {
-			hwe = Double.parseDouble(cl.getOptionValue(cmd_hwe));
-			if (hwe < 0) {
-				throw new IllegalArgumentException("bad parameter for --hwe: " + hwe);
-			}
-			hweFlag = true;
-		}
+//
+//		if (cl.hasOption(cmd_hwe)) {
+//			hwe = Double.parseDouble(cl.getOptionValue(cmd_hwe));
+//			if (hwe < 0) {
+//				throw new IllegalArgumentException("bad parameter for --hwe: " + hwe);
+//			}
+//			hweFlag = true;
+//		}
 
 		if (cl.hasOption(cmd_header)) {
 			header = true;
@@ -940,50 +957,53 @@ public class Parameter {
 		}
 		if (cl.hasOption(cmd_cv)) {
 			cv = Integer.parseInt(cl.getOptionValue(cmd_cv));
+			if (cv < 2) {
+				throw new IllegalArgumentException("bad parameter for option --cv.");
+			}
 			cvFlag = true;
 		}
-		if (cl.hasOption(cmd_trgroup)) {
-			trgroup = Double.parseDouble(cl.getOptionValue(cmd_trgroup));
-			trgroupFlag = true;
-		}
-		if (cl.hasOption(cmd_trsex)) {
-			trsex = Integer.parseInt(cl.getOptionValue(cmd_trsex));
-			if (trsex != 1 && trsex != 2) {
-				throw new IllegalArgumentException("unknown value for option --trsex");
-			}
-			trsexFlag = true;
-		}
-		if (cl.hasOption(cmd_ttfile)) {
-			String tf = cl.getOptionValue(cmd_ttfile);
-			File ttfile = new File(tf);
-			if (!ttfile.exists()) {
-				throw new IllegalArgumentException("could not open ttfile " + tf);
-			}
-
-			ArrayList<String> Farray = NewIt.newArrayList();
-			ArrayList<String> Iarray = NewIt.newArrayList();
-			BufferedReader reader = null;
-			try {
-				reader = new BufferedReader(new FileReader(new File(tf)));
-			} catch (IOException E) {
-				throw new IllegalArgumentException("failed in reading " + tf);
-			}
-			String line = null;
-			try {
-				while ((line = reader.readLine()) != null) {
-					String[] l = line.split(delim);
-					Farray.add(l[0]);
-					Iarray.add(l[1]);
-				}
-			} catch (IOException e) {
-				e.printStackTrace();
-			}
-
-			ttArray = new String[2][Farray.size()];
-			ttArray[0] = (String[]) Farray.toArray(new String[0]);
-			ttArray[1] = (String[]) Iarray.toArray(new String[0]);
-			ttfileFlag = true;
-		}
+//		if (cl.hasOption(cmd_trgroup)) {
+//			trgroup = Double.parseDouble(cl.getOptionValue(cmd_trgroup));
+//			trgroupFlag = true;
+//		}
+//		if (cl.hasOption(cmd_trsex)) {
+//			trsex = Integer.parseInt(cl.getOptionValue(cmd_trsex));
+//			if (trsex != 1 && trsex != 2) {
+//				throw new IllegalArgumentException("unknown value for option --trsex.");
+//			}
+//			trsexFlag = true;
+//		}
+//		if (cl.hasOption(cmd_ttfile)) {
+//			String tf = cl.getOptionValue(cmd_ttfile);
+//			File ttfile = new File(tf);
+//			if (!ttfile.exists()) {
+//				throw new IllegalArgumentException("could not open ttfile " + tf);
+//			}
+//
+//			ArrayList<String> Farray = NewIt.newArrayList();
+//			ArrayList<String> Iarray = NewIt.newArrayList();
+//			BufferedReader reader = null;
+//			try {
+//				reader = new BufferedReader(new FileReader(new File(tf)));
+//			} catch (IOException E) {
+//				throw new IllegalArgumentException("failed in reading " + tf);
+//			}
+//			String line = null;
+//			try {
+//				while ((line = reader.readLine()) != null) {
+//					String[] l = line.split(delim);
+//					Farray.add(l[0]);
+//					Iarray.add(l[1]);
+//				}
+//			} catch (IOException e) {
+//				e.printStackTrace();
+//			}
+//
+//			ttArray = new String[2][Farray.size()];
+//			ttArray[0] = (String[]) Farray.toArray(new String[0]);
+//			ttArray[1] = (String[]) Iarray.toArray(new String[0]);
+//			ttfileFlag = true;
+//		}
 		// if (cl.hasOption(cmd_border)) {
 		// String[] h = cl.getOptionValues(cmd_border);
 		// if (h.length != 2) {
@@ -1010,11 +1030,18 @@ public class Parameter {
 			seed = Integer.parseInt(cl.getOptionValue(cmd_seed));
 		}
 		if (cl.hasOption(cmd_tie)) {
-			tie = Integer.parseInt(cl.getOptionValue(cmd_tie));
+			String t = cl.getOptionValue(cmd_tie);
+			if (t.compareTo("h") == 0) {
+				tie = 1;
+			} else if (t.compareTo("l") == 0) {
+				tie = 0;
+			} else {
+				tie = -1;
+			}
 		}
-		if (cl.hasOption(cmd_simu)) {
-			simu = Integer.parseInt(cl.getOptionValue(cmd_simu));
-		}
+//		if (cl.hasOption(cmd_simu)) {
+//			simu = Integer.parseInt(cl.getOptionValue(cmd_simu));
+//		}
 		if (cl.hasOption(cmd_perm)) {
 			perm = Integer.parseInt(cl.getOptionValue(cmd_perm));
 			permFlag = true;
@@ -1026,34 +1053,48 @@ public class Parameter {
 			}
 			epFlag = true;
 		}
-		if (cl.hasOption(cmd_perm_scheme)) {
-			permu_scheme = true;
-		}
+//		if (cl.hasOption(cmd_perm_scheme)) {
+//			permu_scheme = true;
+//		}
 		// if (cl.hasOption(cmd_unrelated_only)) {
 		// unrelated_only = true;
 		// }
 		if (cl.hasOption(cmd_order)) {
 			order = Integer.parseInt(cl.getOptionValue(cmd_order));
+			if (order <=0 ) {
+				throw new IllegalArgumentException("bad parameter for option --cv.");
+			}
 		}
 		if (cl.hasOption(cmd_thin)) {
 			thin = Double.parseDouble(cl.getOptionValue(cmd_thin));
+			if (thin < 0) {
+				throw new IllegalArgumentException("bad parameter for option --thin.");
+			}
 		}
 		if (cl.hasOption(cmd_slice)) {
 			String[] s = cl.getOptionValue(cmd_slice).split("/");
 			slice = Integer.parseInt(s[0]);
 			sliceN = Integer.parseInt(s[1]);
+			if (slice <= 0 || sliceN <=0 || slice>sliceN) {
+				throw new IllegalArgumentException("bad parameter for option --slice.");
+			}
+			sliceFlag = true;
 		}
 		if (cl.hasOption(cmd_missing_phenotype)) {
 			missing_phenotype = cl.getOptionValue(cmd_missing_phenotype);
 		}
-		if (cl.hasOption(cmd_missing_genotype)) {
-			missing_genotype = cl.getOptionValue(cmd_missing_genotype);
-		}
+//		if (cl.hasOption(cmd_missing_genotype)) {
+//			missing_genotype = cl.getOptionValue(cmd_missing_genotype);
+//		}
 		if (cl.hasOption(cmd_missing_allele)) {
 			missing_allele = cl.getOptionValue(cmd_missing_allele);
 		}
 		if (cl.hasOption(cmd_status_shift)) {
 			status_shift = -1;
+		}
+		if (cl.hasOption(cmd_Vc)) {
+			vc = Double.parseDouble(cl.getOptionValue(cmd_Vc));
+			vcFlag = true;
 		}
 		if (cl.hasOption(cmd_training)) {
 			threshold_training = Double.parseDouble(cl.getOptionValue(cmd_training));
@@ -1068,6 +1109,13 @@ public class Parameter {
 		}
 		if (cl.hasOption(cmd_verbose)) {
 			verboseFlag = true;
+		}
+		if (cl.hasOption(cmd_version)) {
+			System.out.println(version);
+			System.exit(1);
+		}
+		if (cl.hasOption(cmd_testdrive)) {
+			testdrive = true;
 		}
 		if (help) {
 			HelpFormatter formatter = new HelpFormatter();
@@ -1107,11 +1155,6 @@ public class Parameter {
 				predictor[i] = idx.get(i).intValue() - 1;
 			}
 		}
-	}
-
-	public static void setPermutationThreshold(double p) {
-		threshold_permu = p;
-		permuFlag = true;
 	}
 
 	public static void main(String[] args) throws IOException {
