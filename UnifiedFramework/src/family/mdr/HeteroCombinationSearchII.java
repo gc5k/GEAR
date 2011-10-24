@@ -76,7 +76,7 @@ public class HeteroCombinationSearchII extends AbstractMergeSearch {
 			if (!mute) {
 				boolean flag = true;
 				if (Parameter.epFlag ) {
-					if (mdrStat.getTestingBalancedAccuracy() < Parameter.threshold_permu) {
+					if (mdrStat.getTestingBalancedAccuracy() < Parameter.ep) {
 						flag = false;
 					}
 				} else {

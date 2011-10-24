@@ -36,15 +36,15 @@ public class ModelGenerator implements Iterator<String> {
 
 		if (bgSNP != null) {
 			if (R > bgSNP.length + seq.length) {
-				throw new IllegalArgumentException ("the number of qualified snps were fewer than the order of interaction going to detect.");
+				throw new IllegalArgumentException("the number of qualified snps were fewer than the order of interaction going to detect.");
 			}
 			if (R < bgSNP.length) {
 				R = bgSNP.length;
 			}
-			
+
 		} else {
 			if (R > seq.length) {
-				throw new IllegalArgumentException ("the number of qualified snps were fewer than the order of interaction going to detect.");
+				throw new IllegalArgumentException("the number of qualified snps were fewer than the order of interaction going to detect.");
 			}
 		}
 		len = seq.length;
@@ -54,8 +54,8 @@ public class ModelGenerator implements Iterator<String> {
 			r = R - bgSNP.length;
 			System.arraycopy(bgSNP, 0, comb, 0, bgSNP.length);
 			StringBuilder sb = new StringBuilder();
-			for(int i = 0; i < bgSNP.length; i++) {
-				if(i != bgSNP.length -1) {
+			for (int i = 0; i < bgSNP.length; i++) {
+				if (i != bgSNP.length - 1) {
 					sb.append(bgSNP[i]);
 					sb.append(MDRConstant.seperator);
 				} else {
@@ -68,10 +68,10 @@ public class ModelGenerator implements Iterator<String> {
 		}
 
 		a = new int[r];
-		
+
 		BigInteger nFact = BigInteger.ONE;
 		for (int i = 0; i < r; i++) {
-			nFact = nFact.multiply(new BigInteger(Integer.toString(len-i)));
+			nFact = nFact.multiply(new BigInteger(Integer.toString(len - i)));
 		}
 		for (int i = 1; i <= r; i++) {
 			nFact = nFact.divide(new BigInteger(Integer.toString(i)));
@@ -158,7 +158,7 @@ public class ModelGenerator implements Iterator<String> {
 		}
 		for (int i = 0; i < s.length; i++) {
 			comb[i + offset] = seq[s[i]];
-			if(i != s.length - 1) {
+			if (i != s.length - 1) {
 				sb.append(seq[s[i]]);
 				sb.append(MDRConstant.seperator);
 			} else {
@@ -168,12 +168,16 @@ public class ModelGenerator implements Iterator<String> {
 		return sb.toString();
 	}
 
+	public BigInteger getTotal() {
+		return total;
+	}
+
 	/**
 	 * @param args
 	 */
 	public static void main(String[] args) {
 		System.out.println("CombinationGeneratorII");
-		int[] in = {2};
+		int[] in = { 2 };
 		long t = System.currentTimeMillis();
 		Random rnd = new Random();
 		HashSet<Integer> S = NewIt.newHashSet();
@@ -183,7 +187,7 @@ public class ModelGenerator implements Iterator<String> {
 		int[] seq = new int[S.size()];
 
 		int c = 0;
-		for (Iterator<Integer> e = S.iterator(); e.hasNext(); ) {
+		for (Iterator<Integer> e = S.iterator(); e.hasNext();) {
 			Integer I = e.next();
 			seq[c++] = I.intValue();
 		}
