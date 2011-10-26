@@ -25,6 +25,8 @@ import org.apache.commons.math.MathException;
 import org.apache.commons.math.distribution.NormalDistribution;
 import org.apache.commons.math.distribution.NormalDistributionImpl;
 
+import test.Test;
+
 public class HeteroCombinationSearchP extends AbstractMergeSearch {
 
 	private double seT;
@@ -293,6 +295,9 @@ public class HeteroCombinationSearchP extends AbstractMergeSearch {
 
 		long t0 = System.currentTimeMillis();
 		int c = 0;
+		System.err.println("number of tests: " + cg.getTotal());
+		Test.LOG.append("number of tests: " + cg.getTotal());
+		Test.LOG.append("\n");
 		for (; cg.hasNext();) {
 			String m = cg.next();
 			c++;
@@ -341,7 +346,7 @@ public class HeteroCombinationSearchP extends AbstractMergeSearch {
 					if (j != len - 1) {
 						System.out.print("-");
 					} else {
-						System.out.print("; ");
+						System.out.print(", ");
 					}
 				}
 				System.out.print(mdrStat);
@@ -470,10 +475,10 @@ public class HeteroCombinationSearchP extends AbstractMergeSearch {
 		Arrays.sort(roundBest);
 		StringBuilder sb = new StringBuilder(Parameter.out);
 		sb.append(order);
-		sb.append(".thres");
 		if (Parameter.sliceFlag) {
 			sb.append(".slice" + Parameter.slice + "." + Parameter.sliceN);
 		}
+		sb.append(".thres");
 		PrintStream PW = null;
 		try {
 			PW = new PrintStream(sb.toString());
@@ -527,6 +532,8 @@ public class HeteroCombinationSearchP extends AbstractMergeSearch {
 		b0 *= t;
 		b0 /= 3600000;
 		System.err.println("Estimated time (hour) to complete the whole analysis: " + String.format("%.4f", b0));
+		Test.LOG.append("Estimated time (hour) to complete the whole analysis: " + String.format("%.4f", b0));
+		Test.LOG.append("\n");
 	}
 
 	@Override
