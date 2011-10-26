@@ -260,13 +260,32 @@ public class Parameter {
 
 	private final String cmd_out = "out";
 	public static String out = "gmdr";
-	
+
 	private final String cmd_help = "help";
 	public boolean help = false;
 
 	private final String cmd_testdrive = "time";
 	public static int testUnit = 1000;
 	public static boolean testdrive = false;
+
+	private final String cmd_cluster = "cluster";
+	public static int cluster = 0;
+	public static boolean clusterFlag = false;
+	
+	private final String cmd_email = "email";
+	public static String email = "";
+	public static boolean emailFlag = false;
+	
+	private final String cmd_memory = "memory";
+	public static String memory = "1G";
+	public static boolean memoryFlag = false;
+	
+	private final String cmd_walltime = "walltime";
+	public static int walltime = 10;
+	public static boolean walltimeFlag = false;
+
+	private final String cmd_submit = "submit";
+	public static boolean submit = false;
 
 	private final String cmd_version = "version";
 	public static String version = "\n" +
@@ -287,6 +306,7 @@ public class Parameter {
 		return ops;
 	}
 
+	@SuppressWarnings("static-access")
 	public void commandInitial() {
 //		ops.addOption(OptionBuilder.withDescription("u (default) for the unified framework and f for using sibs only.").hasArg().create(cmd_model));
 		ops.addOption(OptionBuilder.withDescription("method for case-control sample.").create(cmd_cc));
@@ -367,7 +387,13 @@ public class Parameter {
 		ops.addOption(OptionBuilder.withDescription("print the result in verbose form.").create(cmd_verbose));
 		ops.addOption(OptionBuilder.withDescription("give an evaluation for computation time").create(cmd_testdrive));
 		ops.addOption(OptionBuilder.withDescription("help manual.").create(cmd_help));
-		ops.addOption(OptionBuilder.withDescription("version.").create(cmd_version));		
+		ops.addOption(OptionBuilder.withDescription("version.").create(cmd_version));
+		
+		ops.addOption(OptionBuilder.withDescription("specify the number of nodes to use on a cluster.").hasArg().create(cmd_cluster));
+		ops.addOption(OptionBuilder.withDescription("specify email to get informed.").hasArg().create(cmd_email));
+		ops.addOption(OptionBuilder.withDescription("specify memory size.").hasArg().create(cmd_memory));
+		ops.addOption(OptionBuilder.withDescription("specify wall time for each job.").hasArg().create(cmd_walltime));
+		ops.addOption(OptionBuilder.withDescription("submit jobs to a cluster.").create(cmd_submit));
 	}
 
 	public void commandListenor(String[] args) {
@@ -1117,11 +1143,31 @@ public class Parameter {
 		if (cl.hasOption(cmd_testdrive)) {
 			testdrive = true;
 		}
+		if (cl.hasOption(cmd_cluster)) {
+			cluster = Integer.parseInt(cl.getOptionValue(cmd_cluster));
+			clusterFlag = true;
+		}
+		if (cl.hasOption(cmd_email)) {
+			email = cl.getOptionValue(cmd_email);
+			emailFlag = true;
+		}
+		if (cl.hasOption(cmd_memory)) {
+			memory = cl.getOptionValue(cmd_memory);
+			memoryFlag = true;
+		}
+		if (cl.hasOption(cmd_walltime)) {
+			walltime = Integer.parseInt(cl.getOptionValue(cmd_walltime));
+			walltimeFlag = true;
+		}
+		if (cl.hasOption(cmd_submit)) {
+			submit = true;
+		}
 		if (help) {
 			HelpFormatter formatter = new HelpFormatter();
 			formatter.printHelp("UGMDR", ops);
 			System.exit(1);
 		}
+
 	}
 
 	public static void findCovar_Number(String[] F) {
