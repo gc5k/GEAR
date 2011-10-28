@@ -287,7 +287,7 @@ public class Parameter {
 	public static int walltime = 10;
 	public static boolean walltimeFlag = false;
 
-	private final String cmd_submit = "submit";
+	private final String cmd_submit = "hpc";
 	public static boolean submit = false;
 
 	private final String cmd_script = "script";

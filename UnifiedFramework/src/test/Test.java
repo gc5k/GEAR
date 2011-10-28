@@ -218,12 +218,16 @@ public class Test {
 			int len = args.length;
 			int c = 0;
 			while (c < len) {
-				if (args[c].compareTo("--cluster") == 0 || args[c].compareTo("--email") == 0 || args[c].compareTo("--memory") == 0
+				if (args[c].compareTo("--node") == 0 || args[c].compareTo("--email") == 0 || args[c].compareTo("--memory") == 0
 						|| args[c].compareTo("--walltime") == 0) {
 					c += 2;
 					continue;
 				}
 				if (args[c].compareTo("--time") == 0) {
+					c++;
+					continue;
+				}
+				if (args[c].compareTo("--hpc") == 0) {
 					c++;
 					continue;
 				}
@@ -305,7 +309,20 @@ public class Test {
 
 	public static void savecmd(String[] args) {
 		StringBuffer sb = new StringBuffer();
+
 		sb.append(Parameter.out);
+		if(Parameter.submit) {
+			sb.append(".hpc");
+		} else if(Parameter.clusterFlag) {
+			sb.append(".");
+			sb.append("slice");
+			sb.append(Parameter.slice);
+			sb.append(".");
+			sb.append(Parameter.sliceN);
+			sb.append(".");
+			sb.append("cluster");
+		}
+
 		sb.append(".script");
 		PrintStream ps = null;
 		try {
