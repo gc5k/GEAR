@@ -19,6 +19,7 @@ import org.apache.commons.lang3.ArrayUtils;
 
 import family.mdr.arsenal.MDRConstant;
 
+import test.Test;
 import util.NewIt;
 
 /**
@@ -56,7 +57,7 @@ public class Parameter {
 	
 	private final String cmd_pi = "pi";
 	public static boolean piFlag = false;
-	
+
 	private final String cmd_pii = "pii";
 	public static boolean piiFlag = false;
 	
@@ -73,6 +74,7 @@ public class Parameter {
 	public static String ped = null;
 	private final String cmd_map = "map";
 	public static String map = null;
+
 	// file set end
 
 	// bfile set start
@@ -268,10 +270,11 @@ public class Parameter {
 	public static int testUnit = 1000;
 	public static boolean testdrive = false;
 
-	private final String cmd_cluster = "cluster";
-	public static int cluster = 0;
 	public static boolean clusterFlag = false;
-	
+	private final String cmd_node = "node";
+	public static int node = 5;
+	public static boolean nodeFlag = false;
+
 	private final String cmd_email = "email";
 	public static String email = "";
 	public static boolean emailFlag = false;
@@ -287,6 +290,8 @@ public class Parameter {
 	private final String cmd_submit = "submit";
 	public static boolean submit = false;
 
+	private final String cmd_script = "script";
+	public static String script_f = "";
 	private final String cmd_version = "version";
 	public static String version = "\n" +
 								   "************************************************************\n" +
@@ -389,7 +394,7 @@ public class Parameter {
 		ops.addOption(OptionBuilder.withDescription("help manual.").create(cmd_help));
 		ops.addOption(OptionBuilder.withDescription("version.").create(cmd_version));
 		
-		ops.addOption(OptionBuilder.withDescription("specify the number of nodes to use on a cluster.").hasArg().create(cmd_cluster));
+		ops.addOption(OptionBuilder.withDescription("specify the number of nodes to use on a cluster.").hasArg().create(cmd_node));
 		ops.addOption(OptionBuilder.withDescription("specify email to get informed.").hasArg().create(cmd_email));
 		ops.addOption(OptionBuilder.withDescription("specify memory size.").hasArg().create(cmd_memory));
 		ops.addOption(OptionBuilder.withDescription("specify wall time for each job.").hasArg().create(cmd_walltime));
@@ -1143,24 +1148,29 @@ public class Parameter {
 		if (cl.hasOption(cmd_testdrive)) {
 			testdrive = true;
 		}
-		if (cl.hasOption(cmd_cluster)) {
-			cluster = Integer.parseInt(cl.getOptionValue(cmd_cluster));
+		if (cl.hasOption(cmd_node)) {
+			node = Integer.parseInt(cl.getOptionValue(cmd_node));
+			nodeFlag = true;
 			clusterFlag = true;
 		}
 		if (cl.hasOption(cmd_email)) {
 			email = cl.getOptionValue(cmd_email);
 			emailFlag = true;
+			clusterFlag = true;
 		}
 		if (cl.hasOption(cmd_memory)) {
 			memory = cl.getOptionValue(cmd_memory);
 			memoryFlag = true;
+			clusterFlag = true;
 		}
 		if (cl.hasOption(cmd_walltime)) {
 			walltime = Integer.parseInt(cl.getOptionValue(cmd_walltime));
 			walltimeFlag = true;
+			clusterFlag = true;
 		}
 		if (cl.hasOption(cmd_submit)) {
 			submit = true;
+			clusterFlag = true;
 		}
 		if (help) {
 			HelpFormatter formatter = new HelpFormatter();
