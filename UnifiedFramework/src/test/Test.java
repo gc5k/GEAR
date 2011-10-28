@@ -1,12 +1,15 @@
 package test;
 
+import java.io.BufferedReader;
+import java.io.File;
 import java.io.FileNotFoundException;
+import java.io.FileReader;
 import java.io.IOException;
 import java.io.PrintStream;
-import java.lang.management.ManagementFactory;
-import java.lang.management.RuntimeMXBean;
+import java.util.ArrayList;
 import java.util.Calendar;
-import java.util.List;
+
+import util.NewIt;
 
 import admixture.parameter.Parameter;
 
@@ -23,8 +26,7 @@ import family.pedigree.design.hierarchy.Unified;
 import family.pedigree.design.hierarchy.UnifiedII;
 import family.pedigree.design.hierarchy.UnifiedUnrelated;
 import family.plink.PLINKBinaryParser;
-import family.plink.PLINKParser;
-import family.plink.PLINKTransposeParser;
+import family.plink.PLINKParser; //import family.plink.PLINKTransposeParser;
 import family.popstat.AlleleFrequency;
 import family.popstat.GenotypeMatrix;
 
@@ -34,28 +36,30 @@ import family.popstat.GenotypeMatrix;
  */
 
 public class Test {
-	
+
 	public static StringBuffer LOG = new StringBuffer();
+	public static boolean fileFlag = false;
+	public static boolean bfileFlag = false;
 	public static void main(String[] args) throws IOException {
 
+		String[] scmd = script(args);
 		Parameter p = new Parameter();
-		p.commandListenor(args);
-		printCommandLine(args);
+		p.commandListenor(scmd);
+		printCommandLine(scmd);
 
+		savecmd(args);
 		if (Parameter.clusterFlag) {
-			if (!Parameter.emailFlag) {
-				System.err.println("please specify your email\n");
-				System.exit(1);
-			}
-			String script = generateScript(args);
+			String script = generateScript(scmd);
+
 			if (Parameter.submit) {
-				Runtime   rt   =   Runtime.getRuntime();
-				Process   pro   =   rt.exec(script);
+				Runtime rt = Runtime.getRuntime();
+				rt.exec(script);
 				System.err.println(script + " was submitted to the cluster.");
 			}
 			System.exit(1);
+
 		}
-		
+
 		PLINKParser pp = null;
 		if (Parameter.fileFlag) {
 			pp = new PLINKParser(Parameter.ped, Parameter.map, Parameter.pheno);
@@ -91,7 +95,7 @@ public class Test {
 		GenotypeMatrix GM = new GenotypeMatrix(chen);
 		AlleleFrequency af = new AlleleFrequency(GM);
 		af.CalculateAlleleFrequency();
-//		System.err.println(af);
+		// System.err.println(af);
 		pp.setAlleleFrequency(af.getAlleleFrequency());
 
 		SoftSNPFilter softFilter = new SoftSNPFilter(pp.getSNPFilter(), af);
@@ -113,7 +117,7 @@ public class Test {
 
 		for (int j = Parameter.order; j <= Parameter.order; j++) {
 			StringBuilder sb = new StringBuilder(Parameter.out);
-//			sb.append(j);
+			// sb.append(j);
 			if (Parameter.sliceFlag) {
 				sb.append(".slice" + Parameter.slice + "." + Parameter.sliceN);
 			}
@@ -128,10 +132,10 @@ public class Test {
 			LOG.append("interaction result was saved to " + sb.toString());
 			LOG.append("\n");
 		}
-		
+
 		printLog();
 	}
-	
+
 	public static void printCommandLine(String[] args) {
 		StringBuilder sb = new StringBuilder(Parameter.out);
 		sb.append(".log");
@@ -147,7 +151,7 @@ public class Test {
 		LOG.append("\n");
 
 	}
-	
+
 	public static void printLog() {
 		StringBuilder sb = new StringBuilder(Parameter.out);
 		if (Parameter.sliceFlag) {
@@ -166,7 +170,7 @@ public class Test {
 	}
 
 	public static String generateScript(String[] args) {
-		
+
 		StringBuffer pl = new StringBuffer(Parameter.out);
 		pl.append(".pl");
 		PrintStream PL = null;
@@ -179,16 +183,16 @@ public class Test {
 		PL.append("use strict;\n");
 		PL.append("use warnings;\n");
 
-		for (int i = 1; i <= Parameter.cluster; i++) {
+		for (int i = 1; i <= Parameter.node; i++) {
 			StringBuffer sb = new StringBuffer(Parameter.out);
 			sb.append(".");
 			sb.append("slice");
 			sb.append(i);
 			sb.append(".");
-			sb.append(Parameter.cluster);
+			sb.append(Parameter.node);
 			sb.append(".");
 			sb.append("cluster");
-			PL.append("system(" +"\"qsub " + sb.toString() + "\"" + ");");
+			PL.append("system(" + "\"qsub " + sb.toString() + "\"" + ");");
 			PL.append("\n");
 			PrintStream pw = null;
 			try {
@@ -201,22 +205,25 @@ public class Test {
 			pw.append("#$ -cwd\n");
 			pw.append("#$ -V\n");
 			pw.append("#$ -m eas\n");
-			pw.append("#$ -N " + Parameter.out + "." + "slice" + i + "." + Parameter.cluster + "\n");
-			pw.append("#$ -M " + Parameter.email + "\n");
+			pw.append("#$ -N " + Parameter.out + "." + "slice" + i + "." + Parameter.node + "\n");
+			if (Parameter.emailFlag) {
+				pw.append("#$ -M " + Parameter.email + "\n");
+			}
 			pw.append("#$ -l h_rt=" + Parameter.walltime + ":10:00,s_rt=" + Parameter.walltime + ":00:00,vf=" + Parameter.memory + "\n\n");
-			
+
 			pw.append("java -jar ");
 			pw.append("-Xmx" + Parameter.memory + " ");
 			pw.append("gmdr.jar ");
-			
+
 			int len = args.length;
-			int c = 0; 
-			while(c<len){
-				if(args[c].compareTo("--cluster") == 0 || args[c].compareTo("--email") == 0 || args[c].compareTo("--memory") == 0 || args[c].compareTo("--walltime") == 0) {
-					c +=2;
+			int c = 0;
+			while (c < len) {
+				if (args[c].compareTo("--cluster") == 0 || args[c].compareTo("--email") == 0 || args[c].compareTo("--memory") == 0
+						|| args[c].compareTo("--walltime") == 0) {
+					c += 2;
 					continue;
 				}
-				if(args[c].compareTo("--time") == 0) {
+				if (args[c].compareTo("--time") == 0) {
 					c++;
 					continue;
 				}
@@ -224,7 +231,7 @@ public class Test {
 				c++;
 			}
 			pw.append("--slice ");
-			pw.append(i + "/" + Parameter.cluster);
+			pw.append(i + "/" + Parameter.node);
 			pw.close();
 			System.err.println(sb.toString() + " was generated.");
 		}
@@ -234,5 +241,81 @@ public class Test {
 		StringBuffer script = new StringBuffer();
 		script.append("perl " + pl.toString());
 		return script.toString();
+	}
+
+	public static String[] script(String[] args) {
+
+		String sf = null;
+		boolean scriptFlag = false;
+		String[] scmd;
+		int c = 0;
+		for (int i = 0; i < args.length; i++) {
+			if (args[i].compareTo("--script") == 0) {
+				c = i;
+				sf = args[i + 1];
+				scriptFlag = true;
+				continue;
+			} else if (i == c+1) {
+				continue;
+			}
+			if (args[i].compareTo("--bfile")==0 || args[i].compareTo("--bed") == 0 || args[i].compareTo("--bim") == 0 || args[i].compareTo("--fam") == 0) {
+				bfileFlag = true;
+			}
+			if (args[i].compareTo("--file") == 0 || args[i].compareTo("--ped") == 0 || args[i].compareTo("--map") == 0) {
+				fileFlag = true;
+			}
+		}
+		
+		if (bfileFlag && fileFlag) {
+			throw new IllegalArgumentException("specified both text and binary format files.");
+		}
+
+		if (scriptFlag) {
+			File f = new File(sf);
+			if (!f.exists()) {
+				throw new IllegalArgumentException("could not find " + sf);
+			}
+			BufferedReader reader = null;
+			try {
+				reader = new BufferedReader(new FileReader(f));
+			} catch (IOException E) {
+				throw new IllegalArgumentException("could not open snps file " + sf);
+			}
+
+			ArrayList<String> cmd = NewIt.newArrayList();
+			String line = null;
+			try {
+				while ((line = reader.readLine()) != null) {
+					String[] s = line.split("\\s+");
+					for (int i = 0; i < s.length; i++) {
+						cmd.add(s[i]);
+					}
+				}
+				reader.close();
+			} catch (IOException E) {
+				throw new IllegalArgumentException("bad lines in " + sf);
+			}
+
+			scmd = (String[]) cmd.toArray(new String[0]);
+		} else {
+			scmd = args;
+		}
+		return scmd;
+	}
+
+	public static void savecmd(String[] args) {
+		StringBuffer sb = new StringBuffer();
+		sb.append(Parameter.out);
+		sb.append(".script");
+		PrintStream ps = null;
+		try {
+			ps = new PrintStream(sb.toString());
+		} catch (FileNotFoundException e) {
+			e.printStackTrace();
+		}
+		for (String s:args) {
+			ps.print(s + " ");
+		}
+		ps.close();
 	}
 }

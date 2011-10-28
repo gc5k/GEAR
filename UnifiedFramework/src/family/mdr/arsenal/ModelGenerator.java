@@ -88,6 +88,11 @@ public class ModelGenerator implements Iterator<String> {
 		numLeft = new BigInteger(total.toString());
 		if (Parameter.sliceN > 1) {
 			BigInteger size = total.divide(new BigInteger(Integer.toString(Parameter.sliceN)));
+			if (size.compareTo(BigInteger.ZERO) == 0) {
+				System.err.println("Given " + total + " interactions, " + "--slice option made " + Parameter.sliceN + " slices, which " +
+						"were too many.\nGMDR quit");
+				System.exit(1);
+			}
 			BigInteger stop = size.multiply(new BigInteger(Integer.toString(Parameter.slice - 1)));
 			shift(stop);
 			if (Parameter.slice != Parameter.sliceN) {
