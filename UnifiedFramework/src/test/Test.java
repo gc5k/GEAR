@@ -223,7 +223,7 @@ public class Test {
 					c += 2;
 					continue;
 				}
-				if (args[c].compareTo("--time") == 0) {
+				if (args[c].compareTo("--testdrive") == 0) {
 					c++;
 					continue;
 				}

@@ -35,8 +35,6 @@ public class SNPFilterI implements SNPFilterInterface {
 
 	protected int[][] snpWin = null;
 
-	protected int[][] snps = null;
-
 	public SNPFilterI(MapFile mapData) {
 		this.mapData = mapData;
 		snpList = mapData.getMarkerList();
@@ -109,8 +107,10 @@ public class SNPFilterI implements SNPFilterInterface {
 		chrSNP = new int[L][];
 		for (int i = 0; i < L; i++) {
 			HashSet<Integer> chrSet = chrSNPSet.get(i);
-			if (chrSet.size() == 0)
-				throw new IllegalArgumentException("could not find chromosome " + Parameter.in_chr[i]);
+			if (chrSet.size() == 0) {
+				System.err.println("could not find chromosome " + Parameter.in_chr[i]);
+				continue;
+			}
 			snpArrays.add(chrSet);
 			chrSNP[i] = new int[chrSet.size()];
 			int c = 0;
@@ -145,7 +145,8 @@ public class SNPFilterI implements SNPFilterInterface {
 			}
 		}
 		if (snpwindowList.size() == 0) {
-			throw new IllegalArgumentException("could not find the snp windows specified.");
+			System.err.println("could not find the snp windows specified.");
+			
 		}
 		for (int i = 0; i < snpList.size(); i++) {
 			SNP snp = snpList.get(i);
@@ -165,7 +166,8 @@ public class SNPFilterI implements SNPFilterInterface {
 		for (int i = 0; i < snpwindowSet.size(); i++) {
 			HashSet<Integer> swSet = snpwindowSet.get(i);
 			if (swSet.size() == 0) {
-				throw new IllegalArgumentException("could not find snps near " + Parameter.snpwindow[snpwindowIndex.get(i).intValue()]);
+				System.err.println("could not find snps near " + Parameter.snpwindow[snpwindowIndex.get(i).intValue()]);
+				continue;
 			}
 			snpArrays.add(swSet);
 			snpWin[i] = new int[snpwindowSet.get(i).size()];
@@ -214,37 +216,43 @@ public class SNPFilterI implements SNPFilterInterface {
 
 		for (int i = 0; i < inRangeSet.size(); i++) {
 			HashSet<Integer> rSet = inRangeSet.get(i);
-			if (rSet.size() == 0)
-				throw new IllegalArgumentException("could not find the snp range " + in_range[i][0] + " " + in_range[i][1]);
+			if (rSet.size() == 0) {
+				System.err.println("could not find the snp range " + in_range[i][0] + " " + in_range[i][1]);
+				continue;
+			}
 			snpArrays.add(rSet);
 		}
 	}
 
 	private void selectSNPs() {
 
-		snps = new int[Parameter.xincludesnp.length][1];
-		for (int i = 0; i < snps.length; i++) {
-			snps[i][0] = -1;
+		ArrayList<ArrayList<Integer>> xsnps = NewIt.newArrayList();
+		for(int i = 0; i < Parameter.xincludesnp.length; i++) {
+			ArrayList<Integer> s = NewIt.newArrayList();
+			xsnps.add(s);
 		}
-
 		if (Parameter.xincludesnp != null) {
 			for (int i = 0; i < snpList.size(); i++) {
 				SNP snp = snpList.get(i);
 				String rs = snp.getName();
-				int idx = ArrayUtils.indexOf(Parameter.xincludesnp, rs);
-				if (idx >= 0) {
-					includeSNP(i);
-					snps[idx][0] = i;
+				for (int j = 0; j < Parameter.xincludesnp.length; j++) {
+					int idx = ArrayUtils.indexOf(Parameter.xincludesnp[j], rs);
+					if (idx >= 0) {
+						includeSNP(i);
+						xsnps.get(j).add(i);
+						break;
+					}
 				}
 			}
 		}
 
-		for (int i = 0; i < snps.length; i++) {
-			if (snps[i][0] == -1) {
-				throw new IllegalArgumentException("could not find snp " + Parameter.xincludesnp[i]);
+		for (int i = 0; i < xsnps.size(); i++) {
+			ArrayList<Integer> xsnp = xsnps.get(i);
+			if (xsnp.size() ==0) {
+				continue;
 			}
 			HashSet<Integer> snpSet = NewIt.newHashSet();
-			snpSet.add(new Integer(snps[i][0]));
+			snpSet.addAll(xsnp);
 			snpArrays.add(snpSet);
 		}
 		return;
@@ -288,6 +296,9 @@ public class SNPFilterI implements SNPFilterInterface {
 		for (HashSet<Integer> e : snpArrays) {
 			if (e.size() > 0)
 				L++;
+		}
+		if (L == 0) {
+			throw new IllegalArgumentException("no snps selected for analysis.");
 		}
 		wseq = new int[L][];
 		int c = 0;

@@ -37,36 +37,37 @@ public class Parameter {
 	private final String cmd_missing_phenotype = "missingphenotype";
 	public static String missing_phenotype = "-9";
 
-//	private final String cmd_missing_genotype = "missinggenotype";
-//	public static String missing_genotype = "0";
+	// private final String cmd_missing_genotype = "missinggenotype";
+	// public static String missing_genotype = "0";
 
 	private final String cmd_status_shift = "ss";
 	public static int status_shift = 0;
 
-//	private final String cmd_model = "model"; // cc for case control,
-//	// u1 for the unified method in which the founders are exchangeable to each
-//	// other,
-//	// u2 for the unified method in which the founders are exchangeable but
-//	// within family;
-//	// fam1 for ajhg2008
-//	// fam2 for sii
-//	public static String model = "cc";
+	// private final String cmd_model = "model"; // cc for case control,
+	// // u1 for the unified method in which the founders are exchangeable to
+	// each
+	// // other,
+	// // u2 for the unified method in which the founders are exchangeable but
+	// // within family;
+	// // fam1 for ajhg2008
+	// // fam2 for sii
+	// public static String model = "cc";
 
 	private final String cmd_cc = "cc";
 	public static boolean ccFlag = true;
-	
+
 	private final String cmd_pi = "pi";
 	public static boolean piFlag = false;
 
 	private final String cmd_pii = "pii";
 	public static boolean piiFlag = false;
-	
+
 	private final String cmd_ui = "ui";
 	public static boolean uiFlag = false;
 
 	private final String cmd_uii = "uii";
 	public static boolean uiiFlag = false;
-	
+
 	// file set start
 	private final String cmd_file = "file";
 	public static boolean fileFlag = false;
@@ -89,12 +90,12 @@ public class Parameter {
 	// bfile set end
 
 	// tfile set start
-//	private final String cmd_tfile = "tfile";
-//	public static boolean tfileFlag = false;
-//	private final String cmd_tped = "tped";
-//	public static String tped = null;
-//	private final String cmd_tfam = "tfam";
-//	public static String tfam = null;
+	// private final String cmd_tfile = "tfile";
+	// public static boolean tfileFlag = false;
+	// private final String cmd_tped = "tped";
+	// public static String tped = null;
+	// private final String cmd_tfam = "tfam";
+	// public static String tfam = null;
 	// tfile set end
 
 	// phenotype set start
@@ -118,12 +119,11 @@ public class Parameter {
 	public static String[] ex_family = null;
 	private final String cmd_ex_fam_file = "exfamf";
 	public static boolean exfamFlag = false;
-/*
-	private final String cmd_ex_ind = "exind";
-	public static String[][] ex_ind = null;
-	private final String cmd_ex_ind_file = "exindfile";
-	public static boolean exindFlag = false;
-*/
+	/*
+	 * private final String cmd_ex_ind = "exind"; public static String[][]
+	 * ex_ind = null; private final String cmd_ex_ind_file = "exindfile"; public
+	 * static boolean exindFlag = false;
+	 */
 	private final String cmd_filter_male = "male";
 	public static boolean filter_maleFlag = false;
 
@@ -157,7 +157,7 @@ public class Parameter {
 	public static boolean snpPairFlag = false;
 
 	// this set only used when the option x is specified;
-	public static String[] xincludesnp = null;
+	public static String[][] xincludesnp = null;
 	public static String[] xinsnpPair = null;
 
 	public static boolean xsnpFlag = false;
@@ -181,9 +181,9 @@ public class Parameter {
 	public static double geno = 2;
 	public static boolean genoFlag = false;
 
-//	private final String cmd_hwe = "hwe";
-//	public static double hwe = -1;
-//	public static boolean hweFlag = false;
+	// private final String cmd_hwe = "hwe";
+	// public static double hwe = -1;
+	// public static boolean hweFlag = false;
 
 	private final String cmd_header = "header";
 	public static boolean header = false;
@@ -203,15 +203,15 @@ public class Parameter {
 	public static int cv = 5;
 	public static boolean cvFlag = true;
 
-//	private final String cmd_trgroup = "trgroup";
+	// private final String cmd_trgroup = "trgroup";
 	public static double trgroup = 0.7;
 	public static boolean trgroupFlag = false;
 
-//	private final String cmd_ttfile = "ttfile";
+	// private final String cmd_ttfile = "ttfile";
 	public static boolean ttfileFlag = false;
 	public static String[][] ttArray = null;
 
-//	private final String cmd_trsex = "trsex";
+	// private final String cmd_trsex = "trsex";
 	public static boolean trsexFlag = false;
 	public static int trsex = 0;
 	// private final String cmd_border = "border";
@@ -234,15 +234,14 @@ public class Parameter {
 	public static int perm = 100;
 	public static boolean permFlag = false;
 
-
-//	private final String cmd_perm_scheme = "ps";
+	// private final String cmd_perm_scheme = "ps";
 	public static boolean permu_scheme = true;
 
 	private final String cmd_verbose = "verbose";
 	public static boolean verboseFlag = false;
 
-//	private final String cmd_simu = "simu";
-//	public int simu = 1;
+	// private final String cmd_simu = "simu";
+	// public int simu = 1;
 
 	private final String cmd_Vc = "vc";
 	public static double vc = 0.05;
@@ -266,7 +265,7 @@ public class Parameter {
 	private final String cmd_help = "help";
 	public boolean help = false;
 
-	private final String cmd_testdrive = "time";
+	private final String cmd_testdrive = "testdrive";
 	public static int testUnit = 1000;
 	public static boolean testdrive = false;
 
@@ -278,11 +277,11 @@ public class Parameter {
 	private final String cmd_email = "email";
 	public static String email = "";
 	public static boolean emailFlag = false;
-	
+
 	private final String cmd_memory = "memory";
 	public static String memory = "1G";
 	public static boolean memoryFlag = false;
-	
+
 	private final String cmd_walltime = "walltime";
 	public static int walltime = 10;
 	public static boolean walltimeFlag = false;
@@ -293,13 +292,13 @@ public class Parameter {
 	private final String cmd_script = "script";
 	public static String script_f = "";
 	private final String cmd_version = "version";
-	public static String version = "\n" +
-								   "************************************************************\n" +
-			                       "    GMDR 1.0 released 13/11/2011\n" +
-			                       "    Developed by Guo-Bo Chen, guobo.chen@uq.edu.au\n" +
-			                       "    Queensland Brain Institute, University of Queensland\n" +
-			                       "    St Lucia, Queensland 4067, Australia\n" +
-			                       "************************************************************\n";
+	public static String version = "\n"
+			+ "************************************************************\n"
+			+ "    GMDR 1.0 released 13/11/2011\n"
+			+ "    Developed by Guo-Bo Chen, guobo.chen@uq.edu.au\n"
+			+ "    Queensland Brain Institute, University of Queensland\n"
+			+ "    St Lucia, Queensland 4067, Australia\n"
+			+ "************************************************************\n";
 	private Options ops = new Options();
 	private CommandLineParser parser = new PosixParser();
 
@@ -313,92 +312,187 @@ public class Parameter {
 
 	@SuppressWarnings("static-access")
 	public void commandInitial() {
-//		ops.addOption(OptionBuilder.withDescription("u (default) for the unified framework and f for using sibs only.").hasArg().create(cmd_model));
-		ops.addOption(OptionBuilder.withDescription("method for case-control sample.").create(cmd_cc));
-		ops.addOption(OptionBuilder.withDescription("method I for pedigree-based sample.").create(cmd_pi));
-		ops.addOption(OptionBuilder.withDescription("method II for pedigree-based sample.").create(cmd_pii));
-		ops.addOption(OptionBuilder.withDescription("method I for unrelated ans family samples.").create(cmd_ui));
-		ops.addOption(OptionBuilder.withDescription("method II for unrelated ans family samples.").create(cmd_uii));
-		
-		ops.addOption(OptionBuilder.withDescription("specify the .ped and .map files").hasArg().create(cmd_file));
-		ops.addOption(OptionBuilder.withDescription("specify the .ped file.").hasArg().create(cmd_ped));
-		ops.addOption(OptionBuilder.withDescription("specify the .map file.").hasArg().create(cmd_map));
-
-		ops.addOption(OptionBuilder.withDescription("specify the .bed, .bim and .fam files.").hasArg().create(cmd_bfile));
-		ops.addOption(OptionBuilder.withDescription("specify the .bed file.").hasArg().create(cmd_bed));
-		ops.addOption(OptionBuilder.withDescription("specify the .bim file.").hasArg().create(cmd_bim));
-		ops.addOption(OptionBuilder.withDescription("specify the .fam file.").hasArg().create(cmd_fam));
-
-//		ops.addOption(OptionBuilder.withDescription("specify the .tped and .tfam files").hasArg().create(cmd_tfile));
-//		ops.addOption(OptionBuilder.withDescription("specify the .tped file.").hasArg().create(cmd_tped));
-//		ops.addOption(OptionBuilder.withDescription("specify the .tfam file.").hasArg().create(cmd_tfam));
-
-		ops.addOption(OptionBuilder.withDescription("specify the phenotype file.").hasArg().create(cmd_pheno));
-		ops.addOption(OptionBuilder.withDescription("specify 1 or more covariates by number.").hasArgs().create(cmd_covar));
-		ops.addOption(OptionBuilder.withDescription("specify 1 or more covariates by name.").hasArgs().create(cmd_covar_name));
-
-		ops.addOption(OptionBuilder.withDescription("specify the window size for a snp").hasArgs().create(cmd_snpwindow));
-
-		ops.addOption(OptionBuilder.withDescription("include snps in detecting interaction").hasArgs().create(cmd_snp));
-		ops.addOption(OptionBuilder.withDescription("specify the background snp").hasArgs().create(cmd_bgsnp));
-		ops.addOption(OptionBuilder.withDescription("specify the file containing included snps when detecting interaction").hasArg()
-				.create(cmd_snp_f));
-		ops.addOption(OptionBuilder.withDescription("select chromosomes").hasArgs().create(cmd_chr));
-		ops.addOption(OptionBuilder.withDescription("specify interacting snps").create(cmd_x));
-
-		ops.addOption(OptionBuilder.withDescription("specify excluded families").hasArgs().create(cmd_ex_fam));
-		ops.addOption(OptionBuilder.withDescription("specify the file containing excluded family ids").hasArg().create(cmd_ex_fam_file));
-//		ops.addOption(OptionBuilder.withDescription("specify excluded individuals").hasArgs().create(cmd_ex_ind));
-//		ops.addOption(OptionBuilder.withDescription("specify the file containing excluded individual ids").hasArg().create(cmd_ex_ind_file));
-		ops.addOption(OptionBuilder.withDescription("include males only").create(cmd_filter_male));
-		ops.addOption(OptionBuilder.withDescription("include females only").create(cmd_filter_female));
-		ops.addOption(OptionBuilder.withDescription("include unknown sex ").create(cmd_ex_nosex));
-
-		ops.addOption(OptionBuilder.withDescription("specify response by number.").hasArg().create(cmd_res_number));
-		ops.addOption(OptionBuilder.withDescription("specify response by name.").hasArg().create(cmd_res_name));
-
+		// ops.addOption(OptionBuilder.withDescription("u (default) for the unified framework and f for using sibs only.").hasArg().create(cmd_model));
 		ops.addOption(OptionBuilder.withDescription(
-				"method for adjustment of the phenotype, 0 (default) for linear regression, 1 for logistic regression.").hasArg().create(cmd_reg));
-		ops.addOption(OptionBuilder.withDescription("fold of cross-validation, and default is 5.").hasArg().create(cmd_cv));
-//		ops.addOption(OptionBuilder.withDescription("specify the proportion of the training set.").hasArg().create(cmd_trgroup));
-//		ops.addOption(OptionBuilder.withDescription("specify the file containing the training set.").hasArg().create(cmd_ttfile));
-//		ops.addOption(OptionBuilder.withDescription("specify the gender as the training set.").hasArg().create(cmd_trsex));
-		// ops.addOption(OptionBuilder.withDescription("specify start of the training set.").hasArgs().create(cmd_border));
-		ops.addOption(OptionBuilder.withDescription("specify the order of interaction.").hasArg().create(cmd_order));
-		ops.addOption(OptionBuilder.withDescription("specify the random sample fraction.").hasArg().create(cmd_thin));
-		ops.addOption(OptionBuilder.withDescription("specify partition of the searching space.").hasArg().create(cmd_slice));
-		ops.addOption(OptionBuilder.withDescription("specify the minor allele frequency for inclusion.").hasArg().create(cmd_maf));
-		ops.addOption(OptionBuilder.withDescription("specify missing genotype rate for inclusion.").hasArg().create(cmd_geno));
-//		ops.addOption(OptionBuilder.withDescription("specify the p value of departure from Hardy-Weinberg Equilibrium for inclusion").hasArg()
-//				.create(cmd_hwe));
-		ops.addOption(OptionBuilder.withDescription("seed for the algorithms").hasArg().create(cmd_seed));
-		ops.addOption(OptionBuilder.withDescription("specify the classification for a tie genotype").hasArg().create(cmd_tie));
+				"method for case-control sample.").create(cmd_cc));
+		ops.addOption(OptionBuilder.withDescription(
+				"method I for pedigree-based sample.").create(cmd_pi));
+		ops.addOption(OptionBuilder.withDescription(
+				"method II for pedigree-based sample.").create(cmd_pii));
+		ops.addOption(OptionBuilder.withDescription(
+				"method I for unrelated ans family samples.").create(cmd_ui));
+		ops.addOption(OptionBuilder.withDescription(
+				"method II for unrelated ans family samples.").create(cmd_uii));
 
-		ops.addOption(OptionBuilder.withDescription("replication for permutation.").hasArg().create(cmd_perm));
-		ops.addOption(OptionBuilder.withDescription("output threshold for empirical p value.").hasArg().create(cmd_ep));
-//		ops.addOption(OptionBuilder.withDescription("only sibs are exchangeable when this option is turned on").create(cmd_perm_scheme));
+		ops.addOption(OptionBuilder
+				.withDescription("specify the .ped and .map files").hasArg()
+				.create(cmd_file));
+		ops.addOption(OptionBuilder.withDescription("specify the .ped file.")
+				.hasArg().create(cmd_ped));
+		ops.addOption(OptionBuilder.withDescription("specify the .map file.")
+				.hasArg().create(cmd_map));
+
+		ops.addOption(OptionBuilder
+				.withDescription("specify the .bed, .bim and .fam files.")
+				.hasArg().create(cmd_bfile));
+		ops.addOption(OptionBuilder.withDescription("specify the .bed file.")
+				.hasArg().create(cmd_bed));
+		ops.addOption(OptionBuilder.withDescription("specify the .bim file.")
+				.hasArg().create(cmd_bim));
+		ops.addOption(OptionBuilder.withDescription("specify the .fam file.")
+				.hasArg().create(cmd_fam));
+
+		// ops.addOption(OptionBuilder.withDescription("specify the .tped and .tfam files").hasArg().create(cmd_tfile));
+		// ops.addOption(OptionBuilder.withDescription("specify the .tped file.").hasArg().create(cmd_tped));
+		// ops.addOption(OptionBuilder.withDescription("specify the .tfam file.").hasArg().create(cmd_tfam));
+
+		ops.addOption(OptionBuilder
+				.withDescription("specify the phenotype file.").hasArg()
+				.create(cmd_pheno));
+		ops.addOption(OptionBuilder
+				.withDescription("specify 1 or more covariates by number.")
+				.hasArgs().create(cmd_covar));
+		ops.addOption(OptionBuilder
+				.withDescription("specify 1 or more covariates by name.")
+				.hasArgs().create(cmd_covar_name));
+
+		ops.addOption(OptionBuilder
+				.withDescription("specify the window size for a snp").hasArgs()
+				.create(cmd_snpwindow));
+
+		ops.addOption(OptionBuilder
+				.withDescription("include snps in detecting interaction")
+				.hasArgs().create(cmd_snp));
+		ops.addOption(OptionBuilder
+				.withDescription("specify the background snp").hasArgs()
+				.create(cmd_bgsnp));
+		ops.addOption(OptionBuilder
+				.withDescription(
+						"specify the file containing included snps when detecting interaction")
+				.hasArgs().create(cmd_snp_f));
+		ops.addOption(OptionBuilder.withDescription("select chromosomes")
+				.hasArgs().create(cmd_chr));
+		ops.addOption(OptionBuilder.withDescription("specify interacting snps")
+				.create(cmd_x));
+
+		ops.addOption(OptionBuilder
+				.withDescription("specify excluded families").hasArgs()
+				.create(cmd_ex_fam));
+		ops.addOption(OptionBuilder
+				.withDescription(
+						"specify the file containing excluded family ids")
+				.hasArg().create(cmd_ex_fam_file));
+		// ops.addOption(OptionBuilder.withDescription("specify excluded individuals").hasArgs().create(cmd_ex_ind));
+		// ops.addOption(OptionBuilder.withDescription("specify the file containing excluded individual ids").hasArg().create(cmd_ex_ind_file));
+		ops.addOption(OptionBuilder.withDescription("include males only")
+				.create(cmd_filter_male));
+		ops.addOption(OptionBuilder.withDescription("include females only")
+				.create(cmd_filter_female));
+		ops.addOption(OptionBuilder.withDescription("include unknown sex ")
+				.create(cmd_ex_nosex));
+
+		ops.addOption(OptionBuilder
+				.withDescription("specify response by number.").hasArg()
+				.create(cmd_res_number));
+		ops.addOption(OptionBuilder
+				.withDescription("specify response by name.").hasArg()
+				.create(cmd_res_name));
+
+		ops.addOption(OptionBuilder
+				.withDescription(
+						"method for adjustment of the phenotype, 0 (default) for linear regression, 1 for logistic regression.")
+				.hasArg().create(cmd_reg));
+		ops.addOption(OptionBuilder
+				.withDescription("fold of cross-validation, and default is 5.")
+				.hasArg().create(cmd_cv));
+		// ops.addOption(OptionBuilder.withDescription("specify the proportion of the training set.").hasArg().create(cmd_trgroup));
+		// ops.addOption(OptionBuilder.withDescription("specify the file containing the training set.").hasArg().create(cmd_ttfile));
+		// ops.addOption(OptionBuilder.withDescription("specify the gender as the training set.").hasArg().create(cmd_trsex));
+		// ops.addOption(OptionBuilder.withDescription("specify start of the training set.").hasArgs().create(cmd_border));
+		ops.addOption(OptionBuilder
+				.withDescription("specify the order of interaction.").hasArg()
+				.create(cmd_order));
+		ops.addOption(OptionBuilder
+				.withDescription("specify the random sample fraction.")
+				.hasArg().create(cmd_thin));
+		ops.addOption(OptionBuilder
+				.withDescription("specify partition of the searching space.")
+				.hasArg().create(cmd_slice));
+		ops.addOption(OptionBuilder
+				.withDescription(
+						"specify the minor allele frequency for inclusion.")
+				.hasArg().create(cmd_maf));
+		ops.addOption(OptionBuilder
+				.withDescription("specify missing genotype rate for inclusion.")
+				.hasArg().create(cmd_geno));
+		// ops.addOption(OptionBuilder.withDescription("specify the p value of departure from Hardy-Weinberg Equilibrium for inclusion").hasArg()
+		// .create(cmd_hwe));
+		ops.addOption(OptionBuilder.withDescription("seed for the algorithms")
+				.hasArg().create(cmd_seed));
+		ops.addOption(OptionBuilder
+				.withDescription(
+						"specify the classification for a tie genotype")
+				.hasArg().create(cmd_tie));
+
+		ops.addOption(OptionBuilder
+				.withDescription("replication for permutation.").hasArg()
+				.create(cmd_perm));
+		ops.addOption(OptionBuilder
+				.withDescription("output threshold for empirical p value.")
+				.hasArg().create(cmd_ep));
+		// ops.addOption(OptionBuilder.withDescription("only sibs are exchangeable when this option is turned on").create(cmd_perm_scheme));
 
 		// ops.addOption(OptionBuilder.withDescription("use unrelated indivuduals only, if '--md' is specified.").create(cmd_unrelated_only));
-//		ops.addOption(OptionBuilder.withDescription("replications for simulation, and this parameter is for simulation only").hasArg().create(
-//				cmd_simu));
-		ops.addOption(OptionBuilder.withDescription("missing phenotype, default -9").hasArg().create(cmd_missing_phenotype));
-//		ops.addOption(OptionBuilder.withDescription("missing genotype, default 00").hasArg().create(cmd_missing_genotype));
-		ops.addOption(OptionBuilder.withDescription("missing allele, default 0").hasArg().create(cmd_missing_allele));
-		ops.addOption(OptionBuilder.withDescription("use this option if status was coded as 1 (unaffected)/2 (affected).").create(cmd_status_shift));
-		ops.addOption(OptionBuilder.withDescription("threshold of variance explained for output").hasArg().create(cmd_Vc));
-		ops.addOption(OptionBuilder.withDescription("threshold of training accuracy for output").hasArg().create(cmd_training));
-		ops.addOption(OptionBuilder.withDescription("threshold of testing accuracy for output").hasArg().create(cmd_testing));
-		ops.addOption(OptionBuilder.withDescription("specify the root for output files.").hasArg().create(cmd_out));
-		ops.addOption(OptionBuilder.withDescription("print the result in verbose form.").create(cmd_verbose));
-		ops.addOption(OptionBuilder.withDescription("give an evaluation for computation time").create(cmd_testdrive));
-		ops.addOption(OptionBuilder.withDescription("help manual.").create(cmd_help));
-		ops.addOption(OptionBuilder.withDescription("version.").create(cmd_version));
-		
-		ops.addOption(OptionBuilder.withDescription("specify the number of nodes to use on a cluster.").hasArg().create(cmd_node));
-		ops.addOption(OptionBuilder.withDescription("specify email to get informed.").hasArg().create(cmd_email));
-		ops.addOption(OptionBuilder.withDescription("specify memory size.").hasArg().create(cmd_memory));
-		ops.addOption(OptionBuilder.withDescription("specify wall time for each job.").hasArg().create(cmd_walltime));
-		ops.addOption(OptionBuilder.withDescription("submit jobs to a cluster.").create(cmd_submit));
+		// ops.addOption(OptionBuilder.withDescription("replications for simulation, and this parameter is for simulation only").hasArg().create(
+		// cmd_simu));
+		ops.addOption(OptionBuilder
+				.withDescription("missing phenotype, default -9").hasArg()
+				.create(cmd_missing_phenotype));
+		// ops.addOption(OptionBuilder.withDescription("missing genotype, default 00").hasArg().create(cmd_missing_genotype));
+		ops.addOption(OptionBuilder
+				.withDescription("missing allele, default 0").hasArg()
+				.create(cmd_missing_allele));
+		ops.addOption(OptionBuilder
+				.withDescription(
+						"use this option if status was coded as 1 (unaffected)/2 (affected).")
+				.create(cmd_status_shift));
+		ops.addOption(OptionBuilder
+				.withDescription("threshold of variance explained for output")
+				.hasArg().create(cmd_Vc));
+		ops.addOption(OptionBuilder
+				.withDescription("threshold of training accuracy for output")
+				.hasArg().create(cmd_training));
+		ops.addOption(OptionBuilder
+				.withDescription("threshold of testing accuracy for output")
+				.hasArg().create(cmd_testing));
+		ops.addOption(OptionBuilder
+				.withDescription("specify the root for output files.").hasArg()
+				.create(cmd_out));
+		ops.addOption(OptionBuilder.withDescription(
+				"print the result in verbose form.").create(cmd_verbose));
+		ops.addOption(OptionBuilder.withDescription(
+				"give an evaluation for computation time")
+				.create(cmd_testdrive));
+		ops.addOption(OptionBuilder.withDescription("help manual.").create(
+				cmd_help));
+		ops.addOption(OptionBuilder.withDescription("version.").create(
+				cmd_version));
+
+		ops.addOption(OptionBuilder
+				.withDescription(
+						"specify the number of nodes to use on a cluster.")
+				.hasArg().create(cmd_node));
+		ops.addOption(OptionBuilder
+				.withDescription("specify email to get informed.").hasArg()
+				.create(cmd_email));
+		ops.addOption(OptionBuilder.withDescription("specify memory size.")
+				.hasArg().create(cmd_memory));
+		ops.addOption(OptionBuilder
+				.withDescription("specify wall time for each job.").hasArg()
+				.create(cmd_walltime));
+		ops.addOption(OptionBuilder
+				.withDescription("submit jobs to a cluster.")
+				.create(cmd_submit));
 	}
 
 	public void commandListenor(String[] args) {
@@ -417,7 +511,7 @@ public class Parameter {
 		}
 		if (cl.hasOption(cmd_cc)) {
 			ccFlag = true;
-			
+
 			piFlag = false;
 			piiFlag = false;
 			uiFlag = false;
@@ -425,7 +519,7 @@ public class Parameter {
 		}
 		if (cl.hasOption(cmd_pi)) {
 			piFlag = true;
-			
+
 			ccFlag = false;
 			piiFlag = false;
 			uiFlag = false;
@@ -433,7 +527,7 @@ public class Parameter {
 		}
 		if (cl.hasOption(cmd_pii)) {
 			piiFlag = true;
-			
+
 			ccFlag = false;
 			piFlag = false;
 			uiFlag = false;
@@ -488,35 +582,35 @@ public class Parameter {
 		}
 
 		// tfile
-//		if (cl.hasOption(cmd_tfile)) {
-//			StringBuffer sb1 = new StringBuffer();
-//			StringBuffer sb2 = new StringBuffer();
-//			sb1.append(cl.getOptionValue(cmd_tfile));
-//			sb1.append(".tped");
-//
-//			sb2.append(cl.getOptionValue(cmd_tfile));
-//			sb2.append(".tfam");
-//
-//			tped = sb1.toString();
-//			tfam = sb2.toString();
-//		}
-//		if (cl.hasOption(cmd_tped)) {
-//			tped = cl.getOptionValue(cmd_tped);
-//		}
-//		if (cl.hasOption(cmd_tfam)) {
-//			tfam = cl.getOptionValue(cmd_tfam);
-//		}
-//		if (tped != null && tfam != null) {
-//			File fped = new File(tped);
-//			if (!fped.exists()) {
-//				throw new IllegalArgumentException("could not open " + tped);
-//			}
-//			File ffam = new File(tfam);
-//			if (!ffam.exists()) {
-//				throw new IllegalArgumentException("could not open " + tfam);
-//			}
-//			tfileFlag = true;
-//		}
+		// if (cl.hasOption(cmd_tfile)) {
+		// StringBuffer sb1 = new StringBuffer();
+		// StringBuffer sb2 = new StringBuffer();
+		// sb1.append(cl.getOptionValue(cmd_tfile));
+		// sb1.append(".tped");
+		//
+		// sb2.append(cl.getOptionValue(cmd_tfile));
+		// sb2.append(".tfam");
+		//
+		// tped = sb1.toString();
+		// tfam = sb2.toString();
+		// }
+		// if (cl.hasOption(cmd_tped)) {
+		// tped = cl.getOptionValue(cmd_tped);
+		// }
+		// if (cl.hasOption(cmd_tfam)) {
+		// tfam = cl.getOptionValue(cmd_tfam);
+		// }
+		// if (tped != null && tfam != null) {
+		// File fped = new File(tped);
+		// if (!fped.exists()) {
+		// throw new IllegalArgumentException("could not open " + tped);
+		// }
+		// File ffam = new File(tfam);
+		// if (!ffam.exists()) {
+		// throw new IllegalArgumentException("could not open " + tfam);
+		// }
+		// tfileFlag = true;
+		// }
 
 		// bfile
 		if (cl.hasOption(cmd_bfile)) {
@@ -576,9 +670,11 @@ public class Parameter {
 				if (p[i].contains("-")) {
 					String[] pp = p[i].split("-");
 					if (pp.length != 2) {
-						throw new IllegalArgumentException("bad parameter for option --response ");
+						throw new IllegalArgumentException(
+								"bad parameter for option --response ");
 					}
-					for (int j = Integer.parseInt(pp[0]); j <= Integer.parseInt(pp[1]); j++) {
+					for (int j = Integer.parseInt(pp[0]); j <= Integer
+							.parseInt(pp[1]); j++) {
 						idx.add(new Integer(j));
 					}
 				} else {
@@ -590,7 +686,8 @@ public class Parameter {
 			for (Iterator<Integer> e = idx.iterator(); e.hasNext();) {
 				predictor[c] = e.next().intValue() - 1;
 				if (predictor[c] < 0) {
-					throw new IllegalArgumentException("bad parameter for option --response ");
+					throw new IllegalArgumentException(
+							"bad parameter for option --response ");
 				}
 				c++;
 			}
@@ -603,7 +700,8 @@ public class Parameter {
 				if (p[i].contains("-")) {
 					String[] pp = predictor_name[i].split("-");
 					if (pp.length != 2) {
-						throw new IllegalArgumentException("bad parameter for option --covarname ");
+						throw new IllegalArgumentException(
+								"bad parameter for option --covarname ");
 					}
 					for (int j = 0; j < pp.length; j++) {
 						cn.add(pp[j]);
@@ -628,7 +726,8 @@ public class Parameter {
 						if (S.contains("-")) {
 							String[] s = S.split("-");
 							if (s.length != 2) {
-								throw new IllegalArgumentException("bad parameter " + snp[i]);
+								throw new IllegalArgumentException(
+										"bad parameter " + snp[i]);
 							}
 							exsnppair.add(s[0]);
 							exsnppair.add(s[1]);
@@ -639,7 +738,8 @@ public class Parameter {
 						if (snp[i].contains("-")) {
 							String[] s = snp[i].split("-");
 							if (s.length != 2) {
-								throw new IllegalArgumentException("bad parameter " + snp[i]);
+								throw new IllegalArgumentException(
+										"bad parameter " + snp[i]);
 							}
 							insnppair.add(s[0]);
 							insnppair.add(s[1]);
@@ -670,12 +770,14 @@ public class Parameter {
 				ArrayList<String> insnppair = NewIt.newArrayList();
 				for (int i = 0; i < snp.length; i++) {
 					if (snp[i].startsWith("-")) {
-						throw new IllegalArgumentException("bad parameter " + snp[i]);
+						throw new IllegalArgumentException("bad parameter "
+								+ snp[i]);
 					} else {
 						if (snp[i].contains("-")) {
 							String[] s = snp[i].split("-");
 							if (s.length != 2) {
-								throw new IllegalArgumentException("bad parameter " + snp[i]);
+								throw new IllegalArgumentException(
+										"bad parameter " + snp[i]);
 							}
 							insnppair.add(s[0]);
 							insnppair.add(s[1]);
@@ -685,7 +787,8 @@ public class Parameter {
 					}
 				}
 				if (insnp.size() > 0) {
-					xincludesnp = (String[]) insnp.toArray(new String[0]);
+					xincludesnp = new String[1][];
+					xincludesnp[0] = (String[]) insnp.toArray(new String[0]);
 					snpFlag = true;
 				}
 				if (insnppair.size() > 0) {
@@ -710,84 +813,173 @@ public class Parameter {
 		}
 
 		if (cl.hasOption(cmd_snp_f)) {
+
 			if (!x) {
-				String snps_file = cl.getOptionValue(cmd_snp_f);
-
-				File f = new File(snps_file);
-				if (!f.exists()) {
-					throw new IllegalArgumentException("could not find " + snps_file);
-				}
-				BufferedReader reader = null;
-				try {
-					reader = new BufferedReader(new FileReader(f));
-				} catch (IOException E) {
-					throw new IllegalArgumentException("could not open snps file " + snps_file);
-				}
-
-				ArrayList<String> snp = NewIt.newArrayList();
-				String line = null;
-				try {
-					while ((line = reader.readLine()) != null) {
-						String[] s = line.split(delim);
-						for (int i = 0; i < s.length; i++) {
-							snp.add(s[i]);
-						}
+				String[] snps_file = cl.getOptionValues(cmd_snp_f);
+				ArrayList<String> includesnpList = NewIt.newArrayList();
+				ArrayList<String> excludesnpList = NewIt.newArrayList();
+				ArrayList<String> includesnpPairList = NewIt.newArrayList();
+				ArrayList<String> excludesnpPairList = NewIt.newArrayList();
+				for (int h = 0; h < snps_file.length; h++) {
+					File f = new File(snps_file[h]);
+					if (!f.exists()) {
+						throw new IllegalArgumentException("could not find "
+								+ snps_file[h]);
 					}
-					reader.close();
-				} catch (IOException E) {
-					throw new IllegalArgumentException("bad lines in " + snps_file);
-				}
-				if (snp.size() > 0) {
-					ArrayList<String> insnp = NewIt.newArrayList();
-					ArrayList<String> exsnp = NewIt.newArrayList();
-					ArrayList<String> insnppair = NewIt.newArrayList();
-					ArrayList<String> exsnppair = NewIt.newArrayList();
-					for (int i = 0; i < snp.size(); i++) {
-						String subSNP = snp.get(i);
-						if (subSNP.startsWith("-")) {
-							String S = subSNP.substring(1, subSNP.length());
-							if (S.contains("-")) {
-								String[] s = S.split("-");
-								if (s.length != 2) {
-									throw new IllegalArgumentException("bad parameter for --snpf in cmd_snp_f line " + (i+1));
-								}
-								exsnppair.add(s[0]);
-								exsnppair.add(s[1]);
-							} else {
-								exsnp.add(S);
-							}
-						} else {
-							if (subSNP.contains("-")) {
-								String[] s = subSNP.split("-");
-								if (s.length != 2) {
-									throw new IllegalArgumentException("bad parameter for --snpf in cmd_snp_f line " + (i+1));
-								}
-								insnppair.add(s[0]);
-								insnppair.add(s[1]);
-							} else {
-								insnp.add(subSNP);
+					BufferedReader reader = null;
+					try {
+						reader = new BufferedReader(new FileReader(f));
+					} catch (IOException E) {
+						throw new IllegalArgumentException(
+								"could not open snps file " + snps_file);
+					}
+					ArrayList<String> snp = NewIt.newArrayList();
+					String line = null;
+					try {
+						while ((line = reader.readLine()) != null) {
+							String[] s = line.split(delim);
+							for (int i = 0; i < s.length; i++) {
+								snp.add(s[i]);
 							}
 						}
+						reader.close();
+					} catch (IOException E) {
+						throw new IllegalArgumentException("bad lines in "
+								+ snps_file);
 					}
-					if (insnp.size() > 0) {
-						includesnp = (String[]) insnp.toArray(new String[0]);
-						snpFlag = true;
+					if (snp.size() > 0) {
+						ArrayList<String> insnp = NewIt.newArrayList();
+						ArrayList<String> exsnp = NewIt.newArrayList();
+						ArrayList<String> insnppair = NewIt.newArrayList();
+						ArrayList<String> exsnppair = NewIt.newArrayList();
+						for (int i = 0; i < snp.size(); i++) {
+							String subSNP = snp.get(i);
+							if (subSNP.startsWith("-")) {
+								String S = subSNP.substring(1, subSNP.length());
+								if (S.contains("-")) {
+									String[] s = S.split("-");
+									if (s.length != 2) {
+										throw new IllegalArgumentException(
+												"bad parameter for --snpf in cmd_snp_f line "
+														+ (i + 1));
+									}
+									exsnppair.add(s[0]);
+									exsnppair.add(s[1]);
+								} else {
+									exsnp.add(S);
+								}
+							} else {
+								if (subSNP.contains("-")) {
+									String[] s = subSNP.split("-");
+									if (s.length != 2) {
+										throw new IllegalArgumentException(
+												"bad parameter for --snpf in cmd_snp_f line "
+														+ (i + 1));
+									}
+									insnppair.add(s[0]);
+									insnppair.add(s[1]);
+								} else {
+									insnp.add(subSNP);
+								}
+							}
+						}
+						if (insnp.size() > 0) {
+							includesnpList.addAll(insnp);
+							snpFlag = true;
+						}
+						if (exsnp.size() > 0) {
+							excludesnpList.addAll(exsnp);
+							snpFlag = true;
+						}
+						if (insnppair.size() > 0) {
+							includesnpPairList.addAll(insnppair);
+							snpPairFlag = true;
+						}
+						if (exsnppair.size() > 0) {
+							excludesnpPairList.addAll(exsnppair);
+							snpPairFlag = true;
+						}
 					}
-					if (exsnp.size() > 0) {
-						excludesnp = (String[]) exsnp.toArray(new String[0]);
-						snpFlag = true;
+					if(includesnpList.size() >0) {
+						includesnp = (String[]) includesnpList.toArray(new String[0]);
 					}
-					if (insnppair.size() > 0) {
-						insnpPair = (String[]) insnppair.toArray(new String[0]);
-						snpPairFlag = true;
+					if(excludesnpList.size() > 0) {
+						excludesnp = (String[]) excludesnpList.toArray(new String[0]);
 					}
-					if (exsnppair.size() > 0) {
-						exsnpPair = (String[]) exsnppair.toArray(new String[0]);
-						snpPairFlag = true;
+					if(includesnpPairList.size() > 0) {
+						insnpPair = (String[]) includesnpList.toArray(new String[0]);
+					}
+					if(excludesnpPairList.size() > 0) {
+						exsnpPair = (String[]) excludesnpList.toArray(new String[0]);
 					}
 				}
 			} else {
+				String[] snps_file = cl.getOptionValues(cmd_snp_f);
+				xincludesnp = new String[snps_file.length][];
+				ArrayList<String> xsnppairList = NewIt.newArrayList();
+				for (int h = 0; h < snps_file.length; h++) {
+					File f = new File(snps_file[h]);
+					if (!f.exists()) {
+						throw new IllegalArgumentException("could not find "
+								+ snps_file[h]);
+					}
+					BufferedReader reader = null;
+					try {
+						reader = new BufferedReader(new FileReader(f));
+					} catch (IOException E) {
+						throw new IllegalArgumentException(
+								"could not open snps file " + snps_file);
+					}
+					ArrayList<String> snp = NewIt.newArrayList();
+					String line = null;
+					try {
+						while ((line = reader.readLine()) != null) {
+							String[] s = line.split(delim);
+							for (int i = 0; i < s.length; i++) {
+								snp.add(s[i]);
+							}
+						}
+						reader.close();
+					} catch (IOException E) {
+						throw new IllegalArgumentException("bad lines in "
+								+ snps_file);
+					}
+					if (snp.size() > 0) {
+						ArrayList<String> insnp = NewIt.newArrayList();
+						ArrayList<String> insnppair = NewIt.newArrayList();
 
+						for (int i = 0; i < snp.size(); i++) {
+							String subSNP = snp.get(i);
+							if (subSNP.startsWith("-")) {
+
+							} else {
+								if (subSNP.contains("-")) {
+									String[] s = subSNP.split("-");
+									if (s.length != 2) {
+										throw new IllegalArgumentException(
+												"bad parameter for --snpf in cmd_snp_f line "
+														+ (i + 1));
+									}
+									insnppair.add(s[0]);
+									insnppair.add(s[1]);
+								} else {
+									insnp.add(subSNP);
+								}
+							}
+						}
+						if (insnp.size() > 0) {
+							xincludesnp[h] = (String[]) insnp.toArray(new String[0]);
+							snpFlag = true;
+						}
+						if (insnppair.size() > 0) {
+							xsnppairList.addAll(insnppair);
+							snpPairFlag = true;
+						}
+					}
+					if(xsnppairList.size() > 0) {
+						insnpPair = (String[]) xsnppairList.toArray(new String[0]);
+					}
+				}
 			}
 		}
 
@@ -839,59 +1031,32 @@ public class Parameter {
 				throw new IllegalArgumentException("bad lines in " + file);
 			}
 		}
-/*
-		if (cl.hasOption(cmd_ex_ind)) {
-			String[] ind = cl.getOptionValues(cmd_ex_ind);
-			ex_ind = new String[2][ind.length];
-			for (int i = 0; i < ind.length / 2; i++) {
-				String[] Ind = ind[i].split(incommand_separator);
-				ex_ind[0][i] = Ind[0];
-				ex_ind[1][i] = Ind[1];
-			}
-			exindFlag = true;
-		}
-		if (cl.hasOption(cmd_ex_ind_file)) {
-			String file = cl.getOptionValue(cmd_ex_ind_file);
-			File find = new File(file);
-			if (!find.exists()) {
-				throw new IllegalArgumentException("could not open file: " + file);
-			}
-			ArrayList<String> fid = NewIt.newArrayList();
-			ArrayList<String> iid = NewIt.newArrayList();
-
-			BufferedReader reader = null;
-			try {
-				reader = new BufferedReader(new FileReader(new File(file)));
-			} catch (IOException E) {
-				throw new IllegalArgumentException("failed in reading " + file);
-			}
-
-			String line;
-			try {
-				while ((line = reader.readLine()) != null) {
-					String[] l = line.split(incommand_separator);
-					if (l.length < 2) {
-						continue;
-					}
-					fid.add(l[0]);
-					iid.add(l[1]);
-				}
-			} catch (IOException e) {
-				e.printStackTrace(System.err);
-				System.exit(0);
-			}
-			if (fid.size() > 0) {
-				exindFlag = true;
-				ex_ind = new String[2][fid.size()];
-				for (int i = 0; i < ex_ind.length; i++) {
-					ex_ind[0][i] = fid.get(i);
-					ex_ind[1][i] = iid.get(i);
-				}
-			} else {
-				throw new IllegalArgumentException("bad lines in " + file);
-			}
-		}
-*/
+		/*
+		 * if (cl.hasOption(cmd_ex_ind)) { String[] ind =
+		 * cl.getOptionValues(cmd_ex_ind); ex_ind = new String[2][ind.length];
+		 * for (int i = 0; i < ind.length / 2; i++) { String[] Ind =
+		 * ind[i].split(incommand_separator); ex_ind[0][i] = Ind[0];
+		 * ex_ind[1][i] = Ind[1]; } exindFlag = true; } if
+		 * (cl.hasOption(cmd_ex_ind_file)) { String file =
+		 * cl.getOptionValue(cmd_ex_ind_file); File find = new File(file); if
+		 * (!find.exists()) { throw new
+		 * IllegalArgumentException("could not open file: " + file); }
+		 * ArrayList<String> fid = NewIt.newArrayList(); ArrayList<String> iid =
+		 * NewIt.newArrayList();
+		 * 
+		 * BufferedReader reader = null; try { reader = new BufferedReader(new
+		 * FileReader(new File(file))); } catch (IOException E) { throw new
+		 * IllegalArgumentException("failed in reading " + file); }
+		 * 
+		 * String line; try { while ((line = reader.readLine()) != null) {
+		 * String[] l = line.split(incommand_separator); if (l.length < 2) {
+		 * continue; } fid.add(l[0]); iid.add(l[1]); } } catch (IOException e) {
+		 * e.printStackTrace(System.err); System.exit(0); } if (fid.size() > 0)
+		 * { exindFlag = true; ex_ind = new String[2][fid.size()]; for (int i =
+		 * 0; i < ex_ind.length; i++) { ex_ind[0][i] = fid.get(i); ex_ind[1][i]
+		 * = iid.get(i); } } else { throw new
+		 * IllegalArgumentException("bad lines in " + file); } }
+		 */
 		if (cl.hasOption(cmd_filter_male)) {
 			filter_maleFlag = true;
 			filter_femaleFlag = false;
@@ -936,11 +1101,12 @@ public class Parameter {
 			for (int i = 0; i < s.length; i++) {
 				String[] ss = s[i].split(incommand_separator);
 				if (ss.length != 3) {
-					throw new IllegalArgumentException("bad parameter for --snpwindow: " + s[i]);
+					throw new IllegalArgumentException(
+							"bad parameter for --snpwindow: " + s[i]);
 				}
 				snpwindow[i] = ss[0];
 				snp_window[i][0] = Double.parseDouble(ss[1]) * -1000;
-				if (Double.parseDouble(ss[2])>0) { 
+				if (Double.parseDouble(ss[2]) > 0) {
 					snp_window[i][1] = Double.parseDouble(ss[2]) * 1000;
 				} else {
 					snp_window[i][1] = Double.MAX_VALUE;
@@ -952,7 +1118,8 @@ public class Parameter {
 		if (cl.hasOption(cmd_maf)) {
 			maf = Double.parseDouble(cl.getOptionValue(cmd_maf));
 			if (maf < 0) {
-				throw new IllegalArgumentException("bad parameter for --maf: " + maf);
+				throw new IllegalArgumentException("bad parameter for --maf: "
+						+ maf);
 			}
 			mafFlag = true;
 		}
@@ -960,18 +1127,20 @@ public class Parameter {
 		if (cl.hasOption(cmd_geno)) {
 			geno = Double.parseDouble(cl.getOptionValue(cmd_geno));
 			if (geno < 0) {
-				throw new IllegalArgumentException("bad parameter for --geno: " + geno);
+				throw new IllegalArgumentException("bad parameter for --geno: "
+						+ geno);
 			}
 			genoFlag = true;
 		}
-//
-//		if (cl.hasOption(cmd_hwe)) {
-//			hwe = Double.parseDouble(cl.getOptionValue(cmd_hwe));
-//			if (hwe < 0) {
-//				throw new IllegalArgumentException("bad parameter for --hwe: " + hwe);
-//			}
-//			hweFlag = true;
-//		}
+		//
+		// if (cl.hasOption(cmd_hwe)) {
+		// hwe = Double.parseDouble(cl.getOptionValue(cmd_hwe));
+		// if (hwe < 0) {
+		// throw new IllegalArgumentException("bad parameter for --hwe: " +
+		// hwe);
+		// }
+		// hweFlag = true;
+		// }
 
 		if (cl.hasOption(cmd_header)) {
 			header = true;
@@ -989,52 +1158,54 @@ public class Parameter {
 		if (cl.hasOption(cmd_cv)) {
 			cv = Integer.parseInt(cl.getOptionValue(cmd_cv));
 			if (cv < 2) {
-				throw new IllegalArgumentException("bad parameter for option --cv.");
+				throw new IllegalArgumentException(
+						"bad parameter for option --cv.");
 			}
 			cvFlag = true;
 		}
-//		if (cl.hasOption(cmd_trgroup)) {
-//			trgroup = Double.parseDouble(cl.getOptionValue(cmd_trgroup));
-//			trgroupFlag = true;
-//		}
-//		if (cl.hasOption(cmd_trsex)) {
-//			trsex = Integer.parseInt(cl.getOptionValue(cmd_trsex));
-//			if (trsex != 1 && trsex != 2) {
-//				throw new IllegalArgumentException("unknown value for option --trsex.");
-//			}
-//			trsexFlag = true;
-//		}
-//		if (cl.hasOption(cmd_ttfile)) {
-//			String tf = cl.getOptionValue(cmd_ttfile);
-//			File ttfile = new File(tf);
-//			if (!ttfile.exists()) {
-//				throw new IllegalArgumentException("could not open ttfile " + tf);
-//			}
-//
-//			ArrayList<String> Farray = NewIt.newArrayList();
-//			ArrayList<String> Iarray = NewIt.newArrayList();
-//			BufferedReader reader = null;
-//			try {
-//				reader = new BufferedReader(new FileReader(new File(tf)));
-//			} catch (IOException E) {
-//				throw new IllegalArgumentException("failed in reading " + tf);
-//			}
-//			String line = null;
-//			try {
-//				while ((line = reader.readLine()) != null) {
-//					String[] l = line.split(delim);
-//					Farray.add(l[0]);
-//					Iarray.add(l[1]);
-//				}
-//			} catch (IOException e) {
-//				e.printStackTrace();
-//			}
-//
-//			ttArray = new String[2][Farray.size()];
-//			ttArray[0] = (String[]) Farray.toArray(new String[0]);
-//			ttArray[1] = (String[]) Iarray.toArray(new String[0]);
-//			ttfileFlag = true;
-//		}
+		// if (cl.hasOption(cmd_trgroup)) {
+		// trgroup = Double.parseDouble(cl.getOptionValue(cmd_trgroup));
+		// trgroupFlag = true;
+		// }
+		// if (cl.hasOption(cmd_trsex)) {
+		// trsex = Integer.parseInt(cl.getOptionValue(cmd_trsex));
+		// if (trsex != 1 && trsex != 2) {
+		// throw new
+		// IllegalArgumentException("unknown value for option --trsex.");
+		// }
+		// trsexFlag = true;
+		// }
+		// if (cl.hasOption(cmd_ttfile)) {
+		// String tf = cl.getOptionValue(cmd_ttfile);
+		// File ttfile = new File(tf);
+		// if (!ttfile.exists()) {
+		// throw new IllegalArgumentException("could not open ttfile " + tf);
+		// }
+		//
+		// ArrayList<String> Farray = NewIt.newArrayList();
+		// ArrayList<String> Iarray = NewIt.newArrayList();
+		// BufferedReader reader = null;
+		// try {
+		// reader = new BufferedReader(new FileReader(new File(tf)));
+		// } catch (IOException E) {
+		// throw new IllegalArgumentException("failed in reading " + tf);
+		// }
+		// String line = null;
+		// try {
+		// while ((line = reader.readLine()) != null) {
+		// String[] l = line.split(delim);
+		// Farray.add(l[0]);
+		// Iarray.add(l[1]);
+		// }
+		// } catch (IOException e) {
+		// e.printStackTrace();
+		// }
+		//
+		// ttArray = new String[2][Farray.size()];
+		// ttArray[0] = (String[]) Farray.toArray(new String[0]);
+		// ttArray[1] = (String[]) Iarray.toArray(new String[0]);
+		// ttfileFlag = true;
+		// }
 		// if (cl.hasOption(cmd_border)) {
 		// String[] h = cl.getOptionValues(cmd_border);
 		// if (h.length != 2) {
@@ -1070,9 +1241,9 @@ public class Parameter {
 				tie = -1;
 			}
 		}
-//		if (cl.hasOption(cmd_simu)) {
-//			simu = Integer.parseInt(cl.getOptionValue(cmd_simu));
-//		}
+		// if (cl.hasOption(cmd_simu)) {
+		// simu = Integer.parseInt(cl.getOptionValue(cmd_simu));
+		// }
 		if (cl.hasOption(cmd_perm)) {
 			perm = Integer.parseInt(cl.getOptionValue(cmd_perm));
 			permFlag = true;
@@ -1080,43 +1251,47 @@ public class Parameter {
 		if (cl.hasOption(cmd_ep)) {
 			ep = Double.parseDouble(cl.getOptionValue(cmd_ep));
 			if (ep >= 1 || ep < 0) {
-				throw new IllegalArgumentException("bad parameter for option --ep.");
+				throw new IllegalArgumentException(
+						"bad parameter for option --ep.");
 			}
 			epFlag = true;
 		}
-//		if (cl.hasOption(cmd_perm_scheme)) {
-//			permu_scheme = true;
-//		}
+		// if (cl.hasOption(cmd_perm_scheme)) {
+		// permu_scheme = true;
+		// }
 		// if (cl.hasOption(cmd_unrelated_only)) {
 		// unrelated_only = true;
 		// }
 		if (cl.hasOption(cmd_order)) {
 			order = Integer.parseInt(cl.getOptionValue(cmd_order));
-			if (order <=0 ) {
-				throw new IllegalArgumentException("bad parameter for option --cv.");
+			if (order <= 0) {
+				throw new IllegalArgumentException(
+						"bad parameter for option --cv.");
 			}
 		}
 		if (cl.hasOption(cmd_thin)) {
 			thin = Double.parseDouble(cl.getOptionValue(cmd_thin));
 			if (thin < 0) {
-				throw new IllegalArgumentException("bad parameter for option --thin.");
+				throw new IllegalArgumentException(
+						"bad parameter for option --thin.");
 			}
 		}
 		if (cl.hasOption(cmd_slice)) {
 			String[] s = cl.getOptionValue(cmd_slice).split("/");
 			slice = Integer.parseInt(s[0]);
 			sliceN = Integer.parseInt(s[1]);
-			if (slice <= 0 || sliceN <=0 || slice>sliceN) {
-				throw new IllegalArgumentException("bad parameter for option --slice.");
+			if (slice <= 0 || sliceN <= 0 || slice > sliceN) {
+				throw new IllegalArgumentException(
+						"bad parameter for option --slice.");
 			}
 			sliceFlag = true;
 		}
 		if (cl.hasOption(cmd_missing_phenotype)) {
 			missing_phenotype = cl.getOptionValue(cmd_missing_phenotype);
 		}
-//		if (cl.hasOption(cmd_missing_genotype)) {
-//			missing_genotype = cl.getOptionValue(cmd_missing_genotype);
-//		}
+		// if (cl.hasOption(cmd_missing_genotype)) {
+		// missing_genotype = cl.getOptionValue(cmd_missing_genotype);
+		// }
 		if (cl.hasOption(cmd_missing_allele)) {
 			missing_allele = cl.getOptionValue(cmd_missing_allele);
 		}
@@ -1128,11 +1303,13 @@ public class Parameter {
 			vcFlag = true;
 		}
 		if (cl.hasOption(cmd_training)) {
-			threshold_training = Double.parseDouble(cl.getOptionValue(cmd_training));
+			threshold_training = Double.parseDouble(cl
+					.getOptionValue(cmd_training));
 			trainingFlag = true;
 		}
 		if (cl.hasOption(cmd_testing)) {
-			threshold_testing = Double.parseDouble(cl.getOptionValue(cmd_testing));
+			threshold_testing = Double.parseDouble(cl
+					.getOptionValue(cmd_testing));
 			testingFlag = true;
 		}
 		if (cl.hasOption(cmd_out)) {
@@ -1199,7 +1376,8 @@ public class Parameter {
 				} else {
 					int j = ArrayUtils.indexOf(F, predictor_name[i]);
 					if (j < 0) {
-						System.err.println("unknown covariat " + predictor_name[i]);
+						System.err.println("unknown covariat "
+								+ predictor_name[i]);
 						System.exit(0);
 					} else {
 						idx.add(new Integer(j));

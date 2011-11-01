@@ -301,9 +301,11 @@ public class HeteroCombinationSearchP extends AbstractMergeSearch {
 		for (; cg.hasNext();) {
 			String m = cg.next();
 			c++;
-			if (Parameter.testdrive && c == Parameter.testUnit) {
+			if (c == Parameter.testUnit) {
 				testdrive(t0);
-				System.exit(1);
+				if(Parameter.testdrive) {
+					System.exit(1);
+				}
 			}
 			if (rnd.nextDouble() > Parameter.thin)
 				continue;
