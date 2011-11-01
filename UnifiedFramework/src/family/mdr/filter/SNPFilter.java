@@ -118,7 +118,7 @@ public class SNPFilter implements SNPFilterInterface {
 			}
 		}
 		if (snpwindowList.size() == 0) {
-			throw new IllegalArgumentException("could not identify the window size.");
+			System.err.println("could not identify the window size.");
 		}
 		for (int i = 0; i < snpList.size(); i++) {
 			SNP snp = snpList.get(i);
