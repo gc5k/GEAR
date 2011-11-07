@@ -1,5 +1,7 @@
 package family.mdr.filter;
 
+import java.io.FileNotFoundException;
+import java.io.PrintStream;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashSet;
@@ -11,6 +13,7 @@ import admixture.parameter.Parameter;
 import family.pedigree.file.MapFile;
 import family.pedigree.file.SNP;
 
+import test.Test;
 import util.NewIt;
 
 public class SNPFilterI implements SNPFilterInterface {
@@ -48,24 +51,37 @@ public class SNPFilterI implements SNPFilterInterface {
 
 		if (Parameter.bgsnpFlag) {
 			selectBackgroundSNP();
+			filterFlag = true;
 		}
 
 		if (Parameter.inchrFlag) {
 			selectChromosome();
+			filterFlag = true;
 		}
 
 		if (Parameter.snpwindowFlag) {
 			selectSNPWindow();
+			filterFlag = true;
 		}
 
+		if (Parameter.geneFlag) {
+			selectGene();
+			filterFlag = true;
+		}
 		if (Parameter.snpPairFlag) {
 			selectSNPRange();
+			filterFlag = true;
 		}
 
 		if (Parameter.snpFlag) {
 			selectSNPs();
+			filterFlag = true;
 		}
 
+		if (filterFlag && selectedSNPSet.size() == 0 && excludedSNPSet.size() == 0 && bgSNPSet.size() == 0) {
+			System.err.println("No snps selected. GMDR quit.");
+			System.exit(0);
+		}
 		makeWSNPList();
 
 		return;
@@ -222,6 +238,58 @@ public class SNPFilterI implements SNPFilterInterface {
 			}
 			snpArrays.add(rSet);
 		}
+	}
+	
+	private void selectGene() {
+		ArrayList<ArrayList<Integer>> xsnps = NewIt.newArrayList();
+		for (int i = 0; i < Parameter.gene.length; i++) {
+			ArrayList<Integer> s = NewIt.newArrayList();
+			xsnps.add(s);
+		}
+		for (int i = 0; i < snpList.size(); i++) {
+			SNP snp = snpList.get(i);
+			String chr = snp.getChromosome();
+			int pos = snp.getPosition();
+			int idx = ArrayUtils.indexOf(Parameter.gene_chr, chr);
+			if (idx >= 0) {
+				if ( pos >= Parameter.gene_begin[idx]*1000 && pos <= Parameter.gene_end[idx]*1000) {
+					xsnps.get(idx).add(i);
+					includeSNP(i);
+				}
+			}
+		}
+
+		StringBuffer sb = new StringBuffer(Parameter.out+".gene");
+		PrintStream PW = null;
+		try {
+			PW = new PrintStream(sb.toString());
+		} catch (FileNotFoundException e) {
+			e.printStackTrace();
+		}
+		for (int i = 0; i < xsnps.size(); i++) {
+			ArrayList<Integer> s = xsnps.get(i);
+			if (s.size() == 0) {
+				continue;
+			}
+			System.err.println(s.size() + " snps selected with gene " + Parameter.gene[i]);
+			Test.LOG.append(s.size() + " snps selected with gene " + Parameter.gene[i] + "\n");
+			PW.println(Parameter.gene[i]);
+			for (int j = 0; j < s.size(); j++) {
+				SNP snp = snpList.get(s.get(j));
+				PW.println(snp.getName() + " " + snp.getChromosome() + " " + snp.getPosition());
+			}
+		}
+		PW.close();
+
+		for (int i = 0; i < xsnps.size(); i++) {
+			ArrayList<Integer> xsnp = xsnps.get(i);
+			if (xsnp.size() ==0) {
+				continue;
+			}
+			HashSet<Integer> snpSet = NewIt.newHashSet();
+			snpSet.addAll(xsnp);
+			snpArrays.add(snpSet);
+		}		
 	}
 
 	private void selectSNPs() {

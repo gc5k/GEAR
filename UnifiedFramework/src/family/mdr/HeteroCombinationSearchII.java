@@ -65,8 +65,6 @@ public class HeteroCombinationSearchII extends AbstractMergeSearch {
 		count = 0;
 		topN = N;
 
-		int count = 0;
-
 		for (; cg.hasNext();) {
 			String m = cg.next();
 			if (rnd.nextDouble() > Parameter.thin)

@@ -8,7 +8,6 @@ import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Arrays;
 
 import org.apache.commons.lang3.ArrayUtils;
 
@@ -83,8 +82,10 @@ public class BEDReader extends PedigreeFile {
 		byte[] magic = new byte[3];
 		int n = in.read(magic, 0, 3);
 		if (magic[2] == 1) {
+			System.err.println("reading data in plink snp-major mode");
 			snp_major(in, numMarkerInFile, WSNP);
 		} else {
+			System.err.println("reading data in plink individual-major mode");
 			individual_major(in, numMarkerInFile, WSNP);
 		}
 		in.close();

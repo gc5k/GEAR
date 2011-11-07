@@ -3,18 +3,13 @@ package family.mdr;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Random;
-import java.util.Map.Entry;
 
 import admixture.parameter.Parameter;
-
-import family.mdr.arsenal.MDRConstant;
 import family.mdr.arsenal.ModelGenerator;
 import family.mdr.data.PersonIndex;
 import family.mdr.result.Combination;
-import family.mdr.result.Suite;
 import family.pedigree.file.MapFile;
 
-import statistics.FisherExactTest.mdrExactTest.MDRTruncatedExactTest;
 import util.NewIt;
 
 /**

@@ -19,6 +19,8 @@ public class MDRStatistic implements Comparable<MDRStatistic> {
 	private int Nneg;
 	private double mean;
 	private double FValue;
+	private int degreeDenominator;
+	private int degreeNumerator;
 	private double PF;
 	
 	private double TrainingP;
@@ -138,8 +140,6 @@ public class MDRStatistic implements Comparable<MDRStatistic> {
 	private void F() {
 		double numerator = 0;
 		double denominator = 0;
-		int degreeNumerator = 0;
-		int degreeDenominator = 0;
 
 		if(Npos>0 && Nneg>0) {
 			numerator = Vx / 2;
@@ -177,13 +177,17 @@ public class MDRStatistic implements Comparable<MDRStatistic> {
 		StringBuilder sb = new StringBuilder();
 		F();
 		sb.append(N + ", ");
-		sb.append(String.format("%.4f", Vx/Vt) + "(");
+		sb.append(String.format("%.4f", Vx/Vt) + ", ");
 		sb.append(String.format("%.4f", Vx));
 		sb.append(", ");
 		sb.append(String.format("%.4f", Vt));
-		sb.append("), ");
-		sb.append(String.format("%.4f", stats[0]) + "(" + String.format("%.4f", meanT) + ", " 
-				+ String.format("%.4f", seT)+ ", " + String.format("%.4E", pT) + "), ");
+		sb.append(", ");
+		sb.append(String.format("%.4f", FValue));
+		sb.append(", ");
+		sb.append(String.format("%.4E", PF));
+		sb.append("("+degreeNumerator +","+degreeDenominator+"), ");
+		sb.append(String.format("%.4f", stats[0]) + ", " + String.format("%.4f", meanT) + ", " 
+				+ String.format("%.4f", seT)+ ", " + String.format("%.4E", pT) + ", ");
 		sb.append(String.format("%.4f", stats[1]));
 
 		return sb.toString();

@@ -117,7 +117,6 @@ public class HeteroCombinationSearchP extends AbstractMergeSearch {
 			Cell tCell;
 			Set<String> cellKeys = model.keySet();
 
-			int idx = 0;
 			for (String cellKey : cellKeys) {
 				int tr_status = -1;
 				Suite fullSuite = model.get(cellKey);
@@ -142,7 +141,6 @@ public class HeteroCombinationSearchP extends AbstractMergeSearch {
 				cvSet.addTrainingModel(cellKey, trCell);
 				cvSet.addTestingModel(cellKey, tCell);
 
-				idx++;
 			}
 
 			double trAccu = 0;
@@ -291,8 +289,6 @@ public class HeteroCombinationSearchP extends AbstractMergeSearch {
 		count = 0;
 		topN = N;
 
-		int count = 0;
-
 		long t0 = System.currentTimeMillis();
 		int c = 0;
 		System.err.println("number of tests: " + cg.getTotal());
@@ -352,14 +348,14 @@ public class HeteroCombinationSearchP extends AbstractMergeSearch {
 					}
 				}
 				System.out.print(mdrStat);
-				System.out.print(";\t");
+				System.out.print(", ");
 				if (Parameter.verboseFlag) {
 					for (int j = 0; j < len; j++) {
 						System.out.print(mapData.getSNP(idx[j]));
 						if (j != idx.length - 1)
 							System.out.print(", ");
 					}
-					System.out.print(";\t");
+					System.out.print(", ");
 					System.out.print(model.printModel(idx, mapData));
 				}
 				System.out.println();
@@ -491,21 +487,21 @@ public class HeteroCombinationSearchP extends AbstractMergeSearch {
 			PW.println(roundBest[i]);
 		}
 		PW.close();
-		int idx_005 = (int) (roundBest.length * 0.95);
-		int idx_001 = (int) (roundBest.length * 0.99);
-		System.out.println("threshold at significance level 0.05 = " + roundBest[idx_005]);
-		System.out.println("threshold at significance level 0.01 = " + roundBest[idx_001]);
+//		int idx_005 = (int) (roundBest.length * 0.95);
+//		int idx_001 = (int) (roundBest.length * 0.99);
+//		System.out.println("threshold at significance level 0.05 = " + roundBest[idx_005]);
+//		System.out.println("threshold at significance level 0.01 = " + roundBest[idx_001]);
 	}
 
 	public void PrintHeader() {
 		System.out.print("model" + ", ");
 		System.out.print("effective individuals, ");
-		System.out.print("vc(vx, vt)" + ", ");
+		System.out.print("vc, vx, vt, F, PF(d1,d2), ");
 		for (int i = 0; i < MDRConstant.NumStats; i++) {
 			if (i != MDRConstant.NumStats - 1) {
-				System.out.print(MDRConstant.TestStatistic[i] + ", ");
+				System.out.print(MDRConstant.TestStatistic[i] + "(TA), " + "mean TA (null dis), " + "S.E.TA (null dis), ");
 			} else {
-				System.out.print(MDRConstant.TestStatistic[i] + "; ");
+				System.out.print(MDRConstant.TestStatistic[i] + ", ");
 			}
 		}
 		if (Parameter.verboseFlag) {
@@ -516,7 +512,7 @@ public class HeteroCombinationSearchP extends AbstractMergeSearch {
 				if (i < order - 1) {
 					System.out.print("MAF" + (i + 1) + ", ");
 				} else {
-					System.out.print("MAF" + (i + 1) + "; ");
+					System.out.print("MAF" + (i + 1) + ", ");
 				}
 			}
 			System.out
