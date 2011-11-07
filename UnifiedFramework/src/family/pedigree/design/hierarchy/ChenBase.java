@@ -1,7 +1,6 @@
 package family.pedigree.design.hierarchy;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Hashtable;
 import java.util.Random;
 
@@ -204,7 +203,6 @@ public abstract class ChenBase implements ChenInterface {
 	protected abstract void RevvingUp();
 
 	protected void fetchScore(int pheIdx) {
-		double sum = 0;
 		if (PersonTable.size() < 10) {
 			System.err.println("too few effective individuals (" + PersonTable.size() + ") for the selected trait.");
 			System.exit(0);
@@ -224,7 +222,6 @@ public abstract class ChenBase implements ChenInterface {
 				ArrayList<String> v = CovariateTable.get(i);
 				String s = (String) v.get(pheIdx);
 				score[i] = Double.parseDouble(s);
-				sum += score[i];
 			}
 		}
 	}

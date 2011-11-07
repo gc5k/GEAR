@@ -42,12 +42,13 @@ public class Test {
 	public static boolean bfileFlag = false;
 	public static void main(String[] args) throws IOException {
 
+		System.err.print(Parameter.version);
 		String[] scmd = script(args);
 		Parameter p = new Parameter();
-		p.commandListenor(scmd);
 		printCommandLine(scmd);
+		p.commandListenor(scmd);
 
-		savecmd(args);
+//		savecmd(args);
 		if (Parameter.clusterFlag) {
 			String script = generateScript(scmd);
 
@@ -124,31 +125,40 @@ public class Test {
 			sb.append(".int");
 			PrintStream PW = new PrintStream(sb.toString());
 			System.setOut(PW);
-			System.err.println("order: " + j);
+			System.err.println("interaction order: " + j);
 			as.setMute(false);
 			as.search(j, 1);
 			PW.close();
-			System.err.println("interaction result was saved to " + sb.toString());
-			LOG.append("interaction result was saved to " + sb.toString());
-			LOG.append("\n");
+			System.err.println("\ninteraction result was saved to " + sb.toString());
+			LOG.append("\ninteraction result was saved to " + sb.toString() + "\n");
+			System.err.println("permutation threshold of testing accuracy was saved to " + Parameter.out + ".thres.");
+			LOG.append("permutation threshold of testing accuracy was saved to " + Parameter.out + ".thres.\n");
+			if(Parameter.permFlag) {
+				System.err.println("script was saved to " + Parameter.out + ".script");
+				LOG.append("log was saved to " + Parameter.out + ".script\n");
+			}
+			System.err.println("script was saved to " + Parameter.out + ".log");
+			LOG.append("log was saved to " + Parameter.out + ".log\n");
+
 		}
 
 		printLog();
 	}
 
 	public static void printCommandLine(String[] args) {
-		StringBuilder sb = new StringBuilder(Parameter.out);
-		sb.append(".log");
 
 		Calendar calendar = Calendar.getInstance();
-		LOG.append("The analysis was implemented at: " + calendar.getTime());
-		LOG.append("\n");
-		LOG.append("The command line in effect: ");
-		LOG.append("\n");
+		System.err.println("The analysis was implemented at: " + calendar.getTime() + "\n");
+		LOG.append(Parameter.version);
+		LOG.append("The analysis was implemented at: " + calendar.getTime() + "\n\n");
+		System.err.println("The command line in effect: ");
+		LOG.append("The command line in effect: \n");
 		for (int i = 0; i < args.length; i++) {
+			System.err.print(args[i] + " ");
 			LOG.append(args[i] + " ");
 		}
-		LOG.append("\n");
+		System.err.println("\n");
+		LOG.append("\n\n");
 
 	}
 
@@ -165,6 +175,12 @@ public class Test {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
+		Calendar calendar = Calendar.getInstance();
+		System.err.println("\nThe analysis was finished at: " + calendar.getTime() + "\n");
+		System.err.println("These above messages were printed into " + sb.toString() + "\n");
+		LOG.append("\nThe analysis was finished at: " + calendar.getTime() + "\n");
+		LOG.append("\n");
+
 		pw.append(LOG.toString());
 		pw.close();
 	}
@@ -269,7 +285,7 @@ public class Test {
 				fileFlag = true;
 			}
 		}
-		
+
 		if (bfileFlag && fileFlag) {
 			throw new IllegalArgumentException("specified both text and binary format files.");
 		}

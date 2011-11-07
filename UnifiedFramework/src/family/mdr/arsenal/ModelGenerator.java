@@ -3,7 +3,6 @@ package family.mdr.arsenal;
 import java.util.Arrays;
 import java.util.HashSet;
 import java.util.Iterator;
-import java.util.Random;
 import java.math.BigInteger;
 
 import admixture.parameter.Parameter;
@@ -183,8 +182,6 @@ public class ModelGenerator implements Iterator<String> {
 	public static void main(String[] args) {
 		System.out.println("CombinationGeneratorII");
 		int[] in = { 2 };
-		long t = System.currentTimeMillis();
-		Random rnd = new Random();
 		HashSet<Integer> S = NewIt.newHashSet();
 		for (int i = 0; i < 100; i++) {
 			S.add(new Integer(i));

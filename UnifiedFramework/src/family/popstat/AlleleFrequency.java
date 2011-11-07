@@ -1,7 +1,5 @@
 package family.popstat;
 
-import statistics.FisherExactTest.FastFisherExactTest;
-
 import org.apache.commons.math.MathException;
 import org.apache.commons.math.stat.inference.ChiSquareTestImpl;
 

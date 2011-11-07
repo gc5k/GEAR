@@ -1,10 +1,14 @@
 package admixture.parameter;
 
 import java.io.BufferedReader;
+import java.io.DataInputStream;
 import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashSet;
 import java.util.Iterator;
 
@@ -19,7 +23,6 @@ import org.apache.commons.lang3.ArrayUtils;
 
 import family.mdr.arsenal.MDRConstant;
 
-import test.Test;
 import util.NewIt;
 
 /**
@@ -135,6 +138,20 @@ public class Parameter {
 	// end individual filter
 
 	// snp selection
+	private final String cmd_region = "region";
+	public static boolean regionFlag = false;
+	public static String[] chr_reg = null;
+	public static double[] begin = null;
+	public static double[] end = null;
+
+	private final String cmd_gene36 = "gene36";
+	private final String cmd_gene37 = "gene37";
+	public static boolean geneFlag = false;
+	public static String[] gene = null;
+	public static String[] gene_chr = null;
+	public static double[] gene_begin = null;
+	public static double[] gene_end = null;
+
 	private final String cmd_chr = "chr";
 	public static String[] in_chr = null;
 	public static String[] ex_chr = null;
@@ -289,16 +306,16 @@ public class Parameter {
 	private final String cmd_submit = "hpc";
 	public static boolean submit = false;
 
-	private final String cmd_script = "script";
 	public static String script_f = "";
 	private final String cmd_version = "version";
 	public static String version = "\n"
-			+ "************************************************************\n"
-			+ "    GMDR 1.0 released 13/11/2011\n"
-			+ "    Developed by Guo-Bo Chen, guobo.chen@uq.edu.au\n"
-			+ "    Queensland Brain Institute, University of Queensland\n"
-			+ "    St Lucia, Queensland 4067, Australia\n"
-			+ "************************************************************\n";
+			+ "******************************************************************\n"
+			+ "| GMDR 1.0 released 13/11/2011                                   |\n"
+			+ "| (C) 2011 Guo-Bo Chen, Xiang-Yang Lou                           |\n"
+			+ "| GNU General Public License, v2                                 |\n"
+			+ "| Department of Biostatistics, Section on Statistical Genetics   |\n"
+			+ "| University of Alabama at Birmingham                            |\n"
+			+ "******************************************************************\n";
 	private Options ops = new Options();
 	private CommandLineParser parser = new PosixParser();
 
@@ -356,6 +373,15 @@ public class Parameter {
 				.withDescription("specify 1 or more covariates by name.")
 				.hasArgs().create(cmd_covar_name));
 
+		ops.addOption(OptionBuilder
+				.withDescription("specify regions to select snps").hasArgs()
+				.create(cmd_region));
+		ops.addOption(OptionBuilder.withDescription("specify genes in gene build 36").hasArgs()
+				.create(cmd_gene36));
+		ops.addOption(OptionBuilder.withDescription("specify genes in gene build 37").hasArgs()
+				.create(cmd_gene37));
+
+		
 		ops.addOption(OptionBuilder
 				.withDescription("specify the window size for a snp").hasArgs()
 				.create(cmd_snpwindow));
@@ -811,6 +837,160 @@ public class Parameter {
 			bgsnp = cl.getOptionValues(cmd_bgsnp);
 			bgsnpFlag = true;
 		}
+		if (cl.hasOption(cmd_region)) {
+			String[] r = cl.getOptionValues(cmd_region);
+			ArrayList<String> chr = NewIt.newArrayList();
+			ArrayList<String> b = NewIt.newArrayList();
+			ArrayList<String> e = NewIt.newArrayList();
+
+			for (int i = 0; i < r.length; i++) {
+				String[] s = r[i].split(",");
+				if (s.length != 3) {
+					throw new IllegalArgumentException("bad parameter for "
+							+ cmd_region);
+				}
+				chr.add(s[0]);
+				b.add(s[1]);
+				e.add(s[2]);
+			}
+			chr_reg = (String[]) chr.toArray(new String[0]);
+			begin = new double[b.size()];
+			end = new double[e.size()];
+			for (int i = 0; i < r.length; i++) {
+				begin[i] = Double.parseDouble(b.get(i));
+				end[i] = Double.parseDouble(e.get(i));
+			}
+			regionFlag = true;
+		}
+
+		if (cl.hasOption(cmd_gene36)) {
+			String[] g = cl.getOptionValues(cmd_gene36);
+			boolean[] gflag = new boolean[g.length];
+			Arrays.fill(gflag, false);
+			ArrayList<String> ge = NewIt.newArrayList();
+			ArrayList<String> g_chr = NewIt.newArrayList();
+			ArrayList<String> g_begin = NewIt.newArrayList();
+			ArrayList<String> g_end = NewIt.newArrayList();
+			
+			InputStream is = getClass().getResourceAsStream("/gene36.txt");
+			DataInputStream in = new DataInputStream(is);
+			BufferedReader reader = new BufferedReader(new InputStreamReader(in));
+
+			String line = null;
+			try {
+				while ((line = reader.readLine()) != null) {
+
+					String[] s = line.split("\\s+");
+//					System.err.println(line);
+					if (s.length != 4) {
+						continue;
+					}
+
+					for (int i = 0; i < g.length; i++) {
+						if (s[0].compareTo(g[i]) == 0) {
+							ge.add(s[0]);
+							g_chr.add(s[1]);
+							g_begin.add(s[2]);
+							g_end.add(s[3]);
+							gflag[i] = true;
+						}
+					}
+
+				}
+				reader.close();
+			} catch (IOException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+			boolean flag = true;
+			for(int i = 0; i < gflag.length; i++) {
+				if(!gflag[i]) {
+					System.err.println("did not find gene " + g[i]);
+					flag = false;
+				}
+			}
+			if(!flag) {
+				System.exit(0);
+			}
+
+			gene = (String[]) ge.toArray(new String[0]);
+			gene_chr = (String[]) g_chr.toArray(new String[0]);
+			gene_begin = new double[gene_chr.length];
+			gene_end = new double[gene_chr.length];
+
+			for (int i = 0; i < gene_chr.length; i++) {
+				gene_begin[i] = Double.parseDouble(g_begin.get(i)) / 1000;
+				gene_end[i] = Double.parseDouble(g_end.get(i)) / 1000;
+				System.err.println(gene[i] + ": chr" + gene_chr[i] + " " +gene_begin[i] + "k ~ " + gene_end[i] + "k");
+			}
+			geneFlag = true;
+
+		}
+
+
+		if (cl.hasOption(cmd_gene37)) {
+			String[] g = cl.getOptionValues(cmd_gene36);
+			boolean[] gflag = new boolean[g.length];
+			Arrays.fill(gflag, false);
+			ArrayList<String> ge = NewIt.newArrayList();
+			ArrayList<String> g_chr = NewIt.newArrayList();
+			ArrayList<String> g_begin = NewIt.newArrayList();
+			ArrayList<String> g_end = NewIt.newArrayList();
+			
+			InputStream is = getClass().getResourceAsStream("/gene37.txt");
+			DataInputStream in = new DataInputStream(is);
+			BufferedReader reader = new BufferedReader(new InputStreamReader(in));
+
+			String line = null;
+			try {
+				while ((line = reader.readLine()) != null) {
+
+					String[] s = line.split("\\s+");
+//					System.err.println(line);
+					if (s.length != 4) {
+						continue;
+					}
+
+					for (int i = 0; i < g.length; i++) {
+						if (s[0].compareTo(g[i]) == 0) {
+							ge.add(s[0]);
+							g_chr.add(s[1]);
+							g_begin.add(s[2]);
+							g_end.add(s[3]);
+							gflag[i] = true;
+						}
+					}
+
+				}
+				reader.close();
+			} catch (IOException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+			boolean flag = true;
+			for(int i = 0; i < gflag.length; i++) {
+				if(!gflag[i]) {
+					System.err.println("did not find gene " + g[i]);
+					flag = false;
+				}
+			}
+			if(!flag) {
+				System.exit(0);
+			}
+
+			gene = (String[]) ge.toArray(new String[0]);
+			gene_chr = (String[]) g_chr.toArray(new String[0]);
+			gene_begin = new double[gene_chr.length];
+			gene_end = new double[gene_chr.length];
+
+			for (int i = 0; i < gene_chr.length; i++) {
+				gene_begin[i] = Double.parseDouble(g_begin.get(i)) / 1000;
+				gene_end[i] = Double.parseDouble(g_end.get(i)) / 1000;
+				System.err.println(gene[i] + ": chr" + gene_chr[i] + " " +gene_begin[i] + "k ~ " + gene_end[i] + "k");
+			}
+			geneFlag = true;
+
+		}
 
 		if (cl.hasOption(cmd_snp_f)) {
 
@@ -900,17 +1080,21 @@ public class Parameter {
 							snpPairFlag = true;
 						}
 					}
-					if(includesnpList.size() >0) {
-						includesnp = (String[]) includesnpList.toArray(new String[0]);
+					if (includesnpList.size() > 0) {
+						includesnp = (String[]) includesnpList
+								.toArray(new String[0]);
 					}
-					if(excludesnpList.size() > 0) {
-						excludesnp = (String[]) excludesnpList.toArray(new String[0]);
+					if (excludesnpList.size() > 0) {
+						excludesnp = (String[]) excludesnpList
+								.toArray(new String[0]);
 					}
-					if(includesnpPairList.size() > 0) {
-						insnpPair = (String[]) includesnpList.toArray(new String[0]);
+					if (includesnpPairList.size() > 0) {
+						insnpPair = (String[]) includesnpList
+								.toArray(new String[0]);
 					}
-					if(excludesnpPairList.size() > 0) {
-						exsnpPair = (String[]) excludesnpList.toArray(new String[0]);
+					if (excludesnpPairList.size() > 0) {
+						exsnpPair = (String[]) excludesnpList
+								.toArray(new String[0]);
 					}
 				}
 			} else {
@@ -968,7 +1152,8 @@ public class Parameter {
 							}
 						}
 						if (insnp.size() > 0) {
-							xincludesnp[h] = (String[]) insnp.toArray(new String[0]);
+							xincludesnp[h] = (String[]) insnp
+									.toArray(new String[0]);
 							snpFlag = true;
 						}
 						if (insnppair.size() > 0) {
@@ -976,8 +1161,9 @@ public class Parameter {
 							snpPairFlag = true;
 						}
 					}
-					if(xsnppairList.size() > 0) {
-						insnpPair = (String[]) xsnppairList.toArray(new String[0]);
+					if (xsnppairList.size() > 0) {
+						insnpPair = (String[]) xsnppairList
+								.toArray(new String[0]);
 					}
 				}
 			}
@@ -1319,7 +1505,7 @@ public class Parameter {
 			verboseFlag = true;
 		}
 		if (cl.hasOption(cmd_version)) {
-			System.out.println(version);
+			System.err.println();
 			System.exit(1);
 		}
 		if (cl.hasOption(cmd_testdrive)) {

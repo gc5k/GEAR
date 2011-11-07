@@ -213,20 +213,13 @@ public class ToolKit {
 		}
 		double weightH = 0;
 		double weightL = 0;
-		double truePos = 0;
-		double trueNeg = 0;
-		double falsePos = 0;
-		double falseNeg = 0;
+
 		for (String key : model.keySet()) {
 			Cell cell = (Cell) model.get(key);
 			if (cell.getStatus() == 1) {
 				weightH += ((Double) QTLProbabilityMatrix.get(key)).doubleValue();
-				truePos += cell.getPositiveScore();
-				falseNeg += Math.abs(cell.getNegativeScore());
 			} else if (cell.getStatus() == 0) {
 				weightL += ((Double) QTLProbabilityMatrix.get(key)).doubleValue();
-				trueNeg += Math.abs(cell.getNegativeScore());
-				falsePos += cell.getPositiveScore();
 			} else {
 				// what's going on if for a negative status;
 			}

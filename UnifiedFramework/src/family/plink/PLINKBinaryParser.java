@@ -23,27 +23,30 @@ public class PLINKBinaryParser extends PLINKParser {
 		if (phenotypeFile != null) {
 			phenoData = new PhenotypeFile();
 			ParsePhenoFile();
+			Test.LOG.append("reading " + phenotypeFile + ".\n");
+			System.err.println("reading " + phenotypeFile + ".");
+			Test.LOG.append(phenoData.getNumTraits() + " traits in " + phenotypeFile + ".\n");
+			System.err.println(phenoData.getNumTraits() + " traits in " + phenotypeFile + ".");
+
 		}
 		if (mapFile != null) {
 			ParseMapFile();
-			Test.LOG.append(mapData.getMarkerNumber() + " markers.");
-			Test.LOG.append("\n");
-			System.err.println(mapData.getMarkerNumber() + " markers.");
+			Test.LOG.append("reading " + mapFile + ".\n");
+			Test.LOG.append(mapData.getMarkerNumberOriginal() + " markers in " + mapFile + ".\n");
+			Test.LOG.append(mapData.getMarkerNumber() + " selected markers.\n");
+			System.err.println("reading " + mapFile + ".");
+			System.err.println(mapData.getMarkerNumberOriginal() + " markers in " + mapFile + ".");
+			System.err.println(mapData.getMarkerNumber() + " selected markers.");
 			pedData = new BEDReader(FamFile, snpFilter.getWorkingSNP().length, mapData);
 			pedData.setHeader(false);
 			ParsePedFile();
-			Test.LOG.append(pedData.getNumIndividuals() + " individuals.");
-			Test.LOG.append("\n");
+			Test.LOG.append("reading " + pedigreeFile + ".");
+			Test.LOG.append(pedData.getNumIndividuals() + " individuals.\n");
+			System.err.println("reading " + pedigreeFile + ".");
 			System.err.println(pedData.getNumIndividuals() + " individuals.");
 		}
 //		mapData.setPolymorphism(pedData.getAlleleFrequency());
 		pedData.cleanup();
-		if (phenoData != null) {
-			Test.LOG.append(phenoData.getNumTraits() + " traits.");
-			Test.LOG.append("\n");
-			System.err.println(phenoData.getNumTraits() + " traits.");
-			
-		}
 	}
 
 	@Override

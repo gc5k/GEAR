@@ -3,6 +3,8 @@ package family.plink;
 import java.io.File;
 import java.io.IOException;
 
+import test.Test;
+
 import admixture.parameter.Parameter;
 
 import family.mdr.filter.SNPFilter;
@@ -37,11 +39,25 @@ public class PLINKParser {
 		if (phenotypeFile != null) {
 			phenoData = new PhenotypeFile();
 			ParsePhenoFile();
+			Test.LOG.append("reading " + phenotypeFile + ".\n");
+			System.err.println("reading " + phenotypeFile + ".");
+			Test.LOG.append(phenoData.getNumTraits() + " traits in " + phenotypeFile + ".\n");
+			System.err.println(phenoData.getNumTraits() + " traits in " + phenotypeFile + ".");
 		}
 		if (mapFile != null) {
 			ParseMapFile();
+			Test.LOG.append("reading " + mapFile + ".\n");
+			Test.LOG.append(mapData.getMarkerNumberOriginal() + " markers in " + mapFile + ".\n");
+			Test.LOG.append(mapData.getMarkerNumber() + " selected markers.\n");
+			System.err.println("reading " + mapFile + ".");
+			System.err.println(mapData.getMarkerNumberOriginal() + " markers in " + mapFile + ".");
+			System.err.println(mapData.getMarkerNumber() + " selected markers.");
 			pedData.setHeader(false);
 			ParsePedFile();
+			Test.LOG.append("reading " + pedigreeFile + ".");
+			Test.LOG.append(pedData.getNumIndividuals() + " individuals.\n");
+			System.err.println("reading " + pedigreeFile + ".");
+			System.err.println(pedData.getNumIndividuals() + " individuals.");
 		} else {
 			pedData.setHeader(true);
 			ParsePedFile();
@@ -50,6 +66,7 @@ public class PLINKParser {
 //		mapData.setPolymorphism(pedData.getPolymorphism(), pedData.getAlleleFrequency());
 		mapData.setPolymorphismMarker(pedData.getPolymorphism());
 		pedData.cleanup();
+
 	}
 
 	public void ParseMapFile() {
