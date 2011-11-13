@@ -8,6 +8,7 @@ import admixture.parameter.Parameter;
 import family.mdr.arsenal.ModelGenerator;
 import family.mdr.data.PersonIndex;
 import family.mdr.result.Combination;
+import family.mdr.result.MDRStatistic;
 import family.pedigree.file.MapFile;
 
 import util.NewIt;

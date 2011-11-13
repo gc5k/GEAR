@@ -56,7 +56,9 @@ public class Test {
 				Runtime rt = Runtime.getRuntime();
 				rt.exec(script);
 				System.err.println(script + " was submitted to the cluster.");
+				Test.LOG.append(script + " was submitted to the cluster.\n");
 			}
+			Test.printLog();
 			System.exit(1);
 
 		}
@@ -71,6 +73,8 @@ public class Test {
 			// Parameter.map, Parameter.pheno);
 		} else {
 			System.err.println("did not specify files.");
+			Test.LOG.append("did not specify files.\n");
+			Test.printLog();
 			System.exit(0);
 		}
 		pp.Parse();
@@ -104,7 +108,7 @@ public class Test {
 
 		AbstractMergeSearch as;
 		ModelGenerator mg;
-		if (Parameter.x) {
+		if (Parameter.transFlag) {
 			mg = new ModelGeneratorII(softFilter.getWSeq2(), softFilter.getBgSeq());
 		} else {
 			mg = new ModelGenerator(softFilter.getWSeq(), softFilter.getBgSeq());
@@ -116,7 +120,9 @@ public class Test {
 					.build();
 		}
 
+
 		for (int j = Parameter.order; j <= Parameter.order; j++) {
+
 			StringBuilder sb = new StringBuilder(Parameter.out);
 			// sb.append(j);
 			if (Parameter.sliceFlag) {
@@ -131,14 +137,6 @@ public class Test {
 			PW.close();
 			System.err.println("\ninteraction result was saved to " + sb.toString());
 			LOG.append("\ninteraction result was saved to " + sb.toString() + "\n");
-			System.err.println("permutation threshold of testing accuracy was saved to " + Parameter.out + ".thres.");
-			LOG.append("permutation threshold of testing accuracy was saved to " + Parameter.out + ".thres.\n");
-			if(Parameter.permFlag) {
-				System.err.println("script was saved to " + Parameter.out + ".script");
-				LOG.append("log was saved to " + Parameter.out + ".script\n");
-			}
-			System.err.println("script was saved to " + Parameter.out + ".log");
-			LOG.append("log was saved to " + Parameter.out + ".log\n");
 
 		}
 
@@ -177,7 +175,7 @@ public class Test {
 		}
 		Calendar calendar = Calendar.getInstance();
 		System.err.println("\nThe analysis was finished at: " + calendar.getTime() + "\n");
-		System.err.println("These above messages were printed into " + sb.toString() + "\n");
+		System.err.println("These above messages were printed into " + sb.toString() + ".\n");
 		LOG.append("\nThe analysis was finished at: " + calendar.getTime() + "\n");
 		LOG.append("\n");
 
@@ -287,19 +285,28 @@ public class Test {
 		}
 
 		if (bfileFlag && fileFlag) {
-			throw new IllegalArgumentException("specified both text and binary format files.");
+			System.err.println("specified both text and binary format files.");
+			Test.LOG.append("specified both text and binary format files.\n");
+			Test.printLog();
+			System.exit(0);
 		}
 
 		if (scriptFlag) {
 			File f = new File(sf);
 			if (!f.exists()) {
-				throw new IllegalArgumentException("could not find " + sf);
+				System.err.print("could not find " + sf + ".");
+				Test.LOG.append("could not find " + sf + ".\n");
+				Test.printLog();
+				System.exit(0);
 			}
 			BufferedReader reader = null;
 			try {
 				reader = new BufferedReader(new FileReader(f));
 			} catch (IOException E) {
-				throw new IllegalArgumentException("could not open snps file " + sf);
+				System.err.print("could not open " + sf + ".");
+				Test.LOG.append("could not open " + sf + ".\n");
+				Test.printLog();
+				System.exit(0);
 			}
 
 			ArrayList<String> cmd = NewIt.newArrayList();
@@ -313,7 +320,10 @@ public class Test {
 				}
 				reader.close();
 			} catch (IOException E) {
-				throw new IllegalArgumentException("bad lines in " + sf);
+				System.err.println("bad lines in " + sf + ".");
+				Test.LOG.append("bad lines in " + sf + ".\n");
+				Test.printLog();
+				System.exit(0);
 			}
 
 			scmd = (String[]) cmd.toArray(new String[0]);

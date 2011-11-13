@@ -18,11 +18,12 @@ import org.apache.commons.cli.HelpFormatter;
 import org.apache.commons.cli.OptionBuilder;
 import org.apache.commons.cli.Options;
 import org.apache.commons.cli.ParseException;
-import org.apache.commons.cli.PosixParser;
+import org.apache.commons.cli.GnuParser;
 import org.apache.commons.lang3.ArrayUtils;
 
 import family.mdr.arsenal.MDRConstant;
 
+import test.Test;
 import util.NewIt;
 
 /**
@@ -35,16 +36,19 @@ public class Parameter {
 	private final String delim = "\\s+";
 	private final String incommand_separator = ",";
 	private final String cmd_missing_allele = "missingallele";
+	private final String cmd_missing_allele_long = "missing-allele";
 	public static String missing_allele = "0";
 
 	private final String cmd_missing_phenotype = "missingphenotype";
+	private final String cmd_missing_phenotype_long = "missing-phenotype";
 	public static String missing_phenotype = "-9";
 
 	// private final String cmd_missing_genotype = "missinggenotype";
 	// public static String missing_genotype = "0";
 
-	private final String cmd_status_shift = "ss";
-	public static int status_shift = 0;
+	private final String cmd_status_shift = "1";
+	public static int status_shift = 1;
+	public static boolean status_shiftFlag = false;
 
 	// private final String cmd_model = "model"; // cc for case control,
 	// // u1 for the unified method in which the founders are exchangeable to
@@ -102,18 +106,22 @@ public class Parameter {
 	// tfile set end
 
 	// phenotype set start
-	private final String cmd_pheno = "pheno";
-	public static String pheno = null;
-	private final String cmd_res_number = "response";
-	public static int response = -1;
-	private final String cmd_res_name = "responsename";
-	public static String response_name = null;
 	private final String cmd_covar = "covar";
+	public static String pheno = null;
+	private final String cmd_pheno_number = "pheno_number";
+	private final String cmd_pheno_number_long = "pheno-number";
+	public static int response = -1;
+	private final String cmd_pheno_name = "response_name";
+	private final String cmd_pheno_name_long = "pheno-name";
+	public static String response_name = null;
+	private final String cmd_covar_number = "covar_number";
+	private final String cmd_covar_number_long = "covar-number";
 	public static int[] predictor = null;
-	private final String cmd_covar_name = "covarname";
+	private final String cmd_covar_name = "covar_name";
+	private final String cmd_covar_name_long = "covar-name";
 	public static String[] predictor_name = null;
 
-	private final String cmd_reg = "reg";
+	private final String cmd_reg = "regression";
 	public int linkfunction = 0;
 	// phenotype set end
 
@@ -144,27 +152,48 @@ public class Parameter {
 	public static double[] begin = null;
 	public static double[] end = null;
 
-	private final String cmd_gene36 = "gene36";
-	private final String cmd_gene37 = "gene37";
+	private final String cmd_gene_window = "genewindow";
+	private final String cmd_gene_window_long = "gene-window";
+	public static double genewindow = 0;
+	
+	private final String cmd_hg18 = "hg18";
+	public static boolean hg18Flag = false;
+	private final String cmd_hg19 = "hg19";
+	public static boolean hg19Flag = true;
+	public static String hgFile = "/gene37.txt";
+	
+	private final String cmd_gene = "gene";
+	private final String cmd_gene_list = "genelist";
+	private final String cmd_gene_list_long = "gene-list";
 	public static boolean geneFlag = false;
+	public static boolean genelistFlag = false;
 	public static String[] gene = null;
 	public static String[] gene_chr = null;
 	public static double[] gene_begin = null;
 	public static double[] gene_end = null;
 
+	private final String cmd_snp2genelist = "makegene2snplist";
+	private final String cmd_snp2gene_list = "make-gene2snp-list";
+	private final String cmd_snp2genemlist = "makegene2snpmlist";
+	private final String cmd_snp2gene_mlist = "make-gene2snp-mlist";
+	public static boolean snp2genefilesFlag = false;
+	public static boolean snp2genefileFlag = false;
+	
 	private final String cmd_chr = "chr";
 	public static String[] in_chr = null;
 	public static String[] ex_chr = null;
 	public static boolean inchrFlag = false;
 	public static boolean exchrFlag = false;
 
-	private final String cmd_snpwindow = "window";
+	private final String cmd_snpwindow = "snpwindow";
+	private final String cmd_snpwindow_long = "snp-window";
 	public static String[] snpwindow = null;
 	public static double[][] snp_window = null;
 	public static boolean snpwindowFlag = false;
 
 	private final String cmd_snp = "snp";
-	private final String cmd_snp_f = "snpf";
+	private final String cmd_snp_list = "snplist";
+	private final String cmd_snp_list_long = "snp-list";
 	public static boolean snpFlag = false;
 	public static String[] includesnp = null;
 	public static String[] excludesnp = null;
@@ -185,8 +214,8 @@ public class Parameter {
 	public static boolean bgsnpFlag = false;
 	public static String[] bgsnp = null;
 
-	private final String cmd_x = "x";
-	public static boolean x = false;
+	private final String cmd_trans = "trans";
+	public static boolean transFlag = false;
 	// snp selection end
 
 	// soft snp selection
@@ -283,6 +312,7 @@ public class Parameter {
 	public boolean help = false;
 
 	private final String cmd_testdrive = "testdrive";
+	private final String cmd_testdrive_long = "test-drive";
 	public static int testUnit = 1000;
 	public static boolean testdrive = false;
 
@@ -317,7 +347,7 @@ public class Parameter {
 			+ "| University of Alabama at Birmingham                            |\n"
 			+ "******************************************************************\n";
 	private Options ops = new Options();
-	private CommandLineParser parser = new PosixParser();
+	private CommandLineParser parser = new GnuParser();
 
 	public Parameter() {
 		commandInitial();
@@ -329,7 +359,7 @@ public class Parameter {
 
 	@SuppressWarnings("static-access")
 	public void commandInitial() {
-		// ops.addOption(OptionBuilder.withDescription("u (default) for the unified framework and f for using sibs only.").hasArg().create(cmd_model));
+
 		ops.addOption(OptionBuilder.withDescription(
 				"method for case-control sample.").create(cmd_cc));
 		ops.addOption(OptionBuilder.withDescription(
@@ -365,26 +395,38 @@ public class Parameter {
 
 		ops.addOption(OptionBuilder
 				.withDescription("specify the phenotype file.").hasArg()
-				.create(cmd_pheno));
+				.create(cmd_covar));
 		ops.addOption(OptionBuilder
 				.withDescription("specify 1 or more covariates by number.")
-				.hasArgs().create(cmd_covar));
+				.hasArgs().withLongOpt(cmd_covar_number_long).create(cmd_covar_number));
 		ops.addOption(OptionBuilder
 				.withDescription("specify 1 or more covariates by name.")
-				.hasArgs().create(cmd_covar_name));
+				.hasArgs().withLongOpt(cmd_covar_name_long).create(cmd_covar_name));
 
 		ops.addOption(OptionBuilder
-				.withDescription("specify regions to select snps").hasArgs()
+				.withDescription("specify regions to select snps.").hasArgs()
 				.create(cmd_region));
-		ops.addOption(OptionBuilder.withDescription("specify genes in gene build 36").hasArgs()
-				.create(cmd_gene36));
-		ops.addOption(OptionBuilder.withDescription("specify genes in gene build 37").hasArgs()
-				.create(cmd_gene37));
+		ops.addOption(OptionBuilder.withDescription("specify genes.").hasArgs()
+				.create(cmd_gene));
+		ops.addOption(OptionBuilder.withDescription("specify a genelist.").hasArgs()
+				.withLongOpt(cmd_gene_list_long).create(cmd_gene_list));
+		ops.addOption(OptionBuilder.withDescription("specify gene window in kb.").hasArg()
+				.withLongOpt(cmd_gene_window_long).create(cmd_gene_window));
 
+		ops.addOption(OptionBuilder.withDescription("make snp lists with respect genes")
+				.withLongOpt(cmd_snp2gene_list).create(cmd_snp2genelist));
+		ops.addOption(OptionBuilder.withDescription("make snp lists with respect genes")
+				.withLongOpt(cmd_snp2gene_mlist).create(cmd_snp2genemlist));
+
+		ops.addOption(OptionBuilder.withDescription("using human genome build 18.")
+				.create(cmd_hg18));
+		ops.addOption(OptionBuilder.withDescription("using human genome build 19.")
+				.create(cmd_hg19));
 		
+
 		ops.addOption(OptionBuilder
 				.withDescription("specify the window size for a snp").hasArgs()
-				.create(cmd_snpwindow));
+				.withLongOpt(cmd_snpwindow_long).create(cmd_snpwindow));
 
 		ops.addOption(OptionBuilder
 				.withDescription("include snps in detecting interaction")
@@ -395,11 +437,11 @@ public class Parameter {
 		ops.addOption(OptionBuilder
 				.withDescription(
 						"specify the file containing included snps when detecting interaction")
-				.hasArgs().create(cmd_snp_f));
+				.hasArgs().withLongOpt(cmd_snp_list_long).create(cmd_snp_list));
 		ops.addOption(OptionBuilder.withDescription("select chromosomes")
 				.hasArgs().create(cmd_chr));
 		ops.addOption(OptionBuilder.withDescription("specify interacting snps")
-				.create(cmd_x));
+				.create(cmd_trans));
 
 		ops.addOption(OptionBuilder
 				.withDescription("specify excluded families").hasArgs()
@@ -418,11 +460,11 @@ public class Parameter {
 				.create(cmd_ex_nosex));
 
 		ops.addOption(OptionBuilder
-				.withDescription("specify response by number.").hasArg()
-				.create(cmd_res_number));
+				.withDescription("specify phenotype by number.").hasArg()
+				.withLongOpt(cmd_pheno_number_long).create(cmd_pheno_number));
 		ops.addOption(OptionBuilder
-				.withDescription("specify response by name.").hasArg()
-				.create(cmd_res_name));
+				.withDescription("specify phenotype by name.").hasArg()
+				.withLongOpt(cmd_pheno_name_long).create(cmd_pheno_name));
 
 		ops.addOption(OptionBuilder
 				.withDescription(
@@ -472,11 +514,11 @@ public class Parameter {
 		// ops.addOption(OptionBuilder.withDescription("replications for simulation, and this parameter is for simulation only").hasArg().create(
 		// cmd_simu));
 		ops.addOption(OptionBuilder
-				.withDescription("missing phenotype, default -9").hasArg()
+				.withDescription("missing phenotype, default -9").hasArg().withLongOpt(cmd_missing_phenotype_long)
 				.create(cmd_missing_phenotype));
 		// ops.addOption(OptionBuilder.withDescription("missing genotype, default 00").hasArg().create(cmd_missing_genotype));
 		ops.addOption(OptionBuilder
-				.withDescription("missing allele, default 0").hasArg()
+				.withDescription("missing allele, default 0").hasArg().withLongOpt(cmd_missing_allele_long)
 				.create(cmd_missing_allele));
 		ops.addOption(OptionBuilder
 				.withDescription(
@@ -497,7 +539,7 @@ public class Parameter {
 		ops.addOption(OptionBuilder.withDescription(
 				"print the result in verbose form.").create(cmd_verbose));
 		ops.addOption(OptionBuilder.withDescription(
-				"give an evaluation for computation time")
+				"give an evaluation for computation time").withLongOpt(cmd_testdrive_long)
 				.create(cmd_testdrive));
 		ops.addOption(OptionBuilder.withDescription("help manual.").create(
 				cmd_help));
@@ -532,8 +574,8 @@ public class Parameter {
 		if (cl.hasOption(cmd_help)) {
 			help = true;
 		}
-		if (cl.hasOption(cmd_x)) {
-			x = true;
+		if (cl.hasOption(cmd_trans)) {
+			transFlag = true;
 		}
 		if (cl.hasOption(cmd_cc)) {
 			ccFlag = true;
@@ -598,45 +640,20 @@ public class Parameter {
 		if (ped != null && map != null) {
 			File fped = new File(ped);
 			if (!fped.exists()) {
-				throw new IllegalArgumentException("could not open " + ped);
+				System.err.println("could not open " + ped + ".");
+				Test.LOG.append("could not open " + ped + ".\n");
+				Test.printLog();
+				System.exit(0);
 			}
 			File fmap = new File(map);
 			if (!fmap.exists()) {
-				throw new IllegalArgumentException("could not open " + map);
+				System.err.println("could not open " + map + ".");
+				Test.LOG.append("could not open " + map + ".\n");
+				Test.printLog();
+				System.exit(0);
 			}
 			fileFlag = true;
 		}
-
-		// tfile
-		// if (cl.hasOption(cmd_tfile)) {
-		// StringBuffer sb1 = new StringBuffer();
-		// StringBuffer sb2 = new StringBuffer();
-		// sb1.append(cl.getOptionValue(cmd_tfile));
-		// sb1.append(".tped");
-		//
-		// sb2.append(cl.getOptionValue(cmd_tfile));
-		// sb2.append(".tfam");
-		//
-		// tped = sb1.toString();
-		// tfam = sb2.toString();
-		// }
-		// if (cl.hasOption(cmd_tped)) {
-		// tped = cl.getOptionValue(cmd_tped);
-		// }
-		// if (cl.hasOption(cmd_tfam)) {
-		// tfam = cl.getOptionValue(cmd_tfam);
-		// }
-		// if (tped != null && tfam != null) {
-		// File fped = new File(tped);
-		// if (!fped.exists()) {
-		// throw new IllegalArgumentException("could not open " + tped);
-		// }
-		// File ffam = new File(tfam);
-		// if (!ffam.exists()) {
-		// throw new IllegalArgumentException("could not open " + tfam);
-		// }
-		// tfileFlag = true;
-		// }
 
 		// bfile
 		if (cl.hasOption(cmd_bfile)) {
@@ -668,36 +685,66 @@ public class Parameter {
 		if (bed != null && bim != null && fam != null) {
 			File fbed = new File(bed);
 			if (!fbed.exists()) {
-				throw new IllegalArgumentException("could not open " + bed);
+				System.err.println("could not open " + bed + ".");
+				Test.LOG.append("could not open " + bed + ".\n");
+				Test.printLog();
+				System.exit(0);
 			}
 			File fbim = new File(bim);
 			if (!fbim.exists()) {
-				throw new IllegalArgumentException("could not open " + bim);
+				System.err.println("could not open " + bim +".");
+				Test.LOG.append("could not open " + bim + ".\n");
+				Test.printLog();
+				System.exit(0);
 			}
 			File ffam = new File(fam);
 			if (!ffam.exists()) {
-				throw new IllegalArgumentException("could not open " + fam);
+				System.err.println("could not open " + fam +".");
+				Test.LOG.append("could not open " + fam + ".\n");
+				Test.printLog();
+				System.exit(0);
 			}
 			bfileFlag = true;
 		}
 
-		if (cl.hasOption(cmd_pheno)) {
-			pheno = cl.getOptionValue(cmd_pheno);
+		if (cl.hasOption(cmd_covar)) {
+			pheno = cl.getOptionValue(cmd_covar);
 			File fpheno = new File(pheno);
 			if (!fpheno.exists()) {
-				throw new IllegalArgumentException("could not open " + fpheno);
+				System.err.println("could not open " + fpheno + ".");
+				Test.LOG.append("could not open " + fpheno + ".\n");
+				Test.printLog();
+				System.exit(0);
 			}
 		}
 
-		if (cl.hasOption(cmd_covar)) {
-			String[] p = cl.getOptionValues(cmd_covar);
+		if (cl.hasOption(cmd_header)) {
+			header = true;
+		}
+		// if (cl.hasOption(cmd_topN)) {
+		// topN = Integer.parseInt(cl.getOptionValue(cmd_topN));
+		// }
+		if (cl.hasOption(cmd_pheno_number)) {
+			response = Integer.parseInt(cl.getOptionValue(cmd_pheno_number)) - 1;
+			if (response < -1) {
+				System.err.println("bad parameter for --" + cmd_pheno_number_long + ": " +(response+1)+ ".");
+				Test.LOG.append("bad parameter for --" + cmd_pheno_number_long +  ": " +(response+1)+ ".\n");
+				Test.printLog();
+				System.exit(0);
+			}
+		}
+
+		if (cl.hasOption(cmd_covar_number)) {
+			String[] p = cl.getOptionValues(cmd_covar_number);
 			HashSet<Integer> idx = NewIt.newHashSet();
 			for (int i = 0, len = p.length; i < len; i++) {
 				if (p[i].contains("-")) {
 					String[] pp = p[i].split("-");
 					if (pp.length != 2) {
-						throw new IllegalArgumentException(
-								"bad parameter for option --response ");
+						System.err.println("bad parameter for option --" + cmd_covar_number_long + ": " + p[i] +".");
+						Test.LOG.append("bad parameter for option --" + cmd_covar_number_long + ": " + p[i] +".\n");
+						Test.printLog();
+						System.exit(0);
 					}
 					for (int j = Integer.parseInt(pp[0]); j <= Integer
 							.parseInt(pp[1]); j++) {
@@ -712,8 +759,10 @@ public class Parameter {
 			for (Iterator<Integer> e = idx.iterator(); e.hasNext();) {
 				predictor[c] = e.next().intValue() - 1;
 				if (predictor[c] < 0) {
-					throw new IllegalArgumentException(
-							"bad parameter for option --response ");
+					System.err.println("bad parameter for option --" + cmd_covar_number_long + ": " + predictor[c] +".");
+					Test.LOG.append("bad parameter for option --" + cmd_covar_number_long + ": " + predictor[c] +".\n");
+					Test.printLog();
+					System.exit(0);
 				}
 				c++;
 			}
@@ -726,8 +775,10 @@ public class Parameter {
 				if (p[i].contains("-")) {
 					String[] pp = predictor_name[i].split("-");
 					if (pp.length != 2) {
-						throw new IllegalArgumentException(
-								"bad parameter for option --covarname ");
+						System.err.println("bad parameter for option --" + cmd_covar_name_long + ": " + p[i] + ".");
+						Test.LOG.append("bad parameter for option --" + cmd_covar_name_long + ": " + p[i] + ".\n");
+						Test.printLog();
+						System.exit(0);
 					}
 					for (int j = 0; j < pp.length; j++) {
 						cn.add(pp[j]);
@@ -740,7 +791,7 @@ public class Parameter {
 		}
 
 		if (cl.hasOption(cmd_snp)) {
-			if (!x) {
+			if (!transFlag) {
 				String[] snp = cl.getOptionValues(cmd_snp);
 				ArrayList<String> insnp = NewIt.newArrayList();
 				ArrayList<String> exsnp = NewIt.newArrayList();
@@ -752,8 +803,10 @@ public class Parameter {
 						if (S.contains("-")) {
 							String[] s = S.split("-");
 							if (s.length != 2) {
-								throw new IllegalArgumentException(
-										"bad parameter " + snp[i]);
+								System.err.println("bad parameter for --" + cmd_snp + ": " + snp[i] + ".");
+								Test.LOG.append("bad parameter  for --" + cmd_snp + ": " + snp[i] + ".\n");
+								Test.printLog();
+								System.exit(0);
 							}
 							exsnppair.add(s[0]);
 							exsnppair.add(s[1]);
@@ -764,8 +817,10 @@ public class Parameter {
 						if (snp[i].contains("-")) {
 							String[] s = snp[i].split("-");
 							if (s.length != 2) {
-								throw new IllegalArgumentException(
-										"bad parameter " + snp[i]);
+								System.err.println("bad parameter for --" + cmd_snp + ": " + snp[i] + ".");
+								Test.LOG.append("bad parameter for --" + cmd_snp + ": " + snp[i] +".\n");
+								Test.printLog();
+								System.exit(0);
 							}
 							insnppair.add(s[0]);
 							insnppair.add(s[1]);
@@ -796,14 +851,19 @@ public class Parameter {
 				ArrayList<String> insnppair = NewIt.newArrayList();
 				for (int i = 0; i < snp.length; i++) {
 					if (snp[i].startsWith("-")) {
-						throw new IllegalArgumentException("bad parameter "
-								+ snp[i]);
+						System.err.println("bad parameter for --" + cmd_snp + ": " + snp[i] + ".");
+						Test.LOG.append("bad parameter for --" + cmd_snp + ": " + snp[i] +".\n");
+						Test.printLog();
+						System.exit(0);
+						
 					} else {
 						if (snp[i].contains("-")) {
 							String[] s = snp[i].split("-");
 							if (s.length != 2) {
-								throw new IllegalArgumentException(
-										"bad parameter " + snp[i]);
+								System.err.println("bad parameter for --" + cmd_snp + ": " + snp[i] +".");
+								Test.LOG.append("bad parameter for --" + cmd_snp + ": " + snp[i] +".\n");
+								Test.printLog();
+								System.exit(0);
 							}
 							insnppair.add(s[0]);
 							insnppair.add(s[1]);
@@ -832,11 +892,34 @@ public class Parameter {
 				bgSet.add(bg[i]);
 			}
 			if (bgSet.size() != bg.length) {
-				throw new IllegalArgumentException("bad parameter for bgsnp");
+				System.err.println("bad parameter for --" + cmd_bgsnp + ".");
+				Test.LOG.append("bad parameter for --" + cmd_bgsnp + ".\n");
+				Test.printLog();
+				System.exit(0);
 			}
 			bgsnp = cl.getOptionValues(cmd_bgsnp);
 			bgsnpFlag = true;
 		}
+
+		if (cl.hasOption(cmd_hg18)) {
+			hg18Flag = true;
+			hg19Flag = false;
+			hgFile = "/gene36.txt";
+		}
+
+		if (cl.hasOption(cmd_hg19)) {
+			hg19Flag = false;
+			hg18Flag = false;
+			hgFile = "/gene37.txt";
+		}
+
+		if (cl.hasOption(cmd_snp2genelist)) {
+			snp2genefileFlag = true;
+		}
+		if (cl.hasOption(cmd_snp2genemlist)) {
+			snp2genefilesFlag = true;
+		}
+
 		if (cl.hasOption(cmd_region)) {
 			String[] r = cl.getOptionValues(cmd_region);
 			ArrayList<String> chr = NewIt.newArrayList();
@@ -846,8 +929,10 @@ public class Parameter {
 			for (int i = 0; i < r.length; i++) {
 				String[] s = r[i].split(",");
 				if (s.length != 3) {
-					throw new IllegalArgumentException("bad parameter for "
-							+ cmd_region);
+					System.err.println("bad parameter for --" + cmd_region + ": " + r[i] +".");
+					Test.LOG.append("bad parameter for --" + cmd_region + ": " + r[i] +".\n");
+					Test.printLog();
+					System.exit(0);
 				}
 				chr.add(s[0]);
 				b.add(s[1]);
@@ -863,16 +948,45 @@ public class Parameter {
 			regionFlag = true;
 		}
 
-		if (cl.hasOption(cmd_gene36)) {
-			String[] g = cl.getOptionValues(cmd_gene36);
-			boolean[] gflag = new boolean[g.length];
+		if (cl.hasOption(cmd_gene_list)) {
+			String gl = cl.getOptionValue(cmd_gene_list);
+
+			File f = new File(gl);
+			if (!f.exists()) {
+				System.err.println("could not find file --" + cmd_gene_list_long + " " + gl +".");
+				Test.LOG.append("could not find file --" + cmd_gene_list_long + " " + gl + ".\n");
+				Test.printLog();
+				System.exit(0);
+			}
+			BufferedReader reader0 = null;
+			try {
+				reader0 = new BufferedReader(new FileReader(f));
+			} catch (IOException E) {
+				System.err.println("could not open gene list " + gl + ".");
+				Test.LOG.append("could not open gene list " + gl + ".\n");
+				Test.printLog();
+				System.exit(0);
+			}
+			String line0 = null;
+			HashSet<String> gSet = NewIt.newHashSet();
+			try {
+				while((line0 = reader0.readLine()) != null) {
+					String[] gn = line0.split(delim);
+					gSet.add(gn[0]);
+				}
+			} catch (IOException e1) {
+				// TODO Auto-generated catch block
+				e1.printStackTrace();
+			}
+			String[] g = (String[]) gSet.toArray(new String[0]);
+			boolean[] gflag = new boolean[gSet.size()];
 			Arrays.fill(gflag, false);
 			ArrayList<String> ge = NewIt.newArrayList();
 			ArrayList<String> g_chr = NewIt.newArrayList();
 			ArrayList<String> g_begin = NewIt.newArrayList();
 			ArrayList<String> g_end = NewIt.newArrayList();
 			
-			InputStream is = getClass().getResourceAsStream("/gene36.txt");
+			InputStream is = getClass().getResourceAsStream(hgFile);
 			DataInputStream in = new DataInputStream(is);
 			BufferedReader reader = new BufferedReader(new InputStreamReader(in));
 
@@ -905,11 +1019,13 @@ public class Parameter {
 			boolean flag = true;
 			for(int i = 0; i < gflag.length; i++) {
 				if(!gflag[i]) {
-					System.err.println("did not find gene " + g[i]);
+					System.err.println("did not fine gene " + g[i] + ".");
+					Test.LOG.append("did not find gene " + g[i] + ".\n");
 					flag = false;
 				}
 			}
 			if(!flag) {
+				Test.printLog();
 				System.exit(0);
 			}
 
@@ -921,15 +1037,26 @@ public class Parameter {
 			for (int i = 0; i < gene_chr.length; i++) {
 				gene_begin[i] = Double.parseDouble(g_begin.get(i)) / 1000;
 				gene_end[i] = Double.parseDouble(g_end.get(i)) / 1000;
-				System.err.println(gene[i] + ": chr" + gene_chr[i] + " " +gene_begin[i] + "k ~ " + gene_end[i] + "k");
+				System.err.println(gene[i] + ": chr" + gene_chr[i] + " " +gene_begin[i] + "k ~ " + gene_end[i] + "k.");
+				Test.LOG.append(gene[i] + ": chr" + gene_chr[i] + " " +gene_begin[i] + "k ~ " + gene_end[i] + "k.\n");
 			}
 			geneFlag = true;
 
 		}
+		
+		if (cl.hasOption(cmd_gene_window)) {
+			double gw = Double.parseDouble(cl.getOptionValue(cmd_gene_window));
+			if (gw < 0) {
+				System.err.println("bad parameter for option --" + cmd_gene_window_long + ": " + gw + ".");
+				Test.LOG.append("bad parameter for option --" + cmd_gene_window_long + ": " + gw +".\n");
+				Test.printLog();
+				System.exit(0);
+			}
+			genewindow = gw;
+		}
 
-
-		if (cl.hasOption(cmd_gene37)) {
-			String[] g = cl.getOptionValues(cmd_gene36);
+		if (cl.hasOption(cmd_gene)) {
+			String[] g = cl.getOptionValues(cmd_gene);
 			boolean[] gflag = new boolean[g.length];
 			Arrays.fill(gflag, false);
 			ArrayList<String> ge = NewIt.newArrayList();
@@ -937,7 +1064,7 @@ public class Parameter {
 			ArrayList<String> g_begin = NewIt.newArrayList();
 			ArrayList<String> g_end = NewIt.newArrayList();
 			
-			InputStream is = getClass().getResourceAsStream("/gene37.txt");
+			InputStream is = getClass().getResourceAsStream(hgFile);
 			DataInputStream in = new DataInputStream(is);
 			BufferedReader reader = new BufferedReader(new InputStreamReader(in));
 
@@ -970,11 +1097,13 @@ public class Parameter {
 			boolean flag = true;
 			for(int i = 0; i < gflag.length; i++) {
 				if(!gflag[i]) {
-					System.err.println("did not find gene " + g[i]);
+					System.err.println("did not find gene " + g[i] + ".");
+					Test.LOG.append("did not find gene " + g[i] + ".\n");
 					flag = false;
 				}
 			}
 			if(!flag) {
+				Test.printLog();
 				System.exit(0);
 			}
 
@@ -987,15 +1116,16 @@ public class Parameter {
 				gene_begin[i] = Double.parseDouble(g_begin.get(i)) / 1000;
 				gene_end[i] = Double.parseDouble(g_end.get(i)) / 1000;
 				System.err.println(gene[i] + ": chr" + gene_chr[i] + " " +gene_begin[i] + "k ~ " + gene_end[i] + "k");
+				Test.LOG.append(gene[i] + ": chr" + gene_chr[i] + " " +gene_begin[i] + "k ~ " + gene_end[i] + "k.\n");
 			}
 			geneFlag = true;
 
 		}
 
-		if (cl.hasOption(cmd_snp_f)) {
+		if (cl.hasOption(cmd_snp_list)) {
 
-			if (!x) {
-				String[] snps_file = cl.getOptionValues(cmd_snp_f);
+			if (!transFlag) {
+				String[] snps_file = cl.getOptionValues(cmd_snp_list);
 				ArrayList<String> includesnpList = NewIt.newArrayList();
 				ArrayList<String> excludesnpList = NewIt.newArrayList();
 				ArrayList<String> includesnpPairList = NewIt.newArrayList();
@@ -1003,29 +1133,33 @@ public class Parameter {
 				for (int h = 0; h < snps_file.length; h++) {
 					File f = new File(snps_file[h]);
 					if (!f.exists()) {
-						throw new IllegalArgumentException("could not find "
-								+ snps_file[h]);
+						System.err.println("could not find --" + cmd_snp_list_long + ": " + snps_file[h] + ".");
+						Test.LOG.append("could not fine --" + cmd_snp_list_long + ": " + snps_file[h] + ".\n");
+						Test.printLog();
+						System.exit(0);
 					}
 					BufferedReader reader = null;
 					try {
 						reader = new BufferedReader(new FileReader(f));
 					} catch (IOException E) {
-						throw new IllegalArgumentException(
-								"could not open snps file " + snps_file);
+						System.err.println("could not read --" + cmd_snp_list + ": " + snps_file[h] + ".");
+						Test.LOG.append("could not read --" + cmd_snp_list + ": " + snps_file[h] + ".\n");
+						Test.printLog();
+						System.exit(0);
 					}
 					ArrayList<String> snp = NewIt.newArrayList();
 					String line = null;
 					try {
 						while ((line = reader.readLine()) != null) {
 							String[] s = line.split(delim);
-							for (int i = 0; i < s.length; i++) {
-								snp.add(s[i]);
-							}
+							snp.add(s[0]);
 						}
 						reader.close();
 					} catch (IOException E) {
-						throw new IllegalArgumentException("bad lines in "
-								+ snps_file);
+						System.err.println("bad lines in " + snps_file[h] + ".");
+						Test.LOG.append("bad lines in " + snps_file[h] + ".\n");
+						Test.printLog();
+						System.exit(0);
 					}
 					if (snp.size() > 0) {
 						ArrayList<String> insnp = NewIt.newArrayList();
@@ -1039,9 +1173,10 @@ public class Parameter {
 								if (S.contains("-")) {
 									String[] s = S.split("-");
 									if (s.length != 2) {
-										throw new IllegalArgumentException(
-												"bad parameter for --snpf in cmd_snp_f line "
-														+ (i + 1));
+										System.err.println("bad parameter " + subSNP + " in --" + f + ".");
+										Test.LOG.append("bad parameter " + subSNP + " in --" + f + ".\n");
+										Test.printLog();
+										System.exit(0);
 									}
 									exsnppair.add(s[0]);
 									exsnppair.add(s[1]);
@@ -1052,9 +1187,10 @@ public class Parameter {
 								if (subSNP.contains("-")) {
 									String[] s = subSNP.split("-");
 									if (s.length != 2) {
-										throw new IllegalArgumentException(
-												"bad parameter for --snpf in cmd_snp_f line "
-														+ (i + 1));
+										System.err.println("bad parameter " + subSNP + " in --" + f + ".");
+										Test.LOG.append("bad parameter " + subSNP + " in --" + f + ".\n");
+										Test.printLog();
+										System.exit(0);
 									}
 									insnppair.add(s[0]);
 									insnppair.add(s[1]);
@@ -1098,35 +1234,41 @@ public class Parameter {
 					}
 				}
 			} else {
-				String[] snps_file = cl.getOptionValues(cmd_snp_f);
+				String[] snps_file = cl.getOptionValues(cmd_snp_list);
 				xincludesnp = new String[snps_file.length][];
 				ArrayList<String> xsnppairList = NewIt.newArrayList();
 				for (int h = 0; h < snps_file.length; h++) {
 					File f = new File(snps_file[h]);
 					if (!f.exists()) {
-						throw new IllegalArgumentException("could not find "
-								+ snps_file[h]);
+						System.err.println("could not find " + snps_file[h] + ".");
+						Test.LOG.append("could not find " + snps_file[h] + ".\n");
+						Test.printLog();
+						System.exit(0);
 					}
 					BufferedReader reader = null;
 					try {
 						reader = new BufferedReader(new FileReader(f));
 					} catch (IOException E) {
-						throw new IllegalArgumentException(
-								"could not open snps file " + snps_file);
+
+						System.err.println("could not read " + snps_file[h] + ".");
+						Test.LOG.append("could not read " + snps_file[h] + ".\n");
+						Test.printLog();
+						System.exit(0);
 					}
 					ArrayList<String> snp = NewIt.newArrayList();
 					String line = null;
 					try {
 						while ((line = reader.readLine()) != null) {
 							String[] s = line.split(delim);
-							for (int i = 0; i < s.length; i++) {
-								snp.add(s[i]);
-							}
+							snp.add(s[0]);
 						}
 						reader.close();
 					} catch (IOException E) {
-						throw new IllegalArgumentException("bad lines in "
-								+ snps_file);
+
+						System.err.println("bad lines in " + snps_file[h] + ".");
+						Test.LOG.append("bad lines in " + snps_file[h] + ".\n");
+						Test.printLog();
+						System.exit(0);
 					}
 					if (snp.size() > 0) {
 						ArrayList<String> insnp = NewIt.newArrayList();
@@ -1140,9 +1282,11 @@ public class Parameter {
 								if (subSNP.contains("-")) {
 									String[] s = subSNP.split("-");
 									if (s.length != 2) {
-										throw new IllegalArgumentException(
-												"bad parameter for --snpf in cmd_snp_f line "
-														+ (i + 1));
+
+										System.err.println("bad parameter " + subSNP + " in " + snps_file[h] + ".");
+										Test.LOG.append("bad parameter " + subSNP + " in " + snps_file[h] + ".\n");
+										Test.printLog();
+										System.exit(0);
 									}
 									insnppair.add(s[0]);
 									insnppair.add(s[1]);
@@ -1191,13 +1335,19 @@ public class Parameter {
 			String file = cl.getOptionValue(cmd_ex_fam_file);
 			File f = new File(file);
 			if (!f.exists()) {
-				throw new IllegalArgumentException("coudl not open " + file);
+				System.err.println("could not open " + file + ".");
+				Test.LOG.append("could not open " + file + ".\n");
+				Test.printLog();
+				System.exit(0);
 			}
 			BufferedReader reader = null;
 			try {
 				reader = new BufferedReader(new FileReader(new File(file)));
 			} catch (IOException E) {
-				throw new IllegalArgumentException("failed in reading " + file);
+				System.err.println("bad parameter in " + file + ".");
+				Test.LOG.append("bad parameter in " + file + ".\n");
+				Test.printLog();
+				System.exit(0);
 			}
 			String line;
 			HashSet<String> famSet = NewIt.newHashSet();
@@ -1214,7 +1364,10 @@ public class Parameter {
 				ex_family = (String[]) famSet.toArray(new String[0]);
 				exfamFlag = true;
 			} else {
-				throw new IllegalArgumentException("bad lines in " + file);
+				System.err.println("bad parameter in " + file + ".");
+				Test.LOG.append("bad parameter in " + file + ".\n");
+				Test.printLog();
+				System.exit(0);
 			}
 		}
 		/*
@@ -1268,7 +1421,10 @@ public class Parameter {
 				}
 			}
 			if (chr.length != chrSet.size() + exSet.size()) {
-				throw new IllegalArgumentException("bad parameter for --chr");
+				System.err.println("bad parameter for optin --" + cmd_chr + ".");
+				Test.LOG.append("bad parameter for option --" + cmd_chr + ".\n");
+				Test.printLog();
+				System.exit(0);
 			}
 			if (chrSet.size() > 0) {
 				in_chr = (String[]) chrSet.toArray(new String[0]);
@@ -1287,8 +1443,10 @@ public class Parameter {
 			for (int i = 0; i < s.length; i++) {
 				String[] ss = s[i].split(incommand_separator);
 				if (ss.length != 3) {
-					throw new IllegalArgumentException(
-							"bad parameter for --snpwindow: " + s[i]);
+					System.err.println("bad parameter for optin --" + cmd_snpwindow_long + " " + s[i] + ".");
+					Test.LOG.append("bad parameter for option --" + cmd_snpwindow_long + " " + s[i] + ".\n");
+					Test.printLog();
+					System.exit(0);
 				}
 				snpwindow[i] = ss[0];
 				snp_window[i][0] = Double.parseDouble(ss[1]) * -1000;
@@ -1304,8 +1462,11 @@ public class Parameter {
 		if (cl.hasOption(cmd_maf)) {
 			maf = Double.parseDouble(cl.getOptionValue(cmd_maf));
 			if (maf < 0) {
-				throw new IllegalArgumentException("bad parameter for --maf: "
-						+ maf);
+
+				System.err.println("bad parameter for optin --" + cmd_maf + " " + maf + ".");
+				Test.LOG.append("bad parameter for option --" + cmd_maf + " " + maf + ".\n");
+				Test.printLog();
+				System.exit(0);
 			}
 			mafFlag = true;
 		}
@@ -1313,8 +1474,11 @@ public class Parameter {
 		if (cl.hasOption(cmd_geno)) {
 			geno = Double.parseDouble(cl.getOptionValue(cmd_geno));
 			if (geno < 0) {
-				throw new IllegalArgumentException("bad parameter for --geno: "
-						+ geno);
+
+				System.err.println("bad parameter for optin --" + cmd_geno + " " + geno + ".");
+				Test.LOG.append("bad parameter for option --" + cmd_geno + " " + geno + ".\n");
+				Test.printLog();
+				System.exit(0);
 			}
 			genoFlag = true;
 		}
@@ -1328,24 +1492,17 @@ public class Parameter {
 		// hweFlag = true;
 		// }
 
-		if (cl.hasOption(cmd_header)) {
-			header = true;
-		}
-		// if (cl.hasOption(cmd_topN)) {
-		// topN = Integer.parseInt(cl.getOptionValue(cmd_topN));
-		// }
-		if (cl.hasOption(cmd_res_number)) {
-			response = Integer.parseInt(cl.getOptionValue(cmd_res_number)) - 1;
-		}
-
 		if (cl.hasOption(cmd_reg)) {
 			linkfunction = Integer.parseInt(cl.getOptionValue(cmd_reg));
 		}
 		if (cl.hasOption(cmd_cv)) {
 			cv = Integer.parseInt(cl.getOptionValue(cmd_cv));
 			if (cv < 2) {
-				throw new IllegalArgumentException(
-						"bad parameter for option --cv.");
+
+				System.err.println("bad parameter for optin --" + cmd_cv + " " + cv + ".");
+				Test.LOG.append("bad parameter for option --" + cmd_cv + " " + cv + ".\n");
+				Test.printLog();
+				System.exit(0);
 			}
 			cvFlag = true;
 		}
@@ -1437,8 +1594,11 @@ public class Parameter {
 		if (cl.hasOption(cmd_ep)) {
 			ep = Double.parseDouble(cl.getOptionValue(cmd_ep));
 			if (ep >= 1 || ep < 0) {
-				throw new IllegalArgumentException(
-						"bad parameter for option --ep.");
+
+				System.err.println("bad parameter for optin --" + ep + " " + ep + ".");
+				Test.LOG.append("bad parameter for option --" + ep + " " + ep + ".\n");
+				Test.printLog();
+				System.exit(0);
 			}
 			epFlag = true;
 		}
@@ -1450,16 +1610,15 @@ public class Parameter {
 		// }
 		if (cl.hasOption(cmd_order)) {
 			order = Integer.parseInt(cl.getOptionValue(cmd_order));
-			if (order <= 0) {
-				throw new IllegalArgumentException(
-						"bad parameter for option --cv.");
-			}
 		}
 		if (cl.hasOption(cmd_thin)) {
 			thin = Double.parseDouble(cl.getOptionValue(cmd_thin));
 			if (thin < 0) {
-				throw new IllegalArgumentException(
-						"bad parameter for option --thin.");
+
+				System.err.println("bad parameter for optin --" + cmd_thin + " " + thin + ".");
+				Test.LOG.append("bad parameter for option --" + cmd_thin + " " + thin + ".\n");
+				Test.printLog();
+				System.exit(0);
 			}
 		}
 		if (cl.hasOption(cmd_slice)) {
@@ -1467,8 +1626,11 @@ public class Parameter {
 			slice = Integer.parseInt(s[0]);
 			sliceN = Integer.parseInt(s[1]);
 			if (slice <= 0 || sliceN <= 0 || slice > sliceN) {
-				throw new IllegalArgumentException(
-						"bad parameter for option --slice.");
+
+				System.err.println("bad parameter for optin --" + cmd_slice + " " + slice + ".");
+				Test.LOG.append("bad parameter for option --" + cmd_slice + " " + slice + ".\n");
+				Test.printLog();
+				System.exit(0);
 			}
 			sliceFlag = true;
 		}
@@ -1482,7 +1644,8 @@ public class Parameter {
 			missing_allele = cl.getOptionValue(cmd_missing_allele);
 		}
 		if (cl.hasOption(cmd_status_shift)) {
-			status_shift = -1;
+			status_shift = 0;
+			status_shiftFlag = true;
 		}
 		if (cl.hasOption(cmd_Vc)) {
 			vc = Double.parseDouble(cl.getOptionValue(cmd_Vc));
@@ -1506,6 +1669,7 @@ public class Parameter {
 		}
 		if (cl.hasOption(cmd_version)) {
 			System.err.println();
+			Test.printLog();
 			System.exit(1);
 		}
 		if (cl.hasOption(cmd_testdrive)) {

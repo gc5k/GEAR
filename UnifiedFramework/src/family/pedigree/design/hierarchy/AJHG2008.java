@@ -14,6 +14,7 @@ import admixture.parameter.Parameter;
 
 import score.LinearRegression;
 import score.LogisticRegression;
+import test.Test;
 import util.NewIt;
 import util.Sample;
 
@@ -36,7 +37,8 @@ import family.pedigree.phenotype.Subject;
 
 public class AJHG2008 extends ChenBase {
 
-	public AJHG2008(PedigreeFile ped, PhenotypeFile phe, MapFile map, long s, int pIdx, int[] cIdx, int m) {
+	public AJHG2008(PedigreeFile ped, PhenotypeFile phe, MapFile map, long s,
+			int pIdx, int[] cIdx, int m) {
 		super(ped, phe, map, s, pIdx, cIdx, m);
 	}
 
@@ -50,7 +52,7 @@ public class AJHG2008 extends ChenBase {
 		if (PhenoData != null)
 			CovariateTable.ensureCapacity(qualified_Sib);
 
-		status = new byte[qualified_Sib];
+		status = new double[qualified_Sib];
 
 		ArrayList<PersonIndex> s_P = NewIt.newArrayList();
 		ArrayList<ArrayList<String>> s_C = NewIt.newArrayList();
@@ -65,7 +67,8 @@ public class AJHG2008 extends ChenBase {
 				continue;
 			}
 			BFamilyStruct fs = Fam.get(fi);
-			FamilyUnit FamUnit = PhenoData == null ? null : PhenoData.getFamilyUnit(fi);
+			FamilyUnit FamUnit = PhenoData == null ? null : PhenoData
+					.getFamilyUnit(fi);
 			String[] pi = fs.getPersonListSorted();
 			int si = 0;
 			ArrayList<BPerson> plist = NewIt.newArrayList();
@@ -73,14 +76,17 @@ public class AJHG2008 extends ChenBase {
 				if (!lineup.filter[c][i])
 					continue;
 				BPerson per = fs.getPerson(pi[i]);
-				Subject sub = PhenoData == null ? null : FamUnit.getSubject(pi[i]);
+				Subject sub = PhenoData == null ? null : FamUnit
+						.getSubject(pi[i]);
 
 				if (fs.hasAncestor(per)) {
-					s_P.add(new PersonIndex(fs.getFamilyStructName(), pi[i], per, false, false));
+					s_P.add(new PersonIndex(fs.getFamilyStructName(), pi[i],
+							per, false, false));
 					BPerson pseudoper = new BPerson(per);
 					plist.add(pseudoper);
-					s_P.add(new PersonIndex(fs.getFamilyStructName(), pseudoper.getPersonID(), pseudoper, true, false));
-					status[s] = (byte) per.getAffectedStatus();
+					s_P.add(new PersonIndex(fs.getFamilyStructName(), pseudoper
+							.getPersonID(), pseudoper, true, false));
+					status[s] = Double.parseDouble(per.getAffectedStatus());
 					if (sub != null)
 						s_C.add(sub.getTraits());
 					si++;
@@ -118,14 +124,17 @@ public class AJHG2008 extends ChenBase {
 				if (rnd.nextBoolean()) {
 					int[] si = Sample.SampleIndex(0, numSib[i] - 1, numSib[i]);
 					for (int j = 0; j < si.length; j++) {
-						PersonTable.get(c + j * 2).setPermutedScore(score[c + j * 2 + 1]);
-						PersonTable.get(c + j * 2 + 1).setPermutedScore(score[c + j * 2]);
+						PersonTable.get(c + j * 2).setPermutedScore(
+								score[c + j * 2 + 1]);
+						PersonTable.get(c + j * 2 + 1).setPermutedScore(
+								score[c + j * 2]);
 					}
 				}
 				c += numSib[i] * 2;
 			}
 		} else {
-			int[] idx = Sample.SampleIndex(0, PersonTable.size() - 1, PersonTable.size());
+			int[] idx = Sample.SampleIndex(0, PersonTable.size() - 1,
+					PersonTable.size());
 			for (int i = 0; i < idx.length; i++) {
 				PersonTable.get(i).setPermutedScore(score[idx[i]]);
 			}
@@ -152,7 +161,8 @@ public class AJHG2008 extends ChenBase {
 				if (numGenotypedParents == 2) {
 					fam.countAllele(genoset.getchildrenGenoMap(), aSet);
 					fam.countAllele(genoset.getparentsGenoMap(), aSet);
-					gDis = new ObservedParents(genoset.getchildrenGenoMap(), genoset.getparentsGenoMap());
+					gDis = new ObservedParents(genoset.getchildrenGenoMap(),
+							genoset.getparentsGenoMap());
 				} else {
 					fam.countAllele(genoset.getchildrenGenoMap(), aSet);
 					fam.countAllele(genoset.getparentsGenoMap(), aSet);
@@ -160,12 +170,17 @@ public class AJHG2008 extends ChenBase {
 						String PG = genoset.getparentsGenoMap().firstKey();
 						if (!AbstractGenoDistribution.isHeterozygous(PG)) {
 							// table 1
-							gDis = new HomozygousParent(genoset.getchildrenGenoMap(), genoset.getparentsGenoMap());
+							gDis = new HomozygousParent(
+									genoset.getchildrenGenoMap(),
+									genoset.getparentsGenoMap());
 						} else {// table 2
-							gDis = new HeterozygousParent(genoset.getchildrenGenoMap(), genoset.getparentsGenoMap());
+							gDis = new HeterozygousParent(
+									genoset.getchildrenGenoMap(),
+									genoset.getparentsGenoMap());
 						}
 					} else {// table 3
-						gDis = new UnobservedParents(genoset.getchildrenGenoMap());
+						gDis = new UnobservedParents(
+								genoset.getchildrenGenoMap());
 					}
 				}
 				perList = fam.getPersonList();
@@ -183,8 +198,10 @@ public class AJHG2008 extends ChenBase {
 					String[] nontran_tran = new String[2];
 					if (f) {
 						nontran_tran = fam.getNonTransmitted(g, gDis);
-						int a1 = Integer.parseInt(nontran_tran[0].substring(0, 1));
-						int a2 = Integer.parseInt(nontran_tran[0].substring(1, 2));
+						int a1 = Integer.parseInt(nontran_tran[0].substring(0,
+								1));
+						int a2 = Integer.parseInt(nontran_tran[0].substring(1,
+								2));
 						pseudoper.addMarker(f, a1, a2, i);
 					} else {
 						pseudoper.addMarker(f, 0, 0, i);
@@ -233,15 +250,18 @@ public class AJHG2008 extends ChenBase {
 		score = new double[PersonTable.size()];
 		for (int i = 0; i < PersonTable.size(); i += 2) {
 			if (pheIdx == -1) {
-				score[i] = status[i / 2] + Parameter.status_shift;
+				if (PedData.IsSixthColBinary()) {
+					score[i] = status[i / 2] - Parameter.status_shift;
+				} else {
+					score[i] = status[i / 2];
+				}
 				score[i + 1] = -1 * score[i];
 			} else {
-				try {
-					if (PhenoData == null) {
-						throw new Exception();
-					}
-				} catch (Exception E) {
-					System.err.println("no phenotype file");
+				if (PhenoData == null) {
+					System.err.println("no phenotype file.");
+					Test.LOG.append("no phenotype file.\n");
+					Test.printLog();
+					System.exit(0);
 				}
 				ArrayList<String> v = CovariateTable.get(i / 2);
 				String s = v.get(pheIdx);
@@ -262,7 +282,7 @@ public class AJHG2008 extends ChenBase {
 			ArrayList<Double> c = NewIt.newArrayList();
 			ArrayList<String> tempc = CovariateTable.get(i / 2);
 			if (pheIdx == -1) {// using affecting status as phenotype
-				t = status[i / 2] + Parameter.status_shift;
+				t = status[i / 2] - Parameter.status_shift;
 			} else {
 				t = Double.parseDouble((String) tempc.get(pheIdx));
 			}
@@ -292,15 +312,9 @@ public class AJHG2008 extends ChenBase {
 		}
 
 		double[] r = null;
-		if (method == 0) {
-			LinearRegression LReg = new LinearRegression(Y, X, true);
-			LReg.MLE();
-			r = LReg.getResiduals1();
-		} else {
-			LogisticRegression LogReg1 = new LogisticRegression(Y, X, true);
-			LogReg1.MLE();
-			r = LogReg1.getResiduals1();
-		}
+		LinearRegression LReg = new LinearRegression(Y, X, true);
+		LReg.MLE();
+		r = LReg.getResiduals1();
 
 		for (int i = 0; i < r.length; i++) {
 			score[i * 2] = r[i];
@@ -311,15 +325,23 @@ public class AJHG2008 extends ChenBase {
 	@Override
 	protected void buildScoreII() {
 		if (PersonTable.size() < 10) {
-			System.err.println("too few effective individuals (" + PersonTable.size() + ") for the selected trait.");
+			System.err.println("too few effective individuals ("
+					+ PersonTable.size() + ") for the selected trait.");
+			Test.LOG.append("too few effective individuals ("
+					+ PersonTable.size() + ") for the selected trait.\n");
+			Test.printLog();
 			System.exit(0);
 		}
 		score = new double[PersonTable.size()];
 		ArrayList<Double> T = NewIt.newArrayList();
 
-		for (int i = 0; i < PersonTable.size()/2; i++) {
+		for (int i = 0; i < PersonTable.size() / 2; i++) {
 			double t = 0;
-			t = status[i] + Parameter.status_shift;
+			if (PedData.IsSixthColBinary()) {
+				t = status[i] - Parameter.status_shift;
+			} else {
+				t = status[i];
+			}
 			T.add(new Double(t));
 		}
 
@@ -331,10 +353,15 @@ public class AJHG2008 extends ChenBase {
 		}
 
 		double[] r = null;
-
-		LinearRegression LReg = new LinearRegression(Y, X, true);
-		LReg.MLE();
-		r = LReg.getResiduals1();
+		if (method == 0) {
+			LinearRegression LReg = new LinearRegression(Y, X, true);
+			LReg.MLE();
+			r = LReg.getResiduals1();
+		} else {
+			LogisticRegression LogReg1 = new LogisticRegression(Y, X, true);
+			LogReg1.MLE();
+			r = LogReg1.getResiduals1();
+		}
 
 		for (int i = 0; i < r.length; i++) {
 			score[i * 2] = r[i];

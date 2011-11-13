@@ -8,6 +8,7 @@ import java.util.ArrayList;
 
 import admixture.parameter.Parameter;
 
+import test.Test;
 import util.NewIt;
 import family.mdr.arsenal.MDRConstant;
 import family.pedigree.genotype.BFamilyStruct;
@@ -59,7 +60,7 @@ public class TransposePedigreeReader extends PedigreeFile {
 			per.setDadID(tokens[2]);
 			per.setMomID(tokens[3]);
 			per.setGender(Integer.parseInt(tokens[4]));
-			per.setAffectedStatus(Integer.parseInt(tokens[5]));
+			per.setAffectedStatus(tokens[5]);
 
 			BFamilyStruct fam = familystructure.get(tokens[0]);
 			if (fam == null) {
@@ -82,7 +83,9 @@ public class TransposePedigreeReader extends PedigreeFile {
 			String[] tokenizer = line.split(MDRConstant.delim);
 			int numTokens = tokenizer.length;
 			if (colNum != numTokens) {
-				System.err.println("Column number mismatch in tpedfile in line " + (k + 1));
+				System.err.println("Column number mismatch in tpedfile in line " + (k + 1) + ".");
+				Test.LOG.append("Column number mismatch in tpedfile in line " + (k+1) + ".\n");
+				Test.printLog();
 				System.exit(0);
 			}
 			mapData.addSNP(tokenizer[1], tokenizer[0], Float.parseFloat(tokenizer[2]), Integer.parseInt(tokenizer[3]));

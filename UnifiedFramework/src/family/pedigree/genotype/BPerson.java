@@ -15,7 +15,7 @@ public class BPerson {
 	protected String momID;
 	protected String dadID;
 	protected int gender;
-	protected int affectedStatus;
+	protected String affectedStatus;
 	protected int numMarkers;
 	protected int genoLen;
 	protected int[] alleles;
@@ -143,7 +143,7 @@ public class BPerson {
 	 * 
 	 * @return affectedStatus
 	 */
-	public int getAffectedStatus() {
+	public String getAffectedStatus() {
 		return affectedStatus;
 	}
 
@@ -152,7 +152,7 @@ public class BPerson {
 	 * 
 	 * @param affectedStatus
 	 */
-	public void setAffectedStatus(int affectedStatus) {
+	public void setAffectedStatus(String affectedStatus) {
 		this.affectedStatus = affectedStatus;
 	}
 

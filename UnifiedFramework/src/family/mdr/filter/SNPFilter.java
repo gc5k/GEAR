@@ -75,6 +75,8 @@ public class SNPFilter implements SNPFilterInterface {
 
 		if (filterFlag && selectedSNPSet.size() == 0 && excludedSNPSet.size() == 0 && bgSNPSet.size() == 0) {
 			System.err.println("No snps selected. GMDR quit.");
+			Test.LOG.append("No snps selected. GMDR quit.\n");
+			Test.printLog();
 			System.exit(0);
 		}
 		makeWSNPList();
@@ -167,34 +169,79 @@ public class SNPFilter implements SNPFilterInterface {
 			int pos = snp.getPosition();
 			int idx = ArrayUtils.indexOf(Parameter.gene_chr, chr);
 			if (idx >= 0) {
-				if ( pos >= Parameter.gene_begin[idx]*1000 && pos <= Parameter.gene_end[idx]*1000) {
+				if ( pos >= (Parameter.gene_begin[idx] - Parameter.genewindow)*1000  && pos <= (Parameter.gene_end[idx] + Parameter.genewindow) *1000  ) {
 					xsnps.get(idx).add(i);
 					includeSNP(i);
 				}
 			}
 		}		
 
-		StringBuffer sb = new StringBuffer(Parameter.out+".gene");
-		PrintStream PW = null;
-		try {
-			PW = new PrintStream(sb.toString());
-		} catch (FileNotFoundException e) {
-			e.printStackTrace();
-		}
-		for (int i = 0; i < xsnps.size(); i++) {
-			ArrayList<Integer> s = xsnps.get(i);
-			if (s.size() == 0) {
-				continue;
+		if (Parameter.snp2genefilesFlag) {
+			for (int i = 0; i < xsnps.size(); i++) {
+				StringBuffer sb = new StringBuffer(Parameter.gene[i] + ".gene");
+				PrintStream PW = null;
+				try {
+					PW = new PrintStream(sb.toString());
+				} catch (FileNotFoundException e) {
+					e.printStackTrace();
+				}
+
+				ArrayList<Integer> s = xsnps.get(i);
+				if (s.size() == 0) {
+					continue;
+				}
+				System.err.println(s.size() + " snps selected with gene "
+						+ Parameter.gene[i]);
+				System.err.println("writing snps into " 
+						+ Parameter.gene[i] + ".gene");
+				Test.LOG.append(s.size() + " snps selected with gene "
+						+ Parameter.gene[i] + "\n");
+				Test.LOG.append("writing snps into " 
+						+ Parameter.gene[i] + ".gene\n");
+				for (int j = 0; j < s.size(); j++) {
+					SNP snp = snpList.get(s.get(j));
+					PW.println(snp.getName() + " " + snp.getChromosome() + " "
+							+ snp.getPosition() +" " + Parameter.gene[i]);
+				}
+				PW.close();
 			}
-			System.err.println(s.size() + " snps selected with gene " + Parameter.gene[i]);
-			Test.LOG.append(s.size() + " snps selected with gene " + Parameter.gene[i] + "\n");
-			PW.println(Parameter.gene[i]);
-			for (int j = 0; j < s.size(); j++) {
-				SNP snp = snpList.get(s.get(j));
-				PW.println(snp.getName() + " " + snp.getChromosome() + " " + snp.getPosition());
+			Test.printLog();
+			System.exit(1);
+		} else {
+			StringBuffer sb = new StringBuffer(Parameter.out + ".gene");
+			PrintStream PW = null;
+			try {
+				PW = new PrintStream(sb.toString());
+			} catch (FileNotFoundException e) {
+				e.printStackTrace();
+			}
+			for (int i = 0; i < xsnps.size(); i++) {
+				ArrayList<Integer> s = xsnps.get(i);
+				if (s.size() == 0) {
+					continue;
+				}
+				System.err.println(s.size() + " snps selected with gene "
+						+ Parameter.gene[i]);
+
+				Test.LOG.append(s.size() + " snps selected with gene "
+						+ Parameter.gene[i] + "\n");
+				for (int j = 0; j < s.size(); j++) {
+					SNP snp = snpList.get(s.get(j));
+					PW.println(snp.getName() + " " + snp.getChromosome() + " "
+							+ snp.getPosition() +" " + Parameter.gene[i]);
+				}
+			}
+			System.err.println("writing snps into " 
+					+ Parameter.out + ".gene");
+			Test.LOG.append("writing snps into " 
+					+ Parameter.out + ".gene\n");
+			PW.close();
+			if (Parameter.snp2genefileFlag) {
+				Test.printLog();
+				System.exit(1);
 			}
 		}
-		PW.close();
+
 	}
 
 	private void selectSNPRange() {

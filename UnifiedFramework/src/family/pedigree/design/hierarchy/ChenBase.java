@@ -10,6 +10,7 @@ import admixture.parameter.Parameter;
 
 import score.LinearRegression;
 import score.LogisticRegression;
+import test.Test;
 
 import family.mdr.data.PersonIndex;
 import family.mdr.partition.Partition;
@@ -39,7 +40,7 @@ public abstract class ChenBase implements ChenInterface {
 	protected int qualified_Unrelated;
 	protected int qualified_Sib;
 	protected int[] numSib;
-	protected byte[] status;
+	protected double[] status;
 	protected double[] score;
 	// protected double[] permuted_score;
 
@@ -63,7 +64,7 @@ public abstract class ChenBase implements ChenInterface {
 
 		private void qualification() {
 			Hashtable<String, BFamilyStruct> Fam = PedData.getFamilyStruct();
-
+			boolean IsPhenotypeBinary = PedData.IsSixthColBinary();
 			num_qualified = new int[Fam.size()][2];
 			filter = new boolean[Fam.size()][];
 			int c = 0;
@@ -92,8 +93,18 @@ public abstract class ChenBase implements ChenInterface {
 							filter[c][cc++] = hf;
 							continue;
 						}
-						int s = per.getAffectedStatus();
-						boolean f = ((s + Parameter.status_shift) == 1 || (s + Parameter.status_shift) == 0) ? true : false;
+						boolean f = true;
+						if (IsPhenotypeBinary) {
+							String s = per.getAffectedStatus();
+							if (Parameter.status_shiftFlag) {
+								f = (s.compareTo(Parameter.missing_phenotype) == 0) ? false : true;
+							} else {
+								f = (s.compareTo(Parameter.missing_phenotype) == 0 || s.compareTo("0") == 0 ) ? false : true;
+							}
+						} else {
+							String s =  per.getAffectedStatus();
+							f = (s.compareTo(Parameter.missing_phenotype) == 0) ? true : false;
+						}
 
 						filter[c][cc++] = f;
 						if (!f)
@@ -122,7 +133,8 @@ public abstract class ChenBase implements ChenInterface {
 						boolean f = FamUnit.containsSubject(pi[i]);
 						if (f) {
 							Subject sub = FamUnit.getSubject(pi[i]);
-							f = filterItUp(fi, pi[i], (byte) per.getAffectedStatus(), sub.getTraits());
+							f = keep(fi, pi[i], per.getAffectedStatus(),
+									sub.getTraits());
 						}
 						filter[c][cc++] = f;
 						if (!f)
@@ -143,19 +155,31 @@ public abstract class ChenBase implements ChenInterface {
 			}
 		}
 
-		protected boolean filterItUp(String fid, String pid, byte s, ArrayList<String> trait) {
+		protected boolean keep(String fid, String pid, String s,
+				ArrayList<String> trait) {
 			boolean f = true;
+			boolean IsPhenotypeBinary = PedData.IsSixthColBinary();
 			if (pheIdx == -1) {
-				f = ((s + Parameter.status_shift) == 0 || (s + Parameter.status_shift) == 1) ? true : false;
+				if (IsPhenotypeBinary) {
+					if (Parameter.status_shiftFlag) {
+						f = (s.compareTo(Parameter.missing_phenotype) == 0) ? false : true;
+					} else {
+						f = (s.compareTo(Parameter.missing_phenotype) == 0 || s.compareTo("0") == 0 ) ? false : true;
+					}
+				} else {
+					f = (s.compareTo(Parameter.missing_phenotype) == 0) ? true : false;
+				}
 			} else {
-				f = (trait.get(pheIdx).compareTo(Parameter.missing_phenotype) == 0) ? false : true;
+				f = (trait.get(pheIdx).compareTo(Parameter.missing_phenotype) == 0) ? false
+						: true;
 			}
 
 			if (covIdx == null) {
 				return f;
 			} else {
 				for (int j = 0; j < covIdx.length; j++) {
-					f = (trait.get(j).compareTo(Parameter.missing_phenotype) == 0) ? false : true;
+					f = (trait.get(j).compareTo(Parameter.missing_phenotype) == 0) ? false
+							: true;
 				}
 				return f;
 			}
@@ -174,13 +198,15 @@ public abstract class ChenBase implements ChenInterface {
 				return flag = p.getGender() == 2 ? true : false;
 			}
 			if (Parameter.ex_nosexFlag) {
-				return flag = (p.getGender() == 1 || p.getGender() == 2) ? true : false;
+				return flag = (p.getGender() == 1 || p.getGender() == 2) ? true
+						: false;
 			}
 			return flag;
 		}
 	}
 
-	public ChenBase(PedigreeFile ped, PhenotypeFile phe, MapFile map, long s, int pIdx, int[] cIdx, int m) {
+	public ChenBase(PedigreeFile ped, PhenotypeFile phe, MapFile map, long s,
+			int pIdx, int[] cIdx, int m) {
 		rnd.setSeed(Parameter.seed);
 		PedData = ped;
 		PhenoData = phe;
@@ -204,21 +230,30 @@ public abstract class ChenBase implements ChenInterface {
 
 	protected void fetchScore(int pheIdx) {
 		if (PersonTable.size() < 10) {
-			System.err.println("too few effective individuals (" + PersonTable.size() + ") for the selected trait.");
+			System.err.println("too few effective individuals ("
+					+ PersonTable.size() + ") for the selected trait.");
+			Test.LOG.append("too few effective individuals ("
+					+ PersonTable.size() + ") for the selected trait.\n");
+			Test.printLog();
 			System.exit(0);
 		}
 		score = new double[PersonTable.size()];
 		for (int i = 0; i < PersonTable.size(); i++) {
 			if (pheIdx == -1) {
-				score[i] = status[i] - 1;
-			} else {
-				try {
-					if (PhenoData == null) {
-						throw new Exception();
-					}
-				} catch (Exception E) {
-					System.err.println("no phenotype file");
+				if (PedData.IsSixthColBinary()) {
+					score[i] = status[i] - Parameter.status_shift;
+				} else {
+					score[i] = status[i];
 				}
+			} else {
+
+				if (PhenoData == null) {
+					System.err.println("no phenotype file.");
+					Test.LOG.append("no phenotype file.\n");
+					Test.printLog();
+					System.exit(0);
+				}
+
 				ArrayList<String> v = CovariateTable.get(i);
 				String s = (String) v.get(pheIdx);
 				score[i] = Double.parseDouble(s);
@@ -228,7 +263,11 @@ public abstract class ChenBase implements ChenInterface {
 
 	protected void buildScoreII() {
 		if (PersonTable.size() < 10) {
-			System.err.println("too few effective individuals (" + PersonTable.size() + ") for the selected trait.");
+			System.err.println("too few effective individuals ("
+					+ PersonTable.size() + ") for the selected trait.");
+			Test.LOG.append("too few effective individuals ("
+					+ PersonTable.size() + ") for the selected trait.\n");
+			Test.printLog();
 			System.exit(0);
 		}
 		score = new double[PersonTable.size()];
@@ -236,7 +275,11 @@ public abstract class ChenBase implements ChenInterface {
 
 		for (int i = 0; i < PersonTable.size(); i++) {
 			double t = 0;
-			t = status[i] + Parameter.status_shift;
+			if (PedData.IsSixthColBinary()) {
+				t = status[i] - Parameter.status_shift;
+			} else {
+				t = status[i];
+			}
 			T.add(new Double(t));
 		}
 
@@ -248,7 +291,6 @@ public abstract class ChenBase implements ChenInterface {
 		}
 
 		double[] r = null;
-
 		LinearRegression LReg = new LinearRegression(Y, X, true);
 		LReg.MLE();
 		r = LReg.getResiduals1();
@@ -258,7 +300,11 @@ public abstract class ChenBase implements ChenInterface {
 
 	protected void buildScore(int pheIdx, int[] covIdx, int method) {
 		if (PersonTable.size() < 10) {
-			System.err.println("too few effective individuals (" + PersonTable.size() + ") for the selected trait.");
+			System.err.println("too few effective individuals ("
+					+ PersonTable.size() + ") for the selected trait.");
+			Test.LOG.append("too few effective individuals ("
+					+ PersonTable.size() + ") for the selected trait.\n");
+			Test.printLog();
 			System.exit(0);
 		}
 		score = new double[PersonTable.size()];
@@ -269,8 +315,12 @@ public abstract class ChenBase implements ChenInterface {
 			double t = 0;
 			ArrayList<Double> c = NewIt.newArrayList();
 			ArrayList<String> tempc = CovariateTable.get(i);
-			if (pheIdx == -1) {// using affecting status as phenotype
-				t = status[i] + Parameter.status_shift;
+			if (pheIdx == -1) {
+				if (PedData.IsSixthColBinary()) {
+					t = status[i] - Parameter.status_shift;
+				} else {
+					t = status[i];
+				}
 			} else {
 				t = Double.parseDouble((String) tempc.get(pheIdx));
 			}
@@ -319,7 +369,7 @@ public abstract class ChenBase implements ChenInterface {
 	}
 
 	@Override
-	public byte[] getStatus() {
+	public double[] getStatus() {
 		return status;
 	}
 
@@ -364,9 +414,9 @@ public abstract class ChenBase implements ChenInterface {
 		ArrayList<Integer> g = null;
 		if (Parameter.trgroupFlag) {
 			g = Partition.TTPartition(PersonTable.size());
-		} else if (Parameter.ttfileFlag){
+		} else if (Parameter.ttfileFlag) {
 			g = Partition.ttFilePartition(PersonTable);
-		} else if (Parameter.trsexFlag){
+		} else if (Parameter.trsexFlag) {
 			g = Partition.SexPartition(PersonTable);
 		} else if (Parameter.cvFlag) {
 			g = Partition.CVPartition(PersonTable.size());

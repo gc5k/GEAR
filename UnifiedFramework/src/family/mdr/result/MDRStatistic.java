@@ -1,7 +1,9 @@
-package family.mdr;
+package family.mdr.result;
 
 import org.apache.commons.math.MathException;
 import org.apache.commons.math.distribution.FDistributionImpl;
+
+import admixture.parameter.Parameter;
 /**
  * 
  * @author Guo-Bo Chen, chenguobo@gmail.com
@@ -144,21 +146,21 @@ public class MDRStatistic implements Comparable<MDRStatistic> {
 		if(Npos>0 && Nneg>0) {
 			numerator = Vx / 2;
 			denominator = Vt / (N-2);
-			degreeNumerator = 2;
+			degreeNumerator = 1;
 			degreeDenominator = N - 2;
 			FValue = numerator / denominator;
-		} else if(Npos > 0 && Nneg == 0) {
-			numerator = Vx / 1;
-			denominator = Vt / (N-1);
-			degreeNumerator = 1;
-			degreeDenominator = N - 1;
-			FValue = numerator / denominator;
-		} else if(Npos == 0 && Nneg > 0) {
-			numerator = Vx / 1;
-			denominator = Vt / (N-1);
-			degreeNumerator = 1;
-			degreeDenominator = N - 1;
-			FValue = numerator / denominator;
+//		} else if (Npos > 0 && Nneg == 0) {
+//			numerator = Vx / 1;
+//			denominator = Vt / (N - 1);
+//			degreeNumerator = 1;
+//			degreeDenominator = N - 1;
+//			FValue = numerator / denominator;
+//		} else if (Npos == 0 && Nneg > 0) {
+//			numerator = Vx / 1;
+//			denominator = Vt / (N - 1);
+//			degreeNumerator = 1;
+//			degreeDenominator = N - 1;
+//			FValue = numerator / denominator;
 		} else {
 			degreeNumerator = 1;
 			degreeDenominator = 1;
@@ -186,8 +188,11 @@ public class MDRStatistic implements Comparable<MDRStatistic> {
 		sb.append(", ");
 		sb.append(String.format("%.4E", PF));
 		sb.append("("+degreeNumerator +","+degreeDenominator+"), ");
-		sb.append(String.format("%.4f", stats[0]) + ", " + String.format("%.4f", meanT) + ", " 
+		sb.append(String.format("%.4f", stats[0]) + ", ");
+		if (Parameter.permFlag) {
+			sb.append(String.format("%.4f", meanT) + ", " 
 				+ String.format("%.4f", seT)+ ", " + String.format("%.4E", pT) + ", ");
+		}
 		sb.append(String.format("%.4f", stats[1]));
 
 		return sb.toString();

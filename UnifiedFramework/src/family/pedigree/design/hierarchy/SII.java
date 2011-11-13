@@ -36,7 +36,7 @@ public final class SII extends ChenBase {
 		if (PhenoData != null)
 			CovariateTable.ensureCapacity(qualified_Sib);
 
-		status = new byte[qualified_Sib];
+		status = new double[qualified_Sib];
 
 		ArrayList<PersonIndex> s_P = NewIt.newArrayList();
 		ArrayList<ArrayList<String>> s_C = NewIt.newArrayList();
@@ -63,7 +63,7 @@ public final class SII extends ChenBase {
 
 				if (fs.hasAncestor(per)) {
 					s_P.add(new PersonIndex(fs.getFamilyStructName(), pi[i], per, false, false));
-					status[s] = (byte) per.getAffectedStatus();
+					status[s] = Double.parseDouble(per.getAffectedStatus());
 					if (sub != null)
 						s_C.add(sub.getTraits());
 					si++;

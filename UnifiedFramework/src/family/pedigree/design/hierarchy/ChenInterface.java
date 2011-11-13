@@ -15,7 +15,7 @@ public interface ChenInterface {
 
 	public void setSeed(long s);
 	public void recoverSeed();
-	public byte[] getStatus();
+	public double[] getStatus();
 	public void getPermutedScore(boolean nested);
 	public void RecoverScore();
 	public MapFile getMapFile();
