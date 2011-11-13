@@ -73,7 +73,7 @@ public class PLINKParser {
 		if (mapFile != null) {
 			mapData.parseMap();
 		}
-		if (Parameter.x) {
+		if (Parameter.transFlag) {
 			snpFilter = new SNPFilterI(mapData);
 		} else {
 			snpFilter = new SNPFilter(mapData);

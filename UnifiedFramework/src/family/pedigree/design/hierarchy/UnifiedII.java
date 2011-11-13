@@ -40,7 +40,7 @@ public class UnifiedII extends ChenBase {
 		if(PhenoData != null)
 			CovariateTable.ensureCapacity(qualified_Unrelated + qualified_Sib);
 
-		status = new byte[qualified_Unrelated + qualified_Sib];
+		status = new double[qualified_Unrelated + qualified_Sib];
 
 		ArrayList<PersonIndex> u_P = NewIt.newArrayList();
 		ArrayList<ArrayList<String>> u_C = NewIt.newArrayList();
@@ -74,14 +74,14 @@ public class UnifiedII extends ChenBase {
 
 				if (fs.hasAncestor(per)) {
 					s_P.add(new PersonIndex(fs.getFamilyStructName(), pi[i], per, false, false));
-					status[s + qualified_Unrelated] = (byte) per.getAffectedStatus();
+					status[s + qualified_Unrelated] = Double.parseDouble(per.getAffectedStatus());
 					if(PhenoData != null)
 						s_C.add(sub.getTraits());
 					si++;
 					s++;
 				} else {
 					u_P.add(new PersonIndex(fs.getFamilyStructName(), pi[i], per, false, true));
-					status[un] = (byte) per.getAffectedStatus();
+					status[un] = Double.parseDouble(per.getAffectedStatus());
 					if(PhenoData != null)
 						u_C.add(sub.getTraits());
 					F.add(new Integer(un++));

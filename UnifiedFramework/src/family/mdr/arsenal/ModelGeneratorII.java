@@ -2,6 +2,8 @@ package family.mdr.arsenal;
 
 import java.math.BigInteger;
 
+import test.Test;
+
 import admixture.parameter.Parameter;
 
 public class ModelGeneratorII extends ModelGenerator {
@@ -60,7 +62,10 @@ public class ModelGeneratorII extends ModelGenerator {
 			BigInteger size = total.divide(new BigInteger(Integer.toString(Parameter.sliceN)));
 			if (size.compareTo(BigInteger.ZERO) == 0) {
 				System.err.println("Given " + total + " interactions, " + "--slice option made " + Parameter.sliceN + " slices, which " +
-						"were too many.\nGMDR quit");
+						"were too many.\nGMDR quit.");
+				Test.LOG.append("Given " + total + " interactions, " + "--slice option made " + Parameter.sliceN + " slices, which " +
+						"were too many.\nGMDR quit.\n");
+				Test.printLog();
 				System.exit(1);
 			}
 			BigInteger stop = size.multiply(new BigInteger(Integer.toString(Parameter.slice - 1)));

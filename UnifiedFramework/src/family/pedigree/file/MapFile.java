@@ -7,6 +7,9 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
 
+import admixture.parameter.Parameter;
+
+import test.Test;
 import util.NewIt;
 
 
@@ -44,7 +47,10 @@ public class MapFile {
 		try {
 			reader = new BufferedReader(new FileReader(mapfile));
 		} catch (IOException E) {
-			throw new IllegalArgumentException("could not open map file");
+			System.err.println("could not open map file.");
+			Test.LOG.append("could not open map file.\n");
+			Test.printLog();
+			System.exit(0);
 		}
 
 		String line = null;
@@ -73,8 +79,10 @@ public class MapFile {
 		if(badline != null) {
 			System.err.println( "problems with the lines below:");
 			for(Integer i: badline) {
-				System.err.println( i + ",");
+				System.err.print( i + ",");
+				Test.LOG.append(i + ",");
 			}
+			Test.printLog();
 			System.exit(0);
 		}
 		numMarkerOriginal = snpList.size();
@@ -137,6 +145,8 @@ public class MapFile {
 	public void setPolymorphism(char[][] p, short[][] freq) {
 		if(p.length != snpList.size()) {
 			System.err.println("map file and the pedigree file do not match.");
+			Test.LOG.append("map file and the pedigree file do not match.\n");
+			Test.printLog();
 			System.exit(0);
 		} else {
 			for(int i = 0; i < p.length; i++) {

@@ -1,5 +1,7 @@
 package score;
 import org.apache.commons.math.linear.*;
+
+import test.Test;
 /**
  * 
  * @author Guo-Bo Chen, chenguobo@gmail.com
@@ -54,8 +56,10 @@ public class LinearRegression {
 		RealMatrix Matrix_XT = Matrix_X.transpose();
 		RealMatrix Matrix_XT_X = Matrix_XT.multiply(Matrix_X);
 		if (Matrix_XT_X.isSingular()) {
-			throw new IllegalArgumentException(
-					"The covariate matrix is singular.");
+			System.err.println("the covariate matrix is singular.");
+			Test.LOG.append("the covariate matrix is singular.\n");
+			Test.printLog();
+			System.exit(0);
 		}
 		RealMatrix Matrix_XT_X_Ivt = Matrix_XT_X.inverse();
 		RealMatrix Matrix_XT_X_Ivt_XT = Matrix_XT_X_Ivt.multiply(Matrix_XT);

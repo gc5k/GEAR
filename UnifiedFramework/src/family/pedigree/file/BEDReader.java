@@ -55,7 +55,8 @@ public class BEDReader extends PedigreeFile {
 			per.setDadID(tokens[2]);
 			per.setMomID(tokens[3]);
 			per.setGender(Integer.parseInt(tokens[4]));
-			per.setAffectedStatus(Integer.parseInt(tokens[5]));
+			per.setAffectedStatus(tokens[5]);
+			SixthCol.add(tokens[5]);
 
 			BFamilyStruct fam = familystructure.get(tokens[0]);
 			if (fam == null) {
@@ -65,7 +66,7 @@ public class BEDReader extends PedigreeFile {
 			fam.addPerson(per);
 			n_individual++;
 		}
-
+		Is6ColBinary();
 	}
 
 	@Override
@@ -82,10 +83,10 @@ public class BEDReader extends PedigreeFile {
 		byte[] magic = new byte[3];
 		int n = in.read(magic, 0, 3);
 		if (magic[2] == 1) {
-			System.err.println("reading data in plink snp-major mode");
+			System.err.println("reading data in plink snp-major mode.");
 			snp_major(in, numMarkerInFile, WSNP);
 		} else {
-			System.err.println("reading data in plink individual-major mode");
+			System.err.println("reading data in plink individual-major mode.");
 			individual_major(in, numMarkerInFile, WSNP);
 		}
 		in.close();

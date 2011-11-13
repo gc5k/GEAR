@@ -6,12 +6,14 @@ import java.io.FileReader;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Enumeration;
+import java.util.HashSet;
 import java.util.Hashtable;
 
 import org.apache.commons.lang3.ArrayUtils;
 
 import admixture.parameter.Parameter;
 
+import test.Test;
 import util.NewIt;
 import family.mdr.arsenal.MDRConstant;
 import family.pedigree.genotype.BFamilyStruct;
@@ -27,6 +29,8 @@ public class PedigreeFile {
 	protected Hashtable<String, BFamilyStruct> familystructure;
 	protected ArrayList<String> FamID;
 
+	protected HashSet<String> SixthCol = NewIt.newHashSet();
+	protected boolean IsSixthColBinary = true;
 	protected int num_marker;
 	protected String titleLine = null;
 	protected String pedfile;
@@ -103,8 +107,11 @@ public class PedigreeFile {
 			String[] tokenizer = line.split(MDRConstant.delim);
 			int numTokens = tokenizer.length;
 			numMarkers = (numTokens - 6) / 2;
-			if (numMarkers != numMarkerInFile) {
-				throw new IllegalArgumentException("Mismatched Colunm in ped file at line " + (k + 1));
+			if (numMarkers != numMarkerInFile) {				
+				System.err.println("Mismatched column in ped file at line " + (k+1));
+				Test.LOG.append("Mismatched column in ped file at line " + (k+1) + ".\n");
+				Test.printLog();
+				System.exit(0);
 			}
 
 			per = new BPerson(num_marker);
@@ -116,16 +123,12 @@ public class PedigreeFile {
 				per.setDadID(tokenizer[2]);
 				per.setMomID(tokenizer[3]);
 
-				try {
-					int Gender = Integer.parseInt(tokenizer[4]);
-					int Status = Integer.parseInt(tokenizer[5]);
+				
+				int Gender = Integer.parseInt(tokenizer[4]);
+				SixthCol.add(tokenizer[5]);
 
-					per.setGender(Gender);
-					per.setAffectedStatus(Status);
-
-				} catch (NumberFormatException nfe) {
-					throw new IOException("Pedfile error: invalid gender or affected status on line " + (k + 1));
-				}
+				per.setGender(Gender);
+				per.setAffectedStatus(tokenizer[5]);
 
 				int c = 0;
 				for (int j = 0; j < (tokenizer.length - 6) / 2; j++) {
@@ -142,7 +145,10 @@ public class PedigreeFile {
 							per.addMarker(flag, 0, 0, c);
 						}
 					} catch (NumberFormatException nfe) {
-						throw new IllegalArgumentException("Pedigree file input error: invalid genotype on line " + (k + 1));
+						System.err.println("invalid genotype in ped file at line " + (k + 1) + " for marker " + (c+1) + ".");
+						Test.LOG.append("invalid genotype in ped file at line " + (k + 1) + " for marker " + (c+1) + ".\n");
+						Test.printLog();
+						System.exit(0);
 					}
 					c++;
 				}
@@ -161,8 +167,29 @@ public class PedigreeFile {
 			}
 			k++;
 		}
+		Is6ColBinary();
 	}
 
+	protected void Is6ColBinary() {
+		for(String c : SixthCol) {
+			if(Parameter.status_shiftFlag) {
+				if(c.compareTo("1") != 0 && c.compareTo("0")!= 0 && c.compareTo(Parameter.missing_phenotype) != 0) {
+					IsSixthColBinary = false;
+					break;
+				}
+			} else {
+				if(c.compareTo("2") != 0 && c.compareTo("1")!= 0 && c.compareTo("0") != 0 && c.compareTo(Parameter.missing_phenotype) != 0) {
+					IsSixthColBinary = false;
+					break;
+				}
+			}
+		}
+	}
+	
+	public boolean IsSixthColBinary() {
+		return IsSixthColBinary;
+	}
+	
 	protected int[] recode(int idx, String[] allele) {
 		int[] code = { -1, -1 };
 		char[] ref = AlleleSet[idx];

@@ -5,6 +5,7 @@ import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
 
+import test.Test;
 import util.NewIt;
 
 public class BIMReader extends MapFile {
@@ -48,8 +49,10 @@ public class BIMReader extends MapFile {
 		if(badline != null) {
 			System.err.println( "problems with the lines below:");
 			for(Integer i: badline) {
-				System.err.println( i + ",");
+				System.err.print( i + ",");
+				Test.LOG.append(i + ",");
 			}
+			Test.printLog();
 			System.exit(0);
 		}
 		numMarkerOriginal = snpList.size();

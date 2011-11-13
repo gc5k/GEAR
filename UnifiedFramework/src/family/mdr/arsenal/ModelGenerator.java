@@ -6,6 +6,7 @@ import java.util.Iterator;
 import java.math.BigInteger;
 
 import admixture.parameter.Parameter;
+import test.Test;
 import util.NewIt;
 
 public class ModelGenerator implements Iterator<String> {
@@ -35,7 +36,11 @@ public class ModelGenerator implements Iterator<String> {
 
 		if (bgSNP != null) {
 			if (R > bgSNP.length + seq.length) {
-				throw new IllegalArgumentException("the number of qualified snps were fewer than the order of interaction going to detect.");
+
+				System.err.println("the number of qualified snps were fewer than the order of interaction going to detect.");
+				Test.LOG.append("the number of qualified snps were fewer than the order of interaction going to detect.\n");
+				Test.printLog();
+				System.exit(0);
 			}
 			if (R < bgSNP.length) {
 				R = bgSNP.length;
@@ -43,7 +48,10 @@ public class ModelGenerator implements Iterator<String> {
 
 		} else {
 			if (R > seq.length) {
-				throw new IllegalArgumentException("the number of qualified snps were fewer than the order of interaction going to detect.");
+				System.err.println("the number of qualified snps were fewer than the order of interaction going to detect.");
+				Test.LOG.append("the number of qualified snps were fewer than the order of interaction going to detect.\n");
+				Test.printLog();
+				System.exit(0);				
 			}
 		}
 		len = seq.length;
@@ -89,7 +97,10 @@ public class ModelGenerator implements Iterator<String> {
 			BigInteger size = total.divide(new BigInteger(Integer.toString(Parameter.sliceN)));
 			if (size.compareTo(BigInteger.ZERO) == 0) {
 				System.err.println("Given " + total + " interactions, " + "--slice option made " + Parameter.sliceN + " slices, which " +
-						"were too many.\nGMDR quit");
+						"were too many.\nGMDR quit.");
+				Test.LOG.append("Given " + total + " interactions, " + "--slice option made " + Parameter.sliceN + " slices, which " +
+						"were too many.\nGMDR quit\n");
+				Test.printLog();
 				System.exit(1);
 			}
 			BigInteger stop = size.multiply(new BigInteger(Integer.toString(Parameter.slice - 1)));

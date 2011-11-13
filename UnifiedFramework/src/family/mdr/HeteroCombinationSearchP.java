@@ -16,6 +16,8 @@ import family.mdr.arsenal.ToolKit;
 import family.mdr.data.PersonIndex;
 import family.mdr.result.Cell;
 import family.mdr.result.Combination;
+import family.mdr.result.MDRStatistic;
+
 import family.mdr.result.OneCVSet;
 import family.mdr.result.Suite;
 import family.pedigree.design.hierarchy.ChenInterface;
@@ -33,7 +35,7 @@ public class HeteroCombinationSearchP extends AbstractMergeSearch {
 	private double meanT;
 	private double TStat;
 	private double pT = Double.NaN;
-	private double[] roundBest = null;
+//	private double[] roundBest = null;
 	private NormalDistribution nd = new NormalDistributionImpl();
 	private ChenInterface chen;
 
@@ -77,10 +79,10 @@ public class HeteroCombinationSearchP extends AbstractMergeSearch {
 
 		super(builder.cv, builder.dr, builder.mf, builder.mg, builder.N, builder.mute);
 		this.chen = builder.chen;
-		if (Parameter.permFlag) {
-			roundBest = new double[Parameter.perm];
-			Arrays.fill(roundBest, 0);
-		}
+//		if (Parameter.permFlag) {
+//			roundBest = new double[Parameter.perm];
+//			Arrays.fill(roundBest, 0);
+//		}
 
 	}
 
@@ -348,8 +350,8 @@ public class HeteroCombinationSearchP extends AbstractMergeSearch {
 					}
 				}
 				System.out.print(mdrStat);
-				System.out.print(", ");
 				if (Parameter.verboseFlag) {
+					System.out.print(", ");
 					for (int j = 0; j < len; j++) {
 						System.out.print(mapData.getSNP(idx[j]));
 						if (j != idx.length - 1)
@@ -361,7 +363,7 @@ public class HeteroCombinationSearchP extends AbstractMergeSearch {
 				System.out.println();
 			}
 		}
-		calculateThreshold();
+//		calculateThreshold();
 	}
 
 	private void pcalculateSingleBest(String modelName) {
@@ -447,9 +449,9 @@ public class HeteroCombinationSearchP extends AbstractMergeSearch {
 			tSq += Pmean[MDRConstant.TestingBalancedAccuIdx] * Pmean[MDRConstant.TestingBalancedAccuIdx];
 			tSum += Pmean[MDRConstant.TestingBalancedAccuIdx];
 
-			if (roundBest[i] < permuvalue[i]) {
-				roundBest[i] = permuvalue[i];
-			}
+//			if (roundBest[i] < permuvalue[i]) {
+//				roundBest[i] = permuvalue[i];
+//			}
 		}
 
 		meanT = tSum / Parameter.perm;
@@ -466,32 +468,32 @@ public class HeteroCombinationSearchP extends AbstractMergeSearch {
 
 	}
 
-	private void calculateThreshold() {
-		if (roundBest == null) {
-			return;
-		}
-		Arrays.sort(roundBest);
-		StringBuilder sb = new StringBuilder(Parameter.out);
-		sb.append(order);
-		if (Parameter.sliceFlag) {
-			sb.append(".slice" + Parameter.slice + "." + Parameter.sliceN);
-		}
-		sb.append(".thres");
-		PrintStream PW = null;
-		try {
-			PW = new PrintStream(sb.toString());
-		} catch (FileNotFoundException e) {
-			e.printStackTrace();
-		}
-		for (int i = 0; i < roundBest.length; i++) {
-			PW.println(roundBest[i]);
-		}
-		PW.close();
-//		int idx_005 = (int) (roundBest.length * 0.95);
-//		int idx_001 = (int) (roundBest.length * 0.99);
-//		System.out.println("threshold at significance level 0.05 = " + roundBest[idx_005]);
-//		System.out.println("threshold at significance level 0.01 = " + roundBest[idx_001]);
-	}
+//	private void calculateThreshold() {
+//		if (roundBest == null) {
+//			return;
+//		}
+//		Arrays.sort(roundBest);
+//		StringBuilder sb = new StringBuilder(Parameter.out);
+//		sb.append(order);
+//		if (Parameter.sliceFlag) {
+//			sb.append(".slice" + Parameter.slice + "." + Parameter.sliceN);
+//		}
+//		sb.append(".thres");
+//		PrintStream PW = null;
+//		try {
+//			PW = new PrintStream(sb.toString());
+//		} catch (FileNotFoundException e) {
+//			e.printStackTrace();
+//		}
+//		for (int i = 0; i < roundBest.length; i++) {
+//			PW.println(roundBest[i]);
+//		}
+//		PW.close();
+////		int idx_005 = (int) (roundBest.length * 0.95);
+////		int idx_001 = (int) (roundBest.length * 0.99);
+////		System.out.println("threshold at significance level 0.05 = " + roundBest[idx_005]);
+////		System.out.println("threshold at significance level 0.01 = " + roundBest[idx_001]);
+//	}
 
 	public void PrintHeader() {
 		System.out.print("model" + ", ");
@@ -499,16 +501,19 @@ public class HeteroCombinationSearchP extends AbstractMergeSearch {
 		System.out.print("vc, vx, vt, F, PF(d1,d2), ");
 		for (int i = 0; i < MDRConstant.NumStats; i++) {
 			if (i != MDRConstant.NumStats - 1) {
-				System.out.print(MDRConstant.TestStatistic[i] + "(TA), " + "mean TA (null dis), " + "S.E.TA (null dis), ");
+				System.out.print(MDRConstant.TestStatistic[i] + "(TA), ");
+				if (Parameter.permFlag) {
+					System.out.print("mean TA (null dis), " + "S.E.TA (null dis), ");
+				}
 			} else {
-				System.out.print(MDRConstant.TestStatistic[i] + ", ");
+				System.out.print(MDRConstant.TestStatistic[i]);
 			}
 		}
 		if (Parameter.verboseFlag) {
 			for (int i = 0; i < order; i++) {
-				System.out.print("locus" + (i + 1) + ", ");
-				System.out.print("chr" + (i + 1) + ", ");
-				System.out.print("position" + (i + 1) + ", ");
+				System.out.print(", LOCUS" + (i + 1) + ", ");
+				System.out.print("CHR" + (i + 1) + ", ");
+				System.out.print("POS" + (i + 1) + ", ");
 				if (i < order - 1) {
 					System.out.print("MAF" + (i + 1) + ", ");
 				} else {
