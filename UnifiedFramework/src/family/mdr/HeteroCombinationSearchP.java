@@ -1,10 +1,6 @@
 package family.mdr;
-
-import java.io.FileNotFoundException;
-import java.io.PrintStream;
 import java.math.BigInteger;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Set;
 import java.util.Map.Entry;
 
@@ -498,12 +494,12 @@ public class HeteroCombinationSearchP extends AbstractMergeSearch {
 	public void PrintHeader() {
 		System.out.print("model" + ", ");
 		System.out.print("effective individuals, ");
-		System.out.print("vc, vx, vt, F, PF(d1,d2), ");
+		System.out.print("vc, vx, vt, ");
 		for (int i = 0; i < MDRConstant.NumStats; i++) {
 			if (i != MDRConstant.NumStats - 1) {
 				System.out.print(MDRConstant.TestStatistic[i] + "(TA), ");
 				if (Parameter.permFlag) {
-					System.out.print("mean TA (null dis), " + "S.E.TA (null dis), ");
+					System.out.print("mean TA (null dis), " + "S.E.TA (null dis), " + "P (z-score), ");
 				}
 			} else {
 				System.out.print(MDRConstant.TestStatistic[i]);
