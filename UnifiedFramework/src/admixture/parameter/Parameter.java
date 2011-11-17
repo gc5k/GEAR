@@ -346,6 +346,7 @@ public class Parameter {
 			+ "******************************************************************\n"
 			+ "| GMDR 1.0 released 13/11/2011                                   |\n"
 			+ "| (C) 2011 Guo-Bo Chen, Xiang-Yang Lou                           |\n"
+			+ "| v 0.7.1                                                        |\n"			
 			+ "| GNU General Public License, v2                                 |\n"
 			+ "| Department of Biostatistics, Section on Statistical Genetics   |\n"
 			+ "| University of Alabama at Birmingham                            |\n"
@@ -580,6 +581,9 @@ public class Parameter {
 		}
 		if (cl.hasOption(cmd_trans)) {
 			transFlag = true;
+		}
+		if (cl.hasOption(cmd_out)) {
+			out = cl.getOptionValue(cmd_out);
 		}
 		if (cl.hasOption(cmd_cc)) {
 			ccFlag = true;
@@ -958,8 +962,8 @@ public class Parameter {
 
 			File f = new File(gl);
 			if (!f.exists()) {
-				System.err.println("could not find file --" + cmd_gene_list_long + " " + gl +".");
-				Test.LOG.append("could not find file --" + cmd_gene_list_long + " " + gl + ".\n");
+				System.err.println("could not find file for --option " + cmd_gene_list_long + ": " + gl +".");
+				Test.LOG.append("could not find file for --option " + cmd_gene_list_long + ": " + gl + ".\n");
 				Test.printLog();
 				System.exit(0);
 			}
@@ -1018,7 +1022,6 @@ public class Parameter {
 				}
 				reader.close();
 			} catch (IOException e) {
-				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}
 			boolean flag = true;
@@ -1029,11 +1032,9 @@ public class Parameter {
 					flag = false;
 				}
 			}
-			if(!snp2genefileFlag && !snp2genefilesFlag) {
-				if(!flag) {
-					Test.printLog();
-					System.exit(0);
-				}
+			if(!flag) {
+				Test.printLog();
+				System.exit(0);
 			}
 
 			gene = (String[]) ge.toArray(new String[0]);
@@ -1048,7 +1049,6 @@ public class Parameter {
 				Test.LOG.append(gene[i] + ": chr" + gene_chr[i] + " " +gene_begin[i] + "k ~ " + gene_end[i] + "k.\n");
 			}
 			geneFlag = true;
-
 		}
 		
 		if (cl.hasOption(cmd_gene_window)) {
@@ -1668,9 +1668,7 @@ public class Parameter {
 					.getOptionValue(cmd_testing));
 			testingFlag = true;
 		}
-		if (cl.hasOption(cmd_out)) {
-			out = cl.getOptionValue(cmd_out);
-		}
+
 		if (cl.hasOption(cmd_verbose)) {
 			verboseFlag = true;
 		}

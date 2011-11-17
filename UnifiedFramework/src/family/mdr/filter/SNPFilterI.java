@@ -249,6 +249,7 @@ public class SNPFilterI implements SNPFilterInterface {
 	}
 	
 	private void selectGene() {
+		int count = 0;
 		ArrayList<ArrayList<Integer>> xsnps = NewIt.newArrayList();
 		for (int i = 0; i < Parameter.gene.length; i++) {
 			ArrayList<Integer> s = NewIt.newArrayList();
@@ -264,6 +265,7 @@ public class SNPFilterI implements SNPFilterInterface {
 							&& pos <= (Parameter.gene_end[j] + Parameter.genewindow) * 1000) {
 						xsnps.get(j).add(i);
 						includeSNP(i);
+						count++;
 					}
 				}
 			}
@@ -334,6 +336,9 @@ public class SNPFilterI implements SNPFilterInterface {
 				System.exit(1);
 			}
 		}
+
+		System.err.print(count + " snps selected in total.");
+		Test.LOG.append(count + " snps selected in total.\n");
 
 		for (int i = 0; i < xsnps.size(); i++) {
 			ArrayList<Integer> xsnp = xsnps.get(i);
