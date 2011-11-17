@@ -152,6 +152,10 @@ public class Parameter {
 	public static double[] begin = null;
 	public static double[] end = null;
 
+	private final String cmd_gene_warning = "genewarn";
+	private final String cmd_gene_warning_long = "gene-warn-off";
+	public static boolean genewarning = true;
+
 	private final String cmd_gene_window = "genewindow";
 	private final String cmd_gene_window_long = "gene-window";
 	public static double genewindow = 0;
@@ -916,6 +920,7 @@ public class Parameter {
 		if (cl.hasOption(cmd_snp2genelist)) {
 			snp2genefileFlag = true;
 		}
+
 		if (cl.hasOption(cmd_snp2genemlist)) {
 			snp2genefilesFlag = true;
 		}
@@ -1024,9 +1029,11 @@ public class Parameter {
 					flag = false;
 				}
 			}
-			if(!flag) {
-				Test.printLog();
-				System.exit(0);
+			if(!snp2genefileFlag && !snp2genefilesFlag) {
+				if(!flag) {
+					Test.printLog();
+					System.exit(0);
+				}
 			}
 
 			gene = (String[]) ge.toArray(new String[0]);

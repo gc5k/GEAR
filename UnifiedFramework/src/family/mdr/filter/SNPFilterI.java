@@ -258,11 +258,13 @@ public class SNPFilterI implements SNPFilterInterface {
 			SNP snp = snpList.get(i);
 			String chr = snp.getChromosome();
 			int pos = snp.getPosition();
-			int idx = ArrayUtils.indexOf(Parameter.gene_chr, chr);
-			if (idx >= 0) {
-				if ( pos >= (Parameter.gene_begin[idx]- Parameter.genewindow) *1000  && pos <= (Parameter.gene_end[idx] + Parameter.genewindow)*1000 ) {
-					xsnps.get(idx).add(i);
-					includeSNP(i);
+			for (int j = 0; j < Parameter.gene_chr.length; j++) {
+				if (chr.compareTo(Parameter.gene_chr[j]) == 0) {
+					if (pos >= (Parameter.gene_begin[j] - Parameter.genewindow) * 1000
+							&& pos <= (Parameter.gene_end[j] + Parameter.genewindow) * 1000) {
+						xsnps.get(j).add(i);
+						includeSNP(i);
+					}
 				}
 			}
 		}
@@ -281,14 +283,14 @@ public class SNPFilterI implements SNPFilterInterface {
 				if (s.size() == 0) {
 					continue;
 				}
-				System.err.println(s.size() + " snps selected with gene "
+				System.err.print(s.size() + " snps selected with gene "
 						+ Parameter.gene[i]);
-				System.err.println("writing snps into " 
-						+ Parameter.gene[i] + ".gene");
+				System.err.println(" [writing snps into " 
+						+ Parameter.gene[i] + ".gene]");
 				Test.LOG.append(s.size() + " snps selected with gene "
 						+ Parameter.gene[i] + "\n");
-				Test.LOG.append("writing snps into " 
-						+ Parameter.gene[i] + ".gene\n");
+				Test.LOG.append(" [writing snps into " 
+						+ Parameter.gene[i] + ".gene]\n");
 				for (int j = 0; j < s.size(); j++) {
 					SNP snp = snpList.get(s.get(j));
 					PW.println(snp.getName() + " " + snp.getChromosome() + " "

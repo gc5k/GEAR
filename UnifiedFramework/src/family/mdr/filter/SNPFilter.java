@@ -41,7 +41,7 @@ public class SNPFilter implements SNPFilterInterface {
 	}
 
 	public void Select() {
-		
+
 		if (Parameter.bgsnpFlag) {
 			selectBackgroundSNP();
 			filterFlag = true;
@@ -73,7 +73,8 @@ public class SNPFilter implements SNPFilterInterface {
 			filterFlag = true;
 		}
 
-		if (filterFlag && selectedSNPSet.size() == 0 && excludedSNPSet.size() == 0 && bgSNPSet.size() == 0) {
+		if (filterFlag && selectedSNPSet.size() == 0
+				&& excludedSNPSet.size() == 0 && bgSNPSet.size() == 0) {
 			System.err.println("No snps selected. GMDR quit.");
 			Test.LOG.append("No snps selected. GMDR quit.\n");
 			Test.printLog();
@@ -149,15 +150,16 @@ public class SNPFilter implements SNPFilterInterface {
 				int d = snpwindowList.get(j).compareTo(snp);
 				if (d != Integer.MAX_VALUE && d != Integer.MIN_VALUE) {
 					int idx = snpwindowIndex.get(j).intValue();
-					if (d > Parameter.snp_window[idx][0] && d < Parameter.snp_window[idx][1])
+					if (d > Parameter.snp_window[idx][0]
+							&& d < Parameter.snp_window[idx][1])
 						includeSNP(i);
 				}
 			}
 		}
 	}
-	
+
 	private void selectGene() {
-		
+
 		ArrayList<ArrayList<Integer>> xsnps = NewIt.newArrayList();
 		for (int i = 0; i < Parameter.gene.length; i++) {
 			ArrayList<Integer> s = NewIt.newArrayList();
@@ -167,14 +169,17 @@ public class SNPFilter implements SNPFilterInterface {
 			SNP snp = snpList.get(i);
 			String chr = snp.getChromosome();
 			int pos = snp.getPosition();
-			int idx = ArrayUtils.indexOf(Parameter.gene_chr, chr);
-			if (idx >= 0) {
-				if ( pos >= (Parameter.gene_begin[idx] - Parameter.genewindow)*1000  && pos <= (Parameter.gene_end[idx] + Parameter.genewindow) *1000  ) {
-					xsnps.get(idx).add(i);
-					includeSNP(i);
+			for (int j = 0; j < Parameter.gene_chr.length; j++) {
+
+				if (chr.compareTo(Parameter.gene_chr[j]) == 0) {
+					if (pos >= (Parameter.gene_begin[j] - Parameter.genewindow) * 1000
+							&& pos <= (Parameter.gene_end[j] + Parameter.genewindow) * 1000) {
+						xsnps.get(j).add(i);
+						includeSNP(i);
+					}
 				}
 			}
-		}		
+		}
 
 		if (Parameter.snp2genefilesFlag) {
 			for (int i = 0; i < xsnps.size(); i++) {
@@ -190,18 +195,18 @@ public class SNPFilter implements SNPFilterInterface {
 				if (s.size() == 0) {
 					continue;
 				}
-				System.err.println(s.size() + " snps selected with gene "
+				System.err.print(s.size() + " snps selected with gene "
 						+ Parameter.gene[i]);
-				System.err.println("writing snps into " 
-						+ Parameter.gene[i] + ".gene");
+				System.err.println(" [writing snps into " + Parameter.gene[i]
+						+ ".gene]");
 				Test.LOG.append(s.size() + " snps selected with gene "
-						+ Parameter.gene[i] + "\n");
-				Test.LOG.append("writing snps into " 
-						+ Parameter.gene[i] + ".gene\n");
+						+ Parameter.gene[i]);
+				Test.LOG.append(" [writing snps into " + Parameter.gene[i]
+						+ ".gene]\n");
 				for (int j = 0; j < s.size(); j++) {
 					SNP snp = snpList.get(s.get(j));
 					PW.println(snp.getName() + " " + snp.getChromosome() + " "
-							+ snp.getPosition() +" " + Parameter.gene[i]);
+							+ snp.getPosition() + " " + Parameter.gene[i]);
 				}
 				PW.close();
 			}
@@ -228,13 +233,11 @@ public class SNPFilter implements SNPFilterInterface {
 				for (int j = 0; j < s.size(); j++) {
 					SNP snp = snpList.get(s.get(j));
 					PW.println(snp.getName() + " " + snp.getChromosome() + " "
-							+ snp.getPosition() +" " + Parameter.gene[i]);
+							+ snp.getPosition() + " " + Parameter.gene[i]);
 				}
 			}
-			System.err.println("writing snps into " 
-					+ Parameter.out + ".gene");
-			Test.LOG.append("writing snps into " 
-					+ Parameter.out + ".gene\n");
+			System.err.println("writing snps into " + Parameter.out + ".gene");
+			Test.LOG.append("writing snps into " + Parameter.out + ".gene\n");
 			PW.close();
 			if (Parameter.snp2genefileFlag) {
 				Test.printLog();
@@ -261,9 +264,9 @@ public class SNPFilter implements SNPFilterInterface {
 			}
 			for (int i = 0; i < in_range.length; i++) {
 				if (in_range[i][0] > in_range[i][1]) {
-					in_range[i][0] = in_range[i][0]^in_range[i][1];
-					in_range[i][1] = in_range[i][0]^in_range[i][1];
-					in_range[i][0] = in_range[i][0]^in_range[i][1];
+					in_range[i][0] = in_range[i][0] ^ in_range[i][1];
+					in_range[i][1] = in_range[i][0] ^ in_range[i][1];
+					in_range[i][0] = in_range[i][0] ^ in_range[i][1];
 				}
 			}
 		}
@@ -283,9 +286,9 @@ public class SNPFilter implements SNPFilterInterface {
 			}
 			for (int i = 0; i < ex_range.length; i++) {
 				if (ex_range[i][0] > ex_range[i][1]) {
-					ex_range[i][0] = ex_range[i][0]^ex_range[i][1];
-					ex_range[i][1] = ex_range[i][0]^ex_range[i][1];
-					ex_range[i][0] = ex_range[i][0]^ex_range[i][1];
+					ex_range[i][0] = ex_range[i][0] ^ ex_range[i][1];
+					ex_range[i][1] = ex_range[i][0] ^ ex_range[i][1];
+					ex_range[i][0] = ex_range[i][0] ^ ex_range[i][1];
 				}
 			}
 		}
@@ -312,15 +315,16 @@ public class SNPFilter implements SNPFilterInterface {
 			}
 		}
 	}
-	
+
 	private void selectSNPRegion() {
-		for(int i = 0; i < snpList.size(); i++) {
+		for (int i = 0; i < snpList.size(); i++) {
 			SNP snp = snpList.get(i);
 			String chr = snp.getChromosome();
 			int pos = snp.getPosition();
 			int idx = ArrayUtils.indexOf(Parameter.chr_reg, chr);
 			if (idx >= 0) {
-				if (pos >= Parameter.begin[idx] * 1000 && pos <= Parameter.end[idx] * 1000 ) {
+				if (pos >= Parameter.begin[idx] * 1000
+						&& pos <= Parameter.end[idx] * 1000) {
 					includeSNP(i);
 				}
 			}
@@ -361,7 +365,8 @@ public class SNPFilter implements SNPFilterInterface {
 			if (selectedSNPSet.size() > bgSNPSet.size()) {
 				WSNP = new int[selectedSNPSet.size()];
 				int c = 0;
-				for (Iterator<Integer> e = selectedSNPSet.iterator(); e.hasNext();) {
+				for (Iterator<Integer> e = selectedSNPSet.iterator(); e
+						.hasNext();) {
 					Integer V = e.next();
 					WSNP[c++] = V.intValue();
 				}

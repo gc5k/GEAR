@@ -120,7 +120,8 @@ public class Test {
 					.build();
 		}
 
-
+		System.err.println(chen.getSample().size() + " individuals used in the analysis.");
+		Test.LOG.append(chen.getSample().size() + " individuals used in the analysis.\n");
 		for (int j = Parameter.order; j <= Parameter.order; j++) {
 
 			StringBuilder sb = new StringBuilder(Parameter.out);
@@ -214,7 +215,6 @@ public class Test {
 			} catch (FileNotFoundException e) {
 				e.printStackTrace();
 			}
-			pw.append("#!/bin/bash\n");
 			pw.append("#$ -S /bin/bash\n");
 			pw.append("#$ -cwd\n");
 			pw.append("#$ -V\n");
