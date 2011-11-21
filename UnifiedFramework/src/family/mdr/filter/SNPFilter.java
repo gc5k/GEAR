@@ -57,8 +57,7 @@ public class SNPFilter implements SNPFilterInterface {
 			filterFlag = true;
 		}
 
-		if (Parameter.snpPairFlag || Parameter.snpFlag) {
-			selectSNPRange();
+		if (Parameter.snpFlag) {
 			selectSNPs();
 			filterFlag = true;
 		}
@@ -184,12 +183,16 @@ public class SNPFilter implements SNPFilterInterface {
 			}
 		}
 
+		int countgene = 0;
 		if (Parameter.snp2genefilesFlag) {
 			for (int i = 0; i < xsnps.size(); i++) {
+				StringBuffer sbsnp = new StringBuffer(Parameter.gene[i] + ".snp");
 				StringBuffer sb = new StringBuffer(Parameter.gene[i] + ".gene");
 				PrintStream PW = null;
+				PrintStream PWsnp = null;
 				try {
 					PW = new PrintStream(sb.toString());
+					PWsnp = new PrintStream(sbsnp.toString());
 				} catch (FileNotFoundException e) {
 					e.printStackTrace();
 				}
@@ -198,6 +201,7 @@ public class SNPFilter implements SNPFilterInterface {
 				if (s.size() == 0) {
 					continue;
 				}
+				countgene++;
 				System.err.print(s.size() + " snps selected with gene "
 						+ Parameter.gene[i]);
 				System.err.println(" [writing snps into " + Parameter.gene[i]
@@ -208,19 +212,25 @@ public class SNPFilter implements SNPFilterInterface {
 						+ ".gene]\n");
 				for (int j = 0; j < s.size(); j++) {
 					SNP snp = snpList.get(s.get(j));
+					PWsnp.println(snp.getName());
 					PW.println(snp.getName() + " " + snp.getChromosome() + " "
 							+ snp.getPosition() + " " + Parameter.gene[i]);
 				}
-
+				PWsnp.close();
 				PW.close();
 			}
+			System.err.println(count + " snps selected for " + countgene + " selected genes in total.");
+			Test.LOG.append(count + " snps selected for " + countgene + " selected genes in total.\n");
 			Test.printLog();
 			System.exit(1);
 		} else {
+			StringBuffer sbsnp = new StringBuffer(Parameter.out + ".snp");
 			StringBuffer sb = new StringBuffer(Parameter.out + ".gene");
 			PrintStream PW = null;
+			PrintStream PWsnp = null;
 			try {
 				PW = new PrintStream(sb.toString());
+				PWsnp = new PrintStream(sbsnp.toString());
 			} catch (FileNotFoundException e) {
 				e.printStackTrace();
 			}
@@ -229,6 +239,7 @@ public class SNPFilter implements SNPFilterInterface {
 				if (s.size() == 0) {
 					continue;
 				}
+				countgene++;
 				System.err.println(s.size() + " snps selected with gene "
 						+ Parameter.gene[i]);
 
@@ -236,6 +247,7 @@ public class SNPFilter implements SNPFilterInterface {
 						+ Parameter.gene[i] + "\n");
 				for (int j = 0; j < s.size(); j++) {
 					SNP snp = snpList.get(s.get(j));
+					PWsnp.println(snp.getName());
 					PW.println(snp.getName() + " " + snp.getChromosome() + " "
 							+ snp.getPosition() + " " + Parameter.gene[i]);
 				}
@@ -243,83 +255,15 @@ public class SNPFilter implements SNPFilterInterface {
 			System.err.println("writing snps into " + Parameter.out + ".gene");
 			Test.LOG.append("writing snps into " + Parameter.out + ".gene\n");
 			PW.close();
+			PWsnp.close();
+			System.err.println(count + " snps selected for " + countgene + " selected genes in total.");
+			Test.LOG.append(count + " snps selected for " + countgene + " selected genes in total.\n");
 			if (Parameter.snp2genefileFlag) {
 				Test.printLog();
 				System.exit(1);
 			}
 		}
-		System.err.print(count + " snps selected in total.");
-		Test.LOG.append(count + " snps selected in total.\n");
 
-	}
-
-	private void selectSNPRange() {
-
-		if (Parameter.insnpPair != null) {
-			in_range = new int[Parameter.insnpPair.length / 2][2];
-			for (int i = 0; i < snpList.size(); i++) {
-				SNP snp = snpList.get(i);
-				String rs = snp.getName();
-				int idx = ArrayUtils.indexOf(Parameter.insnpPair, rs);
-				if (idx >= 0) {
-					int dim1 = idx >> 1;
-					int dim2 = (idx - (idx >> 1 << 1));
-					in_range[dim1][dim2] = i;
-					includeSNP(i);
-				}
-			}
-			for (int i = 0; i < in_range.length; i++) {
-				if (in_range[i][0] > in_range[i][1]) {
-					in_range[i][0] = in_range[i][0] ^ in_range[i][1];
-					in_range[i][1] = in_range[i][0] ^ in_range[i][1];
-					in_range[i][0] = in_range[i][0] ^ in_range[i][1];
-				}
-			}
-		}
-
-		if (Parameter.exsnpPair != null) {
-			ex_range = new int[Parameter.exsnpPair.length / 2][2];
-			for (int i = 0; i < snpList.size(); i++) {
-				SNP snp = snpList.get(i);
-				String rs = snp.getName();
-				int idx = ArrayUtils.indexOf(Parameter.exsnpPair, rs);
-				if (idx >= 0) {
-					int dim1 = idx >> 1;
-					int dim2 = (idx - (idx >> 1 << 1));
-					ex_range[dim1][dim2] = i;
-					excludeSNP(i);
-				}
-			}
-			for (int i = 0; i < ex_range.length; i++) {
-				if (ex_range[i][0] > ex_range[i][1]) {
-					ex_range[i][0] = ex_range[i][0] ^ ex_range[i][1];
-					ex_range[i][1] = ex_range[i][0] ^ ex_range[i][1];
-					ex_range[i][0] = ex_range[i][0] ^ ex_range[i][1];
-				}
-			}
-		}
-
-		for (int i = 0; i < snpList.size(); i++) {
-			boolean flag = false;
-			if (ex_range != null) {
-				for (int j = 0; j < ex_range.length; j++) {
-					if (i >= ex_range[j][0] && i <= ex_range[j][1]) {
-						excludeSNP(i);
-						flag = true;
-						break;
-					}
-				}
-			}
-			if (!flag) {
-				if (in_range != null) {
-					for (int j = 0; j < in_range.length; j++) {
-						if (i >= in_range[j][0] && i <= in_range[j][1]) {
-							includeSNP(i);
-						}
-					}
-				}
-			}
-		}
 	}
 
 	private void selectSNPRegion() {
