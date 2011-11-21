@@ -152,10 +152,6 @@ public class Parameter {
 	public static double[] begin = null;
 	public static double[] end = null;
 
-	private final String cmd_gene_warning = "genewarn";
-	private final String cmd_gene_warning_long = "gene-warn-off";
-	public static boolean genewarning = true;
-
 	private final String cmd_gene_window = "genewindow";
 	private final String cmd_gene_window_long = "gene-window";
 	public static double genewindow = 0;
@@ -164,7 +160,8 @@ public class Parameter {
 	public static boolean hg18Flag = false;
 	private final String cmd_hg19 = "hg19";
 	public static boolean hg19Flag = true;
-	public static String hgFile = "/gene37.txt";
+	private final String cmd_hg = "hg";
+	public static String hgFile = "/gene36.txt";
 	
 	private final String cmd_gene = "gene";
 	private final String cmd_gene_list = "genelist";
@@ -177,9 +174,9 @@ public class Parameter {
 	public static double[] gene_end = null;
 
 	private final String cmd_snp2genelist = "makegene2snplist";
-	private final String cmd_snp2gene_list = "make-gene2snp-list";
+	private final String cmd_snp2gene_list = "make-snp-list";
 	private final String cmd_snp2genemlist = "makegene2snpmlist";
-	private final String cmd_snp2gene_mlist = "make-gene2snp-mlist";
+	private final String cmd_snp2gene_mlist = "make-snp-mlist";
 	public static boolean snp2genefilesFlag = false;
 	public static boolean snp2genefileFlag = false;
 	
@@ -195,23 +192,16 @@ public class Parameter {
 	public static double[][] snp_window = null;
 	public static boolean snpwindowFlag = false;
 
-	private final String cmd_snp = "snp";
-	private final String cmd_snp_list = "snplist";
-	private final String cmd_snp_list_long = "snp-list";
+//	private final String cmd_snp = "snp";
+	private final String cmd_extract = "extract";
 	public static boolean snpFlag = false;
+	private final String cmd_exclude = "exclude";
 	public static String[] includesnp = null;
 	public static String[] excludesnp = null;
 
-	public static String[] insnpPair = null;
-	public static String[] exsnpPair = null;
-	public static boolean snpPairFlag = false;
-
 	// this set only used when the option x is specified;
 	public static String[][] xincludesnp = null;
-	public static String[] xinsnpPair = null;
-
 	public static boolean xsnpFlag = false;
-	public static boolean xsnpPairFlag = false;
 	// end it
 
 	private final String cmd_bgsnp = "bg";
@@ -346,7 +336,7 @@ public class Parameter {
 			+ "******************************************************************\n"
 			+ "| GMDR 1.0 released 13/11/2011                                   |\n"
 			+ "| (C) 2011 Guo-Bo Chen, Xiang-Yang Lou                           |\n"
-			+ "| v 0.7.1                                                        |\n"			
+			+ "| v 0.7.3                                                        |\n"			
 			+ "| GNU General Public License, v2                                 |\n"
 			+ "| Department of Biostatistics, Section on Statistical Genetics   |\n"
 			+ "| University of Alabama at Birmingham                            |\n"
@@ -423,26 +413,28 @@ public class Parameter {
 		ops.addOption(OptionBuilder.withDescription("make snp lists with respect genes")
 				.withLongOpt(cmd_snp2gene_mlist).create(cmd_snp2genemlist));
 
-		ops.addOption(OptionBuilder.withDescription("using human genome build 18.")
+		ops.addOption(OptionBuilder.withDescription("specify human genome.").hasArg()
+				.create(cmd_hg));
+		ops.addOption(OptionBuilder.withDescription("use human genome build 18.")
 				.create(cmd_hg18));
-		ops.addOption(OptionBuilder.withDescription("using human genome build 19.")
+		ops.addOption(OptionBuilder.withDescription("use human genome build 19.")
 				.create(cmd_hg19));
 		
 
 		ops.addOption(OptionBuilder
 				.withDescription("specify the window size for a snp").hasArgs()
 				.withLongOpt(cmd_snpwindow_long).create(cmd_snpwindow));
-
-		ops.addOption(OptionBuilder
-				.withDescription("include snps in detecting interaction")
-				.hasArgs().create(cmd_snp));
 		ops.addOption(OptionBuilder
 				.withDescription("specify the background snp").hasArgs()
 				.create(cmd_bgsnp));
 		ops.addOption(OptionBuilder
 				.withDescription(
 						"specify the file containing included snps when detecting interaction")
-				.hasArgs().withLongOpt(cmd_snp_list_long).create(cmd_snp_list));
+				.hasArgs().create(cmd_extract));
+		ops.addOption(OptionBuilder
+				.withDescription(
+						"specify the file containing excluded snps when detecting interaction")
+				.hasArg().create(cmd_exclude));
 		ops.addOption(OptionBuilder.withDescription("select chromosomes")
 				.hasArgs().create(cmd_chr));
 		ops.addOption(OptionBuilder.withDescription("specify interacting snps")
@@ -798,101 +790,6 @@ public class Parameter {
 			predictor_name = (String[]) cn.toArray(new String[0]);
 		}
 
-		if (cl.hasOption(cmd_snp)) {
-			if (!transFlag) {
-				String[] snp = cl.getOptionValues(cmd_snp);
-				ArrayList<String> insnp = NewIt.newArrayList();
-				ArrayList<String> exsnp = NewIt.newArrayList();
-				ArrayList<String> insnppair = NewIt.newArrayList();
-				ArrayList<String> exsnppair = NewIt.newArrayList();
-				for (int i = 0; i < snp.length; i++) {
-					if (snp[i].startsWith("-")) {
-						String S = snp[i].substring(1, snp[i].length());
-						if (S.contains("-")) {
-							String[] s = S.split("-");
-							if (s.length != 2) {
-								System.err.println("bad parameter for --" + cmd_snp + ": " + snp[i] + ".");
-								Test.LOG.append("bad parameter  for --" + cmd_snp + ": " + snp[i] + ".\n");
-								Test.printLog();
-								System.exit(0);
-							}
-							exsnppair.add(s[0]);
-							exsnppair.add(s[1]);
-						} else {
-							exsnp.add(S);
-						}
-					} else {
-						if (snp[i].contains("-")) {
-							String[] s = snp[i].split("-");
-							if (s.length != 2) {
-								System.err.println("bad parameter for --" + cmd_snp + ": " + snp[i] + ".");
-								Test.LOG.append("bad parameter for --" + cmd_snp + ": " + snp[i] +".\n");
-								Test.printLog();
-								System.exit(0);
-							}
-							insnppair.add(s[0]);
-							insnppair.add(s[1]);
-						} else {
-							insnp.add(snp[i]);
-						}
-					}
-				}
-				if (insnp.size() > 0) {
-					includesnp = (String[]) insnp.toArray(new String[0]);
-					snpFlag = true;
-				}
-				if (exsnp.size() > 0) {
-					excludesnp = (String[]) exsnp.toArray(new String[0]);
-					snpFlag = true;
-				}
-				if (insnppair.size() > 0) {
-					insnpPair = (String[]) insnppair.toArray(new String[0]);
-					snpPairFlag = true;
-				}
-				if (exsnppair.size() > 0) {
-					exsnpPair = (String[]) exsnppair.toArray(new String[0]);
-					snpPairFlag = true;
-				}
-			} else {
-				String[] snp = cl.getOptionValues(cmd_snp);
-				ArrayList<String> insnp = NewIt.newArrayList();
-				ArrayList<String> insnppair = NewIt.newArrayList();
-				for (int i = 0; i < snp.length; i++) {
-					if (snp[i].startsWith("-")) {
-						System.err.println("bad parameter for --" + cmd_snp + ": " + snp[i] + ".");
-						Test.LOG.append("bad parameter for --" + cmd_snp + ": " + snp[i] +".\n");
-						Test.printLog();
-						System.exit(0);
-						
-					} else {
-						if (snp[i].contains("-")) {
-							String[] s = snp[i].split("-");
-							if (s.length != 2) {
-								System.err.println("bad parameter for --" + cmd_snp + ": " + snp[i] +".");
-								Test.LOG.append("bad parameter for --" + cmd_snp + ": " + snp[i] +".\n");
-								Test.printLog();
-								System.exit(0);
-							}
-							insnppair.add(s[0]);
-							insnppair.add(s[1]);
-						} else {
-							insnp.add(snp[i]);
-						}
-					}
-				}
-				if (insnp.size() > 0) {
-					xincludesnp = new String[1][];
-					xincludesnp[0] = (String[]) insnp.toArray(new String[0]);
-					snpFlag = true;
-				}
-				if (insnppair.size() > 0) {
-					xinsnpPair = (String[]) insnppair.toArray(new String[0]);
-					snpPairFlag = true;
-				}
-
-			}
-		}
-
 		if (cl.hasOption(cmd_bgsnp)) {
 			String[] bg = cl.getOptionValues(cmd_bgsnp);
 			HashSet<String> bgSet = NewIt.newHashSet();
@@ -909,6 +806,7 @@ public class Parameter {
 			bgsnpFlag = true;
 		}
 
+		
 		if (cl.hasOption(cmd_hg18)) {
 			hg18Flag = true;
 			hg19Flag = false;
@@ -916,9 +814,15 @@ public class Parameter {
 		}
 
 		if (cl.hasOption(cmd_hg19)) {
-			hg19Flag = false;
+			hg19Flag = true;
 			hg18Flag = false;
 			hgFile = "/gene37.txt";
+		}
+
+		if (cl.hasOption(cmd_hg)) {
+			hg19Flag = false;
+			hg18Flag = false;
+			hgFile = cl.getOptionValue(cmd_hg);
 		}
 
 		if (cl.hasOption(cmd_snp2genelist)) {
@@ -995,9 +899,30 @@ public class Parameter {
 			ArrayList<String> g_begin = NewIt.newArrayList();
 			ArrayList<String> g_end = NewIt.newArrayList();
 			
-			InputStream is = getClass().getResourceAsStream(hgFile);
-			DataInputStream in = new DataInputStream(is);
-			BufferedReader reader = new BufferedReader(new InputStreamReader(in));
+			BufferedReader reader = null;
+			if(hg18Flag || hg19Flag) {
+				InputStream is = getClass().getResourceAsStream(hgFile);
+				DataInputStream in = new DataInputStream(is);
+				reader = new BufferedReader(new InputStreamReader(in));
+			} else {
+				File fhg = new File(hgFile);
+				if (!fhg.exists()) {
+					System.err.println("could not find file for --option " + cmd_hg + ": " + hgFile +".");
+					Test.LOG.append("could not find file for --option " + cmd_hg + ": " + hgFile + ".\n");
+					Test.printLog();
+					System.exit(0);
+				}
+
+				try {
+					reader = new BufferedReader(new FileReader(fhg));
+				} catch (IOException E) {
+					System.err.println("could not open gene list " + hgFile + ".");
+					Test.LOG.append("could not open gene list " + hgFile + ".\n");
+					Test.printLog();
+					System.exit(0);
+				}
+
+			}
 
 			String line = null;
 			try {
@@ -1018,23 +943,30 @@ public class Parameter {
 							gflag[i] = true;
 						}
 					}
-
 				}
 				reader.close();
 			} catch (IOException e) {
 				e.printStackTrace();
 			}
 			boolean flag = true;
+			int count = 0;
 			for(int i = 0; i < gflag.length; i++) {
 				if(!gflag[i]) {
-					System.err.println("did not fine gene " + g[i] + ".");
-					Test.LOG.append("did not find gene " + g[i] + ".\n");
+					System.err.println("could not fine gene " + g[i] + ".");
+					Test.LOG.append("could not find gene " + g[i] + ".\n");
 					flag = false;
+					count ++;
 				}
 			}
-			if(!flag) {
-				Test.printLog();
-				System.exit(0);
+
+			System.err.println("of " + gflag.length + " genes " + (gflag.length - count) + " was found.");
+			Test.LOG.append("of " + gflag.length + " genes " + (gflag.length - count) + " was found.\n");
+			
+			if (!snp2genefileFlag && !snp2genefilesFlag) {
+				if(!flag) {
+					Test.printLog();
+					System.exit(0);
+				}
 			}
 
 			gene = (String[]) ge.toArray(new String[0]);
@@ -1071,9 +1003,29 @@ public class Parameter {
 			ArrayList<String> g_begin = NewIt.newArrayList();
 			ArrayList<String> g_end = NewIt.newArrayList();
 			
-			InputStream is = getClass().getResourceAsStream(hgFile);
-			DataInputStream in = new DataInputStream(is);
-			BufferedReader reader = new BufferedReader(new InputStreamReader(in));
+			BufferedReader reader = null;
+			if(hg18Flag || hg19Flag) {
+				InputStream is = getClass().getResourceAsStream(hgFile);
+				DataInputStream in = new DataInputStream(is);
+				reader = new BufferedReader(new InputStreamReader(in));
+			} else {
+				File fhg = new File(hgFile);
+				if (!fhg.exists()) {
+					System.err.println("could not find file for --option " + cmd_hg + ": " + hgFile +".");
+					Test.LOG.append("could not find file for --option " + cmd_hg + ": " + hgFile + ".\n");
+					Test.printLog();
+					System.exit(0);
+				}
+				try {
+					reader = new BufferedReader(new FileReader(fhg));
+				} catch (IOException E) {
+					System.err.println("could not open gene list " + hgFile + ".");
+					Test.LOG.append("could not open gene list " + hgFile + ".\n");
+					Test.printLog();
+					System.exit(0);
+				}
+
+			}
 
 			String line = null;
 			try {
@@ -1102,16 +1054,22 @@ public class Parameter {
 				e.printStackTrace();
 			}
 			boolean flag = true;
+			int count = 0;
 			for(int i = 0; i < gflag.length; i++) {
 				if(!gflag[i]) {
-					System.err.println("did not find gene " + g[i] + ".");
-					Test.LOG.append("did not find gene " + g[i] + ".\n");
+					System.err.println("could not find gene " + g[i] + ".");
+					Test.LOG.append("could not find gene " + g[i] + ".\n");
 					flag = false;
+					count++;
 				}
 			}
-			if(!flag) {
-				Test.printLog();
-				System.exit(0);
+			System.err.println("of " + gflag.length + " genes " + (gflag.length - count) + " was found.");
+			Test.LOG.append("of " + gflag.length + " genes " + (gflag.length - count) + " was found.\n");
+			if (!snp2genefileFlag && !snp2genefilesFlag) {
+				if(!flag) {
+					Test.printLog();
+					System.exit(0);
+				}
 			}
 
 			gene = (String[]) ge.toArray(new String[0]);
@@ -1126,22 +1084,18 @@ public class Parameter {
 				Test.LOG.append(gene[i] + ": chr" + gene_chr[i] + " " +gene_begin[i] + "k ~ " + gene_end[i] + "k.\n");
 			}
 			geneFlag = true;
-
 		}
 
-		if (cl.hasOption(cmd_snp_list)) {
+		if (cl.hasOption(cmd_extract)) {
 
 			if (!transFlag) {
-				String[] snps_file = cl.getOptionValues(cmd_snp_list);
+				String[] snps_file = cl.getOptionValues(cmd_extract);
 				ArrayList<String> includesnpList = NewIt.newArrayList();
-				ArrayList<String> excludesnpList = NewIt.newArrayList();
-				ArrayList<String> includesnpPairList = NewIt.newArrayList();
-				ArrayList<String> excludesnpPairList = NewIt.newArrayList();
 				for (int h = 0; h < snps_file.length; h++) {
 					File f = new File(snps_file[h]);
 					if (!f.exists()) {
-						System.err.println("could not find --" + cmd_snp_list_long + ": " + snps_file[h] + ".");
-						Test.LOG.append("could not fine --" + cmd_snp_list_long + ": " + snps_file[h] + ".\n");
+						System.err.println("could not find --" + cmd_extract + ": " + snps_file[h] + ".");
+						Test.LOG.append("could not fine --" + cmd_extract + ": " + snps_file[h] + ".\n");
 						Test.printLog();
 						System.exit(0);
 					}
@@ -1149,8 +1103,8 @@ public class Parameter {
 					try {
 						reader = new BufferedReader(new FileReader(f));
 					} catch (IOException E) {
-						System.err.println("could not read --" + cmd_snp_list + ": " + snps_file[h] + ".");
-						Test.LOG.append("could not read --" + cmd_snp_list + ": " + snps_file[h] + ".\n");
+						System.err.println("could not read --" + cmd_extract + ": " + snps_file[h] + ".");
+						Test.LOG.append("could not read --" + cmd_extract + ": " + snps_file[h] + ".\n");
 						Test.printLog();
 						System.exit(0);
 					}
@@ -1170,80 +1124,25 @@ public class Parameter {
 					}
 					if (snp.size() > 0) {
 						ArrayList<String> insnp = NewIt.newArrayList();
-						ArrayList<String> exsnp = NewIt.newArrayList();
-						ArrayList<String> insnppair = NewIt.newArrayList();
-						ArrayList<String> exsnppair = NewIt.newArrayList();
 						for (int i = 0; i < snp.size(); i++) {
 							String subSNP = snp.get(i);
-							if (subSNP.startsWith("-")) {
-								String S = subSNP.substring(1, subSNP.length());
-								if (S.contains("-")) {
-									String[] s = S.split("-");
-									if (s.length != 2) {
-										System.err.println("bad parameter " + subSNP + " in --" + f + ".");
-										Test.LOG.append("bad parameter " + subSNP + " in --" + f + ".\n");
-										Test.printLog();
-										System.exit(0);
-									}
-									exsnppair.add(s[0]);
-									exsnppair.add(s[1]);
-								} else {
-									exsnp.add(S);
-								}
-							} else {
-								if (subSNP.contains("-")) {
-									String[] s = subSNP.split("-");
-									if (s.length != 2) {
-										System.err.println("bad parameter " + subSNP + " in --" + f + ".");
-										Test.LOG.append("bad parameter " + subSNP + " in --" + f + ".\n");
-										Test.printLog();
-										System.exit(0);
-									}
-									insnppair.add(s[0]);
-									insnppair.add(s[1]);
-								} else {
-									insnp.add(subSNP);
-								}
-							}
+							insnp.add(subSNP);
 						}
+
 						if (insnp.size() > 0) {
 							includesnpList.addAll(insnp);
 							snpFlag = true;
-						}
-						if (exsnp.size() > 0) {
-							excludesnpList.addAll(exsnp);
-							snpFlag = true;
-						}
-						if (insnppair.size() > 0) {
-							includesnpPairList.addAll(insnppair);
-							snpPairFlag = true;
-						}
-						if (exsnppair.size() > 0) {
-							excludesnpPairList.addAll(exsnppair);
-							snpPairFlag = true;
 						}
 					}
 					if (includesnpList.size() > 0) {
 						includesnp = (String[]) includesnpList
 								.toArray(new String[0]);
 					}
-					if (excludesnpList.size() > 0) {
-						excludesnp = (String[]) excludesnpList
-								.toArray(new String[0]);
-					}
-					if (includesnpPairList.size() > 0) {
-						insnpPair = (String[]) includesnpList
-								.toArray(new String[0]);
-					}
-					if (excludesnpPairList.size() > 0) {
-						exsnpPair = (String[]) excludesnpList
-								.toArray(new String[0]);
-					}
+
 				}
 			} else {
-				String[] snps_file = cl.getOptionValues(cmd_snp_list);
+				String[] snps_file = cl.getOptionValues(cmd_extract);
 				xincludesnp = new String[snps_file.length][];
-				ArrayList<String> xsnppairList = NewIt.newArrayList();
 				for (int h = 0; h < snps_file.length; h++) {
 					File f = new File(snps_file[h]);
 					if (!f.exists()) {
@@ -1279,47 +1178,79 @@ public class Parameter {
 					}
 					if (snp.size() > 0) {
 						ArrayList<String> insnp = NewIt.newArrayList();
-						ArrayList<String> insnppair = NewIt.newArrayList();
 
 						for (int i = 0; i < snp.size(); i++) {
 							String subSNP = snp.get(i);
-							if (subSNP.startsWith("-")) {
-
-							} else {
-								if (subSNP.contains("-")) {
-									String[] s = subSNP.split("-");
-									if (s.length != 2) {
-
-										System.err.println("bad parameter " + subSNP + " in " + snps_file[h] + ".");
-										Test.LOG.append("bad parameter " + subSNP + " in " + snps_file[h] + ".\n");
-										Test.printLog();
-										System.exit(0);
-									}
-									insnppair.add(s[0]);
-									insnppair.add(s[1]);
-								} else {
-									insnp.add(subSNP);
-								}
-							}
+							insnp.add(subSNP);
 						}
 						if (insnp.size() > 0) {
 							xincludesnp[h] = (String[]) insnp
 									.toArray(new String[0]);
 							snpFlag = true;
 						}
-						if (insnppair.size() > 0) {
-							xsnppairList.addAll(insnppair);
-							snpPairFlag = true;
-						}
-					}
-					if (xsnppairList.size() > 0) {
-						insnpPair = (String[]) xsnppairList
-								.toArray(new String[0]);
 					}
 				}
 			}
 		}
 
+
+		if (cl.hasOption(cmd_exclude)) {
+
+			if (!transFlag) {
+				String snps_file = cl.getOptionValue(cmd_exclude);
+				ArrayList<String> excludesnpList = NewIt.newArrayList();
+				for (int h = 0; h < 1; h++) {
+					File f = new File(snps_file);
+					if (!f.exists()) {
+						System.err.println("could not find --" + cmd_extract + ": " + snps_file + ".");
+						Test.LOG.append("could not fine --" + cmd_extract + ": " + snps_file + ".\n");
+						Test.printLog();
+						System.exit(0);
+					}
+					BufferedReader reader = null;
+					try {
+						reader = new BufferedReader(new FileReader(f));
+					} catch (IOException E) {
+						System.err.println("could not read --" + cmd_extract + ": " + snps_file + ".");
+						Test.LOG.append("could not read --" + cmd_extract + ": " + snps_file + ".\n");
+						Test.printLog();
+						System.exit(0);
+					}
+					ArrayList<String> snp = NewIt.newArrayList();
+					String line = null;
+					try {
+						while ((line = reader.readLine()) != null) {
+							String[] s = line.split(delim);
+							snp.add(s[0]);
+						}
+						reader.close();
+					} catch (IOException E) {
+						System.err.println("bad lines in " + snps_file + ".");
+						Test.LOG.append("bad lines in " + snps_file + ".\n");
+						Test.printLog();
+						System.exit(0);
+					}
+					if (snp.size() > 0) {
+						ArrayList<String> exsnp = NewIt.newArrayList();
+						for (int i = 0; i < snp.size(); i++) {
+							String subSNP = snp.get(i);
+							exsnp.add(subSNP);
+						}
+						if (exsnp.size() > 0) {
+							excludesnpList.addAll(exsnp);
+							snpFlag = true;
+						}
+					}
+					if (excludesnpList.size() > 0) {
+						excludesnp = (String[]) excludesnpList
+								.toArray(new String[0]);
+					}
+				}
+			}
+			
+		}
+
+		
 		if (cl.hasOption(cmd_filter_male)) {
 			filter_maleFlag = true;
 		}

@@ -74,11 +74,6 @@ public class SNPFilterI implements SNPFilterInterface {
 			filterFlag = true;
 		}
 
-		if (Parameter.snpPairFlag) {
-			selectSNPRange();
-			filterFlag = true;
-		}
-
 		if (Parameter.snpFlag) {
 			selectSNPs();
 			filterFlag = true;
@@ -202,52 +197,6 @@ public class SNPFilterI implements SNPFilterInterface {
 		}
 	}
 
-	private void selectSNPRange() {
-
-		ArrayList<HashSet<Integer>> inRangeSet = NewIt.newArrayList();
-		for (int i = 0; i < Parameter.xinsnpPair.length / 2; i++) {
-			HashSet<Integer> rSet = NewIt.newHashSet();
-			inRangeSet.add(rSet);
-		}
-
-		if (Parameter.xinsnpPair != null) {
-			in_range = new int[Parameter.xinsnpPair.length / 2][2];
-			for (int i = 0; i < snpList.size(); i++) {
-				SNP snp = snpList.get(i);
-				String rs = snp.getName();
-				int idx = ArrayUtils.indexOf(Parameter.xinsnpPair, rs);
-				if (idx >= 0) {
-					int dim1 = idx >> 1;
-					int dim2 = (idx - (idx >> 1 << 1));
-					in_range[dim1][dim2] = i;
-					includeSNP(i);
-				}
-			}
-		}
-
-		for (int i = 0; i < snpList.size(); i++) {
-			if (in_range != null) {
-				for (int j = 0; j < in_range.length; j++) {
-					if (i >= in_range[j][0] && i <= in_range[j][1]) {
-						includeSNP(i);
-						HashSet<Integer> rSet = inRangeSet.get(j);
-						rSet.add(new Integer(i));
-						break;
-					}
-				}
-			}
-		}
-
-		for (int i = 0; i < inRangeSet.size(); i++) {
-			HashSet<Integer> rSet = inRangeSet.get(i);
-			if (rSet.size() == 0) {
-				System.err.println("could not find the snp range " + in_range[i][0] + " " + in_range[i][1]);
-				continue;
-			}
-			snpArrays.add(rSet);
-		}
-	}
-	
 	private void selectGene() {
 		int count = 0;
 		ArrayList<ArrayList<Integer>> xsnps = NewIt.newArrayList();
@@ -271,12 +220,16 @@ public class SNPFilterI implements SNPFilterInterface {
 			}
 		}
 
+		int countgene = 0;
 		if (Parameter.snp2genefilesFlag) {
 			for (int i = 0; i < xsnps.size(); i++) {
+				StringBuffer sbsnp = new StringBuffer(Parameter.gene[i] + ".snp");
 				StringBuffer sb = new StringBuffer(Parameter.gene[i] + ".gene");
 				PrintStream PW = null;
+				PrintStream PWsnp = null;
 				try {
 					PW = new PrintStream(sb.toString());
+					PWsnp = new PrintStream(sbsnp.toString());
 				} catch (FileNotFoundException e) {
 					e.printStackTrace();
 				}
@@ -285,28 +238,36 @@ public class SNPFilterI implements SNPFilterInterface {
 				if (s.size() == 0) {
 					continue;
 				}
+				countgene++;
 				System.err.print(s.size() + " snps selected with gene "
 						+ Parameter.gene[i]);
-				System.err.println(" [writing snps into " 
-						+ Parameter.gene[i] + ".gene]");
+				System.err.println(" [writing snps into " + Parameter.gene[i]
+						+ ".gene]");
 				Test.LOG.append(s.size() + " snps selected with gene "
-						+ Parameter.gene[i] + "\n");
-				Test.LOG.append(" [writing snps into " 
-						+ Parameter.gene[i] + ".gene]\n");
+						+ Parameter.gene[i]);
+				Test.LOG.append(" [writing snps into " + Parameter.gene[i]
+						+ ".gene]\n");
 				for (int j = 0; j < s.size(); j++) {
 					SNP snp = snpList.get(s.get(j));
+					PWsnp.println(snp.getName());
 					PW.println(snp.getName() + " " + snp.getChromosome() + " "
-							+ snp.getPosition() +" " + Parameter.gene[i]);
+							+ snp.getPosition() + " " + Parameter.gene[i]);
 				}
+				PWsnp.close();
 				PW.close();
 			}
+			System.err.println(count + " snps selected for " + countgene + " selected genes in total.");
+			Test.LOG.append(count + " snps selected for " + countgene + " selected genes in total.\n");
 			Test.printLog();
 			System.exit(1);
 		} else {
+			StringBuffer sbsnp = new StringBuffer(Parameter.out + ".snp");
 			StringBuffer sb = new StringBuffer(Parameter.out + ".gene");
 			PrintStream PW = null;
+			PrintStream PWsnp = null;
 			try {
 				PW = new PrintStream(sb.toString());
+				PWsnp = new PrintStream(sbsnp.toString());
 			} catch (FileNotFoundException e) {
 				e.printStackTrace();
 			}
@@ -315,6 +276,7 @@ public class SNPFilterI implements SNPFilterInterface {
 				if (s.size() == 0) {
 					continue;
 				}
+				countgene++;
 				System.err.println(s.size() + " snps selected with gene "
 						+ Parameter.gene[i]);
 
@@ -322,23 +284,22 @@ public class SNPFilterI implements SNPFilterInterface {
 						+ Parameter.gene[i] + "\n");
 				for (int j = 0; j < s.size(); j++) {
 					SNP snp = snpList.get(s.get(j));
+					PWsnp.println(snp.getName());
 					PW.println(snp.getName() + " " + snp.getChromosome() + " "
-							+ snp.getPosition() +" " + Parameter.gene[i]);
+							+ snp.getPosition() + " " + Parameter.gene[i]);
 				}
 			}
-			System.err.println("writing snps into " 
-					+ Parameter.out + ".gene");
-			Test.LOG.append("writing snps into " 
-					+ Parameter.out + ".gene\n");
+			System.err.println("writing snps into " + Parameter.out + ".gene");
+			Test.LOG.append("writing snps into " + Parameter.out + ".gene\n");
 			PW.close();
+			PWsnp.close();
+			System.err.println(count + " snps selected for " + countgene + " selected genes in total.");
+			Test.LOG.append(count + " snps selected for " + countgene + " selected genes in total.\n");
 			if (Parameter.snp2genefileFlag) {
 				Test.printLog();
 				System.exit(1);
 			}
 		}
-
-		System.err.print(count + " snps selected in total.");
-		Test.LOG.append(count + " snps selected in total.\n");
 
 		for (int i = 0; i < xsnps.size(); i++) {
 			ArrayList<Integer> xsnp = xsnps.get(i);
