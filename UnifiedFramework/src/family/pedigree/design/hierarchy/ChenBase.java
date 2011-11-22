@@ -4,8 +4,6 @@ import java.util.ArrayList;
 import java.util.Hashtable;
 import java.util.Random;
 
-import org.apache.commons.lang3.ArrayUtils;
-
 import admixture.parameter.Parameter;
 
 import score.LinearRegression;
@@ -74,15 +72,6 @@ public abstract class ChenBase implements ChenInterface {
 				filter[c] = new boolean[pi.length];
 
 				// filter_family
-				if (Parameter.exfamFlag) {
-					if (ArrayUtils.indexOf(Parameter.ex_family, fi) >= 0) {
-						for (int i = 0; i < filter[c].length; i++) {
-							filter[c][i] = false;
-						}
-						c++;
-						continue;
-					}
-				}
 
 				if (PhenoData == null) {
 					int cc = 0;
@@ -97,13 +86,16 @@ public abstract class ChenBase implements ChenInterface {
 						if (IsPhenotypeBinary) {
 							String s = per.getAffectedStatus();
 							if (Parameter.status_shiftFlag) {
-								f = (s.compareTo(Parameter.missing_phenotype) == 0) ? false : true;
+								f = (s.compareTo(Parameter.missing_phenotype) == 0) ? false
+										: true;
 							} else {
-								f = (s.compareTo(Parameter.missing_phenotype) == 0 || s.compareTo("0") == 0 ) ? false : true;
+								f = (s.compareTo(Parameter.missing_phenotype) == 0 || s
+										.compareTo("0") == 0) ? false : true;
 							}
 						} else {
-							String s =  per.getAffectedStatus();
-							f = (s.compareTo(Parameter.missing_phenotype) == 0) ? true : false;
+							String s = per.getAffectedStatus();
+							f = (s.compareTo(Parameter.missing_phenotype) == 0) ? true
+									: false;
 						}
 
 						filter[c][cc++] = f;
@@ -162,12 +154,15 @@ public abstract class ChenBase implements ChenInterface {
 			if (pheIdx == -1) {
 				if (IsPhenotypeBinary) {
 					if (Parameter.status_shiftFlag) {
-						f = (s.compareTo(Parameter.missing_phenotype) == 0) ? false : true;
+						f = (s.compareTo(Parameter.missing_phenotype) == 0) ? false
+								: true;
 					} else {
-						f = (s.compareTo(Parameter.missing_phenotype) == 0 || s.compareTo("0") == 0 ) ? false : true;
+						f = (s.compareTo(Parameter.missing_phenotype) == 0 || s
+								.compareTo("0") == 0) ? false : true;
 					}
 				} else {
-					f = (s.compareTo(Parameter.missing_phenotype) == 0) ? true : false;
+					f = (s.compareTo(Parameter.missing_phenotype) == 0) ? true
+							: false;
 				}
 			} else {
 				f = (trait.get(pheIdx).compareTo(Parameter.missing_phenotype) == 0) ? false
@@ -191,13 +186,37 @@ public abstract class ChenBase implements ChenInterface {
 
 		protected boolean hardFilter(BPerson p) {
 			boolean flag = true;
-			if (Parameter.filter_maleFlag) {
+
+			if (Parameter.keepFlag) {
+				flag = false;
+				String fi = p.getFamilyID();
+				String pi = p.getPersonID();
+				for (int i = 0; i < Parameter.indKeep[0].length; i++) {
+					if (fi.compareTo(Parameter.indKeep[0][i]) == 0
+							&& pi.compareTo(Parameter.indKeep[1][i]) == 0) {
+						flag = true;
+						break;
+					}
+				}
+			}
+			if (Parameter.removeFlag) {
+				String fi = p.getFamilyID();
+				String pi = p.getPersonID();
+				for (int i = 0; i < Parameter.ex_family[0].length; i++) {
+					if (fi.compareTo(Parameter.ex_family[0][i]) == 0
+							&& pi.compareTo(Parameter.ex_family[1][i]) == 0) {
+						flag = false;
+						break;
+					}
+				}
+			} 
+			if (flag && Parameter.keep_maleFlag) {
 				return flag = p.getGender() == 1 ? true : false;
 			}
-			if (Parameter.filter_femaleFlag) {
+			if (flag && Parameter.keep_femaleFlag) {
 				return flag = p.getGender() == 2 ? true : false;
 			}
-			if (Parameter.ex_nosexFlag) {
+			if (flag && Parameter.ex_nosexFlag) {
 				return flag = (p.getGender() == 1 || p.getGender() == 2) ? true
 						: false;
 			}
