@@ -126,22 +126,29 @@ public class Parameter {
 	// phenotype set end
 
 	// individual selection start
-	private final String cmd_ex_fam = "exfam";
-	public static String[] ex_family = null;
-	private final String cmd_ex_fam_file = "exfamf";
-	public static boolean exfamFlag = false;
+	private final String cmd_remove = "remove";
+	public static String[][] ex_family = null;
+	public static boolean removeFlag = false;
+	private final String cmd_keep = "keep";
+	public static String[][] indKeep = null;
+	public static boolean keepFlag = false;
+		
+	
 	/*
 	 * private final String cmd_ex_ind = "exind"; public static String[][]
 	 * ex_ind = null; private final String cmd_ex_ind_file = "exindfile"; public
 	 * static boolean exindFlag = false;
 	 */
-	private final String cmd_filter_male = "male";
-	public static boolean filter_maleFlag = false;
+	private final String cmd_keep_male = "male";
+	private final String cmd_keep_male_long = "keep-male";
+	public static boolean keep_maleFlag = false;
 
-	private final String cmd_filter_female = "female";
-	public static boolean filter_femaleFlag = false;
+	private final String cmd_keep_female = "female";
+	private final String cmd_keep_female_long = "keep-female";
+	public static boolean keep_femaleFlag = false;
 
 	private final String cmd_ex_nosex = "exnosex";
+	private final String cmd_ex_nosex_long = "exclude-nosex";
 	public static boolean ex_nosexFlag = false;
 	// end individual filter
 
@@ -254,11 +261,6 @@ public class Parameter {
 	// private final String cmd_trsex = "trsex";
 	public static boolean trsexFlag = false;
 	public static int trsex = 0;
-	// private final String cmd_border = "border";
-	// public static String border_fid;
-	// public static String border_iid;
-	// public static boolean borderFlag = false;
-	// public static boolean reverseborderFlag = false;
 
 	private final String cmd_order = "order";
 	public static int order = 1;
@@ -384,10 +386,6 @@ public class Parameter {
 		ops.addOption(OptionBuilder.withDescription("specify the .fam file.")
 				.hasArg().create(cmd_fam));
 
-		// ops.addOption(OptionBuilder.withDescription("specify the .tped and .tfam files").hasArg().create(cmd_tfile));
-		// ops.addOption(OptionBuilder.withDescription("specify the .tped file.").hasArg().create(cmd_tped));
-		// ops.addOption(OptionBuilder.withDescription("specify the .tfam file.").hasArg().create(cmd_tfam));
-
 		ops.addOption(OptionBuilder
 				.withDescription("specify the phenotype file.").hasArg()
 				.create(cmd_covar));
@@ -441,19 +439,19 @@ public class Parameter {
 				.create(cmd_trans));
 
 		ops.addOption(OptionBuilder
-				.withDescription("specify excluded families").hasArgs()
-				.create(cmd_ex_fam));
+				.withDescription("remove individuals").hasArg()
+				.create(cmd_remove));
+
 		ops.addOption(OptionBuilder
-				.withDescription(
-						"specify the file containing excluded family ids")
-				.hasArg().create(cmd_ex_fam_file));
+				.withDescription("keep individuals").hasArg()
+				.create(cmd_keep));
 		// ops.addOption(OptionBuilder.withDescription("specify excluded individuals").hasArgs().create(cmd_ex_ind));
 		// ops.addOption(OptionBuilder.withDescription("specify the file containing excluded individual ids").hasArg().create(cmd_ex_ind_file));
-		ops.addOption(OptionBuilder.withDescription("include males only")
-				.create(cmd_filter_male));
-		ops.addOption(OptionBuilder.withDescription("include females only")
-				.create(cmd_filter_female));
-		ops.addOption(OptionBuilder.withDescription("include unknown sex ")
+		ops.addOption(OptionBuilder.withDescription("keep males only").withLongOpt(cmd_keep_male_long)
+				.create(cmd_keep_male));
+		ops.addOption(OptionBuilder.withDescription("keep females only").withLongOpt(cmd_keep_female_long)
+				.create(cmd_keep_female));
+		ops.addOption(OptionBuilder.withDescription("exclude unknown sex").withLongOpt(cmd_ex_nosex_long)
 				.create(cmd_ex_nosex));
 
 		ops.addOption(OptionBuilder
@@ -490,8 +488,7 @@ public class Parameter {
 		ops.addOption(OptionBuilder
 				.withDescription("specify missing genotype rate for inclusion.")
 				.hasArg().create(cmd_geno));
-		// ops.addOption(OptionBuilder.withDescription("specify the p value of departure from Hardy-Weinberg Equilibrium for inclusion").hasArg()
-		// .create(cmd_hwe));
+
 		ops.addOption(OptionBuilder.withDescription("seed for the algorithms")
 				.hasArg().create(cmd_seed));
 		ops.addOption(OptionBuilder
@@ -1251,26 +1248,17 @@ public class Parameter {
 		}
 
 		
-		if (cl.hasOption(cmd_filter_male)) {
-			filter_maleFlag = true;
+		if (cl.hasOption(cmd_keep_male)) {
+			keep_maleFlag = true;
 		}
-		if (cl.hasOption(cmd_filter_female)) {
-			filter_femaleFlag = true;
+		if (cl.hasOption(cmd_keep_female)) {
+			keep_femaleFlag = true;
 		}
 		if (cl.hasOption(cmd_ex_nosex)) {
 			ex_nosexFlag = true;
 		}
-		if (cl.hasOption(cmd_ex_fam)) {
-			ex_family = cl.getOptionValues(cmd_ex_fam);
-			HashSet<String> famSet = NewIt.newHashSet();
-			for (int i = 0; i < ex_family.length; i++) {
-				famSet.add(ex_family[i]);
-			}
-			ex_family = (String[]) famSet.toArray(new String[0]);
-			exfamFlag = true;
-		}
-		if (cl.hasOption(cmd_ex_fam_file)) {
-			String file = cl.getOptionValue(cmd_ex_fam_file);
+		if (cl.hasOption(cmd_remove)) {
+			String file = cl.getOptionValue(cmd_remove);
 			File f = new File(file);
 			if (!f.exists()) {
 				System.err.println("could not open " + file + ".");
@@ -1282,68 +1270,67 @@ public class Parameter {
 			try {
 				reader = new BufferedReader(new FileReader(new File(file)));
 			} catch (IOException E) {
-				System.err.println("bad parameter in " + file + ".");
-				Test.LOG.append("bad parameter in " + file + ".\n");
+				System.err.println("could not read " + file + ".");
+				Test.LOG.append("coudl not read " + file + ".\n");
 				Test.printLog();
 				System.exit(0);
 			}
-			String line;
-			HashSet<String> famSet = NewIt.newHashSet();
+			ArrayList<String> famList = NewIt.newArrayList();
+			ArrayList<String> indList = NewIt.newArrayList();
+			String line = null;
 			try {
 				while ((line = reader.readLine()) != null) {
 					String[] l = line.split(MDRConstant.delim);
-					famSet.add(l[0]);
+					if(l.length < 2) continue;
+					famList.add(l[0]);
+					indList.add(l[1]);
 				}
 			} catch (IOException e) {
 				e.printStackTrace(System.err);
 				System.exit(0);
 			}
-			if (famSet.size() > 0) {
-				ex_family = (String[]) famSet.toArray(new String[0]);
-				exfamFlag = true;
-			} else {
-				System.err.println("bad parameter in " + file + ".");
-				Test.LOG.append("bad parameter in " + file + ".\n");
+			ex_family = new String[2][];
+			ex_family[0] = (String[]) famList.toArray(new String[0]);
+			ex_family[1] = (String[]) indList.toArray(new String[0]);
+			removeFlag = true;
+		}
+
+		if (cl.hasOption(cmd_keep)) {
+			String file = cl.getOptionValue(cmd_keep);
+			File f = new File(file);
+			if (!f.exists()) {
+				System.err.println("could not open " + file + ".");
+				Test.LOG.append("could not open " + file + ".\n");
 				Test.printLog();
 				System.exit(0);
 			}
-		}
-		/*
-		 * if (cl.hasOption(cmd_ex_ind)) { String[] ind =
-		 * cl.getOptionValues(cmd_ex_ind); ex_ind = new String[2][ind.length];
-		 * for (int i = 0; i < ind.length / 2; i++) { String[] Ind =
-		 * ind[i].split(incommand_separator); ex_ind[0][i] = Ind[0];
-		 * ex_ind[1][i] = Ind[1]; } exindFlag = true; } if
-		 * (cl.hasOption(cmd_ex_ind_file)) { String file =
-		 * cl.getOptionValue(cmd_ex_ind_file); File find = new File(file); if
-		 * (!find.exists()) { throw new
-		 * IllegalArgumentException("could not open file: " + file); }
-		 * ArrayList<String> fid = NewIt.newArrayList(); ArrayList<String> iid =
-		 * NewIt.newArrayList();
-		 * 
-		 * BufferedReader reader = null; try { reader = new BufferedReader(new
-		 * FileReader(new File(file))); } catch (IOException E) { throw new
-		 * IllegalArgumentException("failed in reading " + file); }
-		 * 
-		 * String line; try { while ((line = reader.readLine()) != null) {
-		 * String[] l = line.split(incommand_separator); if (l.length < 2) {
-		 * continue; } fid.add(l[0]); iid.add(l[1]); } } catch (IOException e) {
-		 * e.printStackTrace(System.err); System.exit(0); } if (fid.size() > 0)
-		 * { exindFlag = true; ex_ind = new String[2][fid.size()]; for (int i =
-		 * 0; i < ex_ind.length; i++) { ex_ind[0][i] = fid.get(i); ex_ind[1][i]
-		 * = iid.get(i); } } else { throw new
-		 * IllegalArgumentException("bad lines in " + file); } }
-		 */
-		if (cl.hasOption(cmd_filter_male)) {
-			filter_maleFlag = true;
-			filter_femaleFlag = false;
-		}
-		if (cl.hasOption(cmd_filter_female)) {
-			filter_femaleFlag = true;
-			filter_maleFlag = false;
-		}
-		if (cl.hasOption(cmd_ex_nosex)) {
-			ex_nosexFlag = true;
+			BufferedReader reader = null;
+			try {
+				reader = new BufferedReader(new FileReader(new File(file)));
+			} catch (IOException E) {
+				System.err.println("could not read " + file + ".");
+				Test.LOG.append("coudl not read " + file + ".\n");
+				Test.printLog();
+				System.exit(0);
+			}
+			ArrayList<String> famList = NewIt.newArrayList();
+			ArrayList<String> indList = NewIt.newArrayList();
+			String line = null;
+			try {
+				while ((line = reader.readLine()) != null) {
+					String[] l = line.split(MDRConstant.delim);
+					if(l.length < 2) continue;
+					famList.add(l[0]);
+					indList.add(l[1]);
+				}
+			} catch (IOException e) {
+				e.printStackTrace(System.err);
+				System.exit(0);
+			}
+			indKeep = new String[2][];
+			indKeep[0] = (String[]) famList.toArray(new String[0]);
+			indKeep[1] = (String[]) indList.toArray(new String[0]);
+			keepFlag = true;
 		}
 
 		if (cl.hasOption(cmd_chr)) {
