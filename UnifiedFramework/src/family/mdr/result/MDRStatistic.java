@@ -188,12 +188,13 @@ public class MDRStatistic implements Comparable<MDRStatistic> {
 //		sb.append(", ");
 //		sb.append(String.format("%.4E", PF));
 //		sb.append(", "+degreeNumerator +", "+degreeDenominator+", ");
+		sb.append(String.format("%.4f", stats[1]) + ", ");
 		sb.append(String.format("%.4f", stats[0]) + ", ");
 		if (Parameter.permFlag) {
 			sb.append(String.format("%.4f", meanT) + ", " 
 				+ String.format("%.4f", seT)+ ", " + String.format("%.4E", pT) + ", ");
 		}
-		sb.append(String.format("%.4f", stats[1]));
+		
 
 		return sb.toString();
 	}

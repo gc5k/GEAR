@@ -134,11 +134,11 @@ public class SNP implements Comparable<SNP>{
 			d0 = freq[0];
 		}
 		if (d0 < d1) {
-			sb.append(snp[0] + "(" + String.format("%.2f", d0 / (d0 + d1)) + ")");
+			sb.append(snp[0] + ", " + String.format("%.3f", d0 / (d0 + d1)) + ", ");
 //					+ "), " + snp[1] + "("
 //					+ String.format("%.2f", d1 / (d0 + d1)) + ")");
 		} else {
-			sb.append(snp[1] + "(" + String.format("%.2f", d1 / (d0 + d1)) + ")");
+			sb.append(snp[1] + ", " + String.format("%.3f", d1 / (d0 + d1)) + ", ");
 //					+ "), " + snp[0] + "("
 //					+ String.format("%.2f", d0 / (d0 + d1)) + ")");
 		}

@@ -33,10 +33,10 @@ public class PLINKBinaryParser extends PLINKParser {
 			ParseMapFile();
 			Test.LOG.append("reading " + mapFile + ".\n");
 			Test.LOG.append(mapData.getMarkerNumberOriginal() + " markers in " + mapFile + ".\n");
-			Test.LOG.append(mapData.getMarkerNumber() + " selected markers.\n");
+//			Test.LOG.append(mapData.getMarkerNumber() + " selected markers.\n");
 			System.err.println("reading " + mapFile + ".");
 			System.err.println(mapData.getMarkerNumberOriginal() + " markers in " + mapFile + ".");
-			System.err.println(mapData.getMarkerNumber() + " selected markers.");
+//			System.err.println(mapData.getMarkerNumber() + " selected markers.");
 			pedData = new BEDReader(FamFile, snpFilter.getWorkingSNP().length, mapData);
 			pedData.setHeader(false);
 			ParsePedFile();
