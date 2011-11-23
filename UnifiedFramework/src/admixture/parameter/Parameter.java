@@ -223,6 +223,11 @@ public class Parameter {
 	private final String cmd_maf = "maf";
 	public static double maf = 0;
 	public static boolean mafFlag = false;
+	
+	private final String cmd_max_maf = "max_maf";
+	private final String cmd_max_maf_long = "max-maf";
+	public static double max_maf = 1;
+	public static boolean maxmafFlag = false;
 
 	private final String cmd_geno = "geno";
 	public static double geno = 2;
@@ -279,12 +284,9 @@ public class Parameter {
 	// private final String cmd_perm_scheme = "ps";
 	public static boolean permu_scheme = true;
 
-	private final String cmd_verbose = "verbose";
-	public static boolean verboseFlag = false;
-
 	// private final String cmd_simu = "simu";
 	// public int simu = 1;
-
+/*
 	private final String cmd_Vc = "vc";
 	public static double vc = 0.05;
 	public static boolean vcFlag = false;
@@ -300,7 +302,7 @@ public class Parameter {
 	private final String cmd_testing = "test";
 	public static double threshold_testing = 0.0;
 	public static boolean testingFlag = false;
-
+*/
 	private final String cmd_out = "out";
 	public static String out = "gmdr";
 
@@ -338,7 +340,7 @@ public class Parameter {
 			+ "******************************************************************\n"
 			+ "| GMDR 1.0 released 13/11/2011                                   |\n"
 			+ "| (C) 2011 Guo-Bo Chen, Xiang-Yang Lou                           |\n"
-			+ "| v 0.7.3                                                        |\n"			
+			+ "| v 0.7.5                                                        |\n"			
 			+ "| GNU General Public License, v2                                 |\n"
 			+ "| Department of Biostatistics, Section on Statistical Genetics   |\n"
 			+ "| University of Alabama at Birmingham                            |\n"
@@ -486,6 +488,10 @@ public class Parameter {
 						"specify the minor allele frequency for inclusion.")
 				.hasArg().create(cmd_maf));
 		ops.addOption(OptionBuilder
+				.withDescription(
+						"specify the minor allele frequency for inclusion.")
+				.hasArg().withLongOpt(cmd_max_maf_long).create(cmd_max_maf));
+		ops.addOption(OptionBuilder
 				.withDescription("specify missing genotype rate for inclusion.")
 				.hasArg().create(cmd_geno));
 
@@ -499,9 +505,7 @@ public class Parameter {
 		ops.addOption(OptionBuilder
 				.withDescription("replication for permutation.").hasArg()
 				.create(cmd_perm));
-		ops.addOption(OptionBuilder
-				.withDescription("output threshold for empirical p value.")
-				.hasArg().create(cmd_ep));
+
 		// ops.addOption(OptionBuilder.withDescription("only sibs are exchangeable when this option is turned on").create(cmd_perm_scheme));
 
 		// ops.addOption(OptionBuilder.withDescription("use unrelated indivuduals only, if '--md' is specified.").create(cmd_unrelated_only));
@@ -518,6 +522,10 @@ public class Parameter {
 				.withDescription(
 						"use this option if status was coded as 1 (unaffected)/2 (affected).")
 				.create(cmd_status_shift));
+		/*
+		ops.addOption(OptionBuilder
+				.withDescription("output threshold for empirical p value.")
+				.hasArg().create(cmd_ep));
 		ops.addOption(OptionBuilder
 				.withDescription("threshold of variance explained for output")
 				.hasArg().create(cmd_Vc));
@@ -527,11 +535,10 @@ public class Parameter {
 		ops.addOption(OptionBuilder
 				.withDescription("threshold of testing accuracy for output")
 				.hasArg().create(cmd_testing));
+		*/
 		ops.addOption(OptionBuilder
 				.withDescription("specify the root for output files.").hasArg()
 				.create(cmd_out));
-		ops.addOption(OptionBuilder.withDescription(
-				"print the result in verbose form.").create(cmd_verbose));
 		ops.addOption(OptionBuilder.withDescription(
 				"give an evaluation for computation time").withLongOpt(cmd_testdrive_long)
 				.create(cmd_testdrive));
@@ -1396,6 +1403,17 @@ public class Parameter {
 			mafFlag = true;
 		}
 
+		if (cl.hasOption(cmd_max_maf)) {
+			max_maf = Double.parseDouble(cl.getOptionValue(cmd_max_maf));
+			if (max_maf < 0) {
+				System.err.println("bad parameter for optin --" + cmd_max_maf_long + " " + max_maf + ".");
+				Test.LOG.append("bad parameter for option --" + cmd_max_maf_long + " " + max_maf + ".\n");
+				Test.printLog();
+				System.exit(0);
+			}
+			maxmafFlag = true;
+		}
+
 		if (cl.hasOption(cmd_geno)) {
 			geno = Double.parseDouble(cl.getOptionValue(cmd_geno));
 			if (geno < 0) {
@@ -1516,6 +1534,7 @@ public class Parameter {
 			perm = Integer.parseInt(cl.getOptionValue(cmd_perm));
 			permFlag = true;
 		}
+		/*
 		if (cl.hasOption(cmd_ep)) {
 			ep = Double.parseDouble(cl.getOptionValue(cmd_ep));
 			if (ep >= 1 || ep < 0) {
@@ -1527,6 +1546,7 @@ public class Parameter {
 			}
 			epFlag = true;
 		}
+		*/
 		// if (cl.hasOption(cmd_perm_scheme)) {
 		// permu_scheme = true;
 		// }
@@ -1572,6 +1592,7 @@ public class Parameter {
 			status_shift = 0;
 			status_shiftFlag = true;
 		}
+		/*
 		if (cl.hasOption(cmd_Vc)) {
 			vc = Double.parseDouble(cl.getOptionValue(cmd_Vc));
 			vcFlag = true;
@@ -1586,10 +1607,7 @@ public class Parameter {
 					.getOptionValue(cmd_testing));
 			testingFlag = true;
 		}
-
-		if (cl.hasOption(cmd_verbose)) {
-			verboseFlag = true;
-		}
+		*/
 		if (cl.hasOption(cmd_version)) {
 			System.err.println();
 			Test.printLog();

@@ -7,6 +7,7 @@ import admixture.parameter.Parameter;
 import family.mdr.filter.SNPFilterInterface;
 import family.popstat.AlleleFrequency;
 
+import test.Test;
 import util.NewIt;
 
 public class SoftSNPFilter {
@@ -32,29 +33,37 @@ public class SoftSNPFilter {
 	public void Filter() {
 		if (wseq != null) {
 			double [][] allelefreq = al.getAlleleFrequency();
+			int count = 0;
 			for (int i = 0; i < wseq.length; i++) {
 				int idx = wseq[i];
 				boolean flag = true;
 				if (Parameter.genoFlag) {
-					if (allelefreq[idx][2] <= Parameter.geno) {
-						qualifiedSNPSet.add(new Integer(idx));
-					} else {
+					if (allelefreq[idx][2] > Parameter.geno) {
 						flag = false;
+						continue;
 					}
 				}
+				double f = allelefreq[idx][0] < allelefreq[idx][1] ? allelefreq[idx][0]:allelefreq[idx][1]; 
 				if (Parameter.mafFlag) {
-					double f = allelefreq[idx][0] < allelefreq[idx][1] ? allelefreq[idx][0]:allelefreq[idx][1];
-					if (f > Parameter.maf && f != 0) {
-						qualifiedSNPSet.add(new Integer(idx));
-					} else {
+					if (f < Parameter.maf ) {
 						flag = false;
+						continue;
+					}
+				}
+				if (Parameter.maxmafFlag) {
+					if (f > Parameter.max_maf ) {
+						flag = false;
+						continue;
 					}
 				}
 				if (flag) {
 					qualifiedSNPSet.add(new Integer(idx));
+					count++;
 				}
 			}
-			
+			Test.LOG.append(count + " selected markers.\n");
+			System.err.println(count + " selected markers.");
+
 			wseq = new int[qualifiedSNPSet.size()];
 			int c = 0;
 			for (Integer I : qualifiedSNPSet) {

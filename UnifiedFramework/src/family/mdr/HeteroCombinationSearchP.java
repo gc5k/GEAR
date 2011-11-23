@@ -1,4 +1,6 @@
 package family.mdr;
+import java.io.FileNotFoundException;
+import java.io.PrintStream;
 import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.Set;
@@ -279,6 +281,7 @@ public class HeteroCombinationSearchP extends AbstractMergeSearch {
 
 	@Override
 	public void search(int or, int N) {
+		
 		order = or;
 		PrintHeader();
 		bestStat = new MDRStatistic();
@@ -286,6 +289,21 @@ public class HeteroCombinationSearchP extends AbstractMergeSearch {
 		cg.revup(or);
 		count = 0;
 		topN = N;
+		StringBuffer sb = new StringBuffer(Parameter.out + ".cls");
+		PrintStream PW = null;
+		try {
+			PW = new PrintStream(sb.toString());
+		} catch (FileNotFoundException e) {
+			e.printStackTrace();
+		}
+
+		for (int i = 0; i < order; i++) {
+			PW.print("LOCUS" + (i + 1) + ", ");
+			PW.print("CHR" + (i + 1) + ", ");
+			PW.print("POS" + (i + 1) + ", ");
+			PW.print("MinAllele, MAF" + (i + 1) + ", ");
+		}
+		PW.println("classification (genotype, risk group, positive scores, positive subjects, negative score, negative subjects)");
 
 		long t0 = System.currentTimeMillis();
 		int c = 0;
@@ -311,26 +329,6 @@ public class HeteroCombinationSearchP extends AbstractMergeSearch {
 			count++;
 			if (!mute) {
 				boolean flag = true;
-				if (Parameter.epFlag) {
-					if (Parameter.permFlag && mdrStat.getTestingBalancedPT() > Parameter.ep) {
-						flag = false;
-					}
-				}
-				if (flag && Parameter.trainingFlag) {
-					if (mdrStat.getTrainingBalancedAccuracy() < Parameter.threshold_training) {
-						flag = false;
-					}
-				}
-				if (flag && Parameter.testingFlag) {
-					if (mdrStat.getTestingBalancedAccuracy() < Parameter.threshold_testing) {
-						flag = false;
-					}
-				}
-				if (flag && Parameter.vcFlag) {
-					if (mdrStat.getVc() < Parameter.vc) {
-						flag = false;
-					}
-				}
 
 				if (!flag) {
 					continue;
@@ -345,18 +343,11 @@ public class HeteroCombinationSearchP extends AbstractMergeSearch {
 						System.out.print(", ");
 					}
 				}
-				System.out.print(mdrStat);
-				if (Parameter.verboseFlag) {
-					System.out.print(", ");
-					for (int j = 0; j < len; j++) {
-						System.out.print(mapData.getSNP(idx[j]));
-						if (j != idx.length - 1)
-							System.out.print(", ");
-					}
-					System.out.print(", ");
-					System.out.print(model.printModel(idx, mapData));
+				System.out.println(mdrStat);
+				for (int j = 0; j < len; j++) {
+					PW.print(mapData.getSNP(idx[j]));
 				}
-				System.out.println();
+				PW.println(model.printModel(idx, mapData));
 			}
 		}
 //		calculateThreshold();
@@ -496,28 +487,14 @@ public class HeteroCombinationSearchP extends AbstractMergeSearch {
 		System.out.print("effective individuals, ");
 		System.out.print("vc, vx, vt, ");
 		for (int i = 0; i < MDRConstant.NumStats; i++) {
-			if (i != MDRConstant.NumStats - 1) {
-				System.out.print(MDRConstant.TestStatistic[i] + "(TA), ");
+			if (i == MDRConstant.NumStats - 1) {
+				System.out.print("Testing Accuracy (TA), ");
 				if (Parameter.permFlag) {
-					System.out.print("mean TA (null dis), " + "S.E.TA (null dis), " + "P (z-score), ");
+					System.out.print("mean TA (null dis), " + "S.E.TA (null dis), " + "P (z-score)");
 				}
 			} else {
-				System.out.print(MDRConstant.TestStatistic[i]);
+				System.out.print("Training Accuracy, ");
 			}
-		}
-		if (Parameter.verboseFlag) {
-			for (int i = 0; i < order; i++) {
-				System.out.print(", LOCUS" + (i + 1) + ", ");
-				System.out.print("CHR" + (i + 1) + ", ");
-				System.out.print("POS" + (i + 1) + ", ");
-				if (i < order - 1) {
-					System.out.print("MAF" + (i + 1) + ", ");
-				} else {
-					System.out.print("MAF" + (i + 1) + ", ");
-				}
-			}
-			System.out
-					.print("classification (genotype, risk group, positive scores, positive subjects, negative score, negative subjects)");
 		}
 		System.out.println();
 	}
