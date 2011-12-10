@@ -47,22 +47,32 @@ public class PhenotypeFile {
 		int k = 0;
 		int colNum = 0;
 		while ((line = reader.readLine()) != null) {
-			if (line.length() == 0) {
+			if (line.length() == 0 && line.startsWith("#")) {
 				// skip blank lines
 				continue;
 			}
-			if (line.startsWith("#")) {
-				// skip comments
-				continue;
-			}
+
 			
-			if(k == 0) {
-				String[] t = line.split("\\s+");
-				colNum = t.length - 2;
-				traits = new String[colNum];
-				System.arraycopy(t, 2, traits, 0, traits.length);
-				k++;
-				continue;
+			if ( k == 0) {
+				if(Parameter.covar_header_flag) {
+				
+					String[] t = line.split("\\s+");
+					colNum = t.length - 2;
+					traits = new String[colNum];
+					System.arraycopy(t, 2, traits, 0, traits.length);
+					k++;
+					continue;
+				} else {
+					String[] t = line.split("\\s+");
+					colNum = t.length - 2;
+					traits = new String[colNum];
+					for (int i = 0; i < traits.length; i++) {
+						StringBuilder sb = new StringBuilder("Cov");
+						sb.append((i+1));
+						traits[i] = sb.toString();
+					}
+					k++;
+				}
 			}
 			
 			String[] tokenizer = line.split("\\s+");
@@ -103,7 +113,7 @@ public class PhenotypeFile {
 			fam.addSubject(sub);
 			this.families.put(sub.getFamilyID(), fam);
 		}
-		Parameter.findCovar_Number(traits);
+//		Parameter.findCovar_Number(traits);
 		
 	}
 

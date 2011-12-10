@@ -19,7 +19,6 @@ import org.apache.commons.cli.OptionBuilder;
 import org.apache.commons.cli.Options;
 import org.apache.commons.cli.ParseException;
 import org.apache.commons.cli.GnuParser;
-import org.apache.commons.lang3.ArrayUtils;
 
 import family.mdr.arsenal.MDRConstant;
 
@@ -78,9 +77,9 @@ public class Parameter {
 	// file set start
 	private final String cmd_file = "file";
 	public static boolean fileFlag = false;
-	private final String cmd_ped = "ped";
+//	private final String cmd_ped = "ped";
 	public static String ped = null;
-	private final String cmd_map = "map";
+//	private final String cmd_map = "map";
 	public static String map = null;
 
 	// file set end
@@ -88,11 +87,11 @@ public class Parameter {
 	// bfile set start
 	private final String cmd_bfile = "bfile";
 	public static boolean bfileFlag = false;
-	private final String cmd_bed = "bed";
+//	private final String cmd_bed = "bed";
 	public static String bed = null;
-	private final String cmd_bim = "bim";
+//	private final String cmd_bim = "bim";
 	public static String bim = null;
-	private final String cmd_fam = "fam";
+//	private final String cmd_fam = "fam";
 	public static String fam = null;
 	// bfile set end
 
@@ -106,20 +105,24 @@ public class Parameter {
 	// tfile set end
 
 	// phenotype set start
+
 	private final String cmd_covar = "covar";
+	private final String cmd_covar_header = "covar_head";
+	private final String cmd_covar_header_long = "covar-head";
+	public static boolean covar_header_flag = false;
 	public static String pheno = null;
 	private final String cmd_pheno_number = "pheno_number";
 	private final String cmd_pheno_number_long = "pheno-number";
 	public static int response = -1;
-	private final String cmd_pheno_name = "response_name";
-	private final String cmd_pheno_name_long = "pheno-name";
-	public static String response_name = null;
+//	private final String cmd_pheno_name = "response_name";
+//	private final String cmd_pheno_name_long = "pheno-name";
+//	public static String response_name = null;
 	private final String cmd_covar_number = "covar_number";
 	private final String cmd_covar_number_long = "covar-number";
 	public static int[] predictor = null;
-	private final String cmd_covar_name = "covar_name";
-	private final String cmd_covar_name_long = "covar-name";
-	public static String[] predictor_name = null;
+//	private final String cmd_covar_name = "covar_name";
+//	private final String cmd_covar_name_long = "covar-name";
+//	public static String[] predictor_name = null;
 
 	private final String cmd_reg = "regression";
 	public int linkfunction = 0;
@@ -132,8 +135,8 @@ public class Parameter {
 	private final String cmd_keep = "keep";
 	public static String[][] indKeep = null;
 	public static boolean keepFlag = false;
-		
-	
+
+
 	/*
 	 * private final String cmd_ex_ind = "exind"; public static String[][]
 	 * ex_ind = null; private final String cmd_ex_ind_file = "exindfile"; public
@@ -167,10 +170,10 @@ public class Parameter {
 	public static boolean hg18Flag = false;
 	private final String cmd_hg19 = "hg19";
 	public static boolean hg19Flag = true;
-	private final String cmd_hg = "hg";
+	private final String cmd_hg = "reference";
 	public static String hgFile = "/gene36.txt";
 	
-	private final String cmd_gene = "gene";
+//	private final String cmd_gene = "gene";
 	private final String cmd_gene_list = "genelist";
 	private final String cmd_gene_list_long = "gene-list";
 	public static boolean geneFlag = false;
@@ -338,9 +341,9 @@ public class Parameter {
 	private final String cmd_version = "version";
 	public static String version = "\n"
 			+ "******************************************************************\n"
-			+ "| GMDR 1.0 released 13/11/2011                                   |\n"
+			+ "| GMDR 1.0 released Dec/06/2011                                   |\n"
 			+ "| (C) 2011 Guo-Bo Chen, Xiang-Yang Lou                           |\n"
-			+ "| v 0.7.5                                                        |\n"			
+			+ "| v 0.7.7                                                        |\n"			
 			+ "| GNU General Public License, v2                                 |\n"
 			+ "| Department of Biostatistics, Section on Statistical Genetics   |\n"
 			+ "| University of Alabama at Birmingham                            |\n"
@@ -373,36 +376,37 @@ public class Parameter {
 		ops.addOption(OptionBuilder
 				.withDescription("specify the .ped and .map files").hasArg()
 				.create(cmd_file));
-		ops.addOption(OptionBuilder.withDescription("specify the .ped file.")
-				.hasArg().create(cmd_ped));
-		ops.addOption(OptionBuilder.withDescription("specify the .map file.")
-				.hasArg().create(cmd_map));
+//		ops.addOption(OptionBuilder.withDescription("specify the .ped file.")
+//				.hasArg().create(cmd_ped));
+//		ops.addOption(OptionBuilder.withDescription("specify the .map file.")
+//				.hasArg().create(cmd_map));
 
 		ops.addOption(OptionBuilder
 				.withDescription("specify the .bed, .bim and .fam files.")
 				.hasArg().create(cmd_bfile));
-		ops.addOption(OptionBuilder.withDescription("specify the .bed file.")
-				.hasArg().create(cmd_bed));
-		ops.addOption(OptionBuilder.withDescription("specify the .bim file.")
-				.hasArg().create(cmd_bim));
-		ops.addOption(OptionBuilder.withDescription("specify the .fam file.")
-				.hasArg().create(cmd_fam));
+//		ops.addOption(OptionBuilder.withDescription("specify the .bed file.")
+//				.hasArg().create(cmd_bed));
+//		ops.addOption(OptionBuilder.withDescription("specify the .bim file.")
+//				.hasArg().create(cmd_bim));
+//		ops.addOption(OptionBuilder.withDescription("specify the .fam file.")
+//				.hasArg().create(cmd_fam));
 
 		ops.addOption(OptionBuilder
 				.withDescription("specify the phenotype file.").hasArg()
 				.create(cmd_covar));
+		ops.addOption(OptionBuilder.withDescription("the phenotype file has header").withLongOpt(cmd_covar_header_long).create(cmd_covar_header));
 		ops.addOption(OptionBuilder
 				.withDescription("specify 1 or more covariates by number.")
 				.hasArgs().withLongOpt(cmd_covar_number_long).create(cmd_covar_number));
-		ops.addOption(OptionBuilder
-				.withDescription("specify 1 or more covariates by name.")
-				.hasArgs().withLongOpt(cmd_covar_name_long).create(cmd_covar_name));
+//		ops.addOption(OptionBuilder
+//				.withDescription("specify 1 or more covariates by name.")
+//				.hasArgs().withLongOpt(cmd_covar_name_long).create(cmd_covar_name));
 
 		ops.addOption(OptionBuilder
 				.withDescription("specify regions to select snps.").hasArgs()
 				.create(cmd_region));
-		ops.addOption(OptionBuilder.withDescription("specify genes.").hasArgs()
-				.create(cmd_gene));
+//		ops.addOption(OptionBuilder.withDescription("specify genes.").hasArgs()
+//				.create(cmd_gene));
 		ops.addOption(OptionBuilder.withDescription("specify a genelist.").hasArgs()
 				.withLongOpt(cmd_gene_list_long).create(cmd_gene_list));
 		ops.addOption(OptionBuilder.withDescription("specify gene window in kb.").hasArg()
@@ -413,7 +417,7 @@ public class Parameter {
 		ops.addOption(OptionBuilder.withDescription("make snp lists with respect genes")
 				.withLongOpt(cmd_snp2gene_mlist).create(cmd_snp2genemlist));
 
-		ops.addOption(OptionBuilder.withDescription("specify human genome.").hasArg()
+		ops.addOption(OptionBuilder.withDescription("specify the gene reference.").hasArg()
 				.create(cmd_hg));
 		ops.addOption(OptionBuilder.withDescription("use human genome build 18.")
 				.create(cmd_hg18));
@@ -459,9 +463,9 @@ public class Parameter {
 		ops.addOption(OptionBuilder
 				.withDescription("specify phenotype by number.").hasArg()
 				.withLongOpt(cmd_pheno_number_long).create(cmd_pheno_number));
-		ops.addOption(OptionBuilder
-				.withDescription("specify phenotype by name.").hasArg()
-				.withLongOpt(cmd_pheno_name_long).create(cmd_pheno_name));
+//		ops.addOption(OptionBuilder
+//				.withDescription("specify phenotype by name.").hasArg()
+//				.withLongOpt(cmd_pheno_name_long).create(cmd_pheno_name));
 
 		ops.addOption(OptionBuilder
 				.withDescription(
@@ -635,12 +639,12 @@ public class Parameter {
 			ped = sb1.toString();
 			map = sb2.toString();
 		}
-		if (cl.hasOption(cmd_ped)) {
-			ped = cl.getOptionValue(cmd_ped);
-		}
-		if (cl.hasOption(cmd_map)) {
-			map = cl.getOptionValue(cmd_map);
-		}
+//		if (cl.hasOption(cmd_ped)) {
+//			ped = cl.getOptionValue(cmd_ped);
+//		}
+//		if (cl.hasOption(cmd_map)) {
+//			map = cl.getOptionValue(cmd_map);
+//		}
 		if (ped != null && map != null) {
 			File fped = new File(ped);
 			if (!fped.exists()) {
@@ -677,15 +681,15 @@ public class Parameter {
 			bim = sb2.toString();
 			fam = sb3.toString();
 		}
-		if (cl.hasOption(cmd_bed)) {
-			bed = cl.getOptionValue(cmd_bed);
-		}
-		if (cl.hasOption(cmd_bim)) {
-			bim = cl.getOptionValue(cmd_bim);
-		}
-		if (cl.hasOption(cmd_fam)) {
-			fam = cl.getOptionValue(cmd_fam);
-		}
+//		if (cl.hasOption(cmd_bed)) {
+//			bed = cl.getOptionValue(cmd_bed);
+//		}
+//		if (cl.hasOption(cmd_bim)) {
+//			bim = cl.getOptionValue(cmd_bim);
+//		}
+//		if (cl.hasOption(cmd_fam)) {
+//			fam = cl.getOptionValue(cmd_fam);
+//		}
 		if (bed != null && bim != null && fam != null) {
 			File fbed = new File(bed);
 			if (!fbed.exists()) {
@@ -720,6 +724,10 @@ public class Parameter {
 				Test.printLog();
 				System.exit(0);
 			}
+		}
+		
+		if (cl.hasOption(cmd_covar_header)) {
+			covar_header_flag = true;
 		}
 
 		if (cl.hasOption(cmd_header)) {
@@ -772,27 +780,27 @@ public class Parameter {
 			}
 		}
 
-		if (cl.hasOption(cmd_covar_name)) {
-			HashSet<String> cn = NewIt.newHashSet();
-			String[] p = cl.getOptionValues(cmd_covar_name);
-			for (int i = 0; i < p.length; i++) {
-				if (p[i].contains("-")) {
-					String[] pp = predictor_name[i].split("-");
-					if (pp.length != 2) {
-						System.err.println("bad parameter for option --" + cmd_covar_name_long + ": " + p[i] + ".");
-						Test.LOG.append("bad parameter for option --" + cmd_covar_name_long + ": " + p[i] + ".\n");
-						Test.printLog();
-						System.exit(0);
-					}
-					for (int j = 0; j < pp.length; j++) {
-						cn.add(pp[j]);
-					}
-				} else {
-					cn.add(p[i]);
-				}
-			}
-			predictor_name = (String[]) cn.toArray(new String[0]);
-		}
+//		if (cl.hasOption(cmd_covar_name)) {
+//			HashSet<String> cn = NewIt.newHashSet();
+//			String[] p = cl.getOptionValues(cmd_covar_name);
+//			for (int i = 0; i < p.length; i++) {
+//				if (p[i].contains("-")) {
+//					String[] pp = predictor_name[i].split("-");
+//					if (pp.length != 2) {
+//						System.err.println("bad parameter for option --" + cmd_covar_name_long + ": " + p[i] + ".");
+//						Test.LOG.append("bad parameter for option --" + cmd_covar_name_long + ": " + p[i] + ".\n");
+//						Test.printLog();
+//						System.exit(0);
+//					}
+//					for (int j = 0; j < pp.length; j++) {
+//						cn.add(pp[j]);
+//					}
+//				} else {
+//					cn.add(p[i]);
+//				}
+//			}
+//			predictor_name = (String[]) cn.toArray(new String[0]);
+//		}
 
 		if (cl.hasOption(cmd_bgsnp)) {
 			String[] bg = cl.getOptionValues(cmd_bgsnp);
@@ -892,7 +900,6 @@ public class Parameter {
 					gSet.add(gn[0]);
 				}
 			} catch (IOException e1) {
-				// TODO Auto-generated catch block
 				e1.printStackTrace();
 			}
 			String[] g = (String[]) gSet.toArray(new String[0]);
@@ -998,97 +1005,96 @@ public class Parameter {
 			genewindow = gw;
 		}
 
-		if (cl.hasOption(cmd_gene)) {
-			String[] g = cl.getOptionValues(cmd_gene);
-			boolean[] gflag = new boolean[g.length];
-			Arrays.fill(gflag, false);
-			ArrayList<String> ge = NewIt.newArrayList();
-			ArrayList<String> g_chr = NewIt.newArrayList();
-			ArrayList<String> g_begin = NewIt.newArrayList();
-			ArrayList<String> g_end = NewIt.newArrayList();
-			
-			BufferedReader reader = null;
-			if(hg18Flag || hg19Flag) {
-				InputStream is = getClass().getResourceAsStream(hgFile);
-				DataInputStream in = new DataInputStream(is);
-				reader = new BufferedReader(new InputStreamReader(in));
-			} else {
-				File fhg = new File(hgFile);
-				if (!fhg.exists()) {
-					System.err.println("could not find file for --option " + cmd_hg + ": " + hgFile +".");
-					Test.LOG.append("could not find file for --option " + cmd_hg + ": " + hgFile + ".\n");
-					Test.printLog();
-					System.exit(0);
-				}
-				try {
-					reader = new BufferedReader(new FileReader(fhg));
-				} catch (IOException E) {
-					System.err.println("could not open gene list " + hgFile + ".");
-					Test.LOG.append("could not open gene list " + hgFile + ".\n");
-					Test.printLog();
-					System.exit(0);
-				}
-
-			}
-
-			String line = null;
-			try {
-				while ((line = reader.readLine()) != null) {
-
-					String[] s = line.split("\\s+");
-//					System.err.println(line);
-					if (s.length != 4) {
-						continue;
-					}
-
-					for (int i = 0; i < g.length; i++) {
-						if (s[0].compareTo(g[i]) == 0) {
-							ge.add(s[0]);
-							g_chr.add(s[1]);
-							g_begin.add(s[2]);
-							g_end.add(s[3]);
-							gflag[i] = true;
-						}
-					}
-
-				}
-				reader.close();
-			} catch (IOException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			}
-			boolean flag = true;
-			int count = 0;
-			for(int i = 0; i < gflag.length; i++) {
-				if(!gflag[i]) {
-					System.err.println("could not find gene " + g[i] + ".");
-					Test.LOG.append("could not find gene " + g[i] + ".\n");
-					flag = false;
-					count++;
-				}
-			}
-			System.err.println("of " + gflag.length + " genes " + (gflag.length - count) + " was found.");
-			Test.LOG.append("of " + gflag.length + " genes " + (gflag.length - count) + " was found.\n");
-			if (!snp2genefileFlag && !snp2genefilesFlag) {
-				if(!flag) {
-					Test.printLog();
-					System.exit(0);
-				}
-			}
-
-			gene = (String[]) ge.toArray(new String[0]);
-			gene_chr = (String[]) g_chr.toArray(new String[0]);
-			gene_begin = new double[gene_chr.length];
-			gene_end = new double[gene_chr.length];
-
-			for (int i = 0; i < gene_chr.length; i++) {
-				gene_begin[i] = Double.parseDouble(g_begin.get(i)) / 1000;
-				gene_end[i] = Double.parseDouble(g_end.get(i)) / 1000;
-				System.err.println(gene[i] + ": chr" + gene_chr[i] + " " +gene_begin[i] + "k ~ " + gene_end[i] + "k");
-				Test.LOG.append(gene[i] + ": chr" + gene_chr[i] + " " +gene_begin[i] + "k ~ " + gene_end[i] + "k.\n");
-			}
-			geneFlag = true;
-		}
+//		if (cl.hasOption(cmd_gene)) {
+//			String[] g = cl.getOptionValues(cmd_gene);
+//			boolean[] gflag = new boolean[g.length];
+//			Arrays.fill(gflag, false);
+//			ArrayList<String> ge = NewIt.newArrayList();
+//			ArrayList<String> g_chr = NewIt.newArrayList();
+//			ArrayList<String> g_begin = NewIt.newArrayList();
+//			ArrayList<String> g_end = NewIt.newArrayList();
+//			
+//			BufferedReader reader = null;
+//			if(hg18Flag || hg19Flag) {
+//				InputStream is = getClass().getResourceAsStream(hgFile);
+//				DataInputStream in = new DataInputStream(is);
+//				reader = new BufferedReader(new InputStreamReader(in));
+//			} else {
+//				File fhg = new File(hgFile);
+//				if (!fhg.exists()) {
+//					System.err.println("could not find file for --option " + cmd_hg + ": " + hgFile +".");
+//					Test.LOG.append("could not find file for --option " + cmd_hg + ": " + hgFile + ".\n");
+//					Test.printLog();
+//					System.exit(0);
+//				}
+//				try {
+//					reader = new BufferedReader(new FileReader(fhg));
+//				} catch (IOException E) {
+//					System.err.println("could not open gene list " + hgFile + ".");
+//					Test.LOG.append("could not open gene list " + hgFile + ".\n");
+//					Test.printLog();
+//					System.exit(0);
+//				}
+//
+//			}
+//
+//			String line = null;
+//			try {
+//				while ((line = reader.readLine()) != null) {
+//
+//					String[] s = line.split("\\s+");
+////					System.err.println(line);
+//					if (s.length != 4) {
+//						continue;
+//					}
+//
+//					for (int i = 0; i < g.length; i++) {
+//						if (s[0].compareTo(g[i]) == 0) {
+//							ge.add(s[0]);
+//							g_chr.add(s[1]);
+//							g_begin.add(s[2]);
+//							g_end.add(s[3]);
+//							gflag[i] = true;
+//						}
+//					}
+//
+//				}
+//				reader.close();
+//			} catch (IOException e) {
+//				e.printStackTrace();
+//			}
+//			boolean flag = true;
+//			int count = 0;
+//			for(int i = 0; i < gflag.length; i++) {
+//				if(!gflag[i]) {
+//					System.err.println("could not find gene " + g[i] + ".");
+//					Test.LOG.append("could not find gene " + g[i] + ".\n");
+//					flag = false;
+//					count++;
+//				}
+//			}
+//			System.err.println("of " + gflag.length + " genes " + (gflag.length - count) + " was found.");
+//			Test.LOG.append("of " + gflag.length + " genes " + (gflag.length - count) + " was found.\n");
+//			if (!snp2genefileFlag && !snp2genefilesFlag) {
+//				if(!flag) {
+//					Test.printLog();
+//					System.exit(0);
+//				}
+//			}
+//
+//			gene = (String[]) ge.toArray(new String[0]);
+//			gene_chr = (String[]) g_chr.toArray(new String[0]);
+//			gene_begin = new double[gene_chr.length];
+//			gene_end = new double[gene_chr.length];
+//
+//			for (int i = 0; i < gene_chr.length; i++) {
+//				gene_begin[i] = Double.parseDouble(g_begin.get(i)) / 1000;
+//				gene_end[i] = Double.parseDouble(g_end.get(i)) / 1000;
+//				System.err.println(gene[i] + ": chr" + gene_chr[i] + " " +gene_begin[i] + "k ~ " + gene_end[i] + "k");
+//				Test.LOG.append(gene[i] + ": chr" + gene_chr[i] + " " +gene_begin[i] + "k ~ " + gene_end[i] + "k.\n");
+//			}
+//			geneFlag = true;
+//		}
 
 		if (cl.hasOption(cmd_extract)) {
 
@@ -1648,39 +1654,39 @@ public class Parameter {
 
 	}
 
-	public static void findCovar_Number(String[] F) {
-		if (predictor_name != null) {
-			ArrayList<Integer> idx = NewIt.newArrayList();
-			for (int i = 0; i < predictor_name.length; i++) {
-				if (predictor_name[i].contains("-")) {
-					String[] pp = predictor_name[i].split("-");
-					int j1 = ArrayUtils.indexOf(F, pp[0]);
-					int j2 = ArrayUtils.indexOf(F, pp[1]);
-					if (j1 > j2) {
-						j1 = j1 ^ j2;
-						j2 = j1 ^ j2;
-						j1 = j1 ^ j2;
-					}
-					for (int j = j1; j <= j2; j++) {
-						idx.add(new Integer(j));
-					}
-				} else {
-					int j = ArrayUtils.indexOf(F, predictor_name[i]);
-					if (j < 0) {
-						System.err.println("unknown covariat "
-								+ predictor_name[i]);
-						System.exit(0);
-					} else {
-						idx.add(new Integer(j));
-					}
-				}
-			}
-			predictor = new int[idx.size()];
-			for (int i = 0; i < predictor.length; i++) {
-				predictor[i] = idx.get(i).intValue() - 1;
-			}
-		}
-	}
+//	public static void findCovar_Number(String[] F) {
+//		if (predictor_name != null) {
+//			ArrayList<Integer> idx = NewIt.newArrayList();
+//			for (int i = 0; i < predictor_name.length; i++) {
+//				if (predictor_name[i].contains("-")) {
+//					String[] pp = predictor_name[i].split("-");
+//					int j1 = ArrayUtils.indexOf(F, pp[0]);
+//					int j2 = ArrayUtils.indexOf(F, pp[1]);
+//					if (j1 > j2) {
+//						j1 = j1 ^ j2;
+//						j2 = j1 ^ j2;
+//						j1 = j1 ^ j2;
+//					}
+//					for (int j = j1; j <= j2; j++) {
+//						idx.add(new Integer(j));
+//					}
+//				} else {
+//					int j = ArrayUtils.indexOf(F, predictor_name[i]);
+//					if (j < 0) {
+//						System.err.println("unknown covariat "
+//								+ predictor_name[i]);
+//						System.exit(0);
+//					} else {
+//						idx.add(new Integer(j));
+//					}
+//				}
+//			}
+//			predictor = new int[idx.size()];
+//			for (int i = 0; i < predictor.length; i++) {
+//				predictor[i] = idx.get(i).intValue() - 1;
+//			}
+//		}
+//	}
 
 	public static void main(String[] args) throws IOException {
 		Parameter p = new Parameter();
