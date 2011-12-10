@@ -62,16 +62,17 @@ public class SNPFilter implements SNPFilterInterface {
 			filterFlag = true;
 		}
 
-		if (Parameter.geneFlag) {
-			selectGene();
-			filterFlag = true;
-		}
 
 		if (Parameter.regionFlag) {
 			selectSNPRegion();
 			filterFlag = true;
 		}
 
+		if (Parameter.geneFlag) {
+			selectGene();
+			filterFlag = true;
+		}
+		
 		if (filterFlag && selectedSNPSet.size() == 0
 				&& excludedSNPSet.size() == 0 && bgSNPSet.size() == 0) {
 			System.err.println("No snps selected. GMDR quit.");
@@ -161,26 +162,53 @@ public class SNPFilter implements SNPFilterInterface {
 
 		int count = 0;
 		ArrayList<ArrayList<Integer>> xsnps = NewIt.newArrayList();
-		for (int i = 0; i < Parameter.gene.length; i++) {
-			ArrayList<Integer> s = NewIt.newArrayList();
-			xsnps.add(s);
-		}
-		
-		for (int i = 0; i < snpList.size(); i++) {
-			SNP snp = snpList.get(i);
-			String chr = snp.getChromosome();
-			int pos = snp.getPosition();
-			for (int j = 0; j < Parameter.gene_chr.length; j++) {
 
-				if (chr.compareTo(Parameter.gene_chr[j]) == 0) {
-					if (pos >= (Parameter.gene_begin[j] - Parameter.genewindow) * 1000
-							&& pos <= (Parameter.gene_end[j] + Parameter.genewindow) * 1000) {
-						xsnps.get(j).add(i);
-						includeSNP(i);
-						count++;
+		if(!Parameter.snp2genefileFlag && !Parameter.snp2genefilesFlag) {
+			for (int i = 0; i < Parameter.gene.length; i++) {
+				ArrayList<Integer> s = NewIt.newArrayList();
+				xsnps.add(s);
+			}
+
+			for (int i = 0; i < snpList.size(); i++) {
+				SNP snp = snpList.get(i);
+				String chr = snp.getChromosome();
+				int pos = snp.getPosition();
+				for (int j = 0; j < Parameter.gene_chr.length; j++) {
+
+					if (chr.compareTo(Parameter.gene_chr[j]) == 0) {
+						if (pos >= (Parameter.gene_begin[j] - Parameter.genewindow) * 1000
+								&& pos <= (Parameter.gene_end[j] + Parameter.genewindow) * 1000) {
+							xsnps.get(j).add(i);
+							includeSNP(i);
+							count++;
+						}
 					}
 				}
 			}
+		} else {
+			for (int i = 0; i < Parameter.gene.length; i++) {
+				ArrayList<Integer> s = NewIt.newArrayList();
+				xsnps.add(s);
+			}
+
+			for (Iterator<Integer> e = selectedSNPSet.iterator(); e.hasNext(); ) {
+				int i = e.next().intValue();
+				SNP snp = snpList.get(i);
+				String chr = snp.getChromosome();
+				int pos = snp.getPosition();
+				for (int j = 0; j < Parameter.gene_chr.length; j++) {
+
+					if (chr.compareTo(Parameter.gene_chr[j]) == 0) {
+						if (pos >= (Parameter.gene_begin[j] - Parameter.genewindow) * 1000
+								&& pos <= (Parameter.gene_end[j] + Parameter.genewindow) * 1000) {
+							xsnps.get(j).add(i);
+
+							count++;
+						}
+					}
+				}
+			}
+
 		}
 
 		int countgene = 0;
@@ -284,24 +312,31 @@ public class SNPFilter implements SNPFilterInterface {
 
 	private void selectSNPs() {
 
+		
 		if (Parameter.includesnp != null) {
+			HashSet<String> SS = NewIt.newHashSet();
+			for (int i = 0; i < Parameter.includesnp.length; i++) {
+				SS.add(Parameter.includesnp[i]);
+			}
 			for (int i = 0; i < snpList.size(); i++) {
 				SNP snp = snpList.get(i);
 				String rs = snp.getName();
-				int idx = ArrayUtils.indexOf(Parameter.includesnp, rs);
-				if (idx >= 0) {
+				if(SS.contains(rs)) {
 					includeSNP(i);
 				}
 			}
 		}
 
 		if (Parameter.excludesnp != null) {
+			HashSet<String> SS = NewIt.newHashSet();
+			for (int i = 0; i < Parameter.includesnp.length; i++) {
+				SS.add(Parameter.includesnp[i]);
+			}
 			for (int i = 0; i < snpList.size(); i++) {
 				SNP snp = snpList.get(i);
 				String rs = snp.getName();
-				int idx = ArrayUtils.indexOf(Parameter.excludesnp, rs);
-				if (idx >= 0) {
-					excludeSNP(i);
+				if(!SS.contains(rs)) {
+					includeSNP(i);
 				}
 			}
 		}
