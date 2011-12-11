@@ -467,10 +467,10 @@ public class Parameter {
 //				.withDescription("specify phenotype by name.").hasArg()
 //				.withLongOpt(cmd_pheno_name_long).create(cmd_pheno_name));
 
-		ops.addOption(OptionBuilder
-				.withDescription(
-						"method for adjustment of the phenotype, 0 (default) for linear regression, 1 for logistic regression.")
-				.hasArg().create(cmd_reg));
+//		ops.addOption(OptionBuilder
+//				.withDescription(
+//						"method for adjustment of the phenotype, 0 (default) for linear regression, 1 for logistic regression.")
+//				.hasArg().create(cmd_reg));
 		ops.addOption(OptionBuilder
 				.withDescription("fold of cross-validation, and default is 5.")
 				.hasArg().create(cmd_cv));
@@ -1441,9 +1441,9 @@ public class Parameter {
 		// hweFlag = true;
 		// }
 
-		if (cl.hasOption(cmd_reg)) {
-			linkfunction = Integer.parseInt(cl.getOptionValue(cmd_reg));
-		}
+//		if (cl.hasOption(cmd_reg)) {
+//			linkfunction = Integer.parseInt(cl.getOptionValue(cmd_reg));
+//		}
 		if (cl.hasOption(cmd_cv)) {
 			cv = Integer.parseInt(cl.getOptionValue(cmd_cv));
 			if (cv < 2) {
