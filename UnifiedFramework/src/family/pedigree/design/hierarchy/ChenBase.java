@@ -292,6 +292,10 @@ public abstract class ChenBase implements ChenInterface {
 		score = new double[PersonTable.size()];
 		ArrayList<Double> T = NewIt.newArrayList();
 
+		int method = 0;
+		if(PedData.IsSixthColBinary()) {
+			method = 1;
+		}
 		for (int i = 0; i < PersonTable.size(); i++) {
 			double t = 0;
 			if (PedData.IsSixthColBinary()) {
@@ -310,9 +314,15 @@ public abstract class ChenBase implements ChenInterface {
 		}
 
 		double[] r = null;
-		LinearRegression LReg = new LinearRegression(Y, X, true);
-		LReg.MLE();
-		r = LReg.getResiduals1();
+		if (method == 0) {
+			LinearRegression LReg = new LinearRegression(Y, X, true);
+			LReg.MLE();
+			r = LReg.getResiduals1();
+		} else {
+			LogisticRegression LogReg = new LogisticRegression(Y, X, true);
+			LogReg.MLE();
+			r = LogReg.getResiduals1();
+		}
 
 		System.arraycopy(r, 0, score, 0, r.length);
 	}
@@ -393,7 +403,36 @@ public abstract class ChenBase implements ChenInterface {
 	}
 
 	protected void generateScore() {
+
 		if (PhenoData != null) {
+
+			if(pheIdx == -1) {
+				if (PedData.IsSixthColBinary()) {
+					method = 1;
+				} else {
+					method = 0;
+				}
+			} else {
+
+				for (int i = 0; i < PersonTable.size(); i++) {
+					ArrayList<String> tempc = CovariateTable.get(i);
+					String t = tempc.get(pheIdx);
+					
+					if(Parameter.status_shiftFlag) {
+						if(t.compareTo("1") != 0 && t.compareTo("0")!= 0 && t.compareTo(Parameter.missing_phenotype) != 0) {
+							method = 0;
+							break;
+						}
+					} else {
+						if(t.compareTo("2") != 0 && t.compareTo("1")!= 0 && t.compareTo("0") != 0 && t.compareTo(Parameter.missing_phenotype) != 0) {
+							method = 0;
+							break;
+						}
+					}
+				}
+
+			}
+
 			if (method >= 0) {
 				buildScore(pheIdx, covIdx, method);
 			} else {
