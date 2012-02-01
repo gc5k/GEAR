@@ -18,12 +18,11 @@ public class PolygenicPar {
 	private final String cmd_LD = "ld";
 	public static double ld = 0;
 
+	private final String cmd_U = "U";
+	public static boolean U = false;
+
 	private final String cmd_seed = "seed";
 	public static long seed = 2011;
-
-	private final String cmd_no_correct = "no_correct";
-	private final String cmd_no_correct_long = "no-correct";
-	public static boolean correct = true;
 
 	private final String cmd_sample = "sample_size";
 	private final String cmd_sample_long = "sample-size";
@@ -60,9 +59,9 @@ public class PolygenicPar {
 
 		ops.addOption(OptionBuilder.withDescription("LD (correlation), defualt= " + ld).hasArg().create(cmd_LD));
 
+		ops.addOption(OptionBuilder.withDescription("Uniform Effect ").create(cmd_U));
+		
 		ops.addOption(OptionBuilder.withDescription("seed for simulation, default = " + seed).hasArg().withArgName("seed").create(cmd_seed));
-
-		ops.addOption(OptionBuilder.withLongOpt(cmd_no_correct_long).withDescription("correct mean for liability, default = " + correct).hasArg().withArgName("correct").create(cmd_no_correct));
 
 		ops.addOption(OptionBuilder.withLongOpt(cmd_sample_long).withDescription("sample size, default = " + sample).hasArg().create(cmd_sample));
 
@@ -98,12 +97,12 @@ public class PolygenicPar {
 			ld = Double.parseDouble(cl.getOptionValue(cmd_LD));
 		}
 
+		if(cl.hasOption(cmd_U)) {
+			U = true;
+		}
+
 		if(cl.hasOption(cmd_seed)) {
 			seed = Long.parseLong(cl.getOptionValue(cmd_seed));
-		}
-		
-		if(cl.hasOption(cmd_no_correct)) {
-			correct = false;
 		}
 
 		if(cl.hasOption(cmd_sample)) {

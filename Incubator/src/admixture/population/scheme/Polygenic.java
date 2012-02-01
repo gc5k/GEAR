@@ -21,6 +21,7 @@ public class Polygenic {
 	private long seed = 2011;
 
 	private int M = 1;
+	private boolean U = false;
 	private int sample = 1000;
 	private int N_case = 500;
 	private int N_control = 500;
@@ -45,10 +46,11 @@ public class Polygenic {
 	private String A1 = "A";
 	private String A2 = "C";
 	public static StringBuilder LOG = new StringBuilder();
-	
+
 	public Polygenic(PolygenicPar P) {
 
 		M = P.marker;
+		U = P.U;
 		ld = P.ld;
 		seed = P.seed;
 		sample = P.sample;
@@ -58,7 +60,7 @@ public class Polygenic {
 		out = P.out;
 
 		N_control = sample - N_case;
-	    E = Math.sqrt(1-h2);
+		E = Math.sqrt(1 - h2);
 
 		rnd = new RandomDataImpl();
 		rnd.reSeed(seed);
@@ -77,8 +79,11 @@ public class Polygenic {
 		Liab = new double[N_case + N_control];
 
 		Calendar calendar = Calendar.getInstance();
-		LOG.append("\nThe analysis was implemented at: " + calendar.getTime() + "\n");
+		LOG.append("\nThe analysis was implemented at: " + calendar.getTime()
+				+ "\n");
+		LOG.append("seed: " + seed + "\n");
 		LOG.append("Marker: " + M + "\n");
+		LOG.append("Uniform Effet: " + U + "\n");
 		LOG.append("LD: " + ld + "\n");
 		LOG.append("Sample size: " + sample + "\n");
 		LOG.append("case: " + N_case + "\n");
@@ -98,25 +103,27 @@ public class Polygenic {
 		Poly.GenerateSample();
 		Poly.writeFile();
 		Poly.writeLog();
-		
+
 	}
-	
+
 	public void writeLog() {
 
 		Calendar calendar = Calendar.getInstance();
-		LOG.append("\nThe analysis was completed at: " + calendar.getTime() + "\n");
+		LOG.append("\nThe analysis was completed at: " + calendar.getTime()
+				+ "\n");
 		PrintWriter log = null;
 		try {
-			log = new PrintWriter(new BufferedWriter(new FileWriter(out + ".plog")));
+			log = new PrintWriter(new BufferedWriter(new FileWriter(out
+					+ ".plog")));
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 		log.println(LOG.toString());
 		log.close();
-		
+
 		System.out.println(LOG.toString());
-		
+
 	}
 
 	public void GenerateSample() {
@@ -125,11 +132,11 @@ public class Polygenic {
 		int count_control = 0;
 		int count = 0;
 		RealMatrix effect = GenerateEffects();
-		
+
 		norm = new NormalDistributionImpl(0, 1);
 
 		int c = 0;
-		while(count < sample) {
+		while (count < sample) {
 			c++;
 			RealMatrix chr = SampleChromosome();
 			RealMatrix res = chr.transpose().multiply(effect);
@@ -144,7 +151,7 @@ public class Polygenic {
 				e.printStackTrace();
 			}
 
-			if ( 1 - liability < K) {
+			if (1 - liability < K) {
 				if (count_case < N_case) {
 					BV[count_case] = bv;
 					phenotype[count_case] = L;
@@ -174,27 +181,37 @@ public class Polygenic {
 
 	public RealMatrix GenerateEffects() {
 
-		double[] effect = new double[freq.length];
-		for (int i = 0; i < effect.length; i++) {
-			double sigma_b = Math.sqrt((vy * h2)/ (freq.length * 2 * freq[i] * (1-freq[i])));
-			effect[i] = rnd.nextGaussian(0, sigma_b);
+		double[] effect = new double[M];
+		if (U) {
+			for (int i = 0; i < effect.length; i++) {
+				double sigma_b = Math.sqrt((vy * h2)
+						/ (M * 2 * freq[i] * (1 - freq[i])));
+				effect[i] = sigma_b;
+			}
+		} else {
+			for (int i = 0; i < effect.length; i++) {
+				double sigma_b = Math.sqrt((vy * h2)
+						/ (freq.length * 2 * freq[i] * (1 - freq[i])));
+				effect[i] = rnd.nextGaussian(0, sigma_b);
+			}
 		}
 
 		PrintWriter eff = null;
 		try {
-			eff = new PrintWriter(new BufferedWriter(new FileWriter(out + ".rnd")));
+			eff = new PrintWriter(new BufferedWriter(new FileWriter(out
+					+ ".rnd")));
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
-		
-		for(int i = 0; i < effect.length; i++) {
+
+		for (int i = 0; i < effect.length; i++) {
 			eff.println("rs" + i + " " + A2 + " " + effect[i]);
 		}
 		eff.close();
 
 		RealMatrix Eff = new Array2DRowRealMatrix(effect);
-		
+		getMean(Eff);
 		return Eff;
 
 	}
@@ -211,10 +228,11 @@ public class Polygenic {
 					v[i][j] = z;
 				} else {
 					double d = rnd.nextUniform(0, 1);
-					int a = (int) v[i-1][j];
-					double f1 = a == 0 ? freq[i-1] : (1-freq[i-1]);
-					double f2 = a == 0 ? freq[i] : (1-freq[i]);
-					v[i][j] = d < (f1 * f2 + Dprime[i-1]) / f1 ? v[i-1][j] : (1-v[i-1][j]);
+					int a = (int) v[i - 1][j];
+					double f1 = a == 0 ? freq[i - 1] : (1 - freq[i - 1]);
+					double f2 = a == 0 ? freq[i] : (1 - freq[i]);
+					v[i][j] = d < (f1 * f2 + Dprime[i - 1]) / f1 ? v[i - 1][j]
+							: (1 - v[i - 1][j]);
 				}
 			}
 			g[i] = v[i][0] + v[i][1] - 1;
@@ -251,17 +269,21 @@ public class Polygenic {
 		PrintWriter phe = null;
 		PrintWriter cov = null;
 		try {
-			pedout = new PrintWriter(new BufferedWriter(new FileWriter(out + ".ped")));
-			map = new PrintWriter(new BufferedWriter(new FileWriter(out + ".map")));
-			phe = new PrintWriter(new BufferedWriter(new FileWriter(out + ".phe")));
-			cov = new PrintWriter(new BufferedWriter(new FileWriter(out + ".cov")));
+			pedout = new PrintWriter(new BufferedWriter(new FileWriter(out
+					+ ".ped")));
+			map = new PrintWriter(new BufferedWriter(new FileWriter(out
+					+ ".map")));
+			phe = new PrintWriter(new BufferedWriter(new FileWriter(out
+					+ ".phe")));
+			cov = new PrintWriter(new BufferedWriter(new FileWriter(out
+					+ ".cov")));
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
-		
+
 		for (int i = 0; i < genotype.length; i++) {
-			if ( i < N_case) {
+			if (i < N_case) {
 				pedout.print("case_" + i + " ");
 				pedout.print(1 + " ");
 				pedout.print(0 + " ");
@@ -279,7 +301,7 @@ public class Polygenic {
 				pedout.print(1 + " ");
 			}
 
-			for (int j = 0; j < genotype[i].length; j++ ) {
+			for (int j = 0; j < genotype[i].length; j++) {
 				int g = (int) genotype[i][j];
 				if (g == -1) {
 					pedout.print(A1 + " " + A1 + "  ");
@@ -291,37 +313,38 @@ public class Polygenic {
 			}
 			pedout.println();
 
-			if( i < N_case) {
+			if (i < N_case) {
 				phe.print("case_" + i + " " + 1 + " " + 2 + " ");
 				cov.print("case_" + i + " " + 1 + " " + 2 + " ");
 			} else {
 				phe.print("control_" + i + " " + 1 + " " + 1 + " ");
 				cov.print("control_" + i + " " + 1 + " " + 1 + " ");
-			}			
+			}
 			phe.println();
 
 			cov.print(Liab[i] + " ");
 			cov.println(BV[i]);
 		}
 
-		for (int i = 0; i < M; i ++) {
+		for (int i = 0; i < M; i++) {
 			map.print(1 + " ");
 			map.print("rs" + i + " ");
-			map.print(i/(M * 1.0) + " ");
-			map.println(i* 100);
+			map.print(i / (M * 1.0) + " ");
+			map.println(i * 100);
 		}
-		
+
 		pedout.close();
 		phe.close();
 		map.close();
 		cov.close();
 	}
-	
+
 	public double[] CalculateDprime(double[] f, double[] cor) {
 		double[] D = new double[cor.length];
 
-		for(int i = 0; i < D.length; i++) {
-			D[i] = cor[i]*Math.sqrt(f[i] * (1-f[i]) * f[i+1] * (1-f[i+1]));
+		for (int i = 0; i < D.length; i++) {
+			D[i] = cor[i]
+					* Math.sqrt(f[i] * (1 - f[i]) * f[i + 1] * (1 - f[i + 1]));
 		}
 
 		return D;
