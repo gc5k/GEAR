@@ -8,7 +8,7 @@ import org.apache.commons.cli.Options;
 import org.apache.commons.cli.ParseException;
 import org.apache.commons.cli.PosixParser;
 
-public class PolygenicPar {
+public class NewPolygenicPar {
 
 	private final String sep=",";
 
@@ -37,6 +37,10 @@ public class PolygenicPar {
 	private final String cmd_h2 = "h2";
 	public static double h2 = 0.5;
 
+	private final String cmd_noselection = "no_selection";
+	private final String cmd_noselection_long = "no-selection";
+	public static boolean noselection = false;
+
 	private final String cmd_out = "out";
 	public static String out = "Poly";
 
@@ -45,7 +49,7 @@ public class PolygenicPar {
 	private Options ops = new Options();
 	private CommandLineParser parser = new PosixParser();
 
-	public PolygenicPar() {
+	public NewPolygenicPar() {
 		commandInitial();
 	}
 
@@ -70,6 +74,8 @@ public class PolygenicPar {
 		ops.addOption(OptionBuilder.withDescription("prevalence, default = " + K).hasArg().create(cmd_prevalence));
 
 		ops.addOption(OptionBuilder.withDescription("heritability, default = " + h2).hasArg().create(cmd_h2));
+
+		ops.addOption(OptionBuilder.withLongOpt(cmd_noselection_long).withDescription("selection, default = no").create(cmd_noselection));
 
 		ops.addOption(OptionBuilder.withDescription("root file, default = " + out).hasArg().create(cmd_out));
 		
@@ -121,6 +127,10 @@ public class PolygenicPar {
 			h2 = Double.parseDouble(cl.getOptionValue(cmd_h2));
 		}
 
+		if(cl.hasOption(cmd_noselection)) {
+			noselection = true;
+		}
+
 		if(cl.hasOption(cmd_out)) {
 			out = cl.getOptionValue(cmd_out);
 		}
@@ -128,7 +138,7 @@ public class PolygenicPar {
 	}
 
 	public static void main(String[] args) {
-		PolygenicPar p = new PolygenicPar();
+		NewPolygenicPar p = new NewPolygenicPar();
 		p.commandListenor(args);
 		System.out.println(p);
 	}
