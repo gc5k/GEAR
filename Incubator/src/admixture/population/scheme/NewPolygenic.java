@@ -14,7 +14,7 @@ import org.apache.commons.math.linear.RealMatrix;
 import org.apache.commons.math.random.RandomDataImpl;
 import org.apache.commons.math.stat.StatUtils;
 
-public class Polygenic {
+public class NewPolygenic {
 
 	private NormalDistributionImpl norm;
 	private RandomDataImpl rnd;
@@ -29,7 +29,8 @@ public class Polygenic {
 	private double[][] genotype;
 	private double[] BV;
 	private double[] phenotype;
-	private double[] Liab;
+
+	private double[] risk;
 
 	private double[] freq;
 	private double[] LD;
@@ -40,14 +41,14 @@ public class Polygenic {
 	private double h2 = 0.5;
 	private double E = 0.5;
 	private double K = 0.05;
-
+	private boolean noselection = false;
 	private String out = "Poly";
 
 	private String A1 = "A";
 	private String A2 = "C";
 	public static StringBuilder LOG = new StringBuilder();
 
-	public Polygenic(PolygenicPar P) {
+	public NewPolygenic(NewPolygenicPar P) {
 
 		M = P.marker;
 		U = P.U;
@@ -57,6 +58,7 @@ public class Polygenic {
 		N_case = P.cs;
 		h2 = P.h2;
 		K = P.K;
+		noselection = P.noselection;
 		out = P.out;
 
 		N_control = sample - N_case;
@@ -76,7 +78,7 @@ public class Polygenic {
 		genotype = new double[N_case + N_control][M];
 		phenotype = new double[N_case + N_control];
 		BV = new double[N_case + N_control];
-		Liab = new double[N_case + N_control];
+		risk = new double[N_case + N_control];
 
 		Calendar calendar = Calendar.getInstance();
 		LOG.append("\nThe analysis was implemented at: " + calendar.getTime()
@@ -89,6 +91,7 @@ public class Polygenic {
 		LOG.append("case: " + N_case + "\n");
 		LOG.append("Control: " + N_control + "\n");
 		LOG.append("K: " + K + "\n");
+		LOG.append("No selection: " + noselection + "\n");
 		LOG.append("h2: " + h2 + "\n");
 		LOG.append("out: " + out + "\n");
 		LOG.append("\n");
@@ -96,10 +99,11 @@ public class Polygenic {
 
 	public static void main(String[] args) {
 
-		PolygenicPar p = new PolygenicPar();
+		NewPolygenicPar p = new NewPolygenicPar();
 		p.commandListenor(args);
 
-		Polygenic Poly = new Polygenic(p);
+		NewPolygenic Poly = new NewPolygenic(p);
+
 		Poly.GenerateSample();
 		Poly.writeFile();
 		Poly.writeLog();
@@ -128,6 +132,15 @@ public class Polygenic {
 
 	public void GenerateSample() {
 
+		if (noselection) {
+			GenerateSampleNoSelection();
+		} else {
+			GenerateSampleSelection();
+		}
+	}
+
+
+	public void GenerateSampleSelection() {
 		int count_case = 0;
 		int count_control = 0;
 		int count = 0;
@@ -156,7 +169,7 @@ public class Polygenic {
 					BV[count_case] = bv;
 					phenotype[count_case] = L;
 					genotype[count_case] = chr.getColumn(0);
-					Liab[count_case] = liability;
+					risk[count_case] = liability;
 					count_case++;
 				} else {
 					continue;
@@ -166,7 +179,7 @@ public class Polygenic {
 					BV[N_case + count_control] = bv;
 					phenotype[N_case + count_control] = L;
 					genotype[N_case + count_control] = chr.getColumn(0);
-					Liab[N_case + count_control] = liability;
+					risk[N_case + count_control] = liability;
 					count_control++;
 				} else {
 					continue;
@@ -176,6 +189,49 @@ public class Polygenic {
 			count++;
 		}
 		LOG.append("total individuals visited: " + c + "\n");
+	}
+
+	public void GenerateSampleNoSelection() {
+
+		int count_case = 0;
+		int count_control = 0;
+		int count = 0;
+		RealMatrix effect = GenerateEffects();
+
+		norm = new NormalDistributionImpl(0, 1);
+
+		while (count < sample) {
+			RealMatrix chr = SampleChromosome();
+			RealMatrix res = chr.transpose().multiply(effect);
+
+			double bv = res.getEntry(0, 0);
+			double L = bv + rnd.nextGaussian(0, E);
+			double liability = 0;
+
+			try {
+				liability = norm.cumulativeProbability(L);
+			} catch (MathException e) {
+				e.printStackTrace();
+			}
+
+			if (1 - liability < K) {
+				BV[count_case] = bv;
+				phenotype[count_case] = L;
+				genotype[count_case] = chr.getColumn(0);
+				risk[count_case] = liability;
+				count_case++;
+			} else {
+				count_control++;
+				BV[sample - count_control] = bv;
+				phenotype[sample - count_control] = L;
+				genotype[sample - count_control] = chr.getColumn(0);
+				risk[sample - count_control] = liability;
+			}
+
+			count++;
+		}
+		N_case=count_case;
+		LOG.append("total individuals visited (no selection): " + count + " (affected=" + N_case + ")\n");
 
 	}
 
@@ -322,8 +378,9 @@ public class Polygenic {
 			}
 			phe.println();
 
-			cov.print(Liab[i] + " ");
-			cov.println(BV[i]);
+			cov.print(risk[i] + " ");
+			cov.print(BV[i] + " ");
+			cov.println(phenotype[i]);
 		}
 
 		for (int i = 0; i < M; i++) {
