@@ -1,10 +1,6 @@
 package parameter;
 
-import java.io.BufferedReader;
 import java.io.File;
-import java.io.FileReader;
-import java.io.IOException;
-import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.Random;
 
@@ -17,7 +13,6 @@ import org.apache.commons.cli.ParseException;
 import org.apache.commons.cli.PosixParser;
 
 import test.Test;
-import util.FileProcessor;
 import util.NewIt;
 
 public class Parameter {
@@ -50,8 +45,7 @@ public class Parameter {
 	private final String cmd_realcheck_threshold_lower_long = "realcheck-threshold-lower";
 	public static double realcheckThresholdLower = 0;	
 	public static boolean realcheckThresholdUpperLowerFlag = false;
-	
-	
+
 	private final String cmd_realcheck_threshold = "realcheck_threshold";
 	private final String cmd_realcheck_threshold_long = "realcheck-threshold";
 	public static double realcheckThreshold = 1;
@@ -70,7 +64,19 @@ public class Parameter {
 	public static String bimfile2 = null;
 	public static String famfile2 = null;
 	public static boolean bfileOption2 = false;
+
+///////////////simulation nuclear family
+	private final String cmd_simu_fam = "simu_fam";
+	private final String cmd_simu_fam_long = "simu-fam";
+	public static boolean simufamFlag = false;
 	
+	private final String cmd_simu_fam_size = "simu_fam_size";
+	private final String cmd_simu_fam_size_long = "simu-fam-size";
+	public static int simu_fam_size = 100;
+	private final String cmd_simu_fam_marker = "simu_fam_marker";
+	private final String cmd_simu_fam_marker_long = "simu-fam-marker";
+	public static int simu_fam_marker = 10;
+
 ///////////////simulation real data
 	private final String cmd_simu_seed = "simu_seed";
 	private final String cmd_simu_seed_long = "simu-seed";
@@ -152,8 +158,16 @@ public class Parameter {
 	public static boolean nontransFlag = false;
 
 	private final String cmd_nontrans_seed = "nontrans_seed";
-	private final String cmd_nontrans_seed_long = "nontrans-seed";
-	public static long nontransSeed = (new Random()).nextLong();
+	private final String cmd_nontrans_seed_long = "nontrans-seed";	
+	public static long nontransSeed = 2010;
+
+	private final String cmd_nontrans_cases = "nontrans_cases";
+	private final String cmd_nontrans_cases_long = "nontrans-cases";
+	public static boolean nontranscasesFlag = false;
+
+	private final String cmd_nontrans_controls = "nontrans_controls";
+	private final String cmd_nontrans_controls_long = "nontrans-controls";
+	public static boolean nontranscontrolsFlag = false;
 
 ///////////////////pop stat
 	private final String cmd_freq = "freq";
@@ -330,6 +344,13 @@ public class Parameter {
 
 		ops.addOption(OptionBuilder.withDescription("bfile2 ").hasArg().create(cmd_bfile2));
 
+//simulation nuclear fam
+		ops.addOption(OptionBuilder.withLongOpt(cmd_simu_fam_long).withDescription("simulation nuclear family ").create(cmd_simu_fam));
+
+		ops.addOption(OptionBuilder.withLongOpt(cmd_simu_fam_size_long).withDescription("simulation nuclear family size ").hasArg().create(cmd_simu_fam_size));
+		
+		ops.addOption(OptionBuilder.withLongOpt(cmd_simu_fam_marker_long).withDescription("simulation number for nuclear family ").hasArg().create(cmd_simu_fam_marker));		
+		
 //simulation real data
 		ops.addOption(OptionBuilder.withLongOpt(cmd_simu_seed_long).withDescription("gwas simulation seed ").hasArg().create(cmd_simu_seed));
 
@@ -349,6 +370,10 @@ public class Parameter {
 
 //nontransmitted
 		ops.addOption(OptionBuilder.withDescription("nontransmitted ").create(cmd_nontrans));
+
+		ops.addOption(OptionBuilder.withLongOpt(cmd_nontrans_cases_long).withDescription("nontransmitted filter cases ").create(cmd_nontrans_cases));
+
+		ops.addOption(OptionBuilder.withLongOpt(cmd_nontrans_controls_long).withDescription("nontransmitted filter controls ").create(cmd_nontrans_controls));
 
 		ops.addOption(OptionBuilder.withLongOpt(cmd_nontrans_seed_long).withDescription("gwas prevalence of the binary trait ").hasArg().create(cmd_nontrans_seed));
 		
@@ -592,7 +617,17 @@ public class Parameter {
 		if (cl.hasOption(cmd_nontrans_seed)) {
 			nontransSeed = Long.parseLong(cl.getOptionValue(cmd_nontrans_seed));
 		}
-		
+
+		if (cl.hasOption(cmd_nontrans_cases)) {
+			nontranscasesFlag = true;
+			nontranscontrolsFlag = false;
+		}
+
+		if (cl.hasOption(cmd_nontrans_cases)) {
+			nontranscontrolsFlag = true;
+			nontranscasesFlag = false;
+		}
+
 //pop stat
 		if (cl.hasOption(cmd_freq) ) {
 			sumStatFlag = true;
@@ -605,8 +640,21 @@ public class Parameter {
 			sumStatOption[geno_freq] = true;
 		}
 
-//simulation real data
+//simulation nuclear family		
 
+		if (cl.hasOption(cmd_simu_fam)) {
+			simufamFlag = true;
+		}
+		
+		if (cl.hasOption(cmd_simu_fam_size)) {
+			simu_fam_size = Integer.parseInt(cl.getOptionValue(cmd_simu_fam_size));
+		}
+		
+		if (cl.hasOption(cmd_simu_fam_marker)) {
+			simu_fam_marker = Integer.parseInt(cl.getOptionValue(cmd_simu_fam_marker));
+		}
+		
+//simulation real data
 		if (cl.hasOption(cmd_simu_qt)) {
 			simuFlag = true;
 			simuType[sm_qt] = false;
