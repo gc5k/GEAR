@@ -20,6 +20,7 @@ import family.RabinowitzLairdAlgorithm.lou.HeterozygousParent;
 import family.RabinowitzLairdAlgorithm.lou.HomozygousParent;
 import family.RabinowitzLairdAlgorithm.lou.ObservedParents;
 import family.RabinowitzLairdAlgorithm.lou.UnobservedParents;
+import family.pedigree.Hukou;
 import family.pedigree.PersonIndex;
 import family.pedigree.file.MapFile;
 import family.pedigree.file.PedigreeFile;
@@ -28,10 +29,13 @@ import family.pedigree.genotype.BPerson;
 
 public class AJHG2008 extends ChenBase {
 
+	private long seed = 2010;
+
 	public AJHG2008(PedigreeFile ped, MapFile map) {
 		super(ped, map);
 	}
-	public void RevvingUp() {
+	
+	public void RevvingUp(ArrayList<PersonIndex> pt) {
 		Hashtable<String, BFamilyStruct> Fam = PedData.getFamilyStruct();
 		Hashtable<String, BFamilyStruct> fam_has_sib = NewIt.newHashtable();
 		PersonTable.ensureCapacity(qualified_Sib);
@@ -62,6 +66,7 @@ public class AJHG2008 extends ChenBase {
 				}
 
 			}
+
 			if (si != 0) {
 				SibIdx.add(new Integer(si));
 				for (int i = 0; i < plist.size(); i++) {
@@ -77,6 +82,10 @@ public class AJHG2008 extends ChenBase {
 
 		AbstractGenoDistribution.rnd = new Random(seed);
 		NonTransmitted(fam_has_sib);
+	}
+
+	public void setSeed(long sd) {
+		seed = sd;
 	}
 
 	private void NonTransmitted(Hashtable<String, BFamilyStruct> Fam) {

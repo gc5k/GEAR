@@ -40,6 +40,7 @@ public class BPerson {
 		personID = p.getPersonID() + "ajhg2008";
 		momID = p.getMomID();
 		dadID = p.getDadID();
+		gender = p.getGender();
 		affectedStatus = p.getAffectedStatus();
 		this.numMarkers = p.getNumMarkers();
 		if (numMarkers % intL == 0) {

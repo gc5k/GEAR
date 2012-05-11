@@ -4,6 +4,7 @@ import he.H2Transformer;
 import he.HERegression;
 import realcheck.RealCheck;
 import simulation.RealDataSimulation;
+import simulation.SimuFamily;
 import simulation.SimuPolyCC;
 import sumstat.FrequencyCalculator;
 import parameter.Parameter;
@@ -19,6 +20,9 @@ public class Pipeline {
 			RealCheck realcheck = new RealCheck(p);
 			realcheck.Check();
 			
+		} else if (Parameter.simufamFlag) {
+			SimuFamily simuFam = new SimuFamily(p);
+			simuFam.generateSample();
 		} else if (Parameter.simuFlag) {
 			RealDataSimulation rdSimu = new RealDataSimulation(p);
 			rdSimu.GenerateSample();

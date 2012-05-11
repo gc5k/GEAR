@@ -44,6 +44,7 @@ public class SampleFilter {
 
 	private String[][] indKeep;
 	private String[][] indExclude;
+
 	public SampleFilter(PedigreeFile ped, MapFile map) {
 		PedData = ped;
 		MapData = map;

@@ -5,6 +5,7 @@ import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Enumeration;
 import java.util.HashSet;
 import java.util.Hashtable;
@@ -43,15 +44,31 @@ public class PedigreeFile {
 		FamID = NewIt.newArrayList();
 	}
 
-	public String[] getFamListSorted() {
+	public String[] getFamList() {
 		Enumeration<String> famstrList = this.familystructure.keys();
 		String[] FID = new String[familystructure.size()];
 		int ind = 0;
 		while (famstrList.hasMoreElements()) {
 			FID[ind++] = famstrList.nextElement();
 		}
-//		Arrays.sort(FID);
 		return FID;
+	}
+
+	public String[] getFamListSorted() {
+		ArrayList<String> f = NewIt.newArrayList();
+		for(int i = 0; i < HukouBook.size(); i++) {
+			Hukou hukou = HukouBook.get(i);
+			if(f.size()==0) {
+				f.add(hukou.getFamilyID());
+			} else {
+				if(hukou.getFamilyID().compareTo(f.get(f.size()-1)) == 0) {
+					continue;
+				}
+				f.add(hukou.getFamilyID());
+			}
+		}
+		String[] fs = (String[]) f.toArray(new String[0]);
+		return (String[]) f.toArray(new String[0]);
 	}
 
 	public BFamilyStruct getFamilyStruct(String familystrID) {
