@@ -1,4 +1,4 @@
-package write;
+package pscontrol.write;
 
 import java.io.DataOutputStream;
 import java.io.FileNotFoundException;
@@ -19,7 +19,7 @@ import family.plink.PLINKBinaryParser;
 import family.plink.PLINKParser;
 import family.qc.rowqc.SampleFilter;
 
-public class WriteBedSNPMajor {
+public class NonTransWriteBedSNPMajor {
 	private byte byte1 = 108;
 	private byte byte2 = 27;
 	private byte byte3 = 1;
@@ -29,7 +29,7 @@ public class WriteBedSNPMajor {
 	private Parameter par;
 	private ArrayList<SNP> snpList;
 
-	public WriteBedSNPMajor (Parameter p) {
+	public NonTransWriteBedSNPMajor (Parameter p) {
 		par = p;		
 		PLINKParser pp = null;
 		if (Parameter.fileOption) {
@@ -50,78 +50,9 @@ public class WriteBedSNPMajor {
 		PersonTable = sf.getSample();
 	}
 
-	public WriteBedSNPMajor (ArrayList<PersonIndex> pt, ArrayList<SNP> sl) {
+	public NonTransWriteBedSNPMajor (ArrayList<PersonIndex> pt, ArrayList<SNP> sl) {
 		snpList = sl;
 		PersonTable = pt;
-	}
-
-	public void WriteFile() {
-		StringBuffer sbim = new StringBuffer();
-		sbim.append(par.out);
-		sbim.append(".bim");
-		PrintStream pbim = FileProcessor.CreatePrintStream(sbim.toString());
-		for (Iterator<SNP> e = snpList.iterator(); e.hasNext(); ) {
-			SNP snp = e.next();
-			pbim.append(snp.getChromosome() + "\t" +snp.getName() + "\t" + snp.getDistance() + "\t" + snp.getPosition() + "\t" + snp.getRefAllele() + "\t" + snp.getSecAllele() + "\n");
-		}
-		pbim.close();
-		
-		StringBuffer sfam = new StringBuffer();
-		sfam.append(par.out);
-		sfam.append(".fam");
-		PrintStream pfam = FileProcessor.CreatePrintStream(sfam.toString());		
-		for (Iterator<PersonIndex> e = PersonTable.iterator(); e.hasNext(); ) {
-			PersonIndex per = e.next();
-			BPerson bp = per.getPerson();
-			pfam.append(bp.getFamilyID() + "\t" + bp.getPersonID() + "\t" + bp.getDadID() + "\t" + bp.getMomID() + "\t" + bp.getGender() + "\t" + bp.getAffectedStatus() + "\n");
-		}
-		pfam.close();
-		
-		StringBuffer sbed = new StringBuffer();
-		sbed.append(par.out);
-		sbed.append(".bed");
-		try {
-			os = new DataOutputStream(new FileOutputStream(sbed.toString()));
-		} catch (FileNotFoundException e) {
-			e.printStackTrace();
-		}
-
-		try {
-			os.writeByte(byte1);
-			os.writeByte(byte2);
-			os.writeByte(byte3);
-			
-			for (int i = 0; i < snpList.size(); i++) {
-				byte gbyte = 0;
-				int idx = 0;
-
-				int posByte = i >> BPerson.shift;
-				int posBite = (i - (i >> BPerson.shift << BPerson.shift)) << 1;
-
-				for (int j = 0; j < PersonTable.size(); j++) {
-					PersonIndex pi = PersonTable.get(j);
-					BPerson bp = pi.getPerson();
-					byte g = bp.getOriginalGenotypeScore(posByte, posBite);
-					idx++;
-					if (j != (PersonTable.size() - 1) ) {
-						gbyte <<= 2;
-						gbyte += g;
-						if (idx == 4) {
-							os.writeByte(gbyte);
-							gbyte = 0;
-							idx = 0;
-						}
-					} else {
-						gbyte <<= 2;
-						gbyte += g;
-						os.writeByte(gbyte);
-					}
-				}
-			}
-			os.close();
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
 	}
 
 	public void WriteFile(String out) {
@@ -142,7 +73,8 @@ public class WriteBedSNPMajor {
 		for (Iterator<PersonIndex> e = PersonTable.iterator(); e.hasNext(); ) {
 			PersonIndex per = e.next();
 			BPerson bp = per.getPerson();
-			pfam.append(bp.getFamilyID() + "\t" + bp.getPersonID() + "\t" + bp.getDadID() + "\t" + bp.getMomID() + "\t" + bp.getGender() + "\t" + bp.getAffectedStatus() + "\n");
+			String[] id = bp.getPersonID().split("ajhg2008");
+			pfam.append(bp.getFamilyID() + "\t" + id[0] + "\t" + bp.getDadID() + "\t" + bp.getMomID() + "\t" + bp.getGender() + "\t" + bp.getAffectedStatus() + "\n");
 		}
 		pfam.close();
 		
