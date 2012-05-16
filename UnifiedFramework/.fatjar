@@ -1,0 +1,14 @@
+#Fat Jar Configuration File
+#Mon Apr 09 11:58:09 CDT 2012
+onejar.license.required=true
+manifest.classpath=
+manifest.removesigners=true
+onejar.checkbox=false
+jarname=20120304_GMDR_fat.jar
+manifest.mergeall=false
+manifest.mainclass=gui.MainFrame
+manifest.file=<createnew>
+jarname.isextern=false
+onejar.expand=
+excludes=
+includes=
