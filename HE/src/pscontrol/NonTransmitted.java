@@ -5,9 +5,9 @@ import java.util.Iterator;
 
 import parameter.Parameter;
 import pscontrol.hierarchy.AJHG2008;
+import pscontrol.write.NonTransWriteBedSNPMajor;
 import test.Test;
 import util.NewIt;
-import write.WriteBedSNPMajor;
 import family.pedigree.PersonIndex;
 import family.plink.PLINKBinaryParser;
 import family.plink.PLINKParser;
@@ -67,8 +67,11 @@ public class NonTransmitted {
 			}
 		}
 
-		WriteBedSNPMajor writeSNP = new WriteBedSNPMajor(ps, ajhg2008
+		NonTransWriteBedSNPMajor writeSNP = new NonTransWriteBedSNPMajor(ps, ajhg2008
 				.getMapFile().getMarkerList());
-		writeSNP.WriteFile();
+		StringBuilder out = new StringBuilder(); 
+		out.append(par.out);
+		out.append(".nt");
+		writeSNP.WriteFile(out.toString());
 	}
 }

@@ -623,7 +623,7 @@ public class Parameter {
 			nontranscontrolsFlag = false;
 		}
 
-		if (cl.hasOption(cmd_nontrans_cases)) {
+		if (cl.hasOption(cmd_nontrans_controls)) {
 			nontranscontrolsFlag = true;
 			nontranscasesFlag = false;
 		}
