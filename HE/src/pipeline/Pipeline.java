@@ -58,7 +58,7 @@ public class Pipeline {
 			NonTransmitted nt = new NonTransmitted(p);
 			nt.GenerateNonTransmitted();
 
-		} else {
+		} else if (Parameter.heFlag){
 			HERegression HER = null;
 			HER = new HERegression(p);
 			HER.Regression();
