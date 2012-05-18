@@ -182,7 +182,8 @@ public class Parameter {
 	public static boolean[] sumStatOption = { true, false };
 
 //he regression
-	public boolean heOption = true;
+	public static boolean heFlag = true;
+	private final String cmd_he = "he";
 	private final String cmd_grm = "grm";
 	public static String grm = null;
 	public static String grm_id = null;
@@ -421,6 +422,8 @@ public class Parameter {
 		ops.addOption(OptionBuilder.withLongOpt(cmd_make_bed_long).withDescription("make bed ").create(cmd_make_bed));		
 		
 //haseman-elston regression
+		ops.addOption(OptionBuilder.withDescription("haseman-elston regression ").hasArg().create(cmd_he));		
+		
 		ops.addOption(OptionBuilder.withDescription("grm ").hasArg().create(cmd_grm));
 
 		ops.addOption(OptionBuilder.withDescription("pheno ").hasArg().create(cmd_pheno));
@@ -748,6 +751,10 @@ public class Parameter {
 		}
 
 //haseman-elston regression
+		if(cl.hasOption(cmd_he)) {
+			heFlag = true;
+		}
+		
 		if (cl.hasOption(cmd_grm)) {
 			StringBuilder sb1 = new StringBuilder(cl.getOptionValue(cmd_grm));
 			grm = sb1.append(".grm.gz").toString();
