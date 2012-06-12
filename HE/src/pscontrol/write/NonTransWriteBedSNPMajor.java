@@ -103,18 +103,18 @@ public class NonTransWriteBedSNPMajor {
 					PersonIndex pi = PersonTable.get(j);
 					BPerson bp = pi.getPerson();
 					byte g = bp.getOriginalGenotypeScore(posByte, posBite);
+
+					g <<= 2 * idx;
+					gbyte |= g;
 					idx++;
+					
 					if (j != (PersonTable.size() - 1) ) {
-						gbyte <<= 2;
-						gbyte += g;
 						if (idx == 4) {
 							os.writeByte(gbyte);
 							gbyte = 0;
 							idx = 0;
 						}
 					} else {
-						gbyte <<= 2;
-						gbyte += g;
 						os.writeByte(gbyte);
 					}
 				}

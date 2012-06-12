@@ -55,13 +55,13 @@ public class SimuPolyCC {
 		U = P.polyU;
 		ld = P.polyLD;
 		seed = P.seed;
-		sample = P.polySample;
-		N_case = P.polyCS;
-		h2 = P.polyHsq;
-		K = P.polyK;
+		sample = P.simuCC[0] + P.simuCC[1];
+		N_case = P.simuCC[0];
+		N_control = P.simuCC[1];
+		h2 = P.simuHsq;
+		K = P.simuK;
 		out = P.out;
 
-		N_control = sample - N_case;
 		E = Math.sqrt(1 - h2);
 
 		rnd = new RandomDataImpl();

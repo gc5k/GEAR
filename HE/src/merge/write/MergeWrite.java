@@ -1,4 +1,4 @@
-package write;
+package merge.write;
 
 import java.io.DataOutputStream;
 import java.io.FileNotFoundException;
@@ -19,7 +19,7 @@ import family.plink.PLINKBinaryParser;
 import family.plink.PLINKParser;
 import family.qc.rowqc.SampleFilter;
 
-public class WriteBedSNPMajor {
+public class MergeWrite {
 	private byte byte1 = 108;
 	private byte byte2 = 27;
 	private byte byte3 = 1;
@@ -29,8 +29,8 @@ public class WriteBedSNPMajor {
 	private Parameter par;
 	private ArrayList<SNP> snpList;
 
-	public WriteBedSNPMajor (Parameter p) {
-		par = p;		
+	public MergeWrite (Parameter p) {
+		par = p;
 		PLINKParser pp = null;
 		if (Parameter.fileOption) {
 			pp = new PLINKParser(Parameter.pedfile, Parameter.mapfile);
@@ -50,7 +50,7 @@ public class WriteBedSNPMajor {
 		PersonTable = sf.getSample();
 	}
 
-	public WriteBedSNPMajor (ArrayList<PersonIndex> pt, ArrayList<SNP> sl) {
+	public MergeWrite (ArrayList<PersonIndex> pt, ArrayList<SNP> sl) {
 		snpList = sl;
 		PersonTable = pt;
 	}
@@ -106,7 +106,7 @@ public class WriteBedSNPMajor {
 					g <<= 2 * idx;
 					gbyte |= g;
 					idx++;
-					
+
 					if (j != (PersonTable.size() - 1) ) {
 						if (idx == 4) {
 							os.writeByte(gbyte);
@@ -175,7 +175,7 @@ public class WriteBedSNPMajor {
 					g <<= 2 * idx;
 					gbyte |= g;
 					idx++;
-					
+
 					if (j != (PersonTable.size() - 1) ) {
 						if (idx == 4) {
 							os.writeByte(gbyte);

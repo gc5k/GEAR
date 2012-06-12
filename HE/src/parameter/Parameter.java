@@ -40,7 +40,7 @@ public class Parameter {
 	private final String cmd_realcheck_threshold_upper = "realcheck_threshold_upper";
 	private final String cmd_realcheck_threshold_upper_long = "realcheck-threshold-upper";
 	public static double realcheckThresholdUpper = 1;
-	
+
 	private final String cmd_realcheck_threshold_lower = "realcheck_threshold_lower";
 	private final String cmd_realcheck_threshold_lower_long = "realcheck-threshold-lower";
 	public static double realcheckThresholdLower = 0;	
@@ -51,10 +51,14 @@ public class Parameter {
 	public static double realcheckThreshold = 1;
 	public static boolean realcheckThresholdFlag = true;
 
-	private final String cmd_realcheck_marker = "realcheck_marker";
-	private final String cmd_realcheck_marker_long = "realcheck-marker-number";
-	public static int realcheckMarkerNumber = 0;
+	private final String cmd_realcheck_marker_number = "realcheck_marker_number";
+	private final String cmd_realcheck_marker_number_long = "realcheck-marker-number";
+	public static int realcheckMarkerNumber = 100;
 
+	private final String cmd_realcheck_snps = "realcheck_snps";
+	private final String cmd_realcheck_snps_long = "realcheck-snps";
+	public static String realcheckSNPs = null;
+	
 	private final String cmd_realcheck = "realcheck";
 	public static boolean realcheckFlag = false;
 
@@ -65,11 +69,30 @@ public class Parameter {
 	public static String famfile2 = null;
 	public static boolean bfileOption2 = false;
 
+///////////////merge
+	private final String cmd_merge = "merge";
+	public static boolean mergeFlag = false;
+	private final String cmd_merge_maf_cutoff = "merge_maf_cutoff";
+	private final String cmd_merge_maf_cutoff_long = "merge-maf-cutoff";
+	public static double merge_maf_cutoff = 0.4;
+
+	private final String cmd_merge_p_cutoff = "merge_p_cutoff";
+	private final String cmd_merge_p_cutoff_long = "merge-p-cutoff";
+	public static double merge_p_cutoff = 0.05;
+
+	private final String cmd_remove_atgc = "remove_atgc";
+	private final String cmd_remove_atgc_long = "remove-atgc";
+	public static boolean removeATGCFlag = false;
+	
+	private final String cmd_remove_Flip = "remove_flip";
+	private final String cmd_remove_Flip_long = "remove-flip";
+	public static boolean removeFlipFlag = false;
+
 ///////////////simulation nuclear family
 	private final String cmd_simu_fam = "simu_fam";
 	private final String cmd_simu_fam_long = "simu-fam";
 	public static boolean simufamFlag = false;
-	
+
 	private final String cmd_simu_fam_size = "simu_fam_size";
 	private final String cmd_simu_fam_size_long = "simu-fam-size";
 	public static int simu_fam_size = 100;
@@ -78,6 +101,11 @@ public class Parameter {
 	public static int simu_fam_marker = 10;
 
 ///////////////simulation real data
+	
+	private final String cmd_simu_realdata = "simu_real_data";
+	private final String cmd_simu_realdata_long = "simu-real-data";
+	public static boolean simuRealData = false;
+	
 	private final String cmd_simu_seed = "simu_seed";
 	private final String cmd_simu_seed_long = "simu-seed";
 	public static long simuSeed = (new Random()).nextLong();
@@ -111,7 +139,7 @@ public class Parameter {
 
 	public final static int sm_qt = 0;
 	public final static int sm_cc = 1;
-	public static boolean simuFlag = false;
+
 	public static boolean[] simuType = { true, false };
 
 /////////////////simulation polygenic
@@ -128,7 +156,7 @@ public class Parameter {
 	private final String cmd_poly_loci_long = "poly-loci";
 	
 	public static int polyLoci = 1000;
-	
+
 	private final String cmd_poly_LD = "poly_ld";
 	private final String cmd_poly_LD_long = "poly-ld";
 	public static double polyLD = 0;
@@ -136,22 +164,6 @@ public class Parameter {
 	private final String cmd_poly_U = "poly_U";
 	private final String cmd_poly_U_long = "poly-U";
 	public static boolean polyU = false;
-
-	private final String cmd_poly_sample = "poly_sample_size";
-	private final String cmd_poly_sample_long = "poly-sample-size";
-	public static int polySample = 1000;
-
-	private final String cmd_poly_case = "poly_case";
-	private final String cmd_poly_case_long = "poly-case";	
-	public static int polyCS = 500;
-
-	private final String cmd_poly_k = "poly_k";
-	private final String cmd_poly_k_long = "poly-k";
-	public static double polyK = 0.05;
-
-	private final String cmd_poly_hsq = "poly_hsq";
-	private final String cmd_poly_hsq_long = "poly-hsq";
-	public static double polyHsq = 0.5;
 
 ///////////////////nontrans
 	private final String cmd_nontrans = "nontrans";
@@ -247,20 +259,40 @@ public class Parameter {
 	public static boolean inchrFlag = false;
 	public static boolean exchrFlag = false;
 
+	private final String cmd_snps = "snps";
+	public static String snpList = null;
+
 //////////////////level 1 individual selection
 	private final String cmd_keep = "keep";
 	public static String keepFile = null;
 	public static boolean keepFlag = false;
 
-	// individual selection start
+///////////////// individual selection start
 	private final String cmd_remove = "remove";
 	public static String removeFile = null;
 	public static boolean removeFlag = false;
 
+///////////////// reference-allele
+	private final String cmd_reference_allele = "reference_allele";
+	private final String cmd_reference_allele_long = "refernce-allele";
+	public static String reference_allele = null;
+	
 /////////////////write bed file
+
 	private final String cmd_make_bed = "make_bed";
 	public static String cmd_make_bed_long = "make-bed";
 	public static boolean makebedFlag = false;
+
+	private final String cmd_strand = "strand";
+	public static boolean strandFlag = false;
+	public static String strand_file = null;
+	private final String cmd_strand_maf_cutoff = "strand_maf_cutoff";
+	private final String cmd_strand_maf_cutoff_long = "strand-maf-cutoff";
+	public static double strand_maf_cutoff = 0.4;
+	
+	private final String cmd_strand_p_cutoff = "strand_p_cutoff";
+	public final String cmd_strand_p_cutoff_long = "strand-p-cutoff";
+	public static double strand_p_cutoff = 0.05;
 
 	/*
 	 * private final String cmd_ex_ind = "exind"; public static String[][]
@@ -339,12 +371,29 @@ public class Parameter {
 
 		ops.addOption(OptionBuilder.withLongOpt(cmd_realcheck_threshold_long).withDescription("realcheck marker threshold").hasArg().create(cmd_realcheck_threshold));
 
-		ops.addOption(OptionBuilder.withLongOpt(cmd_realcheck_marker_long).withDescription("realcheck marker number").hasArg().create(cmd_realcheck_marker));
+		ops.addOption(OptionBuilder.withLongOpt(cmd_realcheck_marker_number_long).withDescription("realcheck marker number").hasArg().create(cmd_realcheck_marker_number));
+
+		ops.addOption(OptionBuilder.withLongOpt(cmd_realcheck_snps_long).withDescription("realcheck snp number").hasArg().create(cmd_realcheck_snps));
 
 		ops.addOption(OptionBuilder.withDescription("realcheck ").create(cmd_realcheck));
 
 		ops.addOption(OptionBuilder.withDescription("bfile2 ").hasArg().create(cmd_bfile2));
 
+
+//simulation merge
+		ops.addOption(OptionBuilder.withDescription("merge ").create(cmd_merge));
+
+		ops.addOption(OptionBuilder.withLongOpt(cmd_merge_maf_cutoff_long).withDescription("merge maf cutoff").hasArg().create(cmd_merge_maf_cutoff));
+
+		ops.addOption(OptionBuilder.withLongOpt(cmd_merge_p_cutoff_long).withDescription("merge p cutoff").hasArg().create(cmd_merge_p_cutoff));
+
+		ops.addOption(OptionBuilder.withLongOpt(cmd_remove_atgc_long).withDescription("remove A/T and G/C loci").create(cmd_remove_atgc));
+
+		ops.addOption(OptionBuilder.withLongOpt(cmd_remove_Flip_long).withDescription("remove flipped loci").create(cmd_remove_Flip));
+		
+		ops.addOption(OptionBuilder.withLongOpt(cmd_simu_fam_marker_long).withDescription("simulation number for nuclear family ").hasArg().create(cmd_simu_fam_marker));		
+
+		
 //simulation nuclear fam
 		ops.addOption(OptionBuilder.withLongOpt(cmd_simu_fam_long).withDescription("simulation nuclear family ").create(cmd_simu_fam));
 
@@ -353,6 +402,8 @@ public class Parameter {
 		ops.addOption(OptionBuilder.withLongOpt(cmd_simu_fam_marker_long).withDescription("simulation number for nuclear family ").hasArg().create(cmd_simu_fam_marker));		
 		
 //simulation real data
+		ops.addOption(OptionBuilder.withLongOpt(cmd_simu_realdata_long).withDescription("gwas simulations ").hasArg().create(cmd_simu_realdata));
+
 		ops.addOption(OptionBuilder.withLongOpt(cmd_simu_seed_long).withDescription("gwas simulation seed ").hasArg().create(cmd_simu_seed));
 
 		ops.addOption(OptionBuilder.withLongOpt(cmd_simu_rep_long).withDescription("gwas simulation replication ").hasArg().create(cmd_simu_rep));
@@ -388,22 +439,15 @@ public class Parameter {
 		ops.addOption(OptionBuilder.withLongOpt(cmd_poly_LD_long).withDescription("LD (correlation), defualt= " + polyLD).hasArg().create(cmd_poly_LD));
 
 		ops.addOption(OptionBuilder.withLongOpt(cmd_poly_U_long).withDescription("polygenic model has Uniform Effect? " + polyU).create(cmd_poly_U));
-
-		ops.addOption(OptionBuilder.withLongOpt(cmd_poly_sample_long).withDescription("polygenic model sample size, default = " + polySample).hasArg().create(cmd_poly_sample));
-
-		ops.addOption(OptionBuilder.withLongOpt(cmd_poly_case_long).withDescription("number of cases, default = " + polyCS).hasArg().create(cmd_poly_case));
-
-		ops.addOption(OptionBuilder.withLongOpt(cmd_poly_k_long).withDescription("prevalence, default = " + polyK).hasArg().create(cmd_poly_k));
-
-		ops.addOption(OptionBuilder.withLongOpt(cmd_poly_hsq_long).withDescription("heritability, default = " + polyHsq).hasArg().create(cmd_poly_hsq));
 		
 //pop stat
 		ops.addOption(OptionBuilder.withDescription("calculate MAF frequency ").create(cmd_freq));
-
 		ops.addOption(OptionBuilder.withLongOpt(cmd_geno_freq_long).withDescription("calculate genotype frequency ").create(cmd_geno_freq));
 
 //snp selection
 		ops.addOption(OptionBuilder.withDescription("select chromosomes").hasArgs().create(cmd_chr));
+		ops.addOption(OptionBuilder.withDescription("select snps").hasArgs().create(cmd_snps));
+
 //individual selection
 
 		ops.addOption(OptionBuilder.withDescription("remove individuals").hasArg().create(cmd_remove));
@@ -419,10 +463,18 @@ public class Parameter {
 
 //make bed
 		
-		ops.addOption(OptionBuilder.withLongOpt(cmd_make_bed_long).withDescription("make bed ").create(cmd_make_bed));		
-		
+		ops.addOption(OptionBuilder.withLongOpt(cmd_reference_allele_long).withDescription("set reference allele ").hasArg().create(cmd_reference_allele));
+
+		ops.addOption(OptionBuilder.withLongOpt(cmd_make_bed_long).withDescription("make bed ").create(cmd_make_bed));
+
+		ops.addOption(OptionBuilder.withDescription("solve strand ").hasArg().create(cmd_strand));
+
+		ops.addOption(OptionBuilder.withLongOpt(cmd_strand_maf_cutoff_long).withDescription("strand maf cutoff").hasArg().create(cmd_strand_maf_cutoff));
+
+		ops.addOption(OptionBuilder.withLongOpt(cmd_strand_p_cutoff_long).withDescription("strand p cutoff ").hasArg().create(cmd_strand_p_cutoff));
+
 //haseman-elston regression
-		ops.addOption(OptionBuilder.withDescription("haseman-elston regression ").hasArg().create(cmd_he));		
+		ops.addOption(OptionBuilder.withDescription("haseman-elston regression ").create(cmd_he));		
 		
 		ops.addOption(OptionBuilder.withDescription("grm ").hasArg().create(cmd_grm));
 
@@ -515,23 +567,25 @@ public class Parameter {
 			realcheckThresholdFlag = true;
 		}
 
-		if (cl.hasOption(cmd_realcheck_threshold)) {
-			realcheckThreshold = Double.parseDouble(cl.getOptionValue(cmd_realcheck_threshold));
-
-			if (realcheckThreshold < 0) {
-				System.err.println("realcheck threshold should be tween 0 and 1");
-				System.exit(0);
-			}
-		}
-
-		if (cl.hasOption(cmd_realcheck_marker)) {
-			realcheckMarkerNumber = Integer.parseInt(cl.getOptionValue(cmd_realcheck_marker));
+		if (cl.hasOption(cmd_realcheck_marker_number)) {
+			realcheckMarkerNumber = Integer.parseInt(cl.getOptionValue(cmd_realcheck_marker_number));
 			if (realcheckMarkerNumber < 0) {
 				System.err.println("realcheck marker number should be greater than 0");
 				System.exit(0);
 			}
 		}
 
+		if (cl.hasOption(cmd_realcheck_snps)) {
+			realcheckSNPs = cl.getOptionValue(cmd_realcheck_snps);
+			File f = new File(realcheckSNPs);
+			if (!f.exists()) {
+				System.err.println("could not open " + snpList + ".");
+				Test.LOG.append("could not open " + snpList + ".\n");
+				Test.printLog();
+				System.exit(0);
+			}
+		}
+		
 		if (cl.hasOption(cmd_realcheck)) {
 			realcheckFlag = true;
 		}
@@ -573,6 +627,19 @@ public class Parameter {
 			}
 		}
 		
+		if (cl.hasOption(cmd_snps)) {
+			
+			snpList = cl.getOptionValue(cmd_snps);
+			File f = new File(snpList);
+			if (!f.exists()) {
+				System.err.println("could not open " + snpList + ".");
+				Test.LOG.append("could not open " + snpList + ".\n");
+				Test.printLog();
+				System.exit(0);
+			}
+
+		}
+		
 //individual selection 1 keep
 		if (cl.hasOption(cmd_keep)) {
 			keepFile = cl.getOptionValue(cmd_keep);
@@ -605,6 +672,50 @@ public class Parameter {
 				System.exit(0);
 			}
 			removeFlag = true;
+		}
+
+/////// set reference
+		if (cl.hasOption(cmd_reference_allele)) {
+			reference_allele = cl.getOptionValue(cmd_reference_allele);
+			File f = new File(reference_allele);
+			if (!f.exists()) {
+				System.err.println("could not open " + reference_allele + ".");
+				Test.LOG.append("could not open " + reference_allele + ".\n");
+				Test.printLog();
+				System.exit(0);
+			}
+		}
+		
+		if (cl.hasOption(cmd_strand)) {
+			strand_file = cl.getOptionValue(cmd_strand);
+			File f = new File(strand_file);
+			if (!f.exists()) {
+				System.err.println("could not open " + reference_allele + ".");
+				Test.LOG.append("could not open " + reference_allele + ".\n");
+				Test.printLog();
+				System.exit(0);
+			}
+			strandFlag = true;
+		}
+
+		if (cl.hasOption(cmd_strand_maf_cutoff)) {
+			strand_maf_cutoff = Double.parseDouble(cl.getOptionValue(cmd_strand_maf_cutoff));
+			if (strand_maf_cutoff>0.5 || strand_maf_cutoff<0) {
+				System.err.println("strand maf cut off should be between 0 and 0.5.");
+				Test.LOG.append("strand maf cut off should be between 0 and 0.5.");
+				Test.printLog();
+				System.exit(0);
+			}
+		}
+
+		if (cl.hasOption(cmd_strand_p_cutoff)) {
+			strand_p_cutoff = Double.parseDouble(cl.getOptionValue(cmd_strand_p_cutoff));
+			if (strand_p_cutoff>1 || strand_p_cutoff<0) {
+				System.err.println("strand p cut off should be between 0 and 1.");
+				Test.LOG.append("strand maf cut off should be between 0 and 1.");
+				Test.printLog();
+				System.exit(0);
+			}
 		}
 
 //make bed
@@ -643,8 +754,36 @@ public class Parameter {
 			sumStatOption[geno_freq] = true;
 		}
 
-//simulation nuclear family		
+//merge 
+		if (cl.hasOption(cmd_merge)) {
+			mergeFlag = true;
+		}
+		
+		if (cl.hasOption(cmd_merge_maf_cutoff)) {
+			merge_maf_cutoff = Double.parseDouble(cl.getOptionValue(cmd_merge_maf_cutoff));
+			if (merge_maf_cutoff > 0.5 || merge_maf_cutoff < 0) {
+				System.err.println("merger maf cutoff should be between 0 and 0.5");
+				System.exit(0);
+			}
+		}		
 
+		if (cl.hasOption(cmd_merge_p_cutoff)) {
+			merge_p_cutoff = Double.parseDouble(cl.getOptionValue(cmd_merge_p_cutoff));
+			if (merge_p_cutoff < 0) {
+				System.err.println("merger p cutoff should be between 0 and 1.");
+				System.exit(0);
+			}
+		}		
+
+		if (cl.hasOption(cmd_remove_atgc)) {
+			removeATGCFlag = true;
+		}
+
+		if (cl.hasOption(cmd_remove_Flip)) {
+			removeFlipFlag = true;
+		}
+
+//simulation nuclear family		
 		if (cl.hasOption(cmd_simu_fam)) {
 			simufamFlag = true;
 		}
@@ -658,14 +797,17 @@ public class Parameter {
 		}
 		
 //simulation real data
+
+		if (cl.hasOption(cmd_simu_realdata)) {
+			simuRealData = true;
+		}
+		
 		if (cl.hasOption(cmd_simu_qt)) {
-			simuFlag = true;
 			simuType[sm_qt] = false;
 			simuType[sm_cc] = true;
 		}
 
 		if (cl.hasOption(cmd_simu_cc)) {
-			simuFlag = true;
 			simuType[sm_qt] = true;
 			simuType[sm_cc] = false;
 			
@@ -714,6 +856,7 @@ public class Parameter {
 		}
 
 //simulation polygenic
+
 		if (cl.hasOption(cmd_simu_poly_qt)) {
 			simupolyQTFlag = true;
 		}
@@ -732,22 +875,6 @@ public class Parameter {
 
 		if(cl.hasOption(cmd_poly_U)) {
 			polyU = true;
-		}
-
-		if(cl.hasOption(cmd_poly_sample)) {
-			polySample = Integer.parseInt(cl.getOptionValue(cmd_poly_sample)); 
-		}
-
-		if(cl.hasOption(cmd_poly_case)) {
-			polyCS = Integer.parseInt(cl.getOptionValue(cmd_poly_case));
-		}
-		
-		if(cl.hasOption(cmd_poly_k)) {
-			polyK = Double.parseDouble(cl.getOptionValue(cmd_poly_k));
-		}
-
-		if(cl.hasOption(cmd_poly_hsq)) {
-			polyHsq = Double.parseDouble(cl.getOptionValue(cmd_poly_hsq));
 		}
 
 //haseman-elston regression

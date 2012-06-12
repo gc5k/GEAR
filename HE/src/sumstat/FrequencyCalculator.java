@@ -86,26 +86,29 @@ public class FrequencyCalculator {
 
 		for (int i = 0; i < numMarker; i++) {
 
+			double wa = allelefreq[i][0] + allelefreq[i][1];
 			double a = allelefreq[i][0] + allelefreq[i][1] + allelefreq[i][2];
-			if (a > 0) {
-				for (int j = 0; j < allelefreq[i].length; j++) {
-					allelefreq[i][j] /= a;
+			if (wa > 0) {
+				for (int j = 0; j < allelefreq[i].length - 1; j++) {
+					allelefreq[i][j] /= wa;
 				}
+				allelefreq[i][2] /= a;
 			} else {
 				allelefreq[i][2] = 1;
 			}
+
+			double wb = genotypefreq[i][0] + genotypefreq[i][1] + genotypefreq[i][2];
 			double b = genotypefreq[i][0] + genotypefreq[i][1] + genotypefreq[i][2] + genotypefreq[i][3];
-			if (b > 0) {
-				for (int j = 0; j < genotypefreq[i].length; j++) {
-					if (b >= 0) {
-						genotypefreq[i][j] /= b;
-					}
+			if (wb > 0) {
+				for (int j = 0; j < genotypefreq[i].length - 1; j++) {
+					genotypefreq[i][j] /= wb;
 				}
+				genotypefreq[i][3] /= b;
 			} else {
 				genotypefreq[i][3] = 1;
 			}
 
-			FastFisherExactTest ff = new FastFisherExactTest( N[i][3], N[i][1], N[i][0]);
+			FastFisherExactTest ff = new FastFisherExactTest(N[i][3], N[i][1], N[i][0]);
 			hw[i][0] = ff.HDP();
 			hw[i][1] = chiHWE(N[i][3], N[i][1], N[i][0]);
 
