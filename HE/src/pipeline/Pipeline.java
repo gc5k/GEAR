@@ -1,11 +1,14 @@
 package pipeline;
+import merge.MergeTwoFile;
 import write.WriteBedSNPMajor;
 import he.H2Transformer;
 import he.HERegression;
 import realcheck.RealCheck;
+import realcheck.RealCheckOne;
 import simulation.RealDataSimulation;
 import simulation.SimuFamily;
 import simulation.SimuPolyCC;
+import strand.Strand;
 import sumstat.FrequencyCalculator;
 import parameter.Parameter;
 import pscontrol.NonTransmitted;
@@ -16,14 +19,26 @@ public class Pipeline {
 		Parameter p = new Parameter();
 		p.commandListenor(args);
 
-		if (Parameter.realcheckFlag) {
-			RealCheck realcheck = new RealCheck(p);
-			realcheck.Check();
-			
+		if (Parameter.strandFlag) {
+			Strand strand = new Strand(p);
+			strand.Merge();
+		} else if (Parameter.mergeFlag) {
+			MergeTwoFile mtf = new MergeTwoFile(p);
+			mtf.Merge();
+		} else if (Parameter.realcheckFlag) {
+			if(Parameter.bfile2 != null) {
+				RealCheck realcheck = new RealCheck(p);
+				realcheck.Check();
+			} else {
+				RealCheckOne realcheckone = new RealCheckOne(p);
+				realcheckone.Check();
+			}
+
 		} else if (Parameter.simufamFlag) {
 			SimuFamily simuFam = new SimuFamily(p);
 			simuFam.generateSample();
-		} else if (Parameter.simuFlag) {
+
+		} else if (Parameter.simuRealData) {
 			RealDataSimulation rdSimu = new RealDataSimulation(p);
 			rdSimu.GenerateSample();
 			
@@ -40,10 +55,12 @@ public class Pipeline {
 				FrequencyCalculator fc = new FrequencyCalculator(p);
 				fc.CalculateAlleleFrequency();
 				System.out.println(fc);
+
 			} else if (Parameter.sumStatOption[Parameter.geno_freq]) {
 				FrequencyCalculator fc = new FrequencyCalculator(p);
 				fc.CalculateAlleleFrequency();
 				System.out.println(fc);				
+
 			}
 		} else if (Parameter.makebedFlag) {
 			WriteBedSNPMajor bedWriter = new WriteBedSNPMajor(p);
