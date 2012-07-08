@@ -14,7 +14,7 @@ import org.apache.commons.math.linear.RealMatrix;
 import org.apache.commons.math.random.RandomDataImpl;
 import org.apache.commons.math.stat.StatUtils;
 
-public class NewPolygenic {
+public class PolygenicII {
 
 	private NormalDistributionImpl norm;
 	private RandomDataImpl rnd;
@@ -25,22 +25,26 @@ public class NewPolygenic {
 	private int sample = 1000;
 	private int N_case = 500;
 	private int N_control = 500;
+	private int N_total;
 
 	private double[][] genotype;
+	private double[][] genotype_p;
 	private double[] BV;
+	private double[] BV_p;
 	private double[] phenotype;
+	private double[] phenotype_p;
 
 	private double[] risk;
 
 	private double[] freq;
-	private double[] DPrime;
-	private double ld;
 	private double[] LD;
+	private double ld;
+	private double[] Dprime;
 
 	private double vy = 1;
 	private double h2 = 0.5;
 	private double E = 0.5;
-	private double K = 0.05;
+	private double K = 0.1;
 	private boolean noselection = false;
 	private String out = "Poly";
 
@@ -48,7 +52,7 @@ public class NewPolygenic {
 	private String A2 = "C";
 	public static StringBuilder LOG = new StringBuilder();
 
-	public NewPolygenic(NewPolygenicPar P) {
+	public PolygenicII(NewPolygenicPar P) {
 
 		M = P.marker;
 		U = P.U;
@@ -69,11 +73,11 @@ public class NewPolygenic {
 		norm = new NormalDistributionImpl(0, vy);
 
 		freq = new double[M];
-		DPrime = new double[M - 1];
+		LD = new double[M - 1];
 
 		Arrays.fill(freq, 0.5);
-		Arrays.fill(DPrime, ld);
-		LD = CalculateDprime(freq, DPrime);
+		Arrays.fill(LD, ld);
+		Dprime = CalculateDprime(freq, LD);
 
 		genotype = new double[N_case + N_control][M];
 		phenotype = new double[N_case + N_control];
@@ -102,7 +106,7 @@ public class NewPolygenic {
 		NewPolygenicPar p = new NewPolygenicPar();
 		p.commandListenor(args);
 
-		NewPolygenic Poly = new NewPolygenic(p);
+		PolygenicII Poly = new PolygenicII(p);
 
 		Poly.GenerateSample();
 		Poly.writeFile();
@@ -132,63 +136,65 @@ public class NewPolygenic {
 
 	public void GenerateSample() {
 
-		if (noselection) {
-			GenerateSampleNoSelection();
-		} else {
-			GenerateSampleSelection();
-		}
-	}
+		double total = Math.ceil(N_case / K);
+		N_total = (new Double(total)).intValue();
 
-
-	public void GenerateSampleSelection() {
-		int count_case = 0;
-		int count_control = 0;
-		int count = 0;
 		RealMatrix effect = GenerateEffects();
+		BV_p = new double[N_total];
+		genotype_p = new double[N_total][2];
+		phenotype_p = new double[N_total];
 
-		norm = new NormalDistributionImpl(0, 1);
-
-		int c = 0;
-		while (count < sample) {
-			c++;
+		double BVsq = 0;
+		double sum_bv = 0;
+		for (int i = 0; i < N_total; i++ ) {
 			RealMatrix chr = SampleChromosome();
 			RealMatrix res = chr.transpose().multiply(effect);
-
-			double bv = res.getEntry(0, 0);
-			double L = bv + rnd.nextGaussian(0, E);
-			double liability = 0;
-
-			try {
-				liability = norm.cumulativeProbability(L);
-			} catch (MathException e) {
-				e.printStackTrace();
-			}
-
-			if (1 - liability < K) {
-				if (count_case < N_case) {
-					BV[count_case] = bv;
-					phenotype[count_case] = L;
-					genotype[count_case] = chr.getColumn(0);
-					risk[count_case] = liability;
-					count_case++;
-				} else {
-					continue;
-				}
-			} else {
-				if (count_control < N_control) {
-					BV[N_case + count_control] = bv;
-					phenotype[N_case + count_control] = L;
-					genotype[N_case + count_control] = chr.getColumn(0);
-					risk[N_case + count_control] = liability;
-					count_control++;
-				} else {
-					continue;
-				}
-			}
-
-			count++;
+			BV_p[i] = res.getEntry(0, 0);
+			BVsq += BV_p[i] * BV_p[i];
+			sum_bv += BV_p[i];
+			genotype_p[i] = chr.getColumn(0);
 		}
-		LOG.append("total individuals visited: " + c + "\n");
+		double mean_bv = sum_bv/N_total;
+		double sd_bv = Math.sqrt(BVsq/N_total - (mean_bv) * (mean_bv));
+
+		for (int i = 0; i < N_total; i++) {
+			BV_p[i] = Math.sqrt(h2) * (BV_p[i] - mean_bv) / sd_bv;
+		}
+		System.out.println("mean: " + BVsq + " " + mean_bv + " " + sd_bv);
+		GenerateSampleSelection();
+	}
+
+	public void GenerateSampleSelection() {
+		double[] pp = new double[N_total];
+		for (int j = 0; j < N_total; j++) {
+			phenotype_p[j] = BV_p[j] + rnd.nextGaussian(0, E);
+			pp[j] = phenotype_p[j];
+		}
+		
+		Arrays.sort(pp);
+		double T = pp[N_total - 1 - N_case];
+		
+		int[] case_index = new int[N_case];
+		int[] ctrl_index = new int[N_control];
+		int idx_cs = 0;
+		int idx_ctrl = 0;
+		for (int j = 0; j < N_total; j++) {
+			if(phenotype_p[j] >= T && idx_cs < N_case) {
+				case_index[idx_cs++]= j;
+			}
+			if(phenotype_p[j] < T && idx_ctrl < N_control) {
+				ctrl_index[idx_ctrl++] = j;
+			}
+		}
+		
+		for (int j = 0; j < N_case; j++) {
+			System.out.println("cs " + j + ": " +BV_p[case_index[j]] + " " + phenotype_p[case_index[j]]);
+		}
+		for (int j = 0; j < N_control; j++) {
+			System.out.println("ctrl " + j + ": " + BV_p[ctrl_index[j]] + " " + phenotype_p[ctrl_index[j]]);
+		}
+		
+		System.out.println(N_total + " " + T);
 	}
 
 	public void GenerateSampleNoSelection() {
@@ -287,7 +293,7 @@ public class NewPolygenic {
 					int a = (int) v[i - 1][j];
 					double f1 = a == 0 ? freq[i - 1] : (1 - freq[i - 1]);
 					double f2 = a == 0 ? freq[i] : (1 - freq[i]);
-					v[i][j] = d < (f1 * f2 + LD[i - 1]) / f1 ? v[i - 1][j]
+					v[i][j] = d < (f1 * f2 + Dprime[i - 1]) / f1 ? v[i - 1][j]
 							: (1 - v[i - 1][j]);
 				}
 			}
@@ -396,15 +402,12 @@ public class NewPolygenic {
 		cov.close();
 	}
 
-	public double[] CalculateDprime(double[] f, double[] dprime) {
-		double[] D = new double[dprime.length];
+	public double[] CalculateDprime(double[] f, double[] cor) {
+		double[] D = new double[cor.length];
 
 		for (int i = 0; i < D.length; i++) {
-			if(dprime[i]>0) {
-				D[i]=dprime[i]*Math.min(f[i]*(1-f[i+1]), f[i+1]*(1-f[i]));
-			} else {
-				D[i]=dprime[i]*Math.min(f[i]*f[i+1], (1-f[i])*(1-f[i+1]));
-			}
+			D[i] = cor[i]
+					* Math.sqrt(f[i] * (1 - f[i]) * f[i + 1] * (1 - f[i + 1]));
 		}
 
 		return D;
