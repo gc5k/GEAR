@@ -5,6 +5,7 @@ import java.util.Hashtable;
 
 import org.apache.commons.lang3.ArrayUtils;
 
+import test.Test;
 import util.NewIt;
 import util.Sample;
 import family.mdr.data.PersonIndex;
@@ -92,6 +93,11 @@ public final class Unified extends ChenBase {
 		}
 
 		numSib = ArrayUtils.toPrimitive(SibIdx.toArray(new Integer[0]));
+
+		System.err.println(un + " unrelated individuals.");
+		Test.LOG.append(un + " unrelated individuals." + "\n");
+		System.err.println(s + " siblings from " + numSib.length + " families.\n");
+		Test.LOG.append(s + " siblings from " + numSib.length + " families." + "\n");
 
 	}
 

@@ -341,7 +341,7 @@ public class Parameter {
 	private final String cmd_version = "version";
 	public static String version = "\n"
 			+ "******************************************************************\n"
-			+ "| GMDR 1.0 released Dec/06/2011                                   |\n"
+			+ "| GMDR 1.0 released Dec/06/2011                                  |\n"
 			+ "| (C) 2011 Guo-Bo Chen, Xiang-Yang Lou                           |\n"
 			+ "| v 0.7.7                                                        |\n"			
 			+ "| GNU General Public License, v2                                 |\n"

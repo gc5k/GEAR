@@ -5,6 +5,7 @@ import java.util.Hashtable;
 
 import org.apache.commons.lang3.ArrayUtils;
 
+import test.Test;
 import util.NewIt;
 import util.Sample;
 import family.mdr.data.PersonIndex;
@@ -37,7 +38,7 @@ public class UnifiedII extends ChenBase {
 		Hashtable<String, BFamilyStruct> Fam = PedData.getFamilyStruct();
 
 		PersonTable.ensureCapacity(qualified_Unrelated + qualified_Sib);
-		if(PhenoData != null)
+		if (PhenoData != null)
 			CovariateTable.ensureCapacity(qualified_Unrelated + qualified_Sib);
 
 		status = new double[qualified_Unrelated + qualified_Sib];
@@ -61,7 +62,8 @@ public class UnifiedII extends ChenBase {
 				continue;
 			}
 			BFamilyStruct fs = Fam.get(fi);
-			FamilyUnit FamUnit = PhenoData == null ? null:PhenoData.getFamilyUnit(fi);
+			FamilyUnit FamUnit = PhenoData == null ? null : PhenoData
+					.getFamilyUnit(fi);
 			String[] pi = fs.getPersonListSorted();
 			int si = 0;
 			ArrayList<Integer> F = NewIt.newArrayList();
@@ -70,19 +72,23 @@ public class UnifiedII extends ChenBase {
 				if (!lineup.filter[c][i])
 					continue;
 				BPerson per = fs.getPerson(pi[i]);
-				Subject sub = PhenoData == null ? null : FamUnit.getSubject(pi[i]);
+				Subject sub = PhenoData == null ? null : FamUnit
+						.getSubject(pi[i]);
 
 				if (fs.hasAncestor(per)) {
-					s_P.add(new PersonIndex(fs.getFamilyStructName(), pi[i], per, false, false));
-					status[s + qualified_Unrelated] = Double.parseDouble(per.getAffectedStatus());
-					if(PhenoData != null)
+					s_P.add(new PersonIndex(fs.getFamilyStructName(), pi[i],
+							per, false, false));
+					status[s + qualified_Unrelated] = Double.parseDouble(per
+							.getAffectedStatus());
+					if (PhenoData != null)
 						s_C.add(sub.getTraits());
 					si++;
 					s++;
 				} else {
-					u_P.add(new PersonIndex(fs.getFamilyStructName(), pi[i], per, false, true));
+					u_P.add(new PersonIndex(fs.getFamilyStructName(), pi[i],
+							per, false, true));
 					status[un] = Double.parseDouble(per.getAffectedStatus());
-					if(PhenoData != null)
+					if (PhenoData != null)
 						u_C.add(sub.getTraits());
 					F.add(new Integer(un++));
 				}
@@ -103,7 +109,7 @@ public class UnifiedII extends ChenBase {
 		}
 		PersonTable.addAll(u_P);
 		PersonTable.addAll(s_P);
-		if(PhenoData != null) {
+		if (PhenoData != null) {
 			CovariateTable.addAll(u_C);
 			CovariateTable.addAll(s_C);
 		}
@@ -111,9 +117,20 @@ public class UnifiedII extends ChenBase {
 		numSib = ArrayUtils.toPrimitive(SibIdx.toArray(new Integer[0]));
 		singleton = ArrayUtils.toPrimitive(Singleton.toArray(new Integer[0]));
 		founder = new int[FounderIdx.size()][];
+		int sumFounder = 0;
 		for (int i = 0; i < founder.length; i++) {
-			founder[i] = ArrayUtils.toPrimitive(FounderIdx.get(i).toArray(new Integer[0]));
+			founder[i] = ArrayUtils.toPrimitive(FounderIdx.get(i).toArray(
+					new Integer[0]));
+			sumFounder += founder[i].length;
 		}
+
+		System.err.println(sumFounder + " founders from " + founder.length + " families.");
+		Test.LOG.append(sumFounder + " founders from " + founder.length + " families." + "\n");
+		System.err.println(s + " siblings from " + numSib.length + " families.");
+		Test.LOG.append(s + " siblings from " + numSib.length + " families." + "\n");
+		System.err.println(singleton.length + " singletons.");
+		Test.LOG.append(singleton.length + " singletons." + "\n");
+
 	}
 
 	public void getPermutedScore(boolean isNested) {

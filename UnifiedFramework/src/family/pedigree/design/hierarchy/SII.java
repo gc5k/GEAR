@@ -5,6 +5,7 @@ import java.util.Hashtable;
 
 import org.apache.commons.lang3.ArrayUtils;
 
+import test.Test;
 import util.NewIt;
 import util.Sample;
 import family.mdr.data.PersonIndex;
@@ -79,6 +80,9 @@ public final class SII extends ChenBase {
 			CovariateTable.addAll(s_C);
 
 		numSib = ArrayUtils.toPrimitive(SibIdx.toArray(new Integer[0]));
+		System.err.println(s + " siblings from " + numSib.length + " families.");
+		Test.LOG.append(s + " siblings from " + numSib.length + " families.\n");
+
 	}
 
 	public void getPermutedScore(boolean isNested) {
