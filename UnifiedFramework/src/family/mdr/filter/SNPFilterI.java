@@ -389,16 +389,20 @@ public class SNPFilterI implements SNPFilterInterface {
 			ArrayList<Integer> s = NewIt.newArrayList();
 			xsnps.add(s);
 		}
-		if (Parameter.xincludesnp != null) {
+		for (int i = 0; i < Parameter.xincludesnp.length; i++) {
 			HashSet<String> SS = NewIt.newHashSet();
-			for (int i = 0; i < Parameter.includesnp.length; i++) {
-				SS.add(Parameter.includesnp[i]);
+
+			ArrayList<Integer> s = xsnps.get(i);
+
+			for (int j = 0; j < Parameter.xincludesnp[i].length; j++) {
+				SS.add(Parameter.xincludesnp[i][j]);
 			}
-			for (int i = 0; i < snpList.size(); i++) {
-				SNP snp = snpList.get(i);
+			for (int j = 0; j < snpList.size(); j++) {
+				SNP snp = snpList.get(j);
 				String rs = snp.getName();
 				if(SS.contains(rs)) {
-					includeSNP(i);
+					includeSNP(j);
+					s.add(j);
 				}
 			}
 		}

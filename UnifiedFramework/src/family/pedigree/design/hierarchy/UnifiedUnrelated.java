@@ -3,6 +3,7 @@ package family.pedigree.design.hierarchy;
 import java.util.ArrayList;
 import java.util.Hashtable;
 
+import test.Test;
 import util.NewIt;
 import util.Sample;
 import family.mdr.data.PersonIndex;
@@ -78,6 +79,9 @@ public final class UnifiedUnrelated extends ChenBase {
 		for (int i = 0; i < m.length; i++) {
 			m[i] = i;
 		}
+
+		System.err.println(un + " unrelated individuals.");
+		Test.LOG.append(un + " unrelated individuals." + "\n");
 	}
 
 	public void getPermutedScore(boolean isNested) {

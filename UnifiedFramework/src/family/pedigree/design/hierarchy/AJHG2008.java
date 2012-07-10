@@ -112,6 +112,10 @@ public class AJHG2008 extends ChenBase {
 		for (int i = 0; i < MapData.getMarkerNumber(); i++) {
 			m[i] = i;
 		}
+		
+		System.err.println(s + " siblings from " + numSib.length + " families.");
+		Test.LOG.append(s + " siblings from " + numSib.length + " families.\n");
+
 		AbstractGenoDistribution.rnd = new Random(seed);
 		NonTransmitted(fam_has_sib);
 	}
