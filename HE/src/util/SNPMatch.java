@@ -2,6 +2,22 @@ package util;
 
 public class SNPMatch {
 
+	public static String Flip(String a) {
+		String f = "A";
+		if(a.compareTo("A") == 0) {
+			f = "T";
+		} else if(a.compareTo("C") == 0) {
+			f = "G";
+		} else if(a.compareTo("G") == 0) {
+			f = "C";
+		} else if (a.compareTo("T") == 0) {
+			f = "A";
+		} else {
+			f = "N";
+		}
+		return f;		
+	}
+	
 	public static char Flip(char a) {
 		char f = 'A';
 		if(a == 'A') {
@@ -18,6 +34,27 @@ public class SNPMatch {
 		
 		return f;
 	}
+	
+	public static boolean Confusion(String a, String b) {
+		boolean f = false;
+		char a1 = a.charAt(0);
+		char a2 = b.charAt(0);
+		if(a1>a2) {
+			char t = a1;
+			a1 = a2;
+			a2 = t;
+		}
+
+		if(a1=='A' && a2=='T') {
+			f = true;
+		}
+		if(a1=='C' && a2 =='G') {
+			f = true;
+		}
+		
+		return f;
+	}
+
 	
 	public static boolean Confusion(char a1, char a2) {
 		boolean f = false;

@@ -13,6 +13,7 @@ import org.apache.commons.cli.ParseException;
 import org.apache.commons.cli.PosixParser;
 
 import test.Test;
+import util.FileProcessor;
 import util.NewIt;
 
 public class Parameter {
@@ -80,13 +81,44 @@ public class Parameter {
 	private final String cmd_merge_p_cutoff_long = "merge-p-cutoff";
 	public static double merge_p_cutoff = 0.05;
 
-	private final String cmd_remove_atgc = "remove_atgc";
-	private final String cmd_remove_atgc_long = "remove-atgc";
-	public static boolean removeATGCFlag = false;
+	private final String cmd_keep_atgc = "keep_atgc";
+	private final String cmd_keep_atgc_long = "keep-atgc";
+	public static boolean keepATGCFlag = false;
 	
 	private final String cmd_remove_Flip = "remove_flip";
 	private final String cmd_remove_Flip_long = "remove-flip";
 	public static boolean removeFlipFlag = false;
+
+	
+//strand
+	private final String cmd_strand = "strand";
+	public static boolean strandFlag = false;
+	public static String strand_file = null;
+
+//make-predictor
+
+	private final String cmd_make_predictor = "build_predictor";
+	private final String cmd_make_predictor_long = "build-predictor";
+	public static boolean makePredictorFlag = false;
+
+	private final String cmd_make_predictor2 = "build_predictor2";
+	private final String cmd_make_predictor2_long = "build-predictor2";
+	public static boolean makePredictor2Flag = false;
+
+	
+	private final String cmd_predictor_idx = "predictor_idx";
+	private final String cmd_predictor_idx_long = "predictor-idx";
+	public static int predictor_idx = 0;
+
+	private final String cmd_predictor_file = "predictor_file";
+	private final String cmd_predictor_file_long = "predictor-file";
+	public static String predictor_file = null;
+
+	private final String cmd_linear = "linear";
+	private final String cmd_logit = "logit";
+	public static int LINEAR = 0;
+	public static int LOGIT = 1;
+	public static int tranFunction = LINEAR;
 
 ///////////////simulation nuclear family
 	private final String cmd_simu_fam = "simu_fam";
@@ -101,7 +133,7 @@ public class Parameter {
 	public static int simu_fam_marker = 10;
 
 ///////////////simulation real data
-	
+
 	private final String cmd_simu_realdata = "simu_real_data";
 	private final String cmd_simu_realdata_long = "simu-real-data";
 	public static boolean simuRealData = false;
@@ -193,6 +225,33 @@ public class Parameter {
 	public static boolean sumStatFlag = false;
 	public static boolean[] sumStatOption = { true, false };
 
+//profile
+	
+	private final String cmd_score = "score";
+	private final String cmd_MaCH_Infor = "mach_infor";
+	private final String cmd_MaCH_Infor_long = "mach-infor";
+	private final String cmd_MaCH_Dosage = "mach_dosage";
+	private final String cmd_MaCH_Dosage_long = "mach-dosage";
+
+	private final String cmd_MaCH_Infor_Batch = "mach_infor_batch";
+	private final String cmd_MaCH_Infor_Batch_long = "mach-infor-batch";
+	private final String cmd_MaCH_Dosage_Batch = "mach_dosage_batch";
+	private final String cmd_MaCH_Dosage_Batch_long = "mach-dosage-batch";
+
+	private final String cmd_q_score_file = "q_score_file";
+	private final String cmd_q_score_file_long = "q-score-file";
+	private final String cmd_q_score_range ="q_score_range";
+	private final String cmd_q_score_range_long = "q-score-range";
+	
+	public static boolean scoreFlag = true;
+	public static String scoreFile = null;
+	public static String MaCH_Infor = null;
+	public static String MaCH_Dosage = null;
+	public static String MaCH_Infor_Batch = null;
+	public static String MaCH_Dosage_Batch = null;
+	public static String q_score_file = null;
+	public static String q_score_range_file = null;
+
 //he regression
 	public static boolean heFlag = true;
 	private final String cmd_he = "he";
@@ -250,7 +309,7 @@ public class Parameter {
 	public double[] cal_cc = {0,0}; 
 
 	private final String cmd_na = "na";
-	public static String[] na = {"-9", "-NA"};
+	public static String[] na = {"-9", "NA", "na", "-Inf", "Inf"};
 
 ///////////////////level 1 snp selection
 	private final String cmd_chr = "chr";
@@ -282,17 +341,6 @@ public class Parameter {
 	private final String cmd_make_bed = "make_bed";
 	public static String cmd_make_bed_long = "make-bed";
 	public static boolean makebedFlag = false;
-
-	private final String cmd_strand = "strand";
-	public static boolean strandFlag = false;
-	public static String strand_file = null;
-	private final String cmd_strand_maf_cutoff = "strand_maf_cutoff";
-	private final String cmd_strand_maf_cutoff_long = "strand-maf-cutoff";
-	public static double strand_maf_cutoff = 0.4;
-	
-	private final String cmd_strand_p_cutoff = "strand_p_cutoff";
-	public final String cmd_strand_p_cutoff_long = "strand-p-cutoff";
-	public static double strand_p_cutoff = 0.05;
 
 	/*
 	 * private final String cmd_ex_ind = "exind"; public static String[][]
@@ -387,13 +435,22 @@ public class Parameter {
 
 		ops.addOption(OptionBuilder.withLongOpt(cmd_merge_p_cutoff_long).withDescription("merge p cutoff").hasArg().create(cmd_merge_p_cutoff));
 
-		ops.addOption(OptionBuilder.withLongOpt(cmd_remove_atgc_long).withDescription("remove A/T and G/C loci").create(cmd_remove_atgc));
+		ops.addOption(OptionBuilder.withLongOpt(cmd_keep_atgc_long).withDescription("remove A/T and G/C loci").create(cmd_keep_atgc));
 
 		ops.addOption(OptionBuilder.withLongOpt(cmd_remove_Flip_long).withDescription("remove flipped loci").create(cmd_remove_Flip));
-		
-		ops.addOption(OptionBuilder.withLongOpt(cmd_simu_fam_marker_long).withDescription("simulation number for nuclear family ").hasArg().create(cmd_simu_fam_marker));		
+//make predictor
+		ops.addOption(OptionBuilder.withLongOpt(cmd_make_predictor_long).withDescription("make predictor").create(cmd_make_predictor));
 
-		
+		ops.addOption(OptionBuilder.withLongOpt(cmd_make_predictor2_long).withDescription("make predictor2").create(cmd_make_predictor2));
+
+		ops.addOption(OptionBuilder.withLongOpt(cmd_predictor_idx_long).withDescription("predictor index").hasArg().create(cmd_predictor_idx));
+
+		ops.addOption(OptionBuilder.withLongOpt(cmd_predictor_file_long).withDescription("predictor file").hasArg().create(cmd_predictor_file));
+
+		ops.addOption(OptionBuilder.withDescription("linear").create(cmd_linear));
+
+		ops.addOption(OptionBuilder.withDescription("logit").create(cmd_logit));
+
 //simulation nuclear fam
 		ops.addOption(OptionBuilder.withLongOpt(cmd_simu_fam_long).withDescription("simulation nuclear family ").create(cmd_simu_fam));
 
@@ -462,20 +519,31 @@ public class Parameter {
 				.create(cmd_ex_nosex));
 
 //make bed
-		
+
 		ops.addOption(OptionBuilder.withLongOpt(cmd_reference_allele_long).withDescription("set reference allele ").hasArg().create(cmd_reference_allele));
 
 		ops.addOption(OptionBuilder.withLongOpt(cmd_make_bed_long).withDescription("make bed ").create(cmd_make_bed));
 
 		ops.addOption(OptionBuilder.withDescription("solve strand ").hasArg().create(cmd_strand));
 
-		ops.addOption(OptionBuilder.withLongOpt(cmd_strand_maf_cutoff_long).withDescription("strand maf cutoff").hasArg().create(cmd_strand_maf_cutoff));
+//profile
+		ops.addOption(OptionBuilder.withDescription("profile score").hasArg().create(cmd_score));
+		
+		ops.addOption(OptionBuilder.withLongOpt(cmd_MaCH_Dosage_long).withDescription("Mach dosage file").hasArg().create(cmd_MaCH_Dosage));
 
-		ops.addOption(OptionBuilder.withLongOpt(cmd_strand_p_cutoff_long).withDescription("strand p cutoff ").hasArg().create(cmd_strand_p_cutoff));
+		ops.addOption(OptionBuilder.withLongOpt(cmd_MaCH_Infor_long).withDescription("Mach dosage information file").hasArg().create(cmd_MaCH_Infor));
+
+		ops.addOption(OptionBuilder.withLongOpt(cmd_MaCH_Dosage_Batch_long).withDescription("Mach dosage batch file").hasArg().create(cmd_MaCH_Dosage_Batch));
+
+		ops.addOption(OptionBuilder.withLongOpt(cmd_MaCH_Infor_Batch_long).withDescription("Mach dosage information batch file").hasArg().create(cmd_MaCH_Infor_Batch));
+
+		ops.addOption(OptionBuilder.withLongOpt(cmd_q_score_file_long).withDescription("q score file").hasArg().create(cmd_q_score_file));
+
+		ops.addOption(OptionBuilder.withLongOpt(cmd_q_score_range_long).withDescription("q score range").hasArg().create(cmd_q_score_range));
 
 //haseman-elston regression
-		ops.addOption(OptionBuilder.withDescription("haseman-elston regression ").create(cmd_he));		
-		
+		ops.addOption(OptionBuilder.withDescription("haseman-elston regression ").create(cmd_he));
+
 		ops.addOption(OptionBuilder.withDescription("grm ").hasArg().create(cmd_grm));
 
 		ops.addOption(OptionBuilder.withDescription("pheno ").hasArg().create(cmd_pheno));
@@ -577,13 +645,7 @@ public class Parameter {
 
 		if (cl.hasOption(cmd_realcheck_snps)) {
 			realcheckSNPs = cl.getOptionValue(cmd_realcheck_snps);
-			File f = new File(realcheckSNPs);
-			if (!f.exists()) {
-				System.err.println("could not open " + snpList + ".");
-				Test.LOG.append("could not open " + snpList + ".\n");
-				Test.printLog();
-				System.exit(0);
-			}
+			exists(realcheckSNPs);
 		}
 		
 		if (cl.hasOption(cmd_realcheck)) {
@@ -613,8 +675,6 @@ public class Parameter {
 			}
 			if (chr.length != chrSet.size() + exSet.size()) {
 				System.err.println("bad parameter for optin --" + cmd_chr + ".");
-				Test.LOG.append("bad parameter for option --" + cmd_chr + ".\n");
-				Test.printLog();
 				System.exit(0);
 			}
 			if (chrSet.size() > 0) {
@@ -628,28 +688,14 @@ public class Parameter {
 		}
 		
 		if (cl.hasOption(cmd_snps)) {
-			
 			snpList = cl.getOptionValue(cmd_snps);
-			File f = new File(snpList);
-			if (!f.exists()) {
-				System.err.println("could not open " + snpList + ".");
-				Test.LOG.append("could not open " + snpList + ".\n");
-				Test.printLog();
-				System.exit(0);
-			}
-
+			exists(snpList);
 		}
 		
 //individual selection 1 keep
 		if (cl.hasOption(cmd_keep)) {
 			keepFile = cl.getOptionValue(cmd_keep);
-			File f = new File(keepFile);
-			if (!f.exists()) {
-				System.err.println("could not open " + keepFile + ".");
-				Test.LOG.append("could not open " + keepFile + ".\n");
-				Test.printLog();
-				System.exit(0);
-			}
+			exists(keepFile);
 			keepFlag = true;
 		}
 
@@ -664,58 +710,20 @@ public class Parameter {
 		}
 		if (cl.hasOption(cmd_remove)) {
 			removeFile = cl.getOptionValue(cmd_remove);
-			File f = new File(removeFile);
-			if (!f.exists()) {
-				System.err.println("could not open " + removeFile + ".");
-				Test.LOG.append("could not open " + removeFile + ".\n");
-				Test.printLog();
-				System.exit(0);
-			}
+			exists(removeFile);
 			removeFlag = true;
 		}
 
 /////// set reference
 		if (cl.hasOption(cmd_reference_allele)) {
 			reference_allele = cl.getOptionValue(cmd_reference_allele);
-			File f = new File(reference_allele);
-			if (!f.exists()) {
-				System.err.println("could not open " + reference_allele + ".");
-				Test.LOG.append("could not open " + reference_allele + ".\n");
-				Test.printLog();
-				System.exit(0);
-			}
+			exists(reference_allele);
 		}
 		
 		if (cl.hasOption(cmd_strand)) {
 			strand_file = cl.getOptionValue(cmd_strand);
-			File f = new File(strand_file);
-			if (!f.exists()) {
-				System.err.println("could not open " + reference_allele + ".");
-				Test.LOG.append("could not open " + reference_allele + ".\n");
-				Test.printLog();
-				System.exit(0);
-			}
+			exists(strand_file);
 			strandFlag = true;
-		}
-
-		if (cl.hasOption(cmd_strand_maf_cutoff)) {
-			strand_maf_cutoff = Double.parseDouble(cl.getOptionValue(cmd_strand_maf_cutoff));
-			if (strand_maf_cutoff>0.5 || strand_maf_cutoff<0) {
-				System.err.println("strand maf cut off should be between 0 and 0.5.");
-				Test.LOG.append("strand maf cut off should be between 0 and 0.5.");
-				Test.printLog();
-				System.exit(0);
-			}
-		}
-
-		if (cl.hasOption(cmd_strand_p_cutoff)) {
-			strand_p_cutoff = Double.parseDouble(cl.getOptionValue(cmd_strand_p_cutoff));
-			if (strand_p_cutoff>1 || strand_p_cutoff<0) {
-				System.err.println("strand p cut off should be between 0 and 1.");
-				Test.LOG.append("strand maf cut off should be between 0 and 1.");
-				Test.printLog();
-				System.exit(0);
-			}
 		}
 
 //make bed
@@ -775,15 +783,46 @@ public class Parameter {
 			}
 		}		
 
-		if (cl.hasOption(cmd_remove_atgc)) {
-			removeATGCFlag = true;
+		if (cl.hasOption(cmd_keep_atgc)) {
+			keepATGCFlag = true;
 		}
 
 		if (cl.hasOption(cmd_remove_Flip)) {
 			removeFlipFlag = true;
 		}
 
-//simulation nuclear family		
+//make predictor
+		if (cl.hasOption(cmd_make_predictor)) {
+			makePredictorFlag = true;
+		}
+
+		if (cl.hasOption(cmd_make_predictor2)) {
+			makePredictor2Flag = true;
+		}
+
+		if (cl.hasOption(cmd_predictor_idx)) {
+			predictor_idx = Integer.parseInt(cl.getOptionValue(cmd_predictor_idx));
+			predictor_idx--;
+			if (predictor_idx < 0) {
+				System.err.println("predictor-idx should bigger than 0");
+				System.exit(0);
+			}
+		}
+
+		if (cl.hasOption(cmd_predictor_file)) {
+			predictor_file = cl.getOptionValue(cmd_predictor_file);
+			exists(predictor_file);
+		}
+
+		if (cl.hasOption(cmd_linear)) {
+			tranFunction = LINEAR;
+		}
+
+		if (cl.hasOption(cmd_logit)) {
+			tranFunction = LOGIT;
+		}
+
+//simulation nuclear family
 		if (cl.hasOption(cmd_simu_fam)) {
 			simufamFlag = true;
 		}
@@ -877,11 +916,48 @@ public class Parameter {
 			polyU = true;
 		}
 
-//haseman-elston regression
-		if(cl.hasOption(cmd_he)) {
-			heFlag = true;
+//profile
+		if (cl.hasOption(cmd_score)) {
+			scoreFlag = true;
+			scoreFile = cl.getOptionValue(cmd_score);
+			exists(scoreFile);
+		}
+
+		if (cl.hasOption(cmd_MaCH_Infor)) {
+			MaCH_Infor = cl.getOptionValue(cmd_MaCH_Infor);
+			exists(MaCH_Infor);
 		}
 		
+		if (cl.hasOption(cmd_MaCH_Dosage)) {
+			MaCH_Dosage = cl.getOptionValue(cmd_MaCH_Dosage);
+			exists(MaCH_Dosage);
+		}
+
+		if (cl.hasOption(cmd_MaCH_Infor_Batch)) {
+			MaCH_Infor_Batch = cl.getOptionValue(cmd_MaCH_Infor_Batch);
+			exists(MaCH_Infor_Batch);
+		}
+
+		if (cl.hasOption(cmd_MaCH_Dosage_Batch)) {
+			MaCH_Dosage_Batch = cl.getOptionValue(cmd_MaCH_Dosage_Batch);
+			exists(MaCH_Dosage_Batch);
+		}
+
+		if (cl.hasOption(cmd_q_score_file)) {
+			q_score_file = cl.getOptionValue(cmd_q_score_file);
+			exists(q_score_file);
+		}
+
+		if (cl.hasOption(cmd_q_score_range)) {
+			q_score_range_file = cl.getOptionValue(cmd_q_score_range);
+			exists(q_score_range_file);
+		}
+
+//haseman-elston regression
+		if (cl.hasOption(cmd_he)) {
+			heFlag = true;
+		}
+
 		if (cl.hasOption(cmd_grm)) {
 			StringBuilder sb1 = new StringBuilder(cl.getOptionValue(cmd_grm));
 			grm = sb1.append(".grm.gz").toString();
@@ -975,5 +1051,13 @@ public class Parameter {
 			}
 		}
 		return f;
+	}
+	
+	private void exists(String file) {
+		File f = new File(file);
+		if (!f.exists()) {
+			System.err.println("could not open " + file + ".");
+			System.exit(0);
+		}
 	}
 }

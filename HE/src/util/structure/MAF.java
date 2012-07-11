@@ -10,7 +10,7 @@ public class MAF {
 	private double NChr;
 
 	public MAF(String line, int idx) {
-		
+
 		String[] s = line.split(delim);
 		if(s.length== 6) {
 			chr = s[0];

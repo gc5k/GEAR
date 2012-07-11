@@ -7,10 +7,8 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.PrintStream;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Iterator;
-import java.util.Set;
 
 import parameter.Parameter;
 import test.Test;
@@ -240,7 +238,7 @@ public class Strand {
 				if (p < par.merge_p_cutoff) {
 					f = false;
 				}
-				if (par.removeATGCFlag && ATGCLocus) {
+				if (!par.keepATGCFlag && ATGCLocus) {
 					f = false;
 				}
 				if (par.removeFlipFlag && flip) {
@@ -328,12 +326,12 @@ public class Strand {
 		}
 		for (int i = 0; i < G.getNumMarker(); i++) {
 			double w = frq[i][0] + frq[i][1];
-			n[i] = frq[i][0] + frq[i][1] + frq[i][2];
+			n[i] = frq[i][0] + frq[i][1];
 			if (w > 0) {
 				for (int j = 0; j < frq[i].length - 1; j++) {
 					frq[i][j] /= w;
 				}
-				frq[i][2] /= n[i];
+				frq[i][2] /= frq[i][0] + frq[i][1] + frq[i][2];
 			} else {
 				frq[i][2] = 1;
 			}

@@ -8,9 +8,12 @@ import realcheck.RealCheckOne;
 import simulation.RealDataSimulation;
 import simulation.SimuFamily;
 import simulation.SimuPolyCC;
+import strand.MakePredictor;
+import strand.MakePredictor2;
 import strand.Strand;
 import sumstat.FrequencyCalculator;
 import parameter.Parameter;
+import profile.MaCHDosageProfile;
 import pscontrol.NonTransmitted;
 
 public class Pipeline {
@@ -19,12 +22,21 @@ public class Pipeline {
 		Parameter p = new Parameter();
 		p.commandListenor(args);
 
-		if (Parameter.strandFlag) {
+		if (Parameter.scoreFlag) {
+			MaCHDosageProfile mach = new MaCHDosageProfile(p);
+			mach.makeProfile();
+		} else if (Parameter.strandFlag) {
 			Strand strand = new Strand(p);
 			strand.Merge();
 		} else if (Parameter.mergeFlag) {
 			MergeTwoFile mtf = new MergeTwoFile(p);
 			mtf.Merge();
+		} else if (Parameter.makePredictorFlag) {
+			MakePredictor mp = new MakePredictor(p);
+			mp.BuildPredictor();
+		} else if (Parameter.makePredictor2Flag) {
+			MakePredictor2 mp2 = new MakePredictor2(p);
+			mp2.BuildPredictor();
 		} else if (Parameter.realcheckFlag) {
 			if(Parameter.bfile2 != null) {
 				RealCheck realcheck = new RealCheck(p);
@@ -33,7 +45,6 @@ public class Pipeline {
 				RealCheckOne realcheckone = new RealCheckOne(p);
 				realcheckone.Check();
 			}
-
 		} else if (Parameter.simufamFlag) {
 			SimuFamily simuFam = new SimuFamily(p);
 			simuFam.generateSample();
