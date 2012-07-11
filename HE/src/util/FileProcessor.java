@@ -2,10 +2,13 @@ package util;
 
 import java.io.BufferedReader;
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
+import java.io.InputStreamReader;
 import java.io.PrintStream;
+import java.util.zip.GZIPInputStream;
 
 import parameter.Parameter;
 
@@ -42,4 +45,21 @@ public class FileProcessor {
 
 	}
 	
+	public static BufferedReader ZipFileOpen(String file) {
+		FileInputStream fin = null;
+		try {
+			fin = new FileInputStream(file);
+		} catch (FileNotFoundException e1) {
+			e1.printStackTrace();
+		}
+		GZIPInputStream gzis = null;
+		try {
+			gzis = new GZIPInputStream(fin);
+		} catch (IOException e1) {
+			e1.printStackTrace();
+		}
+		InputStreamReader xover = new InputStreamReader(gzis);
+		BufferedReader is = new BufferedReader(xover);
+		return is;
+	}
 }

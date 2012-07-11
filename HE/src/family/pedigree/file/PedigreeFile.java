@@ -7,6 +7,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Enumeration;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Hashtable;
 
@@ -56,18 +57,20 @@ public class PedigreeFile {
 
 	public String[] getFamListSorted() {
 		ArrayList<String> f = NewIt.newArrayList();
+		HashSet<String> fam = NewIt.newHashSet();
 		for(int i = 0; i < HukouBook.size(); i++) {
 			Hukou hukou = HukouBook.get(i);
 			if(f.size()==0) {
 				f.add(hukou.getFamilyID());
+				fam.add(hukou.getFamilyID());
 			} else {
-				if(hukou.getFamilyID().compareTo(f.get(f.size()-1)) == 0) {
+				if(fam.contains(hukou.getFamilyID())) {
 					continue;
 				}
 				f.add(hukou.getFamilyID());
+				fam.add(hukou.getFamilyID());
 			}
 		}
-		String[] fs = (String[]) f.toArray(new String[0]);
 		return (String[]) f.toArray(new String[0]);
 	}
 
