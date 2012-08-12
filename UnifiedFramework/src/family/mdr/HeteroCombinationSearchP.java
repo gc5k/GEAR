@@ -484,16 +484,16 @@ public class HeteroCombinationSearchP extends AbstractMergeSearch {
 
 	public void PrintHeader() {
 		System.out.print("model" + ", ");
-		System.out.print("effective individuals, ");
+		System.out.print("EffInds, ");
 		System.out.print("vc, vx, vt, ");
 		for (int i = 0; i < MDRConstant.NumStats; i++) {
 			if (i == MDRConstant.NumStats - 1) {
-				System.out.print("Testing Accuracy (TA), ");
+				System.out.print("TA, ");
 				if (Parameter.permFlag) {
-					System.out.print("mean TA (null dis), " + "S.E.TA (null dis), " + "P (z-score)");
+					System.out.print("MeanTA_Null_Dis, " + "S.E.TA_Null_Dis, " + "P(z-score), ");
 				}
 			} else {
-				System.out.print("Training Accuracy, ");
+				System.out.print("TrA, ");
 			}
 		}
 		System.out.println();

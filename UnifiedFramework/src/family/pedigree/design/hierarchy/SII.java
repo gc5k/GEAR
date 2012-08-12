@@ -62,7 +62,7 @@ public final class SII extends ChenBase {
 				BPerson per = fs.getPerson(pi[i]);
 				Subject sub = PhenoData == null ? null : FamUnit.getSubject(pi[i]);
 
-				if (fs.hasAncestor(per)) {
+				if (fs.hasAncestor(per.getPersonID())) {
 					s_P.add(new PersonIndex(fs.getFamilyStructName(), pi[i], per, false, false));
 					status[s] = Double.parseDouble(per.getAffectedStatus());
 					if (sub != null)

@@ -405,6 +405,8 @@ public class SNPFilterI implements SNPFilterInterface {
 					s.add(j);
 				}
 			}
+			System.err.println(s.size() + " of " + SS.size() + " SNPs were selected " + "in " + Parameter.includesnpFile[i] + ".");
+			Test.LOG.append(s.size() + " of " + SS.size() + " SNPs were selected " + "in " + Parameter.includesnpFile[i] + ".\n");
 		}
 
 		for (int i = 0; i < xsnps.size(); i++) {
