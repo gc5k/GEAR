@@ -173,12 +173,12 @@ public class PedigreeFile {
 	protected void Is6ColBinary() {
 		for(String c : SixthCol) {
 			if(Parameter.status_shiftFlag) {
-				if(c.compareTo("1") != 0 && c.compareTo("0")!= 0 && c.compareTo(Parameter.missing_phenotype) != 0) {
+				if(c.compareTo("1") != 0 && c.compareTo("0")!= 0 && !Parameter.isNA(c)) {
 					IsSixthColBinary = false;
 					break;
 				}
 			} else {
-				if(c.compareTo("2") != 0 && c.compareTo("1")!= 0 && c.compareTo("0") != 0 && c.compareTo(Parameter.missing_phenotype) != 0) {
+				if(c.compareTo("2") != 0 && c.compareTo("1")!= 0 && c.compareTo("0") != 0 && !Parameter.isNA(c)) {
 					IsSixthColBinary = false;
 					break;
 				}

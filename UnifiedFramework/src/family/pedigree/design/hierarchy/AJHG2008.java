@@ -79,7 +79,7 @@ public class AJHG2008 extends ChenBase {
 				Subject sub = PhenoData == null ? null : FamUnit
 						.getSubject(pi[i]);
 
-				if (fs.hasAncestor(per)) {
+				if (fs.hasAncestor(per.getPersonID())) {
 					s_P.add(new PersonIndex(fs.getFamilyStructName(), pi[i],
 							per, false, false));
 					BPerson pseudoper = new BPerson(per);

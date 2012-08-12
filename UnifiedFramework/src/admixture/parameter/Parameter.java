@@ -40,7 +40,8 @@ public class Parameter {
 
 	private final String cmd_missing_phenotype = "missingphenotype";
 	private final String cmd_missing_phenotype_long = "missing-phenotype";
-	public static String missing_phenotype = "-9";
+//	public static String missing_phenotype = "-9";
+	public static String[] na = {"-9", "NA"};
 
 	// private final String cmd_missing_genotype = "missinggenotype";
 	// public static String missing_genotype = "0";
@@ -58,6 +59,9 @@ public class Parameter {
 	// // fam1 for ajhg2008
 	// // fam2 for sii
 	// public static String model = "cc";
+
+	private final String cmd_collapse = "collapse";
+	public static boolean collapseFlag = false;
 
 	private final String cmd_cc = "cc";
 	public static boolean ccFlag = true;
@@ -124,8 +128,10 @@ public class Parameter {
 //	private final String cmd_covar_name_long = "covar-name";
 //	public static String[] predictor_name = null;
 
-	private final String cmd_reg = "regression";
-	public int linkfunction = 0;
+	private final String cmd_linear = "linear";
+	private final String cmd_logistic = "logistic";
+//	private final String cmd_reg = "regression";
+	public int linkfunction = 0;//0 for linear; 1 for logistic
 	// phenotype set end
 
 	// individual selection start
@@ -208,6 +214,7 @@ public class Parameter {
 	private final String cmd_exclude = "exclude";
 	public static String[] includesnp = null;
 	public static String[] excludesnp = null;
+	public static String[] includesnpFile = null;
 
 	// this set only used when the option x is specified;
 	public static String[][] xincludesnp = null;
@@ -362,6 +369,7 @@ public class Parameter {
 	@SuppressWarnings("static-access")
 	public void commandInitial() {
 
+		ops.addOption(OptionBuilder.withDescription("collapse other than nuclear families").create(cmd_collapse));
 		ops.addOption(OptionBuilder.withDescription(
 				"method for case-control sample.").create(cmd_cc));
 		ops.addOption(OptionBuilder.withDescription(
@@ -402,6 +410,9 @@ public class Parameter {
 //				.withDescription("specify 1 or more covariates by name.")
 //				.hasArgs().withLongOpt(cmd_covar_name_long).create(cmd_covar_name));
 
+		ops.addOption(OptionBuilder.withDescription("linear regression").create(cmd_linear));
+		ops.addOption(OptionBuilder.withDescription("logistic regression").create(cmd_logistic));
+		
 		ops.addOption(OptionBuilder
 				.withDescription("specify regions to select snps.").hasArgs()
 				.create(cmd_region));
@@ -585,6 +596,11 @@ public class Parameter {
 		if (cl.hasOption(cmd_out)) {
 			out = cl.getOptionValue(cmd_out);
 		}
+		
+		if (cl.hasOption(cmd_collapse)) {
+			collapseFlag = true;
+		}
+
 		if (cl.hasOption(cmd_cc)) {
 			ccFlag = true;
 
@@ -733,9 +749,14 @@ public class Parameter {
 		if (cl.hasOption(cmd_header)) {
 			header = true;
 		}
-		// if (cl.hasOption(cmd_topN)) {
-		// topN = Integer.parseInt(cl.getOptionValue(cmd_topN));
-		// }
+
+		if (cl.hasOption(cmd_linear)) {
+			linkfunction = 0;
+		}
+		
+		if (cl.hasOption(cmd_logistic)) {
+			linkfunction = 1;
+		}
 		if (cl.hasOption(cmd_pheno_number)) {
 			response = Integer.parseInt(cl.getOptionValue(cmd_pheno_number)) - 1;
 			if (response < -1) {
@@ -1099,13 +1120,13 @@ public class Parameter {
 		if (cl.hasOption(cmd_extract)) {
 
 			if (!transFlag) {
-				String[] snps_file = cl.getOptionValues(cmd_extract);
+				includesnpFile = cl.getOptionValues(cmd_extract);
 				ArrayList<String> includesnpList = NewIt.newArrayList();
-				for (int h = 0; h < snps_file.length; h++) {
-					File f = new File(snps_file[h]);
+				for (int h = 0; h < includesnpFile.length; h++) {
+					File f = new File(includesnpFile[h]);
 					if (!f.exists()) {
-						System.err.println("could not find --" + cmd_extract + ": " + snps_file[h] + ".");
-						Test.LOG.append("could not fine --" + cmd_extract + ": " + snps_file[h] + ".\n");
+						System.err.println("could not find --" + cmd_extract + ": " + includesnpFile[h] + ".");
+						Test.LOG.append("could not fine --" + cmd_extract + ": " + includesnpFile[h] + ".\n");
 						Test.printLog();
 						System.exit(0);
 					}
@@ -1113,8 +1134,8 @@ public class Parameter {
 					try {
 						reader = new BufferedReader(new FileReader(f));
 					} catch (IOException E) {
-						System.err.println("could not read --" + cmd_extract + ": " + snps_file[h] + ".");
-						Test.LOG.append("could not read --" + cmd_extract + ": " + snps_file[h] + ".\n");
+						System.err.println("could not read --" + cmd_extract + ": " + includesnpFile[h] + ".");
+						Test.LOG.append("could not read --" + cmd_extract + ": " + includesnpFile[h] + ".\n");
 						Test.printLog();
 						System.exit(0);
 					}
@@ -1127,8 +1148,8 @@ public class Parameter {
 						}
 						reader.close();
 					} catch (IOException E) {
-						System.err.println("bad lines in " + snps_file[h] + ".");
-						Test.LOG.append("bad lines in " + snps_file[h] + ".\n");
+						System.err.println("bad lines in " + includesnpFile[h] + ".");
+						Test.LOG.append("bad lines in " + includesnpFile[h] + ".\n");
 						Test.printLog();
 						System.exit(0);
 					}
@@ -1151,13 +1172,13 @@ public class Parameter {
 
 				}
 			} else {
-				String[] snps_file = cl.getOptionValues(cmd_extract);
-				xincludesnp = new String[snps_file.length][];
-				for (int h = 0; h < snps_file.length; h++) {
-					File f = new File(snps_file[h]);
+				includesnpFile = cl.getOptionValues(cmd_extract);
+				xincludesnp = new String[includesnpFile.length][];
+				for (int h = 0; h < includesnpFile.length; h++) {
+					File f = new File(includesnpFile[h]);
 					if (!f.exists()) {
-						System.err.println("could not find " + snps_file[h] + ".");
-						Test.LOG.append("could not find " + snps_file[h] + ".\n");
+						System.err.println("could not find " + includesnpFile[h] + ".");
+						Test.LOG.append("could not find " + includesnpFile[h] + ".\n");
 						Test.printLog();
 						System.exit(0);
 					}
@@ -1166,8 +1187,8 @@ public class Parameter {
 						reader = new BufferedReader(new FileReader(f));
 					} catch (IOException E) {
 
-						System.err.println("could not read " + snps_file[h] + ".");
-						Test.LOG.append("could not read " + snps_file[h] + ".\n");
+						System.err.println("could not read " + includesnpFile[h] + ".");
+						Test.LOG.append("could not read " + includesnpFile[h] + ".\n");
 						Test.printLog();
 						System.exit(0);
 					}
@@ -1181,8 +1202,8 @@ public class Parameter {
 						reader.close();
 					} catch (IOException E) {
 
-						System.err.println("bad lines in " + snps_file[h] + ".");
-						Test.LOG.append("bad lines in " + snps_file[h] + ".\n");
+						System.err.println("bad lines in " + includesnpFile[h] + ".");
+						Test.LOG.append("bad lines in " + includesnpFile[h] + ".\n");
 						Test.printLog();
 						System.exit(0);
 					}
@@ -1586,7 +1607,9 @@ public class Parameter {
 			sliceFlag = true;
 		}
 		if (cl.hasOption(cmd_missing_phenotype)) {
-			missing_phenotype = cl.getOptionValue(cmd_missing_phenotype);
+			String[] s = cl.getOptionValues(cmd_missing_phenotype);
+			na = s;
+//			missing_phenotype = cl.getOptionValue(cmd_missing_phenotype);
 		}
 		// if (cl.hasOption(cmd_missing_genotype)) {
 		// missing_genotype = cl.getOptionValue(cmd_missing_genotype);
@@ -1688,9 +1711,21 @@ public class Parameter {
 //		}
 //	}
 
+	public static boolean isNA(String n) {
+		boolean f = false;
+		for (int i = 0; i < na.length; i++) {
+			if(n.compareTo(na[i]) == 0) {
+				f = true;
+				break;
+			}
+		}
+		return f;
+	}
+
 	public static void main(String[] args) throws IOException {
 		Parameter p = new Parameter();
 		p.commandListenor(args);
 		System.out.println(p);
 	}
 }
+

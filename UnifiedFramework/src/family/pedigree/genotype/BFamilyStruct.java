@@ -108,21 +108,21 @@ public class BFamilyStruct {
 		return persons;
 	}
 
-	public boolean hasAncestor(BPerson p) {
-		if (p != null) {
-			if (p.getDadID().equals("0") && p.getMomID().equals("0")) {
-				return false;
-			} else {
-				if (persons.containsKey(p.getDadID()) || persons.containsKey(p.getMomID())) {
-					return true;
-				} else {
-					return (hasAncestor(p.getDadID()) || hasAncestor(p.getMomID()));
-				}
-			}
-		} else {
-			return false;
-		}
-	}
+//	public boolean hasAncestor(BPerson per, boolean collapse) {
+//		if (per != null) {
+//			if (per.getDadID().equals("0") && per.getMomID().equals("0")) {//founder
+//				return false;
+//			} else {
+//				if (persons.containsKey(per.getDadID()) || persons.containsKey(per.getMomID())) {//nuclear family
+//					return true;
+//				} else {
+//					return (hasAncestor(per.getDadID()) || hasAncestor(per.getMomID()));
+//				}
+//			}
+//		} else {
+//			return false;
+//		}
+//	}
 
 	public boolean hasAncestor(String id) {
 		BPerson per = (BPerson) persons.get(id);
@@ -130,12 +130,15 @@ public class BFamilyStruct {
 			if (per.getDadID().equals("0") && per.getMomID().equals("0")) {
 				return false;
 			} else {
-				if (persons.containsKey(per.getDadID()) || persons.containsKey(per.getMomID())) {
-					return true;
-				} else {
-					return (hasAncestor(per.getDadID()) || hasAncestor(per.getMomID()));
-				}
+				return true;
 			}
+//			} else {
+//				if (persons.containsKey(per.getDadID()) || persons.containsKey(per.getMomID())) {
+//					return true;
+//				} else {
+//					return (hasAncestor(per.getDadID()) || hasAncestor(per.getMomID()));
+//				}
+//			}
 		} else {
 			return false;
 		}

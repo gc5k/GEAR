@@ -66,7 +66,7 @@ public final class Unified extends ChenBase {
 				BPerson per = fs.getPerson(pi[i]);
 				Subject sub = PhenoData == null ? null : FamUnit.getSubject(pi[i]);
 
-				if (fs.hasAncestor(per)) {
+				if (fs.hasAncestor(per.getPersonID())) {
 					s_P.add(new PersonIndex(fs.getFamilyStructName(), pi[i], per, false, false));
 					status[s + qualified_Unrelated] = Double.parseDouble( per.getAffectedStatus() );
 					if(PhenoData != null)

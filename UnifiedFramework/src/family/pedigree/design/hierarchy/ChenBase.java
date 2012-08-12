@@ -86,22 +86,19 @@ public abstract class ChenBase implements ChenInterface {
 						if (IsPhenotypeBinary) {
 							String s = per.getAffectedStatus();
 							if (Parameter.status_shiftFlag) {
-								f = (s.compareTo(Parameter.missing_phenotype) == 0) ? false
-										: true;
+								f = !Parameter.isNA(s);
 							} else {
-								f = (s.compareTo(Parameter.missing_phenotype) == 0 || s
-										.compareTo("0") == 0) ? false : true;
+								f = (Parameter.isNA(s) || s.compareTo("0") == 0) ? false : true;
 							}
 						} else {
 							String s = per.getAffectedStatus();
-							f = (s.compareTo(Parameter.missing_phenotype) == 0) ? true
-									: false;
+							f = !Parameter.isNA(s);
 						}
 
 						filter[c][cc++] = f;
 						if (!f)
 							continue;
-						if (fs.hasAncestor(per)) {
+						if (fs.hasAncestor(per.getPersonID())) {
 							num_qualified[c][1]++;
 						} else {
 							num_qualified[c][0]++;
@@ -132,7 +129,7 @@ public abstract class ChenBase implements ChenInterface {
 						if (!f)
 							continue;
 
-						if (fs.hasAncestor(per)) {
+						if (fs.hasAncestor(per.getPersonID())) {
 							num_qualified[c][1]++;
 						} else {
 							num_qualified[c][0]++;
@@ -154,34 +151,33 @@ public abstract class ChenBase implements ChenInterface {
 			if (pheIdx == -1) {
 				if (IsPhenotypeBinary) {
 					if (Parameter.status_shiftFlag) {
-						f = (s.compareTo(Parameter.missing_phenotype) == 0) ? false
-								: true;
+						f = !Parameter.isNA(s);
 					} else {
-						f = (s.compareTo(Parameter.missing_phenotype) == 0 || s
-								.compareTo("0") == 0) ? false : true;
+						f = (!Parameter.isNA(s) && s.compareTo("0") != 0);
 					}
 				} else {
-					f = (s.compareTo(Parameter.missing_phenotype) == 0) ? true
-							: false;
+					f = !Parameter.isNA(s);
 				}
 			} else {
-				f = (trait.get(pheIdx).compareTo(Parameter.missing_phenotype) == 0) ? false
-						: true;
+				f = !Parameter.isNA(trait.get(pheIdx));
 			}
+
+			if (!f) return f;
 
 			if (covIdx == null) {
 				return f;
 			} else {
 				for (int j = 0; j < covIdx.length; j++) {
-					f = (trait.get(j).compareTo(Parameter.missing_phenotype) == 0) ? false
-							: true;
+					if (Parameter.isNA(trait.get(covIdx[j])) ) {
+						f = false;
+						break;
+					}
 				}
 				return f;
 			}
 			/*
 			 * further filtering if other conditions are applied.
 			 */
-
 		}
 
 		protected boolean hardFilter(BPerson p) {
@@ -419,12 +415,12 @@ public abstract class ChenBase implements ChenInterface {
 					String t = tempc.get(pheIdx);
 					
 					if(Parameter.status_shiftFlag) {
-						if(t.compareTo("1") != 0 && t.compareTo("0")!= 0 && t.compareTo(Parameter.missing_phenotype) != 0) {
+						if(t.compareTo("1") != 0 && t.compareTo("0")!= 0 && !Parameter.isNA(t) ) {
 							method = 0;
 							break;
 						}
 					} else {
-						if(t.compareTo("2") != 0 && t.compareTo("1")!= 0 && t.compareTo("0") != 0 && t.compareTo(Parameter.missing_phenotype) != 0) {
+						if(t.compareTo("2") != 0 && t.compareTo("1")!= 0 && t.compareTo("0") != 0 && !Parameter.isNA(t)) {
 							method = 0;
 							break;
 						}
