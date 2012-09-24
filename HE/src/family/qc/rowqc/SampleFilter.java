@@ -177,7 +177,7 @@ public class SampleFilter {
 	public ArrayList<PersonIndex> getSample() {
 		return PersonTable;
 	}
-	
+
 	public ArrayList<Hukou> getHukouBook() {
 		return HukouBook;
 	}

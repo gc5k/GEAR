@@ -1,4 +1,6 @@
 package pipeline;
+import java.util.Calendar;
+
 import merge.MergeTwoFile;
 import write.WriteBedSNPMajor;
 import he.H2Transformer;
@@ -8,12 +10,15 @@ import realcheck.RealCheckOne;
 import simulation.RealDataSimulation;
 import simulation.SimuFamily;
 import simulation.SimuPolyCC;
+import simulation.SimuPolyQT;
 import strand.MakePredictor;
 import strand.MakePredictor2;
 import strand.Strand;
 import sumstat.FrequencyCalculator;
+import sumstat.Inbreeding;
 import parameter.Parameter;
 import profile.MaCHDosageProfile;
+import profile.RiskScore;
 import pscontrol.NonTransmitted;
 
 public class Pipeline {
@@ -22,9 +27,18 @@ public class Pipeline {
 		Parameter p = new Parameter();
 		p.commandListenor(args);
 
+		System.out.print(Parameter.version);
+		Calendar calendar = Calendar.getInstance();
+		System.out.println("\nThe analysis started at: " + calendar.getTime() + "\n");
+
 		if (Parameter.scoreFlag) {
-			MaCHDosageProfile mach = new MaCHDosageProfile(p);
-			mach.makeProfile();
+			if (Parameter.bfileOption) {
+				RiskScore rs = new RiskScore(p);
+				rs.makeProfile();
+			} else {
+				MaCHDosageProfile mach = new MaCHDosageProfile(p);
+				mach.makeProfile();
+			}
 		} else if (Parameter.strandFlag) {
 			Strand strand = new Strand(p);
 			strand.Merge();
@@ -56,22 +70,25 @@ public class Pipeline {
 		}  else if (Parameter.simupolyCCFlag) {
 			SimuPolyCC polyCC = new SimuPolyCC(p);
 			polyCC.GenerateSample();
-			polyCC.writeFile();
-			polyCC.writeLog();
 
 		} else if (Parameter.simupolyQTFlag) {
+			SimuPolyQT polyQT = new SimuPolyQT(p);
+			polyQT.generateSample();
 			
 		} else if (Parameter.sumStatFlag) {
-			if (Parameter.sumStatOption[Parameter.freq]) {
+			if (Parameter.freqFlag) {
 				FrequencyCalculator fc = new FrequencyCalculator(p);
 				fc.CalculateAlleleFrequency();
 				System.out.println(fc);
 
-			} else if (Parameter.sumStatOption[Parameter.geno_freq]) {
+			} else if (Parameter.genoFreqFlag) {
 				FrequencyCalculator fc = new FrequencyCalculator(p);
 				fc.CalculateAlleleFrequency();
 				System.out.println(fc);				
 
+			} else if (Parameter.fstFlag ) {
+				Inbreeding inb = new Inbreeding(p);
+				inb.CalculateFst();
 			}
 		} else if (Parameter.makebedFlag) {
 			WriteBedSNPMajor bedWriter = new WriteBedSNPMajor(p);
@@ -92,6 +109,9 @@ public class Pipeline {
 			HER.Regression();
 
 		}
+		
+		System.out.println("\nThe analysis ended at: " + calendar.getTime() + "\n");
+
 	}
 
 }

@@ -11,35 +11,28 @@ import java.util.Calendar;
 
 import parameter.Parameter;
 
-import org.apache.commons.math.MathException;
-import org.apache.commons.math.distribution.NormalDistributionImpl;
 import org.apache.commons.math.linear.Array2DRowRealMatrix;
 import org.apache.commons.math.linear.RealMatrix;
 import org.apache.commons.math.random.RandomDataImpl;
 import org.apache.commons.math.stat.StatUtils;
 
-public class SimuPolyCC {
+public class SimuPolyQT {
 
 	private byte byte1 = 108;
 	private byte byte2 = 27;
 	private byte byte3 = 1;
 	
-	private NormalDistributionImpl norm;
 	private RandomDataImpl rnd;
 	private long seed = 2011;
 
-	private int M = 1;
+	private int M = 100;
 	private int M_null = 0;
 	private boolean U = false;
 	private int sample = 1000;
-	private int N_case = 500;
-	private int N_control = 500;
 
 	private double[][] genotype;
 	private double[] BV;
 	private double[] phenotype;
-
-	private double[] risk;
 
 	private double[] freq;
 	private double[] DPrime;
@@ -49,32 +42,27 @@ public class SimuPolyCC {
 	private double vy = 1;
 	private double h2 = 0.5;
 	private double E = 0.5;
-	private double K = 0.05;
 	private String out = "Poly";
 
 	private String A1 = "A";
 	private String A2 = "C";
 	public static StringBuilder LOG = new StringBuilder();
 
-	public SimuPolyCC(Parameter P) {
+	public SimuPolyQT(Parameter P) {
 
 		M = P.polyLoci;
 		M_null = P.polyLociNull;
 		U = P.polyU;
 		ld = P.polyLD;
 		seed = P.simuSeed;
-		sample = P.simuCC[0] + P.simuCC[1];
-		N_case = P.simuCC[0];
-		N_control = P.simuCC[1];
+		sample = P.poly_sample_QT;
 		h2 = P.simuHsq;
-		K = P.simuK;
 		out = P.out;
 
 		E = Math.sqrt(1 - h2);
 
 		rnd = new RandomDataImpl();
 		rnd.reSeed(seed);
-		norm = new NormalDistributionImpl(0, vy);
 
 		freq = new double[M];
 		DPrime = new double[M - 1];
@@ -83,28 +71,22 @@ public class SimuPolyCC {
 		Arrays.fill(DPrime, ld);
 		LD = CalculateDprime(freq, DPrime);
 
-		genotype = new double[N_case + N_control][M];
-		phenotype = new double[N_case + N_control];
-		BV = new double[N_case + N_control];
-		risk = new double[N_case + N_control];
+		genotype = new double[sample][M];
+		phenotype = new double[sample];
+		BV = new double[sample];
 
 		Calendar calendar = Calendar.getInstance();
 		LOG.append("\nThe analysis was implemented at: " + calendar.getTime()
 				+ "\n");
+		LOG.append("Simulation polygenic model for quantitative traits.\n");
 		LOG.append("seed: " + seed + "\n");
 		LOG.append("Marker: " + M + "\n");
-		LOG.append("Null Marker: " + M_null + "\n");
+		LOG.append("Null marker: " + M + "\n");
 		LOG.append("Uniform Effet: " + U + "\n");
 		LOG.append("LD: " + ld + "\n");
 		LOG.append("Sample size: " + sample + "\n");
-		LOG.append("case: " + N_case + "\n");
-		LOG.append("Control: " + N_control + "\n");
-		LOG.append("K: " + K + "\n");
 		LOG.append("h2: " + h2 + "\n");
 		LOG.append("out: " + out + "\n");
-		if (Parameter.makebedFlag) {
-			LOG.append("make bed");
-		}
 		LOG.append("\n");
 	}
 
@@ -116,6 +98,16 @@ public class SimuPolyCC {
 
 	}
 
+	public void generateSample() {
+		GenerateSampleNoSelection();
+		if(Parameter.makebedFlag) {
+			writeBFile();
+		} else {
+			writeFile();
+		}
+		writeLog();
+	}
+	
 	public void writeLog() {
 
 		Calendar calendar = Calendar.getInstance();
@@ -126,6 +118,7 @@ public class SimuPolyCC {
 			log = new PrintWriter(new BufferedWriter(new FileWriter(out
 					+ ".plog")));
 		} catch (IOException e) {
+			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 		log.println(LOG.toString());
@@ -135,130 +128,51 @@ public class SimuPolyCC {
 
 	}
 
-	public void GenerateSample() {
-		GenerateSampleSelection();
-		if(Parameter.makebedFlag) {
-			writeBFile();
-		} else {
-			writeFile();
-		}
-		writeLog();
-	}
-
-
-	public void GenerateSampleSelection() {
-		int count_case = 0;
-		int count_control = 0;
-		int count = 0;
-		RealMatrix effect = GenerateEffects();
-
-		norm = new NormalDistributionImpl(0, 1);
-
-		int c = 0;
-		while (count < sample) {
-			c++;
-			RealMatrix chr = SampleChromosome();
-			RealMatrix res = chr.transpose().multiply(effect);
-
-			double bv = res.getEntry(0, 0);
-			double L = bv + rnd.nextGaussian(0, E);
-			double liability = 0;
-
-			try {
-				liability = norm.cumulativeProbability(L);
-			} catch (MathException e) {
-				e.printStackTrace();
-			}
-
-			if (1 - liability < K) {
-				if (count_case < N_case) {
-					BV[count_case] = bv;
-					phenotype[count_case] = L;
-					genotype[count_case] = chr.getColumn(0);
-					risk[count_case] = liability;
-					count_case++;
-				} else {
-					continue;
-				}
-			} else {
-				if (count_control < N_control) {
-					BV[N_case + count_control] = bv;
-					phenotype[N_case + count_control] = L;
-					genotype[N_case + count_control] = chr.getColumn(0);
-					risk[N_case + count_control] = liability;
-					count_control++;
-				} else {
-					continue;
-				}
-			}
-
-			count++;
-		}
-		LOG.append("total individuals visited: " + c + "\n");
-	}
-
 	public void GenerateSampleNoSelection() {
 
-		int count_case = 0;
-		int count_control = 0;
 		int count = 0;
 		RealMatrix effect = GenerateEffects();
-
-		norm = new NormalDistributionImpl(0, 1);
 
 		while (count < sample) {
 			RealMatrix chr = SampleChromosome();
 			RealMatrix res = chr.transpose().multiply(effect);
 
 			double bv = res.getEntry(0, 0);
-			double L = bv + rnd.nextGaussian(0, E);
-			double liability = 0;
 
-			try {
-				liability = norm.cumulativeProbability(L);
-			} catch (MathException e) {
-				e.printStackTrace();
-			}
-
-			if (1 - liability < K) {
-				BV[count_case] = bv;
-				phenotype[count_case] = L;
-				genotype[count_case] = chr.getColumn(0);
-				risk[count_case] = liability;
-				count_case++;
-			} else {
-				count_control++;
-				BV[sample - count_control] = bv;
-				phenotype[sample - count_control] = L;
-				genotype[sample - count_control] = chr.getColumn(0);
-				risk[sample - count_control] = liability;
-			}
+			BV[count] = bv;
+			genotype[count] = chr.getColumn(0);
 
 			count++;
 		}
-		N_case=count_case;
-		LOG.append("total individuals visited (no selection): " + count + " (affected=" + N_case + ")\n");
 
+		double vg = StatUtils.variance(BV);
+		double ve = vg * (1-h2) / h2;
+		double E = Math.sqrt(ve);
+		LOG.append("Vg=" + String.format("%.3f", vg) + "\n");
+		for (int i = 0; i < sample; i++) {
+			phenotype[i] = BV[i] + rnd.nextGaussian(0, E);
+		}
+		double vp = StatUtils.variance(phenotype);
+		LOG.append("VP=" + String.format("%.3f", vp) + "\n");
+		LOG.append("total individuals visited (no selection): " + count + "\n");
 	}
 
 	public RealMatrix GenerateEffects() {
 
 		double[] effect = new double[M];
 		if (U) {
-			for (int i = 0; i < effect.length - M_null; i++) {
+			for (int i = 0; i < M - M_null; i++) {
 				double sigma_b = Math.sqrt((vy * h2)
-						/ ((M-M_null) * 2 * freq[i] * (1 - freq[i])));
+						/ ( (M - M_null) * 2 * freq[i] * (1 - freq[i])));
 				effect[i] = sigma_b;
 			}
 		} else {
-			for (int i = 0; i < effect.length - M_null; i++) {
-				double sigma_b = Math.sqrt((vy * h2)
-						/ ((freq.length-M_null) * 2 * freq[i] * (1 - freq[i])));
-				effect[i] = rnd.nextGaussian(0, sigma_b);
+			for (int i = 0; i < M - M_null; i++) {
+				effect[i] = rnd.nextGaussian(0, 1);
 			}
 		}
-		
-		if	(Parameter.simuOrderFlag) {
+
+		if (Parameter.simuOrderFlag) {
 			Arrays.sort(effect);
 		}
 
@@ -304,7 +218,6 @@ public class SimuPolyCC {
 		}
 
 		RealMatrix chr = new Array2DRowRealMatrix(g);
-
 		return chr;
 
 	}
@@ -323,9 +236,7 @@ public class SimuPolyCC {
 		}
 
 		System.out.println(StatUtils.mean(P) + " " + StatUtils.variance(P));
-		
 		return StatUtils.mean(P);
-
 	}
 
 	public void writeBFile() {
@@ -338,6 +249,7 @@ public class SimuPolyCC {
 		try {
 			bedout = new DataOutputStream (new FileOutputStream(out
 					+ ".bed"));
+			
 			fam = new PrintWriter(new BufferedWriter(new FileWriter(out + ".fam")));
 			bim = new PrintWriter(new BufferedWriter(new FileWriter(out
 					+ ".bim")));
@@ -352,41 +264,25 @@ public class SimuPolyCC {
 		}
 
 		for (int i = 0; i < genotype.length; i++) {
-			if (i < N_case) {
-				fam.print("case_" + i + " ");
-				fam.print(1 + " ");
-				fam.print(0 + " ");
-				fam.print(0 + " ");
-				fam.print(1 + " ");
+			fam.print("sample_" + i + " ");
+			fam.print(1 + " ");
+			fam.print(0 + " ");
+			fam.print(0 + " ");
+			fam.print(1 + " ");
 
-				fam.println(2 + " ");
-			} else {
-				fam.print("control_" + i + " ");
-				fam.print(1 + " ");
-				fam.print(0 + " ");
-				fam.print(0 + " ");
-				fam.print(1 + " ");
+			fam.println(2 + " ");
 
-				fam.println(1 + " ");
-			}
-
-			if (i < N_case) {
-				phe.print("case_" + i + " " + 1 + " " + 2 + " ");
-				cov.print("case_" + i + " " + 1 + " " + 2 + " ");
-			} else {
-				phe.print("control_" + i + " " + 1 + " " + 1 + " ");
-				cov.print("control_" + i + " " + 1 + " " + 1 + " ");
-			}
+			phe.print("sample_" + i + " " + 1 + " " + 2 + " ");
 			phe.println();
+			cov.print("sample_" + i + " " + 1 + " " + 2 + " ");
 
-			cov.print(risk[i] + " ");
 			cov.print(BV[i] + " ");
 			cov.println(phenotype[i]);
 		}
 
 		for (int i = 0; i < genotype.length; i++) {
 			for (int j = 0; j < genotype[i].length; j++) {
-				geno.print(((int) genotype[i][j] + 1 ) + " "); 
+				geno.print(((int) genotype[i][j] + 1) + " "); 
 			}
 			geno.println();
 		}
@@ -444,46 +340,34 @@ public class SimuPolyCC {
 
 	}
 
+	
 	public void writeFile() {
 		PrintWriter pedout = null;
 		PrintWriter map = null;
-		PrintWriter phe = null;
 		PrintWriter cov = null;
 		PrintWriter geno = null;
-
 		try {
 			pedout = new PrintWriter(new BufferedWriter(new FileWriter(out
 					+ ".ped")));
 			map = new PrintWriter(new BufferedWriter(new FileWriter(out
 					+ ".map")));
-			phe = new PrintWriter(new BufferedWriter(new FileWriter(out
-					+ ".phe")));
 			cov = new PrintWriter(new BufferedWriter(new FileWriter(out
 					+ ".cov")));
-			geno = new PrintWriter(new BufferedWriter(new FileWriter(out + ".add")));
+			geno = new PrintWriter(new BufferedWriter(new FileWriter(out
+					+ ".add")));
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 
 		for (int i = 0; i < genotype.length; i++) {
-			if (i < N_case) {
-				pedout.print("case_" + i + " ");
-				pedout.print(1 + " ");
-				pedout.print(0 + " ");
-				pedout.print(0 + " ");
-				pedout.print(1 + " ");
 
-				pedout.print(2 + " ");
-			} else {
-				pedout.print("control_" + i + " ");
-				pedout.print(1 + " ");
-				pedout.print(0 + " ");
-				pedout.print(0 + " ");
-				pedout.print(1 + " ");
-
-				pedout.print(1 + " ");
-			}
+			pedout.print("sample_" + i + " ");
+			pedout.print(1 + " ");
+			pedout.print(0 + " ");
+			pedout.print(0 + " ");
+			pedout.print(1 + " ");
+			pedout.print(1 + " ");
 
 			for (int j = 0; j < genotype[i].length; j++) {
 				int g = (int) genotype[i][j];
@@ -497,25 +381,9 @@ public class SimuPolyCC {
 			}
 			pedout.println();
 
-			if (i < N_case) {
-				phe.print("case_" + i + " " + 1 + " " + 2 + " ");
-				cov.print("case_" + i + " " + 1 + " " + 2 + " ");
-			} else {
-				phe.print("control_" + i + " " + 1 + " " + 1 + " ");
-				cov.print("control_" + i + " " + 1 + " " + 1 + " ");
-			}
-			phe.println();
-
-			cov.print(risk[i] + " ");
+			cov.print("sample_" + i + " " + 1 + " " + 1 + " ");
 			cov.print(BV[i] + " ");
 			cov.println(phenotype[i]);
-		}
-
-		for (int i = 0; i < genotype.length; i++) {
-			for (int j = 0; j < genotype[i].length; j++) {
-				geno.print(((int) genotype[i][j] + 1) + " "); 
-			}
-			geno.println();
 		}
 
 		for (int i = 0; i < M; i++) {
@@ -525,13 +393,21 @@ public class SimuPolyCC {
 			map.println(i * 100);
 		}
 
+		for (int i = 0; i < genotype.length; i++) {
+			for (int j = 0; j < genotype[i].length; j++) {
+				geno.print(((int) genotype[i][j] + 1) + " "); 
+			}
+			geno.println();
+		}
+
 		pedout.close();
-		phe.close();
 		map.close();
 		cov.close();
+		geno.close();
 	}
 
 	public double[] CalculateDprime(double[] f, double[] dprime) {
+
 		double[] D = new double[dprime.length];
 
 		for (int i = 0; i < D.length; i++) {
@@ -543,6 +419,5 @@ public class SimuPolyCC {
 		}
 
 		return D;
-
 	}
 }

@@ -28,7 +28,7 @@ public class SumStatQC {
 		QC();
 
 	}
-	
+
 	public void QC() {
 		
 	}
