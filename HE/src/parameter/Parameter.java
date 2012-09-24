@@ -12,8 +12,6 @@ import org.apache.commons.cli.Options;
 import org.apache.commons.cli.ParseException;
 import org.apache.commons.cli.PosixParser;
 
-import test.Test;
-import util.FileProcessor;
 import util.NewIt;
 
 public class Parameter {
@@ -137,7 +135,7 @@ public class Parameter {
 	private final String cmd_simu_realdata = "simu_real_data";
 	private final String cmd_simu_realdata_long = "simu-real-data";
 	public static boolean simuRealData = false;
-	
+
 	private final String cmd_simu_seed = "simu_seed";
 	private final String cmd_simu_seed_long = "simu-seed";
 	public static long simuSeed = (new Random()).nextLong();
@@ -160,10 +158,16 @@ public class Parameter {
 
 	private final String cmd_simu_qt = "simu_qt";
 	private final String cmd_simu_qt_long = "simu-qt";
+	public static boolean simupolyQTFlag = false;
+	
+	private final String cmd_simu_order = "simu_order";
+	private final String cmd_simu_order_long = "simu-order";
+	public static boolean simuOrderFlag = false;
 
 	private final String cmd_simu_cc = "simu_cc";
 	private final String cmd_simu_cc_long = "simu-cc";
 	public static int[] simuCC = { 0, 0 };
+	public static boolean simupolyCCFlag = false;
 
 	private final String cmd_simu_k = "simu_k";
 	private final String cmd_simu_k_long = "simu-k";
@@ -172,22 +176,19 @@ public class Parameter {
 	public final static int sm_qt = 0;
 	public final static int sm_cc = 1;
 
-	public static boolean[] simuType = { true, false };
+	public static boolean[] simuType = { true, false };  //first one for case-control, second one for quantitative
 
 /////////////////simulation polygenic
-	private final String cmd_simu_poly_qt = "simu_poly_qt";
-	private final String cmd_simu_poly_qt_long = "simu-poly-qt";	
-	public static boolean simupolyQTFlag = false;
-
-	private final String cmd_simu_poly_cc = "simu_poly_cc";
-	private final String cmd_simu_poly_cc_long = "simu-poly-cc";
-
-	public static boolean simupolyCCFlag = false;
-
 	private final String cmd_poly_loci = "poly_loci";
 	private final String cmd_poly_loci_long = "poly-loci";
 	
-	public static int polyLoci = 1000;
+	public static int polyLoci = 1000;	
+	
+	private final String cmd_poly_loci_null = "poly_loci_null";
+	private final String cmd_poly_loci_null_long = "poly-loci-null";
+
+	public static int polyLociNull = 0;
+	public static int poly_sample_QT = 1000;
 
 	private final String cmd_poly_LD = "poly_ld";
 	private final String cmd_poly_LD_long = "poly-ld";
@@ -215,15 +216,21 @@ public class Parameter {
 
 ///////////////////pop stat
 	private final String cmd_freq = "freq";
+	public static boolean freqFlag = false;
 	private final String cmd_geno_freq = "geno_freq";
 	private final String cmd_geno_freq_long = "geno-freq";
+	public static boolean genoFreqFlag = false;
 
 	public final String cmd_sum_stat_help = "sum_stat_help";
 	public final String cmd_sum_stat_help_long = "sum-stat-help";
 	public final static int freq = 0;
 	public final static int geno_freq = 1;
 	public static boolean sumStatFlag = false;
-	public static boolean[] sumStatOption = { true, false };
+	
+	//fst
+	private final String cmd_fst = "fst";
+	public static boolean fstFlag = false;
+	public static String fst_file = null;
 
 //profile
 	
@@ -243,7 +250,7 @@ public class Parameter {
 	private final String cmd_q_score_range ="q_score_range";
 	private final String cmd_q_score_range_long = "q-score-range";
 	
-	public static boolean scoreFlag = true;
+	public static boolean scoreFlag = false;
 	public static String scoreFile = null;
 	public static String MaCH_Infor = null;
 	public static String MaCH_Dosage = null;
@@ -253,8 +260,6 @@ public class Parameter {
 	public static String q_score_range_file = null;
 
 //he regression
-	public static boolean heFlag = true;
-	private final String cmd_he = "he";
 	private final String cmd_grm = "grm";
 	public static String grm = null;
 	public static String grm_id = null;
@@ -272,16 +277,20 @@ public class Parameter {
 	public static boolean k_button = false;
 	public static double k = 0.01;
 	
-	private final String cmd_he_sd = "he_sd";
+	private final String cmd_scale = "scale";
+	public static boolean scale = false;
+	
+	private final String cmd_he_sd = "he_sd"; //(y1-y2)^2
 	private final String cmd_he_sd_long = "he-sd";
-	private final String cmd_he_ss = "he_ss";
+	private final String cmd_he_ss = "he_ss"; //(y1+y2)^2
 	private final String cmd_he_ss_long = "he-ss";
-	private final String cmd_he_cp = "he_cp";
+	private final String cmd_he_cp = "he_cp"; //y1*y2
 	private final String cmd_he_cp_long = "he-cp";
 	public static int he_sd = 0;
 	public static int he_ss = 1;
 	public static int he_cp = 2;
 	public static boolean[] heType = {true, false, false};
+	public static boolean heFlag = false;
 
 	private final String cmd_out = "out";
 	public static String out = "he";
@@ -341,7 +350,7 @@ public class Parameter {
 	private final String cmd_make_bed = "make_bed";
 	public static String cmd_make_bed_long = "make-bed";
 	public static boolean makebedFlag = false;
-
+ 
 	/*
 	 * private final String cmd_ex_ind = "exind"; public static String[][]
 	 * ex_ind = null; private final String cmd_ex_ind_file = "exindfile"; public
@@ -359,9 +368,6 @@ public class Parameter {
 	private final String cmd_ex_nosex_long = "exclude-nosex";
 	public static boolean ex_nosexFlag = false;
 ///////////////////global	
-
-	
-	public static String version = "0.1, April/06/2012\n";
 
 	public static boolean transFlag = false;
 
@@ -393,7 +399,13 @@ public class Parameter {
 
 	private final String cmd_help = "help";
 
-	
+	public static String version = "\n"
+			+ "******************************************************************\n"
+			+ "| HE Jul/18/2011                                                 |\n"
+			+ "| (C) 2011 Guo-Bo Chen                                           |\n"
+			+ "| v 0.7.7                                                        |\n"			
+			+ "| GNU General Public License, v2                                 |\n"
+			+ "******************************************************************\n";
 	private Options ops = new Options();
 
 	private CommandLineParser parser = new PosixParser();
@@ -471,7 +483,9 @@ public class Parameter {
 
 		ops.addOption(OptionBuilder.withLongOpt(cmd_simu_hsq_long).withDescription("gwas simulation heritability ").hasArg().create(cmd_simu_hsq));
 
-		ops.addOption(OptionBuilder.withLongOpt(cmd_simu_qt_long).withDescription("gwas simulate quantitative traits ").create(cmd_simu_qt));
+		ops.addOption(OptionBuilder.withLongOpt(cmd_simu_qt_long).withDescription("gwas simulate quantitative traits ").hasArg().create(cmd_simu_qt));
+
+		ops.addOption(OptionBuilder.withLongOpt(cmd_simu_order_long).withDescription("order SNP effects ascendingly ").create(cmd_simu_order));
 
 		ops.addOption(OptionBuilder.withLongOpt(cmd_simu_cc_long).withDescription("gwas simulate case-control ").hasArgs(2).create(cmd_simu_cc));
 
@@ -487,12 +501,11 @@ public class Parameter {
 		ops.addOption(OptionBuilder.withLongOpt(cmd_nontrans_seed_long).withDescription("gwas prevalence of the binary trait ").hasArg().create(cmd_nontrans_seed));
 		
 //simulation polygenic model
-		ops.addOption(OptionBuilder.withLongOpt(cmd_simu_poly_qt_long).withDescription("polygenic model simulation for quantitative traits ").create(cmd_simu_poly_qt));
-
-		ops.addOption(OptionBuilder.withLongOpt(cmd_simu_poly_cc_long).withDescription("polygenic model simulation for case-control sample ").create(cmd_simu_poly_cc));
 
 		ops.addOption(OptionBuilder.withLongOpt(cmd_poly_loci_long).withDescription("number of polygenic loci, defualt= " + polyLoci).hasArg().create(cmd_poly_loci));
 
+		ops.addOption(OptionBuilder.withLongOpt(cmd_poly_loci_null_long).withDescription("number of null polygenic loci, defualt= " + polyLoci).hasArg().create(cmd_poly_loci_null));
+		
 		ops.addOption(OptionBuilder.withLongOpt(cmd_poly_LD_long).withDescription("LD (correlation), defualt= " + polyLD).hasArg().create(cmd_poly_LD));
 
 		ops.addOption(OptionBuilder.withLongOpt(cmd_poly_U_long).withDescription("polygenic model has Uniform Effect? " + polyU).create(cmd_poly_U));
@@ -500,6 +513,8 @@ public class Parameter {
 //pop stat
 		ops.addOption(OptionBuilder.withDescription("calculate MAF frequency ").create(cmd_freq));
 		ops.addOption(OptionBuilder.withLongOpt(cmd_geno_freq_long).withDescription("calculate genotype frequency ").create(cmd_geno_freq));
+
+		ops.addOption(OptionBuilder.withDescription("calculate fst ").hasArg().create(cmd_fst));
 
 //snp selection
 		ops.addOption(OptionBuilder.withDescription("select chromosomes").hasArgs().create(cmd_chr));
@@ -542,8 +557,6 @@ public class Parameter {
 		ops.addOption(OptionBuilder.withLongOpt(cmd_q_score_range_long).withDescription("q score range").hasArg().create(cmd_q_score_range));
 
 //haseman-elston regression
-		ops.addOption(OptionBuilder.withDescription("haseman-elston regression ").create(cmd_he));
-
 		ops.addOption(OptionBuilder.withDescription("grm ").hasArg().create(cmd_grm));
 
 		ops.addOption(OptionBuilder.withDescription("pheno ").hasArg().create(cmd_pheno));
@@ -551,6 +564,8 @@ public class Parameter {
 		ops.addOption(OptionBuilder.withLongOpt(cmd_mpheno).withDescription("pheno number " + cmd_mpheno).hasArg().withArgName("index").create(cmd_mpheno));
 
 		ops.addOption(OptionBuilder.withDescription("reverse ").create(cmd_reverse));
+
+		ops.addOption(OptionBuilder.withDescription("scale ").create(cmd_scale));
 
 		ops.addOption(OptionBuilder.withLongOpt(cmd_he_sd_long).withDescription("phenotype is coded as squared difference").create(cmd_he_sd));
 
@@ -753,13 +768,17 @@ public class Parameter {
 //pop stat
 		if (cl.hasOption(cmd_freq) ) {
 			sumStatFlag = true;
-			sumStatOption[freq] = true;
-			sumStatOption[geno_freq] = false;
+			freqFlag = true;
 		}
 		if (cl.hasOption(cmd_geno_freq)) {
 			sumStatFlag = true;
-			sumStatOption[freq] = false;
-			sumStatOption[geno_freq] = true;
+			genoFreqFlag = true;
+		}
+		if (cl.hasOption(cmd_fst)) {
+			sumStatFlag = true;
+			fstFlag = true;
+			fst_file = cl.getOptionValue(cmd_fst);
+			exists(fst_file);
 		}
 
 //merge 
@@ -844,6 +863,9 @@ public class Parameter {
 		if (cl.hasOption(cmd_simu_qt)) {
 			simuType[sm_qt] = false;
 			simuType[sm_cc] = true;
+			simupolyQTFlag = true;
+			
+			poly_sample_QT = Integer.parseInt(cl.getOptionValue(cmd_simu_qt));
 		}
 
 		if (cl.hasOption(cmd_simu_cc)) {
@@ -853,6 +875,11 @@ public class Parameter {
 			String[] s = cl.getOptionValues(cmd_simu_cc);
 			simuCC[0] = Integer.parseInt(s[0]);
 			simuCC[1] = Integer.parseInt(s[1]);
+			simupolyCCFlag = true;
+		}
+
+		if (cl.hasOption(cmd_simu_order)) {
+			simuOrderFlag = true;
 		}
 
 		if (cl.hasOption(cmd_simu_seed)) {
@@ -896,16 +923,12 @@ public class Parameter {
 
 //simulation polygenic
 
-		if (cl.hasOption(cmd_simu_poly_qt)) {
-			simupolyQTFlag = true;
-		}
-
-		if (cl.hasOption(cmd_simu_poly_cc)) {
-			simupolyCCFlag = true;
-		}
-
 		if (cl.hasOption(cmd_poly_loci)) {
 			polyLoci = Integer.parseInt(cl.getOptionValue(cmd_poly_loci));
+		}
+
+		if (cl.hasOption(cmd_poly_loci_null)) {
+			polyLociNull = Integer.parseInt(cl.getOptionValue(cmd_poly_loci_null));
 		}
 
 		if(cl.hasOption(cmd_poly_LD)) {
@@ -954,9 +977,6 @@ public class Parameter {
 		}
 
 //haseman-elston regression
-		if (cl.hasOption(cmd_he)) {
-			heFlag = true;
-		}
 
 		if (cl.hasOption(cmd_grm)) {
 			StringBuilder sb1 = new StringBuilder(cl.getOptionValue(cmd_grm));
@@ -981,19 +1001,26 @@ public class Parameter {
 			reverse = true;
 		}
 
+		if (cl.hasOption(cmd_scale)) {
+			scale = true;
+		}
+
 		if (cl.hasOption(cmd_he_sd)) {
+			heFlag = true;
 			heType[he_sd] = true;
 			heType[he_ss] = false;
 			heType[he_cp] = false;
 		}
 
 		if (cl.hasOption(cmd_he_ss)) {
+			heFlag = true;
 			heType[he_sd] = false;
 			heType[he_ss] = true;
 			heType[he_cp] = false;
 		}
 
 		if (cl.hasOption(cmd_he_cp)) {
+			heFlag = true;
 			heType[he_sd] = false;
 			heType[he_ss] = false;
 			heType[he_cp] = true;

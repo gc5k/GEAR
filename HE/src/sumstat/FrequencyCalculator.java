@@ -146,19 +146,19 @@ public class FrequencyCalculator {
 		NumberFormat formatter = new DecimalFormat(".###E0");
 
 		StringBuffer sb = new StringBuffer();
-		if(par.sumStatOption[par.freq]) {
-			sb.append("chr\tsnp\tA1\tA2\tfrq(A1)\tfrq(A2)\tNChr");
+		if(par.freqFlag) {
+			sb.append("chr\tsnp\tA1\tA2\tfrq(A1)\tfrq(A2)\tMiss\tNChr");
 		} else {
-			sb.append("chr\tsnp\tA1\tA2\tfrq(A1A1)\tfrq(A1A2)\tfrq(A2A2)\tNChr\tp(Fisher)");
+			sb.append("chr\tsnp\tA1\tA2\tfrq(A1A1)\tfrq(A1A2)\tfrq(A2A2)\tMiss\tNChr\tp(Fisher)");
 		}
 		sb.append(System.getProperty("line.separator"));
 		for (int i = 0; i < allelefreq.length; i++) {
 			SNP snp = snpMap.getSNP(i);
 			sb.append(snp.getChromosome() + "\t" + snp.getName() + "\t" + snp.getRefAllele() + "\t"  + snp.getSecAllele() + "\t");
-			if (par.sumStatOption[par.freq]) {
+			if (par.freqFlag) {
 				sb.append(String.format("%.3f", allelefreq[i][0]) + "\t" + String.format("%.3f", allelefreq[i][1]) + "\t"
-					+ String.format("%.3f", allelefreq[i][2]) + "\t" + N[i][3]);
-			} else if (par.sumStatOption[par.geno_freq]){
+					+ String.format("%.3f", allelefreq[i][2]) + "\t" + N[i][3] * 2);
+			} else if (par.genoFreqFlag){
 				sb.append(String.format("%.3f", genotypefreq[i][0]) + "\t"
 					+ String.format("%.3f", genotypefreq[i][1]) + "\t" + String.format("%.3f", genotypefreq[i][2]) + "\t"
 					+ N[i][3] * 2 + "\t" + hw[i][0]);

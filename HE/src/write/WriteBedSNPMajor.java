@@ -20,9 +20,9 @@ import family.plink.PLINKParser;
 import family.qc.rowqc.SampleFilter;
 
 public class WriteBedSNPMajor {
-	private byte byte1 = 108;
-	private byte byte2 = 27;
-	private byte byte3 = 1;
+	public static byte byte1 = 108;
+	public static byte byte2 = 27;
+	public static byte byte3 = 1;
 	
 	private ArrayList<PersonIndex> PersonTable;
 	private DataOutputStream os = null;

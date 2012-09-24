@@ -23,11 +23,12 @@ public class NonTransmitted {
 
 	public NonTransmitted(Parameter p) {
 		System.err.print(Parameter.version);
+		System.err.println("--nontrans procedure.");
 		par = p;
 
-		if (Parameter.fileOption) {
-			pp = new PLINKParser(Parameter.pedfile, Parameter.mapfile);
-		}
+//		if (Parameter.fileOption) {
+//			pp = new PLINKParser(Parameter.pedfile, Parameter.mapfile);
+//		}
 		if (Parameter.bfileOption) {
 			pp = new PLINKBinaryParser(Parameter.bedfile, Parameter.bimfile,
 					Parameter.famfile);
@@ -50,6 +51,7 @@ public class NonTransmitted {
 		ArrayList<PersonIndex> sample = ajhg2008.getSample();
 		ArrayList<PersonIndex> ps = NewIt.newArrayList();
 
+		System.err.println("Sample size: " + sample.size());
 		for (Iterator<PersonIndex> e = sample.iterator(); e.hasNext();) {
 			PersonIndex pi = e.next();
 			if (pi.isPseudo()) {

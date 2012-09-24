@@ -147,7 +147,7 @@ public class HERegression {
 			if (flag[i]) Len++;
 		dim = Len*(Len-1)/2;
 		
-		// ************************************normalization
+		// ************************************standardising
 		double[] ss = new double[y[0].length-1];
 		double[] ssx = new double[y[0].length-1];
 		for (int i = 0; i < flag.length; i++) {
@@ -162,10 +162,14 @@ public class HERegression {
 			ss[i] /= Len;
 			sd[i] = Math.sqrt((ssx[i] - Len * ss[i] * ss[i])/(Len-1));
 		}
-		for (int i = 0; i < flag.length; i++) {
-			if(!flag[i]) continue;
-			for (int j = 1; j < y[i].length; j++) {
-				y[i][j] = (y[i][j] - ss[j-1])/sd[j-1];
+
+		if (p.scale) {
+			System.out.println("standardising phentoype.");
+			for (int i = 0; i < flag.length; i++) {
+				if(!flag[i]) continue;
+				for (int j = 1; j < y[i].length; j++) {
+					y[i][j] = (y[i][j] - ss[j-1])/sd[j-1];
+				}
 			}
 		}
 
@@ -311,7 +315,14 @@ public class HERegression {
 				/ (dim - mpheno.length - 1);
 		RealMatrix v = Mat_XtX_Inv.scalarMultiply(mse);
 
-
+		sb.append("HE mode: ");
+		if (heType[Parameter.he_sd]) {
+			sb.append("squared difference (yi-yj)^2\n");
+		} else if(heType[Parameter.he_ss]) {
+			sb.append("squared sum (yi+yj)^2\n");
+		} else if(heType[Parameter.he_cp]) {
+			sb.append("cross-product [yi-E(y)][yj-E(y)]\n");
+		}
 		sb.append("grm: " + grmFile + "\n");
 		sb.append("grm id: " + grmID + "\n");
 		sb.append("keep list: " + keepFile + "\n");
@@ -348,7 +359,7 @@ public class HERegression {
 			double v_b0 = v.getEntry(0, 0);
 			double v_b1 = v.getEntry(1, 1);
 
-			double v_ho = (u_b1/u_b0) * (u_b1/u_b0) * (v_b0/(u_b0 * u_b0) + v_b1/(u_b1 * u_b1));
+			double v_ho = (u_b1/u_b0) * (u_b1/u_b0) * (v_b0/(u_b0 * u_b0) + v_b1/(u_b1 * u_b1) - 2*v.getEntry(0, 1)/(u_b0*u_b1));
 			if (heType[Parameter.he_cp]) {
 				v_ho = Math.sqrt(v_b1);
 			}
@@ -381,9 +392,12 @@ public class HERegression {
 			sb.append("\n");
 		}
 		System.out.println(sb);
-		
+
 		if(output != null) {
-			File of = new File(output);
+			StringBuilder fsb = new StringBuilder();
+			fsb.append(output);
+			fsb.append(".he");
+			File of = new File(fsb.toString());
 			PrintWriter pw = null;
 			try {
 				pw = new PrintWriter(of);

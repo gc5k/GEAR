@@ -35,6 +35,7 @@ public class MaCHDosageProfile {
 	private boolean isQ = false;
 
 	public MaCHDosageProfile (Parameter p) {
+		System.err.println("generating risk profiles for mach dosage.");
 		par = p;
 		initial();
 	}
@@ -218,9 +219,11 @@ public class MaCHDosageProfile {
 				String refA = di.getRefAllele();
 				String refB = di.getSecAllele();
 
-				if(di.isATGCLocus() && !par.keepATGCFlag) {
+				if(di.isATGCLocus()) {
 					ATGCLocus++;
-					continue;
+					if (!par.keepATGCFlag) {
+						continue;
+					}
 				}
 
 				ScoreUnit su = null;
@@ -267,7 +270,7 @@ public class MaCHDosageProfile {
 					} else {
 						continue;
 					}
-						
+
 					for (int l = 0; l < qsL2Flag.length; l++) {
 						if (!qsL2Flag[l]) continue;
 						rs[k][l] += locusScore;
@@ -302,14 +305,20 @@ public class MaCHDosageProfile {
 			}
 		}
 
-		if (!par.keepATGCFlag) {
-			if (ATGCLocus > 1) {
-				System.out.println(ATGCLocus + " ATGC loci were removed.");
+		if (ATGCLocus > 1) {
+			if (par.keepATGCFlag) {
+				System.out.println(ATGCLocus + " ATGC loci were detected.");
 			} else {
-				System.out.println(ATGCLocus + " ATGC locus was removed.");
+				System.out.println(ATGCLocus + " ATGC loci were removed.");
+			}
+		} else {
+			if (par.keepATGCFlag) {
+				System.out.println(ATGCLocus + " ATGC Locus were detected.");
+			} else {
+				System.out.println(ATGCLocus + " ATGC locus was removed.");				
 			}
 		}
-		
+
 		System.out.println("In total " + sumSNPMapped + " SNPs mapped to the score file.");
 
 		for (int i = 0; i < CCSNP.length; i++) {
@@ -362,9 +371,11 @@ public class MaCHDosageProfile {
 				String refA = di.getRefAllele();
 				String refB = di.getSecAllele();
 				
-				if(di.isATGCLocus() && !par.keepATGCFlag) {
+				if(di.isATGCLocus()) {
 					ATGCLocus++;
-					continue;
+					if (par.keepATGCFlag) {
+						continue;
+					}
 				}
 
 				ScoreUnit su = null;
@@ -412,11 +423,17 @@ public class MaCHDosageProfile {
 			}
 		}
 
-		if (!par.keepATGCFlag) {
-			if (ATGCLocus > 1) {
-				System.out.println(ATGCLocus + " loci were removed.");
+		if (ATGCLocus > 1) {
+			if (par.keepATGCFlag) {
+				System.out.println(ATGCLocus + " ATGC loci were detected.");
 			} else {
-				System.out.println(ATGCLocus + " locus was removed.");
+				System.out.println(ATGCLocus + " ATGC loci were removed.");
+			}
+		} else {
+			if (par.keepATGCFlag) {
+				System.out.println(ATGCLocus + " ATGC Locus were detected.");
+			} else {
+				System.out.println(ATGCLocus + " ATGC locus was removed.");				
 			}
 		}
 		System.out.println("\nIn total " + CCSNP + " SNPs mapped to the score file, and " + CC + " SNPs had scores.");
