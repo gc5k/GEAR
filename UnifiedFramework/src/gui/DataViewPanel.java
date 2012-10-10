@@ -40,7 +40,7 @@ public class DataViewPanel extends JScrollPane {
 		int index = 0;
 		int colCount = 0;
 		while ((line = br.readLine()) != null) {
-			String[] cells = line.split("\t");
+			String[] cells = line.split("\\s");
 			colCount = Math.max(colCount, cells.length);
 			List<String> list = Arrays.asList(cells);
 			Vector dataRow = new Vector(list);
