@@ -13,24 +13,32 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.ItemEvent;
 import java.awt.event.ItemListener;
+import java.io.File;
 import java.util.Enumeration;
 
 import javax.swing.BorderFactory;
 import javax.swing.JButton;
 import javax.swing.JCheckBox;
 import javax.swing.JDialog;
+import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JTabbedPane;
 import javax.swing.SwingUtilities;
 import javax.swing.UIManager;
 import javax.swing.plaf.FontUIResource;
 
+import org.apache.commons.lang3.ArrayUtils;
+
 public class DataLoadDialog extends JDialog {
 
 	//
 
-	JCheckBox checkBox;
-	DataPanel dataPanel_ap;
+	private DataLoadPanel dataPanel_bi;
+	private DataLoadPanel dataPanel_si;
+	private DataLoadPanel dataPanel_ap;
+	private JCheckBox checkBox;
+
+	private File[] datafiles;
 
 	//
 
@@ -47,12 +55,12 @@ public class DataLoadDialog extends JDialog {
 		JTabbedPane tabbedPane = new JTabbedPane();
 		tabbedPane.setBorder(BorderFactory.createRaisedBevelBorder());
 		//
-		DataPanel dataPanel_bi = new DataPanel();
+		dataPanel_bi = new DataLoadPanel();
 		dataPanel_bi.setFileFormatList(new String[] { "bed", "bim", "fam" });
 		dataPanel_bi.ini();
 		tabbedPane.add("Binary Input", dataPanel_bi);
 		//
-		DataPanel dataPanel_si = new DataPanel();
+		dataPanel_si = new DataLoadPanel();
 		dataPanel_si.setFileFormatList(new String[] { "ped", "map" });
 		dataPanel_si.ini();
 		tabbedPane.add("Standard Input", dataPanel_si);
@@ -73,7 +81,7 @@ public class DataLoadDialog extends JDialog {
 				0));
 		panel_ap.add(panel_tmp, BorderLayout.NORTH);
 		//
-		dataPanel_ap = new DataPanel();
+		dataPanel_ap = new DataLoadPanel();
 		dataPanel_ap.setFileFormatList(new String[] { "phe" });
 		dataPanel_ap.ini();
 		panel_ap.add(dataPanel_ap, BorderLayout.CENTER);
@@ -89,7 +97,7 @@ public class DataLoadDialog extends JDialog {
 		button.setPreferredSize(new Dimension(120, 30));
 		button.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				DataLoadDialog.this.dispose();
+				DataLoadDialog.this.okFiles();
 			}
 		});
 		panel_c.add(button);
@@ -110,6 +118,26 @@ public class DataLoadDialog extends JDialog {
 
 	private void checkBox_itemStateChanged(ItemEvent e) {
 		dataPanel_ap.setEnabled_2(checkBox.isSelected());
+	}
+
+	private void okFiles() {
+		File[] files = dataPanel_bi.getFiles();
+		if (!ArrayUtils.isEmpty(files)) {
+			this.datafiles = files;
+		}
+		files = dataPanel_si.getFiles();
+		if (!ArrayUtils.isEmpty(files)) {
+			this.datafiles = files;
+		}
+		if (ArrayUtils.isEmpty(this.datafiles)) {
+			JOptionPane.showMessageDialog(this, "No data input!", "Error", JOptionPane.ERROR_MESSAGE);
+			return;
+		}
+		dispose();
+	}
+
+	public File[] getFiles() {
+		return datafiles;
 	}
 
 	public static void main(String[] args) {

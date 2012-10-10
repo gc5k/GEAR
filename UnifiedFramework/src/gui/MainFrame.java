@@ -9,6 +9,7 @@ import javax.swing.JFrame;
 import javax.swing.JMenu;
 import javax.swing.JMenuBar;
 import javax.swing.JMenuItem;
+import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JTabbedPane;
 import javax.swing.SwingUtilities;
@@ -19,7 +20,8 @@ public class MainFrame extends JFrame {
 
 	//
 
-	private DataLoadDialog dataLoadFrame;
+	private DataLoadDialog dataLoadDialog;
+	private DataViewDialog dataViewDialog;
 
 	//
 
@@ -73,6 +75,11 @@ public class MainFrame extends JFrame {
 		menu_data.add(menuItem_md);
 		menu_data.addSeparator();
 		JMenuItem menuItem_vd = new JMenuItem("View");
+		menuItem_vd.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				MainFrame.this.actionPerformed_dataview();
+			}
+		});
 		menu_data.add(menuItem_vd);
 		JMenuItem menuItem_dds = new JMenuItem("Define Data Format");
 		menu_data.add(menuItem_dds);
@@ -121,17 +128,29 @@ public class MainFrame extends JFrame {
 	}
 
 	private void actionPerformed_dataload() {
-		if (dataLoadFrame == null) {
-			dataLoadFrame = new DataLoadDialog(this);
+		if (dataLoadDialog == null) {
+			dataLoadDialog = new DataLoadDialog(this);
 		}
-		dataLoadFrame.display();
+		dataLoadDialog.display();
 	}
 
 	private void actionPerformed_dataoutput() {
-		if (dataLoadFrame == null) {
-			dataLoadFrame = new DataLoadDialog(this);
+		if (dataLoadDialog == null) {
+			dataLoadDialog = new DataLoadDialog(this);
 		}
-		dataLoadFrame.display();
+		dataLoadDialog.display();
+	}
+
+	private void actionPerformed_dataview() {
+		if (dataLoadDialog == null) {
+			JOptionPane.showMessageDialog(this, "No data input!", "Error", JOptionPane.ERROR_MESSAGE);
+			return;
+		}
+		if (dataViewDialog == null) {
+			dataViewDialog = new DataViewDialog(this);
+		}
+		dataViewDialog.ini(dataLoadDialog.getFiles());
+		dataViewDialog.display();
 	}
 
 	private void actionPerformed_exit() {
