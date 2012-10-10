@@ -22,7 +22,7 @@ import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JTextField;
 
-public class DataPanel extends JPanel {
+public class DataLoadPanel extends JPanel {
 
 	//
 
@@ -63,7 +63,7 @@ public class DataPanel extends JPanel {
 			final int j = i;
 			fileButtonList[i].addActionListener(new ActionListener() {
 				public void actionPerformed(ActionEvent e) {
-					DataPanel.this.button_actionPerformed(e, j);
+					DataLoadPanel.this.button_actionPerformed(e, j);
 				}
 			});
 			panel_1.add(fileButtonList[i], new GridBagConstraints(2, i, 1, 1, 0.0, 1.0, GridBagConstraints.CENTER, GridBagConstraints.HORIZONTAL, new Insets(5,
@@ -77,7 +77,7 @@ public class DataPanel extends JPanel {
 		dirCheckBox = new JCheckBox();
 		dirCheckBox.addItemListener(new ItemListener() {
 			public void itemStateChanged(ItemEvent e) {
-				DataPanel.this.dirCheckBox_itemStateChanged(e);
+				DataLoadPanel.this.dirCheckBox_itemStateChanged(e);
 			}
 		});
 		dirCheckBox.setSelected(false);
@@ -91,7 +91,7 @@ public class DataPanel extends JPanel {
 		dirButton.setText("...");
 		dirButton.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				DataPanel.this.button_actionPerformed(e, fileFormatList.length);
+				DataLoadPanel.this.button_actionPerformed(e, fileFormatList.length);
 			}
 		});
 		panel_qf.add(dirButton, new GridBagConstraints(2, 0, 1, 1, 0.0, 1.0, GridBagConstraints.CENTER, GridBagConstraints.BOTH, new Insets(5, 5, 5, 5), 0, 0));
@@ -100,7 +100,7 @@ public class DataPanel extends JPanel {
 		dirComboBox.setEditable(false);
 		dirComboBox.addItemListener(new ItemListener() {
 			public void itemStateChanged(ItemEvent e) {
-				DataPanel.this.dirComboBox_itemStateChanged(e);
+				DataLoadPanel.this.dirComboBox_itemStateChanged(e);
 			}
 		});
 		panel_qf.add(dirComboBox,
@@ -222,6 +222,15 @@ public class DataPanel extends JPanel {
 			}
 			setEnabled_1(false);
 		}
+	}
+
+	public File[] getFiles() {
+		for (File file : files) {
+			if (file != null) {
+				return files;
+			}
+		}
+		return null;
 	}
 
 }
