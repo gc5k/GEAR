@@ -11,17 +11,17 @@ public class Radix26 {
 			v.addElement(c);
 		}
 		Collections.reverse(v);
-		for (int j = 0; j <= v.size(); j++) {
-			if (j == v.size()) {
+		for (int i = 0; i <= v.size(); i++) {
+			if (i == v.size()) {
 				v.addElement('A');
 				break;
 			}
-			char c = v.get(j);
+			char c = v.get(i);
 			if (c == 'Z') {
-				v.setElementAt('A', j);
+				v.setElementAt('A', i);
 				continue;
 			} else {
-				v.setElementAt(++c, j);
+				v.setElementAt(++c, i);
 				break;
 			}
 		}

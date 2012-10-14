@@ -89,7 +89,4 @@ public class DataFile {
 		return new Vector[] { dataVector, headVector };
 	}
 
-	public static void main(String[] args) {
-	}
-
 }
