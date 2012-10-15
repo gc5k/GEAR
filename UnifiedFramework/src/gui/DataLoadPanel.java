@@ -26,10 +26,10 @@ public class DataLoadPanel extends JPanel {
 
 	//
 
-	private String[] fileFormatList;
+	private DataFile[] dataFiles;
 	private JTextField[] fileTextFieldList;
+	private JCheckBox[] fileCheckBoxList;
 	private JButton[] fileButtonList;
-	private File[] files;
 
 	private File dir;
 	private JCheckBox dirCheckBox;
@@ -39,11 +39,15 @@ public class DataLoadPanel extends JPanel {
 
 	//
 
-	public void setFileFormatList(String[] formatList) {
-		this.fileFormatList = formatList;
+	public void setFileFormats(String[] formatList) {
+		dataFiles = new DataFile[formatList.length];
+		for (int i = 0; i < dataFiles.length; i++) {
+			dataFiles[i] = new DataFile();
+			dataFiles[i].setFormat(formatList[i]);
+		}
 		fileTextFieldList = new JTextField[formatList.length];
+		fileCheckBoxList = new JCheckBox[formatList.length];
 		fileButtonList = new JButton[formatList.length];
-		files = new File[formatList.length];
 	}
 
 	public void ini() {
@@ -51,13 +55,17 @@ public class DataLoadPanel extends JPanel {
 		//
 		JPanel panel_1 = new JPanel();
 		panel_1.setLayout(new GridBagLayout());
-		for (int i = 0; i < this.fileFormatList.length; i++) {
-			panel_1.add(new JLabel("." + fileFormatList[i] + " file"), new GridBagConstraints(0, i, 1, 1, 0.0, 1.0, GridBagConstraints.CENTER,
+		for (int i = 0; i < dataFiles.length; i++) {
+			panel_1.add(new JLabel("." + dataFiles[i].getFormat() + " file"), new GridBagConstraints(0, i, 1, 1, 0.0, 1.0, GridBagConstraints.CENTER,
 					GridBagConstraints.BOTH, new Insets(5, 5, 5, 5), 0, 0));
 			fileTextFieldList[i] = new JTextField();
 			fileTextFieldList[i].setEditable(false);
 			panel_1.add(fileTextFieldList[i], new GridBagConstraints(1, i, 1, 1, 1.0, 1.0, GridBagConstraints.CENTER, GridBagConstraints.HORIZONTAL,
 					new Insets(5, 5, 5, 5), 0, 0));
+			fileCheckBoxList[i] = new JCheckBox();
+			fileCheckBoxList[i].setText("has header");
+			panel_1.add(fileCheckBoxList[i], new GridBagConstraints(2, i, 1, 1, 0.0, 1.0, GridBagConstraints.CENTER, GridBagConstraints.HORIZONTAL, new Insets(
+					5, 5, 5, 5), 0, 0));
 			fileButtonList[i] = new JButton();
 			fileButtonList[i].setText("Browse");
 			final int j = i;
@@ -66,7 +74,7 @@ public class DataLoadPanel extends JPanel {
 					DataLoadPanel.this.button_actionPerformed(e, j);
 				}
 			});
-			panel_1.add(fileButtonList[i], new GridBagConstraints(2, i, 1, 1, 0.0, 1.0, GridBagConstraints.CENTER, GridBagConstraints.HORIZONTAL, new Insets(5,
+			panel_1.add(fileButtonList[i], new GridBagConstraints(3, i, 1, 1, 0.0, 1.0, GridBagConstraints.CENTER, GridBagConstraints.HORIZONTAL, new Insets(5,
 					5, 5, 5), 0, 0));
 		}
 		add(panel_1, new GridBagConstraints(0, 0, 1, 1, 1.0, 0.0, GridBagConstraints.CENTER, GridBagConstraints.BOTH, new Insets(5, 5, 5, 5), 0, 0));
@@ -91,7 +99,7 @@ public class DataLoadPanel extends JPanel {
 		dirButton.setText("...");
 		dirButton.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				DataLoadPanel.this.button_actionPerformed(e, fileFormatList.length);
+				DataLoadPanel.this.button_actionPerformed(e, dataFiles.length);
 			}
 		});
 		panel_qf.add(dirButton, new GridBagConstraints(2, 0, 1, 1, 0.0, 1.0, GridBagConstraints.CENTER, GridBagConstraints.BOTH, new Insets(5, 5, 5, 5), 0, 0));
@@ -107,8 +115,6 @@ public class DataLoadPanel extends JPanel {
 				new GridBagConstraints(3, 0, 1, 1, 0.0, 1.0, GridBagConstraints.CENTER, GridBagConstraints.BOTH, new Insets(5, 5, 5, 5), 0, 0));
 		add(panel_qf, new GridBagConstraints(0, 1, 1, 1, 1.0, 0.0, GridBagConstraints.CENTER, GridBagConstraints.BOTH, new Insets(5, 5, 5, 5), 0, 0));
 		//
-		add(new JPanel(), new GridBagConstraints(0, 2, 1, 1, 1.0, 1.0, GridBagConstraints.CENTER, GridBagConstraints.BOTH, new Insets(5, 5, 5, 5), 0, 0));
-		//
 		dirCheckBox_itemStateChanged(null);
 	}
 
@@ -123,9 +129,9 @@ public class DataLoadPanel extends JPanel {
 				return fileName.startsWith(fileprefix + ".");
 			}
 		});
-		for (int i = 0; i < fileFormatList.length; i++) {
+		for (int i = 0; i < dataFiles.length; i++) {
 			for (int j = 0; j < files.length; j++) {
-				if (files[j].getName().toLowerCase().endsWith("." + fileFormatList[i].toLowerCase())) {
+				if (files[j].getName().toLowerCase().endsWith("." + dataFiles[i].getFormat().toLowerCase())) {
 					setFile(files[j], i);
 				}
 			}
@@ -133,7 +139,7 @@ public class DataLoadPanel extends JPanel {
 	}
 
 	private void button_actionPerformed(ActionEvent e, int id) {
-		if (-1 < id && id < fileFormatList.length) {
+		if (-1 < id && id < dataFiles.length) {
 			JFileChooser fileChooser = new JFileChooser();
 			fileChooser.setFileSelectionMode(JFileChooser.FILES_ONLY);
 			fileChooser.setMultiSelectionEnabled(false);
@@ -142,7 +148,7 @@ public class DataLoadPanel extends JPanel {
 			}
 			return;
 		}
-		if (id == fileFormatList.length) {
+		if (id == dataFiles.length) {
 			JFileChooser fileChooser = new JFileChooser();
 			fileChooser.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
 			fileChooser.setMultiSelectionEnabled(false);
@@ -150,8 +156,8 @@ public class DataLoadPanel extends JPanel {
 				setDir(fileChooser.getSelectedFile());
 				File[] files = dir.listFiles(new FilenameFilter() {
 					public boolean accept(File dir, String fileName) {
-						for (String format : fileFormatList) {
-							if (fileName.toLowerCase().endsWith("." + format.toLowerCase())) {
+						for (DataFile dataFile : dataFiles) {
+							if (fileName.toLowerCase().endsWith("." + dataFile.getFormat().toLowerCase())) {
 								return true;
 							}
 						}
@@ -181,18 +187,18 @@ public class DataLoadPanel extends JPanel {
 
 	private void setFile(File file, int id) {
 		if (file == null) {
-			files[id] = null;
+			dataFiles[id].setFile(null);
 			fileTextFieldList[id].setText(null);
 			fileTextFieldList[id].setToolTipText(null);
 		} else {
-			files[id] = file;
+			dataFiles[id].setFile(file);
 			fileTextFieldList[id].setText(file.getAbsolutePath());
 			fileTextFieldList[id].setToolTipText(file.getAbsolutePath());
 		}
 	}
 
 	private void clearFiles() {
-		for (int i = 0; i < fileFormatList.length; i++) {
+		for (int i = 0; i < dataFiles.length; i++) {
 			setFile(null, i);
 		}
 	}
@@ -210,27 +216,22 @@ public class DataLoadPanel extends JPanel {
 	}
 
 	void setEnabled_2(boolean enabled) {
-		for (int i = 0; i < fileFormatList.length; i++) {
+		for (int i = 0; i < dataFiles.length; i++) {
 			fileTextFieldList[i].setEnabled(enabled);
 		}
 		dirCheckBox.setEnabled(enabled);
 		if (enabled) {
 			dirCheckBox_itemStateChanged(null);
 		} else {
-			for (int i = 0; i < fileFormatList.length; i++) {
+			for (int i = 0; i < dataFiles.length; i++) {
 				fileButtonList[i].setEnabled(false);
 			}
 			setEnabled_1(false);
 		}
 	}
 
-	public File[] getFiles() {
-		for (File file : files) {
-			if (file != null) {
-				return files;
-			}
-		}
-		return null;
+	public DataFile[] getDataFiles() {
+		return dataFiles;
 	}
 
 }

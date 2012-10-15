@@ -13,7 +13,6 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.ItemEvent;
 import java.awt.event.ItemListener;
-import java.io.File;
 import java.util.Enumeration;
 
 import javax.swing.BorderFactory;
@@ -36,9 +35,9 @@ public class DataLoadDialog extends JDialog {
 	private DataLoadPanel dataPanel_bi;
 	private DataLoadPanel dataPanel_si;
 	private DataLoadPanel dataPanel_ap;
-	private JCheckBox checkBox;
+	private JCheckBox useAP_checkBox;
 
-	private File[] datafiles;
+	private DataFile[][] dataFiles = new DataFile[2][];
 
 	//
 
@@ -56,12 +55,12 @@ public class DataLoadDialog extends JDialog {
 		tabbedPane.setBorder(BorderFactory.createRaisedBevelBorder());
 		//
 		dataPanel_bi = new DataLoadPanel();
-		dataPanel_bi.setFileFormatList(new String[] { "bed", "bim", "fam" });
+		dataPanel_bi.setFileFormats(new String[] { "bed", "bim", "fam" });
 		dataPanel_bi.ini();
 		tabbedPane.add("Binary Input", dataPanel_bi);
 		//
 		dataPanel_si = new DataLoadPanel();
-		dataPanel_si.setFileFormatList(new String[] { "ped", "map" });
+		dataPanel_si.setFileFormats(new String[] { "ped", "map" });
 		dataPanel_si.ini();
 		tabbedPane.add("Standard Input", dataPanel_si);
 		//
@@ -69,20 +68,19 @@ public class DataLoadDialog extends JDialog {
 		panel_ap.setLayout(new BorderLayout());
 		JPanel panel_tmp = new JPanel();
 		panel_tmp.setLayout(new GridBagLayout());
-		checkBox = new JCheckBox();
-		checkBox.setText("Use Alternative Phenotype");
-		checkBox.addItemListener(new ItemListener() {
+		useAP_checkBox = new JCheckBox();
+		useAP_checkBox.setText("Use Alternative Phenotype");
+		useAP_checkBox.addItemListener(new ItemListener() {
 			public void itemStateChanged(ItemEvent e) {
 				DataLoadDialog.this.checkBox_itemStateChanged(e);
 			}
 		});
-		panel_tmp.add(checkBox, new GridBagConstraints(0, 0, 1, 1, 0.0, 1.0, GridBagConstraints.CENTER, GridBagConstraints.BOTH, new Insets(5, 5, 5, 5), 0, 0));
-		panel_tmp.add(new JPanel(), new GridBagConstraints(1, 0, 1, 1, 1.0, 1.0, GridBagConstraints.CENTER, GridBagConstraints.BOTH, new Insets(5, 5, 5, 5), 0,
-				0));
+		panel_tmp.add(useAP_checkBox, new GridBagConstraints(0, 0, 1, 1, 0.0, 1.0, GridBagConstraints.CENTER, GridBagConstraints.BOTH, new Insets(5, 5, 5, 5),
+				0, 0));
 		panel_ap.add(panel_tmp, BorderLayout.NORTH);
 		//
 		dataPanel_ap = new DataLoadPanel();
-		dataPanel_ap.setFileFormatList(new String[] { "phe" });
+		dataPanel_ap.setFileFormats(new String[] { "phe" });
 		dataPanel_ap.ini();
 		panel_ap.add(dataPanel_ap, BorderLayout.CENTER);
 		//
@@ -91,7 +89,7 @@ public class DataLoadDialog extends JDialog {
 		container.add(tabbedPane, BorderLayout.NORTH);
 		//
 		JPanel panel_c = new JPanel();
-		panel_c.setLayout(new FlowLayout(FlowLayout.CENTER, 5, 25));
+		panel_c.setLayout(new FlowLayout(FlowLayout.CENTER, 5, 30));
 		JButton button = new JButton();
 		button.setText("OK");
 		button.setPreferredSize(new Dimension(120, 30));
@@ -117,27 +115,31 @@ public class DataLoadDialog extends JDialog {
 	}
 
 	private void checkBox_itemStateChanged(ItemEvent e) {
-		dataPanel_ap.setEnabled_2(checkBox.isSelected());
+		dataPanel_ap.setEnabled_2(useAP_checkBox.isSelected());
 	}
 
 	private void okFiles() {
-		File[] files = dataPanel_bi.getFiles();
-		if (!ArrayUtils.isEmpty(files)) {
-			this.datafiles = files;
+		DataFile[] files_bi = dataPanel_bi.getDataFiles();
+		if (!ArrayUtils.isEmpty(files_bi)) {
+			dataFiles[0] = files_bi;
 		}
-		files = dataPanel_si.getFiles();
-		if (!ArrayUtils.isEmpty(files)) {
-			this.datafiles = files;
+		DataFile[] files_si = dataPanel_si.getDataFiles();
+		if (!ArrayUtils.isEmpty(files_si)) {
+			dataFiles[0] = files_si;
 		}
-		if (ArrayUtils.isEmpty(this.datafiles)) {
+		DataFile[] files_ap = dataPanel_ap.getDataFiles();
+		if (!ArrayUtils.isEmpty(files_ap)) {
+			dataFiles[1] = files_ap;
+		}
+		if (ArrayUtils.isEmpty(dataFiles[0]) && ArrayUtils.isEmpty(dataFiles[1])) {
 			JOptionPane.showMessageDialog(this, "No data input!", "Error", JOptionPane.ERROR_MESSAGE);
 			return;
 		}
 		dispose();
 	}
 
-	public File[] getFiles() {
-		return datafiles;
+	public DataFile[][] getDataFiles() {
+		return dataFiles;
 	}
 
 	public static void main(String[] args) {
