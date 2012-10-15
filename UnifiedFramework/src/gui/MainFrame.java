@@ -146,9 +146,7 @@ public class MainFrame extends JFrame {
 			JOptionPane.showMessageDialog(this, "No data input!", "Error", JOptionPane.ERROR_MESSAGE);
 			return;
 		}
-		if (dataViewDialog == null) {
-			dataViewDialog = new DataViewDialog(this);
-		}
+		dataViewDialog = new DataViewDialog(this);
 		dataViewDialog.ini(dataLoadDialog.getDataFiles());
 		dataViewDialog.display();
 	}

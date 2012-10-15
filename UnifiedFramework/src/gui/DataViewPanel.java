@@ -11,7 +11,6 @@ public class DataViewPanel extends JScrollPane {
 
 	//
 
-	private DefaultTableModel tableModel;
 	private JTable table;
 
 	//
@@ -21,15 +20,16 @@ public class DataViewPanel extends JScrollPane {
 	}
 
 	void ini() {
-		tableModel = new DataViewTableModel();
-		table = new JTable(tableModel);
+		table = new JTable();
 		table.getTableHeader().setReorderingAllowed(false);
 		setViewportView(table);
 	}
 
 	void setDataFile(DataFile dataFile) throws IOException {
 		Vector[] vs = dataFile.getData(100);
+		DefaultTableModel tableModel = new DataViewTableModel();
 		tableModel.setDataVector(vs[0], vs[1]);
+		table.setModel(tableModel);
 	}
 
 }
