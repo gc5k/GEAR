@@ -234,6 +234,9 @@ public class DataLoadPanel extends JPanel {
 	}
 
 	public DataFile[] getDataFiles() {
+		for (int i = 0; i < fileCheckBoxList.length; i++) {
+			dataFiles[i].setHasHeader(fileCheckBoxList[i].isSelected());
+		}
 		return dataFiles;
 	}
 

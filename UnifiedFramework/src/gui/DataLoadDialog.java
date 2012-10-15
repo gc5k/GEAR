@@ -89,7 +89,7 @@ public class DataLoadDialog extends JDialog {
 		container.add(tabbedPane, BorderLayout.NORTH);
 		//
 		JPanel panel_c = new JPanel();
-		panel_c.setLayout(new FlowLayout(FlowLayout.CENTER, 5, 30));
+		panel_c.setLayout(new FlowLayout(FlowLayout.CENTER, 5, 24));
 		JButton button = new JButton();
 		button.setText("OK");
 		button.setPreferredSize(new Dimension(120, 30));
