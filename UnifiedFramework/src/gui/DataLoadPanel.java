@@ -240,4 +240,13 @@ public class DataLoadPanel extends JPanel {
 		return dataFiles;
 	}
 
+	public boolean hasFile() {
+		for (DataFile dataFile : dataFiles) {
+			if (dataFile.hasFile()) {
+				return true;
+			}
+		}
+		return false;
+	}
+
 }

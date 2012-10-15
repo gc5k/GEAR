@@ -1,11 +1,6 @@
 package gui;
 
-import java.io.BufferedReader;
-import java.io.File;
-import java.io.FileReader;
 import java.io.IOException;
-import java.util.Arrays;
-import java.util.List;
 import java.util.Vector;
 
 import javax.swing.JScrollPane;
@@ -32,28 +27,9 @@ public class DataViewPanel extends JScrollPane {
 		setViewportView(table);
 	}
 
-	void setFile(File file) throws IOException {
-		Vector data = new Vector();
-		Vector cols = new Vector();
-		BufferedReader br = new BufferedReader(new FileReader(file));
-		String line;
-		int index = 0;
-		int colCount = 0;
-		while ((line = br.readLine()) != null) {
-			String[] cells = line.split("\\s");
-			colCount = Math.max(colCount, cells.length);
-			List<String> list = Arrays.asList(cells);
-			Vector dataRow = new Vector(list);
-			data.addElement(dataRow);
-			if (++index == 100) {
-				break;
-			}
-		}
-		br.close();
-		for (int i = 0; i < colCount; i++) {
-			cols.addElement(String.valueOf(i + 1));
-		}
-		tableModel.setDataVector(data, cols);
+	void setDataFile(DataFile dataFile) throws IOException {
+		Vector[] vs = dataFile.getData(100);
+		tableModel.setDataVector(vs[0], vs[1]);
 	}
 
 }

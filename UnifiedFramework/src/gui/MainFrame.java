@@ -142,14 +142,14 @@ public class MainFrame extends JFrame {
 	}
 
 	private void actionPerformed_dataview() {
-		if (dataLoadDialog == null) {
+		if (dataLoadDialog == null || !dataLoadDialog.hasFile()) {
 			JOptionPane.showMessageDialog(this, "No data input!", "Error", JOptionPane.ERROR_MESSAGE);
 			return;
 		}
 		if (dataViewDialog == null) {
 			dataViewDialog = new DataViewDialog(this);
 		}
-		dataViewDialog.ini(dataLoadDialog.getFiles());
+		dataViewDialog.ini(dataLoadDialog.getDataFiles());
 		dataViewDialog.display();
 	}
 

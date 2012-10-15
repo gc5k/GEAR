@@ -26,8 +26,6 @@ import javax.swing.SwingUtilities;
 import javax.swing.UIManager;
 import javax.swing.plaf.FontUIResource;
 
-import org.apache.commons.lang3.ArrayUtils;
-
 public class DataLoadDialog extends JDialog {
 
 	//
@@ -119,27 +117,28 @@ public class DataLoadDialog extends JDialog {
 	}
 
 	private void okFiles() {
-		DataFile[] files_bi = dataPanel_bi.getDataFiles();
-		if (!ArrayUtils.isEmpty(files_bi)) {
-			dataFiles[0] = files_bi;
-		}
-		DataFile[] files_si = dataPanel_si.getDataFiles();
-		if (!ArrayUtils.isEmpty(files_si)) {
-			dataFiles[0] = files_si;
-		}
-		DataFile[] files_ap = dataPanel_ap.getDataFiles();
-		if (!ArrayUtils.isEmpty(files_ap)) {
-			dataFiles[1] = files_ap;
-		}
-		if (ArrayUtils.isEmpty(dataFiles[0]) && ArrayUtils.isEmpty(dataFiles[1])) {
+		if (!dataPanel_si.hasFile() && !dataPanel_bi.hasFile()) {
 			JOptionPane.showMessageDialog(this, "No data input!", "Error", JOptionPane.ERROR_MESSAGE);
 			return;
+		}
+		if (dataPanel_si.hasFile()) {
+			dataFiles[0] = dataPanel_si.getDataFiles();
+		}
+		if (dataPanel_bi.hasFile()) {
+			dataFiles[0] = dataPanel_bi.getDataFiles();
+		}
+		if (dataPanel_ap.hasFile()) {
+			dataFiles[1] = dataPanel_ap.getDataFiles();
 		}
 		dispose();
 	}
 
 	public DataFile[][] getDataFiles() {
 		return dataFiles;
+	}
+
+	public boolean hasFile() {
+		return dataPanel_bi.hasFile() || dataPanel_si.hasFile() || dataPanel_ap.hasFile();
 	}
 
 	public static void main(String[] args) {

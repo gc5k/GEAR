@@ -4,7 +4,6 @@ import java.awt.BorderLayout;
 import java.awt.Container;
 import java.awt.Font;
 import java.awt.Frame;
-import java.io.File;
 import java.io.IOException;
 import java.util.Enumeration;
 
@@ -20,16 +19,11 @@ public class DataViewDialog extends JDialog {
 
 	//
 
-	private File[] files;
-
-	//
-
 	public DataViewDialog(Frame owner) {
 		super(owner, true);
 	}
 
-	void ini(File[] files) {
-		this.files = files;
+	void ini(DataFile[][] dataFiles) {
 		//
 		Container container = getContentPane();
 		container.setLayout(new BorderLayout());
@@ -37,14 +31,19 @@ public class DataViewDialog extends JDialog {
 		JTabbedPane tabbedPane = new JTabbedPane();
 		tabbedPane.setBorder(BorderFactory.createRaisedBevelBorder());
 		//
-		for (File file : this.files) {
-			DataViewPanel dataViewPanel = new DataViewPanel();
-			try {
-				dataViewPanel.setFile(file);
-			} catch (IOException e) {
-				JOptionPane.showMessageDialog(this, e);
+		for (int i = 0; i < dataFiles.length; i++) {
+			if (dataFiles[i] == null) {
+				continue;
 			}
-			tabbedPane.add(file.getName(), dataViewPanel);
+			for (int j = 0; j < dataFiles[i].length; j++) {
+				DataViewPanel dataViewPanel = new DataViewPanel();
+				try {
+					dataViewPanel.setDataFile(dataFiles[i][j]);
+				} catch (IOException e) {
+					JOptionPane.showMessageDialog(this, e);
+				}
+				tabbedPane.add(dataFiles[i][j].getFile().getName(), dataViewPanel);
+			}
 		}
 		//
 		container.add(tabbedPane, BorderLayout.CENTER);
