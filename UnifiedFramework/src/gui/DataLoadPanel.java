@@ -115,6 +115,8 @@ public class DataLoadPanel extends JPanel {
 				new GridBagConstraints(3, 0, 1, 1, 0.0, 1.0, GridBagConstraints.CENTER, GridBagConstraints.BOTH, new Insets(5, 5, 5, 5), 0, 0));
 		add(panel_qf, new GridBagConstraints(0, 1, 1, 1, 1.0, 0.0, GridBagConstraints.CENTER, GridBagConstraints.BOTH, new Insets(5, 5, 5, 5), 0, 0));
 		//
+		add(new JPanel(), new GridBagConstraints(0, 2, 1, 1, 1.0, 1.0, GridBagConstraints.CENTER, GridBagConstraints.BOTH, new Insets(5, 5, 5, 5), 0, 0));
+		//
 		dirCheckBox_itemStateChanged(null);
 	}
 
@@ -218,6 +220,7 @@ public class DataLoadPanel extends JPanel {
 	void setEnabled_2(boolean enabled) {
 		for (int i = 0; i < dataFiles.length; i++) {
 			fileTextFieldList[i].setEnabled(enabled);
+			fileCheckBoxList[i].setEnabled(enabled);
 		}
 		dirCheckBox.setEnabled(enabled);
 		if (enabled) {

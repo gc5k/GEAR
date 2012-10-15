@@ -75,7 +75,7 @@ public class DataLoadDialog extends JDialog {
 				DataLoadDialog.this.checkBox_itemStateChanged(e);
 			}
 		});
-		panel_tmp.add(useAP_checkBox, new GridBagConstraints(0, 0, 1, 1, 0.0, 1.0, GridBagConstraints.CENTER, GridBagConstraints.BOTH, new Insets(5, 5, 5, 5),
+		panel_tmp.add(useAP_checkBox, new GridBagConstraints(0, 0, 1, 1, 0.0, 1.0, GridBagConstraints.CENTER, GridBagConstraints.BOTH, new Insets(10, 5, 5, 5),
 				0, 0));
 		panel_ap.add(panel_tmp, BorderLayout.NORTH);
 		//
