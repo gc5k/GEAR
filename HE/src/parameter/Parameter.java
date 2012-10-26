@@ -159,7 +159,7 @@ public class Parameter {
 	private final String cmd_simu_qt = "simu_qt";
 	private final String cmd_simu_qt_long = "simu-qt";
 	public static boolean simupolyQTFlag = false;
-	
+
 	private final String cmd_simu_order = "simu_order";
 	private final String cmd_simu_order_long = "simu-order";
 	public static boolean simuOrderFlag = false;
@@ -183,7 +183,7 @@ public class Parameter {
 	private final String cmd_poly_loci_long = "poly-loci";
 	
 	public static int polyLoci = 1000;	
-	
+
 	private final String cmd_poly_loci_null = "poly_loci_null";
 	private final String cmd_poly_loci_null_long = "poly-loci-null";
 
@@ -197,6 +197,15 @@ public class Parameter {
 	private final String cmd_poly_U = "poly_U";
 	private final String cmd_poly_U_long = "poly-U";
 	public static boolean polyU = false;
+
+	private final String cmd_poly_freq = "poly_freq";
+	private final String cmd_poly_freq_long = "poly-freq";
+	public static double polyFreq = 0.5;
+	
+	private final String cmd_poly_effect = "poly_effect";
+	private final String cmd_poly_effect_long = "poly-effect";
+	public static boolean polyEffectFlag = false;
+	public static String polyEffectFile = null;
 
 ///////////////////nontrans
 	private final String cmd_nontrans = "nontrans";
@@ -276,10 +285,10 @@ public class Parameter {
 	private final String cmd_k = "k";
 	public static boolean k_button = false;
 	public static double k = 0.01;
-	
+
 	private final String cmd_scale = "scale";
 	public static boolean scale = false;
-	
+
 	private final String cmd_he_sd = "he_sd"; //(y1-y2)^2
 	private final String cmd_he_sd_long = "he-sd";
 	private final String cmd_he_ss = "he_ss"; //(y1+y2)^2
@@ -300,7 +309,7 @@ public class Parameter {
 	private final String cmd_cal_k = "cal_k";
 	private final String cmd_cal_k_long = "cal-k";
 	public double cal_k = 0;
-	
+
 	private final String cmd_cal_hl = "cal_hl";
 	private final String cmd_cal_hl_long = "cal-hl";
 	public double cal_hl = 0;
@@ -505,13 +514,18 @@ public class Parameter {
 		ops.addOption(OptionBuilder.withLongOpt(cmd_poly_loci_long).withDescription("number of polygenic loci, defualt= " + polyLoci).hasArg().create(cmd_poly_loci));
 
 		ops.addOption(OptionBuilder.withLongOpt(cmd_poly_loci_null_long).withDescription("number of null polygenic loci, defualt= " + polyLoci).hasArg().create(cmd_poly_loci_null));
-		
+
 		ops.addOption(OptionBuilder.withLongOpt(cmd_poly_LD_long).withDescription("LD (correlation), defualt= " + polyLD).hasArg().create(cmd_poly_LD));
 
 		ops.addOption(OptionBuilder.withLongOpt(cmd_poly_U_long).withDescription("polygenic model has Uniform Effect? " + polyU).create(cmd_poly_U));
-		
+
+		ops.addOption(OptionBuilder.withLongOpt(cmd_poly_freq_long).withDescription("minor allele frequency for polygenic model? " + polyFreq).hasArg().create(cmd_poly_freq));
+
+		ops.addOption(OptionBuilder.withLongOpt(cmd_poly_effect_long).withDescription("effect for polygenic model? " + polyEffectFile).hasArg().create(cmd_poly_effect));
+
 //pop stat
 		ops.addOption(OptionBuilder.withDescription("calculate MAF frequency ").create(cmd_freq));
+
 		ops.addOption(OptionBuilder.withLongOpt(cmd_geno_freq_long).withDescription("calculate genotype frequency ").create(cmd_geno_freq));
 
 		ops.addOption(OptionBuilder.withDescription("calculate fst ").hasArg().create(cmd_fst));
@@ -931,12 +945,22 @@ public class Parameter {
 			polyLociNull = Integer.parseInt(cl.getOptionValue(cmd_poly_loci_null));
 		}
 
-		if(cl.hasOption(cmd_poly_LD)) {
+		if (cl.hasOption(cmd_poly_LD)) {
 			polyLD = Double.parseDouble(cl.getOptionValue(cmd_poly_LD));
 		}
 
-		if(cl.hasOption(cmd_poly_U)) {
+		if (cl.hasOption(cmd_poly_U)) {
 			polyU = true;
+		}
+
+		if (cl.hasOption(cmd_poly_freq)) {
+			polyFreq = Double.parseDouble(cl.getOptionValue(cmd_poly_freq));
+		}
+
+		if (cl.hasOption(cmd_poly_effect)) {
+			polyEffectFlag = true;
+			polyEffectFile = cl.getOptionValue(cmd_poly_effect);
+			exists(polyEffectFile);
 		}
 
 //profile

@@ -1,15 +1,19 @@
 package simulation;
 
+import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.DataOutputStream;
 import java.io.FileOutputStream;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.PrintWriter;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Calendar;
 
 import parameter.Parameter;
+import util.FileProcessor;
+import util.NewIt;
 
 import org.apache.commons.math.linear.Array2DRowRealMatrix;
 import org.apache.commons.math.linear.RealMatrix;
@@ -67,7 +71,7 @@ public class SimuPolyQT {
 		freq = new double[M];
 		DPrime = new double[M - 1];
 
-		Arrays.fill(freq, 0.5);
+		Arrays.fill(freq, P.polyFreq);
 		Arrays.fill(DPrime, ld);
 		LD = CalculateDprime(freq, DPrime);
 
@@ -80,9 +84,15 @@ public class SimuPolyQT {
 				+ "\n");
 		LOG.append("Simulation polygenic model for quantitative traits.\n");
 		LOG.append("seed: " + seed + "\n");
+
+		LOG.append("MAF: " + P.polyFreq + "\n");
 		LOG.append("Marker: " + M + "\n");
 		LOG.append("Null marker: " + M + "\n");
-		LOG.append("Uniform Effet: " + U + "\n");
+		if (Parameter.polyEffectFlag) {
+			LOG.append("genetic effect file: " + P.polyEffectFile + "\n");
+		} else {
+			LOG.append("Uniform Effect: " + U + "\n");
+		}
 		LOG.append("LD: " + ld + "\n");
 		LOG.append("Sample size: " + sample + "\n");
 		LOG.append("h2: " + h2 + "\n");
@@ -131,7 +141,12 @@ public class SimuPolyQT {
 	public void GenerateSampleNoSelection() {
 
 		int count = 0;
-		RealMatrix effect = GenerateEffects();
+		RealMatrix effect = null;
+		if (Parameter.polyEffectFlag) {
+			effect = readEffects();
+		} else {
+			effect = GenerateEffects();
+		}
 
 		while (count < sample) {
 			RealMatrix chr = SampleChromosome();
@@ -153,7 +168,7 @@ public class SimuPolyQT {
 			phenotype[i] = BV[i] + rnd.nextGaussian(0, E);
 		}
 		double vp = StatUtils.variance(phenotype);
-		LOG.append("VP=" + String.format("%.3f", vp) + "\n");
+		LOG.append("Vp=" + String.format("%.3f", vp) + "\n");
 		LOG.append("total individuals visited (no selection): " + count + "\n");
 	}
 
@@ -395,7 +410,7 @@ public class SimuPolyQT {
 
 		for (int i = 0; i < genotype.length; i++) {
 			for (int j = 0; j < genotype[i].length; j++) {
-				geno.print(((int) genotype[i][j] + 1) + " "); 
+				geno.print(((int) genotype[i][j] + 1) + " ");
 			}
 			geno.println();
 		}
@@ -419,5 +434,45 @@ public class SimuPolyQT {
 		}
 
 		return D;
+	}
+	
+	public RealMatrix readEffects() {
+		BufferedReader reader = FileProcessor.FileOpen(Parameter.polyEffectFile);
+		double[] effect = new double[M];
+		int c= 0;
+		String line = null;
+		try {
+			while ((line = reader.readLine()) != null) {
+				line.trim();
+				String[] l = line.split(Parameter.whitespace);
+				if(l.length < 1) continue;
+				if( c < (M - M_null)) {
+					effect[c++] = Double.parseDouble(l[0]);
+				}
+			}
+		} catch (IOException e) {
+			e.printStackTrace(System.err);
+			System.exit(0);
+		}
+		RealMatrix Eff = new Array2DRowRealMatrix(effect);
+		
+		if (Parameter.simuOrderFlag) {
+			Arrays.sort(effect);
+		}
+
+		PrintWriter eff = null;
+		try {
+			eff = new PrintWriter(new BufferedWriter(new FileWriter(out
+					+ ".rnd")));
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+
+		for (int i = 0; i < effect.length; i++) {
+			eff.println("rs" + i + " " + A2 + " " + effect[i]);
+		}
+		eff.close();
+
+		return Eff;
 	}
 }
