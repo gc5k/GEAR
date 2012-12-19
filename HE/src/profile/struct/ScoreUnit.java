@@ -22,6 +22,12 @@ public class ScoreUnit {
 		}
 	}
 	
+	public ScoreUnit(String snp, String ra, String s) {
+		SNP = snp;
+		RefAllele = ra;
+		score = s;
+	}
+
 	public String getSNP() {
 		return SNP;
 	}
