@@ -22,6 +22,7 @@ public class MaCHDosageProfile {
 	private String[] dosageFile;
 	private String[] inforFile;
 	private String scoreFile;
+	private boolean hasScore = true;
 	private HashMap<String, ScoreUnit> Score = NewIt.newHashMap();
 
 	private ArrayList<String> ID = NewIt.newArrayList();
@@ -44,17 +45,22 @@ public class MaCHDosageProfile {
 
 		//read score file
 		scoreFile = par.scoreFile;
-		BufferedReader readerScoreFile = FileProcessor.FileOpen(scoreFile);
-		String lineScore = null;
-		try {
-			while((lineScore = readerScoreFile.readLine())!=null) {
-				if (lineScore.length() == 0) continue;
-				ScoreUnit su = new ScoreUnit(lineScore);
-				Score.put(su.getSNP(), su);
+		if(scoreFile != null) {
+			BufferedReader readerScoreFile = FileProcessor.FileOpen(scoreFile);
+			String lineScore = null;
+			try {
+				while((lineScore = readerScoreFile.readLine())!=null) {
+					if (lineScore.length() == 0) continue;
+					ScoreUnit su = new ScoreUnit(lineScore);
+					Score.put(su.getSNP(), su);
+				}
+			} catch (IOException e) {
+				e.printStackTrace(System.err);
+				System.exit(0);
 			}
-		} catch (IOException e) {
-			e.printStackTrace(System.err);
-			System.exit(0);
+			hasScore = true;
+		} else {
+			hasScore = false;
 		}
 
 		//read q score file and q range file
@@ -247,14 +253,16 @@ public class MaCHDosageProfile {
 						}
 					}
 
+				} else if (!hasScore) {
+					su = new ScoreUnit(snp, refA, "1");
+					cSNP++;
 				} else {
 					continue;
 				}
-				
+
 				if (!qsL1Flag) {
 					continue;
 				}
-
 
 				for (int k = 0; k < dosage.size(); k++) {
 

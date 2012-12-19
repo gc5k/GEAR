@@ -300,9 +300,17 @@ public class Parameter {
 	public static int he_cp = 2;
 	public static boolean[] heType = {true, false, false};
 	public static boolean heFlag = false;
+	
+	public static double eh2=1;
+	private final String cmd_eh2 = "eh2";
+	public static boolean eh2Flag = false;
 
 	private final String cmd_out = "out";
 	public static String out = "he";
+	
+	private final String cmd_perm = "perm";
+	public static int perm = 100;
+	public static boolean permFlag = false;
 
 ///////////////////heritability transformation
 	public static boolean calOption = false;
@@ -571,6 +579,8 @@ public class Parameter {
 		ops.addOption(OptionBuilder.withLongOpt(cmd_q_score_range_long).withDescription("q score range").hasArg().create(cmd_q_score_range));
 
 //haseman-elston regression
+		ops.addOption(OptionBuilder.withDescription("h2 ").hasArg().create(cmd_eh2));
+
 		ops.addOption(OptionBuilder.withDescription("grm ").hasArg().create(cmd_grm));
 
 		ops.addOption(OptionBuilder.withDescription("pheno ").hasArg().create(cmd_pheno));
@@ -580,6 +590,8 @@ public class Parameter {
 		ops.addOption(OptionBuilder.withDescription("reverse ").create(cmd_reverse));
 
 		ops.addOption(OptionBuilder.withDescription("scale ").create(cmd_scale));
+
+		ops.addOption(OptionBuilder.withDescription("perm ").hasArg().create(cmd_perm));
 
 		ops.addOption(OptionBuilder.withLongOpt(cmd_he_sd_long).withDescription("phenotype is coded as squared difference").create(cmd_he_sd));
 
@@ -1002,6 +1014,11 @@ public class Parameter {
 
 //haseman-elston regression
 
+		if (cl.hasOption(cmd_eh2)) {
+			eh2Flag = true;
+			eh2 = Double.parseDouble(cl.getOptionValue(cmd_eh2));
+		}
+
 		if (cl.hasOption(cmd_grm)) {
 			StringBuilder sb1 = new StringBuilder(cl.getOptionValue(cmd_grm));
 			grm = sb1.append(".grm.gz").toString();
@@ -1027,6 +1044,11 @@ public class Parameter {
 
 		if (cl.hasOption(cmd_scale)) {
 			scale = true;
+		}
+
+		if (cl.hasOption(cmd_perm)) {
+			permFlag = true;
+			perm = Integer.parseInt(cl.getOptionValue(cmd_perm));
 		}
 
 		if (cl.hasOption(cmd_he_sd)) {

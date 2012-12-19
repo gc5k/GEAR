@@ -4,6 +4,9 @@ import java.util.Calendar;
 import merge.MergeTwoFile;
 import write.WriteBedSNPMajor;
 import he.H2Transformer;
+import he.HECalculate;
+import he.HEPermutation;
+import he.HERead;
 import he.HERegression;
 import realcheck.RealCheck;
 import realcheck.RealCheckOne;
@@ -103,10 +106,18 @@ public class Pipeline {
 			NonTransmitted nt = new NonTransmitted(p);
 			nt.GenerateNonTransmitted();
 
-		} else if (Parameter.heFlag){
-			HERegression HER = null;
-			HER = new HERegression(p);
-			HER.Regression();
+		} else if (Parameter.heFlag) {
+			HERead hr = new HERead(p);
+			HECalculate HC = new HECalculate(hr);
+			HC.Regression();
+
+			if(p.permFlag) {
+				HEPermutation hp = new HEPermutation(hr);
+				hp.Permutation();
+			}
+//			HERegression HER = null;
+//			HER = new HERegression(p);
+//			HER.Regression();
 
 		}
 		

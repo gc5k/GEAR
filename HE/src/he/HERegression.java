@@ -294,7 +294,6 @@ public class HERegression {
 			}
 		}
 
-
 		for (int i = 0; i < XtX[0].length; i++) {
 			for (int j = 0; j < i; j++) {
 				XtX[i][j] = XtX[j][i];
@@ -304,8 +303,8 @@ public class HERegression {
 
 	public void Regression() {
 
-		RealMatrix Mat_XtX = new RealMatrixImpl(XtX);
-		RealMatrix Mat_XtY = new RealMatrixImpl(XtY);
+		RealMatrix Mat_XtX = new Array2DRowRealMatrix(XtX);
+		RealMatrix Mat_XtY = new Array2DRowRealMatrix(XtY);
 
 		RealMatrix Mat_XtX_Inv = (new LUDecompositionImpl(Mat_XtX)).getSolver().getInverse();
 		RealMatrix Mat_B = Mat_XtX_Inv.multiply(Mat_XtY);
@@ -391,6 +390,7 @@ public class HERegression {
 			}
 			sb.append("\n");
 		}
+				
 		System.out.println(sb);
 
 		if(output != null) {
@@ -408,6 +408,7 @@ public class HERegression {
 			pw.append(sb);
 			pw.close();
 		}
+		
 	}
 
 	public static void main(String[] args) {
