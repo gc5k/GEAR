@@ -2,6 +2,7 @@ package parameter;
 
 import java.io.File;
 import java.util.HashSet;
+import java.util.Iterator;
 import java.util.Random;
 
 import org.apache.commons.cli.CommandLine;
@@ -12,6 +13,7 @@ import org.apache.commons.cli.Options;
 import org.apache.commons.cli.ParseException;
 import org.apache.commons.cli.PosixParser;
 
+import test.Test;
 import util.NewIt;
 
 public class Parameter {
@@ -87,14 +89,12 @@ public class Parameter {
 	private final String cmd_remove_Flip_long = "remove-flip";
 	public static boolean removeFlipFlag = false;
 
-	
 //strand
 	private final String cmd_strand = "strand";
 	public static boolean strandFlag = false;
 	public static String strand_file = null;
 
 //make-predictor
-
 	private final String cmd_make_predictor = "build_predictor";
 	private final String cmd_make_predictor_long = "build-predictor";
 	public static boolean makePredictorFlag = false;
@@ -269,26 +269,6 @@ public class Parameter {
 	public static String q_score_range_file = null;
 
 //he regression
-	private final String cmd_grm = "grm";
-	public static String grm = null;
-	public static String grm_id = null;
-
-	private final String cmd_pheno = "pheno";
-	public static String pheno = null;
-
-	private final String cmd_mpheno = "mpheno";
-	public static int[] mpheno = {1};
-
-	private final String cmd_reverse = "reverse";
-	public static boolean reverse = false;
-
-	private final String cmd_k = "k";
-	public static boolean k_button = false;
-	public static double k = 0.01;
-
-	private final String cmd_scale = "scale";
-	public static boolean scale = false;
-
 	private final String cmd_he_sd = "he_sd"; //(y1-y2)^2
 	private final String cmd_he_sd_long = "he-sd";
 	private final String cmd_he_ss = "he_ss"; //(y1+y2)^2
@@ -301,6 +281,41 @@ public class Parameter {
 	public static boolean[] heType = {true, false, false};
 	public static boolean heFlag = false;
 	
+
+	private final String cmd_grm = "grm";
+	public static String grm = null;
+	public static String grm_id = null;
+
+	private final String cmd_pheno = "pheno";
+	public static String pheno = null;
+
+	private final String cmd_mpheno = "mpheno";
+	public static int[] mpheno = {1};
+	
+	//quantitative covariates
+	private final String cmd_qcovar = "qcovar";
+	public static String qcovar_file = null;
+	private final String cmd_qcovar_num = "qcovar_num";
+	private final String cmd_qcovar_num_long = "qcovar-num";
+	public static int[] qcovar_num = null;
+
+	//categorical covariates
+	private final String cmd_covar = "covar";
+	public static String covar_file = null;
+	private final String cmd_covar_num = "covar_num";
+	private final String cmd_covar_num_long = "covar-num";
+	public static int[] covar_num = null;
+
+	private final String cmd_reverse = "reverse";
+	public static boolean reverse = false;
+
+	private final String cmd_k = "k";
+	public static boolean k_button = false;
+	public static double k = 0.01;
+
+	private final String cmd_scale = "scale";
+	public static boolean scale = false;
+
 	public static double eh2=1;
 	private final String cmd_eh2 = "eh2";
 	public static boolean eh2Flag = false;
@@ -587,9 +602,17 @@ public class Parameter {
 
 		ops.addOption(OptionBuilder.withLongOpt(cmd_mpheno).withDescription("pheno number " + cmd_mpheno).hasArg().withArgName("index").create(cmd_mpheno));
 
+		ops.addOption(OptionBuilder.withDescription("covariate file").hasArg().create(cmd_covar));
+
+		ops.addOption(OptionBuilder.withLongOpt(cmd_covar_num_long).withDescription("covariate index").hasArg().create(cmd_covar_num));
+
+		ops.addOption(OptionBuilder.withDescription("quantitative covariate file").hasArg().create(cmd_qcovar));
+
+		ops.addOption(OptionBuilder.withLongOpt(cmd_qcovar_num_long).withDescription("quantitative covariate index").hasArg().create(cmd_qcovar_num));
+
 		ops.addOption(OptionBuilder.withDescription("reverse ").create(cmd_reverse));
 
-		ops.addOption(OptionBuilder.withDescription("scale ").create(cmd_scale));
+		ops.addOption(OptionBuilder.withDescription("standardise the phenotype").create(cmd_scale));
 
 		ops.addOption(OptionBuilder.withDescription("perm ").hasArg().create(cmd_perm));
 
@@ -1035,6 +1058,84 @@ public class Parameter {
 			mpheno = new int[s.length];
 			for (int i = 0; i < s.length; i++) {
 				mpheno[i] = Integer.parseInt(s[i]);
+			}
+		}
+
+		if (cl.hasOption(cmd_covar)) {
+			covar_file = cl.getOptionValue(cmd_covar);
+			exists(covar_file);
+		}
+
+		if (cl.hasOption(cmd_covar_num)) {
+			String[] p = cl.getOptionValue(cmd_covar_num).split(",");
+			HashSet<Integer> idx = NewIt.newHashSet();
+			for (int i = 0, len = p.length; i < len; i++) {
+				if (p[i].contains("-")) {
+					String[] pp = p[i].split("-");
+					if (pp.length != 2) {
+						System.err.println("bad parameter for option --" + cmd_covar_num_long + ": " + p[i] +".");
+						Test.LOG.append("bad parameter for option --" + cmd_covar_num_long + ": " + p[i] +".\n");
+						Test.printLog();
+						System.exit(0);
+					}
+					for (int j = Integer.parseInt(pp[0]); j <= Integer
+							.parseInt(pp[1]); j++) {
+						idx.add(new Integer(j));
+					}
+				} else {
+					idx.add(new Integer(Integer.parseInt(p[i])));
+				}
+			}
+			covar_num = new int[idx.size()];
+			int c = 0;
+			for (Iterator<Integer> e = idx.iterator(); e.hasNext();) {
+				covar_num[c] = e.next().intValue();
+				if (covar_num[c] < 0) {
+					System.err.println("bad parameter for option --" + cmd_covar_num_long + ": " + covar_num[c] +".");
+					Test.LOG.append("bad parameter for option --" + cmd_covar_num_long + ": " + covar_num[c] +".\n");
+					Test.printLog();
+					System.exit(0);
+				}
+				c++;
+			}
+		}
+
+		if (cl.hasOption(cmd_qcovar)) {
+			qcovar_file = cl.getOptionValue(cmd_qcovar);
+			exists(qcovar_file);
+		}
+
+		if (cl.hasOption(cmd_qcovar_num)) {
+			String[] p = cl.getOptionValue(cmd_qcovar_num).split(",");
+			HashSet<Integer> idx = NewIt.newHashSet();
+			for (int i = 0, len = p.length; i < len; i++) {
+				if (p[i].contains("-")) {
+					String[] pp = p[i].split("-");
+					if (pp.length != 2) {
+						System.err.println("bad parameter for option --" + cmd_qcovar_num_long + ": " + p[i] +".");
+						Test.LOG.append("bad parameter for option --" + cmd_qcovar_num_long + ": " + p[i] +".\n");
+						Test.printLog();
+						System.exit(0);
+					}
+					for (int j = Integer.parseInt(pp[0]); j <= Integer
+							.parseInt(pp[1]); j++) {
+						idx.add(new Integer(j));
+					}
+				} else {
+					idx.add(new Integer(Integer.parseInt(p[i])));
+				}
+			}
+			qcovar_num = new int[idx.size()];
+			int c = 0;
+			for (Iterator<Integer> e = idx.iterator(); e.hasNext();) {
+				qcovar_num[c] = e.next().intValue();
+				if (qcovar_num[c] < 0) {
+					System.err.println("bad parameter for option --" + cmd_qcovar_num_long + ": " + qcovar_num[c] +".");
+					Test.LOG.append("bad parameter for option --" + cmd_qcovar_num_long + ": " + qcovar_num[c] +".\n");
+					Test.printLog();
+					System.exit(0);
+				}
+				c++;
 			}
 		}
 

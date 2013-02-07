@@ -3,11 +3,11 @@ import java.util.Calendar;
 
 import merge.MergeTwoFile;
 import write.WriteBedSNPMajor;
-import he.H2Transformer;
 import he.HECalculate;
 import he.HEPermutation;
 import he.HERead;
 import he.HERegression;
+import he.h2trans.H2Transformer;
 import realcheck.RealCheck;
 import realcheck.RealCheckOne;
 import simulation.RealDataSimulation;

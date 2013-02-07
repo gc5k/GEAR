@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<classpath>
+	<classpathentry kind="src" path="src"/>
+	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER/org.eclipse.jdt.internal.debug.ui.launcher.StandardVMType/JavaSE-1.6"/>
+	<classpathentry kind="lib" path="/Users/uqgchen5/Documents/workspace/HESF/lib/commons-cli-1.2.jar"/>
+	<classpathentry kind="lib" path="/Users/uqgchen5/Documents/workspace/HESF/lib/commons-math-2.2.jar"/>
+	<classpathentry kind="lib" path="/Users/uqgchen5/Documents/workspace/HESF/lib/javastat_beta1.4.jar"/>
+	<classpathentry kind="lib" path="/Users/uqgchen5/Documents/workspace/HESF/lib/commons-lang3-3.0-beta.jar"/>
+	<classpathentry kind="output" path="bin"/>
+</classpath>

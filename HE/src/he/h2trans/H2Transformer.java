@@ -1,4 +1,4 @@
-package he;
+package he.h2trans;
 import parameter.Parameter;
 import org.apache.commons.math.MathException;
 import org.apache.commons.math.distribution.NormalDistributionImpl;
