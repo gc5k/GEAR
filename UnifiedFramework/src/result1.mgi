@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ClassDiagram>
+    <CommunicationClass name="mdr.result.Cell" x="177" y="260"/>
+    <CommunicationClass name="mdr.result.BestKFoldCVResult" x="654" y="258"/>
+    <CommunicationClass name="mdr.result.OneCVSet" x="384" y="266"/>
+    <CommunicationClass name="mdr.result.Combination" x="520" y="362"/>
+    <CommunicationClass name="mdr.result.Suite" x="218" y="346"/>
+    <CommunicationClass name="mdr.result.SuiteException" x="140" y="203"/>
+    <CommunicationClass name="mdr.result.OneTraitResult" x="357" y="91"/>
+    <CommunicationClass name="mdr.result.SavedModels" x="181" y="108"/>
+    <CommunicationClass name="mdr.result.SingleTraitResult" x="166" y="59"/>
+</ClassDiagram>
