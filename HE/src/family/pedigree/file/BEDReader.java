@@ -178,11 +178,11 @@ public class BEDReader extends PedigreeFile {
 			if (idx < 0)
 				continue;
 			int posByte = i >> 2;
-			int posBite = (i - (i >> 2 << 2)) << 1;
+			int posBite = (i & 0x3) << 1;
 			int g1 = (g[posByte] >> posBite) & 3;
 
 			int ExposByte = c >> 2;
-			int ExposBite = (c - (c >> 2 << 2)) << 1;
+			int ExposBite = (c & 0x3) << 1;
 			Exg[ExposByte] |= g1 << ExposBite;
 			if (g1 == 0) {
 				AlleleFreq[c][0] += 2;
