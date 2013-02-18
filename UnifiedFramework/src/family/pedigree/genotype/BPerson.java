@@ -165,9 +165,9 @@ public class BPerson {
 		return numMarkers;
 	}
 
-	public void addMarker(boolean flag, int a1, int a2, int idx) {
-		int posByte = idx >> shift;
-		int posBite = (idx - (idx >> shift << shift)) << 1;
+	public void addMarker(boolean flag, int a1, int a2, int i) {
+		int posByte = i >> shift;
+		int posBite = (i & 0xf) << 1;
 
 		if (flag) {
 			if (a2 == a1) {// add 00 or 11
@@ -182,9 +182,9 @@ public class BPerson {
 		}
 	}
 
-	public void addByteGenotype(int g, int idx) {
-		int posByte = idx >> shift;
-		int posBite = (idx - (idx >> shift << shift)) << 1;
+	public void addByteGenotype(int g, int i) {
+		int posByte = i >> shift;
+		int posBite = (i & 0xf) << 1;
 
 		alleles[posByte] |= g << posBite;
 	}
@@ -201,7 +201,7 @@ public class BPerson {
 
 	public String getGenotypeScoreString(int i) {
 		int posByte = i >> shift;
-		int posBite = (i - (i >> shift << shift)) << 1;
+		int posBite = (i & 0xf) << 1;
 		int g = (alleles[posByte] >> (posBite)) & 3;
 		if (g == 1) {// 01
 			return MDRConstant.missingGenotype;
@@ -224,7 +224,7 @@ public class BPerson {
 
 	public String getBiAlleleGenotypeString(int i) {
 		int posByte = i >> shift;
-		int posBite = (i - (i >> shift << shift)) << 1;
+		int posBite = (i & 0xf) << 1;
 		int g = (alleles[posByte] >> posBite) & 3;
 		if (g == 1) {// 01
 			return MDRConstant.missingGenotype;
