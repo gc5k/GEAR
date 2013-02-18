@@ -142,7 +142,7 @@ public class BEDReader extends PedigreeFile {
 			if (idx < 0)
 				continue;
 			int posByte = c >> BPerson.shift;
-			int posBite = (c - (c >> BPerson.shift << BPerson.shift)) << 1;
+			int posBite = (i & 0xf) << 1;
 			for (int j = 0; j < n_individual; j++) {
 				BFamilyStruct bf = familystructure.get(Famid.get(j));
 				BPerson per = bf.getPerson(Individualid.get(j));

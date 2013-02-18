@@ -97,7 +97,7 @@ public class NonTransWriteBedSNPMajor {
 				int idx = 0;
 
 				int posByte = i >> BPerson.shift;
-				int posBite = (i - (i >> BPerson.shift << BPerson.shift)) << 1;
+				int posBite = (i & 0xf) << 1;
 
 				for (int j = 0; j < PersonTable.size(); j++) {
 					PersonIndex pi = PersonTable.get(j);
