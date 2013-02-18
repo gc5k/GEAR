@@ -405,7 +405,7 @@ public class MergeTwoFile {
 				int idx = 0;
 
 				int posByte = snpIdx >> BPerson.shift;
-				int posBite = (snpIdx - (snpIdx >> BPerson.shift << BPerson.shift)) << 1;
+				int posBite = (snpIdx & 0xf) << 1;
 
 				for (int j = 0; j < PersonTable1.size(); j++) {
 					PersonIndex pi = PersonTable1.get(j);
@@ -426,7 +426,7 @@ public class MergeTwoFile {
 				int snpIdx2 = comSNPIdx[1][i];
 
 				int posByte2 = snpIdx2 >> BPerson.shift;
-				int posBite2 = (snpIdx2 - (snpIdx2 >> BPerson.shift << BPerson.shift)) << 1;
+				int posBite2 = (snpIdx2 & 0xf) << 1;
 
 				for (int j = 0; j < PersonTable2.size(); j++) {
 					PersonIndex pi = PersonTable2.get(j);

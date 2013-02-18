@@ -44,7 +44,7 @@ public class GenotypeMatrix {
 		//2 homozygote 2/2
 		//3 missing
 		int posByte = i >> shift;
-		int posBite = (i - (i >> shift << shift)) << 1;
+		int posBite = (i & 0xf) << 1;
 		int g = (genotypeMat[idx][posByte] >> (posBite)) & 3;
 		return g;
 //		if (g == 1) {// 01
@@ -60,7 +60,7 @@ public class GenotypeMatrix {
 
 	public int getGenotypeScore(int idx, int i) {
 		int posByte = i >> shift;
-		int posBite = (i - (i >> shift << shift)) << 1;
+		int posBite = (i & 0xf) << 1;
 		int g = (genotypeMat[idx][posByte] >> (posBite)) & 3;
 		return g;
 //		if (g == 1) {// 01
@@ -76,7 +76,7 @@ public class GenotypeMatrix {
 
 	public int[] getBiAlleleGenotype(int idx, int i) {
 		int posByte = i >> shift;
-		int posBite = (i - (i >> shift << shift)) << 1;
+		int posBite = (i & 0xf) << 1;
 		int g = (genotypeMat[idx][posByte] >> posBite) & 3;
 		int[] b = { 0, 0 };
 		switch(g) {
@@ -90,7 +90,7 @@ public class GenotypeMatrix {
 
 	public String getGenotypeScoreString(int idx, int i) {
 		int posByte = i >> shift;
-		int posBite = (i - (i >> shift << shift)) << 1;
+		int posBite = (i & 0xf) << 1;
 		int g = (genotypeMat[idx][posByte] >> (posBite)) & 3;
 		if (g == 3) {// 01
 			return Parameter.missingGenotype;

@@ -39,7 +39,7 @@ public class RealDataSimulationGenotypeMatrix {
 
 	public int getGenotypeScore(int idx, int i) {
 		int posByte = i >> shift;
-		int posBite = (i - (i >> shift << shift)) << 1;
+		int posBite = (i & 0xf) << 1;
 		int g = (genotypeMat[idx][posByte] >> (posBite)) & 3;
 		if (g == 1) {// 01
 			return 2;
@@ -54,7 +54,7 @@ public class RealDataSimulationGenotypeMatrix {
 
 	public int[] getBiAlleleGenotype(int idx, int i) {
 		int posByte = i >> shift;
-		int posBite = (i - (i >> shift << shift)) << 1;
+		int posBite = (i & 0xf) << 1;
 		int g = (genotypeMat[idx][posByte] >> posBite) & 3;
 		int[] b = { 2, 2 };
 		if (g != 1) {
@@ -66,7 +66,7 @@ public class RealDataSimulationGenotypeMatrix {
 
 	public String getGenotypeScoreString(int idx, int i) {
 		int posByte = i >> shift;
-		int posBite = (i - (i >> shift << shift)) << 1;
+		int posBite = (i & 0xf) << 1;
 		int g = (genotypeMat[idx][posByte] >> (posBite)) & 3;
 		if (g == 3) {// 01
 			return Parameter.missingGenotype;

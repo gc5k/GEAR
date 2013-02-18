@@ -168,10 +168,9 @@ public class BPerson {
 		return numMarkers;
 	}
 
-	public void addMarker(boolean flag, int a1, int a2, int idx) {
-		int posByte = idx >> shift;
-		int posBite = (idx - (idx >> shift << shift)) << 1;
-
+	public void addMarker(boolean flag, int a1, int a2, int i) {
+		int posByte = i >> shift;
+		int posBite = (i & 0xf) << 1;
 		if (flag) {
 			if (a2 == a1) {// add 00 or 11
 				int c = (a1+a2) << posBite;
@@ -213,7 +212,7 @@ public class BPerson {
 
 	public String getGenotypeScoreString(int i) {
 		int posByte = i >> shift;
-		int posBite = (i - (i >> shift << shift)) << 1;
+		int posBite = (i & 0xf) << 1;
 		int g = (alleles[posByte] >> (posBite)) & 3;
 		if (g == 1) {// 01
 			return Parameter.missingGenotype;
@@ -236,7 +235,7 @@ public class BPerson {
 
 	public String getBiAlleleGenotypeString(int i) {
 		int posByte = i >> shift;
-		int posBite = (i - (i >> shift << shift)) << 1;
+		int posBite = (i & 0xf) << 1;
 		int g = (alleles[posByte] >> posBite) & 3;
 		if (g == 3) {
 			return Parameter.missingGenotype;
@@ -250,7 +249,7 @@ public class BPerson {
 
 	public int getGenotypeScore(int i) {
 		int posByte = i >> shift;
-		int posBite = (i - (i >> shift << shift)) << 1;
+		int posBite = (i & 0xf) << 1;
 		int g = (alleles[posByte] >> (posBite)) & 3;
 		return g;
 //		if (g == 1) {// 01
@@ -266,7 +265,7 @@ public class BPerson {
 
 	public byte getOriginalGenotypeScore(int i) {//this only for write back to bed file purpose
 		int posByte = i >> shift;
-		int posBite = (i - (i >> shift << shift)) << 1;
+		int posBite = (i & 0xf) << 1;
 		int g = (alleles[posByte] >> (posBite)) & 3;
 		switch(g) {
 			case 0: g = 0; break;

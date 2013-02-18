@@ -407,7 +407,7 @@ public class Strand {
 				int idx = 0;
 
 				int posByte = snpIdx >> BPerson.shift;
-				int posBite = (snpIdx - (snpIdx >> BPerson.shift << BPerson.shift)) << 1;
+				int posBite = (snpIdx & 0xf) << 1;
 
 				for (int j = 0; j < PersonTable1.size(); j++) {
 					PersonIndex pi = PersonTable1.get(j);
