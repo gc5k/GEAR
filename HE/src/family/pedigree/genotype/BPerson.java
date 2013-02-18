@@ -197,7 +197,7 @@ public class BPerson {
 	public void addAllMarker(byte[] g) {
 		for (int i = 0; i < g.length; i++) {
 			int posByte = i >> 2; // one int holds 4 bytes.
-			int posBiteShift = (i - (i >> 2 << 2)) << 3;
+			int posBiteShift =  (i & 0x3) << 3;
 			int gn = 0;
 			switch(g[i]) {
 				case 2: gn = 1; break;
