@@ -193,7 +193,7 @@ public class BPerson {
 
 		for (int i = 0; i < g.length; i++) {
 			int posByte = i >> 2; // one int holds 4 bytes.
-			int posBiteShift = (i - (i >> 2 << 2)) << 3;
+			int posBiteShift =  (i & 0x3) << 3;;
 			alleles[posByte] |= g[i] << posBiteShift;
 		}
 
