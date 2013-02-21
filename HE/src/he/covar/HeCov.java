@@ -5,9 +5,6 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
-import java.util.Iterator;
-import java.util.Set;
-import java.util.TreeSet;
 
 import org.apache.commons.math.linear.Array2DRowRealMatrix;
 import org.apache.commons.math.linear.LUDecompositionImpl;
@@ -37,7 +34,7 @@ public class HeCov {
 	private HashMap<String, Integer> ID2Idx;
 
 	public HeCov(double[][] p, boolean[] f, HashMap<String, Integer> I, String qf, int[] q_i, String cf, int[] c_i) {
-		
+
 		y = p;
 
 		flag = f;
@@ -74,15 +71,12 @@ public class HeCov {
 							for(int i = 0; i < qcov_idx.length; i++) {
 								qcov_idx[i] = i+1;
 							}
-						} else {
-							for(int i = 0; i < qcov_idx.length; i++) {
-								System.out.println("qcov" + qcov_idx[i]);
-							}
 						}
 						q_cov = new double[flag.length][qcov_idx.length];
 					}
 
 					if (ID2Idx.containsKey(sb.toString())) {
+
 						boolean f = true;
 						int idx = ID2Idx.get(sb.toString()).intValue();
 						c = NewIt.newArrayList();
@@ -92,8 +86,8 @@ public class HeCov {
 							}
 							c.add(s[1+qcov_idx[i]]);
 						}
-						
-						cov_flag[idx] = f;
+
+						cov_flag[idx] = f & flag[idx]; //it should exist phenotype
 						if(f) {
 							for (int i = 0; i < c.size(); i++) {
 								q_cov[idx][i] = Double.parseDouble(c.get(i));
@@ -107,6 +101,7 @@ public class HeCov {
 				e.printStackTrace();
 			}
 		}
+
 
 		if( cov_file != null ) {
 
@@ -155,8 +150,8 @@ public class HeCov {
 						
 						if ( qcov_file != null ) {//should be existed in both
 							cov_flag[idx] &= f;
-						} else {//if exists in this file
-							cov_flag[idx] = f;				
+						} else {//if exists this file only, it should be lined up with the phenotype
+							cov_flag[idx] = f & flag[idx];
 						}
 						if (cov_flag[idx]) {
 							cov.set(idx, c);
@@ -182,8 +177,6 @@ public class HeCov {
 		for (int i = 0; i < cov_flag.length; i++) {
 			if(cov_flag[i]) {
 				dim++;
-			} else {
-				System.out.println(i);
 			}
 		}
 
@@ -192,9 +185,9 @@ public class HeCov {
 
 		int cn = 0;
 		for (int i = 0; i < cov_flag.length; i++) {
-			if (!cov_flag[i]) continue;
-			phe[cn][0] = y[i][1];
-			cn++;
+			if (cov_flag[i]) {
+				phe[cn++][0] = y[i][1];
+			}
 		}
 
 		double[][] x1 = null;
@@ -250,7 +243,6 @@ public class HeCov {
 			}
 		}
 
-		System.out.println(x3.length + " " + x3[0].length);
 		RealMatrix Y = new Array2DRowRealMatrix(phe);
 		RealMatrix X = new Array2DRowRealMatrix(x3);
 
@@ -260,14 +252,14 @@ public class HeCov {
 		RealMatrix XtX_Inv = (new LUDecompositionImpl(XtX)).getSolver().getInverse();
 		RealMatrix Mat_B = XtX_Inv.multiply(XtY);
 
-		System.out.println(Mat_B);
 		RealMatrix Pre = X.multiply(Mat_B);
 
 		int cc=0;
 		for(int i = 0; i < cov_flag.length; i++) {
 			flag[i] &= cov_flag[i];
-			if (!cov_flag[i]) continue;
-			y[i][1] -= Pre.getEntry(cc++, 0);
+			if (cov_flag[i]) {
+				y[i][1] -= Pre.getEntry(cc++, 0);
+			}
 		}
 	}
 }

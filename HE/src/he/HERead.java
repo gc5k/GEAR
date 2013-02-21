@@ -183,7 +183,7 @@ public class HERead {
 			}
 		}
 
-		if(p.covar_file!= null || p.qcovar_file != null) {
+		if( p.qcovar_file != null || p.covar_file!= null ) {
 			// if there are covariates
 			HeCov he_cov = new HeCov(y, flag, ID2Idx, p.qcovar_file, p.qcovar_num, p.covar_file, p.covar_num);
 		}
