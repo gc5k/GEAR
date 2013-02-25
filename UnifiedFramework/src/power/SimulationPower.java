@@ -109,10 +109,12 @@ public final class SimulationPower {
 	}
 
 	public String toString() {
+		
+		DecimalFormat fmt = new DecimalFormat("#.###E0");
 		StringBuilder sb = new StringBuilder();
 		sb.append(threshold.length + " rounds of permutation:");
 		sb.append(System.getProperty("line.separator"));
-		sb.append("significance level at alpha = 0.05, BTA threshold=" + String.format("%.4f", t_005));
+		sb.append("significance level at alpha = 0.05, BTA threshold=" + fmt.format(t_005));
 		sb.append(System.getProperty("line.separator"));
 		if (result_005.size() > 0) {
 			for (SimulationStatistic sr : result_005) {
@@ -122,7 +124,7 @@ public final class SimulationPower {
 			sb.append("null");
 			sb.append(System.getProperty("line.separator"));
 		}
-		sb.append("significance level at alpha = 0.01, BTA threshold=" + String.format("%.4f", t_001));
+		sb.append("significance level at alpha = 0.01, BTA threshold=" + fmt.format(t_001));
 		sb.append(System.getProperty("line.separator"));
 		if (result_001.size() > 0) {
 			for (SimulationStatistic sr : result_001) {
