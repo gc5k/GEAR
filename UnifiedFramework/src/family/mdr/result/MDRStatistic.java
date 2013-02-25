@@ -1,5 +1,7 @@
 package family.mdr.result;
 
+import java.text.DecimalFormat;
+
 import org.apache.commons.math.MathException;
 import org.apache.commons.math.distribution.FDistributionImpl;
 
@@ -179,20 +181,23 @@ public class MDRStatistic implements Comparable<MDRStatistic> {
 		StringBuilder sb = new StringBuilder();
 		F();
 		sb.append(N + ", ");
-		sb.append(String.format("%.4f", Vx/Vt) + ", ");
-		sb.append(String.format("%.4f", Vx));
+		
+		DecimalFormat fmt = new DecimalFormat("#.###E0");
+
+		sb.append(fmt.format(Vx/Vt) + ", ");
+		sb.append(fmt.format(Vx));
 		sb.append(", ");
-		sb.append(String.format("%.4f", Vt));
+		sb.append(fmt.format(Vt));
 		sb.append(", ");
 //		sb.append(String.format("%.4f", FValue));
 //		sb.append(", ");
 //		sb.append(String.format("%.4E", PF));
 //		sb.append(", "+degreeNumerator +", "+degreeDenominator+", ");
-		sb.append(String.format("%.4f", stats[1]) + ", ");
-		sb.append(String.format("%.4f", stats[0]) + ", ");
+		sb.append(fmt.format(stats[1]) + ", ");
+		sb.append(fmt.format(stats[0]) + ", ");
 		if (Parameter.permFlag) {
-			sb.append(String.format("%.4f", meanT) + ", " 
-				+ String.format("%.4f", seT)+ ", " + String.format("%.4E", pT) + ", ");
+			sb.append(fmt.format(meanT) + ", " 
+				+ fmt.format(seT)+ ", " + fmt.format(pT) + ", ");
 		}
 		
 

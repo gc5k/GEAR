@@ -2,6 +2,7 @@ package family.mdr;
 import java.io.FileNotFoundException;
 import java.io.PrintStream;
 import java.math.BigInteger;
+import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.Set;
 import java.util.Map.Entry;
@@ -507,8 +508,9 @@ public class HeteroCombinationSearchP extends AbstractMergeSearch {
 		b0 /= Parameter.testUnit;
 		b0 *= t;
 		b0 /= 3600000;
-		System.err.println("Estimated time (hour) to complete the whole analysis: " + String.format("%.4f", b0));
-		Test.LOG.append("Estimated time (hour) to complete the whole analysis: " + String.format("%.4f", b0));
+		DecimalFormat fmt = new DecimalFormat("#.###E0");
+		System.err.println("Estimated time (hour) to complete the whole analysis: " + fmt.format(b0));
+		Test.LOG.append("Estimated time (hour) to complete the whole analysis: " + fmt.format(b0));
 		Test.LOG.append("\n");
 	}
 
