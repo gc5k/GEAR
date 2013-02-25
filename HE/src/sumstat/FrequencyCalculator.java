@@ -143,7 +143,7 @@ public class FrequencyCalculator {
 	}
 
 	public String toString() {
-		NumberFormat formatter = new DecimalFormat(".###E0");
+		NumberFormat fmt = new DecimalFormat(".###E0");
 
 		StringBuffer sb = new StringBuffer();
 		if(par.freqFlag) {
@@ -156,11 +156,11 @@ public class FrequencyCalculator {
 			SNP snp = snpMap.getSNP(i);
 			sb.append(snp.getChromosome() + "\t" + snp.getName() + "\t" + snp.getRefAllele() + "\t"  + snp.getSecAllele() + "\t");
 			if (par.freqFlag) {
-				sb.append(String.format("%.3f", allelefreq[i][0]) + "\t" + String.format("%.3f", allelefreq[i][1]) + "\t"
-					+ String.format("%.3f", allelefreq[i][2]) + "\t" + N[i][3] * 2);
+				sb.append(fmt.format(allelefreq[i][0]) + "\t" + fmt.format(allelefreq[i][1]) + "\t"
+					+ fmt.format(allelefreq[i][2]) + "\t" + N[i][3] * 2);
 			} else if (par.genoFreqFlag){
-				sb.append(String.format("%.3f", genotypefreq[i][0]) + "\t"
-					+ String.format("%.3f", genotypefreq[i][1]) + "\t" + String.format("%.3f", genotypefreq[i][2]) + "\t"
+				sb.append(fmt.format(genotypefreq[i][0]) + "\t"
+					+ fmt.format(genotypefreq[i][1]) + "\t" + fmt.format(genotypefreq[i][2]) + "\t"
 					+ N[i][3] * 2 + "\t" + hw[i][0]);
 			}
 			sb.append(System.getProperty("line.separator"));

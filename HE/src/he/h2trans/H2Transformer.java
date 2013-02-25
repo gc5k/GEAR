@@ -1,4 +1,6 @@
 package he.h2trans;
+import java.text.DecimalFormat;
+
 import parameter.Parameter;
 import org.apache.commons.math.MathException;
 import org.apache.commons.math.distribution.NormalDistributionImpl;
@@ -28,6 +30,8 @@ public class H2Transformer {
 	}
 
 	public void H2() {
+		DecimalFormat fmt = new DecimalFormat("#.###E0");
+
 		NormalDistributionImpl Norm = new NormalDistributionImpl();
 		double q = 0;
 		try {
@@ -42,18 +46,18 @@ public class H2Transformer {
 			double hl_se = 0;
 			if(cal_h2_se > 0) {
 				hl_se = cal_h2_se * (cal_k * (1-cal_k) * cal_k * (1-cal_k))/( z * z * P * (1-P));
-				sb.append("h2(l): " + String.format("%.6f", h2) + "\t" + String.format("%.6f", hl_se) + "\n");
+				sb.append("h2(l): " + fmt.format(h2) + "\t" + fmt.format(hl_se) + "\n");
 			} else {
-				sb.append("h2(l): " + String.format("%.6f", h2) + "\n");
+				sb.append("h2(l): " + fmt.format(h2) + "\n");
 			}
 		} else {
 			h2 = cal_hl * z * z * P * (1-P) / (cal_k * (1- cal_k) * cal_k * (1-cal_k));
 			double ho_se = 0;
 			if(cal_h2_se > 0) {
 				ho_se = cal_h2_se / ( (cal_k * (1-cal_k) * cal_k * (1-cal_k))/( z * z * P * (1-P)) );
-				sb.append("h2(o): " + String.format("%.6f", h2) + "\t" + String.format("%.6f", ho_se) + "\n");
+				sb.append("h2(o): " + fmt.format(h2) + "\t" + fmt.format(ho_se) + "\n");
 			} else {
-				sb.append("h2(o): " + String.format("%.6f", h2) + "\n");
+				sb.append("h2(o): " + fmt.format(h2) + "\n");
 			}
 		}
 		System.out.println(sb);

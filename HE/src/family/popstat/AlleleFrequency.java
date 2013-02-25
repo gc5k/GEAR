@@ -1,5 +1,7 @@
 package family.popstat;
 
+import java.text.DecimalFormat;
+
 import org.apache.commons.math.MathException;
 import org.apache.commons.math.stat.inference.ChiSquareTestImpl;
 
@@ -89,15 +91,17 @@ public class AlleleFrequency {
 	}
 
 	public String toString() {
+		DecimalFormat fmt = new DecimalFormat("#.###E0");
+
 		StringBuffer sb = new StringBuffer();
 		sb.append(G.getG().length);
 		sb.append(System.getProperty("line.separator"));
 		for (int i = 0; i < allelefreq.length; i++) {
 
-			sb.append(String.format("%.3f", allelefreq[i][0]) + " " + String.format("%.3f", allelefreq[i][1]) + " "
-					+ String.format("%.3f", allelefreq[i][2]) + "; " + String.format("%.3f", genotypefreq[i][0]) + " "
-					+ String.format("%.3f", genotypefreq[i][1]) + " " + String.format("%.3f", genotypefreq[i][2]) + " "
-					+ String.format("%.3f", genotypefreq[i][3]));
+			sb.append(fmt.format(allelefreq[i][0]) + " " + fmt.format(allelefreq[i][1]) + " "
+					+ fmt.format(allelefreq[i][2]) + "; " + fmt.format(genotypefreq[i][0]) + " "
+					+ fmt.format(genotypefreq[i][1]) + " " + fmt.format(genotypefreq[i][2]) + " "
+					+ fmt.format(genotypefreq[i][3]));
 	//		sb.append(" hw.fisher " + String.format("%.3f", hw[i][0]) + " hw.chi " + String.format("%.3f", hw[i][1]));
 			sb.append(System.getProperty("line.separator"));
 		}

@@ -1,5 +1,7 @@
 package family.pedigree.file;
 
+import java.text.DecimalFormat;
+
 import test.Test;
 import parameter.Parameter;
 
@@ -121,6 +123,8 @@ public class SNP implements Comparable<SNP>{
 	}
 
 	public String toString() {
+		DecimalFormat fmt = new DecimalFormat("#.###E0");
+
 		StringBuffer sb = new StringBuffer();
 		sb.append(name + ", ");
 		sb.append(chr + ", ");
@@ -134,11 +138,11 @@ public class SNP implements Comparable<SNP>{
 			d0 = freq[0];
 		}
 		if (d0 < d1) {
-			sb.append(snp[0] + ", " + String.format("%.3f", d0 / (d0 + d1)) + ", ");
+			sb.append(snp[0] + ", " + fmt.format(d0 / (d0 + d1)) + ", ");
 //					+ "), " + snp[1] + "("
 //					+ String.format("%.2f", d1 / (d0 + d1)) + ")");
 		} else {
-			sb.append(snp[1] + ", " + String.format("%.3f", d1 / (d0 + d1)) + ", ");
+			sb.append(snp[1] + ", " + fmt.format(d1 / (d0 + d1)) + ", ");
 //					+ "), " + snp[0] + "("
 //					+ String.format("%.2f", d0 / (d0 + d1)) + ")");
 		}

@@ -7,6 +7,7 @@ import java.io.FileOutputStream;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.PrintWriter;
+import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Calendar;
@@ -139,6 +140,7 @@ public class SimuPolyQT {
 	}
 
 	public void GenerateSampleNoSelection() {
+		DecimalFormat fmt = new DecimalFormat("#.###E0");
 
 		int count = 0;
 		RealMatrix effect = null;
@@ -163,12 +165,12 @@ public class SimuPolyQT {
 		double vg = StatUtils.variance(BV);
 		double ve = vg * (1-h2) / h2;
 		double E = Math.sqrt(ve);
-		LOG.append("Vg=" + String.format("%.3f", vg) + "\n");
+		LOG.append("Vg=" + fmt.format(vg) + "\n");
 		for (int i = 0; i < sample; i++) {
 			phenotype[i] = BV[i] + rnd.nextGaussian(0, E);
 		}
 		double vp = StatUtils.variance(phenotype);
-		LOG.append("Vp=" + String.format("%.3f", vp) + "\n");
+		LOG.append("Vp=" + fmt.format(vp) + "\n");
 		LOG.append("total individuals visited (no selection): " + count + "\n");
 	}
 

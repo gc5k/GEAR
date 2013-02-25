@@ -8,6 +8,7 @@ import java.io.FileReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.PrintWriter;
+import java.text.DecimalFormat;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Iterator;
@@ -302,6 +303,7 @@ public class HERegression {
 	}
 
 	public void Regression() {
+		DecimalFormat fmt = new DecimalFormat("#.###E0");
 
 		RealMatrix Mat_XtX = new Array2DRowRealMatrix(XtX);
 		RealMatrix Mat_XtY = new Array2DRowRealMatrix(XtY);
@@ -339,7 +341,7 @@ public class HERegression {
 		sb.append("Coef\t" + "Estimate \t" + "se" + "\n");
 		
 		for (int i = 0; i < Mat_B.getRowDimension(); i++) {
-			sb.append("b" + i + "\t" + String.format("%.6f", Mat_B.getEntry(i, 0)) + "\t" + String.format("%.6f",Math.sqrt(v.getEntry(i, i))) + "\n");
+			sb.append("b" + i + "\t" + fmt.format(Mat_B.getEntry(i, 0)) + "\t" + fmt.format(Math.sqrt(v.getEntry(i, i))) + "\n");
 		}
 
 		if (!reverse) {
@@ -362,7 +364,7 @@ public class HERegression {
 			if (heType[Parameter.he_cp]) {
 				v_ho = Math.sqrt(v_b1);
 			}
-			sb.append("h2(o): " + String.format("%.6f", h_o) + "\t" + String.format("%.6f", v_ho) + "\n");
+			sb.append("h2(o): " + fmt.format(h_o) + "\t" + fmt.format(v_ho) + "\n");
 
 			if (k_button && isCC) {
 				NormalDistributionImpl Norm = new NormalDistributionImpl();
@@ -378,7 +380,7 @@ public class HERegression {
 
 				double f = (k * (1-k) * k * (1-k))/( z * z * P * (1-P));
 				double v_hl = v_ho * f * f;
-				sb.append("h2(l): " + String.format("%.6f", h_l) + "\t" + String.format("%.6f", v_hl) + "\n");
+				sb.append("h2(l): " + fmt.format(h_l) + "\t" + fmt.format(v_hl) + "\n");
 			}
 		}
 
@@ -386,7 +388,7 @@ public class HERegression {
 		sb.append("variance-covariance\n");
 		for (int i = 0; i < v.getRowDimension(); i++) {
 			for (int j = 0; j <= i; j++) {
-				sb.append(String.format("%.6f", v.getEntry(i, j)) + " ");
+				sb.append(fmt.format(v.getEntry(i, j)) + " ");
 			}
 			sb.append("\n");
 		}
