@@ -7,6 +7,7 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.PrintWriter;
+import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -66,6 +67,8 @@ public class HEPermutation {
 	}
 
 	public void Permutation() {
+		DecimalFormat fmt = new DecimalFormat("#.###E0");
+
 		B = new double[heReader.perm];
 		if(heReader.permFlag) {
 			for(int i = 0; i < heReader.perm; i++) {
@@ -82,8 +85,8 @@ public class HEPermutation {
 		}
 
 		DescriptiveStatistics ds = new DescriptiveStatistics(B);
-		System.out.println("mean : " + String.format("%.6f", ds.getMean()));
-		System.out.println("standard deviation : " + String.format("%.6f", ds.getStandardDeviation()));
+		System.out.println("mean : " + fmt.format(ds.getMean()));
+		System.out.println("standard deviation : " + fmt.format(ds.getStandardDeviation()));
 		
 	}
 
@@ -232,6 +235,7 @@ public class HEPermutation {
 	}
 
 	public void Regression() {
+		DecimalFormat fmt = new DecimalFormat("#.###E0");
 
 		RealMatrix Mat_XtX = new Array2DRowRealMatrix(heReader.XtX);
 		RealMatrix Mat_XtY = new Array2DRowRealMatrix(heReader.XtY);
@@ -245,7 +249,7 @@ public class HEPermutation {
 		RealMatrix v = Mat_XtX_Inv.scalarMultiply(mse);
 
 		for (int i = 0; i < Mat_B.getRowDimension(); i++) {
-			heReader.sb.append("b" + i + "\t" + String.format("%.6f", Mat_B.getEntry(i, 0)) + "\t" + String.format("%.6f",Math.sqrt(v.getEntry(i, i))) + "\n");
+			heReader.sb.append("b" + i + "\t" + fmt.format(Mat_B.getEntry(i, 0)) + "\t" + fmt.format(Math.sqrt(v.getEntry(i, i))) + "\n");
 		}
 		
 		if (!heReader.reverse) {
@@ -268,7 +272,7 @@ public class HEPermutation {
 			if (heReader.heType[Parameter.he_cp]) {
 				v_ho = Math.sqrt(v_b1);
 			}
-			heReader.sb.append("h2(o): " + String.format("%.6f", h_o) + "\t" + String.format("%.6f", v_ho) + "\n");
+			heReader.sb.append("h2(o): " + fmt.format(h_o) + "\t" + fmt.format(v_ho) + "\n");
 
 			if (heReader.k_button && heReader.isCC) {
 				NormalDistributionImpl Norm = new NormalDistributionImpl();
@@ -283,7 +287,7 @@ public class HEPermutation {
 
 				double f = (heReader.k * (1-heReader.k) * heReader.k * (1-heReader.k))/( z * z * heReader.P * (1-heReader.P));
 				double v_hl = v_ho * f * f;
-				heReader.sb.append("h2(l): " + String.format("%.6f", h_l) + "\t" + String.format("%.6f", v_hl) + "\n");
+				heReader.sb.append("h2(l): " + fmt.format(h_l) + "\t" + fmt.format(v_hl) + "\n");
 			}
 		}
 
@@ -291,7 +295,7 @@ public class HEPermutation {
 		heReader.sb.append("variance-covariance\n");
 		for (int i = 0; i < v.getRowDimension(); i++) {
 			for (int j = 0; j <= i; j++) {
-				heReader.sb.append(String.format("%.6f", v.getEntry(i, j)) + " ");
+				heReader.sb.append(fmt.format(v.getEntry(i, j)) + " ");
 			}
 			heReader.sb.append("\n");
 		}

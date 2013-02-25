@@ -5,6 +5,7 @@ import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.PrintStream;
+import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
@@ -86,6 +87,8 @@ public class MergeTwoFile {
 	}
 
 	public void Merge() {
+		DecimalFormat fmt = new DecimalFormat("#.###E0");
+
 		StringBuffer sb = new StringBuffer();
 		sb.append(par.out);
 		sb.append(".mergesnp");
@@ -259,11 +262,11 @@ public class MergeTwoFile {
 				flag.add(f);
 				if (f) qualified_snp++;
 				
-				ps.println(snpList1.get(comSNPIdx[0][i]).getName() + " " + snpList1.get(comSNPIdx[0][i]).getChromosome() + " " + snpList1.get(comSNPIdx[0][i]).getPosition() + " " + a1_1 + " " + a1_2 + " "+ a2_1 + " " + a2_2 + " " + " " + String.format("%3f", ref1) + " " + String.format("%3f", allelefreq2[comSNPIdx[1][i]][0]) + " " + flip + " " + f + " " + p + " scheme" + scheme);
+				ps.println(snpList1.get(comSNPIdx[0][i]).getName() + " " + snpList1.get(comSNPIdx[0][i]).getChromosome() + " " + snpList1.get(comSNPIdx[0][i]).getPosition() + " " + a1_1 + " " + a1_2 + " "+ a2_1 + " " + a2_2 + " " + " " + fmt.format(ref1) + " " + fmt.format(allelefreq2[comSNPIdx[1][i]][0]) + " " + flip + " " + f + " " + p + " scheme" + scheme);
 			} else {
 				flag.add(false);
 				snpCoding.add(0);
-				ps1.println(snpList1.get(comSNPIdx[0][i]).getName() + " " + snpList1.get(comSNPIdx[0][i]).getChromosome() + " " + snpList1.get(comSNPIdx[0][i]).getPosition() + " " + a1_1 + " " + a1_2 + " " + a2_1 + " " + a2_2 + " " + " " +String.format("%3f", ref1) + " " + String.format("%3f", allelefreq2[comSNPIdx[1][i]][0]) + " " + flip + " " + f + " " + 1 + " scheme" + scheme);
+				ps1.println(snpList1.get(comSNPIdx[0][i]).getName() + " " + snpList1.get(comSNPIdx[0][i]).getChromosome() + " " + snpList1.get(comSNPIdx[0][i]).getPosition() + " " + a1_1 + " " + a1_2 + " " + a2_1 + " " + a2_2 + " " + " " + fmt.format(ref1) + " " + fmt.format(allelefreq2[comSNPIdx[1][i]][0]) + " " + flip + " " + f + " " + 1 + " scheme" + scheme);
 			}
 		}
 

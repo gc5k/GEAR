@@ -7,6 +7,7 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.PrintWriter;
+import java.text.DecimalFormat;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Set;
@@ -178,6 +179,8 @@ public class HECalculate {
 
 	public void Regression() {
 
+		DecimalFormat fmt = new DecimalFormat("#.###E0");
+
 		RealMatrix Mat_XtX = new Array2DRowRealMatrix(heReader.XtX);
 		RealMatrix Mat_XtY = new Array2DRowRealMatrix(heReader.XtY);
 
@@ -219,7 +222,7 @@ public class HECalculate {
 		heReader.sb.append("Coef\t" + "Estimate \t" + "se" + "\n");
 		
 		for (int i = 0; i < Mat_B.getRowDimension(); i++) {
-			heReader.sb.append("b" + i + "\t" + String.format("%.6f", Mat_B.getEntry(i, 0)) + "\t" + String.format("%.6f",Math.sqrt(v.getEntry(i, i))) + "\n");
+			heReader.sb.append("b" + i + "\t" + fmt.format(Mat_B.getEntry(i, 0)) + "\t" + fmt.format(Math.sqrt(v.getEntry(i, i))) + "\n");
 		}
 
 		if (!heReader.reverse) {
@@ -242,7 +245,7 @@ public class HECalculate {
 			if (heReader.heType[Parameter.he_cp]) {
 				v_ho = Math.sqrt(v_b1);
 			}
-			heReader.sb.append("h2(o): " + String.format("%.6f", h_o) + "\t" + String.format("%.6f", v_ho) + "\n");
+			heReader.sb.append("h2(o): " + fmt.format(h_o) + "\t" + fmt.format(v_ho) + "\n");
 
 			if (heReader.k_button && heReader.isCC) {
 				NormalDistributionImpl Norm = new NormalDistributionImpl();
@@ -257,7 +260,7 @@ public class HECalculate {
 
 				double f = (heReader.k * (1-heReader.k) * heReader.k * (1-heReader.k))/( z * z * heReader.P * (1-heReader.P));
 				double v_hl = v_ho * f * f;
-				heReader.sb.append("h2(l): " + String.format("%.6f", h_l) + "\t" + String.format("%.6f", v_hl) + "\n");
+				heReader.sb.append("h2(l): " + fmt.format(h_l) + "\t" + fmt.format(v_hl) + "\n");
 			}
 		}
 
@@ -265,18 +268,18 @@ public class HECalculate {
 		heReader.sb.append("variance-covariance\n");
 		for (int i = 0; i < v.getRowDimension(); i++) {
 			for (int j = 0; j <= i; j++) {
-				heReader.sb.append(String.format("%.6f", v.getEntry(i, j)) + " ");
+				heReader.sb.append(fmt.format(v.getEntry(i, j)) + " ");
 			}
 			heReader.sb.append("\n");
 		}
 		
 		heReader.lambda.calLambda();
-		heReader.sb.append("\ncov(Y, X): " + String.format("%.6f", heReader.lambda.getCov()) + "\n");  
-		heReader.sb.append("var(X): " + String.format("%.6f", heReader.lambda.getVar()) + "\n");
+		heReader.sb.append("\ncov(Y, X): " + fmt.format(heReader.lambda.getCov()) + "\n");  
+		heReader.sb.append("var(X): " + fmt.format(heReader.lambda.getVar()) + "\n");
 
 		if (heReader.par.eh2Flag) {
 			double Lmd = heReader.lambda.getLambda(-1 * Mat_B.getEntry(0, 0) * heReader.par.eh2);
-			heReader.sb.append("Lambda: " + String.format("%.6f", Lmd));
+			heReader.sb.append("Lambda: " + fmt.format(Lmd));
 		}
 
 		System.out.println(heReader.sb);
