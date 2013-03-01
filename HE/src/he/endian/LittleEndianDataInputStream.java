@@ -9,7 +9,7 @@ import java.nio.*;
 
 public class LittleEndianDataInputStream {
 
-	LittleEndianDataInputStream(DataInputStream inStream, int bufferSize) {
+	public LittleEndianDataInputStream(DataInputStream inStream, int bufferSize) {
 		inStream_ = inStream;
 		buffer_ = ByteBuffer.allocate(bufferSize);
 	}

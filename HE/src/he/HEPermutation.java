@@ -1,6 +1,9 @@
 package he;
 
+import he.endian.LittleEndianDataInputStream;
+
 import java.io.BufferedReader;
+import java.io.DataInputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
@@ -133,97 +136,175 @@ public class HEPermutation {
 //				e.printStackTrace();
 //			}
 		} else {
-			heReader.XtX = new double[2][2];
-			heReader.XtY = new double[2];
-			FileInputStream fin = null;
-			try {
-				fin = new FileInputStream(heReader.grmFile);
-			} catch (FileNotFoundException e1) {
-				e1.printStackTrace();
-			}
-			GZIPInputStream gzis = null;
-			try {
-				gzis = new GZIPInputStream(fin);
-			} catch (IOException e1) {
-				e1.printStackTrace();
-			}
-			InputStreamReader xover = new InputStreamReader(gzis);
+			if (!Parameter.grm_bin_flag) {
+				heReader.XtX = new double[2][2];
+				heReader.XtY = new double[2];
+				// *************************************read grm file
+				FileInputStream fin = null;
+				try {
+					fin = new FileInputStream(heReader.grmFile);
+				} catch (FileNotFoundException e1) {
+					e1.printStackTrace();
+				}
+				GZIPInputStream gzis = null;
+				try {
+					gzis = new GZIPInputStream(fin);
+				} catch (IOException e1) {
+					e1.printStackTrace();
+				}
+				InputStreamReader xover = new InputStreamReader(gzis);
 
-			BufferedReader grmFile = new BufferedReader(xover);
+				BufferedReader grmFile = new BufferedReader(xover);
 
-			try {
+				try {
+					HashMap<Double, Integer> cat = new HashMap<Double, Integer>();
+					while ((line = grmFile.readLine()) != null) {
+						String[] s = line.split(delim);
+						int id1 = Integer.parseInt(s[0]) - 1;
+						int id2 = Integer.parseInt(s[1]) - 1;
+						if (id1 == id2)
+							continue;
+						if (!(heReader.flag[id1] & heReader.flag[id2]))
+							continue;
+						double ds = 0;
+						if (heReader.heType[Parameter.he_sd]) {
+							ds = (heReader.y[id1][1] - heReader.y[id2][1])
+									* (heReader.y[id1][1] - heReader.y[id2][1]);
+						} else if (heReader.heType[Parameter.he_ss]) {
+							ds = (heReader.y[id1][1] + heReader.y[id2][1])
+									* (heReader.y[id1][1] + heReader.y[id2][1]);
+						} else if (heReader.heType[Parameter.he_cp]) {
+							ds = heReader.y[id1][1] * heReader.y[id2][1];
+						}
+
+						if (cat.containsKey(heReader.y[id1][1])) {
+							Integer I = (Integer) cat.get(heReader.y[id1][1]);
+							I++;
+							cat.put(heReader.y[id1][1], I);
+						} else {
+							cat.put(heReader.y[id1][1], 1);
+						}
+						if (cat.containsKey(heReader.y[id2][1])) {
+							Integer I = (Integer) cat.get(heReader.y[id2][1]);
+							I++;
+							cat.put(heReader.y[id2][1], I);
+						} else {
+							cat.put(heReader.y[id2][1], 1);
+						}
+						heReader.yyProd += ds * ds;
+						heReader.XtX[0][0]++;
+						double g = Double.parseDouble(s[3]);
+						heReader.XtX[0][1] += g;
+						heReader.XtX[1][0] += g;
+						heReader.XtX[1][1] += g * g;
+
+						heReader.XtY[0] += ds;
+						heReader.XtY[1] += g * ds;
+
+						heReader.lambda.XYProd += g * ds;
+						heReader.lambda.XXProd += g * g;
+						heReader.lambda.SY += ds;
+						heReader.lambda.SX += g;
+
+						heReader.lambda.N++;
+					}
+
+					if (cat.size() == 2) {
+						heReader.isCC = true;
+						Set<Double> set = cat.keySet();
+						Iterator<Double> it = set.iterator();
+						Double k1 = it.next();
+						Double k2 = it.next();
+						Integer c1 = cat.get(k1);
+						Integer c2 = cat.get(k2);
+
+						if (k1 > k2) {
+							heReader.P = c1.doubleValue()
+									/ (c1.doubleValue() + c2.doubleValue());
+						} else {
+							heReader.P = c2.doubleValue()
+									/ (c1.doubleValue() + c2.doubleValue());
+						}
+					}
+					grmFile.close();
+
+				} catch (IOException e) {
+					e.printStackTrace();
+				}
+			} else {//grm.bin
 				HashMap<Double, Integer> cat = new HashMap<Double, Integer>();
-				while ((line = grmFile.readLine()) != null) {
-					String[] s = line.split(delim);
-					int id1 = Integer.parseInt(s[0]) - 1;
-					int id2 = Integer.parseInt(s[1]) - 1;
-					if (id1 == id2)
-						continue;
-					if (!(heReader.flag[id1] & heReader.flag[id2]))
-						continue;
-					double ds = 0;
-					if (heReader.heType[Parameter.he_sd]) {
-						ds = (y[id1][1] - y[id2][1]) * (y[id1][1] - y[id2][1]);
-					} else if (heReader.heType[Parameter.he_ss]) {
-						ds = (y[id1][1] + y[id2][1]) * (y[id1][1] + y[id2][1]);
-					} else if (heReader.heType[Parameter.he_cp]) {
-						ds = y[id1][1] * y[id2][1];
-					}
 
-					if (cat.containsKey(y[id1][1])) {
-						Integer I = (Integer) cat.get(y[id1][1]);
-						I++;
-						cat.put(y[id1][1], I);
-					} else {
-						cat.put(y[id1][1], 1);
-					}
-					if (cat.containsKey(y[id2][1])) {
-						Integer I = (Integer) cat.get(y[id2][1]);
-						I++;
-						cat.put(y[id2][1], I);
-					} else {
-						cat.put(y[id2][1], 1);
-					}
-					heReader.yyProd += ds * ds;
-					heReader.XtX[0][0]++;
-					double g = Double.parseDouble(s[3]);
-					heReader.XtX[0][1] += g;
-					heReader.XtX[1][0] += g;
-					heReader.XtX[1][1] += g * g;
-
-					heReader.XtY[0] += ds;
-					heReader.XtY[1] += g * ds;
-					
-					
-					heReader.lambda.XYProd += g * ds;
-					heReader.lambda.XXProd += g * g;
-					heReader.lambda.SY += ds;
-					heReader.lambda.SX += g;
-
-					heReader.lambda.N++;
-
+				FileInputStream fileStream = null;
+				try {
+					fileStream = new FileInputStream(Parameter.grm_bin);
+				} catch (FileNotFoundException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
 				}
+				DataInputStream bigEndianDataStream = new DataInputStream(fileStream);
+				LittleEndianDataInputStream littleEndianDataStream = new LittleEndianDataInputStream(bigEndianDataStream, Float.SIZE);
 
-				if (cat.size() == 2) {
-					heReader.isCC = true;
-					Set<Double> set = cat.keySet();
-					Iterator<Double> it = set.iterator();
-					Double k1 = it.next();
-					Double k2 = it.next();
-					Integer c1 = cat.get(k1);
-					Integer c2 = cat.get(k2);
+				for (int i = 0; i < heReader.flag.length; i++) {
+					for (int j = 0; j <= i; j++) {
+						float g = 0;
+						try {
+							if (littleEndianDataStream.available()>0) {
+								g = littleEndianDataStream.readFloat();
+							}
+						} catch (IOException e) {
+							// TODO Auto-generated catch block
+							e.printStackTrace();
+						}
 
-					if (k1 > k2) {
-						heReader.P = c1.doubleValue()
-								/ (c1.doubleValue() + c2.doubleValue());
-					} else {
-						heReader.P = c2.doubleValue()
-								/ (c1.doubleValue() + c2.doubleValue());
+						int id1 = i;
+						int id2 = j;
+						if (id1 == id2)
+							continue;
+						if (!(heReader.flag[id1] & heReader.flag[id2]))
+							continue;
+						double ds = 0;
+						if (heReader.heType[Parameter.he_sd]) {
+							ds = (heReader.y[id1][1] - heReader.y[id2][1])
+									* (heReader.y[id1][1] - heReader.y[id2][1]);
+						} else if (heReader.heType[Parameter.he_ss]) {
+							ds = (heReader.y[id1][1] + heReader.y[id2][1])
+									* (heReader.y[id1][1] + heReader.y[id2][1]);
+						} else if (heReader.heType[Parameter.he_cp]) {
+							ds = heReader.y[id1][1] * heReader.y[id2][1];
+						}
+
+						if (cat.containsKey(heReader.y[id1][1])) {
+							Integer I = (Integer) cat.get(heReader.y[id1][1]);
+							I++;
+							cat.put(heReader.y[id1][1], I);
+						} else {
+							cat.put(heReader.y[id1][1], 1);
+						}
+						if (cat.containsKey(heReader.y[id2][1])) {
+							Integer I = (Integer) cat.get(heReader.y[id2][1]);
+							I++;
+							cat.put(heReader.y[id2][1], I);
+						} else {
+							cat.put(heReader.y[id2][1], 1);
+						}
+						heReader.yyProd += ds * ds;
+						heReader.XtX[0][0]++;
+						heReader.XtX[0][1] += g;
+						heReader.XtX[1][0] += g;
+						heReader.XtX[1][1] += g * g;
+
+						heReader.XtY[0] += ds;
+						heReader.XtY[1] += g * ds;
+
+						heReader.lambda.XYProd += g * ds;
+						heReader.lambda.XXProd += g * g;
+						heReader.lambda.SY += ds;
+						heReader.lambda.SX += g;
+
+						heReader.lambda.N++;
+
 					}
 				}
-				grmFile.close();
-			} catch (IOException e) {
-				e.printStackTrace();
 			}
 		}
 
