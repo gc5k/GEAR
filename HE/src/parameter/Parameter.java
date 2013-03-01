@@ -281,7 +281,11 @@ public class Parameter {
 	public static boolean[] heType = {true, false, false};
 	public static boolean heFlag = false;
 	
-
+	private final String cmd_grm_bin = "grm_bin";
+	private final String cmd_grm_bin_long = "grm-bin";
+	public static String grm_bin = null;
+	public static boolean grm_bin_flag = false;
+	
 	private final String cmd_grm = "grm";
 	public static String grm = null;
 	public static String grm_id = null;
@@ -596,6 +600,8 @@ public class Parameter {
 //haseman-elston regression
 		ops.addOption(OptionBuilder.withDescription("h2 ").hasArg().create(cmd_eh2));
 
+		ops.addOption(OptionBuilder.withLongOpt(cmd_grm_bin_long).withDescription("grm binary format").hasArg().create(cmd_grm_bin));
+		
 		ops.addOption(OptionBuilder.withDescription("grm ").hasArg().create(cmd_grm));
 
 		ops.addOption(OptionBuilder.withDescription("pheno ").hasArg().create(cmd_pheno));
@@ -1047,6 +1053,15 @@ public class Parameter {
 			grm = sb1.append(".grm.gz").toString();
 			StringBuilder sb2 = new StringBuilder(cl.getOptionValue(cmd_grm));
 			grm_id = sb2.append(".grm.id").toString();
+			grm_bin_flag = false;
+		}
+
+		if (cl.hasOption(cmd_grm_bin)) {
+			StringBuilder sb1 = new StringBuilder(cl.getOptionValue(cmd_grm_bin));
+			grm_bin = sb1.append(".grm.bin").toString();
+			StringBuilder sb2 = new StringBuilder(cl.getOptionValue(cmd_grm_bin));
+			grm_id = sb2.append(".grm.id").toString();
+			grm_bin_flag = true;
 		}
 
 		if (cl.hasOption(cmd_pheno)) {
