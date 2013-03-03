@@ -104,7 +104,7 @@ public class SimuPolyQT {
 	public static void main(String[] args) {
 
 		Parameter p = new Parameter();
-		p.commandListenor(args);
+		p.commandListener(args);
 
 
 	}

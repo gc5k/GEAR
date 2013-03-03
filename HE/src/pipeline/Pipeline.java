@@ -28,7 +28,7 @@ public class Pipeline {
 
 	public static void main(String[] args) {
 		Parameter p = new Parameter();
-		p.commandListenor(args);
+		p.commandListener(args);
 
 		System.out.print(Parameter.version);
 		Calendar calendar = Calendar.getInstance();
