@@ -648,7 +648,7 @@ public class Parameter {
 
 	}
 
-	public void commandListenor(String[] args) {
+	public void commandListener(String[] args) {
 		CommandLine cl = null;
 		try {
 			cl = parser.parse(ops, args);
@@ -1227,7 +1227,7 @@ public class Parameter {
 
 	public static void main(String[] args) {
 		Parameter p = new Parameter();
-		p.commandListenor(args);
+		p.commandListener(args);
 		System.out.println(p);
 	}
 

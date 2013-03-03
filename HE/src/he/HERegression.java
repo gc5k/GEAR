@@ -416,7 +416,7 @@ public class HERegression {
 	public static void main(String[] args) {
 
 		Parameter p = new Parameter();
-		p.commandListenor(args);
+		p.commandListener(args);
 
 		HERegression HER = null;
 		HER = new HERegression(p);

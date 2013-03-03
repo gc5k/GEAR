@@ -117,7 +117,7 @@ public class SimuPolyCC {
 	public static void main(String[] args) {
 
 		Parameter p = new Parameter();
-		p.commandListenor(args);
+		p.commandListener(args);
 
 	}
 

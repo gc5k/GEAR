@@ -34,7 +34,7 @@ public class Test {
 		Parameter p = new Parameter();
 
 		printCommandLine(scmd);
-		p.commandListenor(scmd);
+		p.commandListener(scmd);
 
 		PLINKParser pp = null;
 		if (Parameter.fileOption) {
