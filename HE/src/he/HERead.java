@@ -210,8 +210,7 @@ public class HERead {
 		Parameter p = new Parameter();
 		p.commandListener(args);
 
-		HERegression HER = null;
-		HER = new HERegression(p);
+		HERegression HER = new HERegression(p);
 		HER.Regression();
 	}
 
