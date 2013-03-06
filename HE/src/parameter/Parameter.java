@@ -454,6 +454,7 @@ public class Parameter {
 		return ops;
 	}
 
+	@SuppressWarnings("static-access")
 	public void commandInitial() {
 
 		ops.addOption(OptionBuilder.withDescription("file ").hasArg().create(cmd_file));
