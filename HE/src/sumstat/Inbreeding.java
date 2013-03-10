@@ -32,7 +32,6 @@ public class Inbreeding {
 	private GenotypeMatrix G;
 	private int numMarker;
 	private double[] maf;
-	private Parameter par;
 	private MapFile snpMap;
 	private SumStatQC ssQC;
 	
@@ -46,9 +45,7 @@ public class Inbreeding {
 
 	private ArrayList<String> GroupInfor = NewIt.newArrayList();
 	
-	public Inbreeding(Parameter p) {
-		par = p;
-
+	public Inbreeding() {
 		PLINKParser pp = null;
 		if (Parameter.fileOption) {
 			pp = new PLINKParser(Parameter.pedfile, Parameter.mapfile);
@@ -105,7 +102,7 @@ public class Inbreeding {
 		
 		PrintWriter fstOut = null;
 		try {
-			fstOut = new PrintWriter(new String(par.out + ".fst"));
+			fstOut = new PrintWriter(new String(Parameter.INSTANCE.out + ".fst"));
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
@@ -165,7 +162,7 @@ public class Inbreeding {
 		try {
 			while ((line = reader.readLine()) != null) {
 				line.trim();
-				String[] l = line.split(Parameter.whitespace);
+				String[] l = line.split(Parameter.INSTANCE.whitespace);
 				if(l.length < 3) continue;
 				famList.add(l[0]);
 				indList.add(l[1]);

@@ -16,10 +16,12 @@ import org.apache.commons.cli.PosixParser;
 import test.Test;
 import util.NewIt;
 
-public class Parameter {
+// singleton implemented in enum way
+public enum Parameter {
+	INSTANCE;
 
-	private final String sep=",";
-	public static String whitespace = "\\s+";
+	private final String sep = ",";
+	public final String whitespace = "\\s+";
 
 ////////////////bfile
 	private final String cmd_bfile = "bfile";
@@ -446,7 +448,7 @@ public class Parameter {
 
 	private CommandLineParser parser = new PosixParser();
 
-	public Parameter() {
+	private Parameter() {
 		commandInitial();
 	}
 
@@ -1227,9 +1229,8 @@ public class Parameter {
 	}
 
 	public static void main(String[] args) {
-		Parameter p = new Parameter();
-		p.commandListener(args);
-		System.out.println(p);
+		Parameter.INSTANCE.commandListener(args);
+		System.out.println(Parameter.INSTANCE);
 	}
 
 	public static boolean isNA(String n) {

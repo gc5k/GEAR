@@ -24,8 +24,6 @@ import org.apache.commons.math.linear.*;
 import org.apache.commons.math.distribution.*;
 
 public class HERead {
-
-	protected Parameter par;
 	private final String delim = "\\s+";
 	protected boolean[] flag;
 	HashMap<String, Integer> ID;
@@ -57,20 +55,19 @@ public class HERead {
 	protected Lambda lambda;
 	StringBuffer sb = new StringBuffer();
 
-	public HERead(Parameter p) {
-		par = p;
-		grmFile = p.grm;
-		grmID = p.grm_id;
-		keepFile = p.keepFile;
-		phenoFile = p.pheno;
-		mpheno = p.mpheno;
-		reverse = p.reverse;
-		k_button = p.k_button;
-		k = p.k;
-		output = p.out;
-		heType = p.heType;
-		permFlag = p.permFlag;
-		perm = p.perm;
+	public HERead() {
+		grmFile = Parameter.INSTANCE.grm;
+		grmID = Parameter.INSTANCE.grm_id;
+		keepFile = Parameter.INSTANCE.keepFile;
+		phenoFile = Parameter.INSTANCE.pheno;
+		mpheno = Parameter.INSTANCE.mpheno;
+		reverse = Parameter.INSTANCE.reverse;
+		k_button = Parameter.INSTANCE.k_button;
+		k = Parameter.INSTANCE.k;
+		output = Parameter.INSTANCE.out;
+		heType = Parameter.INSTANCE.heType;
+		permFlag = Parameter.INSTANCE.permFlag;
+		perm = Parameter.INSTANCE.perm;
 
 		XtX = new double[mpheno.length + 1][mpheno.length + 1];
 		XtY = new double[mpheno.length + 1];
@@ -173,7 +170,7 @@ public class HERead {
 			sd[i] = Math.sqrt((ssx[i] - Len * ss[i] * ss[i])/(Len-1));
 		}
 
-		if (p.scale) {
+		if (Parameter.INSTANCE.scale) {
 			System.out.println("standardising phentoype.");
 			for (int i = 0; i < flag.length; i++) {
 				if(!flag[i]) continue;
@@ -183,9 +180,15 @@ public class HERead {
 			}
 		}
 
-		if( p.qcovar_file != null || p.covar_file!= null ) {
+		if( Parameter.INSTANCE.qcovar_file != null || Parameter.INSTANCE.covar_file!= null ) {
 			// if there are covariates
-			HeCov he_cov = new HeCov(y, flag, ID2Idx, p.qcovar_file, p.qcovar_num, p.covar_file, p.covar_num);
+			HeCov he_cov = new HeCov(y,
+					                 flag,
+					                 ID2Idx,
+					                 Parameter.INSTANCE.qcovar_file,
+					                 Parameter.INSTANCE.qcovar_num,
+					                 Parameter.INSTANCE.covar_file,
+					                 Parameter.INSTANCE.covar_num);
 		}
 
 		// *************************************read grm file
@@ -206,13 +209,9 @@ public class HERead {
 	}
 	
 	public static void main(String[] args) {
-
-		Parameter p = new Parameter();
-		p.commandListener(args);
-
-		HERegression HER = new HERegression(p);
+		Parameter.INSTANCE.commandListener(args);
+		HERegression HER = new HERegression();
 		HER.Regression();
-		//haha
 	}
 
 }

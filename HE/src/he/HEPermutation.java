@@ -96,7 +96,7 @@ public class HEPermutation {
 	public void Calculate() {
 		String line;
  
-		heReader.lambda = new Lambda(heReader.par);
+		heReader.lambda = new Lambda();
 		double[][] y=permuteY();
 		if (heReader.reverse) {
 //			try {

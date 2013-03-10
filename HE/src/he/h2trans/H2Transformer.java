@@ -16,12 +16,12 @@ public class H2Transformer {
 	private double P = 1;
 	StringBuffer sb = new StringBuffer();
 
-	public H2Transformer(Parameter p) {
-		cal_k = p.cal_k;
-		cal_hl = p.cal_hl;
-		cal_ho = p.cal_ho;
-		cal_cc = p.cal_cc;
-		cal_h2_se = p.cal_h2_se;
+	public H2Transformer() {
+		cal_k = Parameter.INSTANCE.cal_k;
+		cal_hl = Parameter.INSTANCE.cal_hl;
+		cal_ho = Parameter.INSTANCE.cal_ho;
+		cal_cc = Parameter.INSTANCE.cal_cc;
+		cal_h2_se = Parameter.INSTANCE.cal_h2_se;
 		P = cal_cc[0]/(cal_cc[0] + cal_cc[1]);
 		sb.append("cal_k: " + cal_k + "\n");
 		sb.append("cal_hl: " + cal_hl + "\n");

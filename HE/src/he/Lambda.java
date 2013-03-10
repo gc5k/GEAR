@@ -17,12 +17,12 @@ public class Lambda {
 
 	private int mode = -2; //-2 for squared difference; -1 for cross product
 	
-	public Lambda (Parameter p) {
-		if (p.heType[p.he_sd]) {
+	public Lambda () {
+		if (Parameter.INSTANCE.heType[Parameter.INSTANCE.he_sd]) {
 			mode = -2;
-		} else if (p.heType[p.he_ss]) {
+		} else if (Parameter.INSTANCE.heType[Parameter.INSTANCE.he_ss]) {
 			mode = -2;
-		} else if (p.heType[p.he_cp]) {
+		} else if (Parameter.INSTANCE.heType[Parameter.INSTANCE.he_cp]) {
 			mode = -1;
 		}
 	}

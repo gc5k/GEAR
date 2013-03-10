@@ -31,12 +31,8 @@ import util.stat.Z;
 import util.structure.Predictor;
 
 public class RiskScore {
-	
-
 	private String delim = "\\s+";
 	private GenotypeMatrix G1;
-
-	private Parameter par;
 
 	private int[][] comSNPIdx;
 	private double[][] allelefreq1;
@@ -61,9 +57,9 @@ public class RiskScore {
 
 	private SampleFilter sf1;
 
-	public RiskScore(Parameter p) {
+	public RiskScore() {
 		System.err.print("generating risk profile for genotypes.\n");
-		par = p;
+		
 		initial();
 
 		PLINKParser pp1 = null;
@@ -87,7 +83,7 @@ public class RiskScore {
 	private void initial() {
 
 		// read score file
-		scoreFile = par.scoreFile;
+		scoreFile = Parameter.INSTANCE.scoreFile;
 		BufferedReader readerScoreFile = FileProcessor.FileOpen(scoreFile);
 		String lineScore = null;
 		try {
@@ -105,11 +101,11 @@ public class RiskScore {
 		System.err.println(Score.size() + " predictors are read from " + scoreFile + ".");
 
 		// read q score file and q range file
-		if (par.q_score_file != null && par.q_score_range_file != null) {
+		if (Parameter.INSTANCE.q_score_file != null && Parameter.INSTANCE.q_score_range_file != null) {
 
-			System.out.println(par.q_score_file + " " + par.q_score_range_file);
+			System.out.println(Parameter.INSTANCE.q_score_file + " " + Parameter.INSTANCE.q_score_range_file);
 			// q score file
-			q_score_file = par.q_score_file;
+			q_score_file = Parameter.INSTANCE.q_score_file;
 			BufferedReader readerQScoreFile = FileProcessor
 					.FileOpen(q_score_file);
 			String lineQScore = null;
@@ -135,7 +131,7 @@ public class RiskScore {
 			}
 
 			// q range file
-			q_score_range_file = par.q_score_range_file;
+			q_score_range_file = Parameter.INSTANCE.q_score_range_file;
 			BufferedReader readerQRangeFile = FileProcessor
 					.FileOpen(q_score_range_file);
 			String lineQRange = null;
@@ -214,7 +210,7 @@ public class RiskScore {
 				Total++;
 				if (isATGC) {
 					ATGCLocus++;
-					if (!par.keepATGCFlag) {
+					if (!Parameter.INSTANCE.keepATGCFlag) {
 						continue;
 					}
 				}
@@ -259,7 +255,7 @@ public class RiskScore {
 				}
 
 				sc = su.getScore();
-				if(par.tranFunction == 1) {//logit s
+				if(Parameter.INSTANCE.tranFunction == 1) {//logit s
 					if(isMatch) {
 						sc = Math.log(sc);
 					} else {
@@ -298,13 +294,13 @@ public class RiskScore {
 
 		System.out.println(Total + " SNPs were mapped to the score file.");
 		if (ATGCLocus > 1) {
-			if(par.keepATGCFlag) {
+			if(Parameter.INSTANCE.keepATGCFlag) {
 				System.out.println(ATGCLocus + " ATGC loci were detected.");
 			} else {
 				System.out.println(ATGCLocus + " ATGC loci were removed.");
 			}
 		} else {
-			if(par.keepATGCFlag) {
+			if(Parameter.INSTANCE.keepATGCFlag) {
 				System.out.println(ATGCLocus + " ATGC locus was detected.");
 			} else {
 				System.out.println(ATGCLocus + " ATGC locus was removed.");
@@ -319,7 +315,7 @@ public class RiskScore {
 		}
 
 		StringBuffer sbim = new StringBuffer();
-		sbim.append(par.out);
+		sbim.append(Parameter.INSTANCE.out);
 		sbim.append(".profile");
 		PrintStream predictorFile = FileProcessor.CreatePrintStream(sbim.toString());
 		
@@ -366,7 +362,7 @@ public class RiskScore {
 				Total++;
 				if (isATGC) {
 					ATGCLocus++;
-					if (!par.keepATGCFlag) {
+					if (!Parameter.INSTANCE.keepATGCFlag) {
 						continue;
 					}
 				}
@@ -406,7 +402,7 @@ public class RiskScore {
 				CCSNP++;
 
 				sc = su.getScore();
-				if(par.tranFunction == 1) {//logit s
+				if(Parameter.INSTANCE.tranFunction == 1) {//logit s
 					if(isMatch) {
 						sc = Math.log(sc);
 					} else {
@@ -435,13 +431,13 @@ public class RiskScore {
 
 		System.out.println(Total + " SNPs were mapped to the score file.");
 		if (ATGCLocus > 1) {
-			if (par.keepATGCFlag) {
+			if (Parameter.INSTANCE.keepATGCFlag) {
 				System.out.println(ATGCLocus + " ATGC loci were detected.");
 			} else {
 				System.out.println(ATGCLocus + " ATGC loci were removed.");
 			}
 		} else {
-			if (par.keepATGCFlag) {
+			if (Parameter.INSTANCE.keepATGCFlag) {
 				System.out.println(ATGCLocus + " ATGC Locus were detected.");
 			} else {
 				System.out.println(ATGCLocus + " ATGC locus was removed.");				
@@ -454,7 +450,7 @@ public class RiskScore {
 		}
 
 		StringBuffer sbim = new StringBuffer();
-		sbim.append(par.out);
+		sbim.append(Parameter.INSTANCE.out);
 		sbim.append(".profile");
 		PrintStream predictorFile = FileProcessor.CreatePrintStream(sbim.toString());
 		predictorFile.println("FID\tIID\tPHENO\tSCORE");

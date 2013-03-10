@@ -51,17 +51,17 @@ public class HERegression {
 
 	StringBuffer sb = new StringBuffer();
 
-	public HERegression(Parameter p) {
-		grmFile = p.grm;
-		grmID = p.grm_id;
-		keepFile = p.keepFile;
-		phenoFile = p.pheno;
-		mpheno = p.mpheno;
-		reverse = p.reverse;
-		k_button = p.k_button;
-		k = p.k;
-		output = p.out;
-		heType = p.heType;
+	public HERegression() {
+		grmFile = Parameter.INSTANCE.grm;
+		grmID = Parameter.INSTANCE.grm_id;
+		keepFile = Parameter.INSTANCE.keepFile;
+		phenoFile = Parameter.INSTANCE.pheno;
+		mpheno = Parameter.INSTANCE.mpheno;
+		reverse = Parameter.INSTANCE.reverse;
+		k_button = Parameter.INSTANCE.k_button;
+		k = Parameter.INSTANCE.k;
+		output = Parameter.INSTANCE.out;
+		heType = Parameter.INSTANCE.heType;
 
 		XtX = new double[mpheno.length + 1][mpheno.length + 1];
 		XtY = new double[mpheno.length + 1];
@@ -164,7 +164,7 @@ public class HERegression {
 			sd[i] = Math.sqrt((ssx[i] - Len * ss[i] * ss[i])/(Len-1));
 		}
 
-		if (p.scale) {
+		if (Parameter.INSTANCE.scale) {
 			System.out.println("standardising phentoype.");
 			for (int i = 0; i < flag.length; i++) {
 				if(!flag[i]) continue;
@@ -414,11 +414,8 @@ public class HERegression {
 	}
 
 	public static void main(String[] args) {
-
-		Parameter p = new Parameter();
-		p.commandListener(args);
-
-		HERegression HER = new HERegression(p);
+		Parameter.INSTANCE.commandListener(args);
+		HERegression HER = new HERegression();
 		HER.Regression();
 	}
 

@@ -34,9 +34,8 @@ public class RealCheckOne {
 
 	private SampleFilter sf1;
 
-	public RealCheckOne(Parameter p) {
+	public RealCheckOne() {
 		System.err.print(Parameter.version);
-		par = p;
 
 		PLINKParser pp1 = null;
 		if (Parameter.bfileOption) {
@@ -179,7 +178,7 @@ public class RealCheckOne {
 		ArrayList<String> selectedSNP = NewIt.newArrayList();
 		try {
 			while ((line = reader.readLine()) != null) {
-				String[] l = line.split(Parameter.whitespace);
+				String[] l = line.split(Parameter.INSTANCE.whitespace);
 				for (int i = 0; i < l.length; i++) {
 					selectedSNP.add(l[i]);
 				}

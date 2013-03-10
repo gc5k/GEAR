@@ -53,16 +53,16 @@ public class SimuPolyQT {
 	private String A2 = "C";
 	public static StringBuilder LOG = new StringBuilder();
 
-	public SimuPolyQT(Parameter P) {
+	public SimuPolyQT() {
 
-		M = P.polyLoci;
-		M_null = P.polyLociNull;
-		U = P.polyU;
-		ld = P.polyLD;
-		seed = P.simuSeed;
-		sample = P.poly_sample_QT;
-		h2 = P.simuHsq;
-		out = P.out;
+		M = Parameter.INSTANCE.polyLoci;
+		M_null = Parameter.INSTANCE.polyLociNull;
+		U = Parameter.INSTANCE.polyU;
+		ld = Parameter.INSTANCE.polyLD;
+		seed = Parameter.INSTANCE.simuSeed;
+		sample = Parameter.INSTANCE.poly_sample_QT;
+		h2 = Parameter.INSTANCE.simuHsq;
+		out = Parameter.INSTANCE.out;
 
 		E = Math.sqrt(1 - h2);
 
@@ -72,7 +72,7 @@ public class SimuPolyQT {
 		freq = new double[M];
 		DPrime = new double[M - 1];
 
-		Arrays.fill(freq, P.polyFreq);
+		Arrays.fill(freq, Parameter.INSTANCE.polyFreq);
 		Arrays.fill(DPrime, ld);
 		LD = CalculateDprime(freq, DPrime);
 
@@ -86,11 +86,11 @@ public class SimuPolyQT {
 		LOG.append("Simulation polygenic model for quantitative traits.\n");
 		LOG.append("seed: " + seed + "\n");
 
-		LOG.append("MAF: " + P.polyFreq + "\n");
+		LOG.append("MAF: " + Parameter.INSTANCE.polyFreq + "\n");
 		LOG.append("Marker: " + M + "\n");
 		LOG.append("Null marker: " + M + "\n");
 		if (Parameter.polyEffectFlag) {
-			LOG.append("genetic effect file: " + P.polyEffectFile + "\n");
+			LOG.append("genetic effect file: " + Parameter.INSTANCE.polyEffectFile + "\n");
 		} else {
 			LOG.append("Uniform Effect: " + U + "\n");
 		}
@@ -102,11 +102,7 @@ public class SimuPolyQT {
 	}
 
 	public static void main(String[] args) {
-
-		Parameter p = new Parameter();
-		p.commandListener(args);
-
-
+		Parameter.INSTANCE.commandListener(args);
 	}
 
 	public void generateSample() {
@@ -446,7 +442,7 @@ public class SimuPolyQT {
 		try {
 			while ((line = reader.readLine()) != null) {
 				line.trim();
-				String[] l = line.split(Parameter.whitespace);
+				String[] l = line.split(Parameter.INSTANCE.whitespace);
 				if(l.length < 1) continue;
 				if( c < (M - M_null)) {
 					effect[c++] = Double.parseDouble(l[0]);

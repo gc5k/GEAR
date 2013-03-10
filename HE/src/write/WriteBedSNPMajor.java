@@ -26,11 +26,9 @@ public class WriteBedSNPMajor {
 	
 	private ArrayList<PersonIndex> PersonTable;
 	private DataOutputStream os = null;
-	private Parameter par;
 	private ArrayList<SNP> snpList;
 
-	public WriteBedSNPMajor (Parameter p) {
-		par = p;		
+	public WriteBedSNPMajor () {	
 		PLINKParser pp = null;
 		if (Parameter.fileOption) {
 			pp = new PLINKParser(Parameter.pedfile, Parameter.mapfile);
@@ -57,7 +55,7 @@ public class WriteBedSNPMajor {
 
 	public void WriteFile() {
 		StringBuffer sbim = new StringBuffer();
-		sbim.append(par.out);
+		sbim.append(Parameter.INSTANCE.out);
 		sbim.append(".bim");
 		PrintStream pbim = FileProcessor.CreatePrintStream(sbim.toString());
 		for (Iterator<SNP> e = snpList.iterator(); e.hasNext(); ) {
@@ -67,7 +65,7 @@ public class WriteBedSNPMajor {
 		pbim.close();
 		
 		StringBuffer sfam = new StringBuffer();
-		sfam.append(par.out);
+		sfam.append(Parameter.INSTANCE.out);
 		sfam.append(".fam");
 		PrintStream pfam = FileProcessor.CreatePrintStream(sfam.toString());		
 		for (Iterator<PersonIndex> e = PersonTable.iterator(); e.hasNext(); ) {
@@ -78,7 +76,7 @@ public class WriteBedSNPMajor {
 		pfam.close();
 		
 		StringBuffer sbed = new StringBuffer();
-		sbed.append(par.out);
+		sbed.append(Parameter.INSTANCE.out);
 		sbed.append(".bed");
 		try {
 			os = new DataOutputStream(new FileOutputStream(sbed.toString()));

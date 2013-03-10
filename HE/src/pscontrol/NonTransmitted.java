@@ -19,12 +19,10 @@ public class NonTransmitted {
 	private PLINKParser pp = null;
 	private SampleFilter sf = null;
 	private NonTransmitted QC = null;
-	Parameter par;
 
-	public NonTransmitted(Parameter p) {
+	public NonTransmitted() {
 		System.err.print(Parameter.version);
 		System.err.println("--nontrans procedure.");
-		par = p;
 
 //		if (Parameter.fileOption) {
 //			pp = new PLINKParser(Parameter.pedfile, Parameter.mapfile);
@@ -40,12 +38,11 @@ public class NonTransmitted {
 		}
 		pp.Parse();
 		sf = new SampleFilter(pp.getPedigreeData(), pp.getMapData());
-		
 	}
 
 	public void GenerateNonTransmitted() {
 		AJHG2008 ajhg2008 = new AJHG2008(pp.getPedigreeData(), pp.getMapData());
-		ajhg2008.setSeed(par.nontransSeed);
+		ajhg2008.setSeed(Parameter.INSTANCE.nontransSeed);
 		ajhg2008.RevvingUp(sf.getSample());
 
 		ArrayList<PersonIndex> sample = ajhg2008.getSample();
@@ -55,12 +52,12 @@ public class NonTransmitted {
 		for (Iterator<PersonIndex> e = sample.iterator(); e.hasNext();) {
 			PersonIndex pi = e.next();
 			if (pi.isPseudo()) {
-				if (par.nontranscasesFlag) {
+				if (Parameter.INSTANCE.nontranscasesFlag) {
 					if (pi.getPerson().getAffectedStatus().compareTo("2") != 0) {
 						continue;
 					}
 				}
-				if (par.nontranscontrolsFlag) {
+				if (Parameter.INSTANCE.nontranscontrolsFlag) {
 					if (pi.getPerson().getAffectedStatus().compareTo("1") != 0) {
 						continue;
 					}
@@ -72,7 +69,7 @@ public class NonTransmitted {
 		NonTransWriteBedSNPMajor writeSNP = new NonTransWriteBedSNPMajor(ps, ajhg2008
 				.getMapFile().getMarkerList());
 		StringBuilder out = new StringBuilder(); 
-		out.append(par.out);
+		out.append(Parameter.INSTANCE.out);
 		out.append(".nt");
 		writeSNP.WriteFile(out.toString());
 	}

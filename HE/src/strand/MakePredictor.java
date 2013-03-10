@@ -29,8 +29,6 @@ import util.structure.Predictor;
 public class MakePredictor {
 	private GenotypeMatrix G1;
 
-	private Parameter par;
-
 	private int[][] comSNPIdx;
 	private double[][] allelefreq1;
 	private double[] N1;
@@ -45,9 +43,9 @@ public class MakePredictor {
 
 	private SampleFilter sf1;
 	
-	public MakePredictor(Parameter p) {
+	public MakePredictor() {
 		System.err.print(Parameter.version);
-		par = p;
+		
 		readPredictor();
 
 		PLINKParser pp1 = null;
@@ -70,7 +68,7 @@ public class MakePredictor {
 
 	public void BuildPredictor() {
 		StringBuffer sb = new StringBuffer();
-		sb.append(par.out);
+		sb.append(Parameter.INSTANCE.out);
 		sb.append(".mergesnp");
 		PrintStream ps = FileProcessor.CreatePrintStream(sb.toString());
 		ps.append("SNP\tChr\tPos\tA1_1st\tA2_1st\tA1_2nd\tA2_2nd\tMAF_A1_1st\tMAF_A1_2nd\tFlip\tMerged\tP\tScheme\n");
@@ -123,10 +121,10 @@ public class MakePredictor {
 				scoreCoding.add(0);
 			}
 
-			if (!par.keepATGCFlag && ATGCLocus) {
+			if (!Parameter.INSTANCE.keepATGCFlag && ATGCLocus) {
 				f = false;
 			}
-			if (par.removeFlipFlag && flip) {
+			if (Parameter.INSTANCE.removeFlipFlag && flip) {
 				f = false;
 			}
 			flag.add(f);
@@ -223,7 +221,7 @@ public class MakePredictor {
 
 	public void readPredictor() {
 
-		BufferedReader reader = FileProcessor.FileOpen(par.predictor_file);
+		BufferedReader reader = FileProcessor.FileOpen(Parameter.INSTANCE.predictor_file);
 		String line;
 		try {
 			line = reader.readLine();
@@ -244,7 +242,7 @@ public class MakePredictor {
 
 	public void WritePredictor() {
 		StringBuffer sbim = new StringBuffer();
-		sbim.append(par.out);
+		sbim.append(Parameter.INSTANCE.out);
 		sbim.append(".predictor");
 		PrintStream predictorFile = FileProcessor.CreatePrintStream(sbim.toString());
 		
@@ -255,11 +253,11 @@ public class MakePredictor {
 			}
 			SNP snp = snpList1.get(comSNPIdx[0][i]);
 			Predictor pd = predictorList.get(comSNPIdx[1][i]);
-			if (Parameter.isNA(pd.getField(par.predictor_idx))) {
+			if (Parameter.isNA(pd.getField(Parameter.INSTANCE.predictor_idx))) {
 				NMiss++;
 				continue;
 			} else {
-				double s = Double.parseDouble(pd.getField(par.predictor_idx));
+				double s = Double.parseDouble(pd.getField(Parameter.INSTANCE.predictor_idx));
 				if (Parameter.tranFunction == Parameter.LINEAR) {
 					if (scoreCoding.get(i).intValue() == 1) {
 						s *= -1;
