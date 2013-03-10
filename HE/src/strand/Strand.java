@@ -55,9 +55,10 @@ public class Strand {
 		readStrand();
 
 		PLINKParser pp1 = null;
-		if (Parameter.bfileOption) {
-			pp1 = new PLINKBinaryParser(Parameter.bedfile, Parameter.bimfile,
-					Parameter.famfile);
+		if (Parameter.INSTANCE.hasBFileOption()) {
+			pp1 = new PLINKBinaryParser (Parameter.INSTANCE.getBedFile(),
+					                     Parameter.INSTANCE.getBimFile(),
+					                     Parameter.INSTANCE.getFamFile());
 		} else {
 			System.err.println("did not specify files.");
 			Test.LOG.append("did not specify files.\n");

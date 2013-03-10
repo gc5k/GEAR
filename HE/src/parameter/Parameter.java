@@ -22,11 +22,15 @@ public enum Parameter {
 
 ////////////////bfile
 	private final String cmd_bfile = "bfile";
-	public static String bfile = null;
-	public static String bedfile = null;
-	public static String bimfile = null;
-	public static String famfile = null;
-	public static boolean bfileOption = false;
+	private String bedfile = null;
+	private String bimfile = null;
+	private String famfile = null;
+	private boolean bfileOption = false;
+	
+	public String getBedFile() { return bedfile; }
+	public String getBimFile() { return bimfile; }
+	public String getFamFile() { return famfile; }
+	public boolean hasBFileOption() { return bfileOption; }
 
 	private final String cmd_file = "file";
 	public static String tbfile = null;
@@ -670,7 +674,7 @@ public enum Parameter {
 		}
 
 		if (cl.hasOption(cmd_bfile)) {
-			bfile = cl.getOptionValue(cmd_bfile);
+			String bfile = cl.getOptionValue(cmd_bfile);
 			bedfile = (new StringBuffer(bfile)).append(".bed").toString();
 			bimfile = (new StringBuffer(bfile)).append(".bim").toString();
 			famfile = (new StringBuffer(bfile)).append(".fam").toString();
