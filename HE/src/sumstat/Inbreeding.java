@@ -50,8 +50,10 @@ public class Inbreeding {
 		PLINKParser pp = null;
 		if (Parameter.fileOption) {
 			pp = new PLINKParser(Parameter.pedfile, Parameter.mapfile);
-		} else if (Parameter.bfileOption) {
-			pp = new PLINKBinaryParser(Parameter.bedfile, Parameter.bimfile, Parameter.famfile);
+		} else if (Parameter.INSTANCE.hasBFileOption()) {
+			pp = new PLINKBinaryParser(Parameter.INSTANCE.getBedFile(),
+					                   Parameter.INSTANCE.getBimFile(),
+					                   Parameter.INSTANCE.getFamFile());
 		} else {
 			System.err.println("did not specify files.");
 			Test.LOG.append("did not specify files.\n");

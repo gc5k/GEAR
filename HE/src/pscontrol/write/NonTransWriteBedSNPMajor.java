@@ -26,17 +26,17 @@ public class NonTransWriteBedSNPMajor {
 	
 	private ArrayList<PersonIndex> PersonTable;
 	private DataOutputStream os = null;
-	private Parameter par;
 	private ArrayList<SNP> snpList;
 
-	public NonTransWriteBedSNPMajor (Parameter p) {
-		par = p;		
+	public NonTransWriteBedSNPMajor () {
 		PLINKParser pp = null;
 		if (Parameter.fileOption) {
 			pp = new PLINKParser(Parameter.pedfile, Parameter.mapfile);
 		}
-		if (Parameter.bfileOption) {
-			pp = new PLINKBinaryParser(Parameter.bedfile, Parameter.bimfile, Parameter.famfile);
+		if (Parameter.INSTANCE.hasBFileOption()) {
+			pp = new PLINKBinaryParser (Parameter.INSTANCE.getBedFile(),
+					                    Parameter.INSTANCE.getBimFile(),
+					                    Parameter.INSTANCE.getFamFile());
 		} else {
 			System.err.println("did not specify files.");
 			Test.LOG.append("did not specify files.\n");

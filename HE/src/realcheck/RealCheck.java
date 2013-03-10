@@ -46,9 +46,11 @@ public class RealCheck {
 
 		PLINKParser pp1 = null;
 		PLINKParser pp2 = null;
-		if (Parameter.bfileOption && Parameter.bfileOption2) {
-			pp1 = new PLINKBinaryParser(Parameter.bedfile, Parameter.bimfile,
-					Parameter.famfile);
+		if (Parameter.INSTANCE.hasBFileOption() && Parameter.bfileOption2) {
+			pp1 = new PLINKBinaryParser (Parameter.INSTANCE.getBedFile(),
+					                     Parameter.INSTANCE.getBimFile(),
+					                     Parameter.INSTANCE.getFamFile());
+			
 			pp2 = new PLINKBinaryParser(Parameter.bedfile2, Parameter.bimfile2,
 					Parameter.famfile2);
 		} else {

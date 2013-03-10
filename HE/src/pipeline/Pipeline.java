@@ -34,7 +34,7 @@ public class Pipeline {
 		System.out.println("\nThe analysis started at: " + calendar.getTime() + "\n");
 
 		if (Parameter.INSTANCE.scoreFlag) {
-			if (Parameter.INSTANCE.bfileOption) {
+			if (Parameter.INSTANCE.hasBFileOption()) {
 				RiskScore rs = new RiskScore();
 				rs.makeProfile();
 			} else {
