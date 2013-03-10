@@ -20,7 +20,7 @@ import util.NewIt;
 public enum Parameter {
 	INSTANCE;
 
-////////////////bfile
+// PLINK binary input file options Begin
 	private final String cmd_bfile = "bfile";
 	private String bedfile = null;
 	private String bimfile = null;
@@ -31,12 +31,18 @@ public enum Parameter {
 	public String getBimFile() { return bimfile; }
 	public String getFamFile() { return famfile; }
 	public boolean hasBFileOption() { return bfileOption; }
+// PLINK binary input file options End
 
+// PLINK text input file options Begin
 	private final String cmd_file = "file";
-	public static String tbfile = null;
-	public static String pedfile = null;
-	public static String mapfile = null;
-	public static boolean fileOption = false;
+	private String pedfile = null;
+	private String mapfile = null;
+	private boolean fileOption = false;
+	
+	public String getPedFile() { return pedfile; }
+	public String getMapFile() { return mapfile; }
+	public boolean hasFileOption() { return fileOption; }
+// PLINK text input file options End
 
 	public static boolean header = false;
 
@@ -667,9 +673,9 @@ public enum Parameter {
 		}
 
 		if (cl.hasOption(cmd_file)) {
-			tbfile = cl.getOptionValue(cmd_file);
-			pedfile = (new StringBuffer(tbfile)).append(".ped").toString();
-			mapfile = (new StringBuffer(tbfile)).append(".map").toString();
+			String file = cl.getOptionValue(cmd_file);
+			pedfile = (new StringBuffer(file)).append(".ped").toString();
+			mapfile = (new StringBuffer(file)).append(".map").toString();
 			fileOption = true;
 		}
 
