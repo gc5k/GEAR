@@ -32,8 +32,9 @@ public class MergeWrite {
 	public MergeWrite (Parameter p) {
 		par = p;
 		PLINKParser pp = null;
-		if (Parameter.fileOption) {
-			pp = new PLINKParser(Parameter.pedfile, Parameter.mapfile);
+		if (Parameter.INSTANCE.hasFileOption()) {
+			pp = new PLINKParser (Parameter.INSTANCE.getPedFile(),
+					              Parameter.INSTANCE.getMapFile());
 		}
 		if (Parameter.INSTANCE.hasBFileOption()) {
 			pp = new PLINKBinaryParser (Parameter.INSTANCE.getBedFile(),

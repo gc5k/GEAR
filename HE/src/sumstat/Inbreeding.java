@@ -48,12 +48,13 @@ public class Inbreeding {
 	
 	public Inbreeding() {
 		PLINKParser pp = null;
-		if (Parameter.fileOption) {
-			pp = new PLINKParser(Parameter.pedfile, Parameter.mapfile);
+		if (Parameter.INSTANCE.hasFileOption()) {
+			pp = new PLINKParser (Parameter.INSTANCE.getPedFile(),
+					              Parameter.INSTANCE.getMapFile());
 		} else if (Parameter.INSTANCE.hasBFileOption()) {
-			pp = new PLINKBinaryParser(Parameter.INSTANCE.getBedFile(),
-					                   Parameter.INSTANCE.getBimFile(),
-					                   Parameter.INSTANCE.getFamFile());
+			pp = new PLINKBinaryParser (Parameter.INSTANCE.getBedFile(),
+					                    Parameter.INSTANCE.getBimFile(),
+					                    Parameter.INSTANCE.getFamFile());
 		} else {
 			System.err.println("did not specify files.");
 			Test.LOG.append("did not specify files.\n");
