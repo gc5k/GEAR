@@ -15,6 +15,7 @@ import java.util.Calendar;
 import parameter.Parameter;
 import util.FileProcessor;
 import util.NewIt;
+import util.TextHelper;
 
 import org.apache.commons.math.linear.Array2DRowRealMatrix;
 import org.apache.commons.math.linear.RealMatrix;
@@ -442,7 +443,7 @@ public class SimuPolyQT {
 		try {
 			while ((line = reader.readLine()) != null) {
 				line.trim();
-				String[] l = line.split(Parameter.INSTANCE.whitespace);
+				String[] l = line.split(TextHelper.WHITESPACE_DELIMITER);
 				if(l.length < 1) continue;
 				if( c < (M - M_null)) {
 					effect[c++] = Double.parseDouble(l[0]);

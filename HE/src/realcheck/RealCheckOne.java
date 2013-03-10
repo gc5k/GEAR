@@ -14,6 +14,7 @@ import parameter.Parameter;
 import test.Test;
 import util.FileProcessor;
 import util.NewIt;
+import util.TextHelper;
 import family.pedigree.PersonIndex;
 import family.pedigree.file.SNP;
 import family.pedigree.genotype.BPerson;
@@ -178,7 +179,7 @@ public class RealCheckOne {
 		ArrayList<String> selectedSNP = NewIt.newArrayList();
 		try {
 			while ((line = reader.readLine()) != null) {
-				String[] l = line.split(Parameter.INSTANCE.whitespace);
+				String[] l = line.split(TextHelper.WHITESPACE_DELIMITER);
 				for (int i = 0; i < l.length; i++) {
 					selectedSNP.add(l[i]);
 				}
