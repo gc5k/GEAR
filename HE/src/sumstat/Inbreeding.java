@@ -18,6 +18,7 @@ import sumstat.qc.rowqc.SumStatQC;
 import test.Test;
 import util.FileProcessor;
 import util.NewIt;
+import util.TextHelper;
 import util.stat.FastFisherExactTest;
 
 import family.pedigree.PersonIndex;
@@ -162,7 +163,7 @@ public class Inbreeding {
 		try {
 			while ((line = reader.readLine()) != null) {
 				line.trim();
-				String[] l = line.split(Parameter.INSTANCE.whitespace);
+				String[] l = line.split(TextHelper.WHITESPACE_DELIMITER);
 				if(l.length < 3) continue;
 				famList.add(l[0]);
 				indList.add(l[1]);

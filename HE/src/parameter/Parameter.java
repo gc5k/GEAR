@@ -21,7 +21,6 @@ public enum Parameter {
 	INSTANCE;
 
 	private final String sep = ",";
-	public final String whitespace = "\\s+";
 
 ////////////////bfile
 	private final String cmd_bfile = "bfile";

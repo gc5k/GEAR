@@ -17,6 +17,7 @@ import family.pedigree.genotype.BPerson;
 
 import util.FileProcessor;
 import util.NewIt;
+import util.TextHelper;
 
 /**
  * 
@@ -190,7 +191,7 @@ public class SampleFilter {
 
 		try {
 			while ((line = reader.readLine()) != null) {
-				String[] l = line.split(Parameter.INSTANCE.whitespace);
+				String[] l = line.split(TextHelper.WHITESPACE_DELIMITER);
 				if(l.length < 2) continue;
 				famList.add(l[0]);
 				indList.add(l[1]);
@@ -211,7 +212,7 @@ public class SampleFilter {
 		String line = null;
 		try {
 			while ((line = reader.readLine()) != null) {
-				String[] l = line.split(Parameter.INSTANCE.whitespace);
+				String[] l = line.split(TextHelper.WHITESPACE_DELIMITER);
 				if(l.length < 2) continue;
 				famList.add(l[0]);
 				indList.add(l[1]);
