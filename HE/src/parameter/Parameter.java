@@ -20,8 +20,6 @@ import util.NewIt;
 public enum Parameter {
 	INSTANCE;
 
-	private final String sep = ",";
-
 ////////////////bfile
 	private final String cmd_bfile = "bfile";
 	public static String bfile = null;
@@ -1071,7 +1069,7 @@ public enum Parameter {
 		}
 
 		if (cl.hasOption(cmd_mpheno)) {
-			String[] s = cl.getOptionValue(cmd_mpheno).split(sep);
+			String[] s = cl.getOptionValue(cmd_mpheno).split(",");
 			mpheno = new int[s.length];
 			for (int i = 0; i < s.length; i++) {
 				mpheno[i] = Integer.parseInt(s[i]);
@@ -1196,7 +1194,7 @@ public enum Parameter {
 		}
 
 		if (cl.hasOption(cmd_na)) {
-			na = cl.getOptionValue(cmd_na).split(sep);
+			na = cl.getOptionValue(cmd_na).split(",");
 		}
 
 		if (cl.hasOption(cmd_out)) {
@@ -1217,7 +1215,7 @@ public enum Parameter {
 		}
 
 		if (cl.hasOption(cmd_cal_cc)) {
-			String[] s = cl.getOptionValue(cmd_cal_cc).split(sep);
+			String[] s = cl.getOptionValue(cmd_cal_cc).split(",");
 			cal_cc[0] = Double.parseDouble(s[0]);
 			cal_cc[1] = Double.parseDouble(s[1]);
 		}
