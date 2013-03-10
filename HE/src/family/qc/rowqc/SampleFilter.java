@@ -190,7 +190,7 @@ public class SampleFilter {
 
 		try {
 			while ((line = reader.readLine()) != null) {
-				String[] l = line.split(Parameter.whitespace);
+				String[] l = line.split(Parameter.INSTANCE.whitespace);
 				if(l.length < 2) continue;
 				famList.add(l[0]);
 				indList.add(l[1]);
@@ -211,7 +211,7 @@ public class SampleFilter {
 		String line = null;
 		try {
 			while ((line = reader.readLine()) != null) {
-				String[] l = line.split(Parameter.whitespace);
+				String[] l = line.split(Parameter.INSTANCE.whitespace);
 				if(l.length < 2) continue;
 				famList.add(l[0]);
 				indList.add(l[1]);

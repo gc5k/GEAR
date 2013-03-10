@@ -31,8 +31,6 @@ import util.structure.Predictor2;
 public class MakePredictor2 {
 	private GenotypeMatrix G1;
 
-	private Parameter par;
-
 	private int[][] comSNPIdx;
 	private double[][] allelefreq1;
 	private double[] N1;
@@ -46,9 +44,9 @@ public class MakePredictor2 {
 
 	private SampleFilter sf1;
 
-	public MakePredictor2(Parameter p) {
+	public MakePredictor2() {
 		System.err.print(Parameter.version);
-		par = p;
+		
 		readPredictor();
 
 		PLINKParser pp1 = null;
@@ -72,7 +70,7 @@ public class MakePredictor2 {
 		DecimalFormat fmt = new DecimalFormat("#.###E0");
 
 		StringBuffer sb = new StringBuffer();
-		sb.append(par.out);
+		sb.append(Parameter.INSTANCE.out);
 		sb.append(".mergesnp");
 		PrintStream ps = FileProcessor.CreatePrintStream(sb.toString());
 		ps.append("SNP\tChr\tPos\tA1_1st\tA2_1st\tA1_2nd\tA2_2nd\tMAF_A1_1st\tMAF_A1_2nd\tFlip\tMerged\tP\tScheme\n");
@@ -108,7 +106,7 @@ public class MakePredictor2 {
 					if (SNPMatch.Confusion(a1_1, a1_2)) {
 						ATGCLocus = true;
 						if (ref1<0.5 && ref2<0.5) {
-							if (ref1 < par.merge_maf_cutoff && ref2 < par.merge_maf_cutoff) {
+							if (ref1 < Parameter.INSTANCE.merge_maf_cutoff && ref2 < Parameter.INSTANCE.merge_maf_cutoff) {
 								f=true;
 							} else {
 								f=false;
@@ -117,7 +115,7 @@ public class MakePredictor2 {
 							scoreCoding.add(0);
 
 						} else if (ref1<0.5 && ref2>0.5) {
-							if (ref1 < par.merge_maf_cutoff && ref2 > 1-par.merge_maf_cutoff) {
+							if (ref1 < Parameter.INSTANCE.merge_maf_cutoff && ref2 > 1-Parameter.INSTANCE.merge_maf_cutoff) {
 								f=true;
 							} else {
 								f=false;
@@ -127,7 +125,7 @@ public class MakePredictor2 {
 							scoreCoding.add(1);
 
 						} else if (ref1>0.5 && ref2<0.5) {
-							if (ref1 > 1-par.merge_maf_cutoff && ref2 < par.merge_maf_cutoff) {
+							if (ref1 > 1-Parameter.INSTANCE.merge_maf_cutoff && ref2 < Parameter.INSTANCE.merge_maf_cutoff) {
 								f=true;
 							} else {
 								f=false;
@@ -137,7 +135,7 @@ public class MakePredictor2 {
 							scoreCoding.add(1);
 
 						} else {
-							if (ref1 > 1 - par.merge_maf_cutoff && ref2 > 1 - par.merge_maf_cutoff) {
+							if (ref1 > 1 - Parameter.INSTANCE.merge_maf_cutoff && ref2 > 1 - Parameter.INSTANCE.merge_maf_cutoff) {
 								f=true;
 							} else {
 								f=false;
@@ -158,7 +156,7 @@ public class MakePredictor2 {
 					if (SNPMatch.Confusion(a1_1, a1_2)) {
 						ATGCLocus = true;
 						if (ref1<0.5 && (1-ref2)<0.5) {
-							if (ref1 < par.merge_maf_cutoff && (1-ref2) < par.merge_maf_cutoff) {
+							if (ref1 < Parameter.INSTANCE.merge_maf_cutoff && (1-ref2) < Parameter.INSTANCE.merge_maf_cutoff) {
 								f=true;
 							} else {
 								f=false;
@@ -167,7 +165,7 @@ public class MakePredictor2 {
 							ref2 = 1- ref2;
 							flip = true;
 						} else if (ref1<0.5 && (1-ref2) > 0.5) {
-							if (ref1 < par.merge_maf_cutoff && (1-ref2) > 1-par.merge_maf_cutoff) {
+							if (ref1 < Parameter.INSTANCE.merge_maf_cutoff && (1-ref2) > 1-Parameter.INSTANCE.merge_maf_cutoff) {
 								f=true;
 							} else {
 								f=false;
@@ -176,7 +174,7 @@ public class MakePredictor2 {
 							scoreCoding.add(0);
 
 						} else if (ref1>0.5 && (1-ref2) < 0.5) {
-							if (ref1 > 1-par.merge_maf_cutoff && (1-ref2) < par.merge_maf_cutoff) {
+							if (ref1 > 1-Parameter.INSTANCE.merge_maf_cutoff && (1-ref2) < Parameter.INSTANCE.merge_maf_cutoff) {
 								f=true;
 							} else {
 								f=false;
@@ -185,7 +183,7 @@ public class MakePredictor2 {
 							scoreCoding.add(0);
 
 						} else {
-							if (ref1 > 1 - par.merge_maf_cutoff && (1-ref2) > 1 - par.merge_maf_cutoff) {
+							if (ref1 > 1 - Parameter.INSTANCE.merge_maf_cutoff && (1-ref2) > 1 - Parameter.INSTANCE.merge_maf_cutoff) {
 								f=true;
 							} else {
 								f=false;
@@ -223,13 +221,13 @@ public class MakePredictor2 {
 				}
 
 				double p = Z.OddsRatioTestPvalueTwoTail(ref1, ref2, N1[comSNPIdx[0][i]], maf2.getNInd()*2);
-				if (p < par.merge_p_cutoff) {
+				if (p < Parameter.INSTANCE.merge_p_cutoff) {
 					f = false;
 				}
-				if (!par.keepATGCFlag && ATGCLocus) {
+				if (!Parameter.INSTANCE.keepATGCFlag && ATGCLocus) {
 					f = false;
 				}
-				if (par.removeFlipFlag && flip) {
+				if (Parameter.INSTANCE.removeFlipFlag && flip) {
 					f = false;
 				}
 				flag.add(f);
@@ -326,7 +324,7 @@ public class MakePredictor2 {
 
 	public void readPredictor() {
 
-		BufferedReader reader = FileProcessor.FileOpen(par.predictor_file);
+		BufferedReader reader = FileProcessor.FileOpen(Parameter.INSTANCE.predictor_file);
 		String line;
 		try {
 			line = reader.readLine();
@@ -346,7 +344,7 @@ public class MakePredictor2 {
 
 	public void WritePredictor() {
 		StringBuffer sbim = new StringBuffer();
-		sbim.append(par.out);
+		sbim.append(Parameter.INSTANCE.out);
 		sbim.append(".predictor");
 		PrintStream predictorFile = FileProcessor.CreatePrintStream(sbim.toString());
 
@@ -357,11 +355,11 @@ public class MakePredictor2 {
 			}
 			SNP snp = snpList1.get(comSNPIdx[0][i]);
 			Predictor2 pd = predictorList.get(comSNPIdx[1][i]);
-			if (Parameter.isNA(pd.getField(par.predictor_idx))) {
+			if (Parameter.isNA(pd.getField(Parameter.INSTANCE.predictor_idx))) {
 				NMiss++;
 				continue;
 			} else {
-				double s = Double.parseDouble(pd.getField(par.predictor_idx));
+				double s = Double.parseDouble(pd.getField(Parameter.INSTANCE.predictor_idx));
 				if (Parameter.tranFunction == Parameter.LINEAR) {
 					if (scoreCoding.get(i).intValue() == 1) {
 						s *= -1;

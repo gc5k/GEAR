@@ -40,9 +40,8 @@ public class RealCheck {
 	private SampleFilter sf1;
 	private SampleFilter sf2;
 
-	public RealCheck(Parameter p) {
+	public RealCheck() {
 		System.err.print(Parameter.version);
-		par = p;
 
 		PLINKParser pp1 = null;
 		PLINKParser pp2 = null;
@@ -257,7 +256,7 @@ public class RealCheck {
 		ArrayList<String> selectedSNP = NewIt.newArrayList();
 		try {
 			while ((line = reader.readLine()) != null) {
-				String[] l = line.split(Parameter.whitespace);
+				String[] l = line.split(Parameter.INSTANCE.whitespace);
 				for (int i = 0; i < l.length; i++) {
 					selectedSNP.add(l[i]);
 				}

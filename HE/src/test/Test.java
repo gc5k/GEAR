@@ -31,10 +31,8 @@ public class Test {
 
 		System.err.print(Parameter.version);
 		String[] scmd = script(args);
-		Parameter p = new Parameter();
-
 		printCommandLine(scmd);
-		p.commandListener(scmd);
+		Parameter.INSTANCE.commandListener(scmd);
 
 		PLINKParser pp = null;
 		if (Parameter.fileOption) {

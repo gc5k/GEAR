@@ -30,8 +30,6 @@ import util.structure.MAF;
 public class Strand {
 	private GenotypeMatrix G1;
 
-	private Parameter par;
-
 	private int[][] comSNPIdx;
 	private double[][] allelefreq1;
 	private double[] N1;
@@ -52,9 +50,8 @@ public class Strand {
 	
 	private DataOutputStream os = null;
 
-	public Strand(Parameter p) {
+	public Strand() {
 		System.err.print(Parameter.version);
-		par = p;
 		readStrand();
 
 		PLINKParser pp1 = null;
@@ -81,13 +78,13 @@ public class Strand {
 		DecimalFormat fmt = new DecimalFormat("#.###E0");
 
 		StringBuffer sb = new StringBuffer();
-		sb.append(par.out);
+		sb.append(Parameter.INSTANCE.out);
 		sb.append(".mergesnp");
 		PrintStream ps = FileProcessor.CreatePrintStream(sb.toString());
 		ps.append("SNP\tChr\tPos\tA1_1st\tA2_1st\tA1_2nd\tA2_2nd\tMAF_A1_1st\tMAF_A1_2nd\tFlip\tMerged\tP\tScheme\n");
 
 		StringBuffer sb1 = new StringBuffer();
-		sb1.append(par.out);
+		sb1.append(Parameter.INSTANCE.out);
 		sb1.append(".mergebadsnp");
 		PrintStream ps1 = FileProcessor.CreatePrintStream(sb.toString());
 		ps1.append("SNP\tChr\tPos\tA1_1st\tA2_1st\tA1_2nd\tA2_2nd\tMAF_A1_1st\tMAF_A1_2nd\tFlip\tMerged\tP\tScheme\n");
@@ -123,7 +120,7 @@ public class Strand {
 					if (SNPMatch.Confusion(a1_1, a1_2)) {
 						ATGCLocus = true;
 						if (ref1<0.5 && ref2<0.5) {
-							if (ref1 < par.merge_maf_cutoff && ref2 < par.merge_maf_cutoff) {
+							if (ref1 < Parameter.INSTANCE.merge_maf_cutoff && ref2 < Parameter.INSTANCE.merge_maf_cutoff) {
 								f=true;
 							} else {
 								f=false;
@@ -132,7 +129,7 @@ public class Strand {
 							snpCoding.add(0);
 
 						} else if (ref1<0.5 && ref2>0.5) {
-							if (ref1 < par.merge_maf_cutoff && ref2 > 1-par.merge_maf_cutoff) {
+							if (ref1 < Parameter.INSTANCE.merge_maf_cutoff && ref2 > 1-Parameter.INSTANCE.merge_maf_cutoff) {
 								f=true;
 							} else {
 								f=false;
@@ -142,7 +139,7 @@ public class Strand {
 							snpCoding.add(1);
 
 						} else if (ref1>0.5 && ref2<0.5) {
-							if (ref1 > 1-par.merge_maf_cutoff && ref2 < par.merge_maf_cutoff) {
+							if (ref1 > 1-Parameter.INSTANCE.merge_maf_cutoff && ref2 < Parameter.INSTANCE.merge_maf_cutoff) {
 								f=true;
 							} else {
 								f=false;
@@ -152,7 +149,7 @@ public class Strand {
 							snpCoding.add(1);
 
 						} else {
-							if (ref1 > 1 - par.merge_maf_cutoff && ref2 > 1 - par.merge_maf_cutoff) {
+							if (ref1 > 1 - Parameter.INSTANCE.merge_maf_cutoff && ref2 > 1 - Parameter.INSTANCE.merge_maf_cutoff) {
 								f=true;
 							} else {
 								f=false;
@@ -173,7 +170,7 @@ public class Strand {
 					if (SNPMatch.Confusion(a1_1, a1_2)) {
 						ATGCLocus = true;
 						if (ref1<0.5 && (1-ref2)<0.5) {
-							if (ref1 < par.merge_maf_cutoff && (1-ref2) < par.merge_maf_cutoff) {
+							if (ref1 < Parameter.INSTANCE.merge_maf_cutoff && (1-ref2) < Parameter.INSTANCE.merge_maf_cutoff) {
 								f=true;
 							} else {
 								f=false;
@@ -182,7 +179,7 @@ public class Strand {
 							ref2 = 1- ref2;
 							flip = true;
 						} else if (ref1<0.5 && (1-ref2) > 0.5) {
-							if (ref1 < par.merge_maf_cutoff && (1-ref2) > 1-par.merge_maf_cutoff) {
+							if (ref1 < Parameter.INSTANCE.merge_maf_cutoff && (1-ref2) > 1-Parameter.INSTANCE.merge_maf_cutoff) {
 								f=true;
 							} else {
 								f=false;
@@ -191,7 +188,7 @@ public class Strand {
 							snpCoding.add(0);
 
 						} else if (ref1>0.5 && (1-ref2) < 0.5) {
-							if (ref1 > 1-par.merge_maf_cutoff && (1-ref2) < par.merge_maf_cutoff) {
+							if (ref1 > 1-Parameter.INSTANCE.merge_maf_cutoff && (1-ref2) < Parameter.INSTANCE.merge_maf_cutoff) {
 								f=true;
 							} else {
 								f=false;
@@ -200,7 +197,7 @@ public class Strand {
 							snpCoding.add(0);
 
 						} else {
-							if (ref1 > 1 - par.merge_maf_cutoff && (1-ref2) > 1 - par.merge_maf_cutoff) {
+							if (ref1 > 1 - Parameter.INSTANCE.merge_maf_cutoff && (1-ref2) > 1 - Parameter.INSTANCE.merge_maf_cutoff) {
 								f=true;
 							} else {
 								f=false;
@@ -238,13 +235,13 @@ public class Strand {
 				}
 
 				double p = Z.OddsRatioTestPvalueTwoTail(ref1, ref2, N1[comSNPIdx[0][i]], N2[comSNPIdx[1][i]]);
-				if (p < par.merge_p_cutoff) {
+				if (p < Parameter.INSTANCE.merge_p_cutoff) {
 					f = false;
 				}
-				if (!par.keepATGCFlag && ATGCLocus) {
+				if (!Parameter.INSTANCE.keepATGCFlag && ATGCLocus) {
 					f = false;
 				}
-				if (par.removeFlipFlag && flip) {
+				if (Parameter.INSTANCE.removeFlipFlag && flip) {
 					f = false;
 				}
 				flag.add(f);
@@ -343,7 +340,7 @@ public class Strand {
 
 	public void readStrand() {
 		
-		BufferedReader reader = FileProcessor.FileOpen(par.strand_file);
+		BufferedReader reader = FileProcessor.FileOpen(Parameter.INSTANCE.strand_file);
 		String line;
 		try {
 			line = reader.readLine();
@@ -361,7 +358,7 @@ public class Strand {
 	
 	public void WriteFile() {
 		StringBuffer sbim = new StringBuffer();
-		sbim.append(par.out);
+		sbim.append(Parameter.INSTANCE.out);
 		sbim.append(".bim");
 		PrintStream pbim = FileProcessor.CreatePrintStream(sbim.toString());
 		
@@ -375,7 +372,7 @@ public class Strand {
 		pbim.close();
 		
 		StringBuffer sfam = new StringBuffer();
-		sfam.append(par.out);
+		sfam.append(Parameter.INSTANCE.out);
 		sfam.append(".fam");
 		PrintStream pfam = FileProcessor.CreatePrintStream(sfam.toString());		
 		for (Iterator<PersonIndex> e = PersonTable1.iterator(); e.hasNext(); ) {
@@ -387,7 +384,7 @@ public class Strand {
 		pfam.close();
 		
 		StringBuffer sbed = new StringBuffer();
-		sbed.append(par.out);
+		sbed.append(Parameter.INSTANCE.out);
 		sbed.append(".bed");
 		try {
 			os = new DataOutputStream(new FileOutputStream(sbed.toString()));

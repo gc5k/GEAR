@@ -35,9 +35,8 @@ public class MaCHDosageProfile {
 	private String[] QRName;
 	private boolean isQ = false;
 
-	public MaCHDosageProfile (Parameter p) {
+	public MaCHDosageProfile () {
 		System.err.println("generating risk profiles for mach dosage.");
-		par = p;
 		initial();
 	}
 

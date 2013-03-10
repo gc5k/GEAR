@@ -27,91 +27,92 @@ import pscontrol.NonTransmitted;
 public class Pipeline {
 
 	public static void main(String[] args) {
-		Parameter p = new Parameter();
-		p.commandListener(args);
+		Parameter.INSTANCE.commandListener(args);
 
 		System.out.print(Parameter.version);
 		Calendar calendar = Calendar.getInstance();
 		System.out.println("\nThe analysis started at: " + calendar.getTime() + "\n");
 
-		if (Parameter.scoreFlag) {
-			if (Parameter.bfileOption) {
-				RiskScore rs = new RiskScore(p);
+		if (Parameter.INSTANCE.scoreFlag) {
+			if (Parameter.INSTANCE.bfileOption) {
+				RiskScore rs = new RiskScore();
 				rs.makeProfile();
 			} else {
-				MaCHDosageProfile mach = new MaCHDosageProfile(p);
+				MaCHDosageProfile mach = new MaCHDosageProfile();
 				mach.makeProfile();
 			}
 		} else if (Parameter.strandFlag) {
-			Strand strand = new Strand(p);
+			Strand strand = new Strand();
 			strand.Merge();
 		} else if (Parameter.mergeFlag) {
-			MergeTwoFile mtf = new MergeTwoFile(p);
+			MergeTwoFile mtf = new MergeTwoFile();
 			mtf.Merge();
 		} else if (Parameter.makePredictorFlag) {
-			MakePredictor mp = new MakePredictor(p);
+			MakePredictor mp = new MakePredictor();
 			mp.BuildPredictor();
 		} else if (Parameter.makePredictor2Flag) {
-			MakePredictor2 mp2 = new MakePredictor2(p);
+			MakePredictor2 mp2 = new MakePredictor2();
 			mp2.BuildPredictor();
 		} else if (Parameter.realcheckFlag) {
 			if(Parameter.bfile2 != null) {
-				RealCheck realcheck = new RealCheck(p);
+				RealCheck realcheck = new RealCheck();
 				realcheck.Check();
 			} else {
-				RealCheckOne realcheckone = new RealCheckOne(p);
+				RealCheckOne realcheckone = new RealCheckOne();
 				realcheckone.Check();
 			}
 		} else if (Parameter.simufamFlag) {
-			SimuFamily simuFam = new SimuFamily(p);
+			SimuFamily simuFam = new SimuFamily (Parameter.INSTANCE.simu_fam_size,
+												 Parameter.INSTANCE.simu_fam_marker,
+												 Parameter.INSTANCE.seed);
 			simuFam.generateSample();
 
 		} else if (Parameter.simuRealData) {
-			RealDataSimulation rdSimu = new RealDataSimulation(p);
+			RealDataSimulation rdSimu = new RealDataSimulation();
 			rdSimu.GenerateSample();
 			
 		}  else if (Parameter.simupolyCCFlag) {
-			SimuPolyCC polyCC = new SimuPolyCC(p);
+			SimuPolyCC polyCC = new SimuPolyCC();
 			polyCC.GenerateSample();
 
 		} else if (Parameter.simupolyQTFlag) {
-			SimuPolyQT polyQT = new SimuPolyQT(p);
+			SimuPolyQT polyQT = new SimuPolyQT();
 			polyQT.generateSample();
 			
 		} else if (Parameter.sumStatFlag) {
 			if (Parameter.freqFlag) {
-				FrequencyCalculator fc = new FrequencyCalculator(p);
+				FrequencyCalculator fc = new FrequencyCalculator();
 				fc.CalculateAlleleFrequency();
 				System.out.println(fc);
 
 			} else if (Parameter.genoFreqFlag) {
-				FrequencyCalculator fc = new FrequencyCalculator(p);
+				FrequencyCalculator fc = new FrequencyCalculator();
 				fc.CalculateAlleleFrequency();
 				System.out.println(fc);				
 
 			} else if (Parameter.fstFlag ) {
-				Inbreeding inb = new Inbreeding(p);
+				Inbreeding inb = new Inbreeding();
 				inb.CalculateFst();
 			}
 		} else if (Parameter.makebedFlag) {
-			WriteBedSNPMajor bedWriter = new WriteBedSNPMajor(p);
+			WriteBedSNPMajor bedWriter = new WriteBedSNPMajor();
 			bedWriter.WriteFile();
 
 		} else if (Parameter.calOption) {
 			H2Transformer H2 = null;
-			H2 = new H2Transformer(p);
+			H2 = new H2Transformer();
 			H2.H2();
 
 		} else if (Parameter.nontransFlag) {
-			NonTransmitted nt = new NonTransmitted(p);
+			NonTransmitted nt = new NonTransmitted();
 			nt.GenerateNonTransmitted();
 
 		} else if (Parameter.heFlag) {
-			HERead hr = new HERead(p);
+			HERead hr = new HERead();
 			HECalculate HC = new HECalculate(hr);
 			HC.Regression();
 
-			if(p.permFlag) {
+			if(Parameter.INSTANCE.permFlag) {
 				HEPermutation hp = new HEPermutation(hr);
 				hp.Permutation();
 			}

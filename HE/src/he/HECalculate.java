@@ -37,7 +37,7 @@ public class HECalculate {
 
 	public void Calculate() {
 
-		heReader.lambda = new Lambda(heReader.par);
+		heReader.lambda = new Lambda();
 
 		String line;
 		if (heReader.reverse) {
@@ -291,8 +291,8 @@ public class HECalculate {
 			heReader.sb.append(heReader.mpheno[i] + " ");
 		}
 		heReader.sb.append("\n");
-		if (heReader.par.eh2Flag) {
-			heReader.sb.append("Empirical h2: " + heReader.par.eh2 + "\n");
+		if (Parameter.INSTANCE.eh2Flag) {
+			heReader.sb.append("Empirical h2: " + Parameter.INSTANCE.eh2 + "\n");
 		}
 
 		heReader.sb.append("reverse: " + heReader.reverse + "\n");
@@ -373,9 +373,8 @@ public class HECalculate {
 		heReader.sb.append("var(X): " + fmt.format(heReader.lambda.getVar())
 				+ "\n");
 
-		if (heReader.par.eh2Flag) {
-			double Lmd = heReader.lambda.getLambda(-1 * Mat_B.getEntry(0, 0)
-					* heReader.par.eh2);
+		if (Parameter.INSTANCE.eh2Flag) {
+			double Lmd = heReader.lambda.getLambda(-1 * Mat_B.getEntry(0, 0) * Parameter.INSTANCE.eh2);
 			heReader.sb.append("Lambda: " + fmt.format(Lmd));
 		}
 

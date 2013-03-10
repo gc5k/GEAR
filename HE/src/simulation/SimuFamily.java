@@ -33,15 +33,11 @@ public class SimuFamily {
 	private PrintWriter cov = null;
 	
 	private String out = "simuFam";
-	private Parameter par;
 
-	public SimuFamily(Parameter p) {
-
-		par = p;
-		NFam = par.simu_fam_size;
-		NMarker = par.simu_fam_marker;
-		seed = par.seed;
-
+	public SimuFamily(int NFam, int NMarker, long seed) {
+		this.NFam = NFam;
+		this.NMarker = NMarker;
+		this.seed = seed;
 		initial();
 	}
 

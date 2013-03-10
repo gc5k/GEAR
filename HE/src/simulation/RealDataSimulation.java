@@ -36,7 +36,6 @@ public class RealDataSimulation {
 	private int[][] flag = null;
 	private double[] T = null;
 	private Random rnd;
-	private Parameter par;
 	private PLINKParser pp = null;
 	private SampleFilter sf = null;
 	RealDataSimulationGenotypeMatrix GM;
@@ -44,10 +43,8 @@ public class RealDataSimulation {
 	private double accept_cs;
 	private double accept_ctrl;
 
-	public RealDataSimulation(Parameter p) {
-
+	public RealDataSimulation() {
 		System.err.print(Parameter.version);
-		par = p;
 
 		if (Parameter.fileOption) {
 			pp = new PLINKParser(Parameter.pedfile, Parameter.mapfile);
@@ -66,33 +63,33 @@ public class RealDataSimulation {
 	}
 
 	public void GenerateSample() {
-		rnd = new Random(par.simuSeed);
-		if (par.simuCasualLoci != null) {
+		rnd = new Random(Parameter.INSTANCE.simuSeed);
+		if (Parameter.INSTANCE.simuCasualLoci != null) {
 			getCasualLoci();
 		} else {
-			getRandomCasualLoci(par.simuRndCasualLoci);
+			getRandomCasualLoci(Parameter.INSTANCE.simuRndCasualLoci);
 		}
 		RealDataSimulationQC rdSimuQC = new RealDataSimulationQC(pp.getPedigreeData(), pp.getMapData(), sf);
 		GM = new RealDataSimulationGenotypeMatrix(rdSimuQC);
 		sampleSize = GM.getGRow();
-		T = new double[par.simuRep];
-		flag = new int[par.simuRep][];
+		T = new double[Parameter.INSTANCE.simuRep];
+		flag = new int[Parameter.INSTANCE.simuRep][];
 
-		accept_cs = (par.simuCC[0]/ ( 1.0 * sampleSize) ) / par.simuK;
-		accept_ctrl = (par.simuCC[1]/( 1.0 * sampleSize) ) / (1 - par.simuK);
+		accept_cs = (Parameter.INSTANCE.simuCC[0]/ ( 1.0 * sampleSize) ) / Parameter.INSTANCE.simuK;
+		accept_ctrl = (Parameter.INSTANCE.simuCC[1]/( 1.0 * sampleSize) ) / (1 - Parameter.INSTANCE.simuK);
 		
 		if(accept_cs > 1 || accept_ctrl > 1) {
-			System.err.println("it is impossible to generate the case-control sampel with K = " + par.simuK + " with --simu-cc " + par.simuCC[0] + " " + par.simuCC[1]);
+			System.err.println("it is impossible to generate the case-control sampel with K = " + Parameter.INSTANCE.simuK + " with --simu-cc " + Parameter.INSTANCE.simuCC[0] + " " + Parameter.INSTANCE.simuCC[1]);
 		}
 
-		bv = new double[par.simuRep][sampleSize];
+		bv = new double[Parameter.INSTANCE.simuRep][sampleSize];
 		b = generateAddEffects(casualLociIdx.length);
-		y = new double[par.simuRep][];
-		int cut_off = (int) (sampleSize * (1-par.simuK));
-		for (int i = 0; i < par.simuRep; i++) {
+		y = new double[Parameter.INSTANCE.simuRep][];
+		int cut_off = (int) (sampleSize * (1-Parameter.INSTANCE.simuK));
+		for (int i = 0; i < Parameter.INSTANCE.simuRep; i++) {
 			bv[i] = calculateBV(b);
 			double v = StatUtils.variance(bv[i]);
-			double se = Math.sqrt( v/(par.simuHsq) * (1 - par.simuHsq) );
+			double se = Math.sqrt( v/(Parameter.INSTANCE.simuHsq) * (1 - Parameter.INSTANCE.simuHsq) );
 			y[i] = generateY(bv[i], se);
 			double[] t = new double[sampleSize];
 			System.arraycopy(y[i], 0, t, 0, sampleSize);
@@ -101,7 +98,7 @@ public class RealDataSimulation {
 			flag[i] = sample1(T[i], y[i]);
 		}
 
-		StringBuffer sb1 = new StringBuffer(par.out);
+		StringBuffer sb1 = new StringBuffer(Parameter.INSTANCE.out);
 		sb1.append(".eff");
 		PrintStream ps1 = FileProcessor.CreatePrintStream(sb1.toString());
 		ArrayList<SNP> snpList = pp.getMapData().getMarkerList();
@@ -111,7 +108,7 @@ public class RealDataSimulation {
 		}
 		ps1.close();
 
-		StringBuffer sb2 = new StringBuffer(par.out);
+		StringBuffer sb2 = new StringBuffer(Parameter.INSTANCE.out);
 		sb2.append(".phen");
 		PrintStream ps2 = FileProcessor.CreatePrintStream(sb2.toString());
 		ArrayList<PersonIndex> personTable = rdSimuQC.getSample();
@@ -119,7 +116,7 @@ public class RealDataSimulation {
 		for (int i = 0; i < sampleSize; i++) {
 			PersonIndex pi = personTable.get(i);
 			ps2.append(pi.getFamilyID() + " " + pi.getIndividualID() + " ");
-			for (int j = 0; j < par.simuRep; j++) {
+			for (int j = 0; j < Parameter.INSTANCE.simuRep; j++) {
 				ps2.append( flag[j][i] + " ");
 			}
 			ps2.append("\n");
@@ -130,13 +127,13 @@ public class RealDataSimulation {
 	private int[] sample1(double T, double[] y) {
 		int[] indicator = new int[y.length];
 		
-		int filler = Integer.parseInt(par.missing_phenotype);
+		int filler = Integer.parseInt(Parameter.INSTANCE.missing_phenotype);
 		
 		Arrays.fill(indicator, filler);
 		int cs = 0;
 		int ctrl = 0;
 		int i = 0;
-		while(cs < par.simuCC[0] && ctrl < par.simuCC[1]) {
+		while(cs < Parameter.INSTANCE.simuCC[0] && ctrl < Parameter.INSTANCE.simuCC[1]) {
 			if (i == y.length) i = 0;
 
 			if(indicator[i] == filler ) {
@@ -193,7 +190,7 @@ public class RealDataSimulation {
 		ArrayList<SNP> snpList = pp.getMapData().getMarkerList();
 
 		RandomDataImpl rd = new RandomDataImpl();
-		rd.reSeed(par.simuSeed);
+		rd.reSeed(Parameter.INSTANCE.simuSeed);
 		casualLociIdx = rd.nextPermutation(snpList.size(), num);
 	}
 
@@ -201,8 +198,8 @@ public class RealDataSimulation {
 		ArrayList<String> cl = NewIt.newArrayList();
 		ArrayList<SNP> snpList = pp.getMapData().getMarkerList();
 
-		if(par.simuCasualLoci != null) {
-			casualLociFile = par.simuCasualLoci;
+		if(Parameter.INSTANCE.simuCasualLoci != null) {
+			casualLociFile = Parameter.INSTANCE.simuCasualLoci;
 			BufferedReader reader = FileProcessor.FileOpen(casualLociFile);
 			String line = null;
 			try {

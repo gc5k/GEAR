@@ -23,14 +23,12 @@ public class FrequencyCalculator {
 	private int numMarker;
 	private double[][] allelefreq;
 	private double[][] genotypefreq;
-	private Parameter par;
 	private MapFile snpMap;
 
 	private double[][] hw;
 	private int[][] N;
-	public FrequencyCalculator(Parameter p) {
+	public FrequencyCalculator() {
 		System.err.print(Parameter.version);
-		par = p;
 
 		PLINKParser pp = null;
 		if (Parameter.fileOption) {
@@ -146,7 +144,7 @@ public class FrequencyCalculator {
 		NumberFormat fmt = new DecimalFormat(".###E0");
 
 		StringBuffer sb = new StringBuffer();
-		if(par.freqFlag) {
+		if(Parameter.INSTANCE.freqFlag) {
 			sb.append("chr\tsnp\tA1\tA2\tfrq(A1)\tfrq(A2)\tMiss\tNChr");
 		} else {
 			sb.append("chr\tsnp\tA1\tA2\tfrq(A1A1)\tfrq(A1A2)\tfrq(A2A2)\tMiss\tNChr\tp(Fisher)");
@@ -155,10 +153,10 @@ public class FrequencyCalculator {
 		for (int i = 0; i < allelefreq.length; i++) {
 			SNP snp = snpMap.getSNP(i);
 			sb.append(snp.getChromosome() + "\t" + snp.getName() + "\t" + snp.getRefAllele() + "\t"  + snp.getSecAllele() + "\t");
-			if (par.freqFlag) {
+			if (Parameter.INSTANCE.freqFlag) {
 				sb.append(fmt.format(allelefreq[i][0]) + "\t" + fmt.format(allelefreq[i][1]) + "\t"
 					+ fmt.format(allelefreq[i][2]) + "\t" + N[i][3] * 2);
-			} else if (par.genoFreqFlag){
+			} else if (Parameter.INSTANCE.genoFreqFlag){
 				sb.append(fmt.format(genotypefreq[i][0]) + "\t"
 					+ fmt.format(genotypefreq[i][1]) + "\t" + fmt.format(genotypefreq[i][2]) + "\t"
 					+ N[i][3] * 2 + "\t" + hw[i][0]);
