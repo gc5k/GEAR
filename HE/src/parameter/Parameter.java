@@ -446,8 +446,8 @@ public enum Parameter {
 
 	public static String version = "\n"
 			+ "******************************************************************\n"
-			+ "| HE Jul/18/2011                                                 |\n"
-			+ "| (C) 2011 Guo-Bo Chen                                           |\n"
+			+ "| GEAR [GEnetic Analysis Repository] Mar/11/2013                 |\n"
+			+ "| (C) 2013 Guo-Bo Chen, Zhi-Xiang Zhu                            |\n"
 			+ "| v 0.7.7                                                        |\n"			
 			+ "| GNU General Public License, v2                                 |\n"
 			+ "******************************************************************\n";
