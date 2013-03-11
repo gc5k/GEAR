@@ -18,7 +18,7 @@ public class PLINKTransposeParser extends PLINKParser {
 	public void Parse() {
 		mapData = new MapFile(null);
 		pedData = new TransposePedigreeReader(pedigreeFile, FamFile, mapData);
-		pedData.setHeader(Parameter.header);
+		pedData.setHeader(false);
 
 		pedData.setHeader(false);
 		ParsePedFile();

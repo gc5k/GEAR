@@ -32,7 +32,7 @@ public class PLINKParser {
 		mapData = new MapFile(mapFile);
 
 		pedData = new PedigreeFile();
-		pedData.setHeader(Parameter.header);
+		pedData.setHeader(false);
 
 		if (mapFile != null) {//bim
 			ParseMapFile();
