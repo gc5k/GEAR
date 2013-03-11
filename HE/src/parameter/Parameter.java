@@ -44,8 +44,6 @@ public enum Parameter {
 	public boolean hasFileOption() { return fileOption; }
 // PLINK text input file options End
 
-	public static boolean header = false;
-
 ///////////////real check
 	private final String cmd_realcheck_threshold_upper = "realcheck_threshold_upper";
 	private final String cmd_realcheck_threshold_upper_long = "realcheck-threshold-upper";
