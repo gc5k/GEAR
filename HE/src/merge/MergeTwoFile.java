@@ -58,12 +58,14 @@ public class MergeTwoFile {
 		
 		PLINKParser pp1 = null;
 		PLINKParser pp2 = null;
-		if (Parameter.INSTANCE.hasBFileOption() && Parameter.bfileOption2) {
-			pp1 = new PLINKBinaryParser(Parameter.INSTANCE.getBedFile(),
-					                    Parameter.INSTANCE.getBimFile(),
-					                    Parameter.INSTANCE.getFamFile());
-			pp2 = new PLINKBinaryParser(Parameter.bedfile2, Parameter.bimfile2,
-					Parameter.famfile2);
+		if (Parameter.INSTANCE.hasBFileOption() && Parameter.INSTANCE.hasBFile2Option()) {
+			pp1 = new PLINKBinaryParser (Parameter.INSTANCE.getBedFile(),
+					                     Parameter.INSTANCE.getBimFile(),
+					                     Parameter.INSTANCE.getFamFile());
+			
+			pp2 = new PLINKBinaryParser (Parameter.INSTANCE.getBedFile2(),
+					                     Parameter.INSTANCE.getBimFile2(),
+					                     Parameter.INSTANCE.getFamFile2());
 		} else {
 			System.err.println("did not specify files.");
 			Test.LOG.append("did not specify files.\n");
