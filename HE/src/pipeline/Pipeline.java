@@ -53,7 +53,7 @@ public class Pipeline {
 		} else if (Parameter.makePredictor2Flag) {
 			MakePredictor2 mp2 = new MakePredictor2();
 			mp2.BuildPredictor();
-		} else if (Parameter.realcheckFlag) {
+		} else if (Parameter.INSTANCE.hasRealCheckOption()) {
 			if(Parameter.bfile2 != null) {
 				RealCheck realcheck = new RealCheck();
 				realcheck.Check();

@@ -65,7 +65,7 @@ public class RealCheckOne {
 		sb.append(".real");
 		PrintStream ps = FileProcessor.CreatePrintStream(sb.toString());
 
-		if(par.realcheckSNPs != null) {
+		if (Parameter.INSTANCE.getRealCheckParameter().getSnps() != null) {
 			Test.LOG.append("generate similarity matrix with realcheck SNPs.\n");
 			System.err.println("generate similarity matrix with realcheck SNPs.");
 			getSelectedMarker();
@@ -77,16 +77,14 @@ public class RealCheckOne {
 		for (int i = 0; i < G1.getGRow(); i++) {
 			for (int j = i; j < G1.getGRow(); j++) {
 				double[] s = similarityScore(i, j);
-				if (par.realcheckThresholdFlag) {
-					if (s[0] > par.realcheckThresholdLower && s[0] <= par.realcheckThresholdUpper) {
-						PersonIndex ps1 = PersonTable1.get(i);
-						PersonIndex ps2 = PersonTable1.get(j);
-						ps.print(ps1.getFamilyID() + " "
-								+ ps1.getIndividualID() + " "
-								+ ps2.getFamilyID() + " "
-								+ ps2.getIndividualID() + " " + s[0] + " "
-								+ s[1] + "/" + markerIdx.length + "\n");
-					}
+				if (s[0] > Parameter.INSTANCE.getRealCheckParameter().getThresholdLower() && s[0] <= Parameter.INSTANCE.getRealCheckParameter().getThresholdUpper()) {
+					PersonIndex ps1 = PersonTable1.get(i);
+					PersonIndex ps2 = PersonTable1.get(j);
+					ps.print(ps1.getFamilyID() + " "
+							+ ps1.getIndividualID() + " "
+							+ ps2.getFamilyID() + " "
+							+ ps2.getIndividualID() + " " + s[0] + " "
+							+ s[1] + "/" + markerIdx.length + "\n");
 				}
 			}
 		}
@@ -143,12 +141,12 @@ public class RealCheckOne {
 	public void getRandomMarker() {
 		int mn = 0;
 		int nMarker = sf1.getMapFile().getMarkerList().size();
-		if (par.realcheckMarkerNumber > nMarker) {
+		if (Parameter.INSTANCE.getRealCheckParameter().getMarkerNumber() > nMarker) {
 			Test.LOG.append("realcheck marker number was reduced to " + nMarker + "\n");
 			System.err.println("realcheck marker number was reduced to " + nMarker + "\n");
 			mn = nMarker;
 		} else {
-			mn = par.realcheckMarkerNumber;
+			mn = Parameter.INSTANCE.getRealCheckParameter().getMarkerNumber();
 		}
 
 		markerIdx = new int[mn];
@@ -175,7 +173,7 @@ public class RealCheckOne {
 	}
 
 	private ArrayList<String> readRealcheckSNPs() {
-		BufferedReader reader = FileProcessor.FileOpen(par.realcheckSNPs);
+		BufferedReader reader = FileProcessor.FileOpen(Parameter.INSTANCE.getRealCheckParameter().getSnps());
 		String line = null;
 		ArrayList<String> selectedSNP = NewIt.newArrayList();
 		try {
@@ -189,8 +187,8 @@ public class RealCheckOne {
 			e.printStackTrace(System.err);
 			System.exit(0);
 		}
-		Test.LOG.append("read " + selectedSNP.size() + " markers from " + par.realcheckSNPs + ".\n");
-		System.err.println("read " + selectedSNP.size() + " markers from " + par.realcheckSNPs + ".");
+		Test.LOG.append("read " + selectedSNP.size() + " markers from " + Parameter.INSTANCE.getRealCheckParameter().getSnps() + ".\n");
+		System.err.println("read " + selectedSNP.size() + " markers from " + Parameter.INSTANCE.getRealCheckParameter().getSnps() + ".");
 
 		return selectedSNP;
 	}
