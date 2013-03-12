@@ -21,54 +21,107 @@ public enum Parameter {
 	INSTANCE;
 
 // PLINK binary input file options Begin
+	public boolean hasBFileOption() { return bfileOption; }
+	public String getBedFile() { return bedfile; }
+	public String getBimFile() { return bimfile; }
+	public String getFamFile() { return famfile; }
+	
 	private final String cmd_bfile = "bfile";
 	private String bedfile = null;
 	private String bimfile = null;
 	private String famfile = null;
 	private boolean bfileOption = false;
-	
-	public String getBedFile() { return bedfile; }
-	public String getBimFile() { return bimfile; }
-	public String getFamFile() { return famfile; }
-	public boolean hasBFileOption() { return bfileOption; }
 // PLINK binary input file options End
 
 // PLINK text input file options Begin
+	public boolean hasFileOption() { return fileOption; }
+	public String getPedFile() { return pedfile; }
+	public String getMapFile() { return mapfile; }
+	
 	private final String cmd_file = "file";
 	private String pedfile = null;
 	private String mapfile = null;
 	private boolean fileOption = false;
-	
-	public String getPedFile() { return pedfile; }
-	public String getMapFile() { return mapfile; }
-	public boolean hasFileOption() { return fileOption; }
 // PLINK text input file options End
-
-///////////////real check
-	private final String cmd_realcheck_threshold_upper = "realcheck_threshold_upper";
-	private final String cmd_realcheck_threshold_upper_long = "realcheck-threshold-upper";
-	public static double realcheckThresholdUpper = 1;
-
-	private final String cmd_realcheck_threshold_lower = "realcheck_threshold_lower";
-	private final String cmd_realcheck_threshold_lower_long = "realcheck-threshold-lower";
-	public static double realcheckThresholdLower = 0;	
-	public static boolean realcheckThresholdUpperLowerFlag = false;
-
-	private final String cmd_realcheck_threshold = "realcheck_threshold";
-	private final String cmd_realcheck_threshold_long = "realcheck-threshold";
-	public static double realcheckThreshold = 1;
-	public static boolean realcheckThresholdFlag = true;
-
-	private final String cmd_realcheck_marker_number = "realcheck_marker_number";
-	private final String cmd_realcheck_marker_number_long = "realcheck-marker-number";
-	public static int realcheckMarkerNumber = 100;
-
-	private final String cmd_realcheck_snps = "realcheck_snps";
-	private final String cmd_realcheck_snps_long = "realcheck-snps";
-	public static String realcheckSNPs = null;
+	
+	public boolean hasRealCheckOption() { return realcheckFlag; }
 	
 	private final String cmd_realcheck = "realcheck";
-	public static boolean realcheckFlag = false;
+	private boolean realcheckFlag = false;
+	
+	public class RealCheckParameter {
+		private RealCheckParameter() {}
+		
+		public double getThresholdUpper() { return thresholdUpper; }
+		public double getThresholdLower() { return thresholdLower; }
+		public int getMarkerNumber() { return markerNumber; }
+		public String getSnps() { return snps; }
+		
+		@SuppressWarnings("static-access")
+		private void commandInitial() {
+			ops.addOption(OptionBuilder.withLongOpt(cmd_threshold_upper_long).withDescription("realcheck marker threshold upper bounder").hasArg().create(cmd_threshold_upper));
+			ops.addOption(OptionBuilder.withLongOpt(cmd_threshold_lower_long).withDescription("realcheck marker threshold lower bounder").hasArg().create(cmd_threshold_lower));
+			ops.addOption(OptionBuilder.withLongOpt(cmd_marker_number_long).withDescription("realcheck marker number").hasArg().create(cmd_marker_number));
+			ops.addOption(OptionBuilder.withLongOpt(cmd_snps_long).withDescription("realcheck snp number").hasArg().create(cmd_snps));
+		}
+		
+		private void commandListener(CommandLine cl) {
+			if (cl.hasOption(cmd_threshold_upper)) {
+				thresholdUpper = Double.parseDouble(cl.getOptionValue(cmd_threshold_upper));
+				if (thresholdUpper < 0 && thresholdUpper > 1) {
+					System.err.println("realcheck threshold upper bounder should be between 0 and 1");
+					System.exit(0);
+				}
+			}
+			
+			if (cl.hasOption(cmd_threshold_lower)) {
+				thresholdLower = Double.parseDouble(cl.getOptionValue(cmd_threshold_lower));
+				if (thresholdLower < 0 && thresholdLower > 1) {
+					System.err.println("realcheck threshold Lower bounder should be tween 0 and 1");
+					System.exit(0);
+				}
+			}
+
+			if (cl.hasOption(cmd_marker_number)) {
+				markerNumber = Integer.parseInt(cl.getOptionValue(cmd_marker_number));
+				if (markerNumber < 0) {
+					System.err.println("realcheck marker number should be greater than 0");
+					System.exit(0);
+				}
+			}
+
+			if (cl.hasOption(cmd_snps)) {
+				snps = cl.getOptionValue(cmd_snps);
+				exists(snps);
+			}
+		}
+		
+		private final String cmd_threshold_upper = "realcheck_threshold_upper";
+		private final String cmd_threshold_upper_long = "realcheck-threshold-upper";
+		private double thresholdUpper = 1;
+
+		private final String cmd_threshold_lower = "realcheck_threshold_lower";
+		private final String cmd_threshold_lower_long = "realcheck-threshold-lower";
+		private double thresholdLower = 0;
+		
+		private final String cmd_marker_number = "realcheck_marker_number";
+		private final String cmd_marker_number_long = "realcheck-marker-number";
+		private int markerNumber = 100;
+
+		private final String cmd_snps = "realcheck_snps";
+		private final String cmd_snps_long = "realcheck-snps";
+		private String snps = null;
+	}  // class RealCheckParameter
+	
+	private RealCheckParameter realCheckParameter = new RealCheckParameter();
+	
+	public RealCheckParameter getRealCheckParameter() {
+		return realCheckParameter;
+	}
+
+// Real-check options Begin
+	
+// Real-check options End
 
 	private final String cmd_bfile2 = "bfile2";
 	public static String bfile2 = null;
@@ -469,17 +522,9 @@ public enum Parameter {
 		ops.addOption(OptionBuilder.withDescription("bfile ").hasArg().create(cmd_bfile));
 
 //realcheck
-		ops.addOption(OptionBuilder.withLongOpt(cmd_realcheck_threshold_upper_long).withDescription("realcheck marker threshold upper bounder").hasArg().create(cmd_realcheck_threshold_upper));
-
-		ops.addOption(OptionBuilder.withLongOpt(cmd_realcheck_threshold_lower_long).withDescription("realcheck marker threshold lower bounder").hasArg().create(cmd_realcheck_threshold_lower));
-
-		ops.addOption(OptionBuilder.withLongOpt(cmd_realcheck_threshold_long).withDescription("realcheck marker threshold").hasArg().create(cmd_realcheck_threshold));
-
-		ops.addOption(OptionBuilder.withLongOpt(cmd_realcheck_marker_number_long).withDescription("realcheck marker number").hasArg().create(cmd_realcheck_marker_number));
-
-		ops.addOption(OptionBuilder.withLongOpt(cmd_realcheck_snps_long).withDescription("realcheck snp number").hasArg().create(cmd_realcheck_snps));
-
 		ops.addOption(OptionBuilder.withDescription("realcheck ").create(cmd_realcheck));
+		
+		realCheckParameter.commandInitial();
 
 		ops.addOption(OptionBuilder.withDescription("bfile2 ").hasArg().create(cmd_bfile2));
 
@@ -685,50 +730,10 @@ public enum Parameter {
 			bfileOption = true;
 		}
 
-//realcheck
-		if (cl.hasOption(cmd_realcheck_threshold_upper)) {
-			realcheckThresholdUpper = Double.parseDouble(cl.getOptionValue(cmd_realcheck_threshold_upper));
-			if (realcheckThresholdUpper < 0 && realcheckThresholdUpper > 1) {
-				System.err.println("realcheck threshold upper bounder should be tween 0 and 1");
-				System.exit(0);
-			}
-			realcheckThresholdUpperLowerFlag = true;
-		}
-		if (cl.hasOption(cmd_realcheck_threshold_lower)) {
-			realcheckThresholdLower = Double.parseDouble(cl.getOptionValue(cmd_realcheck_threshold_lower));
-			if (realcheckThresholdLower < 0 && realcheckThresholdLower > 1) {
-				System.err.println("realcheck threshold Lower bounder should be tween 0 and 1");
-				System.exit(0);
-			}
-			realcheckThresholdUpperLowerFlag = true;
-		}
-
-		if (cl.hasOption(cmd_realcheck_threshold)) {
-			realcheckThreshold = Double.parseDouble(cl.getOptionValue(cmd_realcheck_threshold));
-
-			if (realcheckThreshold < 0) {
-				System.err.println("realcheck threshold should be tween 0 and 1");
-				System.exit(0);
-			}
-			realcheckThresholdFlag = true;
-		}
-
-		if (cl.hasOption(cmd_realcheck_marker_number)) {
-			realcheckMarkerNumber = Integer.parseInt(cl.getOptionValue(cmd_realcheck_marker_number));
-			if (realcheckMarkerNumber < 0) {
-				System.err.println("realcheck marker number should be greater than 0");
-				System.exit(0);
-			}
-		}
-
-		if (cl.hasOption(cmd_realcheck_snps)) {
-			realcheckSNPs = cl.getOptionValue(cmd_realcheck_snps);
-			exists(realcheckSNPs);
-		}
-		
 		if (cl.hasOption(cmd_realcheck)) {
 			realcheckFlag = true;
 		}
+		realCheckParameter.commandListener(cl);
 
 		if (cl.hasOption(cmd_bfile2)) {
 			bfile2 = cl.getOptionValue(cmd_bfile2);
