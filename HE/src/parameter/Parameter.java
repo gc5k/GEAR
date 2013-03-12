@@ -44,6 +44,7 @@ public enum Parameter {
 	private boolean fileOption = false;
 // PLINK text input file options End
 	
+// Real-check options Begin
 	public boolean hasRealCheckOption() { return realcheckFlag; }
 	
 	private final String cmd_realcheck = "realcheck";
@@ -118,17 +119,20 @@ public enum Parameter {
 	public RealCheckParameter getRealCheckParameter() {
 		return realCheckParameter;
 	}
-
-// Real-check options Begin
-	
 // Real-check options End
 
+// bfile2 options Begin
+	public boolean hasBFile2Option() { return bfile2Option; }
+	public String getBedFile2() { return bedfile2; }
+	public String getBimFile2() { return bimfile2; }
+	public String getFamFile2() { return famfile2; }
+	
 	private final String cmd_bfile2 = "bfile2";
-	public static String bfile2 = null;
-	public static String bedfile2 = null;
-	public static String bimfile2 = null;
-	public static String famfile2 = null;
-	public static boolean bfileOption2 = false;
+	private String bedfile2 = null;
+	private String bimfile2 = null;
+	private String famfile2 = null;
+	private boolean bfile2Option = false;
+// bfile2 options End
 
 ///////////////merge
 	private final String cmd_merge = "merge";
@@ -736,11 +740,11 @@ public enum Parameter {
 		realCheckParameter.commandListener(cl);
 
 		if (cl.hasOption(cmd_bfile2)) {
-			bfile2 = cl.getOptionValue(cmd_bfile2);
+			String bfile2 = cl.getOptionValue(cmd_bfile2);
 			bedfile2 = (new StringBuffer(bfile2)).append(".bed").toString();
 			bimfile2 = (new StringBuffer(bfile2)).append(".bim").toString();
 			famfile2 = (new StringBuffer(bfile2)).append(".fam").toString();
-			bfileOption2 = true;
+			bfile2Option = true;
 		}
 
 //snp selection

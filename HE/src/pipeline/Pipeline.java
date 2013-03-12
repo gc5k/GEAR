@@ -54,7 +54,7 @@ public class Pipeline {
 			MakePredictor2 mp2 = new MakePredictor2();
 			mp2.BuildPredictor();
 		} else if (Parameter.INSTANCE.hasRealCheckOption()) {
-			if(Parameter.bfile2 != null) {
+			if (Parameter.INSTANCE.hasBFile2Option()) {
 				RealCheck realcheck = new RealCheck();
 				realcheck.Check();
 			} else {
