@@ -211,7 +211,7 @@ public class RiskScore {
 				Total++;
 				if (isATGC) {
 					ATGCLocus++;
-					if (!Parameter.INSTANCE.keepATGCFlag) {
+					if (!Parameter.INSTANCE.keepATGC()) {
 						continue;
 					}
 				}
@@ -295,13 +295,13 @@ public class RiskScore {
 
 		System.out.println(Total + " SNPs were mapped to the score file.");
 		if (ATGCLocus > 1) {
-			if(Parameter.INSTANCE.keepATGCFlag) {
+			if(Parameter.INSTANCE.keepATGC()) {
 				System.out.println(ATGCLocus + " ATGC loci were detected.");
 			} else {
 				System.out.println(ATGCLocus + " ATGC loci were removed.");
 			}
 		} else {
-			if(Parameter.INSTANCE.keepATGCFlag) {
+			if(Parameter.INSTANCE.keepATGC()) {
 				System.out.println(ATGCLocus + " ATGC locus was detected.");
 			} else {
 				System.out.println(ATGCLocus + " ATGC locus was removed.");
@@ -363,7 +363,7 @@ public class RiskScore {
 				Total++;
 				if (isATGC) {
 					ATGCLocus++;
-					if (!Parameter.INSTANCE.keepATGCFlag) {
+					if (!Parameter.INSTANCE.keepATGC()) {
 						continue;
 					}
 				}
@@ -432,13 +432,13 @@ public class RiskScore {
 
 		System.out.println(Total + " SNPs were mapped to the score file.");
 		if (ATGCLocus > 1) {
-			if (Parameter.INSTANCE.keepATGCFlag) {
+			if (Parameter.INSTANCE.keepATGC()) {
 				System.out.println(ATGCLocus + " ATGC loci were detected.");
 			} else {
 				System.out.println(ATGCLocus + " ATGC loci were removed.");
 			}
 		} else {
-			if (Parameter.INSTANCE.keepATGCFlag) {
+			if (Parameter.INSTANCE.keepATGC()) {
 				System.out.println(ATGCLocus + " ATGC Locus were detected.");
 			} else {
 				System.out.println(ATGCLocus + " ATGC locus was removed.");				

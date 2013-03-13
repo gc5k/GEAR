@@ -122,10 +122,10 @@ public class MakePredictor {
 				scoreCoding.add(0);
 			}
 
-			if (!Parameter.INSTANCE.keepATGCFlag && ATGCLocus) {
+			if (!Parameter.INSTANCE.keepATGC() && ATGCLocus) {
 				f = false;
 			}
-			if (Parameter.INSTANCE.removeFlipFlag && flip) {
+			if (Parameter.INSTANCE.removeFlip() && flip) {
 				f = false;
 			}
 			flag.add(f);

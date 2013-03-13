@@ -18,7 +18,6 @@ import util.SNPMatch;
 
 public class MaCHDosageProfile {
 	private String delim = "\\s+";
-	private Parameter par;
 	private String[] dosageFile;
 	private String[] inforFile;
 	private String scoreFile;
@@ -43,7 +42,7 @@ public class MaCHDosageProfile {
 	private void initial() {
 
 		//read score file
-		scoreFile = par.scoreFile;
+		scoreFile = Parameter.INSTANCE.scoreFile;
 		if(scoreFile != null) {
 			BufferedReader readerScoreFile = FileProcessor.FileOpen(scoreFile);
 			String lineScore = null;
@@ -63,10 +62,10 @@ public class MaCHDosageProfile {
 		}
 
 		//read q score file and q range file
-		if (par.q_score_file != null && par.q_score_range_file != null) {
+		if (Parameter.INSTANCE.q_score_file != null && Parameter.INSTANCE.q_score_range_file != null) {
 
 			//q score file
-			q_score_file = par.q_score_file;
+			q_score_file = Parameter.INSTANCE.q_score_file;
 			BufferedReader readerQScoreFile = FileProcessor.FileOpen(q_score_file);
 			String lineQScore = null;
 			try {
@@ -87,7 +86,7 @@ public class MaCHDosageProfile {
 			}
 
 			//q range file
-			q_score_range_file = par.q_score_range_file;
+			q_score_range_file = Parameter.INSTANCE.q_score_range_file;
 			BufferedReader readerQRangeFile = FileProcessor.FileOpen(q_score_range_file);
 			String lineQRange = null;
 			ArrayList<ArrayList<String>> QR = NewIt.newArrayList();
@@ -123,16 +122,16 @@ public class MaCHDosageProfile {
 			isQ = true;
 		}
 
-		if (par.MaCH_Dosage != null) {
+		if (Parameter.INSTANCE.MaCH_Dosage != null) {
 			dosageFile = new String[1];
-			dosageFile[0] = par.MaCH_Dosage;
+			dosageFile[0] = Parameter.INSTANCE.MaCH_Dosage;
 			File f = new File(dosageFile[0]);
 			if (!f.exists()) {
 				System.err.println("could not open " + dosageFile[0] + ".");
 				System.exit(0);
 			}
 			inforFile = new String[1];
-			inforFile[0] = par.MaCH_Infor;
+			inforFile[0] = Parameter.INSTANCE.MaCH_Infor;
 			f = new File(inforFile[0]);
 			if (!f.exists()) {
 				System.err.println("could not open " + dosageFile[0] + ".");
@@ -140,7 +139,7 @@ public class MaCHDosageProfile {
 			}
 
 		} else {
-			BufferedReader reader1 = FileProcessor.FileOpen(par.MaCH_Dosage_Batch);
+			BufferedReader reader1 = FileProcessor.FileOpen(Parameter.INSTANCE.MaCH_Dosage_Batch);
 			ArrayList<String> l1 = NewIt.newArrayList();
 			String line = null;
 			try {
@@ -161,7 +160,7 @@ public class MaCHDosageProfile {
 				}
 			}
 
-			BufferedReader reader2 = FileProcessor.FileOpen(par.MaCH_Infor_Batch);
+			BufferedReader reader2 = FileProcessor.FileOpen(Parameter.INSTANCE.MaCH_Infor_Batch);
 			ArrayList<String> l2 = NewIt.newArrayList();
 			try {
 				while ((line=reader2.readLine())!=null) {
@@ -226,7 +225,7 @@ public class MaCHDosageProfile {
 
 				if(di.isATGCLocus()) {
 					ATGCLocus++;
-					if (!par.keepATGCFlag) {
+					if (!Parameter.INSTANCE.keepATGC()) {
 						continue;
 					}
 				}
@@ -313,13 +312,13 @@ public class MaCHDosageProfile {
 		}
 
 		if (ATGCLocus > 1) {
-			if (par.keepATGCFlag) {
+			if (Parameter.INSTANCE.keepATGC()) {
 				System.out.println(ATGCLocus + " ATGC loci were detected.");
 			} else {
 				System.out.println(ATGCLocus + " ATGC loci were removed.");
 			}
 		} else {
-			if (par.keepATGCFlag) {
+			if (Parameter.INSTANCE.keepATGC()) {
 				System.out.println(ATGCLocus + " ATGC Locus were detected.");
 			} else {
 				System.out.println(ATGCLocus + " ATGC locus was removed.");				
@@ -333,7 +332,7 @@ public class MaCHDosageProfile {
 		}
 
 		StringBuffer sbim = new StringBuffer();
-		sbim.append(par.out);
+		sbim.append(Parameter.INSTANCE.out);
 		sbim.append(".profile");
 		PrintStream predictorFile = FileProcessor.CreatePrintStream(sbim.toString());
 		predictorFile.print("FID\tIID");
@@ -380,7 +379,7 @@ public class MaCHDosageProfile {
 				
 				if(di.isATGCLocus()) {
 					ATGCLocus++;
-					if (par.keepATGCFlag) {
+					if (Parameter.INSTANCE.keepATGC()) {
 						continue;
 					}
 				}
@@ -431,13 +430,13 @@ public class MaCHDosageProfile {
 		}
 
 		if (ATGCLocus > 1) {
-			if (par.keepATGCFlag) {
+			if (Parameter.INSTANCE.keepATGC()) {
 				System.out.println(ATGCLocus + " ATGC loci were detected.");
 			} else {
 				System.out.println(ATGCLocus + " ATGC loci were removed.");
 			}
 		} else {
-			if (par.keepATGCFlag) {
+			if (Parameter.INSTANCE.keepATGC()) {
 				System.out.println(ATGCLocus + " ATGC Locus were detected.");
 			} else {
 				System.out.println(ATGCLocus + " ATGC locus was removed.");				
@@ -446,7 +445,7 @@ public class MaCHDosageProfile {
 		System.out.println("\nIn total " + CCSNP + " SNPs mapped to the score file, and " + CC + " SNPs had scores.");
 
 		StringBuffer sbim = new StringBuffer();
-		sbim.append(par.out);
+		sbim.append(Parameter.INSTANCE.out);
 		sbim.append(".profile");
 		PrintStream predictorFile = FileProcessor.CreatePrintStream(sbim.toString());
 		predictorFile.println("FID\tIID\tSCORE");

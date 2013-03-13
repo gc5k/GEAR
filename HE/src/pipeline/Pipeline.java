@@ -44,7 +44,7 @@ public class Pipeline {
 		} else if (Parameter.strandFlag) {
 			Strand strand = new Strand();
 			strand.Merge();
-		} else if (Parameter.mergeFlag) {
+		} else if (Parameter.INSTANCE.hasMergeOption()) {
 			MergeTwoFile mtf = new MergeTwoFile();
 			mtf.Merge();
 		} else if (Parameter.makePredictorFlag) {

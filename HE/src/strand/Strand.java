@@ -121,7 +121,8 @@ public class Strand {
 					if (SNPMatch.Confusion(a1_1, a1_2)) {
 						ATGCLocus = true;
 						if (ref1<0.5 && ref2<0.5) {
-							if (ref1 < Parameter.INSTANCE.merge_maf_cutoff && ref2 < Parameter.INSTANCE.merge_maf_cutoff) {
+							if (ref1 < Parameter.INSTANCE.getMergeParameter().getMafCutoff() &&
+								ref2 < Parameter.INSTANCE.getMergeParameter().getMafCutoff()) {
 								f=true;
 							} else {
 								f=false;
@@ -130,7 +131,8 @@ public class Strand {
 							snpCoding.add(0);
 
 						} else if (ref1<0.5 && ref2>0.5) {
-							if (ref1 < Parameter.INSTANCE.merge_maf_cutoff && ref2 > 1-Parameter.INSTANCE.merge_maf_cutoff) {
+							if (ref1 < Parameter.INSTANCE.getMergeParameter().getMafCutoff() &&
+								ref2 > 1 - Parameter.INSTANCE.getMergeParameter().getMafCutoff()) {
 								f=true;
 							} else {
 								f=false;
@@ -140,7 +142,8 @@ public class Strand {
 							snpCoding.add(1);
 
 						} else if (ref1>0.5 && ref2<0.5) {
-							if (ref1 > 1-Parameter.INSTANCE.merge_maf_cutoff && ref2 < Parameter.INSTANCE.merge_maf_cutoff) {
+							if (ref1 > 1 - Parameter.INSTANCE.getMergeParameter().getMafCutoff() &&
+								ref2 < Parameter.INSTANCE.getMergeParameter().getMafCutoff()) {
 								f=true;
 							} else {
 								f=false;
@@ -150,7 +153,8 @@ public class Strand {
 							snpCoding.add(1);
 
 						} else {
-							if (ref1 > 1 - Parameter.INSTANCE.merge_maf_cutoff && ref2 > 1 - Parameter.INSTANCE.merge_maf_cutoff) {
+							if (ref1 > 1 - Parameter.INSTANCE.getMergeParameter().getMafCutoff() &&
+								ref2 > 1 - Parameter.INSTANCE.getMergeParameter().getMafCutoff()) {
 								f=true;
 							} else {
 								f=false;
@@ -171,7 +175,8 @@ public class Strand {
 					if (SNPMatch.Confusion(a1_1, a1_2)) {
 						ATGCLocus = true;
 						if (ref1<0.5 && (1-ref2)<0.5) {
-							if (ref1 < Parameter.INSTANCE.merge_maf_cutoff && (1-ref2) < Parameter.INSTANCE.merge_maf_cutoff) {
+							if (ref1 < Parameter.INSTANCE.getMergeParameter().getMafCutoff() &&
+								1 - ref2 < Parameter.INSTANCE.getMergeParameter().getMafCutoff()) {
 								f=true;
 							} else {
 								f=false;
@@ -180,7 +185,8 @@ public class Strand {
 							ref2 = 1- ref2;
 							flip = true;
 						} else if (ref1<0.5 && (1-ref2) > 0.5) {
-							if (ref1 < Parameter.INSTANCE.merge_maf_cutoff && (1-ref2) > 1-Parameter.INSTANCE.merge_maf_cutoff) {
+							if (ref1 < Parameter.INSTANCE.getMergeParameter().getMafCutoff() &&
+								1 - ref2 > 1 - Parameter.INSTANCE.getMergeParameter().getMafCutoff()) {
 								f=true;
 							} else {
 								f=false;
@@ -189,7 +195,8 @@ public class Strand {
 							snpCoding.add(0);
 
 						} else if (ref1>0.5 && (1-ref2) < 0.5) {
-							if (ref1 > 1-Parameter.INSTANCE.merge_maf_cutoff && (1-ref2) < Parameter.INSTANCE.merge_maf_cutoff) {
+							if (ref1 > 1 - Parameter.INSTANCE.getMergeParameter().getMafCutoff() &&
+								1 - ref2 < Parameter.INSTANCE.getMergeParameter().getMafCutoff()) {
 								f=true;
 							} else {
 								f=false;
@@ -198,7 +205,8 @@ public class Strand {
 							snpCoding.add(0);
 
 						} else {
-							if (ref1 > 1 - Parameter.INSTANCE.merge_maf_cutoff && (1-ref2) > 1 - Parameter.INSTANCE.merge_maf_cutoff) {
+							if (ref1 > 1 - Parameter.INSTANCE.getMergeParameter().getMafCutoff() &&
+								1 - ref2 > 1 - Parameter.INSTANCE.getMergeParameter().getMafCutoff()) {
 								f=true;
 							} else {
 								f=false;
@@ -236,13 +244,13 @@ public class Strand {
 				}
 
 				double p = Z.OddsRatioTestPvalueTwoTail(ref1, ref2, N1[comSNPIdx[0][i]], N2[comSNPIdx[1][i]]);
-				if (p < Parameter.INSTANCE.merge_p_cutoff) {
+				if (p < Parameter.INSTANCE.getMergeParameter().getMafCutoff()) {
 					f = false;
 				}
-				if (!Parameter.INSTANCE.keepATGCFlag && ATGCLocus) {
+				if (!Parameter.INSTANCE.keepATGC() && ATGCLocus) {
 					f = false;
 				}
-				if (Parameter.INSTANCE.removeFlipFlag && flip) {
+				if (Parameter.INSTANCE.removeFlip() && flip) {
 					f = false;
 				}
 				flag.add(f);
