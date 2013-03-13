@@ -349,7 +349,7 @@ public class Strand {
 
 	public void readStrand() {
 		
-		BufferedReader reader = FileProcessor.FileOpen(Parameter.INSTANCE.strand_file);
+		BufferedReader reader = FileProcessor.FileOpen(Parameter.INSTANCE.getStrandFile());
 		String line;
 		try {
 			line = reader.readLine();
