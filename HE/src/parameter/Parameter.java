@@ -44,6 +44,19 @@ public enum Parameter {
 	private boolean fileOption = false;
 // PLINK text input file options End
 	
+// bfile2 options Begin
+	public boolean hasBFile2Option() { return bfile2Option; }
+	public String getBedFile2() { return bedfile2; }
+	public String getBimFile2() { return bimfile2; }
+	public String getFamFile2() { return famfile2; }
+	
+	private final String cmd_bfile2 = "bfile2";
+	private String bedfile2 = null;
+	private String bimfile2 = null;
+	private String famfile2 = null;
+	private boolean bfile2Option = false;
+// bfile2 options End
+	
 // Real-check options Begin
 	public boolean hasRealCheckOption() { return realcheckFlag; }
 	
@@ -121,44 +134,64 @@ public enum Parameter {
 	}
 // Real-check options End
 
-// bfile2 options Begin
-	public boolean hasBFile2Option() { return bfile2Option; }
-	public String getBedFile2() { return bedfile2; }
-	public String getBimFile2() { return bimfile2; }
-	public String getFamFile2() { return famfile2; }
+// Merge options Begin
+	public boolean hasMergeOption() { return mergeFlag; }
 	
-	private final String cmd_bfile2 = "bfile2";
-	private String bedfile2 = null;
-	private String bimfile2 = null;
-	private String famfile2 = null;
-	private boolean bfile2Option = false;
-// bfile2 options End
-
-///////////////merge
 	private final String cmd_merge = "merge";
-	public static boolean mergeFlag = false;
-	private final String cmd_merge_maf_cutoff = "merge_maf_cutoff";
-	private final String cmd_merge_maf_cutoff_long = "merge-maf-cutoff";
-	public static double merge_maf_cutoff = 0.4;
-
-	private final String cmd_merge_p_cutoff = "merge_p_cutoff";
-	private final String cmd_merge_p_cutoff_long = "merge-p-cutoff";
-	public static double merge_p_cutoff = 0.05;
-
-	private final String cmd_keep_atgc = "keep_atgc";
-	private final String cmd_keep_atgc_long = "keep-atgc";
-	public static boolean keepATGCFlag = false;
+	private boolean mergeFlag = false;
 	
-	private final String cmd_remove_Flip = "remove_flip";
-	private final String cmd_remove_Flip_long = "remove-flip";
-	public static boolean removeFlipFlag = false;
+	public class MergeParameter {
+		private MergeParameter() {}
+		
+		public double getMafCutoff() { return maf_cutoff; }
+		public double getPCutoff() { return p_cutoff; }
+		
+		@SuppressWarnings("static-access")
+		private void commandInitial() {
+			ops.addOption(OptionBuilder.withLongOpt(cmd_maf_cutoff_long).withDescription("merge maf cutoff").hasArg().create(cmd_maf_cutoff));
+			ops.addOption(OptionBuilder.withLongOpt(cmd_p_cutoff_long).withDescription("merge p cutoff").hasArg().create(cmd_p_cutoff));
+		}
+		
+		private void commandListener(CommandLine cl) {
+			if (cl.hasOption(cmd_maf_cutoff)) {
+				maf_cutoff = Double.parseDouble(cl.getOptionValue(cmd_maf_cutoff));
+				if (maf_cutoff > 0.5 || maf_cutoff < 0) {
+					System.err.println("merger maf cutoff should be between 0 and 0.5");
+					System.exit(0);
+				}
+			}		
+
+			if (cl.hasOption(cmd_p_cutoff)) {
+				p_cutoff = Double.parseDouble(cl.getOptionValue(cmd_p_cutoff));
+				if (p_cutoff < 0) {
+					System.err.println("merger p cutoff should be between 0 and 1.");
+					System.exit(0);
+				}
+			}		
+		}
+		
+		private final String cmd_maf_cutoff = "merge_maf_cutoff";
+		private final String cmd_maf_cutoff_long = "merge-maf-cutoff";
+		private double maf_cutoff = 0.4;
+
+		private final String cmd_p_cutoff = "merge_p_cutoff";
+		private final String cmd_p_cutoff_long = "merge-p-cutoff";
+		private double p_cutoff = 0.05;
+	}
+	
+	private MergeParameter mergeParameter = new MergeParameter();
+	
+	public MergeParameter getMergeParameter() {
+		return mergeParameter;
+	}
+// Merge options End
 
 //strand
 	private final String cmd_strand = "strand";
 	public static boolean strandFlag = false;
 	public static String strand_file = null;
 
-//make-predictor
+// Make-predictor-panel options Begin 
 	private final String cmd_make_predictor = "build_predictor";
 	private final String cmd_make_predictor_long = "build-predictor";
 	public static boolean makePredictorFlag = false;
@@ -181,6 +214,19 @@ public enum Parameter {
 	public static int LINEAR = 0;
 	public static int LOGIT = 1;
 	public static int tranFunction = LINEAR;
+// Make-predictor-panel options End
+	
+	public boolean keepATGC() { return keepATGCFlag; }
+	
+	private final String cmd_keep_atgc = "keep_atgc";
+	private final String cmd_keep_atgc_long = "keep-atgc";
+	private boolean keepATGCFlag = false;
+	
+	public boolean removeFlip() { return removeFlipFlag; }
+	
+	private final String cmd_remove_Flip = "remove_flip";
+	private final String cmd_remove_Flip_long = "remove-flip";
+	private boolean removeFlipFlag = false;
 
 ///////////////simulation nuclear family
 	private final String cmd_simu_fam = "simu_fam";
@@ -520,29 +566,18 @@ public enum Parameter {
 
 	@SuppressWarnings("static-access")
 	public void commandInitial() {
-
 		ops.addOption(OptionBuilder.withDescription("file ").hasArg().create(cmd_file));
-
 		ops.addOption(OptionBuilder.withDescription("bfile ").hasArg().create(cmd_bfile));
-
-//realcheck
-		ops.addOption(OptionBuilder.withDescription("realcheck ").create(cmd_realcheck));
-		
-		realCheckParameter.commandInitial();
-
 		ops.addOption(OptionBuilder.withDescription("bfile2 ").hasArg().create(cmd_bfile2));
 
+		// real-check
+		ops.addOption(OptionBuilder.withDescription("realcheck ").create(cmd_realcheck));
+		realCheckParameter.commandInitial();
 
-//simulation merge
+		// merge
 		ops.addOption(OptionBuilder.withDescription("merge ").create(cmd_merge));
+		mergeParameter.commandInitial();
 
-		ops.addOption(OptionBuilder.withLongOpt(cmd_merge_maf_cutoff_long).withDescription("merge maf cutoff").hasArg().create(cmd_merge_maf_cutoff));
-
-		ops.addOption(OptionBuilder.withLongOpt(cmd_merge_p_cutoff_long).withDescription("merge p cutoff").hasArg().create(cmd_merge_p_cutoff));
-
-		ops.addOption(OptionBuilder.withLongOpt(cmd_keep_atgc_long).withDescription("remove A/T and G/C loci").create(cmd_keep_atgc));
-
-		ops.addOption(OptionBuilder.withLongOpt(cmd_remove_Flip_long).withDescription("remove flipped loci").create(cmd_remove_Flip));
 //make predictor
 		ops.addOption(OptionBuilder.withLongOpt(cmd_make_predictor_long).withDescription("make predictor").create(cmd_make_predictor));
 
@@ -555,6 +590,9 @@ public enum Parameter {
 		ops.addOption(OptionBuilder.withDescription("linear").create(cmd_linear));
 
 		ops.addOption(OptionBuilder.withDescription("logit").create(cmd_logit));
+		
+		ops.addOption(OptionBuilder.withLongOpt(cmd_keep_atgc_long).withDescription("remove A/T and G/C loci").create(cmd_keep_atgc));
+		ops.addOption(OptionBuilder.withLongOpt(cmd_remove_Flip_long).withDescription("remove flipped loci").create(cmd_remove_Flip));
 
 //simulation nuclear fam
 		ops.addOption(OptionBuilder.withLongOpt(cmd_simu_fam_long).withDescription("simulation nuclear family ").create(cmd_simu_fam));
@@ -733,12 +771,7 @@ public enum Parameter {
 			famfile = (new StringBuffer(bfile)).append(".fam").toString();
 			bfileOption = true;
 		}
-
-		if (cl.hasOption(cmd_realcheck)) {
-			realcheckFlag = true;
-		}
-		realCheckParameter.commandListener(cl);
-
+		
 		if (cl.hasOption(cmd_bfile2)) {
 			String bfile2 = cl.getOptionValue(cmd_bfile2);
 			bedfile2 = (new StringBuffer(bfile2)).append(".bed").toString();
@@ -746,6 +779,15 @@ public enum Parameter {
 			famfile2 = (new StringBuffer(bfile2)).append(".fam").toString();
 			bfile2Option = true;
 		}
+
+		realcheckFlag = cl.hasOption(cmd_realcheck);
+		realCheckParameter.commandListener(cl);
+
+		mergeFlag = cl.hasOption(cmd_merge);
+		mergeParameter.commandListener(cl);
+		
+		keepATGCFlag = cl.hasOption(cmd_keep_atgc);
+		removeFlipFlag = cl.hasOption(cmd_remove_Flip);
 
 //snp selection
 		if (cl.hasOption(cmd_chr)) {
@@ -851,35 +893,6 @@ public enum Parameter {
 			fstFlag = true;
 			fst_file = cl.getOptionValue(cmd_fst);
 			exists(fst_file);
-		}
-
-//merge 
-		if (cl.hasOption(cmd_merge)) {
-			mergeFlag = true;
-		}
-		
-		if (cl.hasOption(cmd_merge_maf_cutoff)) {
-			merge_maf_cutoff = Double.parseDouble(cl.getOptionValue(cmd_merge_maf_cutoff));
-			if (merge_maf_cutoff > 0.5 || merge_maf_cutoff < 0) {
-				System.err.println("merger maf cutoff should be between 0 and 0.5");
-				System.exit(0);
-			}
-		}		
-
-		if (cl.hasOption(cmd_merge_p_cutoff)) {
-			merge_p_cutoff = Double.parseDouble(cl.getOptionValue(cmd_merge_p_cutoff));
-			if (merge_p_cutoff < 0) {
-				System.err.println("merger p cutoff should be between 0 and 1.");
-				System.exit(0);
-			}
-		}		
-
-		if (cl.hasOption(cmd_keep_atgc)) {
-			keepATGCFlag = true;
-		}
-
-		if (cl.hasOption(cmd_remove_Flip)) {
-			removeFlipFlag = true;
 		}
 
 //make predictor
