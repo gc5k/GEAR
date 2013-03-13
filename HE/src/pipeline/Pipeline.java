@@ -41,7 +41,7 @@ public class Pipeline {
 				MaCHDosageProfile mach = new MaCHDosageProfile();
 				mach.makeProfile();
 			}
-		} else if (Parameter.strandFlag) {
+		} else if (Parameter.INSTANCE.hasStrandOption()) {
 			Strand strand = new Strand();
 			strand.Merge();
 		} else if (Parameter.INSTANCE.hasMergeOption()) {

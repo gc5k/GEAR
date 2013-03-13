@@ -186,10 +186,14 @@ public enum Parameter {
 	}
 // Merge options End
 
-//strand
+// Strand options Begin
+	public boolean hasStrandOption() { return strandFlag; }
+	public String getStrandFile() { return strand_file; }
+	
 	private final String cmd_strand = "strand";
-	public static boolean strandFlag = false;
-	public static String strand_file = null;
+	private boolean strandFlag = false;
+	private String strand_file = null;
+// Strand options End
 
 // Make-predictor-panel options Begin 
 	private final String cmd_make_predictor = "build_predictor";
