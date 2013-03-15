@@ -18,12 +18,16 @@ public class Lambda {
 	private int mode = -2; //-2 for squared difference; -1 for cross product
 	
 	public Lambda () {
-		if (Parameter.INSTANCE.heType[Parameter.INSTANCE.he_sd]) {
+		switch (Parameter.INSTANCE.getHEParameter().getType()) {
+		case SD:
+		case SS:
 			mode = -2;
-		} else if (Parameter.INSTANCE.heType[Parameter.INSTANCE.he_ss]) {
-			mode = -2;
-		} else if (Parameter.INSTANCE.heType[Parameter.INSTANCE.he_cp]) {
+			break;
+		case CP:
 			mode = -1;
+			break;
+		default:
+			// TODO: assert false or throw exception
 		}
 	}
 

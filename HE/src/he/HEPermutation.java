@@ -136,7 +136,7 @@ public class HEPermutation {
 //				e.printStackTrace();
 //			}
 		} else {
-			if (!Parameter.grm_bin_flag) {
+			if (!Parameter.INSTANCE.getHEParameter().isGrmBinary()) {
 				heReader.XtX = new double[2][2];
 				heReader.XtY = new double[2];
 				// *************************************read grm file
@@ -167,16 +167,23 @@ public class HEPermutation {
 						if (!(heReader.flag[id1] & heReader.flag[id2]))
 							continue;
 						double ds = 0;
-						if (heReader.heType[Parameter.he_sd]) {
-							ds = (heReader.y[id1][1] - heReader.y[id2][1])
-									* (heReader.y[id1][1] - heReader.y[id2][1]);
-						} else if (heReader.heType[Parameter.he_ss]) {
-							ds = (heReader.y[id1][1] + heReader.y[id2][1])
-									* (heReader.y[id1][1] + heReader.y[id2][1]);
-						} else if (heReader.heType[Parameter.he_cp]) {
+						
+						switch (heReader.heType) {
+						case SD:
+							ds = (heReader.y[id1][1] - heReader.y[id2][1]) *
+							     (heReader.y[id1][1] - heReader.y[id2][1]);
+							break;
+						case SS:
+							ds = (heReader.y[id1][1] + heReader.y[id2][1]) *
+							     (heReader.y[id1][1] + heReader.y[id2][1]);
+							break;
+						case CP:
 							ds = heReader.y[id1][1] * heReader.y[id2][1];
+							break;
+						default:
+							// TODO: assert false or throw exception
 						}
-
+						
 						if (cat.containsKey(heReader.y[id1][1])) {
 							Integer I = (Integer) cat.get(heReader.y[id1][1]);
 							I++;
@@ -236,7 +243,7 @@ public class HEPermutation {
 
 				FileInputStream fileStream = null;
 				try {
-					fileStream = new FileInputStream(Parameter.grm_bin);
+					fileStream = new FileInputStream(Parameter.INSTANCE.getHEParameter().getGrm());
 				} catch (FileNotFoundException e) {
 					// TODO Auto-generated catch block
 					e.printStackTrace();
@@ -263,16 +270,23 @@ public class HEPermutation {
 						if (!(heReader.flag[id1] & heReader.flag[id2]))
 							continue;
 						double ds = 0;
-						if (heReader.heType[Parameter.he_sd]) {
-							ds = (heReader.y[id1][1] - heReader.y[id2][1])
-									* (heReader.y[id1][1] - heReader.y[id2][1]);
-						} else if (heReader.heType[Parameter.he_ss]) {
-							ds = (heReader.y[id1][1] + heReader.y[id2][1])
-									* (heReader.y[id1][1] + heReader.y[id2][1]);
-						} else if (heReader.heType[Parameter.he_cp]) {
+						
+						switch (heReader.heType) {
+						case SD:
+							ds = (heReader.y[id1][1] - heReader.y[id2][1]) *
+							     (heReader.y[id1][1] - heReader.y[id2][1]);
+							break;
+						case SS:
+							ds = (heReader.y[id1][1] + heReader.y[id2][1]) *
+							     (heReader.y[id1][1] + heReader.y[id2][1]);
+							break;
+						case CP:
 							ds = heReader.y[id1][1] * heReader.y[id2][1];
+							break;
+						default:
+							// TODO: assert false or throw exception
 						}
-
+						
 						if (cat.containsKey(heReader.y[id1][1])) {
 							Integer I = (Integer) cat.get(heReader.y[id1][1]);
 							I++;
@@ -335,14 +349,21 @@ public class HEPermutation {
 		
 		if (!heReader.reverse) {
 			double h_o = 0;
-			if (heReader.heType[Parameter.he_sd]) {
+			
+			switch (heReader.heType) {
+			case SD:
 				h_o = Mat_B.getEntry(1, 0) / Mat_B.getEntry(0, 0) * (-1);
-			} else if (heReader.heType[Parameter.he_ss]) {
+				break;
+			case SS:
 				h_o = Mat_B.getEntry(1, 0) / Mat_B.getEntry(0, 0);
-			} else if (heReader.heType[Parameter.he_cp]) {
+				break;
+			case CP:
 				h_o = Mat_B.getEntry(1, 0);
+				break;
+			default:
+				// TODO: assert false or throw exception
 			}
-
+			
 			double u_b0 = Mat_B.getEntry(0, 0);
 			double u_b1 = Mat_B.getEntry(1, 0);
 
@@ -350,7 +371,7 @@ public class HEPermutation {
 			double v_b1 = v.getEntry(1, 1);
 
 			double v_ho = (u_b1/u_b0) * (u_b1/u_b0) * (v_b0/(u_b0 * u_b0) + v_b1/(u_b1 * u_b1) - 2*v.getEntry(0, 1)/(u_b0*u_b1));
-			if (heReader.heType[Parameter.he_cp]) {
+			if (heReader.heType == parameter.HEType.CP) {
 				v_ho = Math.sqrt(v_b1);
 			}
 			heReader.sb.append("h2(o): " + fmt.format(h_o) + "\t" + fmt.format(v_ho) + "\n");
