@@ -12,6 +12,7 @@ import java.util.HashMap;
 import java.util.Iterator;
 
 import parameter.Parameter;
+import parameter.RegressionModel;
 import profile.struct.DosageInfor;
 import profile.struct.QScore;
 import profile.struct.ScoreUnit;
@@ -256,7 +257,7 @@ public class RiskScore {
 				}
 
 				sc = su.getScore();
-				if(Parameter.INSTANCE.tranFunction == 1) {//logit s
+				if(Parameter.INSTANCE.getTranFunction() == parameter.RegressionModel.LOGIT) {
 					if(isMatch) {
 						sc = Math.log(sc);
 					} else {
@@ -403,7 +404,7 @@ public class RiskScore {
 				CCSNP++;
 
 				sc = su.getScore();
-				if(Parameter.INSTANCE.tranFunction == 1) {//logit s
+				if (Parameter.INSTANCE.getTranFunction() == parameter.RegressionModel.LOGIT) {//logit s
 					if(isMatch) {
 						sc = Math.log(sc);
 					} else {

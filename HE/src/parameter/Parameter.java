@@ -195,29 +195,36 @@ public enum Parameter {
 	private String strand_file = null;
 // Strand options End
 
-// Make-predictor-panel options Begin 
+// Make-predictor-panel options Begin
+	public boolean hasMakePredictorOption() { return makePredictorFlag; }
+	
 	private final String cmd_make_predictor = "build_predictor";
 	private final String cmd_make_predictor_long = "build-predictor";
-	public static boolean makePredictorFlag = false;
+	private boolean makePredictorFlag = false;
+	
+	public boolean hasMakePredictor2Option() { return makePredictor2Flag; }
 
 	private final String cmd_make_predictor2 = "build_predictor2";
 	private final String cmd_make_predictor2_long = "build-predictor2";
-	public static boolean makePredictor2Flag = false;
+	private boolean makePredictor2Flag = false;
 
+	public int getPredictorIdx() { return predictor_idx; }
 	
 	private final String cmd_predictor_idx = "predictor_idx";
 	private final String cmd_predictor_idx_long = "predictor-idx";
-	public static int predictor_idx = 0;
+	private int predictor_idx = 0;
+	
+	public String getPredictorFile() { return predictor_file; }
 
 	private final String cmd_predictor_file = "predictor_file";
 	private final String cmd_predictor_file_long = "predictor-file";
-	public static String predictor_file = null;
+	private String predictor_file = null;
+	
+	public RegressionModel getTranFunction() { return tranFunction; }
 
 	private final String cmd_linear = "linear";
 	private final String cmd_logit = "logit";
-	public static int LINEAR = 0;
-	public static int LOGIT = 1;
-	public static int tranFunction = LINEAR;
+	private RegressionModel tranFunction = RegressionModel.LINEAR;
 // Make-predictor-panel options End
 	
 	public boolean keepATGC() { return keepATGCFlag; }
@@ -790,6 +797,32 @@ public enum Parameter {
 		mergeFlag = cl.hasOption(cmd_merge);
 		mergeParameter.commandListener(cl);
 		
+//make predictor
+		makePredictorFlag = cl.hasOption(cmd_make_predictor);
+		makePredictor2Flag = cl.hasOption(cmd_make_predictor2);
+
+		if (cl.hasOption(cmd_predictor_idx)) {
+			predictor_idx = Integer.parseInt(cl.getOptionValue(cmd_predictor_idx));
+			predictor_idx--;
+			if (predictor_idx < 0) {
+				System.err.println("predictor-idx should bigger than 0");
+				System.exit(0);
+			}
+		}
+
+		if (cl.hasOption(cmd_predictor_file)) {
+			predictor_file = cl.getOptionValue(cmd_predictor_file);
+			exists(predictor_file);
+		}
+
+		if (cl.hasOption(cmd_linear)) {
+			tranFunction = RegressionModel.LINEAR;
+		}
+
+		if (cl.hasOption(cmd_logit)) {
+			tranFunction = RegressionModel.LOGIT;
+		}
+		
 		keepATGCFlag = cl.hasOption(cmd_keep_atgc);
 		removeFlipFlag = cl.hasOption(cmd_remove_Flip);
 
@@ -897,37 +930,6 @@ public enum Parameter {
 			fstFlag = true;
 			fst_file = cl.getOptionValue(cmd_fst);
 			exists(fst_file);
-		}
-
-//make predictor
-		if (cl.hasOption(cmd_make_predictor)) {
-			makePredictorFlag = true;
-		}
-
-		if (cl.hasOption(cmd_make_predictor2)) {
-			makePredictor2Flag = true;
-		}
-
-		if (cl.hasOption(cmd_predictor_idx)) {
-			predictor_idx = Integer.parseInt(cl.getOptionValue(cmd_predictor_idx));
-			predictor_idx--;
-			if (predictor_idx < 0) {
-				System.err.println("predictor-idx should bigger than 0");
-				System.exit(0);
-			}
-		}
-
-		if (cl.hasOption(cmd_predictor_file)) {
-			predictor_file = cl.getOptionValue(cmd_predictor_file);
-			exists(predictor_file);
-		}
-
-		if (cl.hasOption(cmd_linear)) {
-			tranFunction = LINEAR;
-		}
-
-		if (cl.hasOption(cmd_logit)) {
-			tranFunction = LOGIT;
 		}
 
 //simulation nuclear family
