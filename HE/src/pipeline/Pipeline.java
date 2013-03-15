@@ -47,10 +47,10 @@ public class Pipeline {
 		} else if (Parameter.INSTANCE.hasMergeOption()) {
 			MergeTwoFile mtf = new MergeTwoFile();
 			mtf.Merge();
-		} else if (Parameter.makePredictorFlag) {
+		} else if (Parameter.INSTANCE.hasMakePredictorOption()) {
 			MakePredictor mp = new MakePredictor();
 			mp.BuildPredictor();
-		} else if (Parameter.makePredictor2Flag) {
+		} else if (Parameter.INSTANCE.hasMakePredictor2Option()) {
 			MakePredictor2 mp2 = new MakePredictor2();
 			mp2.BuildPredictor();
 		} else if (Parameter.INSTANCE.hasRealCheckOption()) {

@@ -11,6 +11,7 @@ import java.util.HashMap;
 import java.util.Iterator;
 
 import parameter.Parameter;
+import parameter.RegressionModel;
 import test.Test;
 import util.FileProcessor;
 import util.NewIt;
@@ -222,7 +223,7 @@ public class MakePredictor {
 
 	public void readPredictor() {
 
-		BufferedReader reader = FileProcessor.FileOpen(Parameter.INSTANCE.predictor_file);
+		BufferedReader reader = FileProcessor.FileOpen(Parameter.INSTANCE.getPredictorFile());
 		String line;
 		try {
 			line = reader.readLine();
@@ -254,12 +255,12 @@ public class MakePredictor {
 			}
 			SNP snp = snpList1.get(comSNPIdx[0][i]);
 			Predictor pd = predictorList.get(comSNPIdx[1][i]);
-			if (Parameter.isNA(pd.getField(Parameter.INSTANCE.predictor_idx))) {
+			if (Parameter.isNA(pd.getField(Parameter.INSTANCE.getPredictorIdx()))) {
 				NMiss++;
 				continue;
 			} else {
-				double s = Double.parseDouble(pd.getField(Parameter.INSTANCE.predictor_idx));
-				if (Parameter.tranFunction == Parameter.LINEAR) {
+				double s = Double.parseDouble(pd.getField(Parameter.INSTANCE.getPredictorIdx()));
+				if (Parameter.INSTANCE.getTranFunction() == RegressionModel.LINEAR) {
 					if (scoreCoding.get(i).intValue() == 1) {
 						s *= -1;
 					}
