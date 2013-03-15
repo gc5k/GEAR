@@ -107,7 +107,7 @@ public class Pipeline {
 			NonTransmitted nt = new NonTransmitted();
 			nt.GenerateNonTransmitted();
 
-		} else if (Parameter.heFlag) {
+		} else if (Parameter.INSTANCE.hasHEOption()) {
 			HERead hr = new HERead();
 			HECalculate HC = new HECalculate(hr);
 			HC.Regression();
