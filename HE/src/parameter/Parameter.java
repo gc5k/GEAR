@@ -389,33 +389,100 @@ public enum Parameter {
 	public static String q_score_file = null;
 	public static String q_score_range_file = null;
 
-//he regression
-	private final String cmd_he_sd = "he_sd"; //(y1-y2)^2
-	private final String cmd_he_sd_long = "he-sd";
-	private final String cmd_he_ss = "he_ss"; //(y1+y2)^2
-	private final String cmd_he_ss_long = "he-ss";
-	private final String cmd_he_cp = "he_cp"; //y1*y2
-	private final String cmd_he_cp_long = "he-cp";
-	public static int he_sd = 0;
-	public static int he_ss = 1;
-	public static int he_cp = 2;
-	public static boolean[] heType = {true, false, false};
-	public static boolean heFlag = false;
+// HE regression options Begin
+	public boolean hasHEOption() { return heFlag; }
+	private boolean heFlag = false;
 	
-	private final String cmd_grm_bin = "grm_bin";
-	private final String cmd_grm_bin_long = "grm-bin";
-	public static String grm_bin = null;
-	public static boolean grm_bin_flag = false;
+	public class HEParameter {
+		private HEParameter() {}
+		
+		@SuppressWarnings("static-access")
+		private void commandInitial() {
+			ops.addOption(OptionBuilder.withLongOpt(cmd_grm_bin_long).withDescription("grm binary format").hasArg().create(cmd_grm_bin));
+			ops.addOption(OptionBuilder.withDescription("grm ").hasArg().create(cmd_grm));
+			ops.addOption(OptionBuilder.withDescription("pheno ").hasArg().create(cmd_pheno));
+			ops.addOption(OptionBuilder.withLongOpt(cmd_mpheno).withDescription("pheno number " + cmd_mpheno).hasArg().withArgName("index").create(cmd_mpheno));
+			ops.addOption(OptionBuilder.withLongOpt(cmd_sd_long).withDescription("phenotype is coded as squared difference").create(cmd_sd));
+			ops.addOption(OptionBuilder.withLongOpt(cmd_ss_long).withDescription("phenotype is coded as squared sum").create(cmd_ss));
+			ops.addOption(OptionBuilder.withLongOpt(cmd_cp_long).withDescription("phenotype is coded as cross product").create(cmd_cp));
+		}
+		
+		private void commandListener(CommandLine cl) {
+			if (cl.hasOption(cmd_grm)) {
+				StringBuilder sb1 = new StringBuilder(cl.getOptionValue(cmd_grm));
+				grm_ = sb1.append(".grm.gz").toString();
+				StringBuilder sb2 = new StringBuilder(cl.getOptionValue(cmd_grm));
+				grm_id = sb2.append(".grm.id").toString();
+				isGrmBinary_ = false;
+			} else if (cl.hasOption(cmd_grm_bin)) {
+				StringBuilder sb1 = new StringBuilder(cl.getOptionValue(cmd_grm_bin));
+				grm_ = sb1.append(".grm.bin").toString();
+				StringBuilder sb2 = new StringBuilder(cl.getOptionValue(cmd_grm_bin));
+				grm_id = sb2.append(".grm.id").toString();
+				isGrmBinary_ = true;
+			}
+
+			if (cl.hasOption(cmd_pheno)) {
+				pheno = cl.getOptionValue(cmd_pheno);
+			}
+
+			if (cl.hasOption(cmd_mpheno)) {
+				String[] s = cl.getOptionValue(cmd_mpheno).split(",");
+				mpheno = new int[s.length];
+				for (int i = 0; i < s.length; i++) {
+					mpheno[i] = Integer.parseInt(s[i]);
+				}
+			}
+			
+			if (cl.hasOption(cmd_sd)) {
+				type = HEType.SD;
+				heFlag = true;
+			} else if (cl.hasOption(cmd_ss)) {
+				type = HEType.SS;
+				heFlag = true;
+			} else if (cl.hasOption(cmd_cp)) {
+				type = HEType.CP;
+				heFlag = true;
+			}
+		}
+		
+		public HEType getType() { return type; }
+		
+		public boolean isGrmBinary() { return isGrmBinary_; }
+		public String getGrm() { return grm_; }
+		public String getGrmId() { return grm_id; }
+		
+		public String getPheno() { return pheno; }
+		public int[] getMPheno() { return mpheno; }
+		
+		private final String cmd_sd = "he_sd"; //(y1-y2)^2
+		private final String cmd_sd_long = "he-sd";
+		private final String cmd_ss = "he_ss"; //(y1+y2)^2
+		private final String cmd_ss_long = "he-ss";
+		private final String cmd_cp = "he_cp"; //y1*y2
+		private final String cmd_cp_long = "he-cp";
+		
+		private HEType type;
+		
+		private final String cmd_grm_bin = "grm_bin";
+		private final String cmd_grm_bin_long = "grm-bin";
+		private final String cmd_grm = "grm";
+		
+		private boolean isGrmBinary_;
+		private String grm_;
+		private String grm_id = null;
+		
+		private final String cmd_pheno = "pheno";
+		private String pheno = null;
+
+		private final String cmd_mpheno = "mpheno";
+		private int[] mpheno = {1};
+	}
 	
-	private final String cmd_grm = "grm";
-	public static String grm = null;
-	public static String grm_id = null;
-
-	private final String cmd_pheno = "pheno";
-	public static String pheno = null;
-
-	private final String cmd_mpheno = "mpheno";
-	public static int[] mpheno = {1};
+	public HEParameter getHEParameter() { return heParameter; }
+	
+	private HEParameter heParameter = new HEParameter();
+// HE regression options End
 	
 	//quantitative covariates
 	private final String cmd_qcovar = "qcovar";
@@ -705,14 +772,7 @@ public enum Parameter {
 
 //haseman-elston regression
 		ops.addOption(OptionBuilder.withDescription("h2 ").hasArg().create(cmd_eh2));
-
-		ops.addOption(OptionBuilder.withLongOpt(cmd_grm_bin_long).withDescription("grm binary format").hasArg().create(cmd_grm_bin));
-		
-		ops.addOption(OptionBuilder.withDescription("grm ").hasArg().create(cmd_grm));
-
-		ops.addOption(OptionBuilder.withDescription("pheno ").hasArg().create(cmd_pheno));
-
-		ops.addOption(OptionBuilder.withLongOpt(cmd_mpheno).withDescription("pheno number " + cmd_mpheno).hasArg().withArgName("index").create(cmd_mpheno));
+		heParameter.commandInitial();
 
 		ops.addOption(OptionBuilder.withDescription("covariate file").hasArg().create(cmd_covar));
 
@@ -727,12 +787,6 @@ public enum Parameter {
 		ops.addOption(OptionBuilder.withDescription("standardise the phenotype").create(cmd_scale));
 
 		ops.addOption(OptionBuilder.withDescription("perm ").hasArg().create(cmd_perm));
-
-		ops.addOption(OptionBuilder.withLongOpt(cmd_he_sd_long).withDescription("phenotype is coded as squared difference").create(cmd_he_sd));
-
-		ops.addOption(OptionBuilder.withLongOpt(cmd_he_ss_long).withDescription("phenotype is coded as squared sum").create(cmd_he_ss));
-
-		ops.addOption(OptionBuilder.withLongOpt(cmd_he_cp_long).withDescription("phenotype is coded as cross product").create(cmd_he_cp));
 
 		ops.addOption(OptionBuilder.withDescription("prevalence ").hasArg().create(cmd_k));
 
@@ -1084,33 +1138,7 @@ public enum Parameter {
 			eh2 = Double.parseDouble(cl.getOptionValue(cmd_eh2));
 		}
 
-		if (cl.hasOption(cmd_grm)) {
-			StringBuilder sb1 = new StringBuilder(cl.getOptionValue(cmd_grm));
-			grm = sb1.append(".grm.gz").toString();
-			StringBuilder sb2 = new StringBuilder(cl.getOptionValue(cmd_grm));
-			grm_id = sb2.append(".grm.id").toString();
-			grm_bin_flag = false;
-		}
-
-		if (cl.hasOption(cmd_grm_bin)) {
-			StringBuilder sb1 = new StringBuilder(cl.getOptionValue(cmd_grm_bin));
-			grm_bin = sb1.append(".grm.bin").toString();
-			StringBuilder sb2 = new StringBuilder(cl.getOptionValue(cmd_grm_bin));
-			grm_id = sb2.append(".grm.id").toString();
-			grm_bin_flag = true;
-		}
-
-		if (cl.hasOption(cmd_pheno)) {
-			pheno = cl.getOptionValue(cmd_pheno);
-		}
-
-		if (cl.hasOption(cmd_mpheno)) {
-			String[] s = cl.getOptionValue(cmd_mpheno).split(",");
-			mpheno = new int[s.length];
-			for (int i = 0; i < s.length; i++) {
-				mpheno[i] = Integer.parseInt(s[i]);
-			}
-		}
+		heParameter.commandListener(cl);
 
 		if (cl.hasOption(cmd_covar)) {
 			covar_file = cl.getOptionValue(cmd_covar);
@@ -1201,27 +1229,6 @@ public enum Parameter {
 		if (cl.hasOption(cmd_perm)) {
 			permFlag = true;
 			perm = Integer.parseInt(cl.getOptionValue(cmd_perm));
-		}
-
-		if (cl.hasOption(cmd_he_sd)) {
-			heFlag = true;
-			heType[he_sd] = true;
-			heType[he_ss] = false;
-			heType[he_cp] = false;
-		}
-
-		if (cl.hasOption(cmd_he_ss)) {
-			heFlag = true;
-			heType[he_sd] = false;
-			heType[he_ss] = true;
-			heType[he_cp] = false;
-		}
-
-		if (cl.hasOption(cmd_he_cp)) {
-			heFlag = true;
-			heType[he_sd] = false;
-			heType[he_ss] = false;
-			heType[he_cp] = true;
 		}
 
 		if (cl.hasOption(cmd_k)) {

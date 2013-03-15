@@ -39,7 +39,7 @@ public class HERead {
 	protected boolean reverse;
 	protected boolean k_button;
 	protected double k;
-	protected boolean[] heType;
+	protected parameter.HEType heType;
 
 	protected HashMap<String, Integer> ID2Idx;
 
@@ -56,16 +56,16 @@ public class HERead {
 	StringBuffer sb = new StringBuffer();
 
 	public HERead() {
-		grmFile = Parameter.INSTANCE.grm;
-		grmID = Parameter.INSTANCE.grm_id;
+		grmFile = Parameter.INSTANCE.getHEParameter().getGrm();
+		grmID = Parameter.INSTANCE.getHEParameter().getGrmId();
 		keepFile = Parameter.INSTANCE.keepFile;
-		phenoFile = Parameter.INSTANCE.pheno;
-		mpheno = Parameter.INSTANCE.mpheno;
+		phenoFile = Parameter.INSTANCE.getHEParameter().getPheno();
+		mpheno = Parameter.INSTANCE.getHEParameter().getMPheno();
 		reverse = Parameter.INSTANCE.reverse;
 		k_button = Parameter.INSTANCE.k_button;
 		k = Parameter.INSTANCE.k;
 		output = Parameter.INSTANCE.out;
-		heType = Parameter.INSTANCE.heType;
+		heType = Parameter.INSTANCE.getHEParameter().getType();
 		permFlag = Parameter.INSTANCE.permFlag;
 		perm = Parameter.INSTANCE.perm;
 

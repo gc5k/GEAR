@@ -37,7 +37,7 @@ public class HERegression {
 	private boolean reverse;
 	private boolean k_button;
 	private double k;
-	private boolean[] heType;
+	private parameter.HEType heType;
 
 	private HashMap<String, Integer> ID2Idx;
 
@@ -52,16 +52,16 @@ public class HERegression {
 	StringBuffer sb = new StringBuffer();
 
 	public HERegression() {
-		grmFile = Parameter.INSTANCE.grm;
-		grmID = Parameter.INSTANCE.grm_id;
+		grmFile = Parameter.INSTANCE.getHEParameter().getGrm();
+		grmID = Parameter.INSTANCE.getHEParameter().getGrmId();
 		keepFile = Parameter.INSTANCE.keepFile;
-		phenoFile = Parameter.INSTANCE.pheno;
-		mpheno = Parameter.INSTANCE.mpheno;
+		phenoFile = Parameter.INSTANCE.getHEParameter().getPheno();
+		mpheno = Parameter.INSTANCE.getHEParameter().getMPheno();
 		reverse = Parameter.INSTANCE.reverse;
 		k_button = Parameter.INSTANCE.k_button;
 		k = Parameter.INSTANCE.k;
 		output = Parameter.INSTANCE.out;
-		heType = Parameter.INSTANCE.heType;
+		heType = Parameter.INSTANCE.getHEParameter().getType();
 
 		XtX = new double[mpheno.length + 1][mpheno.length + 1];
 		XtY = new double[mpheno.length + 1];
@@ -241,14 +241,21 @@ public class HERegression {
 					if (!(flag[id1] & flag[id2]))
 						continue;
 					double ds = 0;
-					if (heType[Parameter.he_sd]) {
+					
+					switch (heType) {
+					case SD:
 						ds = (y[id1][1] - y[id2][1]) * (y[id1][1] - y[id2][1]);
-					} else if(heType[Parameter.he_ss]) {
+						break;
+					case SS:
 						ds = (y[id1][1] + y[id2][1]) * (y[id1][1] + y[id2][1]);
-					} else if(heType[Parameter.he_cp]) {
+						break;
+					case CP:
 						ds = y[id1][1] * y[id2][1];
+						break;
+					default:
+						// TODO: assert false or throw exception
 					}
-
+					
 					if (cat.containsKey(y[id1][1])) {
 						Integer I = (Integer) cat.get(y[id1][1]);
 						I++;
@@ -317,13 +324,21 @@ public class HERegression {
 		RealMatrix v = Mat_XtX_Inv.scalarMultiply(mse);
 
 		sb.append("HE mode: ");
-		if (heType[Parameter.he_sd]) {
+		
+		switch (heType) {
+		case SD:
 			sb.append("squared difference (yi-yj)^2\n");
-		} else if(heType[Parameter.he_ss]) {
+			break;
+		case SS:
 			sb.append("squared sum (yi+yj)^2\n");
-		} else if(heType[Parameter.he_cp]) {
+			break;
+		case CP:
 			sb.append("cross-product [yi-E(y)][yj-E(y)]\n");
+			break;
+		default:
+			// TODO: assert false or throw exception
 		}
+		
 		sb.append("grm: " + grmFile + "\n");
 		sb.append("grm id: " + grmID + "\n");
 		sb.append("keep list: " + keepFile + "\n");
@@ -346,14 +361,21 @@ public class HERegression {
 
 		if (!reverse) {
 			double h_o = 0;
-			if (heType[Parameter.he_sd]) {
+			
+			switch (heType) {
+			case SD:
 				h_o = Mat_B.getEntry(1, 0) / Mat_B.getEntry(0, 0) * (-1);
-			} else if (heType[Parameter.he_ss]) {
+				break;
+			case SS:
 				h_o = Mat_B.getEntry(1, 0) / Mat_B.getEntry(0, 0);
-			} else if (heType[Parameter.he_cp]) {
+				break;
+			case CP:
 				h_o = Mat_B.getEntry(1, 0);
+				break;
+			default:
+				// TODO: assert false or throw exception
 			}
-
+			
 			double u_b0 = Mat_B.getEntry(0, 0);
 			double u_b1 = Mat_B.getEntry(1, 0);
 
@@ -361,7 +383,7 @@ public class HERegression {
 			double v_b1 = v.getEntry(1, 1);
 
 			double v_ho = (u_b1/u_b0) * (u_b1/u_b0) * (v_b0/(u_b0 * u_b0) + v_b1/(u_b1 * u_b1) - 2*v.getEntry(0, 1)/(u_b0*u_b1));
-			if (heType[Parameter.he_cp]) {
+			if (heType == parameter.HEType.CP) {
 				v_ho = Math.sqrt(v_b1);
 			}
 			sb.append("h2(o): " + fmt.format(h_o) + "\t" + fmt.format(v_ho) + "\n");
