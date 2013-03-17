@@ -10,6 +10,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
 
+import parameter.AboutInfo;
 import parameter.Parameter;
 import test.Test;
 import util.FileProcessor;
@@ -54,7 +55,7 @@ public class MergeTwoFile {
 	private DataOutputStream os = null;
 
 	public MergeTwoFile() {
-		System.err.print(Parameter.INSTANCE.version);
+		System.err.print(AboutInfo.WELCOME_MESSAGE);
 		
 		PLINKParser pp1 = null;
 		PLINKParser pp2 = null;

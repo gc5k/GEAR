@@ -10,6 +10,7 @@ import java.util.Iterator;
 
 import org.apache.commons.math.random.RandomDataImpl;
 
+import parameter.AboutInfo;
 import parameter.Parameter;
 import test.Test;
 import util.FileProcessor;
@@ -36,7 +37,7 @@ public class RealCheckOne {
 	private SampleFilter sf1;
 
 	public RealCheckOne() {
-		System.err.print(Parameter.version);
+		System.err.print(AboutInfo.WELCOME_MESSAGE);
 
 		PLINKParser pp1 = null;
 		if (Parameter.INSTANCE.hasBFileOption()) {

@@ -623,13 +623,6 @@ public enum Parameter {
 
 	private final String cmd_help = "help";
 
-	public static String version = "\n"
-			+ "******************************************************************\n"
-			+ "| GEAR [GEnetic Analysis Repository] Mar/11/2013                 |\n"
-			+ "| (C) 2013 Guo-Bo Chen, Zhi-Xiang Zhu                            |\n"
-			+ "| v 0.7.7                                                        |\n"			
-			+ "| GNU General Public License, v2                                 |\n"
-			+ "******************************************************************\n";
 	private Options ops = new Options();
 
 	private CommandLineParser parser = new PosixParser();

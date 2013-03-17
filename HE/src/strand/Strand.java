@@ -11,6 +11,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
 
+import parameter.AboutInfo;
 import parameter.Parameter;
 import test.Test;
 import util.FileProcessor;
@@ -51,7 +52,7 @@ public class Strand {
 	private DataOutputStream os = null;
 
 	public Strand() {
-		System.err.print(Parameter.version);
+		System.err.print(AboutInfo.WELCOME_MESSAGE);
 		readStrand();
 
 		PLINKParser pp1 = null;

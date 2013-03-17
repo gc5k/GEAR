@@ -19,6 +19,7 @@ import strand.MakePredictor2;
 import strand.Strand;
 import sumstat.FrequencyCalculator;
 import sumstat.Inbreeding;
+import parameter.AboutInfo;
 import parameter.Parameter;
 import profile.MaCHDosageProfile;
 import profile.RiskScore;
@@ -29,7 +30,7 @@ public class Pipeline {
 	public static void main(String[] args) {
 		Parameter.INSTANCE.commandListener(args);
 
-		System.out.print(Parameter.version);
+		System.out.print(AboutInfo.WELCOME_MESSAGE);
 		Calendar calendar = Calendar.getInstance();
 		System.out.println("\nThe analysis started at: " + calendar.getTime() + "\n");
 

@@ -13,6 +13,7 @@ import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.math.random.RandomDataImpl;
 import org.apache.commons.math.stat.StatUtils;
 
+import parameter.AboutInfo;
 import parameter.Parameter;
 import family.pedigree.PersonIndex;
 import family.pedigree.file.SNP;
@@ -44,7 +45,7 @@ public class RealDataSimulation {
 	private double accept_ctrl;
 
 	public RealDataSimulation() {
-		System.err.print(Parameter.version);
+		System.err.print(AboutInfo.WELCOME_MESSAGE);
 
 		if (Parameter.INSTANCE.hasFileOption()) {
 			pp = new PLINKParser (Parameter.INSTANCE.getPedFile(),

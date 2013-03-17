@@ -12,6 +12,7 @@ import java.util.Iterator;
 
 import parameter.Parameter;
 import parameter.RegressionModel;
+import parameter.AboutInfo;
 import test.Test;
 import util.FileProcessor;
 import util.NewIt;
@@ -45,7 +46,7 @@ public class MakePredictor {
 	private SampleFilter sf1;
 	
 	public MakePredictor() {
-		System.err.print(Parameter.version);
+		System.err.print(AboutInfo.WELCOME_MESSAGE);
 		
 		readPredictor();
 
