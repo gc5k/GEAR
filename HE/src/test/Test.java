@@ -15,6 +15,7 @@ import family.plink.PLINKParser;
 
 import util.NewIt;
 
+import parameter.AboutInfo;
 import parameter.Parameter;
 
 /**
@@ -29,7 +30,7 @@ public class Test {
 	public static boolean bfileFlag = false;
 	public static void main(String[] args) throws IOException {
 
-		System.err.print(Parameter.version);
+		System.err.print(AboutInfo.WELCOME_MESSAGE);
 		String[] scmd = script(args);
 		printCommandLine(scmd);
 		Parameter.INSTANCE.commandListener(scmd);
@@ -58,7 +59,7 @@ public class Test {
 
 		Calendar calendar = Calendar.getInstance();
 		System.err.println("The analysis was implemented at: " + calendar.getTime() + "\n");
-		LOG.append(Parameter.version);
+		LOG.append(AboutInfo.WELCOME_MESSAGE);
 		LOG.append("The analysis was implemented at: " + calendar.getTime() + "\n\n");
 		System.err.println("The command line in effect: ");
 		LOG.append("The command line in effect: \n");

@@ -6,6 +6,7 @@ import java.text.NumberFormat;
 import org.apache.commons.math.MathException;
 import org.apache.commons.math.stat.inference.ChiSquareTestImpl;
 
+import parameter.AboutInfo;
 import parameter.Parameter;
 import sumstat.qc.rowqc.SumStatQC;
 import test.Test;
@@ -28,7 +29,7 @@ public class FrequencyCalculator {
 	private double[][] hw;
 	private int[][] N;
 	public FrequencyCalculator() {
-		System.err.print(Parameter.version);
+		System.err.print(AboutInfo.WELCOME_MESSAGE);
 
 		PLINKParser pp = null;
 		if (Parameter.INSTANCE.hasFileOption()) {

@@ -3,6 +3,7 @@ package pscontrol;
 import java.util.ArrayList;
 import java.util.Iterator;
 
+import parameter.AboutInfo;
 import parameter.Parameter;
 import pscontrol.hierarchy.AJHG2008;
 import pscontrol.write.NonTransWriteBedSNPMajor;
@@ -21,7 +22,7 @@ public class NonTransmitted {
 	private NonTransmitted QC = null;
 
 	public NonTransmitted() {
-		System.err.print(Parameter.version);
+		System.err.print(AboutInfo.WELCOME_MESSAGE);
 		System.err.println("--nontrans procedure.");
 
 //		if (Parameter.fileOption) {
