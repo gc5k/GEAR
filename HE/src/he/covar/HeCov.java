@@ -81,7 +81,7 @@ public class HeCov {
 						int idx = ID2Idx.get(sb.toString()).intValue();
 						c = NewIt.newArrayList();
 						for (int i = 0; i < qcov_idx.length; i++) {
-							if(Parameter.isNA(s[1+qcov_idx[i]])) {
+							if(Parameter.INSTANCE.isNA(s[1+qcov_idx[i]])) {
 								f = false;
 							}
 							c.add(s[1+qcov_idx[i]]);
@@ -141,7 +141,7 @@ public class HeCov {
 						int idx = ID2Idx.get(sb.toString()).intValue();
 						c = NewIt.newArrayList();
 						for (int i = 0; i < cov_idx.length; i++) {
-							if(Parameter.isNA(s[1+cov_idx[i]])) {
+							if(Parameter.INSTANCE.isNA(s[1+cov_idx[i]])) {
 								f = false;
 							} else {// exclude NA individuals
 								c.add(s[1+cov_idx[i]]);

@@ -15,7 +15,7 @@ public class ScoreUnit {
 		SNP = s[0];
 		RefAllele = s[1];
 		score = s[2];
-		if(Parameter.isNA(s[2])) {
+		if(Parameter.INSTANCE.isNA(s[2])) {
 			isMissing = true;
 		} else {
 			isMissing = false;

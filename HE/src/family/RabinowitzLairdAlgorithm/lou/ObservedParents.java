@@ -47,7 +47,7 @@ public class ObservedParents extends AbstractGenoDistribution {
 		char PG[][] = { { p1.charAt(0), p1.charAt(1) }, { p2.charAt(0), p2.charAt(1) } };
 		char allele[] = new char[2];
 
-		if (transmitted.compareTo(Parameter.missingGenotype) == 0) {// missing
+		if (transmitted.compareTo(Parameter.INSTANCE.missingGenotype) == 0) {// missing
 																		// data
 			int index1 = (rnd.nextFloat() > 0.5) ? 0 : 1;
 			int index2 = (rnd.nextFloat() > 0.5) ? 0 : 1;

@@ -74,8 +74,8 @@ public class SNP implements Comparable<SNP>{
 			Test.LOG.append("more than 2 alleles for " + name + ".\n");
 			Test.printLog();
 			System.exit(0);
-		} else if (a[0] == Parameter.missing_allele.charAt(0)
-				|| a[1] == Parameter.missing_allele.charAt(0)) {
+		} else if (a[0] == Parameter.INSTANCE.missing_allele.charAt(0)
+				|| a[1] == Parameter.INSTANCE.missing_allele.charAt(0)) {
 //			System.err.println("more than 2 alleles for " + name);
 //			System.exit(0);
 		}

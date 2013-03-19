@@ -113,7 +113,7 @@ public abstract class AbstractGenoDistribution {
 	 *         genotype.
 	 */
 	protected String RandomAssign() {
-		String geno = new String(Parameter.missingGenotype);
+		String geno = new String(Parameter.INSTANCE.missingGenotype);
 		if (isParentGenotyped()) {
 			String p1 = (String) parentGeno.get(0);
 			String p2 = (String) parentGeno.get(1);

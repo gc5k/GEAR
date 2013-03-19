@@ -215,7 +215,7 @@ public class BPerson {
 		int posBite = (i & 0xf) << 1;
 		int g = (alleles[posByte] >> (posBite)) & 3;
 		if (g == 1) {// 01
-			return Parameter.missingGenotype;
+			return Parameter.INSTANCE.missingGenotype;
 		} else {
 			if (g == 2) {
 				return Integer.toString(1);
@@ -238,7 +238,7 @@ public class BPerson {
 		int posBite = (i & 0xf) << 1;
 		int g = (alleles[posByte] >> posBite) & 3;
 		if (g == 3) {
-			return Parameter.missingGenotype;
+			return Parameter.INSTANCE.missingGenotype;
 		} else {
 			StringBuffer sb = new StringBuffer();
 			sb.append((alleles[posByte] >> (posBite + 1)) & 1);
@@ -290,7 +290,7 @@ public class BPerson {
 	public void setNonTransmittedGenotype(int index, String geno) {
 		int a = Integer.parseInt(geno.substring(0, 1));
 		int b = Integer.parseInt(geno.substring(1, 2));
-		boolean flag = geno.compareTo(Parameter.missingGenotype) == 0 ? false : true;
+		boolean flag = geno.compareTo(Parameter.INSTANCE.missingGenotype) == 0 ? false : true;
 		addMarker(flag, a, b, index);
 	}
 }

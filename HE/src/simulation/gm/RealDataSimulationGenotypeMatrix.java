@@ -69,7 +69,7 @@ public class RealDataSimulationGenotypeMatrix {
 		int posBite = (i & 0xf) << 1;
 		int g = (genotypeMat[idx][posByte] >> (posBite)) & 3;
 		if (g == 3) {// 01
-			return Parameter.missingGenotype;
+			return Parameter.INSTANCE.missingGenotype;
 		} else {
 			return Integer.toString(g);
 		}

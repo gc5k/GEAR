@@ -73,7 +73,7 @@ public class Test {
 	}
 
 	public static void printLog() {
-		StringBuilder sb = new StringBuilder(Parameter.out);
+		StringBuilder sb = new StringBuilder(Parameter.INSTANCE.out);
 		sb.append(".log");
 		PrintStream pw = null;
 		try {
@@ -167,7 +167,7 @@ public class Test {
 	public static void savecmd(String[] args) {
 		StringBuffer sb = new StringBuffer();
 
-		sb.append(Parameter.out);
+		sb.append(Parameter.INSTANCE.out);
 		PrintStream ps = null;
 		try {
 			ps = new PrintStream(sb.toString());

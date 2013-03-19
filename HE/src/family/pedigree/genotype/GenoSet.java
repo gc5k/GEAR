@@ -38,9 +38,9 @@ public class GenoSet {
             genotypedParents += parentsGenoMap.get(p).intValue();
         }
 
-        if (parentsGenoMap.containsKey(Parameter.missingGenotype)) {
-            ungenotypedParents = ((Integer) parentsGenoMap.get(Parameter.missingGenotype)).intValue();
-            parentsGenoMap.remove(Parameter.missingGenotype);
+        if (parentsGenoMap.containsKey(Parameter.INSTANCE.missingGenotype)) {
+            ungenotypedParents = ((Integer) parentsGenoMap.get(Parameter.INSTANCE.missingGenotype)).intValue();
+            parentsGenoMap.remove(Parameter.INSTANCE.missingGenotype);
         }
         genotypedParents -= ungenotypedParents;
 
@@ -48,9 +48,9 @@ public class GenoSet {
             genotypedChildren += childrenGenoMap.get(c).intValue();
         }
 
-        if (childrenGenoMap.containsKey(Parameter.missingGenotype)) {
-            ungenotypedChildren = childrenGenoMap.get(Parameter.missingGenotype).intValue();
-            childrenGenoMap.remove(Parameter.missingGenotype);
+        if (childrenGenoMap.containsKey(Parameter.INSTANCE.missingGenotype)) {
+            ungenotypedChildren = childrenGenoMap.get(Parameter.INSTANCE.missingGenotype).intValue();
+            childrenGenoMap.remove(Parameter.INSTANCE.missingGenotype);
         }
         genotypedChildren -= ungenotypedChildren;
     }

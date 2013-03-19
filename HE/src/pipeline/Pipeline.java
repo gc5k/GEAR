@@ -62,49 +62,49 @@ public class Pipeline {
 				RealCheckOne realcheckone = new RealCheckOne();
 				realcheckone.Check();
 			}
-		} else if (Parameter.simufamFlag) {
+		} else if (Parameter.INSTANCE.simufamFlag) {
 			SimuFamily simuFam = new SimuFamily (Parameter.INSTANCE.simu_fam_size,
 												 Parameter.INSTANCE.simu_fam_marker,
 												 Parameter.INSTANCE.seed);
 			simuFam.generateSample();
 
-		} else if (Parameter.simuRealData) {
+		} else if (Parameter.INSTANCE.simuRealData) {
 			RealDataSimulation rdSimu = new RealDataSimulation();
 			rdSimu.GenerateSample();
 			
-		}  else if (Parameter.simupolyCCFlag) {
+		}  else if (Parameter.INSTANCE.simupolyCCFlag) {
 			SimuPolyCC polyCC = new SimuPolyCC();
 			polyCC.GenerateSample();
 
-		} else if (Parameter.simupolyQTFlag) {
+		} else if (Parameter.INSTANCE.simupolyQTFlag) {
 			SimuPolyQT polyQT = new SimuPolyQT();
 			polyQT.generateSample();
 			
-		} else if (Parameter.sumStatFlag) {
-			if (Parameter.freqFlag) {
+		} else if (Parameter.INSTANCE.sumStatFlag) {
+			if (Parameter.INSTANCE.freqFlag) {
 				FrequencyCalculator fc = new FrequencyCalculator();
 				fc.CalculateAlleleFrequency();
 				System.out.println(fc);
 
-			} else if (Parameter.genoFreqFlag) {
+			} else if (Parameter.INSTANCE.genoFreqFlag) {
 				FrequencyCalculator fc = new FrequencyCalculator();
 				fc.CalculateAlleleFrequency();
 				System.out.println(fc);				
 
-			} else if (Parameter.fstFlag ) {
+			} else if (Parameter.INSTANCE.fstFlag ) {
 				Inbreeding inb = new Inbreeding();
 				inb.CalculateFst();
 			}
-		} else if (Parameter.makebedFlag) {
+		} else if (Parameter.INSTANCE.makebedFlag) {
 			WriteBedSNPMajor bedWriter = new WriteBedSNPMajor();
 			bedWriter.WriteFile();
 
-		} else if (Parameter.calOption) {
+		} else if (Parameter.INSTANCE.calOption) {
 			H2Transformer H2 = null;
 			H2 = new H2Transformer();
 			H2.H2();
 
-		} else if (Parameter.nontransFlag) {
+		} else if (Parameter.INSTANCE.nontransFlag) {
 			NonTransmitted nt = new NonTransmitted();
 			nt.GenerateNonTransmitted();
 

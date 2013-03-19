@@ -115,7 +115,7 @@ public class PedigreeFile {
 		AlleleSet = new char[num_marker][2];
 		AlleleFreq = new short[num_marker][2];
 		for (int i = 0; i < num_marker; i++) {
-			AlleleSet[i][0] = AlleleSet[i][1] = Parameter.missing_allele.charAt(0);
+			AlleleSet[i][0] = AlleleSet[i][1] = Parameter.INSTANCE.missing_allele.charAt(0);
 		}
 		int numMarkers = 0;
 		BufferedReader reader = new BufferedReader(new FileReader(new File(infile)));
@@ -161,7 +161,7 @@ public class PedigreeFile {
 					if(idx < 0) continue;
 					try {
 						String[] allele = { tokenizer[6 + j * 2], tokenizer[6 + j * 2 + 1] };
-						boolean flag = (allele[0].compareTo(Parameter.missing_allele) != 0) && (allele[1].compareTo(Parameter.missing_allele) != 0);
+						boolean flag = (allele[0].compareTo(Parameter.INSTANCE.missing_allele) != 0) && (allele[1].compareTo(Parameter.INSTANCE.missing_allele) != 0);
 						if (flag) {
 							int[] code = recode(c, allele);
 							per.addMarker(flag, code[0], code[1], c);
@@ -198,13 +198,13 @@ public class PedigreeFile {
 
 	protected void Is6ColBinary() {
 		for(String c : SixthCol) {
-			if(Parameter.status_shiftFlag) {
-				if(c.compareTo("1") != 0 && c.compareTo("0")!= 0 && c.compareTo(Parameter.missing_phenotype) != 0) {
+			if(Parameter.INSTANCE.status_shiftFlag) {
+				if(c.compareTo("1") != 0 && c.compareTo("0")!= 0 && c.compareTo(Parameter.INSTANCE.missing_phenotype) != 0) {
 					IsSixthColBinary = false;
 					break;
 				}
 			} else {
-				if(c.compareTo("2") != 0 && c.compareTo("1")!= 0 && c.compareTo("0") != 0 && c.compareTo(Parameter.missing_phenotype) != 0) {
+				if(c.compareTo("2") != 0 && c.compareTo("1")!= 0 && c.compareTo("0") != 0 && c.compareTo(Parameter.INSTANCE.missing_phenotype) != 0) {
 					IsSixthColBinary = false;
 					break;
 				}
@@ -219,7 +219,7 @@ public class PedigreeFile {
 	protected int[] recode(int idx, String[] allele) {
 		int[] code = { -1, -1 };
 		char[] ref = AlleleSet[idx];
-		if (ref[1] != Parameter.missing_allele.charAt(0)) { 
+		if (ref[1] != Parameter.INSTANCE.missing_allele.charAt(0)) { 
 			// two detected alleles
 			for (int i = 0; i < 2; i++) {
 				for (int j = 0; j < 2; j++) {
@@ -236,7 +236,7 @@ public class PedigreeFile {
 			// less than two detected alleles
 			if (allele[0].compareTo(allele[1]) == 0) {
 				// 1 when both alleles are same
-				if (ref[0] == Parameter.missing_allele.charAt(0)) {
+				if (ref[0] == Parameter.INSTANCE.missing_allele.charAt(0)) {
 					// zero detected alleles
 					ref[0] = allele[0].charAt(0);
 					code[0] = code[1] = 0;
@@ -251,7 +251,7 @@ public class PedigreeFile {
 				}
 			} else {
 				// 2 when both alleles are different
-				if (ref[0] == Parameter.missing_allele.charAt(0)) {
+				if (ref[0] == Parameter.INSTANCE.missing_allele.charAt(0)) {
 					// zero detected alleles
 					ref[0] = allele[0].charAt(0);
 					ref[1] = allele[1].charAt(0);

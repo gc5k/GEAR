@@ -13,7 +13,7 @@ public class QScore {
 		String s[] = l.split(delim);
 		SNP = s[0];
 		qscore = s[1];
-		if (Parameter.isNA(s[1])) {
+		if (Parameter.INSTANCE.isNA(s[1])) {
 			isMissing = true;
 		} else {
 			isMissing = false;

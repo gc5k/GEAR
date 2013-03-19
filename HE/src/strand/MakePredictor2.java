@@ -365,7 +365,7 @@ public class MakePredictor2 {
 			}
 			SNP snp = snpList1.get(comSNPIdx[0][i]);
 			Predictor2 pd = predictorList.get(comSNPIdx[1][i]);
-			if (Parameter.isNA(pd.getField(Parameter.INSTANCE.getPredictorIdx()))) {
+			if (Parameter.INSTANCE.isNA(pd.getField(Parameter.INSTANCE.getPredictorIdx()))) {
 				NMiss++;
 				continue;
 			} else {

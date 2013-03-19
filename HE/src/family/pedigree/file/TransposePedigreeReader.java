@@ -44,7 +44,7 @@ public class TransposePedigreeReader extends PedigreeFile {
 		treader.close();
 		AlleleSet = new char[num_marker][2];
 		for(int i = 0; i < num_marker; i++) {
-			AlleleSet[i][0] = AlleleSet[i][1] = Parameter.missing_allele.charAt(0);
+			AlleleSet[i][0] = AlleleSet[i][1] = Parameter.INSTANCE.missing_allele.charAt(0);
 		}
 		AlleleFreq = new short[num_marker][2];
 
@@ -94,7 +94,7 @@ public class TransposePedigreeReader extends PedigreeFile {
 					BFamilyStruct bf = familystructure.get(Famid.get(i));
 					per = bf.getPerson(Individualid.get(i));
 					String[] allele = { tokenizer[4 + i * 2], tokenizer[4 + i * 2 + 1] };
-					boolean flag = (allele[0].compareTo(Parameter.missing_allele) != 0) && (allele[1].compareTo(Parameter.missing_allele) != 0);
+					boolean flag = (allele[0].compareTo(Parameter.INSTANCE.missing_allele) != 0) && (allele[1].compareTo(Parameter.INSTANCE.missing_allele) != 0);
 					if (flag) {
 						int[] code = recode(k, allele);
 						per.addMarker(flag, code[0], code[1], k);

@@ -37,21 +37,21 @@ public class SoftSNPFilter {
 			for (int i = 0; i < wseq.length; i++) {
 				int idx = wseq[i];
 				boolean flag = true;
-				if (Parameter.genoFlag) {
-					if (allelefreq[idx][2] > Parameter.geno) {
+				if (Parameter.INSTANCE.genoFlag) {
+					if (allelefreq[idx][2] > Parameter.INSTANCE.geno) {
 						flag = false;
 						continue;
 					}
 				}
 				double f = allelefreq[idx][0] < allelefreq[idx][1] ? allelefreq[idx][0]:allelefreq[idx][1]; 
-				if (Parameter.mafFlag) {
-					if (f < Parameter.maf) {
+				if (Parameter.INSTANCE.mafFlag) {
+					if (f < Parameter.INSTANCE.maf) {
 						flag = false;
 						continue;
 					}
 				}
-				if (Parameter.maxmafFlag) {
-					if (f > Parameter.max_maf ) {
+				if (Parameter.INSTANCE.maxmafFlag) {
+					if (f > Parameter.INSTANCE.max_maf ) {
 						flag = false;
 						continue;
 					}

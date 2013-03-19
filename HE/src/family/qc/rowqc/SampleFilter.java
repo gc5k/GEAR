@@ -123,8 +123,8 @@ public class SampleFilter {
 	protected boolean hardFilter(BPerson p) {
 		boolean flag = true;
 
-		if (Parameter.keepFlag) {
-			System.err.println("reading keep individuals from : " + Parameter.keepFile);
+		if (Parameter.INSTANCE.keepFlag) {
+			System.err.println("reading keep individuals from : " + Parameter.INSTANCE.keepFile);
 			readKeepFile();
 			flag = false;
 			String fi = p.getFamilyID();
@@ -136,8 +136,8 @@ public class SampleFilter {
 					break;
 				}
 			}
-		} else if (Parameter.removeFlag) {
-			System.err.println("reading remove individuals from : " + Parameter.removeFile);
+		} else if (Parameter.INSTANCE.removeFlag) {
+			System.err.println("reading remove individuals from : " + Parameter.INSTANCE.removeFile);
 			readRemoveFile();
 			String fi = p.getFamilyID();
 			String pi = p.getPersonID();
@@ -150,13 +150,13 @@ public class SampleFilter {
 			}
 		}
 
-		if (flag && Parameter.keep_maleFlag) {
+		if (flag && Parameter.INSTANCE.keep_maleFlag) {
 			return flag = p.getGender() == 1 ? true : false;
 		}
-		if (flag && Parameter.keep_femaleFlag) {
+		if (flag && Parameter.INSTANCE.keep_femaleFlag) {
 			return flag = p.getGender() == 2 ? true : false;
 		}
-		if (flag && Parameter.ex_nosexFlag) {
+		if (flag && Parameter.INSTANCE.ex_nosexFlag) {
 			return flag = (p.getGender() == 1 || p.getGender() == 2) ? true
 					: false;
 		}
@@ -184,7 +184,7 @@ public class SampleFilter {
 	}
 	
 	private void readKeepFile() {
-		BufferedReader reader = FileProcessor.FileOpen(Parameter.keepFile);
+		BufferedReader reader = FileProcessor.FileOpen(Parameter.INSTANCE.keepFile);
 		String line = null;
 		ArrayList<String> famList = NewIt.newArrayList();
 		ArrayList<String> indList = NewIt.newArrayList();
@@ -206,7 +206,7 @@ public class SampleFilter {
 	}
 
 	private void readRemoveFile() {
-		BufferedReader reader = FileProcessor.FileOpen(Parameter.removeFile);
+		BufferedReader reader = FileProcessor.FileOpen(Parameter.INSTANCE.removeFile);
 		ArrayList<String> famList = NewIt.newArrayList();
 		ArrayList<String> indList = NewIt.newArrayList();
 		String line = null;

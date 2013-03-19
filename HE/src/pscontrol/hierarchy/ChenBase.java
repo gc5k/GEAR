@@ -34,7 +34,7 @@ public abstract class ChenBase implements ChenInterface {
 	protected int[] subsetMarker;
 
 	public ChenBase(PedigreeFile ped, MapFile map) {
-		rnd.setSeed(Parameter.nontransSeed);
+		rnd.setSeed(Parameter.INSTANCE.nontransSeed);
 		PedData = ped;
 		MapData = map;
 
