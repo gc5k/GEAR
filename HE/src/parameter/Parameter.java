@@ -572,7 +572,7 @@ public enum Parameter {
 /////////////////write bed file
 
 	private final String cmd_make_bed = "make_bed";
-	public static String cmd_make_bed_long = "make-bed";
+	private final String cmd_make_bed_long = "make-bed";
 	public static boolean makebedFlag = false;
  
 	/*
