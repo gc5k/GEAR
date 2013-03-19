@@ -103,7 +103,7 @@ public class HERegression {
 					boolean f = true;
 					y[ii][0] = 1;
 					for (int j = 0; j < mpheno.length; j++) {
-						if (Parameter.isNA(s[1 + mpheno[j]])) {
+						if (Parameter.INSTANCE.isNA(s[1 + mpheno[j]])) {
 							f = false;
 							break;
 						} else {

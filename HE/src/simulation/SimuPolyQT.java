@@ -90,7 +90,7 @@ public class SimuPolyQT {
 		LOG.append("MAF: " + Parameter.INSTANCE.polyFreq + "\n");
 		LOG.append("Marker: " + M + "\n");
 		LOG.append("Null marker: " + M + "\n");
-		if (Parameter.polyEffectFlag) {
+		if (Parameter.INSTANCE.polyEffectFlag) {
 			LOG.append("genetic effect file: " + Parameter.INSTANCE.polyEffectFile + "\n");
 		} else {
 			LOG.append("Uniform Effect: " + U + "\n");
@@ -108,7 +108,7 @@ public class SimuPolyQT {
 
 	public void generateSample() {
 		GenerateSampleNoSelection();
-		if(Parameter.makebedFlag) {
+		if(Parameter.INSTANCE.makebedFlag) {
 			writeBFile();
 		} else {
 			writeFile();
@@ -141,7 +141,7 @@ public class SimuPolyQT {
 
 		int count = 0;
 		RealMatrix effect = null;
-		if (Parameter.polyEffectFlag) {
+		if (Parameter.INSTANCE.polyEffectFlag) {
 			effect = readEffects();
 		} else {
 			effect = GenerateEffects();
@@ -186,7 +186,7 @@ public class SimuPolyQT {
 			}
 		}
 
-		if (Parameter.simuOrderFlag) {
+		if (Parameter.INSTANCE.simuOrderFlag) {
 			Arrays.sort(effect);
 		}
 
@@ -436,7 +436,7 @@ public class SimuPolyQT {
 	}
 	
 	public RealMatrix readEffects() {
-		BufferedReader reader = FileProcessor.FileOpen(Parameter.polyEffectFile);
+		BufferedReader reader = FileProcessor.FileOpen(Parameter.INSTANCE.polyEffectFile);
 		double[] effect = new double[M];
 		int c= 0;
 		String line = null;
@@ -455,7 +455,7 @@ public class SimuPolyQT {
 		}
 		RealMatrix Eff = new Array2DRowRealMatrix(effect);
 		
-		if (Parameter.simuOrderFlag) {
+		if (Parameter.INSTANCE.simuOrderFlag) {
 			Arrays.sort(effect);
 		}
 

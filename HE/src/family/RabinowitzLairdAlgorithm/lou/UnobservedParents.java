@@ -39,13 +39,13 @@ public class UnobservedParents extends AbstractGenoDistribution {
 	 * missing too.
 	 */
 	public String[] getNontransmitted(final String transmitted) {
-		String nontran = new String(Parameter.missingGenotype);
+		String nontran = new String(Parameter.INSTANCE.missingGenotype);
 		String tran = new String(transmitted);
 
-		if (transmitted.compareTo(Parameter.missingGenotype) == 0) {
+		if (transmitted.compareTo(Parameter.INSTANCE.missingGenotype) == 0) {
 			tran = RandomAssign();
-			if (tran.compareTo(Parameter.missingGenotype) == 0) {
-				String nontran_tran[] = { Parameter.missingGenotype, Parameter.missingGenotype};
+			if (tran.compareTo(Parameter.INSTANCE.missingGenotype) == 0) {
+				String nontran_tran[] = { Parameter.INSTANCE.missingGenotype, Parameter.INSTANCE.missingGenotype};
 				return nontran_tran;
 			}
 		}

@@ -242,125 +242,125 @@ public enum Parameter {
 ///////////////simulation nuclear family
 	private final String cmd_simu_fam = "simu_fam";
 	private final String cmd_simu_fam_long = "simu-fam";
-	public static boolean simufamFlag = false;
+	public boolean simufamFlag = false;
 
 	private final String cmd_simu_fam_size = "simu_fam_size";
 	private final String cmd_simu_fam_size_long = "simu-fam-size";
-	public static int simu_fam_size = 100;
+	public int simu_fam_size = 100;
 	private final String cmd_simu_fam_marker = "simu_fam_marker";
 	private final String cmd_simu_fam_marker_long = "simu-fam-marker";
-	public static int simu_fam_marker = 10;
+	public int simu_fam_marker = 10;
 
 ///////////////simulation real data
 
 	private final String cmd_simu_realdata = "simu_real_data";
 	private final String cmd_simu_realdata_long = "simu-real-data";
-	public static boolean simuRealData = false;
+	public boolean simuRealData = false;
 
 	private final String cmd_simu_seed = "simu_seed";
 	private final String cmd_simu_seed_long = "simu-seed";
-	public static long simuSeed = (new Random()).nextLong();
+	public long simuSeed = (new Random()).nextLong();
 
 	private final String cmd_simu_rep = "simu_rep";
 	private final String cmd_simu_rep_long = "simu-rep";
-	public static int simuRep = 1;
+	public int simuRep = 1;
 
 	private final String cmd_simu_casual_loci = "simu_casual_loci";
 	private final String cmd_simu_casual_loci_long = "simu-casual-loci";
-	public static String simuCasualLoci = null;
+	public String simuCasualLoci = null;
 
 	private final String cmd_simu_rnd_casual_loci = "simu_rnd_casual_loci";
 	private final String cmd_simu_rnd_casual_loci_long = "simu-rnd-casual-loci";
-	public static int simuRndCasualLoci = 0;
+	public int simuRndCasualLoci = 0;
 
 	private final String cmd_simu_hsq = "simu_hsq";
 	private final String cmd_simu_hsq_long = "simu-hsq";
-	public static double simuHsq = 0.5;
+	public double simuHsq = 0.5;
 
 	private final String cmd_simu_qt = "simu_qt";
 	private final String cmd_simu_qt_long = "simu-qt";
-	public static boolean simupolyQTFlag = false;
+	public boolean simupolyQTFlag = false;
 
 	private final String cmd_simu_order = "simu_order";
 	private final String cmd_simu_order_long = "simu-order";
-	public static boolean simuOrderFlag = false;
+	public boolean simuOrderFlag = false;
 
 	private final String cmd_simu_cc = "simu_cc";
 	private final String cmd_simu_cc_long = "simu-cc";
-	public static int[] simuCC = { 0, 0 };
-	public static boolean simupolyCCFlag = false;
+	public int[] simuCC = { 0, 0 };
+	public boolean simupolyCCFlag = false;
 
 	private final String cmd_simu_k = "simu_k";
 	private final String cmd_simu_k_long = "simu-k";
-	public static double simuK = 0.1;
+	public double simuK = 0.1;
 
-	public final static int sm_qt = 0;
-	public final static int sm_cc = 1;
+	public final int sm_qt = 0;
+	public final int sm_cc = 1;
 
-	public static boolean[] simuType = { true, false };  //first one for case-control, second one for quantitative
+	public boolean[] simuType = { true, false };  //first one for case-control, second one for quantitative
 
 /////////////////simulation polygenic
 	private final String cmd_poly_loci = "poly_loci";
 	private final String cmd_poly_loci_long = "poly-loci";
 	
-	public static int polyLoci = 1000;	
+	public int polyLoci = 1000;	
 
 	private final String cmd_poly_loci_null = "poly_loci_null";
 	private final String cmd_poly_loci_null_long = "poly-loci-null";
 
-	public static int polyLociNull = 0;
-	public static int poly_sample_QT = 1000;
+	public int polyLociNull = 0;
+	public int poly_sample_QT = 1000;
 
 	private final String cmd_poly_LD = "poly_ld";
 	private final String cmd_poly_LD_long = "poly-ld";
-	public static double polyLD = 0;
+	public double polyLD = 0;
 
 	private final String cmd_poly_U = "poly_U";
 	private final String cmd_poly_U_long = "poly-U";
-	public static boolean polyU = false;
+	public boolean polyU = false;
 
 	private final String cmd_poly_freq = "poly_freq";
 	private final String cmd_poly_freq_long = "poly-freq";
-	public static double polyFreq = 0.5;
+	public double polyFreq = 0.5;
 	
 	private final String cmd_poly_effect = "poly_effect";
 	private final String cmd_poly_effect_long = "poly-effect";
-	public static boolean polyEffectFlag = false;
-	public static String polyEffectFile = null;
+	public boolean polyEffectFlag = false;
+	public String polyEffectFile = null;
 
 ///////////////////nontrans
 	private final String cmd_nontrans = "nontrans";
-	public static boolean nontransFlag = false;
+	public boolean nontransFlag = false;
 
 	private final String cmd_nontrans_seed = "nontrans_seed";
 	private final String cmd_nontrans_seed_long = "nontrans-seed";	
-	public static long nontransSeed = 2010;
+	public long nontransSeed = 2010;
 
 	private final String cmd_nontrans_cases = "nontrans_cases";
 	private final String cmd_nontrans_cases_long = "nontrans-cases";
-	public static boolean nontranscasesFlag = false;
+	public boolean nontranscasesFlag = false;
 
 	private final String cmd_nontrans_controls = "nontrans_controls";
 	private final String cmd_nontrans_controls_long = "nontrans-controls";
-	public static boolean nontranscontrolsFlag = false;
+	public boolean nontranscontrolsFlag = false;
 
 ///////////////////pop stat
 	private final String cmd_freq = "freq";
-	public static boolean freqFlag = false;
+	public boolean freqFlag = false;
 	private final String cmd_geno_freq = "geno_freq";
 	private final String cmd_geno_freq_long = "geno-freq";
-	public static boolean genoFreqFlag = false;
+	public boolean genoFreqFlag = false;
 
 	public final String cmd_sum_stat_help = "sum_stat_help";
 	public final String cmd_sum_stat_help_long = "sum-stat-help";
-	public final static int freq = 0;
-	public final static int geno_freq = 1;
-	public static boolean sumStatFlag = false;
+	public final int freq = 0;
+	public final int geno_freq = 1;
+	public boolean sumStatFlag = false;
 	
 	//fst
 	private final String cmd_fst = "fst";
-	public static boolean fstFlag = false;
-	public static String fst_file = null;
+	public boolean fstFlag = false;
+	public String fst_file = null;
 
 //profile
 	
@@ -380,14 +380,14 @@ public enum Parameter {
 	private final String cmd_q_score_range ="q_score_range";
 	private final String cmd_q_score_range_long = "q-score-range";
 	
-	public static boolean scoreFlag = false;
-	public static String scoreFile = null;
-	public static String MaCH_Infor = null;
-	public static String MaCH_Dosage = null;
-	public static String MaCH_Infor_Batch = null;
-	public static String MaCH_Dosage_Batch = null;
-	public static String q_score_file = null;
-	public static String q_score_range_file = null;
+	public boolean scoreFlag = false;
+	public String scoreFile = null;
+	public String MaCH_Infor = null;
+	public String MaCH_Dosage = null;
+	public String MaCH_Infor_Batch = null;
+	public String MaCH_Dosage_Batch = null;
+	public String q_score_file = null;
+	public String q_score_range_file = null;
 
 // HE regression options Begin
 	public boolean hasHEOption() { return heFlag; }
@@ -486,41 +486,41 @@ public enum Parameter {
 	
 	//quantitative covariates
 	private final String cmd_qcovar = "qcovar";
-	public static String qcovar_file = null;
+	public String qcovar_file = null;
 	private final String cmd_qcovar_num = "qcovar_num";
 	private final String cmd_qcovar_num_long = "qcovar-num";
-	public static int[] qcovar_num = null;
+	public int[] qcovar_num = null;
 
 	//categorical covariates
 	private final String cmd_covar = "covar";
-	public static String covar_file = null;
+	public String covar_file = null;
 	private final String cmd_covar_num = "covar_num";
 	private final String cmd_covar_num_long = "covar-num";
-	public static int[] covar_num = null;
+	public int[] covar_num = null;
 
 	private final String cmd_reverse = "reverse";
-	public static boolean reverse = false;
+	public boolean reverse = false;
 
 	private final String cmd_k = "k";
-	public static boolean k_button = false;
-	public static double k = 0.01;
+	public boolean k_button = false;
+	public double k = 0.01;
 
 	private final String cmd_scale = "scale";
-	public static boolean scale = false;
+	public boolean scale = false;
 
-	public static double eh2=1;
+	public double eh2=1;
 	private final String cmd_eh2 = "eh2";
-	public static boolean eh2Flag = false;
+	public boolean eh2Flag = false;
 
 	private final String cmd_out = "out";
-	public static String out = "he";
+	public String out = "he";
 	
 	private final String cmd_perm = "perm";
-	public static int perm = 100;
-	public static boolean permFlag = false;
+	public int perm = 100;
+	public boolean permFlag = false;
 
 ///////////////////heritability transformation
-	public static boolean calOption = false;
+	public boolean calOption = false;
 	private final String cmd_cal_k = "cal_k";
 	private final String cmd_cal_k_long = "cal-k";
 	public double cal_k = 0;
@@ -542,84 +542,84 @@ public enum Parameter {
 	public double[] cal_cc = {0,0}; 
 
 	private final String cmd_na = "na";
-	public static String[] na = {"-9", "NA", "na", "-Inf", "Inf"};
+	public String[] na = {"-9", "NA", "na", "-Inf", "Inf"};
 
 ///////////////////level 1 snp selection
 	private final String cmd_chr = "chr";
-	public static String[] inchr = null;
-	public static String[] exchr = null;
-	public static boolean inchrFlag = false;
-	public static boolean exchrFlag = false;
+	public String[] inchr = null;
+	public String[] exchr = null;
+	public boolean inchrFlag = false;
+	public boolean exchrFlag = false;
 
 	private final String cmd_snps = "snps";
-	public static String snpList = null;
+	public String snpList = null;
 
 //////////////////level 1 individual selection
 	private final String cmd_keep = "keep";
-	public static String keepFile = null;
-	public static boolean keepFlag = false;
+	public String keepFile = null;
+	public boolean keepFlag = false;
 
 ///////////////// individual selection start
 	private final String cmd_remove = "remove";
-	public static String removeFile = null;
-	public static boolean removeFlag = false;
+	public String removeFile = null;
+	public boolean removeFlag = false;
 
 ///////////////// reference-allele
 	private final String cmd_reference_allele = "reference_allele";
 	private final String cmd_reference_allele_long = "refernce-allele";
-	public static String reference_allele = null;
+	public String reference_allele = null;
 	
 /////////////////write bed file
 
 	private final String cmd_make_bed = "make_bed";
 	private final String cmd_make_bed_long = "make-bed";
-	public static boolean makebedFlag = false;
+	public boolean makebedFlag = false;
  
 	/*
-	 * private final String cmd_ex_ind = "exind"; public static String[][]
+	 * private final String cmd_ex_ind = "exind"; public String[][]
 	 * ex_ind = null; private final String cmd_ex_ind_file = "exindfile"; public
-	 * static boolean exindFlag = false;
+	 * boolean exindFlag = false;
 	 */
 	private final String cmd_keep_male = "male";
 	private final String cmd_keep_male_long = "keep-male";
-	public static boolean keep_maleFlag = false;
+	public boolean keep_maleFlag = false;
 
 	private final String cmd_keep_female = "female";
 	private final String cmd_keep_female_long = "keep-female";
-	public static boolean keep_femaleFlag = false;
+	public boolean keep_femaleFlag = false;
 
 	private final String cmd_ex_nosex = "exnosex";
 	private final String cmd_ex_nosex_long = "exclude-nosex";
-	public static boolean ex_nosexFlag = false;
+	public boolean ex_nosexFlag = false;
 ///////////////////global	
 
-	public static boolean transFlag = false;
+	public boolean transFlag = false;
 
-	public static String missing_allele = "0";
+	public String missing_allele = "0";
 
-	public static boolean status_shiftFlag = false;
+	public boolean status_shiftFlag = false;
 
-	public static String missing_phenotype = "-9";
+	public String missing_phenotype = "-9";
 
-	public static double status_shift = -1;
+	public double status_shift = -1;
 
-	public static String missingGenotype = "22";
+	public String missingGenotype = "22";
 
-	public static boolean covar_header_flag = false;
+	public boolean covar_header_flag = false;
 
-	public static long seed = 2012;
+	public long seed = 2012;
 
-	public static boolean genoFlag = false;
+	public boolean genoFlag = false;
 
-	public static double geno = 0;
+	public double geno = 0;
 
-	public static boolean mafFlag = false;
+	public boolean mafFlag = false;
 	
-	public static double maf = 0;
+	public double maf = 0;
 
-	public static boolean maxmafFlag = false;
+	public boolean maxmafFlag = false;
 	
-	public static double max_maf = 0.55;
+	public double max_maf = 0.55;
 
 	private final String cmd_help = "help";
 
@@ -1261,12 +1261,7 @@ public enum Parameter {
 		}
 	}
 
-	public static void main(String[] args) {
-		Parameter.INSTANCE.commandListener(args);
-		System.out.println(Parameter.INSTANCE);
-	}
-
-	public static boolean isNA(String n) {
+	public boolean isNA(String n) {
 		boolean f = false;
 		for (int i = 0; i < na.length; i++) {
 			if(n.compareTo(na[i]) == 0) {

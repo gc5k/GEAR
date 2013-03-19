@@ -11,7 +11,7 @@ import parameter.Parameter;
 
 public class Sample {
 	public static long seed = 2011;
-	public static Random U = new Random(Parameter.seed);
+	public static Random U = new Random(Parameter.INSTANCE.seed);
 
 	public static void setSeed(long s) {
 		U.setSeed(s);

@@ -47,7 +47,7 @@ public class SNPFilter implements SNPFilterInterface {
 			filterFlag = true;
 		}
 */
-		if (Parameter.inchrFlag || Parameter.exchrFlag) {
+		if (Parameter.INSTANCE.inchrFlag || Parameter.INSTANCE.exchrFlag) {
 			selectChromosome();
 			filterFlag = true;
 		}
@@ -101,22 +101,22 @@ public class SNPFilter implements SNPFilterInterface {
 
 	private void selectChromosome() {
 
-		if (Parameter.inchrFlag) {
+		if (Parameter.INSTANCE.inchrFlag) {
 			for (int i = 0; i < snpList.size(); i++) {
 				SNP snp = snpList.get(i);
 				String chr = snp.getChromosome();
-				int idx = ArrayUtils.indexOf(Parameter.inchr, chr);
+				int idx = ArrayUtils.indexOf(Parameter.INSTANCE.inchr, chr);
 				if (idx >= 0) {
 					includeSNP(i);
 				}
 			}
 		}
 
-		if (Parameter.exchrFlag) {
+		if (Parameter.INSTANCE.exchrFlag) {
 			for (int i = 0; i < snpList.size(); i++) {
 				SNP snp = snpList.get(i);
 				String chr = snp.getChromosome();
-				int idx = ArrayUtils.indexOf(Parameter.exchr, chr);
+				int idx = ArrayUtils.indexOf(Parameter.INSTANCE.exchr, chr);
 				if (idx >= 0) {
 					excludeSNP(i);
 				}

@@ -157,7 +157,7 @@ public class Inbreeding {
 	}
 
 	private void readKeepFile() {
-		BufferedReader reader = FileProcessor.FileOpen(Parameter.fst_file);
+		BufferedReader reader = FileProcessor.FileOpen(Parameter.INSTANCE.fst_file);
 		String line = null;
 		ArrayList<String> famList = NewIt.newArrayList();
 		ArrayList<String> indList = NewIt.newArrayList();

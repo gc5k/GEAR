@@ -59,7 +59,7 @@ public class PhenotypeFile {
 
 			
 			if ( k == 0) {
-				if(Parameter.covar_header_flag) {
+				if(Parameter.INSTANCE.covar_header_flag) {
 				
 					String[] t = line.split("\\s+");
 					colNum = t.length - 2;

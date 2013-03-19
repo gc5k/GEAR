@@ -98,7 +98,7 @@ public class SimuPolyCC {
 		LOG.append("MAF: " + Parameter.INSTANCE.polyFreq + "\n");
 		LOG.append("Marker: " + M + "\n");
 		LOG.append("Null Marker: " + M_null + "\n");
-		if (Parameter.polyEffectFlag) {
+		if (Parameter.INSTANCE.polyEffectFlag) {
 			LOG.append("genetic effect file: " + Parameter.INSTANCE.polyEffectFile + "\n");
 		} else {
 			LOG.append("Uniform Effect: " + U + "\n");
@@ -109,7 +109,7 @@ public class SimuPolyCC {
 		LOG.append("K: " + K + "\n");
 		LOG.append("h2: " + h2 + "\n");
 		LOG.append("out: " + out + "\n");
-		if (Parameter.makebedFlag) {
+		if (Parameter.INSTANCE.makebedFlag) {
 			LOG.append("make bed");
 		}
 		LOG.append("\n");
@@ -140,7 +140,7 @@ public class SimuPolyCC {
 
 	public void GenerateSample() {
 		GenerateSampleSelection();
-		if(Parameter.makebedFlag) {
+		if(Parameter.INSTANCE.makebedFlag) {
 			writeBFile();
 		} else {
 			writeFile();
@@ -155,7 +155,7 @@ public class SimuPolyCC {
 		int count = 0;
 		
 		RealMatrix effect = null;
-		if (Parameter.polyEffectFlag) {
+		if (Parameter.INSTANCE.polyEffectFlag) {
 			effect = readEffects();
 		} else {
 			effect = GenerateEffects();
@@ -267,7 +267,7 @@ public class SimuPolyCC {
 			}
 		}
 		
-		if	(Parameter.simuOrderFlag) {
+		if	(Parameter.INSTANCE.simuOrderFlag) {
 			Arrays.sort(effect);
 		}
 
@@ -556,7 +556,7 @@ public class SimuPolyCC {
 	}
 	
 	public RealMatrix readEffects() {
-		BufferedReader reader = FileProcessor.FileOpen(Parameter.polyEffectFile);
+		BufferedReader reader = FileProcessor.FileOpen(Parameter.INSTANCE.polyEffectFile);
 		double[] effect = new double[M];
 		int c= 0;
 		String line = null;
@@ -575,7 +575,7 @@ public class SimuPolyCC {
 		}
 		RealMatrix Eff = new Array2DRowRealMatrix(effect);
 		
-		if (Parameter.simuOrderFlag) {
+		if (Parameter.INSTANCE.simuOrderFlag) {
 			Arrays.sort(effect);
 		}
 

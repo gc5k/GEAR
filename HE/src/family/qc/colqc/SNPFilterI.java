@@ -429,7 +429,7 @@ public class SNPFilterI implements SNPFilterInterface {
 			}
 			Arrays.sort(WSNP);
 		} else {
-			if (Parameter.transFlag) {
+			if (Parameter.INSTANCE.transFlag) {
 				System.err.println("no snps selected.");
 				Test.LOG.append("no snps selected.\n");
 				Test.printLog();

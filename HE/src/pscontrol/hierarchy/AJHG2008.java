@@ -140,7 +140,7 @@ public class AJHG2008 extends ChenBase {
 					sb.append("ajhg2008");
 					pseudoper = fam.getPerson(sb.toString());
 					String g = per.getBiAlleleGenotypeString(i);
-					boolean f = g.compareTo(Parameter.missingGenotype) != 0;
+					boolean f = g.compareTo(Parameter.INSTANCE.missingGenotype) != 0;
 					String[] nontran_tran = new String[2];
 					if (f) {
 						nontran_tran = fam.getNonTransmitted(g, gDis);
