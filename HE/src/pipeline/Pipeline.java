@@ -3,6 +3,7 @@ import java.util.Calendar;
 
 import merge.MergeTwoFile;
 import write.WriteBedSNPMajor;
+import grm.GRMStat;
 import he.HECalculate;
 import he.HEPermutation;
 import he.HERead;
@@ -121,6 +122,9 @@ public class Pipeline {
 //			HER = new HERegression(p);
 //			HER.Regression();
 
+		} else if (Parameter.INSTANCE.grmstatFlag) {
+			GRMStat gs = new GRMStat();
+			
 		}
 		
 		System.out.println("\nThe analysis ended at: " + calendar.getTime() + "\n");
