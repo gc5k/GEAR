@@ -389,6 +389,15 @@ public enum Parameter {
 	public String q_score_file = null;
 	public String q_score_range_file = null;
 
+//grm statistics	
+	private final String cmd_grm_stat = "grm_stat";
+	private final String cmd_grm_stat_long = "grm-stat";
+	public boolean grmstatFlag = false;
+
+//	private final String cmd_exclude_diag = "exclude_diag";
+//	private final String cmd_exclude_diag_long = "exclude-diag";
+//	public boolean exclude_diag = false;
+	
 // HE regression options Begin
 	public boolean hasHEOption() { return heFlag; }
 	private boolean heFlag = false;
@@ -513,7 +522,7 @@ public enum Parameter {
 	public boolean eh2Flag = false;
 
 	private final String cmd_out = "out";
-	public String out = "he";
+	public String out = "gear";
 	
 	private final String cmd_perm = "perm";
 	public int perm = 100;
@@ -762,6 +771,11 @@ public enum Parameter {
 		ops.addOption(OptionBuilder.withLongOpt(cmd_q_score_file_long).withDescription("q score file").hasArg().create(cmd_q_score_file));
 
 		ops.addOption(OptionBuilder.withLongOpt(cmd_q_score_range_long).withDescription("q score range").hasArg().create(cmd_q_score_range));
+
+//grm-stat
+		ops.addOption(OptionBuilder.withLongOpt(cmd_grm_stat_long).withDescription("grm statistics").create(cmd_grm_stat));
+
+//		ops.addOption(OptionBuilder.withLongOpt(cmd_exclude_diag_long).withDescription("grm statistics excluded diagonal elements").create(cmd_exclude_diag));
 
 //haseman-elston regression
 		ops.addOption(OptionBuilder.withDescription("h2 ").hasArg().create(cmd_eh2));
@@ -1124,6 +1138,16 @@ public enum Parameter {
 			exists(q_score_range_file);
 		}
 
+//grm statistics		
+		if (cl.hasOption(cmd_grm_stat)) {
+			grmstatFlag = true;
+		}
+		
+//		if (cl.hasOption(cmd_exclude_diag)) {
+//			exclude_diag = true;
+//		}
+
+		
 //haseman-elston regression
 
 		if (cl.hasOption(cmd_eh2)) {
