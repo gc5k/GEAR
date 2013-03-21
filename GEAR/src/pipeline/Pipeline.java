@@ -7,7 +7,6 @@ import grm.GRMStat;
 import he.HECalculate;
 import he.HEPermutation;
 import he.HERead;
-import he.HERegression;
 import he.h2trans.H2Transformer;
 import realcheck.RealCheck;
 import realcheck.RealCheckOne;
