@@ -46,8 +46,6 @@ public class MakePredictor2 {
 	private SampleFilter sf1;
 
 	public MakePredictor2() {
-		System.err.print(AboutInfo.WELCOME_MESSAGE);
-		
 		readPredictor();
 
 		PLINKParser pp1 = null;

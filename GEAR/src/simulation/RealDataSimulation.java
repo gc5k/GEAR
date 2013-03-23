@@ -45,8 +45,6 @@ public class RealDataSimulation {
 	private double accept_ctrl;
 
 	public RealDataSimulation() {
-		System.err.print(AboutInfo.WELCOME_MESSAGE);
-
 		if (Parameter.INSTANCE.hasFileOption()) {
 			pp = new PLINKParser (Parameter.INSTANCE.getPedFile(),
 					              Parameter.INSTANCE.getMapFile());

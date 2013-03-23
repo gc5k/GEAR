@@ -52,7 +52,6 @@ public class Strand {
 	private DataOutputStream os = null;
 
 	public Strand() {
-		System.err.print(AboutInfo.WELCOME_MESSAGE);
 		readStrand();
 
 		PLINKParser pp1 = null;

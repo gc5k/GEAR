@@ -37,8 +37,6 @@ public class RealCheckOne {
 	private SampleFilter sf1;
 
 	public RealCheckOne() {
-		System.err.print(AboutInfo.WELCOME_MESSAGE);
-
 		PLINKParser pp1 = null;
 		if (Parameter.INSTANCE.hasBFileOption()) {
 			pp1 = new PLINKBinaryParser (Parameter.INSTANCE.getBedFile(),
