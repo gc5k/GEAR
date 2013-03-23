@@ -42,8 +42,6 @@ public class RealCheck {
 	private SampleFilter sf2;
 
 	public RealCheck() {
-		System.err.print(AboutInfo.WELCOME_MESSAGE);
-
 		PLINKParser pp1 = null;
 		PLINKParser pp2 = null;
 		if (Parameter.INSTANCE.hasBFileOption() && Parameter.INSTANCE.hasBFile2Option()) {

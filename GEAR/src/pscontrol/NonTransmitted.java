@@ -22,7 +22,6 @@ public class NonTransmitted {
 	private NonTransmitted QC = null;
 
 	public NonTransmitted() {
-		System.err.print(AboutInfo.WELCOME_MESSAGE);
 		System.err.println("--nontrans procedure.");
 
 //		if (Parameter.fileOption) {

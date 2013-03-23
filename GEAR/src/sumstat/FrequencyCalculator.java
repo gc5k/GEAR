@@ -29,8 +29,6 @@ public class FrequencyCalculator {
 	private double[][] hw;
 	private int[][] N;
 	public FrequencyCalculator() {
-		System.err.print(AboutInfo.WELCOME_MESSAGE);
-
 		PLINKParser pp = null;
 		if (Parameter.INSTANCE.hasFileOption()) {
 			pp = new PLINKParser (Parameter.INSTANCE.getPedFile(),
