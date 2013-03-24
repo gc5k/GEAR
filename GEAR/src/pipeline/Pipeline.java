@@ -8,6 +8,7 @@ import he.HECalculate;
 import he.HEPermutation;
 import he.HERead;
 import he.h2trans.H2Transformer;
+import hpc.HPC;
 import realcheck.RealCheck;
 import realcheck.RealCheckOne;
 import simulation.RealDataSimulation;
@@ -34,7 +35,11 @@ public class Pipeline {
 		Calendar calendar = Calendar.getInstance();
 		System.out.println("\nThe analysis started at: " + calendar.getTime() + "\n");
 
-		if (Parameter.INSTANCE.scoreFlag) {
+		if (Parameter.INSTANCE.shFlag) {
+			HPC hps = new HPC(args);
+			hps.GenScript();
+			System.exit(0);
+		} else if (Parameter.INSTANCE.scoreFlag) {
 			if (Parameter.INSTANCE.hasBFileOption()) {
 				RiskScore rs = new RiskScore();
 				rs.makeProfile();

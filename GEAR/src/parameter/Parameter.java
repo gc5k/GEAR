@@ -553,6 +553,18 @@ public enum Parameter {
 	private final String cmd_na = "na";
 	public String[] na = {"-9", "NA", "na", "-Inf", "Inf"};
 
+/////////////////hpc
+	private final String cmd_qsub = "qsub";
+	public boolean qsubFlag = false;
+	private final String cmd_sh = "shell";
+	public boolean shFlag = false;
+	private final String cmd_email = "email";
+	public String email = "guobo.chen@uq.edu.au";
+	private final String cmd_ram = "ram";
+	public String ram= "10G";
+	private final String cmd_name = "name";
+	public String name = "gear";
+	
 ///////////////////level 1 snp selection
 	private final String cmd_chr = "chr";
 	public String[] inchr = null;
@@ -798,7 +810,17 @@ public enum Parameter {
 		ops.addOption(OptionBuilder.withDescription("prevalence ").hasArg().create(cmd_k));
 
 		ops.addOption(OptionBuilder.withDescription("na ").hasArg().create(cmd_na));
+///////hpc
+		ops.addOption(OptionBuilder.withDescription("qsub").create(cmd_qsub));
 
+		ops.addOption(OptionBuilder.withDescription("generate shell").create(cmd_sh));
+		
+		ops.addOption(OptionBuilder.withDescription("email").hasArg().create(cmd_email));
+		
+		ops.addOption(OptionBuilder.withDescription("ram").hasArg().create(cmd_ram));
+		
+		ops.addOption(OptionBuilder.withDescription("name").hasArg().create(cmd_name));
+///////transform heritability		
 		ops.addOption(OptionBuilder.withLongOpt(cmd_cal_k_long).withDescription("calculate heritability on the liability/observed scale with value K " + cmd_cal_k).hasArg().create(cmd_cal_k));
 		
 		ops.addOption(OptionBuilder.withLongOpt(cmd_cal_hl_long).withDescription("calculate heritability on the liability/observed scale " + cmd_cal_hl_long).hasArg().create(cmd_cal_hl));
@@ -1255,6 +1277,27 @@ public enum Parameter {
 
 		if (cl.hasOption(cmd_na)) {
 			na = cl.getOptionValue(cmd_na).split(",");
+		}
+
+		if (cl.hasOption(cmd_qsub)) {
+			shFlag = true;
+			qsubFlag = true;
+		}
+		
+		if (cl.hasOption(cmd_sh)) {
+			shFlag = true;
+		}
+		
+		if (cl.hasOption(cmd_email)) {
+			email = cl.getOptionValue(cmd_email);
+		}
+
+		if (cl.hasOption(cmd_ram)) {
+			ram = cl.getOptionValue(cmd_ram);
+		}
+		
+		if (cl.hasOption(cmd_name)) {
+			name = cl.getOptionValue(cmd_name);
 		}
 
 		if (cl.hasOption(cmd_out)) {
