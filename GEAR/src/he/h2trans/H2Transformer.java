@@ -23,14 +23,18 @@ public class H2Transformer {
 		cal_cc = Parameter.INSTANCE.cal_cc;
 		cal_h2_se = Parameter.INSTANCE.cal_h2_se;
 		P = cal_cc[0]/(cal_cc[0] + cal_cc[1]);
-		sb.append("cal_k: " + cal_k + "\n");
-		sb.append("cal_hl: " + cal_hl + "\n");
-		sb.append("cal_ho: " + cal_ho + "\n");
-		sb.append("cal_P: " + P + "\n");
+		sb.append("K (prevalence): " + cal_k + "\n");
+		if(Parameter.INSTANCE.cal_hlFlag) {
+			sb.append("heritability on the liability scale: " + cal_hl + "\n");
+		}
+		if(Parameter.INSTANCE.cal_hoFlag) {
+			sb.append("heritability on the observed scale: " + cal_ho + "\n");
+		}
+		sb.append("Proportion of cases: " + P + "\n");
 	}
 
 	public void H2() {
-		DecimalFormat fmt = new DecimalFormat("#.###E0");
+//		DecimalFormat fmt = new DecimalFormat("#.###E0");
 
 		NormalDistributionImpl Norm = new NormalDistributionImpl();
 		double q = 0;
@@ -41,23 +45,23 @@ public class H2Transformer {
 		}
 		double z = 1 / (Math.sqrt(2*3.1416926)) * Math.exp(-q*q/2);
 		double h2 = 0;
-		if(cal_ho!=0) {
+		if(Parameter.INSTANCE.cal_hoFlag) {
 			h2 = cal_ho * cal_k * (1-cal_k) * cal_k * (1-cal_k) / (z * z * P * (1-P));
 			double hl_se = 0;
-			if(cal_h2_se > 0) {
+			if(Parameter.INSTANCE.cal_h2seFlag ) {
 				hl_se = cal_h2_se * (cal_k * (1-cal_k) * cal_k * (1-cal_k))/( z * z * P * (1-P));
-				sb.append("h2(l): " + fmt.format(h2) + "\t" + fmt.format(hl_se) + "\n");
+				sb.append("\nThe transformed h2(l): " + h2 + " se: " + hl_se + "\n");
 			} else {
-				sb.append("h2(l): " + fmt.format(h2) + "\n");
+				sb.append("\nh2(l): " + h2 + "\n");
 			}
-		} else {
+		} else if (Parameter.INSTANCE.cal_hlFlag) {
 			h2 = cal_hl * z * z * P * (1-P) / (cal_k * (1- cal_k) * cal_k * (1-cal_k));
 			double ho_se = 0;
-			if(cal_h2_se > 0) {
+			if(Parameter.INSTANCE.cal_h2seFlag ) {
 				ho_se = cal_h2_se / ( (cal_k * (1-cal_k) * cal_k * (1-cal_k))/( z * z * P * (1-P)) );
-				sb.append("h2(o): " + fmt.format(h2) + "\t" + fmt.format(ho_se) + "\n");
+				sb.append("\nh2(o): " + h2 + " se: " + ho_se + "\n");
 			} else {
-				sb.append("h2(o): " + fmt.format(h2) + "\n");
+				sb.append("\nh2(o): " + h2 + "\n");
 			}
 		}
 		System.out.println(sb);

@@ -536,14 +536,17 @@ public enum Parameter {
 
 	private final String cmd_cal_hl = "cal_hl";
 	private final String cmd_cal_hl_long = "cal-hl";
+	public boolean cal_hlFlag = false;
 	public double cal_hl = 0;
 	
 	private final String cmd_cal_ho = "cal_ho";
 	private final String cmd_cal_ho_long = "cal-ho";
+	public boolean cal_hoFlag = false;
 	public double cal_ho = 0;
 	
 	private final String cmd_cal_h2_se = "cal_h2_se";
 	private final String cmd_cal_h2_se_long = "cal-h2-se";
+	public boolean cal_h2seFlag = false;
 	public double cal_h2_se = -1;
 	
 	private final String cmd_cal_cc = "cal_cc";
@@ -1311,10 +1314,14 @@ public enum Parameter {
 
 		if (cl.hasOption(cmd_cal_ho)) {
 			cal_ho = Double.parseDouble(cl.getOptionValue(cmd_cal_ho));
+			cal_hoFlag = true;
+			cal_hlFlag = false;
 		}
 
 		if (cl.hasOption(cmd_cal_hl)) {
 			cal_hl = Double.parseDouble(cl.getOptionValue(cmd_cal_hl));
+			cal_hoFlag = false;
+			cal_hlFlag = true;
 		}
 
 		if (cl.hasOption(cmd_cal_cc)) {
@@ -1325,6 +1332,7 @@ public enum Parameter {
 
 		if (cl.hasOption(cmd_cal_h2_se)) {
 			cal_h2_se = Double.parseDouble(cl.getOptionValue(cmd_cal_h2_se));
+			cal_h2seFlag = true;
 		}
 	}
 

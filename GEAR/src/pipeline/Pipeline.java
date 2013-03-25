@@ -105,8 +105,7 @@ public class Pipeline {
 			bedWriter.WriteFile();
 
 		} else if (Parameter.INSTANCE.calOption) {
-			H2Transformer H2 = null;
-			H2 = new H2Transformer();
+			H2Transformer H2 = new H2Transformer();
 			H2.H2();
 
 		} else if (Parameter.INSTANCE.nontransFlag) {
