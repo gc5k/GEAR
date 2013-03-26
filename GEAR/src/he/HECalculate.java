@@ -33,6 +33,7 @@ public class HECalculate {
 	private RealMatrix Mat_B;
 	private int dim = 0;
 	private int Len = 0;
+	private double grmCutoff = 0;
 
 	public HECalculate(HERead h) {
 		heReader = h;
@@ -43,11 +44,15 @@ public class HECalculate {
 
 		heReader.lambda = new Lambda();
 
+		if (Parameter.INSTANCE.getHEParameter().isAbsGrmCutoff()) {
+			grmCutoff = Parameter.INSTANCE.getHEParameter().AbsGrmCutoff();
+		} else if (Parameter.INSTANCE.getHEParameter().isGrmCutoff()) {
+			grmCutoff = Parameter.INSTANCE.getHEParameter().GrmCutoff();
+		}
 		String line;
 		
 		// ************************keep
 		if (heReader.keepFile != null) {
-			File keepF = new File(heReader.keepFile);
 			BufferedReader reader = FileProcessor.FileOpen(heReader.keepFile);
 			boolean[] ff = new boolean[heReader.flag.length];
 			Arrays.fill(ff, false);
@@ -155,6 +160,13 @@ public class HECalculate {
 							continue;
 						if (!(heReader.flag[id1] & heReader.flag[id2]))
 							continue;
+						double g = Double.parseDouble(s[3]);
+
+						if (Parameter.INSTANCE.getHEParameter().isAbsGrmCutoff()) {
+							if (Math.abs(g) > grmCutoff) continue;
+						} else if (Parameter.INSTANCE.getHEParameter().isGrmCutoff()) {
+							if (g > grmCutoff) continue;
+						}
 						double ds = 0;
 						
 						switch (heReader.heType) {
@@ -190,7 +202,6 @@ public class HECalculate {
 						}
 						heReader.yyProd += ds * ds;
 						heReader.XtX[0][0]++;
-						double g = Double.parseDouble(s[3]);
 						heReader.XtX[0][1] += g;
 						heReader.XtX[1][0] += g;
 						heReader.XtX[1][1] += g * g;
@@ -258,6 +269,14 @@ public class HECalculate {
 							continue;
 						if (!(heReader.flag[id1] & heReader.flag[id2]))
 							continue;
+						double g = Double.parseDouble(s[3]);
+
+						if (Parameter.INSTANCE.getHEParameter().isAbsGrmCutoff()) {
+							if (Math.abs(g) > grmCutoff) continue;
+						} else if (Parameter.INSTANCE.getHEParameter().isGrmCutoff()) {
+							if (g > grmCutoff) continue;
+						}
+
 						double ds = 0;
 						
 						switch (heReader.heType) {
@@ -293,7 +312,6 @@ public class HECalculate {
 						}
 						heReader.yyProd += ds * ds;
 						heReader.XtX[0][0]++;
-						double g = Double.parseDouble(s[3]);
 						heReader.XtX[0][1] += g;
 						heReader.XtX[1][0] += g;
 						heReader.XtX[1][1] += g * g;
@@ -362,6 +380,13 @@ public class HECalculate {
 							continue;
 						if (!(heReader.flag[id1] & heReader.flag[id2]))
 							continue;
+
+						if (Parameter.INSTANCE.getHEParameter().isAbsGrmCutoff()) {
+							if (Math.abs(g) > grmCutoff) continue;
+						} else if (Parameter.INSTANCE.getHEParameter().isGrmCutoff()) {
+							if (g > grmCutoff) continue;
+						}
+
 						double ds = 0;
 						
 						switch (heReader.heType) {
@@ -457,6 +482,15 @@ public class HECalculate {
 		
 		heReader.sb.append("grm: " + heReader.grmFile + "\n");
 		heReader.sb.append("grm id: " + heReader.grmID + "\n");
+		
+		if (Parameter.INSTANCE.getHEParameter().isGrmCutoff()) {
+			heReader.sb.append("grm cutoff is: " + grmCutoff + "\n");
+		}
+
+		if (Parameter.INSTANCE.getHEParameter().isAbsGrmCutoff()) {
+			heReader.sb.append("grm absolute cutoff is: |" + grmCutoff + "|\n");
+		}
+
 		heReader.sb.append("keep list: " + heReader.keepFile + "\n");
 		heReader.sb.append("pheno: " + heReader.phenoFile + "\n");
 		heReader.sb.append("mpheno: ");
@@ -503,6 +537,7 @@ public class HECalculate {
 		}
 		
 		heReader.sb.append("In total " + Len + " matched individuals.\n");
+		heReader.sb.append("In total read " + ((int) (heReader.lambda.N)) + " lines in the grm file.\n");
 		heReader.sb.append("\n========================\n");
 		heReader.sb.append("Coef\t" + "Estimate \t" + "se" + "\n");
 
