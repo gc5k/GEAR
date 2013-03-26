@@ -9,6 +9,7 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.PrintWriter;
 import java.text.DecimalFormat;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Set;
@@ -23,12 +24,15 @@ import org.apache.commons.math.linear.Array2DRowRealMatrix;
 import he.endian.LittleEndianDataInputStream;
 
 import parameter.Parameter;
+import util.FileProcessor;
 
 public class HECalculate {
 
 	private final String delim = "\\s+";
 	private HERead heReader;
 	private RealMatrix Mat_B;
+	private int dim = 0;
+	private int Len = 0;
 
 	public HECalculate(HERead h) {
 		heReader = h;
@@ -40,6 +44,62 @@ public class HECalculate {
 		heReader.lambda = new Lambda();
 
 		String line;
+		
+		// ************************keep
+		if (heReader.keepFile != null) {
+			File keepF = new File(heReader.keepFile);
+			BufferedReader reader = FileProcessor.FileOpen(heReader.keepFile);
+			boolean[] ff = new boolean[heReader.flag.length];
+			Arrays.fill(ff, false);
+			try {
+				while ((line = reader.readLine()) != null) {
+					String[] s = line.split(delim);
+					StringBuilder sb = new StringBuilder(s[0] + "." + s[1]);
+					if (heReader.ID2Idx.containsKey(sb.toString())) {
+						int ii = heReader.ID2Idx.get(sb.toString());
+						ff[ii] = true;
+					}
+				}
+				reader.close();
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
+			for (int i = 0; i < ff.length; i++) {
+				heReader.flag[i] &= ff[i];
+			}
+		}
+		Len = 0;
+		for (int i = 0; i < heReader.flag.length; i++)
+			if (heReader.flag[i])
+				Len++;
+		dim = Len * (Len - 1) / 2;
+		
+		// ************************************standardising
+		double[] ss = new double[heReader.y[0].length - 1];
+		double[] ssx = new double[heReader.y[0].length - 1];
+		for (int i = 0; i < heReader.flag.length; i++) {
+			if (!heReader.flag[i])
+				continue;
+			for (int j = 0; j < ss.length; j++) {
+				ss[j] += heReader.y[i][j + 1];
+				ssx[j] += heReader.y[i][j + 1] * heReader.y[i][j + 1];
+			}
+		}
+		double[] sd = new double[ssx.length];
+		for (int i = 0; i < sd.length; i++) {
+			ss[i] /= Len;
+			sd[i] = Math.sqrt((ssx[i] - Len * ss[i] * ss[i]) / (Len - 1));
+		}
+		if (Parameter.INSTANCE.scale) {
+			System.out.println("standardising phentoype.");
+			for (int i = 0; i < heReader.flag.length; i++) {
+				if (!heReader.flag[i])
+					continue;
+				for (int j = 1; j < heReader.y[i].length; j++) {
+					heReader.y[i][j] = (heReader.y[i][j] - ss[j - 1]) / sd[j - 1];
+				}
+			}
+		}
 		if (heReader.reverse) {
 			// try {
 			// while ((line = heReader.is.readLine()) != null) {
@@ -315,14 +375,44 @@ public class HECalculate {
 			heReader.sb.append(heReader.mpheno[i] + " ");
 		}
 		heReader.sb.append("\n");
+
+		if (Parameter.INSTANCE.qcovar_file != null) {
+			heReader.sb.append("quantitative covariate file: " + Parameter.INSTANCE.qcovar_file + "\n");
+			heReader.sb.append("quantitative covariate index: ");
+			if (Parameter.INSTANCE.qcovar_num == null) {
+				heReader.sb.append("all");
+			} else {
+				for (int i = 0; i < Parameter.INSTANCE.qcovar_num.length; i++) {
+					heReader.sb.append(Parameter.INSTANCE.qcovar_num[i] + " ");
+				}
+			}
+			heReader.sb.append("\n");
+		}
+
+		if (Parameter.INSTANCE.covar_file != null) {
+			heReader.sb.append("quality covariate file: " + Parameter.INSTANCE.covar_file + "\n");
+			heReader.sb.append("quality covariate index: ");
+			if (Parameter.INSTANCE.covar_num == null) {
+				heReader.sb.append("all");
+			} else {
+				for (int i = 0; i < Parameter.INSTANCE.covar_num.length; i++) {
+					heReader.sb.append(Parameter.INSTANCE.covar_num[i] + " ");
+				}
+			}
+			heReader.sb.append("\n");
+		}
+
 		if (Parameter.INSTANCE.eh2Flag) {
 			heReader.sb.append("Empirical h2: " + Parameter.INSTANCE.eh2 + "\n");
 		}
 
 		heReader.sb.append("reverse: " + heReader.reverse + "\n");
+		heReader.sb.append("Scale : " + Parameter.INSTANCE.scale + "\n");
 		if (heReader.k_button) {
 			heReader.sb.append("k: " + heReader.k + "\n");
 		}
+		
+		heReader.sb.append("In total " + Len + " matched individuals.\n");
 		heReader.sb.append("\n========================\n");
 		heReader.sb.append("Coef\t" + "Estimate \t" + "se" + "\n");
 
