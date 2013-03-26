@@ -407,6 +407,7 @@ public enum Parameter {
 		
 		@SuppressWarnings("static-access")
 		private void commandInitial() {
+			ops.addOption(OptionBuilder.withLongOpt(cmd_grm_txt_long).withDescription("grm text format").hasArg().create(cmd_grm_txt));
 			ops.addOption(OptionBuilder.withLongOpt(cmd_grm_bin_long).withDescription("grm binary format").hasArg().create(cmd_grm_bin));
 			ops.addOption(OptionBuilder.withDescription("grm ").hasArg().create(cmd_grm));
 			ops.addOption(OptionBuilder.withDescription("pheno ").hasArg().create(cmd_pheno));
@@ -423,12 +424,21 @@ public enum Parameter {
 				StringBuilder sb2 = new StringBuilder(cl.getOptionValue(cmd_grm));
 				grm_id = sb2.append(".grm.id").toString();
 				isGrmBinary_ = false;
+				isGrmTxt_ = false;
 			} else if (cl.hasOption(cmd_grm_bin)) {
 				StringBuilder sb1 = new StringBuilder(cl.getOptionValue(cmd_grm_bin));
 				grm_ = sb1.append(".grm.bin").toString();
 				StringBuilder sb2 = new StringBuilder(cl.getOptionValue(cmd_grm_bin));
 				grm_id = sb2.append(".grm.id").toString();
 				isGrmBinary_ = true;
+				isGrmTxt_ = false;
+			} else if (cl.hasOption(cmd_grm_txt)) {
+				StringBuilder sb1 = new StringBuilder(cl.getOptionValue(cmd_grm_txt));
+				grm_ = sb1.append(".grm.txt").toString();
+				StringBuilder sb2 = new StringBuilder(cl.getOptionValue(cmd_grm_txt));
+				grm_id = sb2.append(".grm.id").toString();
+				isGrmBinary_ = false;
+				isGrmTxt_ = true;
 			}
 
 			if (cl.hasOption(cmd_pheno)) {
@@ -458,6 +468,7 @@ public enum Parameter {
 		public HEType getType() { return type; }
 		
 		public boolean isGrmBinary() { return isGrmBinary_; }
+		public boolean isGrmTxt() { return isGrmTxt_; }
 		public String getGrm() { return grm_; }
 		public String getGrmId() { return grm_id; }
 		
@@ -472,12 +483,15 @@ public enum Parameter {
 		private final String cmd_cp_long = "he-cp";
 		
 		private HEType type;
-		
+
+		private final String cmd_grm_txt = "grm_txt";
+		private final String cmd_grm_txt_long = "grm-txt";
 		private final String cmd_grm_bin = "grm_bin";
 		private final String cmd_grm_bin_long = "grm-bin";
 		private final String cmd_grm = "grm";
 		
 		private boolean isGrmBinary_;
+		private boolean isGrmTxt_;
 		private String grm_;
 		private String grm_id = null;
 		
