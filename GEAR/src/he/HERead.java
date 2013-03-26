@@ -210,8 +210,6 @@ public class HERead {
 	
 	public static void main(String[] args) {
 		Parameter.INSTANCE.commandListener(args);
-		HERegression HER = new HERegression();
-		HER.Regression();
 	}
 
 }
