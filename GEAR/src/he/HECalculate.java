@@ -138,7 +138,97 @@ public class HECalculate {
 			// e.printStackTrace();
 			// }
 		} else {
-			if (!Parameter.INSTANCE.getHEParameter().isGrmBinary()) {
+			if (Parameter.INSTANCE.getHEParameter().isGrmTxt()) {
+				heReader.XtX = new double[2][2];
+				heReader.XtY = new double[2];
+
+				// *************************************read grm text file
+				BufferedReader grmFile = FileProcessor.FileOpen(heReader.grmFile);
+
+				try {
+					HashMap<Double, Integer> cat = new HashMap<Double, Integer>();
+					while ((line = grmFile.readLine()) != null) {
+						String[] s = line.split(delim);
+						int id1 = Integer.parseInt(s[0]) - 1;
+						int id2 = Integer.parseInt(s[1]) - 1;
+						if (id1 == id2)
+							continue;
+						if (!(heReader.flag[id1] & heReader.flag[id2]))
+							continue;
+						double ds = 0;
+						
+						switch (heReader.heType) {
+						case SD:
+							ds = (heReader.y[id1][1] - heReader.y[id2][1]) *
+							     (heReader.y[id1][1] - heReader.y[id2][1]);
+							break;
+						case SS:
+							ds = (heReader.y[id1][1] + heReader.y[id2][1]) *
+							     (heReader.y[id1][1] + heReader.y[id2][1]);
+							break;
+						case CP:
+							ds = heReader.y[id1][1] * heReader.y[id2][1];
+							break;
+						default:
+							// TODO: assert false or throw exception
+							break;
+						}
+
+						if (cat.containsKey(heReader.y[id1][1])) {
+							Integer I = (Integer) cat.get(heReader.y[id1][1]);
+							I++;
+							cat.put(heReader.y[id1][1], I);
+						} else {
+							cat.put(heReader.y[id1][1], 1);
+						}
+						if (cat.containsKey(heReader.y[id2][1])) {
+							Integer I = (Integer) cat.get(heReader.y[id2][1]);
+							I++;
+							cat.put(heReader.y[id2][1], I);
+						} else {
+							cat.put(heReader.y[id2][1], 1);
+						}
+						heReader.yyProd += ds * ds;
+						heReader.XtX[0][0]++;
+						double g = Double.parseDouble(s[3]);
+						heReader.XtX[0][1] += g;
+						heReader.XtX[1][0] += g;
+						heReader.XtX[1][1] += g * g;
+
+						heReader.XtY[0] += ds;
+						heReader.XtY[1] += g * ds;
+
+						heReader.lambda.XYProd += g * ds;
+						heReader.lambda.XXProd += g * g;
+						heReader.lambda.SY += ds;
+						heReader.lambda.SX += g;
+
+						heReader.lambda.N++;
+					}
+
+					if (cat.size() == 2) {
+						heReader.isCC = true;
+						Set<Double> set = cat.keySet();
+						Iterator<Double> it = set.iterator();
+						Double k1 = it.next();
+						Double k2 = it.next();
+						Integer c1 = cat.get(k1);
+						Integer c2 = cat.get(k2);
+
+						if (k1 > k2) {
+							heReader.P = c1.doubleValue()
+									/ (c1.doubleValue() + c2.doubleValue());
+						} else {
+							heReader.P = c2.doubleValue()
+									/ (c1.doubleValue() + c2.doubleValue());
+						}
+					}
+					grmFile.close();
+
+				} catch (IOException e) {
+					e.printStackTrace();
+				}
+			} else if (!Parameter.INSTANCE.getHEParameter().isGrmBinary()) {
 				heReader.XtX = new double[2][2];
 				heReader.XtY = new double[2];
 				// *************************************read grm file
