@@ -9,7 +9,6 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.PrintWriter;
-import java.util.HashMap;
 import java.util.zip.GZIPInputStream;
 
 import parameter.Parameter;
@@ -27,11 +26,16 @@ public class GRMStat {
 	private double Ne = 0;
 	private double Me = 0;
 
-	StringBuffer sb = new StringBuffer();
+	private StringBuffer sb = new StringBuffer();
 	
 	public GRMStat() {
+	}
+	
+	public void GetGRMStats() {
 		if(Parameter.INSTANCE.getHEParameter().isGrmBinary()) {
 			BinaryGRM();
+		} if (Parameter.INSTANCE.getHEParameter().isGrmTxt()) {
+			txtGRM();
 		} else {
 			gzGRM();
 		}
@@ -44,11 +48,11 @@ public class GRMStat {
 		sb.append("Read " + N + " lines." + "\n");
 		sb.append("Individuals: " + s + "\n");
 		sb.append("Mean is " + mean + "\n");
-		sb.append("Variance " + v + "\n");
+		sb.append("Variance is " + v + "\n");
 		sb.append("The effective sample size is " + Ne + "\n");
 		sb.append("Effective number of markers is " + Me + "\n");
 
-		System.out.print(sb);
+		System.out.println(sb);
 
 		StringBuilder fsb = new StringBuilder();
 		fsb.append(Parameter.INSTANCE.out);
@@ -61,6 +65,7 @@ public class GRMStat {
 		}
 		pw.append(sb);
 		pw.close();
+		
 	}
 	
 	private void BinaryGRM() {
@@ -156,6 +161,34 @@ public class GRMStat {
 		getEffectiveNumber();
 	}
 
+	
+	private void txtGRM() {
+
+		BufferedReader grmFile = FileProcessor.FileOpen(Parameter.INSTANCE.getHEParameter().getGrm());
+
+		String line;
+		try {
+			while ((line = grmFile.readLine()) != null) {
+				Nt++;
+				String[] s = line.split(delim);
+				int id1 = Integer.parseInt(s[0]) - 1;
+				int id2 = Integer.parseInt(s[1]) - 1;
+
+				if (id1 == id2)//exclude diagonal if it is required
+					continue;
+				double g = Double.parseDouble(s[3]);
+				mean += g;
+				prod += g*g;
+				N++;
+			}
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+
+		getEffectiveNumber();
+	}
+
 	private void getEffectiveNumber() {
 		mean /= N;
 		prod /= N;
@@ -163,4 +196,5 @@ public class GRMStat {
 		Ne = -1/mean + 1;
 		Me = 1/v;
 	}
+
 }

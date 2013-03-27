@@ -127,6 +127,7 @@ public class Pipeline {
 
 		} else if (Parameter.INSTANCE.grmstatFlag) {
 			GRMStat gs = new GRMStat();
+			gs.GetGRMStats();
 			
 		}
 		
