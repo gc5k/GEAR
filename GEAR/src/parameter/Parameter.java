@@ -407,8 +407,8 @@ public enum Parameter {
 		
 		@SuppressWarnings("static-access")
 		private void commandInitial() {
-			ops.addOption(OptionBuilder.withLongOpt(cmd_grm_cut_off_long).withDescription("grm cut-off").hasArg().create(cmd_grm_cut_off));
-			ops.addOption(OptionBuilder.withLongOpt(cmd_abs_grm_cut_off_long).withDescription("grm absolute cut-off").hasArg().create(cmd_abs_grm_cut_off));
+			ops.addOption(OptionBuilder.withLongOpt(cmd_grm_cutoff_long).withDescription("grm cut-off").hasArg().create(cmd_grm_cutoff));
+			ops.addOption(OptionBuilder.withLongOpt(cmd_abs_grm_cutoff_long).withDescription("grm absolute cut-off").hasArg().create(cmd_abs_grm_cutoff));
 
 			ops.addOption(OptionBuilder.withLongOpt(cmd_grm_txt_long).withDescription("grm text format").hasArg().create(cmd_grm_txt));
 			ops.addOption(OptionBuilder.withLongOpt(cmd_grm_bin_long).withDescription("grm binary format").hasArg().create(cmd_grm_bin));
@@ -444,14 +444,14 @@ public enum Parameter {
 				isGrmTxt_ = true;
 			}
 
-			if (cl.hasOption(cmd_grm_cut_off)) {
-				GrmCutoff_ = Double.parseDouble(cl.getOptionValue(cmd_grm_cut_off));
+			if (cl.hasOption(cmd_grm_cutoff)) {
+				GrmCutoff_ = Double.parseDouble(cl.getOptionValue(cmd_grm_cutoff));
 				GrmCutoffFlag_ = true;
 				AbsGrmCutoffFlag_ = false;
 			}
 
-			if (cl.hasOption(cmd_abs_grm_cut_off)) {
-				AbsGrmCutoff_ = Double.parseDouble(cl.getOptionValue(cmd_abs_grm_cut_off));
+			if (cl.hasOption(cmd_abs_grm_cutoff)) {
+				AbsGrmCutoff_ = Double.parseDouble(cl.getOptionValue(cmd_abs_grm_cutoff));
 				AbsGrmCutoffFlag_ = true;
 				GrmCutoffFlag_ = false;
 			}
@@ -506,12 +506,12 @@ public enum Parameter {
 		
 		private HEType type;
 
-		private final String cmd_grm_cut_off = "grm_cut_off";
-		private final String cmd_grm_cut_off_long = "grm-cut-off";
+		private final String cmd_grm_cutoff = "grm_cutoff";
+		private final String cmd_grm_cutoff_long = "grm-cutoff";
 		private double GrmCutoff_ = 0;
 		private boolean GrmCutoffFlag_ = false; 
-		private final String cmd_abs_grm_cut_off = "grm_abs_cut_off";
-		private final String cmd_abs_grm_cut_off_long = "grm-abs-cut-off";
+		private final String cmd_abs_grm_cutoff = "grm_abs_cutoff";
+		private final String cmd_abs_grm_cutoff_long = "grm-abs-cutoff";
 		private double AbsGrmCutoff_ = 0;
 		private boolean AbsGrmCutoffFlag_ = false; 
 		
