@@ -25,10 +25,17 @@ public class GRMStat {
 	private double v = 0;
 	private double Ne = 0;
 	private double Me = 0;
+	private double grmCutoff = 0;
 
 	private StringBuffer sb = new StringBuffer();
 	
 	public GRMStat() {
+		if (Parameter.INSTANCE.getHEParameter().isAbsGrmCutoff()) {
+			grmCutoff = Parameter.INSTANCE.getHEParameter().AbsGrmCutoff();
+		} else if (Parameter.INSTANCE.getHEParameter().isGrmCutoff()) {
+			grmCutoff = Parameter.INSTANCE.getHEParameter().GrmCutoff();
+		}
+
 	}
 	
 	public void GetGRMStats() {
@@ -112,6 +119,12 @@ public class GRMStat {
 				if (id1 == id2)
 					continue;
 
+				if (Parameter.INSTANCE.getHEParameter().isAbsGrmCutoff()) {
+					if (Math.abs(g) > grmCutoff) continue;
+				} else if (Parameter.INSTANCE.getHEParameter().isGrmCutoff()) {
+					if (g > grmCutoff) continue;
+				}
+
 				mean += g;
 				prod += g*g;
 				N++;
@@ -149,6 +162,13 @@ public class GRMStat {
 				if (id1 == id2)//exclude diagonal if it is required
 					continue;
 				double g = Double.parseDouble(s[3]);
+				
+				if (Parameter.INSTANCE.getHEParameter().isAbsGrmCutoff()) {
+					if (Math.abs(g) > grmCutoff) continue;
+				} else if (Parameter.INSTANCE.getHEParameter().isGrmCutoff()) {
+					if (g > grmCutoff) continue;
+				}
+
 				mean += g;
 				prod += g*g;
 				N++;
@@ -161,7 +181,6 @@ public class GRMStat {
 		getEffectiveNumber();
 	}
 
-	
 	private void txtGRM() {
 
 		BufferedReader grmFile = FileProcessor.FileOpen(Parameter.INSTANCE.getHEParameter().getGrm());
@@ -177,6 +196,13 @@ public class GRMStat {
 				if (id1 == id2)//exclude diagonal if it is required
 					continue;
 				double g = Double.parseDouble(s[3]);
+
+				if (Parameter.INSTANCE.getHEParameter().isAbsGrmCutoff()) {
+					if (Math.abs(g) > grmCutoff) continue;
+				} else if (Parameter.INSTANCE.getHEParameter().isGrmCutoff()) {
+					if (g > grmCutoff) continue;
+				}
+
 				mean += g;
 				prod += g*g;
 				N++;
