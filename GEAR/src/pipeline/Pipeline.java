@@ -35,6 +35,12 @@ public class Pipeline {
 		Calendar calendar = Calendar.getInstance();
 		System.out.println("\nThe analysis started at: " + calendar.getTime() + "\n");
 
+		System.out.println("Options received: ");
+		for (int i = 0; i < args.length; i++) {
+			System.out.print(args[i] + " ");
+		}
+		System.out.println("\n");
+
 		if (Parameter.INSTANCE.shFlag) {
 			HPC hps = new HPC(args);
 			hps.GenScript();
