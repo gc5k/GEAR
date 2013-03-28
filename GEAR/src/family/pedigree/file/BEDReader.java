@@ -147,7 +147,7 @@ public class BEDReader extends PedigreeFile {
 				BFamilyStruct bf = familystructure.get(Famid.get(j));
 				BPerson per = bf.getPerson(Individualid.get(j));
 				int tByte = j >> 2;
-				int tBite = (j - (j >> 2 << 2)) << 1;
+				int tBite = (j & 0x3) << 1;
 				int g1 = (g[tByte] >> tBite) & 3;
 //				if (g1 == 0) {
 //					AlleleFreq[c][0] += 2;
