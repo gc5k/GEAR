@@ -1,5 +1,7 @@
 package family.pedigree.genotype;
 
+import family.plink.PLINKParser;
+import family.plink.PLINKBinaryParser;
 import parameter.Parameter;
 
 /**
@@ -194,19 +196,33 @@ public class BPerson {
 		alleles[posByte] |= g << posBite;
 	}
 
-	public void addAllMarker(byte[] g) {
-		for (int i = 0; i < g.length; i++) {
-			int posByte = i >> 2; // one int holds 4 bytes.
-			int posBiteShift =  (i & 0x3) << 3;
-			int gn = 0;
-			switch(g[i]) {
-				case 2: gn = 1; break;
-				case 0: gn = 0; break;
-				case 3: gn = 2; break;
-				default: gn = 3; break;//missing
+	public void addAllMarker(byte[] genoBytes) {
+		for (int genoByteIdx = 0; genoByteIdx < genoBytes.length; ++genoByteIdx) {
+			int alleleIntIdx = genoByteIdx >> 2;  // one int consists of 4 bytes
+			int bitPosInIntOfThisByte = (genoByteIdx & 0x3) << 3;
+			
+			// One byte can store 4 genotypes
+			for (int genoIdxInByte = 0; genoIdxInByte < 4; ++genoIdxInByte) {
+				int plinkGeno = (genoBytes[genoByteIdx] >> (genoIdxInByte << 1)) & 0x3;
+				int gearGeno = gear.ConstValues.BINARY_MISSING_GENOTYPE;
+				
+				switch (plinkGeno) {
+				case PLINKBinaryParser.HOMOZYGOTE_FIRST:
+					gearGeno = gear.ConstValues.BINARY_HOMOZYGOTE_FIRST;
+					break;
+				case PLINKBinaryParser.HETEROZYGOTE:
+					gearGeno = gear.ConstValues.BINARY_HETEROZYGOTE;
+					break;
+				case PLINKBinaryParser.HOMOZYGOTE_SECOND:
+					gearGeno = gear.ConstValues.BINARY_HOMOZYGOTYE_SECOND;
+					break;
+				case PLINKBinaryParser.MISSING_GENOTYPE:
+					gearGeno = gear.ConstValues.BINARY_MISSING_GENOTYPE;
+					break;
+				}
+				
+				alleles[alleleIntIdx] |= gearGeno << bitPosInIntOfThisByte << (genoIdxInByte << 1);
 			}
-
-			alleles[posByte] |= gn << posBiteShift;
 		}
 	}
 
