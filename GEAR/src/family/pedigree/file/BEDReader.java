@@ -21,7 +21,7 @@ public class BEDReader extends PedigreeFile {
 	public String FamFile;
 	private int n_individual = 0;
 	private ArrayList<String> Famid;
-	private ArrayList<String> Individualid;
+	private ArrayList<BPerson> persons;
 	private MapFile mapData;
 
 	public BEDReader(String famF, int numMark, MapFile mapdata) {
@@ -34,7 +34,7 @@ public class BEDReader extends PedigreeFile {
 	@Override
 	public void initial() throws IOException {
 		Famid = NewIt.newArrayList();
-		Individualid = NewIt.newArrayList();
+		persons = NewIt.newArrayList();
 
 		BufferedReader reader = new BufferedReader(new FileReader(FamFile));
 		AlleleSet = new char[num_marker][];
@@ -50,15 +50,15 @@ public class BEDReader extends PedigreeFile {
 		while ((line = reader.readLine()) != null) {
 			String[] tokens = line.split("\\s+");
 
-			BPerson per = new BPerson(num_marker);
+			BPerson person = new BPerson(num_marker);
 			Famid.add(tokens[0]);
-			Individualid.add(tokens[1]);
-			per.setFamilyID(tokens[0]);
-			per.setPersonID(tokens[1]);
-			per.setDadID(tokens[2]);
-			per.setMomID(tokens[3]);
-			per.setGender(Integer.parseInt(tokens[4]));
-			per.setAffectedStatus(tokens[5]);
+
+			person.setFamilyID(tokens[0]);
+			person.setPersonID(tokens[1]);
+			person.setDadID(tokens[2]);
+			person.setMomID(tokens[3]);
+			person.setGender(Integer.parseInt(tokens[4]));
+			person.setAffectedStatus(tokens[5]);
 			SixthCol.add(tokens[5]);
 			
 			hukou = new Hukou(tokens[0], tokens[1], tokens[2], tokens[3], tokens[4], tokens[5]);
@@ -67,11 +67,12 @@ public class BEDReader extends PedigreeFile {
 				famstr = new BFamilyStruct(tokens[0]);
 				familystructure.put(tokens[0], famstr);
 			}
-			if (famstr.getPersons().containsKey(per.getPersonID())) {
-				throw new IOException("Person " + per.getPersonID() + " in family " + per.getFamilyID() + " appears more than once.");
+			if (famstr.getPersons().containsKey(person.getPersonID())) {
+				throw new IOException("Person " + person.getPersonID() + " in family " + person.getFamilyID() + " appears more than once.");
 			}
 			HukouBook.add(hukou);
-			famstr.addPerson(per);
+			famstr.addPerson(person);
+			persons.add(person);
 			n_individual++;
 		}
 		Is6ColBinary();
@@ -89,7 +90,7 @@ public class BEDReader extends PedigreeFile {
 			System.err.println("cannot open pedigree file.");
 		}
 		byte[] magic = new byte[3];
-		int n = in.read(magic, 0, 3);
+		in.read(magic, 0, 3);
 		if (magic[2] == 1) {
 			System.err.println("reading data in plink snp-major mode.");
 			snp_major(in, numMarkerInFile, WSNP);
@@ -116,14 +117,12 @@ public class BEDReader extends PedigreeFile {
 		byte[] geno = new byte[L];
 		byte[] extract_geno = new byte[exL];
 		for (int i = 0; i < n_individual; i++) {
-			int n = in.read(geno, 0, L);
-			BFamilyStruct bf = familystructure.get(Famid.get(i));
-			BPerson per = bf.getPerson(Individualid.get(i));
+			in.read(geno, 0, L);
 			extract_geno = extractGenotype(geno, numMarkerInFile, WSNP);
-			per.addAllMarker(extract_geno);			
+			persons.get(i).addAllMarker(extract_geno);			
 		}
 		Famid = null;
-		Individualid = null;
+		persons = null;
 	}
 
 	private void snp_major(BufferedInputStream in, int numMarkerInFile, int[] WSNP) throws IOException {
@@ -137,27 +136,17 @@ public class BEDReader extends PedigreeFile {
 
 		int c = 0;
 		for (int i = 0; i < numMarkerInFile; i++) {
-			int n = in.read(g, 0, L);
+			in.read(g, 0, L);
 			int idx = ArrayUtils.indexOf(WSNP, i);
 			if (idx < 0)
 				continue;
 			int posByte = c >> BPerson.shift;
 			int posBite = (i & 0xf) << 1;
 			for (int j = 0; j < n_individual; j++) {
-				BFamilyStruct bf = familystructure.get(Famid.get(j));
-				BPerson per = bf.getPerson(Individualid.get(j));
 				int tByte = j >> 2;
 				int tBite = (j & 0x3) << 1;
 				int g1 = (g[tByte] >> tBite) & 3;
-//				if (g1 == 0) {
-//					AlleleFreq[c][0] += 2;
-//				} else if (g1 == 2) {
-//					AlleleFreq[c][0]++;
-//					AlleleFreq[c][1]++;
-//				} else if (g1 == 3) {
-//					AlleleFreq[c][1] += 2;
-//				}
-				per.addByteGenotype(g1, posByte, posBite);
+				persons.get(j).addByteGenotype(g1, posByte, posBite);
 			}
 			c++;
 		}
