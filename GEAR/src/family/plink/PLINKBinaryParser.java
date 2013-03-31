@@ -6,6 +6,11 @@ import family.pedigree.file.BEDReader;
 import family.pedigree.file.BIMReader;
 
 public class PLINKBinaryParser extends PLINKParser {
+	
+	public static final int HOMOZYGOTE_FIRST = 0x0;
+	public static final int HETEROZYGOTE = 0x2;
+	public static final int HOMOZYGOTE_SECOND = 0x3;
+	public static final int MISSING_GENOTYPE = 0x1;
 
 	protected String FamFile;
 	public PLINKBinaryParser(String ped, String map, String fam) {

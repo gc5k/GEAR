@@ -16,8 +16,17 @@ import org.junit.Test;
 public class PLINKBinaryParserTest {
 
 	@Test
-	public void test() {
-		PLINKBinaryParser parser = new PLINKBinaryParser("data/sim.bed", "data/sim.bim", "data/sim.fam");
+	public void testSnpMajor() {
+		test("data/sim.bed", "data/sim.bim", "data/sim.fam");
+	}
+	
+	@Test
+	public void testIndividualMajor() {
+		test("data/sim_ind_major.bed", "data/sim_ind_major.bim", "data/sim_ind_major.fam");
+	}
+	
+	public void test(String bed, String bim, String fam) {
+		PLINKBinaryParser parser = new PLINKBinaryParser(bed, bim, fam);
 		parser.Parse();
 		
 		PedigreeFile pedData = parser.getPedigreeData();
