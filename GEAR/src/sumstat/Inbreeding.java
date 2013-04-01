@@ -3,15 +3,11 @@ package sumstat;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.PrintWriter;
-import java.text.DecimalFormat;
-import java.text.NumberFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Iterator;
-
-import org.apache.commons.math.MathException;
-import org.apache.commons.math.stat.inference.ChiSquareTestImpl;
+import java.util.Set;
 
 import parameter.Parameter;
 import sumstat.qc.rowqc.SumStatQC;
@@ -19,11 +15,10 @@ import test.Test;
 import util.FileProcessor;
 import util.NewIt;
 import util.TextHelper;
-import util.stat.FastFisherExactTest;
 
 import family.pedigree.PersonIndex;
 import family.pedigree.file.MapFile;
-import family.pedigree.file.SNP;
+import family.pedigree.genotype.BPerson;
 import family.plink.PLINKBinaryParser;
 import family.plink.PLINKParser;
 import family.popstat.GenotypeMatrix;
@@ -43,8 +38,10 @@ public class Inbreeding {
 	private int[] IndGroup;
 	private double[][] w;
 	private double[] Fst;
+	
+	private int missing = -1;
 
-	private ArrayList<String> GroupInfor = NewIt.newArrayList();
+//	private ArrayList<String> GroupInfor = NewIt.newArrayList();
 	
 	public Inbreeding() {
 		PLINKParser pp = null;
@@ -86,24 +83,24 @@ public class Inbreeding {
 		Fst = new double[numMarker];
 		for (int i = 0; i < g.length; i++) {
 			int idx = IndGroup[i];
+			if (idx == missing) continue;
 			for (int j = 0; j < numMarker; j++) {
 				int[] c = G.getBiAlleleGenotype(i, j);
-				if (c[0]==0) {
+				if (c[0]==1) {
 					maf[j]++;
 					mafGroup[j][idx]++;
 				}
-				if (c[1]==0) {
+				if (c[1]==1) {
 					maf[j]++;
 					mafGroup[j][idx]++;
 				}
-				if (c[1]!=2) {
+				if (c[1]!=BPerson.MissingAlleleCode) {
 					w[j][idx]++;
 					N[j]++;
 				}
 			}
 		}
 
-		
 		PrintWriter fstOut = null;
 		try {
 			fstOut = new PrintWriter(new String(Parameter.INSTANCE.out + ".fst"));
@@ -120,7 +117,11 @@ public class Inbreeding {
 			double f = 0;
 			maf[i] = maf[i]/(2*N[i]);
 			for (int j = 0; j < groupID.size(); j++) {
-				mafGroup[i][j] = mafGroup[i][j]/(2*w[i][j]);
+				if (w[i][j] != 0) {
+					mafGroup[i][j] = mafGroup[i][j]/(2*w[i][j]);
+				} else {
+					mafGroup[i][j] = 0;
+				}
 				w[i][j] = w[i][j]/(N[i]);
 			}
 
@@ -141,7 +142,7 @@ public class Inbreeding {
 	public void readGroupInfor() {
 		ArrayList<PersonIndex> pt = ssQC.getSample();
 		IndGroup = new int[pt.size()];
-		Arrays.fill(IndGroup, -1);
+		Arrays.fill(IndGroup, missing);
 		int i = 0;
 		for (Iterator<PersonIndex> e = pt.iterator(); e.hasNext();) {
 			PersonIndex pi = e.next();
@@ -184,6 +185,26 @@ public class Inbreeding {
 		indKeep[0] = (String[]) famList.toArray(new String[0]);
 		indKeep[1] = (String[]) indList.toArray(new String[0]);
 		indKeep[2] = (String[]) groupList.toArray(new String[0]);
-	}
+		
+		
+		Set<String> k = groupID.keySet();
+		String[] g = new String[k.size()];
+		for (Iterator<String> e = k.iterator(); e.hasNext(); ) {
+			String K = e.next();
+			int idx = groupID.get(K).intValue();
+			g[idx] = K;
+		}
 
+		PrintWriter fstGrp = null;
+		try {
+			fstGrp = new PrintWriter(new String(Parameter.INSTANCE.out + ".fst.grp"));
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+		
+		for (int i = 0; i < g.length; i++) {
+			fstGrp.append(g[i] + " " + (i+1) + "\n");
+		}
+		fstGrp.close();
+	}
 }
