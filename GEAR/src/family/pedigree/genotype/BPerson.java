@@ -187,12 +187,6 @@ public class BPerson {
 	}
 
 	public void addByteGenotype(int g, int posByte, int posBite) {
-		switch(g) {
-			case 2: g = 1; break;
-			case 0: break;
-			case 3: g = 2; break;
-			default: g = 3; break;//missing
-		}
 		alleles[posByte] |= g << posBite;
 	}
 
@@ -204,23 +198,7 @@ public class BPerson {
 			// One byte can store 4 genotypes
 			for (int genoIdxInByte = 0; genoIdxInByte < 4; ++genoIdxInByte) {
 				int plinkGeno = (genoBytes[genoByteIdx] >> (genoIdxInByte << 1)) & 0x3;
-				int gearGeno = gear.ConstValues.BINARY_MISSING_GENOTYPE;
-				
-				switch (plinkGeno) {
-				case PLINKBinaryParser.HOMOZYGOTE_FIRST:
-					gearGeno = gear.ConstValues.BINARY_HOMOZYGOTE_FIRST;
-					break;
-				case PLINKBinaryParser.HETEROZYGOTE:
-					gearGeno = gear.ConstValues.BINARY_HETEROZYGOTE;
-					break;
-				case PLINKBinaryParser.HOMOZYGOTE_SECOND:
-					gearGeno = gear.ConstValues.BINARY_HOMOZYGOTYE_SECOND;
-					break;
-				case PLINKBinaryParser.MISSING_GENOTYPE:
-					gearGeno = gear.ConstValues.BINARY_MISSING_GENOTYPE;
-					break;
-				}
-				
+				int gearGeno = PLINKBinaryParser.convertToGearGenotype(plinkGeno);
 				alleles[alleleIntIdx] |= gearGeno << bitPosInIntOfThisByte << (genoIdxInByte << 1);
 			}
 		}
