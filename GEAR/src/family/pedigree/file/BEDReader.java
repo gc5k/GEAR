@@ -16,6 +16,7 @@ import util.NewIt;
 import family.pedigree.Hukou;
 import family.pedigree.genotype.BFamilyStruct;
 import family.pedigree.genotype.BPerson;
+import family.plink.PLINKBinaryParser;
 
 public class BEDReader extends PedigreeFile {
 	public String FamFile;
@@ -124,34 +125,7 @@ public class BEDReader extends PedigreeFile {
 		Famid = null;
 		persons = null;
 	}
-
-	private void snp_major(BufferedInputStream in, int numMarkerInFile, int[] WSNP) throws IOException {
-		int L = 0;
-		if (n_individual % 4 == 0) {
-			L = n_individual / 4;
-		} else {
-			L = n_individual / 4 + 1;
-		}
-		byte[] g = new byte[L];
-
-		int c = 0;
-		for (int i = 0; i < numMarkerInFile; i++) {
-			in.read(g, 0, L);
-			int idx = ArrayUtils.indexOf(WSNP, i);
-			if (idx < 0)
-				continue;
-			int posByte = c >> BPerson.shift;
-			int posBite = (i & 0xf) << 1;
-			for (int j = 0; j < n_individual; j++) {
-				int tByte = j >> 2;
-				int tBite = (j & 0x3) << 1;
-				int g1 = (g[tByte] >> tBite) & 3;
-				persons.get(j).addByteGenotype(g1, posByte, posBite);
-			}
-			c++;
-		}
-	}
-
+	
 	private byte[] extractGenotype(byte[] g, int numMarkerInFile, int[] WSNP) {
 
 		int exL = 0;
@@ -184,5 +158,36 @@ public class BEDReader extends PedigreeFile {
 			c++;
 		}
 		return Exg;
+	}
+	
+	private static int[][] constructSnpMajorGenotypeByteConvertTable() {
+		int [][] table = new int[0x100][4];
+		for (int byteValue = 0; byteValue <= 0xff; ++byteValue) {
+			for (int indIdx = 0; indIdx < 4; ++indIdx) {
+				table[byteValue][indIdx] = PLINKBinaryParser.convertToGearGenotype((byteValue >> (indIdx << 1)) & 0x3);
+			}
+		}
+		return table;
+	}
+
+	private void snp_major(BufferedInputStream in, int numMarkerInFile, int[] WSNP) throws IOException {
+		byte[] g = new byte[(n_individual + 3) / 4];
+		int[][] genoByteCvtTable = constructSnpMajorGenotypeByteConvertTable();
+		int snpIdx = 0;
+		for (int i = 0; i < numMarkerInFile; i++) {
+			in.read(g, 0, g.length);
+			if (ArrayUtils.indexOf(WSNP, i) >= 0) {
+				int indIdx = 0;
+				int posByte = snpIdx >> BPerson.shift;
+				int posBite = (i & 0xf) << 1;
+				for (int byteIdx = 0; byteIdx < g.length; ++byteIdx) {
+					int[] genoValues = genoByteCvtTable[g[byteIdx] & 0xff];  // 0xff is necessary here, otherwise Java will sign extend the byte
+					for (int j = 0; j < 4 && indIdx < n_individual; ++j, ++indIdx) {
+						persons.get(indIdx).addByteGenotype(genoValues[j], posByte, posBite);
+					}
+				}
+				snpIdx++;
+			}
+		}
 	}
 }

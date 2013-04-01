@@ -13,9 +13,26 @@ public class PLINKBinaryParser extends PLINKParser {
 	public static final int MISSING_GENOTYPE = 0x1;
 
 	protected String FamFile;
+	
 	public PLINKBinaryParser(String ped, String map, String fam) {
 		super(ped, map);
 		FamFile = fam;
+	}
+	
+	public static int convertToGearGenotype(int plinkGenotype) {
+		switch (plinkGenotype) {
+		case PLINKBinaryParser.HOMOZYGOTE_FIRST:
+			return gear.ConstValues.BINARY_HOMOZYGOTE_FIRST;
+		case PLINKBinaryParser.HETEROZYGOTE:
+			return gear.ConstValues.BINARY_HETEROZYGOTE;
+		case PLINKBinaryParser.HOMOZYGOTE_SECOND:
+			return gear.ConstValues.BINARY_HOMOZYGOTYE_SECOND;
+		case PLINKBinaryParser.MISSING_GENOTYPE:
+			return gear.ConstValues.BINARY_MISSING_GENOTYPE;
+		default:
+			assert false;
+			return gear.ConstValues.BINARY_MISSING_GENOTYPE;
+		}
 	}
 
 	@Override
