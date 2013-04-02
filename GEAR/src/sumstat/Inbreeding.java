@@ -107,7 +107,7 @@ public class Inbreeding {
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
-		fstOut.print("Chr\tSNP\tPos\tRefA"+ "\t");
+		fstOut.print("CHR\tSNP\tBP\tRefA"+ "\t");
 		for (int i = 0; i < groupID.size(); i++) {
 			fstOut.print("prop" + (i+1) + "\t" + "Freq" + (i+1) + "\t" + "NInd" + (i+1) + "\t");
 		}

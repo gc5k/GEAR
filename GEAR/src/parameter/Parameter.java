@@ -69,6 +69,7 @@ public enum Parameter {
 		public double getThresholdUpper() { return thresholdUpper; }
 		public double getThresholdLower() { return thresholdLower; }
 		public int getMarkerNumber() { return markerNumber; }
+		public boolean getMarkerNumberFlag() { return markerNumberFlag; }
 		public String getSnps() { return snps; }
 		
 		@SuppressWarnings("static-access")
@@ -102,6 +103,7 @@ public enum Parameter {
 					System.err.println("realcheck marker number should be greater than 0");
 					System.exit(0);
 				}
+				markerNumberFlag = true;
 			}
 
 			if (cl.hasOption(cmd_snps)) {
@@ -121,6 +123,7 @@ public enum Parameter {
 		private final String cmd_marker_number = "realcheck_marker_number";
 		private final String cmd_marker_number_long = "realcheck-marker-number";
 		private int markerNumber = 100;
+		private boolean markerNumberFlag = false;
 
 		private final String cmd_snps = "realcheck_snps";
 		private final String cmd_snps_long = "realcheck-snps";
