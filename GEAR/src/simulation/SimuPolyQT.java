@@ -1,5 +1,9 @@
 package simulation;
 
+import gear.util.FileProcessor;
+import gear.util.NewIt;
+import gear.util.TextHelper;
+
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.DataOutputStream;
@@ -13,9 +17,6 @@ import java.util.Arrays;
 import java.util.Calendar;
 
 import parameter.Parameter;
-import util.FileProcessor;
-import util.NewIt;
-import util.TextHelper;
 
 import org.apache.commons.math.linear.Array2DRowRealMatrix;
 import org.apache.commons.math.linear.RealMatrix;

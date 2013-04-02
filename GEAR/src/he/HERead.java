@@ -1,5 +1,6 @@
 package he;
 
+import gear.util.FileProcessor;
 import he.covar.HeCov;
 
 import java.io.BufferedReader;
@@ -17,7 +18,6 @@ import java.util.Set;
 import java.util.zip.GZIPInputStream;
 
 import parameter.Parameter;
-import util.FileProcessor;
 
 import org.apache.commons.math.MathException;
 import org.apache.commons.math.linear.*;

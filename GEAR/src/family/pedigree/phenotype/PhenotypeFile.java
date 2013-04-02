@@ -14,8 +14,8 @@ import parameter.Parameter;
 import family.pedigree.Hukou;
 import family.pedigree.phenotype.FamilyUnit;
 import family.pedigree.phenotype.Subject;
+import gear.util.NewIt;
 
-import util.NewIt;
 
 /**
  * 

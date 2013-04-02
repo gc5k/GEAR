@@ -12,8 +12,8 @@ import java.util.Calendar;
 
 import family.plink.PLINKBinaryParser;
 import family.plink.PLINKParser;
+import gear.util.NewIt;
 
-import util.NewIt;
 
 import parameter.AboutInfo;
 import parameter.Parameter;

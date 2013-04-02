@@ -11,7 +11,6 @@ import java.util.Map.Entry;
 import org.apache.commons.lang3.ArrayUtils;
 
 import parameter.Parameter;
-import util.NewIt;
 
 import family.pedigree.genotype.GenoSet;
 
@@ -26,6 +25,7 @@ import family.pedigree.file.MapFile;
 import family.pedigree.file.PedigreeFile;
 import family.pedigree.genotype.BFamilyStruct;
 import family.pedigree.genotype.BPerson;
+import gear.util.NewIt;
 
 public class AJHG2008 extends ChenBase {
 

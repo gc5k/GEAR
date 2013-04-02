@@ -1,10 +1,11 @@
 package family.pedigree.genotype;
 
 
+import gear.util.NewIt;
+
 import java.util.TreeMap;
 
 import parameter.Parameter;
-import util.NewIt;
 /**
 *
 * @author Guo-Bo Chen, chenguobo@gmail.com

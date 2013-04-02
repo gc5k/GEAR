@@ -11,12 +11,12 @@ import java.util.ArrayList;
 
 import org.apache.commons.lang3.ArrayUtils;
 
-import util.NewIt;
 
 import family.pedigree.Hukou;
 import family.pedigree.genotype.BFamilyStruct;
 import family.pedigree.genotype.BPerson;
 import family.plink.PLINKBinaryParser;
+import gear.util.NewIt;
 
 public class BEDReader extends PedigreeFile {
 	public String FamFile;

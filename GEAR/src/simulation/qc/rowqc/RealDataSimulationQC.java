@@ -10,8 +10,8 @@ import family.pedigree.file.PedigreeFile;
 import family.pedigree.genotype.BFamilyStruct;
 import family.pedigree.genotype.BPerson;
 import family.qc.rowqc.SampleFilter;
+import gear.util.NewIt;
 
-import util.NewIt;
 
 /**
  * 

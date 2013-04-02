@@ -1,6 +1,6 @@
 package profile.struct;
 
-import util.SNPMatch;
+import gear.util.SNPMatch;
 
 public class DosageInfor {
 	private String delim = "\\s+";

@@ -4,8 +4,8 @@ import java.util.TreeMap;
 import java.util.TreeSet;
 
 import family.RabinowitzLairdAlgorithm.AbstractGenoDistribution;
+import gear.util.NewIt;
 
-import util.NewIt;
 
 /**
  * 

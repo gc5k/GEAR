@@ -12,9 +12,6 @@ import java.util.Set;
 import parameter.Parameter;
 import sumstat.qc.rowqc.SumStatQC;
 import test.Test;
-import util.FileProcessor;
-import util.NewIt;
-import util.TextHelper;
 
 import family.pedigree.PersonIndex;
 import family.pedigree.file.MapFile;
@@ -23,6 +20,9 @@ import family.plink.PLINKBinaryParser;
 import family.plink.PLINKParser;
 import family.popstat.GenotypeMatrix;
 import family.qc.rowqc.SampleFilter;
+import gear.util.FileProcessor;
+import gear.util.NewIt;
+import gear.util.TextHelper;
 
 public class Inbreeding {
 	private GenotypeMatrix G;

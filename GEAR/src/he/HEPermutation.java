@@ -1,5 +1,7 @@
 package he;
 
+import gear.util.NewIt;
+import gear.util.Sample;
 import he.endian.LittleEndianDataInputStream;
 
 import java.io.BufferedReader;
@@ -27,8 +29,6 @@ import org.apache.commons.math.linear.Array2DRowRealMatrix;
 import org.apache.commons.math.stat.descriptive.DescriptiveStatistics;
 
 import parameter.Parameter;
-import util.NewIt;
-import util.Sample;
 
 public class HEPermutation {
 

@@ -14,10 +14,10 @@ import family.pedigree.file.MapFile;
 import family.pedigree.file.PedigreeFile;
 import family.pedigree.genotype.BFamilyStruct;
 import family.pedigree.genotype.BPerson;
+import gear.util.FileProcessor;
+import gear.util.NewIt;
+import gear.util.TextHelper;
 
-import util.FileProcessor;
-import util.NewIt;
-import util.TextHelper;
 
 /**
  * 

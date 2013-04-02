@@ -21,11 +21,11 @@ import family.pedigree.genotype.BPerson;
 import family.plink.PLINKBinaryParser;
 import family.plink.PLINKParser;
 import family.qc.rowqc.SampleFilter;
+import gear.util.FileProcessor;
+import gear.util.NewIt;
 import simulation.qc.rowqc.*;
 import simulation.gm.RealDataSimulationGenotypeMatrix;
 import test.Test;
-import util.FileProcessor;
-import util.NewIt;
 
 
 public class RealDataSimulation {

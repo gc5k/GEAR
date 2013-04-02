@@ -8,11 +8,11 @@ import parameter.Parameter;
 import pscontrol.hierarchy.AJHG2008;
 import pscontrol.write.NonTransWriteBedSNPMajor;
 import test.Test;
-import util.NewIt;
 import family.pedigree.PersonIndex;
 import family.plink.PLINKBinaryParser;
 import family.plink.PLINKParser;
 import family.qc.rowqc.SampleFilter;
+import gear.util.NewIt;
 
 public class NonTransmitted {
 	private String casualLociFile = null;

@@ -12,9 +12,6 @@ import org.apache.commons.math.random.RandomDataImpl;
 
 import parameter.Parameter;
 import test.Test;
-import util.FileProcessor;
-import util.NewIt;
-import util.TextHelper;
 import family.pedigree.PersonIndex;
 import family.pedigree.file.SNP;
 import family.pedigree.genotype.BPerson;
@@ -22,6 +19,9 @@ import family.plink.PLINKBinaryParser;
 import family.plink.PLINKParser;
 import family.popstat.GenotypeMatrix;
 import family.qc.rowqc.SampleFilter;
+import gear.util.FileProcessor;
+import gear.util.NewIt;
+import gear.util.TextHelper;
 
 public class RealCheck {
 	private GenotypeMatrix G1;

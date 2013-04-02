@@ -3,8 +3,8 @@ package family.RabinowitzLairdAlgorithm.rabinowitz;
 import java.util.TreeMap;
 
 import family.RabinowitzLairdAlgorithm.AbstractGenoDistribution;
+import gear.util.NewIt;
 
-import util.NewIt;
 /**
 *
 * @author Guo-Bo Chen, chenguobo@gmail.com

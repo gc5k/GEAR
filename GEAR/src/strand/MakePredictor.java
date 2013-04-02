@@ -14,8 +14,6 @@ import parameter.Parameter;
 import parameter.RegressionModel;
 import parameter.AboutInfo;
 import test.Test;
-import util.FileProcessor;
-import util.NewIt;
 import family.pedigree.PersonIndex;
 import family.pedigree.file.SNP;
 import family.pedigree.genotype.BPerson;
@@ -23,10 +21,12 @@ import family.plink.PLINKBinaryParser;
 import family.plink.PLINKParser;
 import family.popstat.GenotypeMatrix;
 import family.qc.rowqc.SampleFilter;
+import gear.util.FileProcessor;
+import gear.util.NewIt;
+import gear.util.SNPMatch;
+import gear.util.stat.Z;
+import gear.util.structure.Predictor;
 
-import util.SNPMatch;
-import util.stat.Z;
-import util.structure.Predictor;
 
 public class MakePredictor {
 	private GenotypeMatrix G1;

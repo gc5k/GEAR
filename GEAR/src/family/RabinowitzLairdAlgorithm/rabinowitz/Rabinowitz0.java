@@ -2,7 +2,7 @@ package family.RabinowitzLairdAlgorithm.rabinowitz;
 
 import java.util.TreeMap;
 import family.RabinowitzLairdAlgorithm.AbstractGenoDistribution;
-import util.NewIt;
+import gear.util.NewIt;
 
 /**
  * 

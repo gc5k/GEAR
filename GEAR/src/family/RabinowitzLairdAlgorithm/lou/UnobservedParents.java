@@ -6,9 +6,9 @@ import java.util.TreeSet;
 import java.util.ArrayList;
 
 import family.RabinowitzLairdAlgorithm.AbstractGenoDistribution;
+import gear.util.NewIt;
 import parameter.Parameter;
 
-import util.NewIt;
 
 /**
  * Class extends GenoDistribution when neither parental genotype are available

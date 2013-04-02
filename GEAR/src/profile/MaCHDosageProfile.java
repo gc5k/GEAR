@@ -1,5 +1,9 @@
 package profile;
 
+import gear.util.FileProcessor;
+import gear.util.NewIt;
+import gear.util.SNPMatch;
+
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.IOException;
@@ -12,9 +16,6 @@ import parameter.Parameter;
 import profile.struct.DosageInfor;
 import profile.struct.ScoreUnit;
 import profile.struct.QScore;
-import util.FileProcessor;
-import util.NewIt;
-import util.SNPMatch;
 
 public class MaCHDosageProfile {
 	private String delim = "\\s+";

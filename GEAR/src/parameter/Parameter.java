@@ -1,5 +1,7 @@
 package parameter;
 
+import gear.util.NewIt;
+
 import java.io.File;
 import java.util.HashSet;
 import java.util.Iterator;
@@ -14,7 +16,6 @@ import org.apache.commons.cli.ParseException;
 import org.apache.commons.cli.PosixParser;
 
 import test.Test;
-import util.NewIt;
 
 // singleton implemented in enum way
 public enum Parameter {

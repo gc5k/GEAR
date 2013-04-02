@@ -12,9 +12,9 @@ import org.apache.commons.lang3.ArrayUtils;
 import parameter.Parameter;
 import family.pedigree.file.MapFile;
 import family.pedigree.file.SNP;
+import gear.util.NewIt;
 
 import test.Test;
-import util.NewIt;
 
 public class SNPFilterI implements SNPFilterInterface {
 	protected MapFile mapData;

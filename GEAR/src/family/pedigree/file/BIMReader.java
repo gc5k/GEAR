@@ -1,12 +1,13 @@
 package family.pedigree.file;
 
+import gear.util.NewIt;
+
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
 
 import test.Test;
-import util.NewIt;
 
 public class BIMReader extends MapFile {
 
