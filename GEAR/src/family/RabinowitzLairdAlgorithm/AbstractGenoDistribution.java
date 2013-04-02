@@ -1,5 +1,7 @@
 package family.RabinowitzLairdAlgorithm;
 
+import gear.util.NewIt;
+
 import java.util.ArrayList;
 import java.util.Random;
 import java.util.Set;
@@ -7,7 +9,6 @@ import java.util.TreeMap;
 import java.util.TreeSet;
 
 import parameter.Parameter;
-import util.NewIt;
 
 /**
  * An abstract class for Transmitted and Nontransmitted tables

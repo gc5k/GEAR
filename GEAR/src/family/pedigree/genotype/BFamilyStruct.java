@@ -18,7 +18,7 @@ import java.util.Set;
 import java.util.TreeMap;
 
 import family.RabinowitzLairdAlgorithm.AbstractGenoDistribution;
-import util.NewIt;
+import gear.util.NewIt;
 
 /**
  * Storing the familyName and the members of a family from a pedigree file. This class is not thread safe (untested)

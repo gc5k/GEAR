@@ -10,7 +10,6 @@ import java.util.Iterator;
 
 import parameter.Parameter;
 import test.Test;
-import util.FileProcessor;
 
 import family.pedigree.PersonIndex;
 import family.pedigree.file.SNP;
@@ -18,6 +17,7 @@ import family.pedigree.genotype.BPerson;
 import family.plink.PLINKBinaryParser;
 import family.plink.PLINKParser;
 import family.qc.rowqc.SampleFilter;
+import gear.util.FileProcessor;
 
 public class WriteBedSNPMajor {
 	public static byte byte1 = 108;

@@ -1,5 +1,8 @@
 package he.covar;
 
+import gear.util.FileProcessor;
+import gear.util.NewIt;
+
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.util.ArrayList;
@@ -12,8 +15,6 @@ import org.apache.commons.math.linear.RealMatrix;
 
 import parameter.Parameter;
 
-import util.FileProcessor;
-import util.NewIt;
 
 public class HeCov {
 	private final String delim = "\\s+";

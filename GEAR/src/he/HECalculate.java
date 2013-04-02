@@ -21,10 +21,10 @@ import org.apache.commons.math.linear.LUDecompositionImpl;
 import org.apache.commons.math.linear.RealMatrix;
 import org.apache.commons.math.linear.Array2DRowRealMatrix;
 
+import gear.util.FileProcessor;
 import he.endian.LittleEndianDataInputStream;
 
 import parameter.Parameter;
-import util.FileProcessor;
 
 public class HECalculate {
 

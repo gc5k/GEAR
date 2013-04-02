@@ -5,9 +5,9 @@ import java.util.TreeMap;
 import java.util.TreeSet;
 
 import family.RabinowitzLairdAlgorithm.AbstractGenoDistribution;
+import gear.util.NewIt;
 import parameter.Parameter;
 
-import util.NewIt;
 
 /**
  * Class extends GenoDristribution Treat the situation of one heterozygous

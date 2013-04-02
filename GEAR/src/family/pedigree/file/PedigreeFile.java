@@ -16,10 +16,10 @@ import org.apache.commons.lang3.ArrayUtils;
 import parameter.Parameter;
 
 import test.Test;
-import util.NewIt;
 import family.pedigree.Hukou;
 import family.pedigree.genotype.BFamilyStruct;
 import family.pedigree.genotype.BPerson;
+import gear.util.NewIt;
 
 /**
  * @author Guo-Bo Chen, chenguobo@gmail.com

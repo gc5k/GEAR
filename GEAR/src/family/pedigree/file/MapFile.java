@@ -1,5 +1,7 @@
 package family.pedigree.file;
 
+import gear.util.NewIt;
+
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileReader;
@@ -10,7 +12,6 @@ import java.util.HashMap;
 import parameter.Parameter;
 
 import test.Test;
-import util.NewIt;
 
 
 public class MapFile {

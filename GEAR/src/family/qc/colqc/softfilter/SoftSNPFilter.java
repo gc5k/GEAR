@@ -6,9 +6,9 @@ import parameter.Parameter;
 
 import family.popstat.AlleleFrequency;
 import family.qc.colqc.SNPFilterInterface;
+import gear.util.NewIt;
 
 import test.Test;
-import util.NewIt;
 
 public class SoftSNPFilter {
 	

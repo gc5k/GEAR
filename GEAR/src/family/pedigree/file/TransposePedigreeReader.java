@@ -9,9 +9,9 @@ import java.util.ArrayList;
 import parameter.Parameter;
 
 import test.Test;
-import util.NewIt;
 import family.pedigree.genotype.BFamilyStruct;
 import family.pedigree.genotype.BPerson;
+import gear.util.NewIt;
 
 public class TransposePedigreeReader extends PedigreeFile {
 

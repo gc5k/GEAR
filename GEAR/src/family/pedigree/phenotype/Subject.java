@@ -1,8 +1,9 @@
 package family.pedigree.phenotype;
 
+import gear.util.NewIt;
+
 import java.util.ArrayList;
 
-import util.NewIt;
 
 /**
  * stores the phenotypic outcomes of each individual. this class is not thread safe (untested)

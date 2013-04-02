@@ -1,5 +1,6 @@
 package grm;
 
+import gear.util.FileProcessor;
 import he.endian.LittleEndianDataInputStream;
 
 import java.io.BufferedReader;
@@ -12,7 +13,6 @@ import java.io.PrintWriter;
 import java.util.zip.GZIPInputStream;
 
 import parameter.Parameter;
-import util.FileProcessor;
 
 public class GRMStat {
 

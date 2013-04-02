@@ -10,7 +10,6 @@ import parameter.AboutInfo;
 import parameter.Parameter;
 import sumstat.qc.rowqc.SumStatQC;
 import test.Test;
-import util.stat.FastFisherExactTest;
 
 import family.pedigree.file.MapFile;
 import family.pedigree.file.SNP;
@@ -18,6 +17,7 @@ import family.plink.PLINKBinaryParser;
 import family.plink.PLINKParser;
 import family.popstat.GenotypeMatrix;
 import family.qc.rowqc.SampleFilter;
+import gear.util.stat.FastFisherExactTest;
 
 public class FrequencyCalculator {
 	private GenotypeMatrix G;

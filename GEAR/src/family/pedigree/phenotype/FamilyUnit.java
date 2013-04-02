@@ -1,9 +1,10 @@
 package family.pedigree.phenotype;
 
+import gear.util.NewIt;
+
 import java.util.Enumeration;
 import java.util.Hashtable;
 
-import util.NewIt;
 
 /**
  * stores the familyName and the members of a family from a pedigree file this class is not thread safe (untested)
