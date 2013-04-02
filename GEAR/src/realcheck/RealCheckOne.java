@@ -1,21 +1,14 @@
 package realcheck;
 
-import java.io.BufferedReader;
-import java.io.IOException;
 import java.io.PrintStream;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.HashMap;
-import java.util.Iterator;
 
 import org.apache.commons.math.random.RandomDataImpl;
 
-import parameter.AboutInfo;
 import parameter.Parameter;
 import test.Test;
 import util.FileProcessor;
-import util.NewIt;
-import util.TextHelper;
 import family.pedigree.PersonIndex;
 import family.pedigree.file.SNP;
 import family.pedigree.genotype.BPerson;
@@ -27,7 +20,6 @@ import family.qc.rowqc.SampleFilter;
 public class RealCheckOne {
 	private GenotypeMatrix G1;
 
-	private Parameter par;
 	private int[] markerIdx;
 
 	private ArrayList<SNP> snpList;
@@ -60,7 +52,7 @@ public class RealCheckOne {
 	public void Check() {
 
 		StringBuffer sb = new StringBuffer();
-		sb.append(par.out);
+		sb.append(Parameter.INSTANCE.out);
 		sb.append(".real");
 		PrintStream ps = FileProcessor.CreatePrintStream(sb.toString());
 
@@ -123,7 +115,7 @@ public class RealCheckOne {
 		for (int i = 0; i < markerIdx.length; i++) markerIdx[i] = i;
 
 		StringBuffer sb = new StringBuffer();
-		sb.append(par.out);
+		sb.append(Parameter.INSTANCE.out);
 		sb.append(".realsnp");
 
 		PrintStream ps = FileProcessor.CreatePrintStream(sb.toString());
@@ -140,24 +132,30 @@ public class RealCheckOne {
 	public void getRandomMarker() {
 		int mn = 0;
 		int nMarker = sf1.getMapFile().getMarkerList().size();
-		if (Parameter.INSTANCE.getRealCheckParameter().getMarkerNumber() > nMarker) {
-			Test.LOG.append("realcheck marker number was reduced to " + nMarker + "\n");
-			System.err.println("realcheck marker number was reduced to " + nMarker + "\n");
-			mn = nMarker;
+		if (Parameter.INSTANCE.getRealCheckParameter().getMarkerNumberFlag()) {
+			if (Parameter.INSTANCE.getRealCheckParameter().getMarkerNumber() > nMarker) {
+				Test.LOG.append("realcheck marker number was reduced to " + nMarker + "\n");
+				System.err.println("realcheck marker number was reduced to " + nMarker + "\n");
+				mn = nMarker;
+			} else {
+				mn = Parameter.INSTANCE.getRealCheckParameter().getMarkerNumber();
+			}
+			markerIdx = new int[mn];
+			RandomDataImpl rd = new RandomDataImpl();
+			rd.reSeed(Parameter.INSTANCE.seed);
+
+			markerIdx = rd.nextPermutation(markerIdx.length,
+				mn);
+			Arrays.sort(markerIdx);
 		} else {
-			mn = Parameter.INSTANCE.getRealCheckParameter().getMarkerNumber();
+			markerIdx = new int[snpList.size()];			
+			for (int i = 0; i < markerIdx.length; i++) {
+				markerIdx[i] = i; 
+			}
 		}
 
-		markerIdx = new int[mn];
-		RandomDataImpl rd = new RandomDataImpl();
-		rd.reSeed(par.seed);
-
-		markerIdx = rd.nextPermutation(markerIdx.length,
-				mn);
-
-		Arrays.sort(markerIdx);
 		StringBuffer sb = new StringBuffer();
-		sb.append(par.out);
+		sb.append(Parameter.INSTANCE.out);
 		sb.append(".realsnp");
 
 		PrintStream ps = FileProcessor.CreatePrintStream(sb.toString());
@@ -169,26 +167,5 @@ public class RealCheckOne {
 					+ snp.getRefAllele() + " " + snp.getSecAllele() + "\n");
 		}
 		ps.close();
-	}
-
-	private ArrayList<String> readRealcheckSNPs() {
-		BufferedReader reader = FileProcessor.FileOpen(Parameter.INSTANCE.getRealCheckParameter().getSnps());
-		String line = null;
-		ArrayList<String> selectedSNP = NewIt.newArrayList();
-		try {
-			while ((line = reader.readLine()) != null) {
-				String[] l = line.split(TextHelper.WHITESPACE_DELIMITER);
-				for (int i = 0; i < l.length; i++) {
-					selectedSNP.add(l[i]);
-				}
-			}
-		} catch (IOException e) {
-			e.printStackTrace(System.err);
-			System.exit(0);
-		}
-		Test.LOG.append("read " + selectedSNP.size() + " markers from " + Parameter.INSTANCE.getRealCheckParameter().getSnps() + ".\n");
-		System.err.println("read " + selectedSNP.size() + " markers from " + Parameter.INSTANCE.getRealCheckParameter().getSnps() + ".");
-
-		return selectedSNP;
 	}
 }

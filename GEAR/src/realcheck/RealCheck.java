@@ -10,7 +10,6 @@ import java.util.Iterator;
 
 import org.apache.commons.math.random.RandomDataImpl;
 
-import parameter.AboutInfo;
 import parameter.Parameter;
 import test.Test;
 import util.FileProcessor;
