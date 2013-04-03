@@ -8,7 +8,6 @@ import family.pedigree.file.PedigreeFile;
 import family.qc.rowqc.SampleFilter;
 
 public class NonTransmittedRowQC {
-	private SampleFilter samFilter;
 	protected MapFile MapData;
 	protected PedigreeFile PedData;
 
@@ -20,8 +19,6 @@ public class NonTransmittedRowQC {
 	public NonTransmittedRowQC(PedigreeFile ped, MapFile map, SampleFilter sf) {
 		MapData = map;
 		PedData = ped;
-		samFilter = sf;
 	}
-	
 	
 }

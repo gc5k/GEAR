@@ -1,7 +1,5 @@
 package family.qc.colqc;
 
-import java.io.FileNotFoundException;
-import java.io.PrintStream;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashSet;
@@ -13,8 +11,6 @@ import parameter.Parameter;
 import family.pedigree.file.MapFile;
 import family.pedigree.file.SNP;
 import gear.util.NewIt;
-
-import test.Test;
 
 public class SNPFilter implements SNPFilterInterface {
 

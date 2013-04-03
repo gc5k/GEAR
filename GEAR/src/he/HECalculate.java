@@ -31,7 +31,6 @@ public class HECalculate {
 	private final String delim = "\\s+";
 	private HERead heReader;
 	private RealMatrix Mat_B;
-	private int dim = 0;
 	private int Len = 0;
 	private double grmCutoff = 0;
 
@@ -77,7 +76,6 @@ public class HECalculate {
 		for (int i = 0; i < heReader.flag.length; i++)
 			if (heReader.flag[i])
 				Len++;
-		dim = Len * (Len - 1) / 2;
 		
 		// ************************************standardising
 		double[] ss = new double[heReader.y[0].length - 1];

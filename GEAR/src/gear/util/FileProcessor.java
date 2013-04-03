@@ -10,8 +10,6 @@ import java.io.InputStreamReader;
 import java.io.PrintStream;
 import java.util.zip.GZIPInputStream;
 
-import parameter.Parameter;
-
 import test.Test;
 
 public class FileProcessor {

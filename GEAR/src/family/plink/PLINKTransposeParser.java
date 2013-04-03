@@ -2,7 +2,6 @@ package family.plink;
 
 import java.io.IOException;
 
-import parameter.Parameter;
 import family.pedigree.file.MapFile;
 import family.pedigree.file.TransposePedigreeReader;
 

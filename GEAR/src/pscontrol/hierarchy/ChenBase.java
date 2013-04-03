@@ -9,7 +9,6 @@ import family.pedigree.PersonIndex;
 import family.pedigree.file.MapFile;
 import family.pedigree.file.PedigreeFile;
 import gear.util.NewIt;
-import gear.util.Sample;
 
 
 /**

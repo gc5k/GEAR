@@ -19,7 +19,7 @@ import family.RabinowitzLairdAlgorithm.lou.HeterozygousParent;
 import family.RabinowitzLairdAlgorithm.lou.HomozygousParent;
 import family.RabinowitzLairdAlgorithm.lou.ObservedParents;
 import family.RabinowitzLairdAlgorithm.lou.UnobservedParents;
-import family.pedigree.Hukou;
+
 import family.pedigree.PersonIndex;
 import family.pedigree.file.MapFile;
 import family.pedigree.file.PedigreeFile;
@@ -44,8 +44,8 @@ public class AJHG2008 extends ChenBase {
 
 		ArrayList<Integer> SibIdx = NewIt.newArrayList();
 
-		int c = 0;
-		int s = 0;
+//		int c = 0;
+//		int s = 0;
 		for (String fi : PedData.getFamListSorted()) {
 			BFamilyStruct fs = Fam.get(fi);
 			String[] pi = fs.getPersonListSorted();
@@ -62,7 +62,7 @@ public class AJHG2008 extends ChenBase {
 					s_P.add(new PersonIndex(fs.getFamilyStructName(), pseudoper
 							.getPersonID(), pseudoper, true, false));
 					si++;
-					s++;
+//					s++;
 				}
 
 			}
@@ -74,7 +74,7 @@ public class AJHG2008 extends ChenBase {
 				}
 				fam_has_sib.put(fs.getFamilyStructName(), fs);
 			}
-			c++;
+//			c++;
 		}
 		PersonTable.addAll(s_P);
 

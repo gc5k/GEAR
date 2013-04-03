@@ -1,6 +1,5 @@
 package family.plink;
 
-import java.io.File;
 import java.io.IOException;
 
 import test.Test;

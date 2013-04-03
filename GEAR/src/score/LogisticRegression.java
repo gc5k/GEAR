@@ -50,30 +50,30 @@ public class LogisticRegression {
 	}
 
 	public void MLE() {
-		RealMatrix Matrix_X = new RealMatrixImpl(X);
+		RealMatrix Matrix_X = new Array2DRowRealMatrix(X);
 		RealMatrix Matrix_XT = Matrix_X.transpose();
 
 		int iter = 0;
-		RealMatrix B_old = new RealMatrixImpl(B);
-		RealMatrix B_new = new RealMatrixImpl(B);
+		RealMatrix B_old = new Array2DRowRealMatrix(B);
+		RealMatrix B_new = new Array2DRowRealMatrix(B);
 		calculate_P(B);
 		LogLikelihood_old = Likelihood();
-		RealMatrix Matrix_W = new RealMatrixImpl(getWMatrix());
+		RealMatrix Matrix_W = new Array2DRowRealMatrix(getWMatrix());
 		RealMatrix Matrix_XT_W = Matrix_XT.multiply(Matrix_W);
 		RealMatrix Matrix_XT_W_X = Matrix_XT_W.multiply(Matrix_X);
-		if(Matrix_XT_W_X.isSingular()) {
+		if(!(new LUDecompositionImpl(Matrix_XT_W_X).getSolver().isNonSingular())) {
 			System.err.println("covariate matrix is singular.");
 			Test.LOG.append("covariate matrix is singular.\n");
 			Test.printLog();
 			System.exit(0);
 		}
-		RealMatrix Inv_XT_W_X = Matrix_XT_W_X.inverse();
+		RealMatrix Inv_XT_W_X = new LUDecompositionImpl(Matrix_XT_W_X).getSolver().getInverse();
 		RealMatrix Inv_XT_W_X_XT = Inv_XT_W_X.multiply(Matrix_XT);
 		do {
 			B_old = B_new;
 			LogLikelihood_old = LogLikelihood_new;
 			B = B_old.getColumn(0);
-			RealMatrix Vector_Res = new RealMatrixImpl(getResiduals1());
+			RealMatrix Vector_Res = new Array2DRowRealMatrix(getResiduals1());
 			RealMatrix Vector_H = Inv_XT_W_X_XT.multiply(Vector_Res);
 			B_new = B_old.add(Vector_H);
 			calculate_P(B_new.getColumn(0));

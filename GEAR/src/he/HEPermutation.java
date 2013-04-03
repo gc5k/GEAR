@@ -97,7 +97,7 @@ public class HEPermutation {
 		String line;
  
 		heReader.lambda = new Lambda();
-		double[][] y=permuteY();
+//		double[][] y=permuteY();
 		if (heReader.reverse) {
 //			try {
 //				while ((line = heReader.is.readLine()) != null) {

@@ -3,7 +3,6 @@ package pscontrol;
 import java.util.ArrayList;
 import java.util.Iterator;
 
-import parameter.AboutInfo;
 import parameter.Parameter;
 import pscontrol.hierarchy.AJHG2008;
 import pscontrol.write.NonTransWriteBedSNPMajor;
@@ -15,11 +14,11 @@ import family.qc.rowqc.SampleFilter;
 import gear.util.NewIt;
 
 public class NonTransmitted {
-	private String casualLociFile = null;
-	private int[] casualLociIdx = null;
+//	private String casualLociFile = null;
+//	private int[] casualLociIdx = null;
 	private PLINKParser pp = null;
 	private SampleFilter sf = null;
-	private NonTransmitted QC = null;
+//	private NonTransmitted QC = null;
 
 	public NonTransmitted() {
 		System.err.println("--nontrans procedure.");

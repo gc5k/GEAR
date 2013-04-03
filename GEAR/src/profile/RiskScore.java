@@ -1,25 +1,17 @@
 package profile;
 
 import java.io.BufferedReader;
-import java.io.DataOutputStream;
-import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.PrintStream;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
-import java.util.Iterator;
 
 import parameter.Parameter;
-import parameter.RegressionModel;
-import profile.struct.DosageInfor;
 import profile.struct.QScore;
 import profile.struct.ScoreUnit;
 import test.Test;
-import family.pedigree.PersonIndex;
 import family.pedigree.file.SNP;
-import family.pedigree.genotype.BPerson;
 import family.plink.PLINKBinaryParser;
 import family.plink.PLINKParser;
 import family.popstat.GenotypeMatrix;
@@ -27,28 +19,25 @@ import family.qc.rowqc.SampleFilter;
 import gear.util.FileProcessor;
 import gear.util.NewIt;
 import gear.util.SNPMatch;
-import gear.util.stat.Z;
-import gear.util.structure.Predictor;
-
 
 public class RiskScore {
 	private String delim = "\\s+";
 	private GenotypeMatrix G1;
 
-	private int[][] comSNPIdx;
-	private double[][] allelefreq1;
-	private double[] N1;
-	private double[] N2;
-	private ArrayList<Boolean> flag;
+//	private int[][] comSNPIdx;
+//	private double[][] allelefreq1;
+//	private double[] N1;
+//	private double[] N2;
+//	private ArrayList<Boolean> flag;
 	private HashMap<String, ScoreUnit> Score = NewIt.newHashMap();
 
 	private String q_score_file;
 	private String q_score_range_file;
 	
 	private String scoreFile;
-	private String[] title;
+//	private String[] title;
 	private ArrayList<SNP> snpList1;
-	private ArrayList<Predictor> predictorList = NewIt.newArrayList();
+//	private ArrayList<Predictor> predictorList = NewIt.newArrayList();
 	private HashMap<String, QScore> QS = NewIt.newHashMap();
 	private double[][] q_score_range;
 	private String[] QRName;
@@ -194,7 +183,7 @@ public class RiskScore {
 		int[] matchScheme = new int[5];
 
 		double[][] riskProfile = new double[G1.getGRow()][QRName.length];
-		int[] CC = new int[G1.getGRow()];
+//		int[] CC = new int[G1.getGRow()];
 		for(int i = 0; i < snpList1.size(); i++) {
 
 			boolean[] qsL2Flag = new boolean[QRName.length];
@@ -350,7 +339,7 @@ public class RiskScore {
 		}
 		double[] riskProfile = new double[G1.getGRow()];
 		int[] GCInd = new int[G1.getGRow()];
-		int[] CC = new int[G1.getGRow()];
+//		int[] CC = new int[G1.getGRow()];
 		for(int i = 0; i < snpList1.size(); i++) {
 			SNP snp = snpList1.get(i);
 			char a1 = snp.getRefAllele();
