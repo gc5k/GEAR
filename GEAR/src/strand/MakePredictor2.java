@@ -1,9 +1,6 @@
 package strand;
 
 import java.io.BufferedReader;
-import java.io.DataOutputStream;
-import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.PrintStream;
 import java.text.DecimalFormat;
@@ -11,12 +8,9 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
 
-import parameter.AboutInfo;
 import parameter.Parameter;
 import test.Test;
-import family.pedigree.PersonIndex;
 import family.pedigree.file.SNP;
-import family.pedigree.genotype.BPerson;
 import family.plink.PLINKBinaryParser;
 import family.plink.PLINKParser;
 import family.popstat.GenotypeMatrix;
@@ -25,7 +19,6 @@ import gear.util.FileProcessor;
 import gear.util.NewIt;
 import gear.util.SNPMatch;
 import gear.util.stat.Z;
-import gear.util.structure.Predictor;
 import gear.util.structure.Predictor2;
 
 
@@ -35,7 +28,7 @@ public class MakePredictor2 {
 	private int[][] comSNPIdx;
 	private double[][] allelefreq1;
 	private double[] N1;
-	private double[] N2;
+//	private double[] N2;
 	private ArrayList<Boolean> flag;
 
 	private String[] title;

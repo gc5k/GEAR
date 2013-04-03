@@ -53,15 +53,15 @@ public class LinearRegression {
 	}
 
 	public void MLE() {
-		RealMatrix Matrix_Y = new RealMatrixImpl(Y);
-		RealMatrix Matrix_X = new RealMatrixImpl(X);
+		RealMatrix Matrix_Y = new Array2DRowRealMatrix(Y);
+		RealMatrix Matrix_X = new Array2DRowRealMatrix(X);
 		RealMatrix Matrix_XT = Matrix_X.transpose();
 		RealMatrix Matrix_XT_X = Matrix_XT.multiply(Matrix_X);
-		if (Matrix_XT_X.isSingular()) {
+		if (!(new LUDecompositionImpl(Matrix_XT_X).getSolver().isNonSingular()) ) { 
 			System.err.println("the covariate matrix is singular.");
 			System.exit(0);
 		}
-		RealMatrix Matrix_XT_X_Ivt = Matrix_XT_X.inverse();
+		RealMatrix Matrix_XT_X_Ivt = new LUDecompositionImpl(Matrix_XT_X).getSolver().getInverse();
 		RealMatrix Matrix_XT_X_Ivt_XT = Matrix_XT_X_Ivt.multiply(Matrix_XT);
 		RealMatrix b = Matrix_XT_X_Ivt_XT.multiply(Matrix_Y);
 		RealMatrix Fitted = Matrix_X.multiply(b);

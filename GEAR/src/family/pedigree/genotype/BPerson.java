@@ -1,6 +1,5 @@
 package family.pedigree.genotype;
 
-import family.plink.PLINKParser;
 import family.plink.PLINKBinaryParser;
 import parameter.Parameter;
 

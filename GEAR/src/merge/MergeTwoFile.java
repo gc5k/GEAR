@@ -10,7 +10,6 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
 
-import parameter.AboutInfo;
 import parameter.Parameter;
 import test.Test;
 import family.pedigree.PersonIndex;

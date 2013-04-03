@@ -11,7 +11,6 @@ import org.apache.commons.math.linear.Array2DRowRealMatrix;
 import org.apache.commons.math.linear.RealMatrix;
 import org.apache.commons.math.random.RandomDataImpl;
 
-import parameter.Parameter;
 
 public class SimuFamily {
 	private RandomDataImpl rnd;
@@ -25,7 +24,6 @@ public class SimuFamily {
 	private double[] LD = null;
 	private double[] rec = null;
 	private double[] maf = null;
-	private double[] effect = null;
 	
 	private PrintWriter pedout = null;
 	private PrintWriter map = null;

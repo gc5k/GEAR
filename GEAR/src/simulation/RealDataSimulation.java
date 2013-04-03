@@ -1,7 +1,6 @@
 package simulation;
 
 import java.io.BufferedReader;
-import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.PrintStream;
 import java.util.ArrayList;
@@ -13,7 +12,6 @@ import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.math.random.RandomDataImpl;
 import org.apache.commons.math.stat.StatUtils;
 
-import parameter.AboutInfo;
 import parameter.Parameter;
 import family.pedigree.PersonIndex;
 import family.pedigree.file.SNP;
@@ -114,7 +112,7 @@ public class RealDataSimulation {
 		sb2.append(".phen");
 		PrintStream ps2 = FileProcessor.CreatePrintStream(sb2.toString());
 		ArrayList<PersonIndex> personTable = rdSimuQC.getSample();
-		int c = 0;
+
 		for (int i = 0; i < sampleSize; i++) {
 			PersonIndex pi = personTable.get(i);
 			ps2.append(pi.getFamilyID() + " " + pi.getIndividualID() + " ");

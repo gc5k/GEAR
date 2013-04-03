@@ -1,7 +1,5 @@
 package family.qc.colqc;
 
-import java.io.FileNotFoundException;
-import java.io.PrintStream;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashSet;
@@ -479,27 +477,6 @@ public class SNPFilterI implements SNPFilterInterface {
 				Arrays.sort(wseq[c]);
 				c++;
 			}
-		}
-	}
-
-	private boolean addBackgroundSNP(int i) {
-		Integer I = new Integer(i);
-		if (bgSNPSet.contains(I)) {
-			return true;
-		} else {
-			bgSNPSet.add(I);
-			includeSNP(i);
-			return false;
-		}
-	}
-
-	private boolean includeSNP(int i) {
-		Integer I = new Integer(i);
-		if (selectedSNPSet.contains(I)) {
-			return true;
-		} else {
-			selectedSNPSet.add(I);
-			return false;
 		}
 	}
 

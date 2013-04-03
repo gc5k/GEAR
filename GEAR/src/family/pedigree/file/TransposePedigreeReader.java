@@ -17,7 +17,6 @@ public class TransposePedigreeReader extends PedigreeFile {
 
 	public String FamFile;
 	public String tPedFile;
-	private int n_individual = 0;
 	private ArrayList<String> Famid;
 	private ArrayList<String> Individualid;
 	private MapFile mapData;
@@ -67,7 +66,6 @@ public class TransposePedigreeReader extends PedigreeFile {
 				familystructure.put(tokens[0], fam);
 			}
 			fam.addPerson(per);
-			n_individual++;
 		}
 	}
 

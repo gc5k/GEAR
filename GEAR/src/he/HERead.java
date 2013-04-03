@@ -5,23 +5,11 @@ import he.covar.HeCov;
 
 import java.io.BufferedReader;
 import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
-import java.io.FileReader;
 import java.io.IOException;
-import java.io.InputStreamReader;
-import java.io.PrintWriter;
 import java.util.Arrays;
 import java.util.HashMap;
-import java.util.Iterator;
-import java.util.Set;
-import java.util.zip.GZIPInputStream;
 
 import parameter.Parameter;
-
-import org.apache.commons.math.MathException;
-import org.apache.commons.math.linear.*;
-import org.apache.commons.math.distribution.*;
 
 public class HERead {
 	private final String delim = "\\s+";

@@ -6,7 +6,6 @@ import java.text.NumberFormat;
 import org.apache.commons.math.MathException;
 import org.apache.commons.math.stat.inference.ChiSquareTestImpl;
 
-import parameter.AboutInfo;
 import parameter.Parameter;
 import sumstat.qc.rowqc.SumStatQC;
 import test.Test;

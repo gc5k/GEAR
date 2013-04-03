@@ -1,5 +1,4 @@
 package he.h2trans;
-import java.text.DecimalFormat;
 
 import parameter.Parameter;
 import org.apache.commons.math.MathException;
