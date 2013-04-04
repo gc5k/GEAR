@@ -15,7 +15,7 @@ import family.plink.PLINKParser;
 import gear.util.NewIt;
 
 
-import parameter.AboutInfo;
+import gear.AboutInfo;
 import parameter.Parameter;
 
 /**

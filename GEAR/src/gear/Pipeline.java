@@ -20,7 +20,6 @@ import strand.MakePredictor2;
 import strand.Strand;
 import sumstat.FrequencyCalculator;
 import sumstat.Inbreeding;
-import parameter.AboutInfo;
 import parameter.Parameter;
 import profile.MaCHDosageProfile;
 import profile.RiskScore;
