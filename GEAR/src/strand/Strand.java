@@ -10,9 +10,9 @@ import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
+import java.util.logging.Level;
 
 import parameter.Parameter;
-import test.Test;
 import family.pedigree.PersonIndex;
 import family.pedigree.file.SNP;
 import family.pedigree.genotype.BPerson;
@@ -21,6 +21,7 @@ import family.plink.PLINKParser;
 import family.popstat.GenotypeMatrix;
 import family.qc.rowqc.SampleFilter;
 import gear.util.FileProcessor;
+import gear.util.Logger;
 import gear.util.NewIt;
 import gear.util.SNPMatch;
 import gear.util.stat.Z;
@@ -59,10 +60,8 @@ public class Strand {
 					                     Parameter.INSTANCE.getBimFile(),
 					                     Parameter.INSTANCE.getFamFile());
 		} else {
-			System.err.println("did not specify files.");
-			Test.LOG.append("did not specify files.\n");
-			Test.printLog();
-			System.exit(0);
+			Logger.printUserError("--bfile is not set.");
+			System.exit(1);
 		}
 		pp1.Parse();
 
@@ -70,8 +69,6 @@ public class Strand {
 		G1 = new GenotypeMatrix(sf1.getSample());
 		PersonTable1 = sf1.getSample();
 		snpList1 = sf1.getMapFile().getMarkerList();
-
-		
 	}
 
 	public void Merge() {
@@ -265,16 +262,14 @@ public class Strand {
 
 		ps.close();
 		ps1.close();
-		if(qualified_snp == 0) {
-			Test.LOG.append(qualified_snp + " common SNPs between two snp files.\nexit");
-			System.err.println(qualified_snp + " common SNPs between two snp files.exit");
-			System.exit(0);
+		if (qualified_snp == 0) {
+			Logger.printUserError("Number of common SNPs between the two SNP files: None");
+			System.exit(1);
 		} else {
-			Test.LOG.append(qualified_snp + " common SNPs can be used between two snp files.\n");
-			System.err.println(qualified_snp + " common SNPs can be used between two snp files.");
+			Logger.printUserLog("Number of common SNPs between the two SNP files: " + qualified_snp);
 		}
 
-		System.err.println("flag " + flag.size() + ": snpCoding " + snpCoding.size());
+		Logger.printUserLog("flag " + flag.size() + ": snpCoding " + snpCoding.size());
 		WriteFile();
 	}
 
@@ -299,13 +294,11 @@ public class Strand {
 			}
 		}
 
-		if(c == 0) {
-			Test.LOG.append(0 + " common SNPs between two snp files.\nexit");
-			System.err.println(c + " common SNPs between two snp files.exit");
-			System.exit(0);
+		if (c == 0) {
+			Logger.printUserError("Number of common SNPs between the two SNP files: None");
+			System.exit(1);
 		} else {
-			Test.LOG.append(c + " common SNPs between two snp files.\n");
-			System.err.println(c + " common SNPs between two snp files.");
+			Logger.printUserLog("Number of common SNPs between the two SNP files: " + c);
 		}
 
 		comSNPIdx = new int[2][c];
@@ -319,8 +312,7 @@ public class Strand {
 				idx1++;
 			}
 		}
-		System.out.println("idx1 "+ idx1);
-
+		Logger.printUserLog("idx1 "+ idx1);
 	}
 
 	public void CalculateAlleleFrequency(GenotypeMatrix G, double[][] frq, double[] n) {
@@ -347,7 +339,6 @@ public class Strand {
 	}
 
 	public void readStrand() {
-		
 		BufferedReader reader = FileProcessor.FileOpen(Parameter.INSTANCE.getStrandFile());
 		String line;
 		try {
@@ -359,9 +350,11 @@ public class Strand {
 				mafList.add(maf);
 			}
 		} catch (IOException e) {
-			e.printStackTrace();
+			Logger.printUserError("An exception occurred when reading the strand file '" + Parameter.INSTANCE.getStrandFile() + "'.");
+			Logger.printUserError("Exception Message: " + e.getMessage());
+			Logger.getDevLogger().log(Level.SEVERE, "Reading strand file", e);
+			System.exit(1);
 		}
-
 	}
 	
 	public void WriteFile() {
@@ -397,7 +390,9 @@ public class Strand {
 		try {
 			os = new DataOutputStream(new FileOutputStream(sbed.toString()));
 		} catch (FileNotFoundException e) {
-			e.printStackTrace();
+			Logger.printUserError("Cannot create file '" + sbed.toString() + "'.");
+			Logger.printUserError("Exception Message: " + e.getMessage());
+			System.exit(1);
 		}
 
 		try {
@@ -449,7 +444,10 @@ public class Strand {
 
 			os.close();
 		} catch (IOException e) {
-			e.printStackTrace();
+			Logger.printUserError("An exception occurred when writing the bed file '" + sbed.toString() + "'.");
+			Logger.printUserError("Exception Message: " + e.getMessage());
+			Logger.getDevLogger().log(Level.SEVERE, "Writing bed file", e);
+			System.exit(1);
 		}
 	}
 }

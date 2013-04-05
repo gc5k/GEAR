@@ -5,6 +5,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Hashtable;
 import java.util.Iterator;
+import java.util.logging.Level;
 
 import parameter.Parameter;
 
@@ -15,6 +16,7 @@ import family.pedigree.file.PedigreeFile;
 import family.pedigree.genotype.BFamilyStruct;
 import family.pedigree.genotype.BPerson;
 import gear.util.FileProcessor;
+import gear.util.Logger;
 import gear.util.NewIt;
 import gear.util.TextHelper;
 
@@ -57,9 +59,9 @@ public class SampleFilter {
 
 	public void QC() {
 		qualification();
-		if(PersonTable.size() == 0) {
-			System.err.println("no individuals left for analysis.");
-			System.exit(0);
+		if (PersonTable.size() == 0) {
+			Logger.printUserError("No individual is left for analysis.");
+			System.exit(1);
 		}
 	}
 
@@ -124,7 +126,7 @@ public class SampleFilter {
 		boolean flag = true;
 
 		if (Parameter.INSTANCE.keepFlag) {
-			System.err.println("reading keep individuals from : " + Parameter.INSTANCE.keepFile);
+			Logger.printUserLog("Reading kept individuals from '" + Parameter.INSTANCE.keepFile + "'.");
 			readKeepFile();
 			flag = false;
 			String fi = p.getFamilyID();
@@ -137,7 +139,7 @@ public class SampleFilter {
 				}
 			}
 		} else if (Parameter.INSTANCE.removeFlag) {
-			System.err.println("reading remove individuals from : " + Parameter.INSTANCE.removeFile);
+			Logger.printUserLog("Reading removed individuals from '" + Parameter.INSTANCE.removeFile + "'.");
 			readRemoveFile();
 			String fi = p.getFamilyID();
 			String pi = p.getPersonID();
@@ -197,8 +199,10 @@ public class SampleFilter {
 				indList.add(l[1]);
 			}
 		} catch (IOException e) {
-			e.printStackTrace(System.err);
-			System.exit(0);
+			Logger.printUserError("An exception occurred when reading the kept-individual file '" + Parameter.INSTANCE.keepFile + "'.");
+			Logger.printUserError("Exception Message: " + e.getMessage());
+			Logger.getDevLogger().log(Level.SEVERE, "Reading kept-individual file", e);
+			System.exit(1);
 		}
 		indKeep = new String[2][];
 		indKeep[0] = (String[]) famList.toArray(new String[0]);
@@ -218,8 +222,10 @@ public class SampleFilter {
 				indList.add(l[1]);
 			}
 		} catch (IOException e) {
-			e.printStackTrace(System.err);
-			System.exit(0);
+			Logger.printUserError("An exception occurred when reading the removed-individual file '" + Parameter.INSTANCE.removeFile + "'.");
+			Logger.printUserError("Exception Message: " + e.getMessage());
+			Logger.getDevLogger().log(Level.SEVERE, "Reading removed-individual file", e);
+			System.exit(1);
 		}
 		indExclude = new String[2][];
 		indExclude[0] = (String[]) famList.toArray(new String[0]);

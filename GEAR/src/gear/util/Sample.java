@@ -61,11 +61,4 @@ public class Sample {
 		return index;
 	}
 	
-
-	public static void main(String[] args) {
-		for (int i = 0; i < 10000; i++) {
-			System.out.println(i);
-			SampleIndex(0, 10000, 50);
-		}
-	}
 }

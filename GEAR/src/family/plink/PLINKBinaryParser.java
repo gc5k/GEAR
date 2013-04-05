@@ -1,9 +1,11 @@
 package family.plink;
 
 import java.io.IOException;
-import test.Test;
+import java.util.logging.Level;
+
 import family.pedigree.file.BEDReader;
 import family.pedigree.file.BIMReader;
+import gear.util.Logger;
 
 public class PLINKBinaryParser extends PLINKParser {
 	
@@ -40,17 +42,13 @@ public class PLINKBinaryParser extends PLINKParser {
 		mapData = new BIMReader(mapFile);
 		if (mapFile != null) {
 			ParseMapFile();
-			Test.LOG.append("reading " + mapFile + ".\n");
-			Test.LOG.append(mapData.getMarkerNumberOriginal() + " markers in " + mapFile + ".\n");
-			System.err.println("reading " + mapFile + ".");
-			System.err.println(mapData.getMarkerNumberOriginal() + " markers in " + mapFile + ".");
+			Logger.printUserLog("Reading '" + mapFile + "'.");
+			Logger.printUserLog("Marker Number: " + mapData.getMarkerNumberOriginal());
 			pedData = new BEDReader(FamFile, snpFilter.getWorkingSNP().length, mapData);
 			pedData.setHeader(false);
 			ParsePedFile();
-			Test.LOG.append("reading " + pedigreeFile + ".");
-			Test.LOG.append(pedData.getNumIndividuals() + " individuals.\n");
-			System.err.println("reading " + pedigreeFile + ".");
-			System.err.println(pedData.getNumIndividuals() + " individuals.");
+			Logger.printUserLog("Reading '" + pedigreeFile + "'.");
+			Logger.printUserLog("Individual Number: " + pedData.getNumIndividuals());
 		}
 		pedData.cleanup();
 	}
@@ -60,8 +58,10 @@ public class PLINKBinaryParser extends PLINKParser {
 		try {
 			pedData.parseLinkage(pedigreeFile, mapData.getMarkerNumberOriginal(), snpFilter.getWorkingSNP());
 		} catch (IOException e) {
-			System.err.println("Pedgree file initialization exception.");
-			e.printStackTrace(System.err);
+			Logger.printUserError("An exception occurred when parsing the pedigree files.");
+			Logger.printUserError("Exception Message: " + e.getMessage());
+			Logger.getDevLogger().log(Level.SEVERE, "Parsing pedigree files", e);
+			System.exit(1);
 		}
 	}
 }

@@ -8,9 +8,9 @@ import java.util.ArrayList;
 
 import parameter.Parameter;
 
-import test.Test;
 import family.pedigree.genotype.BFamilyStruct;
 import family.pedigree.genotype.BPerson;
+import gear.util.Logger;
 import gear.util.NewIt;
 
 public class TransposePedigreeReader extends PedigreeFile {
@@ -80,10 +80,8 @@ public class TransposePedigreeReader extends PedigreeFile {
 			String[] tokenizer = line.split("\\s+");
 			int numTokens = tokenizer.length;
 			if (colNum != numTokens) {
-				System.err.println("Column number mismatch in tpedfile in line " + (k + 1) + ".");
-				Test.LOG.append("Column number mismatch in tpedfile in line " + (k+1) + ".\n");
-				Test.printLog();
-				System.exit(0);
+				Logger.printUserError("Column number mismatch in tpedfile in line " + (k + 1) + ", expect " + colNum + " column(s), but read " + numTokens);
+				System.exit(1);
 			}
 			mapData.addSNP(tokenizer[1], tokenizer[0], Float.parseFloat(tokenizer[2]), Integer.parseInt(tokenizer[3]));
 

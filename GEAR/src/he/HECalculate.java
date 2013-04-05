@@ -13,6 +13,7 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Set;
+import java.util.logging.Level;
 import java.util.zip.GZIPInputStream;
 
 import org.apache.commons.math.MathException;
@@ -22,6 +23,7 @@ import org.apache.commons.math.linear.RealMatrix;
 import org.apache.commons.math.linear.Array2DRowRealMatrix;
 
 import gear.util.FileProcessor;
+import gear.util.Logger;
 import he.endian.LittleEndianDataInputStream;
 
 import parameter.Parameter;
@@ -94,7 +96,7 @@ public class HECalculate {
 			sd[i] = Math.sqrt((ssx[i] - Len * ss[i] * ss[i]) / (Len - 1));
 		}
 		if (Parameter.INSTANCE.scale) {
-			System.out.println("standardising phentoype.");
+			Logger.printUserLog("Standardising phentoype.");
 			for (int i = 0; i < heReader.flag.length; i++) {
 				if (!heReader.flag[i])
 					continue;
@@ -354,8 +356,9 @@ public class HECalculate {
 				try {
 					fileStream = new FileInputStream(Parameter.INSTANCE.getHEParameter().getGrm());
 				} catch (FileNotFoundException e) {
-					// TODO Auto-generated catch block
-					e.printStackTrace();
+					Logger.printUserError("Cannot open the GRM file '" + Parameter.INSTANCE.getHEParameter().getGrm() + "'.");
+					Logger.printUserError("Exception Message: " + e.getMessage());
+					System.exit(1);
 				}
 				DataInputStream bigEndianDataStream = new DataInputStream(fileStream);
 				LittleEndianDataInputStream littleEndianDataStream = new LittleEndianDataInputStream(bigEndianDataStream, Float.SIZE);
@@ -368,8 +371,10 @@ public class HECalculate {
 								g = littleEndianDataStream.readFloat();
 							}
 						} catch (IOException e) {
-							// TODO Auto-generated catch block
-							e.printStackTrace();
+							Logger.printUserError("An exception occurred when reading the GRM file '" + Parameter.INSTANCE.getHEParameter().getGrm() + "'.");
+							Logger.printUserError("Exception Message: " + e.getMessage());
+							Logger.getDevLogger().log(Level.SEVERE, "Reading GRM file", e);
+							System.exit(1);
 						}
 
 						int id1 = i;
@@ -622,7 +627,7 @@ public class HECalculate {
 			heReader.sb.append("Lambda: " + fmt.format(Lmd));
 		}
 
-		System.out.println(heReader.sb);
+		Logger.printUserLog(heReader.sb.toString());
 
 		if (heReader.output != null) {
 			StringBuilder fsb = new StringBuilder();

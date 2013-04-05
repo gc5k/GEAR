@@ -6,9 +6,8 @@ import parameter.Parameter;
 
 import family.popstat.AlleleFrequency;
 import family.qc.colqc.SNPFilterInterface;
+import gear.util.Logger;
 import gear.util.NewIt;
-
-import test.Test;
 
 public class SoftSNPFilter {
 	
@@ -61,8 +60,8 @@ public class SoftSNPFilter {
 					count++;
 				}
 			}
-			Test.LOG.append(count + " selected markers.\n");
-			System.err.println(count + " selected markers.");
+			
+			Logger.printUserLog("Number of selected markers: " + count);
 
 			wseq = new int[qualifiedSNPSet.size()];
 			int c = 0;

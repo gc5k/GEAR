@@ -11,7 +11,6 @@ import java.util.HashMap;
 import java.util.Iterator;
 
 import parameter.Parameter;
-import test.Test;
 import family.pedigree.PersonIndex;
 import family.pedigree.file.SNP;
 import family.pedigree.genotype.BPerson;
@@ -20,6 +19,7 @@ import family.plink.PLINKParser;
 import family.popstat.GenotypeMatrix;
 import family.qc.rowqc.SampleFilter;
 import gear.util.FileProcessor;
+import gear.util.Logger;
 import gear.util.NewIt;
 import gear.util.SNPMatch;
 import gear.util.stat.Z;
@@ -65,10 +65,8 @@ public class MergeTwoFile {
 					                     Parameter.INSTANCE.getBimFile2(),
 					                     Parameter.INSTANCE.getFamFile2());
 		} else {
-			System.err.println("did not specify files.");
-			Test.LOG.append("did not specify files.\n");
-			Test.printLog();
-			System.exit(0);
+			Logger.printUserError("--bfile or --bfile2 is not set.");
+			System.exit(1);
 		}
 		pp1.Parse();
 		pp2.Parse();
@@ -278,13 +276,11 @@ public class MergeTwoFile {
 
 		ps.close();
 		ps1.close();
-		if(qualified_snp == 0) {
-			Test.LOG.append(qualified_snp + " common SNPs between two snp files.\nexit");
-			System.err.println(qualified_snp + " common SNPs between two snp files.exit");
-			System.exit(0);
+		if (qualified_snp == 0) {
+			Logger.printUserError("Common SNPs between the two SNP files: None");
+			System.exit(1);
 		} else {
-			Test.LOG.append(qualified_snp + " common SNPs can be used between two snp files.\n");
-			System.err.println(qualified_snp + " common SNPs can be used between two snp files.");
+			Logger.printUserLog("Common SNP(s) between the two SNP files: " + qualified_snp);
 		}
 
 		WriteTwoFile();
@@ -311,13 +307,11 @@ public class MergeTwoFile {
 			}
 		}
 
-		if(c == 0) {
-			Test.LOG.append(0 + " common SNPs between two snp files.\nexit");
-			System.err.println(c + " common SNPs between two snp files.exit");
-			System.exit(0);
+		if (c == 0) {
+			Logger.printUserError("Common SNPs between the two SNP files: None");
+			System.exit(1);
 		} else {
-			Test.LOG.append(c + " common SNPs between two snp files.\n");
-			System.err.println(c + " common SNPs between two snp files.");
+			Logger.printUserLog("Common SNP(s) between the two SNP files:" + c);
 		}
 
 		comSNPIdx = new int[2][c];

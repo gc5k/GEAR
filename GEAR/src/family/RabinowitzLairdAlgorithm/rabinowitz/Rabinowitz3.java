@@ -4,6 +4,7 @@ import java.util.TreeMap;
 import java.util.TreeSet;
 
 import family.RabinowitzLairdAlgorithm.AbstractGenoDistribution;
+import gear.util.Logger;
 import gear.util.NewIt;
 
 
@@ -262,9 +263,8 @@ public class Rabinowitz3 extends AbstractGenoDistribution {
 				} while (!Criteria3_8(controlMap));
 			}
 		} else {
-			System.err.println("Wrecked in Rabinowitz table 3");
+			Logger.printUserError("Wrecked in Rabinowitz table 3");
 		}
-		// print(control);
 		return control;
 	}
 

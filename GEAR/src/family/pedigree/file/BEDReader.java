@@ -16,6 +16,7 @@ import family.pedigree.Hukou;
 import family.pedigree.genotype.BFamilyStruct;
 import family.pedigree.genotype.BPerson;
 import family.plink.PLINKBinaryParser;
+import gear.util.Logger;
 import gear.util.NewIt;
 
 public class BEDReader extends PedigreeFile {
@@ -88,15 +89,17 @@ public class BEDReader extends PedigreeFile {
 		try {
 			in = new BufferedInputStream(new FileInputStream(new File(pedfile)));
 		} catch (FileNotFoundException e) {
-			System.err.println("cannot open pedigree file.");
+			Logger.printUserError("Cannot open the pedigree file '" + pedfile + "'.");
+			Logger.printUserError("Exception Message: " + e.getMessage());
+			System.exit(1);
 		}
 		byte[] magic = new byte[3];
 		in.read(magic, 0, 3);
 		if (magic[2] == 1) {
-			System.err.println("reading data in plink snp-major mode.");
+			Logger.printUserLog("Reading data in PLINK SNP-major mode.");
 			snp_major(in, numMarkerInFile, WSNP);
 		} else {
-			System.err.println("reading data in plink individual-major mode.");
+			Logger.printUserLog("Reading data in PLINK individual-major mode.");
 			individual_major(in, numMarkerInFile, WSNP);
 		}
 		in.close();

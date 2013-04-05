@@ -7,6 +7,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashSet;
 import java.util.Random;
+import java.util.logging.Level;
 
 import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.math.random.RandomDataImpl;
@@ -20,11 +21,10 @@ import family.plink.PLINKBinaryParser;
 import family.plink.PLINKParser;
 import family.qc.rowqc.SampleFilter;
 import gear.util.FileProcessor;
+import gear.util.Logger;
 import gear.util.NewIt;
 import simulation.qc.rowqc.*;
 import simulation.gm.RealDataSimulationGenotypeMatrix;
-import test.Test;
-
 
 public class RealDataSimulation {
 	private String casualLociFile = null;
@@ -47,15 +47,13 @@ public class RealDataSimulation {
 			pp = new PLINKParser (Parameter.INSTANCE.getPedFile(),
 					              Parameter.INSTANCE.getMapFile());
 		}
-		if (Parameter.INSTANCE.hasBFileOption()) {
+		else if (Parameter.INSTANCE.hasBFileOption()) {
 			pp = new PLINKBinaryParser (Parameter.INSTANCE.getBedFile(),
 					                    Parameter.INSTANCE.getBimFile(),
 					                    Parameter.INSTANCE.getFamFile());
 		} else {
-			System.err.println("did not specify files.");
-			Test.LOG.append("did not specify files.\n");
-			Test.printLog();
-			System.exit(0);
+			Logger.printUserError("No input files.");
+			System.exit(1);
 		}
 		pp.Parse();
 		sf = new SampleFilter(pp.getPedigreeData(), pp.getMapData());
@@ -79,7 +77,7 @@ public class RealDataSimulation {
 		accept_ctrl = (Parameter.INSTANCE.simuCC[1]/( 1.0 * sampleSize) ) / (1 - Parameter.INSTANCE.simuK);
 		
 		if(accept_cs > 1 || accept_ctrl > 1) {
-			System.err.println("it is impossible to generate the case-control sampel with K = " + Parameter.INSTANCE.simuK + " with --simu-cc " + Parameter.INSTANCE.simuCC[0] + " " + Parameter.INSTANCE.simuCC[1]);
+			Logger.printUserLog("It is impossible to generate the case-control sampel with K = " + Parameter.INSTANCE.simuK + " with --simu-cc " + Parameter.INSTANCE.simuCC[0] + " " + Parameter.INSTANCE.simuCC[1]);
 		}
 
 		bv = new double[Parameter.INSTANCE.simuRep][sampleSize];
@@ -209,8 +207,10 @@ public class RealDataSimulation {
 					cl.add(l[0]);
 				}
 			} catch (IOException e) {
-				e.printStackTrace(System.err);
-				System.exit(0);
+				Logger.printUserError("An exception occurred when reading the casual-loci file '" + casualLociFile + "'.");
+				Logger.printUserError("Exception Message: " + e.getMessage());
+				Logger.getDevLogger().log(Level.SEVERE, "Reading casual-loci file", e);
+				System.exit(1);
 			}
 		}
 

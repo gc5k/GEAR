@@ -13,10 +13,10 @@ import org.apache.commons.lang3.ArrayUtils;
 
 import parameter.Parameter;
 
-import test.Test;
 import family.pedigree.Hukou;
 import family.pedigree.genotype.BFamilyStruct;
 import family.pedigree.genotype.BPerson;
+import gear.util.Logger;
 import gear.util.NewIt;
 
 /**
@@ -129,10 +129,8 @@ public class PedigreeFile {
 			int numTokens = tokenizer.length;
 			numMarkers = (numTokens - 6) / 2;
 			if (numMarkers != numMarkerInFile) {				
-				System.err.println("Mismatched column in ped file at line " + (k+1));
-				Test.LOG.append("Mismatched column in ped file at line " + (k+1) + ".\n");
-				Test.printLog();
-				System.exit(0);
+				Logger.printUserError("Mismatched column in ped file at line " + (k+1) + ".");
+				System.exit(1);
 			}
 
 			per = new BPerson(num_marker);
@@ -168,10 +166,8 @@ public class PedigreeFile {
 							per.addMarker(flag, 0, 0, c);
 						}
 					} catch (NumberFormatException nfe) {
-						System.err.println("invalid genotype in ped file at line " + (k + 1) + " for marker " + (c+1) + ".");
-						Test.LOG.append("invalid genotype in ped file at line " + (k + 1) + " for marker " + (c+1) + ".\n");
-						Test.printLog();
-						System.exit(0);
+						Logger.printUserError("An invalid genotype is found in the ped file at line " + (k + 1) + " for marker " + (c+1) + ".");
+						System.exit(1);
 					}
 					c++;
 				}
@@ -228,7 +224,7 @@ public class PedigreeFile {
 				}
 			}
 			if (code[0] == -1 || code[1] == -1) {
-				System.err.println("more than 2 alleles in the marker column " + (idx + 1));
+				Logger.printUserError("There're more than 2 alleles in the marker column " + (idx + 1));
 			}
 		} else {
 			// less than two detected alleles
@@ -266,7 +262,7 @@ public class PedigreeFile {
 						code[0] = 1;
 						code[1] = 0;
 					} else {
-						System.out.println("more than 3 alleles in marker column " + (idx + 1));
+						Logger.printUserError("There're more than 3 alleles in marker column " + (idx + 1));
 					}
 				}
 			}

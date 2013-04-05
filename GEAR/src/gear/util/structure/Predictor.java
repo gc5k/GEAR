@@ -1,5 +1,7 @@
 package gear.util.structure;
 
+import gear.util.Logger;
+
 public class Predictor {
 	private String delim= "\\s+";
 	private String SNP;
@@ -8,14 +10,14 @@ public class Predictor {
 
 	public Predictor(String line, int length, int lineIdx) {
 		String[] s = line.split(delim);
-		if(s.length == length) {
+		if (s.length == length) {
 			SNP = s[0];
 			A1 = s[1].charAt(0);
 			field = new String[length-2];
 			System.arraycopy(s, 2, field, 0, field.length);
 		} else {
-			System.err.println("predictor informtion incorrect at line : " + (lineIdx));
-			System.exit(0);
+			Logger.printUserError("Predictor informtion incorrect at line " + lineIdx + ", expect " + length + "column(s), but read " + s.length);
+			System.exit(1);
 		}
 	}
 

@@ -1,6 +1,7 @@
 package he.covar;
 
 import gear.util.FileProcessor;
+import gear.util.Logger;
 import gear.util.NewIt;
 
 import java.io.BufferedReader;
@@ -181,7 +182,7 @@ public class HeCov {
 			}
 		}
 
-		System.out.println("dimension: " + dim);
+		Logger.printUserLog("Dimension: " + dim);
 		double[][] phe = new double[dim][1];
 
 		int cn = 0;

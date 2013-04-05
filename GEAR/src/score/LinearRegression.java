@@ -1,5 +1,7 @@
 package score;
 
+import gear.util.Logger;
+
 import org.apache.commons.math.linear.*;
 
 /**
@@ -58,8 +60,8 @@ public class LinearRegression {
 		RealMatrix Matrix_XT = Matrix_X.transpose();
 		RealMatrix Matrix_XT_X = Matrix_XT.multiply(Matrix_X);
 		if (!(new LUDecompositionImpl(Matrix_XT_X).getSolver().isNonSingular()) ) { 
-			System.err.println("the covariate matrix is singular.");
-			System.exit(0);
+			Logger.printUserError("The covariate matrix is singular.");
+			System.exit(1);
 		}
 		RealMatrix Matrix_XT_X_Ivt = new LUDecompositionImpl(Matrix_XT_X).getSolver().getInverse();
 		RealMatrix Matrix_XT_X_Ivt_XT = Matrix_XT_X_Ivt.multiply(Matrix_XT);
@@ -103,8 +105,8 @@ public class LinearRegression {
 		LR.MLE();
 		double[][] r = LR.getResiduals2();
 		for(int i = 0; i < r.length; i++) {
-			System.out.println(r[i][0]);
+			Logger.printUserLog(Double.toString(r[i][0]));
 		}
-		System.out.println();
+		Logger.printUserLog("");
 	}
 }

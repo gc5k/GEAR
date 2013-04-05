@@ -1,13 +1,12 @@
 package he;
 
-import gear.util.FileProcessor;
-import he.covar.HeCov;
-
 import java.io.BufferedReader;
-import java.io.File;
 import java.io.IOException;
 import java.util.Arrays;
 import java.util.HashMap;
+
+import gear.util.FileProcessor;
+import gear.util.Logger;
 
 import parameter.Parameter;
 
@@ -114,7 +113,6 @@ public class HERead {
 
 		// ************************keep
 		if (keepFile != null) {
-			File keepF = new File(keepFile);
 			reader = FileProcessor.FileOpen(keepFile);
 			boolean[] ff = new boolean[flag.length];
 			Arrays.fill(ff, false);
@@ -159,7 +157,7 @@ public class HERead {
 		}
 
 		if (Parameter.INSTANCE.scale) {
-			System.out.println("standardising phentoype.");
+			Logger.printUserLog("Standardising phentoype.");
 			for (int i = 0; i < flag.length; i++) {
 				if(!flag[i]) continue;
 				for (int j = 1; j < y[i].length; j++) {
@@ -167,33 +165,6 @@ public class HERead {
 				}
 			}
 		}
-
-		if( Parameter.INSTANCE.qcovar_file != null || Parameter.INSTANCE.covar_file!= null ) {
-			// if there are covariates
-			HeCov he_cov = new HeCov(y,
-					                 flag,
-					                 ID2Idx,
-					                 Parameter.INSTANCE.qcovar_file,
-					                 Parameter.INSTANCE.qcovar_num,
-					                 Parameter.INSTANCE.covar_file,
-					                 Parameter.INSTANCE.covar_num);
-		}
-
-		// *************************************read grm file
-//		FileInputStream fin = null;
-//		try {
-//			fin = new FileInputStream(grmFile);
-//		} catch (FileNotFoundException e1) {
-//			e1.printStackTrace();
-//		}
-//		GZIPInputStream gzis = null;
-//		try {
-//			gzis = new GZIPInputStream(fin);
-//		} catch (IOException e1) {
-//			e1.printStackTrace();
-//		}
-//		xover = new InputStreamReader(gzis);
-
 	}
 	
 	public static void main(String[] args) {

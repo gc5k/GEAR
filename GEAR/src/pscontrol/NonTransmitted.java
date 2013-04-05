@@ -6,35 +6,28 @@ import java.util.Iterator;
 import parameter.Parameter;
 import pscontrol.hierarchy.AJHG2008;
 import pscontrol.write.NonTransWriteBedSNPMajor;
-import test.Test;
 import family.pedigree.PersonIndex;
 import family.plink.PLINKBinaryParser;
 import family.plink.PLINKParser;
 import family.qc.rowqc.SampleFilter;
+import gear.util.Logger;
 import gear.util.NewIt;
 
 public class NonTransmitted {
-//	private String casualLociFile = null;
-//	private int[] casualLociIdx = null;
+
 	private PLINKParser pp = null;
 	private SampleFilter sf = null;
-//	private NonTransmitted QC = null;
 
 	public NonTransmitted() {
-		System.err.println("--nontrans procedure.");
+		Logger.printUserLog("--nontrans procedure.");
 
-//		if (Parameter.fileOption) {
-//			pp = new PLINKParser(Parameter.pedfile, Parameter.mapfile);
-//		}
 		if (Parameter.INSTANCE.hasBFileOption()) {
 			pp = new PLINKBinaryParser (Parameter.INSTANCE.getBedFile(),
 					                    Parameter.INSTANCE.getBimFile(),
 					                    Parameter.INSTANCE.getFamFile());
 		} else {
-			System.err.println("did not specify files.");
-			Test.LOG.append("did not specify files.\n");
-			Test.printLog();
-			System.exit(0);
+			Logger.printUserError("--bfile is not set.");
+			System.exit(1);
 		}
 		pp.Parse();
 		sf = new SampleFilter(pp.getPedigreeData(), pp.getMapData());
@@ -48,7 +41,7 @@ public class NonTransmitted {
 		ArrayList<PersonIndex> sample = ajhg2008.getSample();
 		ArrayList<PersonIndex> ps = NewIt.newArrayList();
 
-		System.err.println("Sample size: " + sample.size());
+		Logger.printUserLog("Sample size: " + sample.size());
 		for (Iterator<PersonIndex> e = sample.iterator(); e.hasNext();) {
 			PersonIndex pi = e.next();
 			if (pi.isPseudo()) {

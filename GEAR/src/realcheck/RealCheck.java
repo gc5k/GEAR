@@ -7,11 +7,11 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Iterator;
+import java.util.logging.Level;
 
 import org.apache.commons.math.random.RandomDataImpl;
 
 import parameter.Parameter;
-import test.Test;
 import family.pedigree.PersonIndex;
 import family.pedigree.file.SNP;
 import family.pedigree.genotype.BPerson;
@@ -20,6 +20,7 @@ import family.plink.PLINKParser;
 import family.popstat.GenotypeMatrix;
 import family.qc.rowqc.SampleFilter;
 import gear.util.FileProcessor;
+import gear.util.Logger;
 import gear.util.NewIt;
 import gear.util.TextHelper;
 
@@ -52,10 +53,8 @@ public class RealCheck {
 					                     Parameter.INSTANCE.getBimFile2(),
 					                     Parameter.INSTANCE.getFamFile2());
 		} else {
-			System.err.println("did not specify files.");
-			Test.LOG.append("did not specify files.\n");
-			Test.printLog();
-			System.exit(0);
+			Logger.printUserError("--bfile or --bfile2 is not set.");
+			System.exit(1);
 		}
 		pp1.Parse();
 		pp2.Parse();
@@ -79,8 +78,7 @@ public class RealCheck {
 		getCommonSNP(sf1.getMapFile().getMarkerList(), sf2.getMapFile().getMarkerList());
 
 		if (Parameter.INSTANCE.getRealCheckParameter().getSnps() != null) {
-			Test.LOG.append("generate similarity matrix with realcheck SNPs.\n");
-			System.err.println("generate similarity matrix with realcheck SNPs.");
+			Logger.printUserLog("A similarity matrix is generated with real-check SNPs.");
 			getSelectedMarker();
 		} else {
 			getRandomMarker();
@@ -163,8 +161,7 @@ public class RealCheck {
 	public void getRandomMarker() {
 		int mn = 0;
 		if (Parameter.INSTANCE.getRealCheckParameter().getMarkerNumber() > comSNPIdxMap.size()) {
-			Test.LOG.append("realcheck marker number was reduced to " + comSNPIdxMap.size() + "\n");
-			System.err.println("realcheck marker number was reduced to " + comSNPIdxMap.size() + "\n");
+			Logger.printUserLog("Realcheck marker number was reduced to " + comSNPIdxMap.size() + "\n");
 			mn = comSNPIdxMap.size();
 		} else {
 			mn = Parameter.INSTANCE.getRealCheckParameter().getMarkerNumber();
@@ -174,8 +171,7 @@ public class RealCheck {
 		RandomDataImpl rd = new RandomDataImpl();
 		rd.reSeed(Parameter.INSTANCE.seed);
 
-		markerIdx = rd.nextPermutation(comSNPIdxMap.size(),
-				mn);
+		markerIdx = rd.nextPermutation(comSNPIdxMap.size(),	mn);
 
 		Arrays.sort(markerIdx);
 		StringBuffer sb = new StringBuffer();
@@ -226,12 +222,11 @@ public class RealCheck {
 			}
 		}
 
-		if(c == 0) {
-			Test.LOG.append(0 + " common SNPs between two snp files.\nexit");
-			System.err.println(c + " common SNPs between two snp files.exit");			
+		if (c == 0) {
+			Logger.printUserError("Common SNPs between the two SNP files: None");
+			System.exit(1);
 		} else {
-			Test.LOG.append(c + " common SNPs between two snp files.\n");
-			System.err.println(c + " common SNPs between two snp files.");
+			Logger.printUserLog("Common SNP(s) between the two SNP files: " + c);
 		}
 
 		comSNPIdx = new int[2][c];
@@ -261,12 +256,12 @@ public class RealCheck {
 				}
 			}
 		} catch (IOException e) {
-			e.printStackTrace(System.err);
-			System.exit(0);
+			Logger.printUserError("An exception occurred when reading the real-check SNPs.");
+			Logger.printUserError("Exception Message: " + e.getMessage());
+			Logger.getDevLogger().log(Level.SEVERE, "Reading real-check SNPs", e);
+			System.exit(1);
 		}
-		Test.LOG.append("read " + selectedSNP.size() + " markers from " + Parameter.INSTANCE.getRealCheckParameter().getSnps() + ".\n");
-		System.err.println("read " + selectedSNP.size() + " markers from " + Parameter.INSTANCE.getRealCheckParameter().getSnps() + ".");
-
+		Logger.printUserLog(selectedSNP.size() + " marker(s) is read in " + Parameter.INSTANCE.getRealCheckParameter().getSnps() + ".");
 		return selectedSNP;
 	}
 }
