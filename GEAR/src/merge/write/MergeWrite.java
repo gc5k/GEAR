@@ -7,9 +7,9 @@ import java.io.IOException;
 import java.io.PrintStream;
 import java.util.ArrayList;
 import java.util.Iterator;
+import java.util.logging.Level;
 
 import parameter.Parameter;
-import test.Test;
 
 import family.pedigree.PersonIndex;
 import family.pedigree.file.SNP;
@@ -18,6 +18,7 @@ import family.plink.PLINKBinaryParser;
 import family.plink.PLINKParser;
 import family.qc.rowqc.SampleFilter;
 import gear.util.FileProcessor;
+import gear.util.Logger;
 
 public class MergeWrite {
 	private byte byte1 = 108;
@@ -41,10 +42,8 @@ public class MergeWrite {
 					                    Parameter.INSTANCE.getBimFile(),
 					                    Parameter.INSTANCE.getFamFile());
 		} else {
-			System.err.println("did not specify files.");
-			Test.LOG.append("did not specify files.\n");
-			Test.printLog();
-			System.exit(0);
+			Logger.printUserError("No input files.");
+			System.exit(1);
 		}
 		pp.Parse();
 		SampleFilter sf = new SampleFilter(pp.getPedigreeData(), pp.getMapData());
@@ -86,7 +85,9 @@ public class MergeWrite {
 		try {
 			os = new DataOutputStream(new FileOutputStream(sbed.toString()));
 		} catch (FileNotFoundException e) {
-			e.printStackTrace();
+			Logger.printUserError("Cannot create the file '" + sbed.toString() + "'.");
+			Logger.printUserError("Exception Message: " + e.getMessage());
+			System.exit(1);
 		}
 
 		try {
@@ -123,7 +124,10 @@ public class MergeWrite {
 			}
 			os.close();
 		} catch (IOException e) {
-			e.printStackTrace();
+			Logger.printUserError("An exception occurred during writing the file '" + sbed.toString() + "'.");
+			Logger.printUserError("Exception Message: " + e.getMessage());
+			Logger.getDevLogger().log(Level.SEVERE, "Writing bed file", e);
+			System.exit(1);
 		}
 	}
 
@@ -155,7 +159,9 @@ public class MergeWrite {
 		try {
 			os = new DataOutputStream(new FileOutputStream(sbed.toString()));
 		} catch (FileNotFoundException e) {
-			e.printStackTrace();
+			Logger.printUserError("Cannot create file '" + sbed.toString() + "'.");
+			Logger.printUserError("Exception Message: " + e.getMessage());
+			System.exit(1);
 		}
 
 		try {
@@ -192,7 +198,10 @@ public class MergeWrite {
 			}
 			os.close();
 		} catch (IOException e) {
-			e.printStackTrace();
+			Logger.printUserError("An exception occurred during writing the file'" + sbed.toString() + "'.");
+			Logger.printUserError("Exception Message: " + e.getMessage());
+			Logger.getDevLogger().log(Level.SEVERE, "Writing bed file", e);
+			System.exit(1);
 		}
 	}
 

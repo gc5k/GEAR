@@ -3,6 +3,7 @@ import java.util.Calendar;
 
 import merge.MergeTwoFile;
 import write.WriteBedSNPMajor;
+import gear.util.Logger;
 import grm.GRMStat;
 import he.HECalculate;
 import he.HEPermutation;
@@ -29,16 +30,15 @@ public class Pipeline {
 
 	public static void main(String[] args) {
 		Parameter.INSTANCE.commandListener(args);
-
-		System.out.print(AboutInfo.WELCOME_MESSAGE);
-		Calendar calendar = Calendar.getInstance();
-		System.out.println("\nThe analysis started at: " + calendar.getTime() + "\n");
-
-		System.out.println("Options received: ");
+		
+		Logger.setLogFiles(Parameter.INSTANCE.out);
+		Logger.printUserLog(AboutInfo.WELCOME_MESSAGE);
+		Logger.printUserLog("Analysis started: " + Calendar.getInstance().getTime() + "\n");
+		Logger.printUserLog("Options received: ");
 		for (int i = 0; i < args.length; i++) {
-			System.out.print(args[i] + " ");
+			Logger.printUserLog(args[i] + " ");
 		}
-		System.out.println("\n");
+		Logger.printUserLog("\n");
 
 		if (Parameter.INSTANCE.shFlag) {
 			HPC hps = new HPC(args);
@@ -94,12 +94,12 @@ public class Pipeline {
 			if (Parameter.INSTANCE.freqFlag) {
 				FrequencyCalculator fc = new FrequencyCalculator();
 				fc.CalculateAlleleFrequency();
-				System.out.println(fc);
+				Logger.printUserLog(fc.toString());
 
 			} else if (Parameter.INSTANCE.genoFreqFlag) {
 				FrequencyCalculator fc = new FrequencyCalculator();
 				fc.CalculateAlleleFrequency();
-				System.out.println(fc);				
+				Logger.printUserLog(fc.toString());				
 
 			} else if (Parameter.INSTANCE.fstFlag ) {
 				Inbreeding inb = new Inbreeding();
@@ -126,18 +126,13 @@ public class Pipeline {
 				HEPermutation hp = new HEPermutation(hr);
 				hp.Permutation();
 			}
-//			HERegression HER = null;
-//			HER = new HERegression(p);
-//			HER.Regression();
-
 		} else if (Parameter.INSTANCE.grmstatFlag) {
 			GRMStat gs = new GRMStat();
 			gs.GetGRMStats();
 			
 		}
 		
-		System.out.println("\nThe analysis ended at: " + calendar.getTime() + "\n");
-
+		Logger.printUserLog("Analysis finished: " + Calendar.getInstance().getTime());
 	}
 
 }

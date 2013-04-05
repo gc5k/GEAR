@@ -2,15 +2,14 @@ package family.pedigree.file;
 
 import java.text.DecimalFormat;
 
-import test.Test;
-import parameter.Parameter;
+import gear.util.Logger;
 
 /**
  * 
  * @author Guo-Bo Chen chenguobo@gmail.com
  * Thanks Jelai Wang.
  */
-public class SNP implements Comparable<SNP>{
+public class SNP implements Comparable<SNP> {
 	private String chr = "";
 	private String name = "";
 	private float distance = 0;
@@ -70,14 +69,8 @@ public class SNP implements Comparable<SNP>{
 
 	public void setAllele(char[] a, short[] freq) {
 		if (a.length >= 3) {
-			System.err.println("more than 2 alleles for " + name);
-			Test.LOG.append("more than 2 alleles for " + name + ".\n");
-			Test.printLog();
-			System.exit(0);
-		} else if (a[0] == Parameter.INSTANCE.missing_allele.charAt(0)
-				|| a[1] == Parameter.INSTANCE.missing_allele.charAt(0)) {
-//			System.err.println("more than 2 alleles for " + name);
-//			System.exit(0);
+			Logger.printUserError("There're more than 2 alleles of " + name + ".");
+			System.exit(1);
 		}
 		snp = new char[2];
 		System.arraycopy(a, 0, snp, 0, 2);
@@ -89,7 +82,6 @@ public class SNP implements Comparable<SNP>{
 	public void setAllele(double[] freq) {
 		this.freq = new double[freq.length];
 		System.arraycopy(freq, 0, this.freq, 0, freq.length);
-//		System.err.println(name + " " + chr + " " + position + " " + freq[0] + " " + freq[1] + " " + snp[0] + " " + snp[1]);
 	}
 
 	public void setAllelePolymorphism(char[] a) {
@@ -139,12 +131,8 @@ public class SNP implements Comparable<SNP>{
 		}
 		if (d0 < d1) {
 			sb.append(snp[0] + ", " + fmt.format(d0 / (d0 + d1)) + ", ");
-//					+ "), " + snp[1] + "("
-//					+ String.format("%.2f", d1 / (d0 + d1)) + ")");
 		} else {
 			sb.append(snp[1] + ", " + fmt.format(d1 / (d0 + d1)) + ", ");
-//					+ "), " + snp[0] + "("
-//					+ String.format("%.2f", d0 / (d0 + d1)) + ")");
 		}
 		if (minor != null) {
 			sb.append(minor);

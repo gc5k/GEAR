@@ -87,16 +87,4 @@ public class RealDataSimulationGenotypeMatrix {
 		return genotypeMat[0].length;
 	}
 
-	public void Test() {
-		long t1 = System.currentTimeMillis();
-		System.err.println(t1);
-		for (int i = 0; i < genotypeMat.length; i++) {
-			for (int j = 0; j < numMarker; j++) {
-				getBiAlleleGenotype(i, j);
-			}
-		}
-		long t2 = System.currentTimeMillis();
-		System.err.println(t2 - t1);
-
-	}
 }

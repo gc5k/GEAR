@@ -1,13 +1,13 @@
 package family.pedigree.file;
 
+import gear.util.Logger;
 import gear.util.NewIt;
 
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
-
-import test.Test;
+import java.util.logging.Level;
 
 public class BIMReader extends MapFile {
 
@@ -20,8 +20,11 @@ public class BIMReader extends MapFile {
 		BufferedReader reader = null;
 		try {
 			reader = new BufferedReader(new FileReader(mapfile));
-		} catch (IOException E) {
-			System.err.println("can't open map file\n");
+		} catch (IOException e) {
+			Logger.printUserError("Can't open the map file.");
+			Logger.printUserError("Exception Message: " + e.getMessage());
+			Logger.getDevLogger().log(Level.SEVERE, "Creating BufferedReader", e);
+			System.exit(1);
 		}
 
 		String line = null;
@@ -43,18 +46,21 @@ public class BIMReader extends MapFile {
 				addSNP(chr, name, dis, pos, tokens[4].charAt(0), tokens[5].charAt(0));
 			}
 			reader.close();
-		} catch (IOException E) {
-			System.err.println("bad map file");
+		} catch (IOException e) {
+			Logger.printUserError("An exception occurred when reading the map file '" + mf + "'.");
+			Logger.printUserError("Exception Message: " + e.getMessage());
+			Logger.getDevLogger().log(Level.SEVERE, "Parsing the map file", e);
+			System.exit(1);
 		}
 
-		if(badline != null) {
-			System.err.println( "problems with the lines below:");
-			for(Integer i: badline) {
-				System.err.print( i + ",");
-				Test.LOG.append(i + ",");
+		if (badline != null) {
+			Logger.printUserError("problems with the lines below:");
+			String badlines = "";
+			for (Integer i: badline) {
+				badlines += i + ",";
 			}
-			Test.printLog();
-			System.exit(0);
+			Logger.printUserError(badlines);
+			System.exit(1);
 		}
 		numMarkerOriginal = snpList.size();
 	}

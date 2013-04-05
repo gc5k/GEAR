@@ -1,5 +1,6 @@
 package he.h2trans;
 
+import gear.util.Logger;
 import parameter.Parameter;
 import org.apache.commons.math.MathException;
 import org.apache.commons.math.distribution.NormalDistributionImpl;
@@ -63,6 +64,6 @@ public class H2Transformer {
 				sb.append("\nh2(o): " + h2 + "\n");
 			}
 		}
-		System.out.println(sb);
+		Logger.printUserLog(sb.toString());
 	}
 }

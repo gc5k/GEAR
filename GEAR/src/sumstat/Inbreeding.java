@@ -8,10 +8,10 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Set;
+import java.util.logging.Level;
 
 import parameter.Parameter;
 import sumstat.qc.rowqc.SumStatQC;
-import test.Test;
 
 import family.pedigree.PersonIndex;
 import family.pedigree.file.MapFile;
@@ -21,6 +21,7 @@ import family.plink.PLINKParser;
 import family.popstat.GenotypeMatrix;
 import family.qc.rowqc.SampleFilter;
 import gear.util.FileProcessor;
+import gear.util.Logger;
 import gear.util.NewIt;
 import gear.util.TextHelper;
 
@@ -53,10 +54,8 @@ public class Inbreeding {
 					                    Parameter.INSTANCE.getBimFile(),
 					                    Parameter.INSTANCE.getFamFile());
 		} else {
-			System.err.println("did not specify files.");
-			Test.LOG.append("did not specify files.\n");
-			Test.printLog();
-			System.exit(0);
+			Logger.printUserError("No input files.");
+			System.exit(1);
 		}
 		pp.Parse();
 		SampleFilter sf = new SampleFilter(pp.getPedigreeData(), pp.getMapData());
@@ -178,8 +177,10 @@ public class Inbreeding {
 				}
 			}
 		} catch (IOException e) {
-			e.printStackTrace(System.err);
-			System.exit(0);
+			Logger.printUserError("An exception occurred when reading the FST file '" + Parameter.INSTANCE.fst_file + "'.");
+			Logger.printUserError("Exception Message: " + e.getMessage());
+			Logger.getDevLogger().log(Level.SEVERE, "Reading FST file", e);
+			System.exit(1);
 		}
 		indKeep = new String[3][];
 		indKeep[0] = (String[]) famList.toArray(new String[0]);

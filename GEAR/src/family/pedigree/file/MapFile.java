@@ -1,5 +1,6 @@
 package family.pedigree.file;
 
+import gear.util.Logger;
 import gear.util.NewIt;
 
 import java.io.BufferedReader;
@@ -8,9 +9,7 @@ import java.io.FileReader;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
-
-import test.Test;
-
+import java.util.logging.Level;
 
 public class MapFile {
 
@@ -45,11 +44,11 @@ public class MapFile {
 		BufferedReader reader = null;
 		try {
 			reader = new BufferedReader(new FileReader(mapfile));
-		} catch (IOException E) {
-			System.err.println("could not open map file.");
-			Test.LOG.append("could not open map file.\n");
-			Test.printLog();
-			System.exit(0);
+		} catch (IOException e) {
+			Logger.printUserError("Could not open the map file.");
+			Logger.printUserError("Exception Message: " + e.getMessage());
+			Logger.getDevLogger().log(Level.SEVERE, "Creating BufferedReader", e);
+			System.exit(1);
 		}
 
 		String line = null;
@@ -71,18 +70,21 @@ public class MapFile {
 				addSNP(chr, name, dis, pos);
 			}
 			reader.close();
-		} catch (IOException E) {
-			System.err.println("bad map file.");
+		} catch (IOException e) {
+			Logger.printUserError("An exception occured when reading the map file '" + mf + "'.");
+			Logger.printUserError("Exception Message: " + e.getMessage());
+			Logger.getDevLogger().log(Level.SEVERE, "Parsing map file", e);
+			System.exit(1);
 		}
 
-		if(badline != null) {
-			System.err.println( "problems with the lines below:");
-			for(Integer i: badline) {
-				System.err.print( i + ",");
-				Test.LOG.append(i + ",");
+		if (badline != null) {
+			Logger.printUserError("The following line(s) have error:");
+			String badlines = "";
+			for (Integer i: badline) {
+				badlines += i + ",";
 			}
-			Test.printLog();
-			System.exit(0);
+			Logger.printUserError(badlines);
+			System.exit(1);
 		}
 		numMarkerOriginal = snpList.size();
 	}
@@ -142,11 +144,10 @@ public class MapFile {
 	}
 	
 	public void setPolymorphism(char[][] p, short[][] freq) {
-		if(p.length != snpList.size()) {
-			System.err.println("map file and the pedigree file do not match.");
-			Test.LOG.append("map file and the pedigree file do not match.\n");
-			Test.printLog();
-			System.exit(0);
+		if (p.length != snpList.size()) {
+			Logger.printUserError("The map file and the pedigree file do not match.\n");
+			Logger.getDevLogger().info("p.length != snpList.size()");
+			System.exit(1);
 		} else {
 			for(int i = 0; i < p.length; i++) {
 				SNP snp = snpList.get(i);

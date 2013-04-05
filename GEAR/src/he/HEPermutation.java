@@ -1,5 +1,6 @@
 package he;
 
+import gear.util.Logger;
 import gear.util.NewIt;
 import gear.util.Sample;
 import he.endian.LittleEndianDataInputStream;
@@ -78,18 +79,18 @@ public class HEPermutation {
 				this.Calculate();
 				Regression();
 				B[i] = Mat_B.getEntry(1, 0);
-				System.out.println("permutation " + i + ": b1 = " + B[i]);				
+				Logger.printUserLog("Permutation " + i + ": b1 = " + B[i]);				
 			}
 		}
 		
 		Arrays.sort(B);
 		for(int i = 0; i < B.length; i++) {
-			System.out.println(B[i]);
+			Logger.printUserLog(Double.toString(B[i]));
 		}
 
 		DescriptiveStatistics ds = new DescriptiveStatistics(B);
-		System.out.println("mean : " + fmt.format(ds.getMean()));
-		System.out.println("standard deviation : " + fmt.format(ds.getStandardDeviation()));
+		Logger.printUserLog("Mean : " + fmt.format(ds.getMean()));
+		Logger.printUserLog("Standard deviation : " + fmt.format(ds.getStandardDeviation()));
 		
 	}
 
@@ -97,7 +98,6 @@ public class HEPermutation {
 		String line;
  
 		heReader.lambda = new Lambda();
-//		double[][] y=permuteY();
 		if (heReader.reverse) {
 //			try {
 //				while ((line = heReader.is.readLine()) != null) {

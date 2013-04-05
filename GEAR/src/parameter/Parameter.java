@@ -1,5 +1,6 @@
 package parameter;
 
+import gear.util.Logger;
 import gear.util.NewIt;
 
 import java.io.File;
@@ -14,8 +15,6 @@ import org.apache.commons.cli.OptionBuilder;
 import org.apache.commons.cli.Options;
 import org.apache.commons.cli.ParseException;
 import org.apache.commons.cli.PosixParser;
-
-import test.Test;
 
 // singleton implemented in enum way
 public enum Parameter {
@@ -85,24 +84,24 @@ public enum Parameter {
 			if (cl.hasOption(cmd_threshold_upper)) {
 				thresholdUpper = Double.parseDouble(cl.getOptionValue(cmd_threshold_upper));
 				if (thresholdUpper < 0 && thresholdUpper > 1) {
-					System.err.println("realcheck threshold upper bounder should be between 0 and 1");
-					System.exit(0);
+					Logger.printUserError("realcheck threshold upper bounder should be between 0 and 1");
+					System.exit(1);
 				}
 			}
 			
 			if (cl.hasOption(cmd_threshold_lower)) {
 				thresholdLower = Double.parseDouble(cl.getOptionValue(cmd_threshold_lower));
 				if (thresholdLower < 0 && thresholdLower > 1) {
-					System.err.println("realcheck threshold Lower bounder should be tween 0 and 1");
-					System.exit(0);
+					Logger.printUserError("realcheck threshold Lower bounder should be tween 0 and 1");
+					System.exit(1);
 				}
 			}
 
 			if (cl.hasOption(cmd_marker_number)) {
 				markerNumber = Integer.parseInt(cl.getOptionValue(cmd_marker_number));
 				if (markerNumber < 0) {
-					System.err.println("realcheck marker number should be greater than 0");
-					System.exit(0);
+					Logger.printUserError("realcheck marker number should be greater than 0");
+					System.exit(1);
 				}
 				markerNumberFlag = true;
 			}
@@ -160,16 +159,16 @@ public enum Parameter {
 			if (cl.hasOption(cmd_maf_cutoff)) {
 				maf_cutoff = Double.parseDouble(cl.getOptionValue(cmd_maf_cutoff));
 				if (maf_cutoff > 0.5 || maf_cutoff < 0) {
-					System.err.println("merger maf cutoff should be between 0 and 0.5");
-					System.exit(0);
+					Logger.printUserError("merger maf cutoff should be between 0 and 0.5");
+					System.exit(1);
 				}
 			}		
 
 			if (cl.hasOption(cmd_p_cutoff)) {
 				p_cutoff = Double.parseDouble(cl.getOptionValue(cmd_p_cutoff));
 				if (p_cutoff < 0) {
-					System.err.println("merger p cutoff should be between 0 and 1.");
-					System.exit(0);
+					Logger.printUserError("merger p cutoff should be between 0 and 1.");
+					System.exit(1);
 				}
 			}		
 		}
@@ -893,8 +892,10 @@ public enum Parameter {
 		CommandLine cl = null;
 		try {
 			cl = parser.parse(ops, args);
-		} catch (ParseException E) {
-			E.printStackTrace(System.err);
+		} catch (ParseException e) {
+			Logger.printUserError("Failed to parse the command-line arguments.");
+			Logger.printUserError("Exception Message: " + e.getMessage());
+			System.exit(1);
 		}
 
 		if (cl.hasOption(cmd_help)) {
@@ -940,8 +941,8 @@ public enum Parameter {
 			predictor_idx = Integer.parseInt(cl.getOptionValue(cmd_predictor_idx));
 			predictor_idx--;
 			if (predictor_idx < 0) {
-				System.err.println("predictor-idx should bigger than 0");
-				System.exit(0);
+				Logger.printUserError("--predictor-idx should be bigger than 0.");
+				System.exit(1);
 			}
 		}
 
@@ -975,8 +976,8 @@ public enum Parameter {
 				}
 			}
 			if (chr.length != chrSet.size() + exSet.size()) {
-				System.err.println("bad parameter for optin --" + cmd_chr + ".");
-				System.exit(0);
+				Logger.printUserError("Bad parameter for optin --" + cmd_chr + ".");
+				System.exit(1);
 			}
 			if (chrSet.size() > 0) {
 				chr = (String[]) chrSet.toArray(new String[0]);
@@ -1115,9 +1116,8 @@ public enum Parameter {
 		if (cl.hasOption(cmd_simu_hsq)) {
 			simuHsq = Double.parseDouble(cl.getOptionValue(cmd_simu_hsq));
 			if (simuHsq < 0 || simuHsq > 1) {
-				System.err
-						.println("simulation heritability should be between 0 and 1");
-				System.exit(0);
+				Logger.printUserError("Simulation heritability should be between 0 and 1 (inclusively).");
+				System.exit(1);
 			}
 		}
 
@@ -1132,18 +1132,16 @@ public enum Parameter {
 		if (cl.hasOption(cmd_simu_k)) {
 			simuK = Double.parseDouble(cl.getOptionValue(cmd_simu_k));
 			if (simuK < 0 || simuK > 1) {
-				System.err
-						.println("simulation prevalence should be between 0 and 1");
-				System.exit(0);
+				Logger.printUserError("Simulation prevalence should be between 0 and 1 (inclusively)");
+				System.exit(1);
 			}
 		}
 
 		if (cl.hasOption(cmd_simu_rep)) {
 			simuRep = Integer.parseInt(cl.getOptionValue(cmd_simu_rep));
 			if (simuRep < 0) {
-				System.err
-						.println("simulation replication should be greater than zero");
-				System.exit(0);
+				Logger.printUserError("simulation replication should be no smaller than zero");
+				System.exit(1);
 			}
 		}
 
@@ -1243,13 +1241,10 @@ public enum Parameter {
 				if (p[i].contains("-")) {
 					String[] pp = p[i].split("-");
 					if (pp.length != 2) {
-						System.err.println("bad parameter for option --" + cmd_covar_num_long + ": " + p[i] +".");
-						Test.LOG.append("bad parameter for option --" + cmd_covar_num_long + ": " + p[i] +".\n");
-						Test.printLog();
-						System.exit(0);
+						Logger.printUserError("Bad parameter for option --" + cmd_covar_num_long + ": " + p[i] +".");
+						System.exit(1);
 					}
-					for (int j = Integer.parseInt(pp[0]); j <= Integer
-							.parseInt(pp[1]); j++) {
+					for (int j = Integer.parseInt(pp[0]); j <= Integer.parseInt(pp[1]); j++) {
 						idx.add(new Integer(j));
 					}
 				} else {
@@ -1261,10 +1256,8 @@ public enum Parameter {
 			for (Iterator<Integer> e = idx.iterator(); e.hasNext();) {
 				covar_num[c] = e.next().intValue();
 				if (covar_num[c] < 0) {
-					System.err.println("bad parameter for option --" + cmd_covar_num_long + ": " + covar_num[c] +".");
-					Test.LOG.append("bad parameter for option --" + cmd_covar_num_long + ": " + covar_num[c] +".\n");
-					Test.printLog();
-					System.exit(0);
+					Logger.printUserError("Bad parameter for option --" + cmd_covar_num_long + ": " + covar_num[c] +".");
+					System.exit(1);
 				}
 				c++;
 			}
@@ -1282,10 +1275,8 @@ public enum Parameter {
 				if (p[i].contains("-")) {
 					String[] pp = p[i].split("-");
 					if (pp.length != 2) {
-						System.err.println("bad parameter for option --" + cmd_qcovar_num_long + ": " + p[i] +".");
-						Test.LOG.append("bad parameter for option --" + cmd_qcovar_num_long + ": " + p[i] +".\n");
-						Test.printLog();
-						System.exit(0);
+						Logger.printUserError("Bad parameter for option --" + cmd_qcovar_num_long + ": " + p[i] +".");
+						System.exit(1);
 					}
 					for (int j = Integer.parseInt(pp[0]); j <= Integer
 							.parseInt(pp[1]); j++) {
@@ -1300,10 +1291,8 @@ public enum Parameter {
 			for (Iterator<Integer> e = idx.iterator(); e.hasNext();) {
 				qcovar_num[c] = e.next().intValue();
 				if (qcovar_num[c] < 0) {
-					System.err.println("bad parameter for option --" + cmd_qcovar_num_long + ": " + qcovar_num[c] +".");
-					Test.LOG.append("bad parameter for option --" + cmd_qcovar_num_long + ": " + qcovar_num[c] +".\n");
-					Test.printLog();
-					System.exit(0);
+					Logger.printUserError("Bad parameter for option --" + cmd_qcovar_num_long + ": " + qcovar_num[c] +".");
+					System.exit(1);
 				}
 				c++;
 			}
@@ -1399,8 +1388,8 @@ public enum Parameter {
 	private void exists(String file) {
 		File f = new File(file);
 		if (!f.exists()) {
-			System.err.println("could not open " + file + ".");
-			System.exit(0);
+			Logger.printUserError("File '" + file + "' does not exist.");
+			System.exit(1);
 		}
 	}
 }

@@ -1,6 +1,7 @@
 package profile;
 
 import gear.util.FileProcessor;
+import gear.util.Logger;
 import gear.util.NewIt;
 import gear.util.SNPMatch;
 
@@ -11,6 +12,7 @@ import java.io.PrintStream;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
+import java.util.logging.Level;
 
 import parameter.Parameter;
 import profile.struct.DosageInfor;
@@ -35,13 +37,12 @@ public class MaCHDosageProfile {
 	private String[] QRName;
 	private boolean isQ = false;
 
-	public MaCHDosageProfile () {
-		System.err.println("generating risk profiles for mach dosage.");
+	public MaCHDosageProfile() {
+		Logger.printUserLog("Generating risk profiles for mach dosage.");
 		initial();
 	}
 
 	private void initial() {
-
 		//read score file
 		scoreFile = Parameter.INSTANCE.scoreFile;
 		if(scoreFile != null) {
@@ -54,8 +55,10 @@ public class MaCHDosageProfile {
 					Score.put(su.getSNP(), su);
 				}
 			} catch (IOException e) {
-				e.printStackTrace(System.err);
-				System.exit(0);
+				Logger.printUserError("An exception occurred when reading the score file '" + scoreFile + "'.");
+				Logger.printUserError("Exception Message: " + e.getMessage());
+				Logger.getDevLogger().log(Level.SEVERE, "Reading score file", e);
+				System.exit(1);
 			}
 			hasScore = true;
 		} else {
@@ -76,14 +79,17 @@ public class MaCHDosageProfile {
 					QS.put(qs.getSNP(), qs);
 				}
 			} catch (IOException e) {
-				e.printStackTrace(System.err);
-				System.exit(0);
+				Logger.printUserError("An exception occurred when reading the q-score file '" + q_score_file + "'.");
+				Logger.printUserError("Exception Message: " + e.getMessage());
+				Logger.getDevLogger().log(Level.SEVERE, "Reading q-score file", e);
+				System.exit(1);
 			}
+			
 			if (QS.size() == 0) {
-				System.out.println("nothing has been selected in " + q_score_file);
-				System.exit(0);
+				Logger.printUserError("Nothing is selected in '" + q_score_file + "'.");
+				System.exit(1);
 			} else {
-				System.out.println("read in " + QS.size() + " SNP scores from " + q_score_file + ".");
+				Logger.printUserLog("Number of SNP scores read from the q-score file '" + q_score_file + "': " + QS.size());
 			}
 
 			//q range file
@@ -101,13 +107,16 @@ public class MaCHDosageProfile {
 					QR.add(qr);
 				}
 			} catch (IOException e) {
-				e.printStackTrace(System.err);
-				System.exit(0);
+				Logger.printUserError("An exception occurred when reading the q-range file '" + q_score_range_file + "'.");
+				Logger.printUserError("Exception Message: " + e.getMessage());
+				Logger.getDevLogger().log(Level.SEVERE, "Reading q-range file", e);
+				System.exit(1);
 			}
+			
 			if (QR.size() == 0) {
-				System.out.println("nothing has been selected in " + q_score_range_file);
+				Logger.printUserError("Nothing is selected in the q-range file '" + q_score_range_file + "'.");
 			} else {
-				System.out.println("read in " + QR.size() + " scores from " + q_score_range_file + ".");
+				Logger.printUserLog("Number of scores read from the q-range file '" + q_score_range_file + "': " + QR.size());
 			}
 
 			q_score_range = new double[QR.size()][2];
@@ -128,17 +137,16 @@ public class MaCHDosageProfile {
 			dosageFile[0] = Parameter.INSTANCE.MaCH_Dosage;
 			File f = new File(dosageFile[0]);
 			if (!f.exists()) {
-				System.err.println("could not open " + dosageFile[0] + ".");
-				System.exit(0);
+				Logger.printUserError("The dosage file '" + dosageFile[0] + "' does not exist");
+				System.exit(1);
 			}
 			inforFile = new String[1];
 			inforFile[0] = Parameter.INSTANCE.MaCH_Infor;
 			f = new File(inforFile[0]);
 			if (!f.exists()) {
-				System.err.println("could not open " + dosageFile[0] + ".");
-				System.exit(0);
+				Logger.printUserError("The information file " + inforFile[0] + "' does not exist");
+				System.exit(1);
 			}
-
 		} else {
 			BufferedReader reader1 = FileProcessor.FileOpen(Parameter.INSTANCE.MaCH_Dosage_Batch);
 			ArrayList<String> l1 = NewIt.newArrayList();
@@ -149,15 +157,17 @@ public class MaCHDosageProfile {
 					l1.add(line);
 				}
 			} catch (IOException e) {
-				e.printStackTrace(System.err);
-				System.exit(0);
+				Logger.printUserError("An exception occurred when reading the dosage batch '" + Parameter.INSTANCE.MaCH_Dosage_Batch + "'.");
+				Logger.printUserError("Exception Message: " + e.getMessage());
+				Logger.getDevLogger().log(Level.SEVERE, "Reading dosage batch", e);
+				System.exit(1);
 			}
 			dosageFile = (String[]) l1.toArray(new String[0]);
 			for (int i = 0; i < dosageFile.length; i++) {
 				File f = new File(dosageFile[i]);
 				if (!f.exists()) {
-					System.err.println("could not open "+ dosageFile[i] + ".");
-					System.exit(0);
+					Logger.printUserError("The dosage file '"+ dosageFile[i] + "' does not exist.");
+					System.exit(1);
 				}
 			}
 
@@ -169,15 +179,17 @@ public class MaCHDosageProfile {
 					l2.add(line);
 				}
 			} catch (IOException e) {
-				e.printStackTrace(System.err);
-				System.exit(0);
+				Logger.printUserError("An exception occurred when reading the information batch '" + Parameter.INSTANCE.MaCH_Infor_Batch + "'.");
+				Logger.printUserError("Exception Message: " + e.getMessage());
+				Logger.getDevLogger().log(Level.SEVERE, "Reading information batch", e);
+				System.exit(1);
 			}
 			inforFile = (String[]) l2.toArray(new String[0]);
 			for (int i = 0; i < inforFile.length; i++) {
 				File f = new File(inforFile[i]);
 				if (!f.exists()) {
-					System.err.println("could not open "+ inforFile[i] + ".");
-					System.exit(0);
+					Logger.printUserError("The information file '"+ inforFile[i] + "' does not exist.");
+					System.exit(1);
 				}
 			}
 		}
@@ -290,9 +302,9 @@ public class MaCHDosageProfile {
 			}
 
 			sumSNPMapped += cSNP;
-			System.out.println(dosageFile[i] + " mapped " + cSNP + " SNPs to the score file.");
+			Logger.printUserLog(dosageFile[i] + " mapped " + cSNP + " SNP(s) to the score file.");
 			for (int j = 0; j < c.length; j++) {
-				System.out.println("\t"+c[j] + " SNPs mapped to the range " + q_score_range[j][0] + " " + q_score_range[j][1]);
+				Logger.printUserLog("\t"+c[j] + " SNP(s) mapped to the range " + q_score_range[j][0] + " " + q_score_range[j][1]);
 			}
 
 			for (int j = 0; j < riskProfile.length; j++) {
@@ -312,24 +324,11 @@ public class MaCHDosageProfile {
 			}
 		}
 
-		if (ATGCLocus > 1) {
-			if (Parameter.INSTANCE.keepATGC()) {
-				System.out.println(ATGCLocus + " ATGC loci were detected.");
-			} else {
-				System.out.println(ATGCLocus + " ATGC loci were removed.");
-			}
-		} else {
-			if (Parameter.INSTANCE.keepATGC()) {
-				System.out.println(ATGCLocus + " ATGC Locus were detected.");
-			} else {
-				System.out.println(ATGCLocus + " ATGC locus was removed.");				
-			}
-		}
-
-		System.out.println("In total " + sumSNPMapped + " SNPs mapped to the score file.");
+		Logger.printUserLog("Number of ATGC loci " + (Parameter.INSTANCE.keepATGC() ? "detected: " : "removed: ") + ATGCLocus);
+		Logger.printUserLog("Number of SNPs mapped to the score file in total: " + sumSNPMapped);
 
 		for (int i = 0; i < CCSNP.length; i++) {
-			System.out.println(CCSNP[i] + " SNPs mapped to the range " + q_score_range[i][0] + " " + q_score_range[i][1]);
+			Logger.printUserLog(CCSNP[i] + " SNP(s) mapped to the range " + q_score_range[i][0] + " " + q_score_range[i][1]);
 		}
 
 		StringBuffer sbim = new StringBuffer();
@@ -415,7 +414,7 @@ public class MaCHDosageProfile {
 					}
 				}
 			}
-			System.out.println(dosageFile[i] + " mapped " + cSNP + " SNPs to the score file, and " + c + " SNPs had scores.");
+			Logger.printUserLog(dosageFile[i] + " mapped " + cSNP + " SNP(s) to the score file, and " + c + " SNP(s) had scores.");
 
 			for (int j = 0; j < rs.length; j++) {
 				riskProfile[j] += rs[j];
@@ -429,21 +428,10 @@ public class MaCHDosageProfile {
 				riskProfile[i] /= 2*CC;
 			}
 		}
-
-		if (ATGCLocus > 1) {
-			if (Parameter.INSTANCE.keepATGC()) {
-				System.out.println(ATGCLocus + " ATGC loci were detected.");
-			} else {
-				System.out.println(ATGCLocus + " ATGC loci were removed.");
-			}
-		} else {
-			if (Parameter.INSTANCE.keepATGC()) {
-				System.out.println(ATGCLocus + " ATGC Locus were detected.");
-			} else {
-				System.out.println(ATGCLocus + " ATGC locus was removed.");				
-			}
-		}
-		System.out.println("\nIn total " + CCSNP + " SNPs mapped to the score file, and " + CC + " SNPs had scores.");
+		
+		Logger.printUserLog("Number of ATGC loci " + (Parameter.INSTANCE.keepATGC() ? "detected: " : "removed: ") + ATGCLocus);
+		Logger.printUserLog("Number of SNPs mapped to the score file in total: " + CCSNP);
+		Logger.printUserLog("Number of SNPs having scores: " + CC);
 
 		StringBuffer sbim = new StringBuffer();
 		sbim.append(Parameter.INSTANCE.out);
@@ -458,7 +446,7 @@ public class MaCHDosageProfile {
 	}
 
 	private ArrayList<DosageInfor> readDosageInfor(String file) {
-		System.out.println("reading " + file);
+		Logger.printUserLog("Reading the dosage information file '" + file + "'.");
 		ArrayList<DosageInfor> SD = NewIt.newArrayList();
 
 		BufferedReader readerDIFile = FileProcessor.FileOpen(file);
@@ -471,14 +459,16 @@ public class MaCHDosageProfile {
 				SD.add(di);
 			}
 		} catch (IOException e) {
-			e.printStackTrace(System.err);
-			System.exit(0);
+			Logger.printUserError("An exception occurred when reading the dosage information file '" + file + "'.");
+			Logger.printUserError("Exception Message: " + e.getMessage());
+			Logger.getDevLogger().log(Level.SEVERE, "Reading dosage information", e);
+			System.exit(1);
 		}
 		return SD;
 	}
 
 	private ArrayList<ArrayList<Double>> readDosage(String file, int idx) {
-		System.out.println("reading " + file);
+		Logger.printUserLog("Reading the dosage file '" + file + "'.");
 		ArrayList<ArrayList<Double>> dosage = NewIt.newArrayList();
 		BufferedReader readerDosageFile = FileProcessor.ZipFileOpen(file);
 		String lineDosage = null;
@@ -496,8 +486,10 @@ public class MaCHDosageProfile {
 				dosage.add(d);
 			}
 		} catch (IOException e) {
-			e.printStackTrace(System.err);
-			System.exit(0);
+			Logger.printUserError("An exception occurred when reading the dosage file '" + file + "'.");
+			Logger.printUserError("Exception Message: " + e.getMessage());
+			Logger.getDevLogger().log(Level.SEVERE, "Reading dosage file", e);
+			System.exit(1);
 		}
 
 		return dosage;

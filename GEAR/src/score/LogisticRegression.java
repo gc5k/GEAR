@@ -1,8 +1,9 @@
 package score;
 
+import gear.util.Logger;
+
 import org.apache.commons.math.linear.*;
 
-import test.Test;
 /**
  * 
  * @author Guo-Bo Chen, chenguobo@gmail.com
@@ -61,11 +62,9 @@ public class LogisticRegression {
 		RealMatrix Matrix_W = new Array2DRowRealMatrix(getWMatrix());
 		RealMatrix Matrix_XT_W = Matrix_XT.multiply(Matrix_W);
 		RealMatrix Matrix_XT_W_X = Matrix_XT_W.multiply(Matrix_X);
-		if(!(new LUDecompositionImpl(Matrix_XT_W_X).getSolver().isNonSingular())) {
-			System.err.println("covariate matrix is singular.");
-			Test.LOG.append("covariate matrix is singular.\n");
-			Test.printLog();
-			System.exit(0);
+		if (!(new LUDecompositionImpl(Matrix_XT_W_X).getSolver().isNonSingular())) {
+			Logger.printUserError("Covariate matrix is singular.");
+			System.exit(1);
 		}
 		RealMatrix Inv_XT_W_X = new LUDecompositionImpl(Matrix_XT_W_X).getSolver().getInverse();
 		RealMatrix Inv_XT_W_X_XT = Inv_XT_W_X.multiply(Matrix_XT);

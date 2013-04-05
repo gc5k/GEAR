@@ -7,15 +7,16 @@ import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
+import java.util.logging.Level;
 
 import parameter.Parameter;
-import test.Test;
 import family.pedigree.file.SNP;
 import family.plink.PLINKBinaryParser;
 import family.plink.PLINKParser;
 import family.popstat.GenotypeMatrix;
 import family.qc.rowqc.SampleFilter;
 import gear.util.FileProcessor;
+import gear.util.Logger;
 import gear.util.NewIt;
 import gear.util.SNPMatch;
 import gear.util.stat.Z;
@@ -47,10 +48,8 @@ public class MakePredictor2 {
 					                     Parameter.INSTANCE.getBimFile(),
 					                     Parameter.INSTANCE.getFamFile());
 		} else {
-			System.err.println("did not specify files.");
-			Test.LOG.append("did not specify files.\n");
-			Test.printLog();
-			System.exit(0);
+			Logger.printUserError("--bfile is not set");
+			System.exit(1);
 		}
 		pp1.Parse();
 
@@ -243,15 +242,13 @@ public class MakePredictor2 {
 
 		ps.close();
 		if(qualified_snp == 0) {
-			Test.LOG.append(qualified_snp + " common SNPs between two snp files.\nexit");
-			System.err.println(qualified_snp + " common SNPs between two snp files.exit");
-			System.exit(0);
+			Logger.printUserError("Common SNPs between the two SNP files: None");
+			System.exit(1);
 		} else {
-			Test.LOG.append(qualified_snp + " common SNPs can be used between two snp files.\n");
-			System.err.println(qualified_snp + " common SNPs can be used between two snp files.");
+			Logger.printUserLog("Common SNP(s) between the two SNP files: " + qualified_snp);
 		}
 
-		System.err.println("flag " + flag.size() + ": snpCoding " + scoreCoding.size());
+		Logger.printUserLog("flag " + flag.size() + ": snpCoding " + scoreCoding.size());
 		WritePredictor();
 	}
 
@@ -276,13 +273,11 @@ public class MakePredictor2 {
 			}
 		}
 
-		if(c == 0) {
-			Test.LOG.append(0 + " common SNPs between two snp files.\nexit");
-			System.err.println(c + " common SNPs between two snp files.exit");
-			System.exit(0);
+		if (c == 0) {
+			Logger.printUserError("Common SNPs between the two SNP files: None");
+			System.exit(1);
 		} else {
-			Test.LOG.append(c + " common SNPs between two snp files.\n");
-			System.err.println(c + " common SNPs between two snp files.");
+			Logger.printUserLog("Common SNP(s) between the two SNP files: " + c);
 		}
 
 		comSNPIdx = new int[2][c];
@@ -296,7 +291,7 @@ public class MakePredictor2 {
 				idx1++;
 			}
 		}
-		System.out.println("idx1 "+ idx1);
+		Logger.printUserLog("idx1 "+ idx1);
 
 	}
 
@@ -339,7 +334,10 @@ public class MakePredictor2 {
 				predictorList.add(maf);
 			}
 		} catch (IOException e) {
-			e.printStackTrace();
+			Logger.printUserError("An exception occurred when parsing the predictor file.");
+			Logger.printUserError("Exception Message: " + e.getMessage());
+			Logger.getDevLogger().log(Level.SEVERE, "Parsing predictor file", e);
+			System.exit(1);
 		}
 	}
 
@@ -380,8 +378,8 @@ public class MakePredictor2 {
 			}
 		}
 		predictorFile.close();
-		System.out.println("write preditor to " + sbim.toString());
-		System.out.println(NMiss + " snps have missing values and were not printed.");
+		Logger.printUserLog("Write preditor to " + sbim.toString());
+		Logger.printUserLog(NMiss + " SNP(s) have missing values and were not printed.");
 	}
 
 }

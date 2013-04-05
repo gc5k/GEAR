@@ -1,5 +1,7 @@
 package gear.util.structure;
 
+import gear.util.Logger;
+
 public class MAF {
 	private String delim= "\\s+";
 	private String chr;
@@ -10,9 +12,8 @@ public class MAF {
 	private double NChr;
 
 	public MAF(String line, int idx) {
-
 		String[] s = line.split(delim);
-		if(s.length== 6) {
+		if (s.length== 6) {
 			chr = s[0];
 			SNP = s[1];
 			A1 = s[2].charAt(0);
@@ -20,8 +21,8 @@ public class MAF {
 			maf = Double.parseDouble(s[4]);
 			NChr = Double.parseDouble(s[5]);
 		} else {
-			System.err.println("maf informtion incorrect at line : " + (idx));
-			System.exit(0);
+			Logger.printUserError("MAF informtion incorrect at line " + (idx) + ", expect 6 columns, but read " + s.length);
+			System.exit(1);
 		}
 	}
 

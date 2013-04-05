@@ -7,7 +7,6 @@ import java.util.Arrays;
 import org.apache.commons.math.random.RandomDataImpl;
 
 import parameter.Parameter;
-import test.Test;
 import family.pedigree.PersonIndex;
 import family.pedigree.file.SNP;
 import family.pedigree.genotype.BPerson;
@@ -16,6 +15,7 @@ import family.plink.PLINKParser;
 import family.popstat.GenotypeMatrix;
 import family.qc.rowqc.SampleFilter;
 import gear.util.FileProcessor;
+import gear.util.Logger;
 
 public class RealCheckOne {
 	private GenotypeMatrix G1;
@@ -35,10 +35,8 @@ public class RealCheckOne {
 					                     Parameter.INSTANCE.getBimFile(),
 					                     Parameter.INSTANCE.getFamFile());
 		} else {
-			System.err.println("did not specify files.");
-			Test.LOG.append("did not specify files.\n");
-			Test.printLog();
-			System.exit(0);
+			Logger.printUserError("--bfile is not set.");
+			System.exit(1);
 		}
 		pp1.Parse();
 
@@ -57,8 +55,7 @@ public class RealCheckOne {
 		PrintStream ps = FileProcessor.CreatePrintStream(sb.toString());
 
 		if (Parameter.INSTANCE.getRealCheckParameter().getSnps() != null) {
-			Test.LOG.append("generate similarity matrix with realcheck SNPs.\n");
-			System.err.println("generate similarity matrix with realcheck SNPs.");
+			Logger.printUserLog("A similarity matrix is generated with real-check SNPs.");
 			getSelectedMarker();
 		} else {
 			getRandomMarker();
@@ -134,8 +131,7 @@ public class RealCheckOne {
 		int nMarker = sf1.getMapFile().getMarkerList().size();
 		if (Parameter.INSTANCE.getRealCheckParameter().getMarkerNumberFlag()) {
 			if (Parameter.INSTANCE.getRealCheckParameter().getMarkerNumber() > nMarker) {
-				Test.LOG.append("realcheck marker number was reduced to " + nMarker + "\n");
-				System.err.println("realcheck marker number was reduced to " + nMarker + "\n");
+				Logger.printUserLog("Real-check marker number is reduced to " + nMarker + ".");
 				mn = nMarker;
 			} else {
 				mn = Parameter.INSTANCE.getRealCheckParameter().getMarkerNumber();

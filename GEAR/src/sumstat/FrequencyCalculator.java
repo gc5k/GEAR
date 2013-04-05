@@ -8,7 +8,6 @@ import org.apache.commons.math.stat.inference.ChiSquareTestImpl;
 
 import parameter.Parameter;
 import sumstat.qc.rowqc.SumStatQC;
-import test.Test;
 
 import family.pedigree.file.MapFile;
 import family.pedigree.file.SNP;
@@ -16,6 +15,7 @@ import family.plink.PLINKBinaryParser;
 import family.plink.PLINKParser;
 import family.popstat.GenotypeMatrix;
 import family.qc.rowqc.SampleFilter;
+import gear.util.Logger;
 import gear.util.stat.FastFisherExactTest;
 
 public class FrequencyCalculator {
@@ -37,10 +37,8 @@ public class FrequencyCalculator {
 					                    Parameter.INSTANCE.getBimFile(),
 					                    Parameter.INSTANCE.getFamFile());
 		} else {
-			System.err.println("did not specify files.");
-			Test.LOG.append("did not specify files.\n");
-			Test.printLog();
-			System.exit(0);
+			Logger.printUserError("No input files.");
+			System.exit(1);
 		}
 		pp.Parse();
 		SampleFilter sf = new SampleFilter(pp.getPedigreeData(), pp.getMapData());

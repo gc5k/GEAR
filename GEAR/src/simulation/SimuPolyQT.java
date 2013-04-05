@@ -1,6 +1,7 @@
 package simulation;
 
 import gear.util.FileProcessor;
+import gear.util.Logger;
 import gear.util.TextHelper;
 
 import java.io.BufferedReader;
@@ -13,6 +14,7 @@ import java.io.PrintWriter;
 import java.text.DecimalFormat;
 import java.util.Arrays;
 import java.util.Calendar;
+import java.util.logging.Level;
 
 import parameter.Parameter;
 
@@ -131,7 +133,7 @@ public class SimuPolyQT {
 		log.println(LOG.toString());
 		log.close();
 
-		System.out.println(LOG.toString());
+		Logger.printUserLog(LOG.toString());
 
 	}
 
@@ -236,7 +238,6 @@ public class SimuPolyQT {
 	}
 
 	public double getMean(RealMatrix effect) {
-
 		int local_sample = 10000;
 		double[] P = new double[local_sample];
 		int c = 0;
@@ -248,7 +249,7 @@ public class SimuPolyQT {
 
 		}
 
-		System.out.println(StatUtils.mean(P) + " " + StatUtils.variance(P));
+		Logger.printUserLog("Mean: " + StatUtils.mean(P) + ", Variance: " + StatUtils.variance(P));
 		return StatUtils.mean(P);
 	}
 
@@ -449,8 +450,10 @@ public class SimuPolyQT {
 				}
 			}
 		} catch (IOException e) {
-			e.printStackTrace(System.err);
-			System.exit(0);
+			Logger.printUserError("An exception occurred when reading the poly-effect file '" + Parameter.INSTANCE.polyEffectFile + "'.");
+			Logger.printUserError("Exception Message: " + e.getMessage());
+			Logger.getDevLogger().log(Level.SEVERE, "Reading poly-effect file", e);
+			System.exit(1);
 		}
 		RealMatrix Eff = new Array2DRowRealMatrix(effect);
 		

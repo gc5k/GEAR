@@ -6,17 +6,18 @@ import java.io.PrintStream;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
+import java.util.logging.Level;
 
 import parameter.Parameter;
 import profile.struct.QScore;
 import profile.struct.ScoreUnit;
-import test.Test;
 import family.pedigree.file.SNP;
 import family.plink.PLINKBinaryParser;
 import family.plink.PLINKParser;
 import family.popstat.GenotypeMatrix;
 import family.qc.rowqc.SampleFilter;
 import gear.util.FileProcessor;
+import gear.util.Logger;
 import gear.util.NewIt;
 import gear.util.SNPMatch;
 
@@ -24,20 +25,13 @@ public class RiskScore {
 	private String delim = "\\s+";
 	private GenotypeMatrix G1;
 
-//	private int[][] comSNPIdx;
-//	private double[][] allelefreq1;
-//	private double[] N1;
-//	private double[] N2;
-//	private ArrayList<Boolean> flag;
 	private HashMap<String, ScoreUnit> Score = NewIt.newHashMap();
 
 	private String q_score_file;
 	private String q_score_range_file;
 	
 	private String scoreFile;
-//	private String[] title;
 	private ArrayList<SNP> snpList1;
-//	private ArrayList<Predictor> predictorList = NewIt.newArrayList();
 	private HashMap<String, QScore> QS = NewIt.newHashMap();
 	private double[][] q_score_range;
 	private String[] QRName;
@@ -48,7 +42,7 @@ public class RiskScore {
 	private SampleFilter sf1;
 
 	public RiskScore() {
-		System.err.print("generating risk profile for genotypes.\n");
+		Logger.printUserLog("Generating risk profile for genotypes.");
 		
 		initial();
 
@@ -58,10 +52,8 @@ public class RiskScore {
 					                     Parameter.INSTANCE.getBimFile(),
 					                     Parameter.INSTANCE.getFamFile());
 		} else {
-			System.err.println("did not specify files.");
-			Test.LOG.append("did not specify files.\n");
-			Test.printLog();
-			System.exit(0);
+			Logger.printUserError("--bfile is not set.");
+			System.exit(1);
 		}
 		pp1.Parse();
 
@@ -77,6 +69,7 @@ public class RiskScore {
 		scoreFile = Parameter.INSTANCE.scoreFile;
 		BufferedReader readerScoreFile = FileProcessor.FileOpen(scoreFile);
 		String lineScore = null;
+		Logger.printUserLog("Reading the score file '" + scoreFile + "'.");
 		try {
 			while ((lineScore = readerScoreFile.readLine()) != null) {
 				if (lineScore.length() == 0)
@@ -85,20 +78,21 @@ public class RiskScore {
 				Score.put(su.getSNP(), su);
 			}
 		} catch (IOException e) {
-			e.printStackTrace(System.err);
-			System.exit(0);
+			Logger.printUserError("An exception occurred when reading the score file '" + scoreFile + "'.");
+			Logger.printUserError("Exception Message: " + e.getMessage());
+			Logger.getDevLogger().log(Level.SEVERE, "Reading score file", e);
+			System.exit(1);
 		}
 
-		System.err.println(Score.size() + " predictors are read from " + scoreFile + ".");
+		Logger.printUserLog("Number of predictors: " + Score.size());
 
 		// read q score file and q range file
 		if (Parameter.INSTANCE.q_score_file != null && Parameter.INSTANCE.q_score_range_file != null) {
-
-			System.out.println(Parameter.INSTANCE.q_score_file + " " + Parameter.INSTANCE.q_score_range_file);
+			Logger.printUserLog("Reading the q-score file '" + Parameter.INSTANCE.q_score_file + " and the q-range file '" + Parameter.INSTANCE.q_score_range_file + "'.");
+			
 			// q score file
 			q_score_file = Parameter.INSTANCE.q_score_file;
-			BufferedReader readerQScoreFile = FileProcessor
-					.FileOpen(q_score_file);
+			BufferedReader readerQScoreFile = FileProcessor.FileOpen(q_score_file);
 			String lineQScore = null;
 			try {
 				while ((lineQScore = readerQScoreFile.readLine()) != null) {
@@ -109,22 +103,22 @@ public class RiskScore {
 					QS.put(qs.getSNP(), qs);
 				}
 			} catch (IOException e) {
-				e.printStackTrace(System.err);
-				System.exit(0);
+				Logger.printUserError("An exception occurred when reading the q-score file '" + q_score_file + "'.");
+				Logger.printUserError("Exception Message: " + e.getMessage());
+				Logger.getDevLogger().log(Level.SEVERE, "Reading q-score file", e);
+				System.exit(1);
 			}
+			
 			if (QS.size() == 0) {
-				System.out.println("nothing has been selected in "
-						+ q_score_file);
-				System.exit(0);
+				Logger.printUserError("Nothing is selected in '" + q_score_file + "'.");
+				System.exit(1);
 			} else {
-				System.out.println("read in " + QS.size() + " SNP scores from "
-						+ q_score_file + ".");
+				Logger.printUserLog("Number of q-scores: " + QS.size());
 			}
 
 			// q range file
 			q_score_range_file = Parameter.INSTANCE.q_score_range_file;
-			BufferedReader readerQRangeFile = FileProcessor
-					.FileOpen(q_score_range_file);
+			BufferedReader readerQRangeFile = FileProcessor.FileOpen(q_score_range_file);
 			String lineQRange = null;
 			ArrayList<ArrayList<String>> QR = NewIt.newArrayList();
 			try {
@@ -141,15 +135,16 @@ public class RiskScore {
 					QR.add(qr);
 				}
 			} catch (IOException e) {
-				e.printStackTrace(System.err);
-				System.exit(0);
+				Logger.printUserError("An exception occurred when reading the q-range file '" + q_score_range_file + "'.");
+				Logger.printUserError("Exception Message: " + e.getMessage());
+				Logger.getDevLogger().log(Level.SEVERE, "Reading q-range file", e);
+				System.exit(1);
 			}
+			
 			if (QR.size() == 0) {
-				System.out.println("nothing has been selected in "
-						+ q_score_range_file);
+				Logger.printUserError("Nothing is selected in '" + q_score_range_file + "'.");
 			} else {
-				System.out.println("read in " + QR.size() + " scores from "
-						+ q_score_range_file + ".");
+				Logger.printUserLog("Number of q-ranges: " + QR.size());
 			}
 
 			q_score_range = new double[QR.size()][2];
@@ -283,26 +278,15 @@ public class RiskScore {
 			}
 		}
 
-		System.out.println(Total + " SNPs were mapped to the score file.");
-		if (ATGCLocus > 1) {
-			if(Parameter.INSTANCE.keepATGC()) {
-				System.out.println(ATGCLocus + " ATGC loci were detected.");
-			} else {
-				System.out.println(ATGCLocus + " ATGC loci were removed.");
-			}
-		} else {
-			if(Parameter.INSTANCE.keepATGC()) {
-				System.out.println(ATGCLocus + " ATGC locus was detected.");
-			} else {
-				System.out.println(ATGCLocus + " ATGC locus was removed.");
-			}
-		}
+		Logger.printUserLog("Number of SNPs mapped to the score file: " + Total);
+		Logger.printUserLog("Number of ATGC loci " + (Parameter.INSTANCE.keepATGC() ? "detected: " : "removed: ") + ATGCLocus);
+				
 		for (int i = 0; i < QRName.length; i++) {
-			System.out.println(CCSNP[i] + " SNPs have mapped into " + QRName[i] + ".");
+			Logger.printUserLog("Number of SNPs mapped into " + QRName[i] + ": " + CCSNP[i]);
 		}
 
 		for (int i = 0; i < 4; i++) {
-			System.out.println(matchScheme[i] + " SNPs match Scheme " + (1+i));
+			Logger.printUserLog("Number of SNPs matching Scheme " + (1+i) + ": " + matchScheme[i]);
 		}
 
 		StringBuffer sbim = new StringBuffer();
@@ -339,7 +323,6 @@ public class RiskScore {
 		}
 		double[] riskProfile = new double[G1.getGRow()];
 		int[] GCInd = new int[G1.getGRow()];
-//		int[] CC = new int[G1.getGRow()];
 		for(int i = 0; i < snpList1.size(); i++) {
 			SNP snp = snpList1.get(i);
 			char a1 = snp.getRefAllele();
@@ -358,7 +341,6 @@ public class RiskScore {
 					}
 				}
 				su = Score.get(snp.getName());
-//				System.err.println(snp.getName()+ "\t" + Score.get(snp.getName()).getSNP());
 				if (su.isMissing()) {
 					continue;
 				}
@@ -420,24 +402,12 @@ public class RiskScore {
 			}
 		}
 
-		System.out.println(Total + " SNPs were mapped to the score file.");
-		if (ATGCLocus > 1) {
-			if (Parameter.INSTANCE.keepATGC()) {
-				System.out.println(ATGCLocus + " ATGC loci were detected.");
-			} else {
-				System.out.println(ATGCLocus + " ATGC loci were removed.");
-			}
-		} else {
-			if (Parameter.INSTANCE.keepATGC()) {
-				System.out.println(ATGCLocus + " ATGC Locus were detected.");
-			} else {
-				System.out.println(ATGCLocus + " ATGC locus was removed.");				
-			}
-		}
-		System.out.println(CCSNP + " SNPs have score in the score file.");
+		Logger.printUserLog("Number of SNPs mapped to the score file: " + Total);
+		Logger.printUserLog("Number of ATGC loci " + (Parameter.INSTANCE.keepATGC() ? "detected: " : "removed: ") + ATGCLocus);
+		Logger.printUserLog("Number of SNP scores in the score file: " + CCSNP);
 
 		for (int i = 0; i < 4; i++) {
-			System.out.println(matchScheme[i] + " SNPs match Scheme " + (1+i));
+			Logger.printUserLog("Number of SNPs matching Scheme " + (1+i) + ": "+ matchScheme[i]);
 		}
 
 		StringBuffer sbim = new StringBuffer();
@@ -449,34 +419,5 @@ public class RiskScore {
 			predictorFile.println(sf1.getSample().get(i).getFamilyID() + "\t" + sf1.getSample().get(i).getIndividualID() + "\t"+ sf1.getHukouBook().get(i).getCol6() + "\t" + riskProfile[i]);
 		}
 		predictorFile.close();
-/*		
-		PrintStream pf = FileProcessor.CreatePrintStream("s1.txt");
-		ArrayList<String> S = s4.get(0);
-		for (int i = 0; i < S.size(); i++) {
-			pf.println(S.get(i));
-		}
-		pf.close();
-		
-		pf = FileProcessor.CreatePrintStream("s2.txt");
-		S = s4.get(1);
-		for (int i = 0; i < S.size(); i++) {
-			pf.println(S.get(i));
-		}
-		pf.close();
-
-		pf = FileProcessor.CreatePrintStream("s3.txt");
-		S = s4.get(2);
-		for (int i = 0; i < S.size(); i++) {
-			pf.println(S.get(i));
-		}
-		pf.close();
-		
-		pf = FileProcessor.CreatePrintStream("s4.txt");
-		S = s4.get(3);
-		for (int i = 0; i < S.size(); i++) {
-			pf.println(S.get(i));
-		}
-		pf.close();
-*/
 	}
 }
