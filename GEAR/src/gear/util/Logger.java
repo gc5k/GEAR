@@ -37,8 +37,7 @@ public class Logger {
 		
 		String devLogFileName = namePrefix + "_dev.log";
 		try {
-			java.util.logging.FileHandler devLogHandler = null;
-			devLogHandler = new java.util.logging.FileHandler(devLogFileName);
+			java.util.logging.FileHandler devLogHandler = new java.util.logging.FileHandler(devLogFileName);
 			devLogHandler.setFormatter(new java.util.logging.SimpleFormatter());
 			devLogger.addHandler(devLogHandler);
 		}
