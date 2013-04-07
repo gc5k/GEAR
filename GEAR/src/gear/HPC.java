@@ -8,14 +8,8 @@ import java.util.logging.Level;
 import gear.util.Logger;
 
 public class HPC {
-	
-	String[] p;
 
-	public HPC(String[] par) {
-		p = par;
-	}
-
-	public void GenScript() {
+	public static void GenScript(String[] args) {
 		StringBuilder sb = new StringBuilder();
 		sb.append(Parameter.INSTANCE.name);
 		sb.append(".sh");
@@ -36,11 +30,11 @@ public class HPC {
 		shell.append("#$ -M " + Parameter.INSTANCE.email + "\n");
 
 		shell.append("java -jar -Xmx" + Parameter.INSTANCE.ram + " ");
-		shell.append(getClass().getProtectionDomain().getCodeSource().getLocation().getPath() + " ");
-		for (int i = 0; i < p.length; i++) {
-			if (p[i].compareTo("--shell") == 0 || p[i].compareTo("--qsub") == 0)
+		shell.append(HPC.class.getProtectionDomain().getCodeSource().getLocation().getPath() + " ");
+		for (int i = 0; i < args.length; i++) {
+			if (args[i].compareTo("--shell") == 0 || args[i].compareTo("--qsub") == 0)
 				continue;
-			shell.append(p[i] + " ");
+			shell.append(args[i] + " ");
 		}
 		shell.append("\n");
 		pw.append(shell);
