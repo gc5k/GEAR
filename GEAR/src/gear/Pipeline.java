@@ -38,7 +38,7 @@ public class Pipeline {
 		for (int i = 0; i < args.length; i++) {
 			Logger.printUserLog(args[i] + " ");
 		}
-		Logger.printUserLog("\n");
+		Logger.printUserLog("");
 
 		if (Parameter.INSTANCE.shFlag) {
 			HPC hps = new HPC(args);
