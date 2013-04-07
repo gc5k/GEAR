@@ -40,9 +40,7 @@ public class Pipeline {
 		Logger.printUserLog("");
 
 		if (Parameter.INSTANCE.shFlag) {
-			HPC hps = new HPC(args);
-			hps.GenScript();
-			System.exit(0);
+			HPC.GenScript(args);
 		} else if (Parameter.INSTANCE.scoreFlag) {
 			if (Parameter.INSTANCE.hasBFileOption()) {
 				RiskScore rs = new RiskScore();
