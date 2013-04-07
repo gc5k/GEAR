@@ -9,7 +9,6 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.logging.Level;
 
-import parameter.Parameter;
 
 import family.pedigree.PersonIndex;
 import family.pedigree.file.SNP;
@@ -17,6 +16,7 @@ import family.pedigree.genotype.BPerson;
 import family.plink.PLINKBinaryParser;
 import family.plink.PLINKParser;
 import family.qc.rowqc.SampleFilter;
+import gear.Parameter;
 import gear.util.FileProcessor;
 import gear.util.Logger;
 

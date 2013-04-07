@@ -9,11 +9,11 @@ import java.util.ArrayList;
 import java.util.Enumeration;
 import java.util.Hashtable;
 
-import parameter.Parameter;
 
 import family.pedigree.Hukou;
 import family.pedigree.phenotype.FamilyUnit;
 import family.pedigree.phenotype.Subject;
+import gear.Parameter;
 import gear.util.NewIt;
 
 

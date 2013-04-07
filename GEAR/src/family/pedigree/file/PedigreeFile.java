@@ -11,11 +11,11 @@ import java.util.Hashtable;
 
 import org.apache.commons.lang3.ArrayUtils;
 
-import parameter.Parameter;
 
 import family.pedigree.Hukou;
 import family.pedigree.genotype.BFamilyStruct;
 import family.pedigree.genotype.BPerson;
+import gear.Parameter;
 import gear.util.Logger;
 import gear.util.NewIt;
 

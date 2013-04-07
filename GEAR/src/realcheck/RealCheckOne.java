@@ -6,7 +6,6 @@ import java.util.Arrays;
 
 import org.apache.commons.math.random.RandomDataImpl;
 
-import parameter.Parameter;
 import family.pedigree.PersonIndex;
 import family.pedigree.file.SNP;
 import family.pedigree.genotype.BPerson;
@@ -14,6 +13,7 @@ import family.plink.PLINKBinaryParser;
 import family.plink.PLINKParser;
 import family.popstat.GenotypeMatrix;
 import family.qc.rowqc.SampleFilter;
+import gear.Parameter;
 import gear.util.FileProcessor;
 import gear.util.Logger;
 

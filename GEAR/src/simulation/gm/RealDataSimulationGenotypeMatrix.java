@@ -3,7 +3,7 @@ package simulation.gm;
 import java.util.ArrayList;
 
 import family.pedigree.PersonIndex;
-import parameter.Parameter;
+import gear.Parameter;
 import simulation.qc.rowqc.RealDataSimulationQC;
 
 public class RealDataSimulationGenotypeMatrix {

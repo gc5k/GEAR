@@ -1,8 +1,9 @@
 package gear.util;
 
+import gear.Parameter;
+
 import java.util.Random;
 
-import parameter.Parameter;
 
 /**
  * 

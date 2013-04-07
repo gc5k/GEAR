@@ -1,6 +1,6 @@
 package profile.struct;
 
-import parameter.Parameter;
+import gear.Parameter;
 
 public class QScore {
 

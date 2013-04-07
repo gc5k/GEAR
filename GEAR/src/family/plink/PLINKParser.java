@@ -3,13 +3,13 @@ package family.plink;
 import java.io.IOException;
 import java.util.logging.Level;
 
-import parameter.Parameter;
 
 import family.qc.colqc.SNPFilter;
 import family.qc.colqc.SNPFilterI;
 import family.qc.colqc.SNPFilterInterface;
 import family.pedigree.file.MapFile;
 import family.pedigree.file.PedigreeFile;
+import gear.Parameter;
 import gear.util.Logger;
 
 public class PLINKParser {

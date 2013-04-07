@@ -9,12 +9,12 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.logging.Level;
 
-import parameter.Parameter;
 import family.pedigree.file.SNP;
 import family.plink.PLINKBinaryParser;
 import family.plink.PLINKParser;
 import family.popstat.GenotypeMatrix;
 import family.qc.rowqc.SampleFilter;
+import gear.Parameter;
 import gear.util.FileProcessor;
 import gear.util.Logger;
 import gear.util.NewIt;
@@ -359,7 +359,7 @@ public class MakePredictor2 {
 				continue;
 			} else {
 				double s = Double.parseDouble(pd.getField(Parameter.INSTANCE.getPredictorIdx()));
-				if (Parameter.INSTANCE.getTranFunction() == parameter.RegressionModel.LINEAR) {
+				if (Parameter.INSTANCE.getTranFunction() == gear.RegressionModel.LINEAR) {
 					if (scoreCoding.get(i).intValue() == 1) {
 						s *= -1;
 					}

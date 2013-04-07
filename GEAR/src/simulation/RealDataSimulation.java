@@ -13,13 +13,13 @@ import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.math.random.RandomDataImpl;
 import org.apache.commons.math.stat.StatUtils;
 
-import parameter.Parameter;
 import family.pedigree.PersonIndex;
 import family.pedigree.file.SNP;
 import family.pedigree.genotype.BPerson;
 import family.plink.PLINKBinaryParser;
 import family.plink.PLINKParser;
 import family.qc.rowqc.SampleFilter;
+import gear.Parameter;
 import gear.util.FileProcessor;
 import gear.util.Logger;
 import gear.util.NewIt;

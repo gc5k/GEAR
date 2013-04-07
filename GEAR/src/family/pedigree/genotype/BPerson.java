@@ -1,7 +1,7 @@
 package family.pedigree.genotype;
 
 import family.plink.PLINKBinaryParser;
-import parameter.Parameter;
+import gear.Parameter;
 
 /**
  * stores the genotypes of each individual. this class is not thread safe

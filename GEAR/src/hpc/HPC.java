@@ -1,10 +1,11 @@
 package hpc;
 
+import gear.Parameter;
+
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.PrintWriter;
 
-import parameter.Parameter;
 
 public class HPC {
 	String[] p;

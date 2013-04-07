@@ -10,7 +10,6 @@ import java.util.Iterator;
 import java.util.Set;
 import java.util.logging.Level;
 
-import parameter.Parameter;
 import sumstat.qc.rowqc.SumStatQC;
 
 import family.pedigree.PersonIndex;
@@ -20,6 +19,7 @@ import family.plink.PLINKBinaryParser;
 import family.plink.PLINKParser;
 import family.popstat.GenotypeMatrix;
 import family.qc.rowqc.SampleFilter;
+import gear.Parameter;
 import gear.util.FileProcessor;
 import gear.util.Logger;
 import gear.util.NewIt;

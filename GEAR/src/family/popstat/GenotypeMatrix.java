@@ -2,9 +2,9 @@ package family.popstat;
 
 import java.util.ArrayList;
 
-import parameter.Parameter;
 import family.pedigree.PersonIndex;
 import family.pedigree.genotype.BPerson;
+import gear.Parameter;
 
 public class GenotypeMatrix {
 

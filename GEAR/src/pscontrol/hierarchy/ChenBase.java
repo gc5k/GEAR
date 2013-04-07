@@ -3,11 +3,11 @@ package pscontrol.hierarchy;
 import java.util.ArrayList;
 import java.util.Random;
 
-import parameter.Parameter;
 
 import family.pedigree.PersonIndex;
 import family.pedigree.file.MapFile;
 import family.pedigree.file.PedigreeFile;
+import gear.Parameter;
 import gear.util.NewIt;
 
 

@@ -6,7 +6,6 @@ import java.text.NumberFormat;
 import org.apache.commons.math.MathException;
 import org.apache.commons.math.stat.inference.ChiSquareTestImpl;
 
-import parameter.Parameter;
 import sumstat.qc.rowqc.SumStatQC;
 
 import family.pedigree.file.MapFile;
@@ -15,6 +14,7 @@ import family.plink.PLINKBinaryParser;
 import family.plink.PLINKParser;
 import family.popstat.GenotypeMatrix;
 import family.qc.rowqc.SampleFilter;
+import gear.Parameter;
 import gear.util.Logger;
 import gear.util.stat.FastFisherExactTest;
 

@@ -1,4 +1,4 @@
-package parameter;
+package gear;
 
 public enum HEType {
 	SD,

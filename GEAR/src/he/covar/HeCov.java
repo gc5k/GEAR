@@ -1,5 +1,6 @@
 package he.covar;
 
+import gear.Parameter;
 import gear.util.FileProcessor;
 import gear.util.Logger;
 import gear.util.NewIt;
@@ -14,7 +15,6 @@ import org.apache.commons.math.linear.Array2DRowRealMatrix;
 import org.apache.commons.math.linear.LUDecompositionImpl;
 import org.apache.commons.math.linear.RealMatrix;
 
-import parameter.Parameter;
 
 
 public class HeCov {

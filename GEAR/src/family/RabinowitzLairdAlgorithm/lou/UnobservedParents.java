@@ -6,8 +6,8 @@ import java.util.TreeSet;
 import java.util.ArrayList;
 
 import family.RabinowitzLairdAlgorithm.AbstractGenoDistribution;
+import gear.Parameter;
 import gear.util.NewIt;
-import parameter.Parameter;
 
 
 /**

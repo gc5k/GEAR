@@ -8,13 +8,13 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.logging.Level;
 
-import parameter.Parameter;
-import parameter.RegressionModel;
 import family.pedigree.file.SNP;
 import family.plink.PLINKBinaryParser;
 import family.plink.PLINKParser;
 import family.popstat.GenotypeMatrix;
 import family.qc.rowqc.SampleFilter;
+import gear.Parameter;
+import gear.RegressionModel;
 import gear.util.FileProcessor;
 import gear.util.Logger;
 import gear.util.NewIt;

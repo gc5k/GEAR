@@ -7,7 +7,6 @@ import java.util.Hashtable;
 import java.util.Iterator;
 import java.util.logging.Level;
 
-import parameter.Parameter;
 
 import family.pedigree.Hukou;
 import family.pedigree.PersonIndex;
@@ -15,6 +14,7 @@ import family.pedigree.file.MapFile;
 import family.pedigree.file.PedigreeFile;
 import family.pedigree.genotype.BFamilyStruct;
 import family.pedigree.genotype.BPerson;
+import gear.Parameter;
 import gear.util.FileProcessor;
 import gear.util.Logger;
 import gear.util.NewIt;

@@ -6,7 +6,7 @@ package family.RabinowitzLairdAlgorithm.lou;
 import java.util.TreeMap;
 
 import family.RabinowitzLairdAlgorithm.AbstractGenoDistribution;
-import parameter.Parameter;
+import gear.Parameter;
 
 /**
  * Class for observing both parental genotypes.
