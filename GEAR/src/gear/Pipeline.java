@@ -10,7 +10,6 @@ import he.HECalculate;
 import he.HEPermutation;
 import he.HERead;
 import he.h2trans.H2Transformer;
-import hpc.HPC;
 import realcheck.RealCheck;
 import realcheck.RealCheckOne;
 import simulation.RealDataSimulation;
