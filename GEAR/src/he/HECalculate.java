@@ -22,11 +22,11 @@ import org.apache.commons.math.linear.LUDecompositionImpl;
 import org.apache.commons.math.linear.RealMatrix;
 import org.apache.commons.math.linear.Array2DRowRealMatrix;
 
+import gear.Parameter;
 import gear.util.FileProcessor;
 import gear.util.Logger;
 import he.endian.LittleEndianDataInputStream;
 
-import parameter.Parameter;
 
 public class HECalculate {
 
@@ -577,7 +577,7 @@ public class HECalculate {
 					* (u_b1 / u_b0)
 					* (v_b0 / (u_b0 * u_b0) + v_b1 / (u_b1 * u_b1) - 2
 							* v.getEntry(0, 1) / (u_b0 * u_b1));
-			if (heReader.heType == parameter.HEType.CP) {
+			if (heReader.heType == gear.HEType.CP) {
 				v_ho = Math.sqrt(v_b1);
 			}
 			heReader.sb.append("h2(o): " + fmt.format(h_o) + "\t"

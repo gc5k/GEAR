@@ -1,6 +1,6 @@
 package he;
 
-import parameter.Parameter;
+import gear.Parameter;
 
 public class Lambda {
 	protected double L = 0;

@@ -5,10 +5,10 @@ import java.io.IOException;
 import java.util.Arrays;
 import java.util.HashMap;
 
+import gear.Parameter;
 import gear.util.FileProcessor;
 import gear.util.Logger;
 
-import parameter.Parameter;
 
 public class HERead {
 	private final String delim = "\\s+";
@@ -26,7 +26,7 @@ public class HERead {
 	protected boolean reverse;
 	protected boolean k_button;
 	protected double k;
-	protected parameter.HEType heType;
+	protected gear.HEType heType;
 
 	protected HashMap<String, Integer> ID2Idx;
 

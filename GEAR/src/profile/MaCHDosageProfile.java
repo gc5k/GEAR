@@ -1,5 +1,6 @@
 package profile;
 
+import gear.Parameter;
 import gear.util.FileProcessor;
 import gear.util.Logger;
 import gear.util.NewIt;
@@ -14,7 +15,6 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.logging.Level;
 
-import parameter.Parameter;
 import profile.struct.DosageInfor;
 import profile.struct.ScoreUnit;
 import profile.struct.QScore;

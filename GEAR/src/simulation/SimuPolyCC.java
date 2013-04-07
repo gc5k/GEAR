@@ -1,5 +1,6 @@
 package simulation;
 
+import gear.Parameter;
 import gear.util.FileProcessor;
 import gear.util.Logger;
 import gear.util.TextHelper;
@@ -15,7 +16,6 @@ import java.util.Arrays;
 import java.util.Calendar;
 import java.util.logging.Level;
 
-import parameter.Parameter;
 
 import org.apache.commons.math.MathException;
 import org.apache.commons.math.distribution.NormalDistributionImpl;

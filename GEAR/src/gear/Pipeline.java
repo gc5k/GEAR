@@ -1,4 +1,5 @@
 package gear;
+
 import java.util.Calendar;
 
 import merge.MergeTwoFile;
@@ -21,7 +22,6 @@ import strand.MakePredictor2;
 import strand.Strand;
 import sumstat.FrequencyCalculator;
 import sumstat.Inbreeding;
-import parameter.Parameter;
 import profile.MaCHDosageProfile;
 import profile.RiskScore;
 import pscontrol.NonTransmitted;

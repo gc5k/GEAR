@@ -2,10 +2,10 @@ package family.qc.colqc.softfilter;
 
 import java.util.HashSet;
 
-import parameter.Parameter;
 
 import family.popstat.AlleleFrequency;
 import family.qc.colqc.SNPFilterInterface;
+import gear.Parameter;
 import gear.util.Logger;
 import gear.util.NewIt;
 

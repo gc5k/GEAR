@@ -3,13 +3,13 @@ package pscontrol;
 import java.util.ArrayList;
 import java.util.Iterator;
 
-import parameter.Parameter;
 import pscontrol.hierarchy.AJHG2008;
 import pscontrol.write.NonTransWriteBedSNPMajor;
 import family.pedigree.PersonIndex;
 import family.plink.PLINKBinaryParser;
 import family.plink.PLINKParser;
 import family.qc.rowqc.SampleFilter;
+import gear.Parameter;
 import gear.util.Logger;
 import gear.util.NewIt;
 

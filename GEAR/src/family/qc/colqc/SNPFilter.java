@@ -7,9 +7,9 @@ import java.util.Iterator;
 
 import org.apache.commons.lang3.ArrayUtils;
 
-import parameter.Parameter;
 import family.pedigree.file.MapFile;
 import family.pedigree.file.SNP;
+import gear.Parameter;
 import gear.util.NewIt;
 
 public class SNPFilter implements SNPFilterInterface {

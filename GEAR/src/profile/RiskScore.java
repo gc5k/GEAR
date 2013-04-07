@@ -8,7 +8,6 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.logging.Level;
 
-import parameter.Parameter;
 import profile.struct.QScore;
 import profile.struct.ScoreUnit;
 import family.pedigree.file.SNP;
@@ -16,6 +15,7 @@ import family.plink.PLINKBinaryParser;
 import family.plink.PLINKParser;
 import family.popstat.GenotypeMatrix;
 import family.qc.rowqc.SampleFilter;
+import gear.Parameter;
 import gear.util.FileProcessor;
 import gear.util.Logger;
 import gear.util.NewIt;
@@ -241,7 +241,7 @@ public class RiskScore {
 				}
 
 				sc = su.getScore();
-				if(Parameter.INSTANCE.getTranFunction() == parameter.RegressionModel.LOGIT) {
+				if(Parameter.INSTANCE.getTranFunction() == gear.RegressionModel.LOGIT) {
 					if(isMatch) {
 						sc = Math.log(sc);
 					} else {
@@ -375,7 +375,7 @@ public class RiskScore {
 				CCSNP++;
 
 				sc = su.getScore();
-				if (Parameter.INSTANCE.getTranFunction() == parameter.RegressionModel.LOGIT) {//logit s
+				if (Parameter.INSTANCE.getTranFunction() == gear.RegressionModel.LOGIT) {//logit s
 					if(isMatch) {
 						sc = Math.log(sc);
 					} else {

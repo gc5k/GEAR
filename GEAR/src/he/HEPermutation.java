@@ -1,5 +1,6 @@
 package he;
 
+import gear.Parameter;
 import gear.util.Logger;
 import gear.util.NewIt;
 import gear.util.Sample;
@@ -29,7 +30,6 @@ import org.apache.commons.math.linear.RealMatrix;
 import org.apache.commons.math.linear.Array2DRowRealMatrix;
 import org.apache.commons.math.stat.descriptive.DescriptiveStatistics;
 
-import parameter.Parameter;
 
 public class HEPermutation {
 
@@ -371,7 +371,7 @@ public class HEPermutation {
 			double v_b1 = v.getEntry(1, 1);
 
 			double v_ho = (u_b1/u_b0) * (u_b1/u_b0) * (v_b0/(u_b0 * u_b0) + v_b1/(u_b1 * u_b1) - 2*v.getEntry(0, 1)/(u_b0*u_b1));
-			if (heReader.heType == parameter.HEType.CP) {
+			if (heReader.heType == gear.HEType.CP) {
 				v_ho = Math.sqrt(v_b1);
 			}
 			heReader.sb.append("h2(o): " + fmt.format(h_o) + "\t" + fmt.format(v_ho) + "\n");
