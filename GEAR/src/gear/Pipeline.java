@@ -39,8 +39,8 @@ public class Pipeline {
 		}
 		Logger.printUserLog("");
 
-		if (Parameter.INSTANCE.shFlag) {
-			HPC.GenScript(args);
+		if (Parameter.INSTANCE.getHpcParameter().isSet()) {
+			HPC.genScript(args);
 		} else if (Parameter.INSTANCE.scoreFlag) {
 			if (Parameter.INSTANCE.hasBFileOption()) {
 				RiskScore rs = new RiskScore();
