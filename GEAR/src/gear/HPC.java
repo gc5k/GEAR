@@ -9,9 +9,9 @@ import gear.util.Logger;
 
 public class HPC {
 
-	public static void GenScript(String[] args) {
+	public static void genScript(String[] args) {
 		StringBuilder sb = new StringBuilder();
-		sb.append(Parameter.INSTANCE.name);
+		sb.append(Parameter.INSTANCE.getHpcParameter().getName());
 		sb.append(".sh");
 		PrintWriter pw = null;
 		try {
@@ -24,12 +24,12 @@ public class HPC {
 
 		StringBuilder shell = new StringBuilder();
 		shell.append("#$ -cwd" + "\n");
-		shell.append("#$ -l vf=" + Parameter.INSTANCE.ram + "\n");
-		shell.append("#$ -N " + Parameter.INSTANCE.name + "\n");
-		shell.append("#$ -m eas" + "\n");
-		shell.append("#$ -M " + Parameter.INSTANCE.email + "\n");
+		shell.append("#$ -l vf=" + Parameter.INSTANCE.getHpcParameter().getRam() + "\n");
+		shell.append("#$ -N " + Parameter.INSTANCE.getHpcParameter().getName() + "\n");
+		shell.append("#$ -m eas\n");
+		shell.append("#$ -M " + Parameter.INSTANCE.getHpcParameter().getEmail() + "\n");
 
-		shell.append("java -jar -Xmx" + Parameter.INSTANCE.ram + " ");
+		shell.append("java -jar -Xmx" + Parameter.INSTANCE.getHpcParameter().getRam() + " ");
 		shell.append(HPC.class.getProtectionDomain().getCodeSource().getLocation().getPath() + " ");
 		for (int i = 0; i < args.length; i++) {
 			if (args[i].compareTo("--shell") == 0 || args[i].compareTo("--qsub") == 0)
@@ -39,7 +39,7 @@ public class HPC {
 		shell.append("\n");
 		pw.append(shell);
 		pw.close();
-		if (Parameter.INSTANCE.qsubFlag) {
+		if (Parameter.INSTANCE.getHpcParameter().isQsubSet()) {
 			Runtime rt = Runtime.getRuntime();
 			String cmd = "qsub " + sb.toString();
 			try {

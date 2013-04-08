@@ -18,7 +18,10 @@ import org.apache.commons.cli.PosixParser;
 
 // singleton implemented in enum way
 public enum Parameter {
+	
 	INSTANCE;
+	
+	CommandLine cl;
 
 // PLINK binary input file options Begin
 	public boolean hasBFileOption() { return bfileOption; }
@@ -406,13 +409,11 @@ public enum Parameter {
 	private boolean heFlag = false;
 	
 	public class HEParameter {
-		private HEParameter() {}
 		
 		@SuppressWarnings("static-access")
-		private void commandInitial() {
+		private HEParameter() {
 			ops.addOption(OptionBuilder.withLongOpt(cmd_grm_cutoff_long).withDescription("grm cut-off").hasArg().create(cmd_grm_cutoff));
 			ops.addOption(OptionBuilder.withLongOpt(cmd_abs_grm_cutoff_long).withDescription("grm absolute cut-off").hasArg().create(cmd_abs_grm_cutoff));
-
 			ops.addOption(OptionBuilder.withLongOpt(cmd_grm_txt_long).withDescription("grm text format").hasArg().create(cmd_grm_txt));
 			ops.addOption(OptionBuilder.withLongOpt(cmd_grm_bin_long).withDescription("grm binary format").hasArg().create(cmd_grm_bin));
 			ops.addOption(OptionBuilder.withDescription("grm ").hasArg().create(cmd_grm));
@@ -423,7 +424,7 @@ public enum Parameter {
 			ops.addOption(OptionBuilder.withLongOpt(cmd_cp_long).withDescription("phenotype is coded as cross product").create(cmd_cp));
 		}
 		
-		private void commandListener(CommandLine cl) {
+		private void commandListener() {
 			if (cl.hasOption(cmd_grm)) {
 				StringBuilder sb1 = new StringBuilder(cl.getOptionValue(cmd_grm));
 				grm_ = sb1.append(".grm.gz").toString();
@@ -534,11 +535,12 @@ public enum Parameter {
 
 		private final String cmd_mpheno = "mpheno";
 		private int[] mpheno = {1};
+		
 	}
 	
 	public HEParameter getHEParameter() { return heParameter; }
 	
-	private HEParameter heParameter = new HEParameter();
+	private HEParameter heParameter;
 // HE regression options End
 	
 	//quantitative covariates
@@ -604,17 +606,48 @@ public enum Parameter {
 	private final String cmd_na = "na";
 	public String[] na = {"-9", "NA", "na", "-Inf", "Inf"};
 
-/////////////////hpc
-	private final String cmd_qsub = "qsub";
-	public boolean qsubFlag = false;
-	private final String cmd_sh = "shell";
-	public boolean shFlag = false;
-	private final String cmd_email = "email";
-	public String email = "guobo.chen@uq.edu.au";
-	private final String cmd_ram = "ram";
-	public String ram= "10G";
-	private final String cmd_name = "name";
-	public String name = "gear";
+	public class HpcParameter {
+		
+		@SuppressWarnings("static-access")
+		private HpcParameter() {
+			ops.addOption(OptionBuilder.withDescription("qsub").create(cmd_qsub));
+			ops.addOption(OptionBuilder.withDescription("generate shell").create(cmd_sh));
+			ops.addOption(OptionBuilder.withDescription("email").hasArg().create(cmd_email));
+			ops.addOption(OptionBuilder.withDescription("ram").hasArg().create(cmd_ram));
+			ops.addOption(OptionBuilder.withDescription("name").hasArg().create(cmd_name));
+		}
+		
+		public boolean isSet() {
+			return cl.hasOption(cmd_qsub) || cl.hasOption(cmd_sh);
+		}
+		
+		public boolean isQsubSet() {
+			return cl.hasOption(cmd_qsub);
+		}
+		
+		public String getEmail() {
+			return cl.getOptionValue(cmd_email, "guobo.chen@uq.edu.au");
+		}
+		
+		public String getRam() {
+			return cl.getOptionValue(cmd_ram, "10G");
+		}
+		
+		public String getName() {
+			return cl.getOptionValue(cmd_name, "gear");
+		}
+		
+		private static final String cmd_qsub = "qsub";
+		private static final String cmd_sh = "shell";
+		private static final String cmd_email = "email";
+		private static final String cmd_ram = "ram";
+		private final String cmd_name = "name";
+	
+	}
+	
+	public HpcParameter getHpcParameter() {	return hpcParameter; }
+	
+	private HpcParameter hpcParameter;
 	
 ///////////////////level 1 snp selection
 	private final String cmd_chr = "chr";
@@ -699,16 +732,10 @@ public enum Parameter {
 
 	private CommandLineParser parser = new PosixParser();
 
-	private Parameter() {
-		commandInitial();
-	}
-
-	public Options getOptions() {
-		return ops;
-	}
-
 	@SuppressWarnings("static-access")
-	public void commandInitial() {
+	private Parameter() {
+		ops = new Options();
+		
 		ops.addOption(OptionBuilder.withDescription("file ").hasArg().create(cmd_file));
 		ops.addOption(OptionBuilder.withDescription("bfile ").hasArg().create(cmd_bfile));
 		ops.addOption(OptionBuilder.withDescription("bfile2 ").hasArg().create(cmd_bfile2));
@@ -842,7 +869,8 @@ public enum Parameter {
 
 //haseman-elston regression
 		ops.addOption(OptionBuilder.withDescription("h2 ").hasArg().create(cmd_eh2));
-		heParameter.commandInitial();
+		
+		heParameter = new HEParameter();
 
 		ops.addOption(OptionBuilder.withDescription("covariate file").hasArg().create(cmd_covar));
 
@@ -861,16 +889,9 @@ public enum Parameter {
 		ops.addOption(OptionBuilder.withDescription("prevalence ").hasArg().create(cmd_k));
 
 		ops.addOption(OptionBuilder.withDescription("na ").hasArg().create(cmd_na));
-///////hpc
-		ops.addOption(OptionBuilder.withDescription("qsub").create(cmd_qsub));
-
-		ops.addOption(OptionBuilder.withDescription("generate shell").create(cmd_sh));
 		
-		ops.addOption(OptionBuilder.withDescription("email").hasArg().create(cmd_email));
+		hpcParameter = new HpcParameter();
 		
-		ops.addOption(OptionBuilder.withDescription("ram").hasArg().create(cmd_ram));
-		
-		ops.addOption(OptionBuilder.withDescription("name").hasArg().create(cmd_name));
 ///////transform heritability		
 		ops.addOption(OptionBuilder.withLongOpt(cmd_cal_k_long).withDescription("calculate heritability on the liability/observed scale with value K " + cmd_cal_k).hasArg().create(cmd_cal_k));
 		
@@ -889,7 +910,6 @@ public enum Parameter {
 	}
 
 	public void commandListener(String[] args) {
-		CommandLine cl = null;
 		try {
 			cl = parser.parse(ops, args);
 		} catch (ParseException e) {
@@ -901,7 +921,7 @@ public enum Parameter {
 		if (cl.hasOption(cmd_help)) {
 			HelpFormatter formatter = new HelpFormatter();
 			formatter.printHelp("HE Regression", ops);
-			System.exit(1);
+			System.exit(0);
 		}
 
 		if (cl.hasOption(cmd_file)) {
@@ -1227,7 +1247,7 @@ public enum Parameter {
 			eh2 = Double.parseDouble(cl.getOptionValue(cmd_eh2));
 		}
 
-		heParameter.commandListener(cl);
+		heParameter.commandListener();
 
 		if (cl.hasOption(cmd_covar)) {
 			covar_file = cl.getOptionValue(cmd_covar);
@@ -1320,27 +1340,6 @@ public enum Parameter {
 			na = cl.getOptionValue(cmd_na).split(",");
 		}
 
-		if (cl.hasOption(cmd_qsub)) {
-			shFlag = true;
-			qsubFlag = true;
-		}
-		
-		if (cl.hasOption(cmd_sh)) {
-			shFlag = true;
-		}
-		
-		if (cl.hasOption(cmd_email)) {
-			email = cl.getOptionValue(cmd_email);
-		}
-
-		if (cl.hasOption(cmd_ram)) {
-			ram = cl.getOptionValue(cmd_ram);
-		}
-		
-		if (cl.hasOption(cmd_name)) {
-			name = cl.getOptionValue(cmd_name);
-		}
-
 		if (cl.hasOption(cmd_out)) {
 			out = cl.getOptionValue(cmd_out);
 		}
@@ -1374,6 +1373,10 @@ public enum Parameter {
 		}
 	}
 
+	public Options getOptions() {
+		return ops;
+	}
+
 	public boolean isNA(String n) {
 		boolean f = false;
 		for (int i = 0; i < na.length; i++) {
@@ -1392,4 +1395,5 @@ public enum Parameter {
 			System.exit(1);
 		}
 	}
+	
 }
