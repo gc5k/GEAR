@@ -7,8 +7,6 @@ import java.io.IOException;
 import java.io.PrintStream;
 import java.util.ArrayList;
 import java.util.Iterator;
-import java.util.logging.Level;
-
 
 import family.pedigree.PersonIndex;
 import family.pedigree.file.SNP;
@@ -84,9 +82,7 @@ public class NonTransWriteBedSNPMajor {
 		try {
 			os = new DataOutputStream(new FileOutputStream(sbed.toString()));
 		} catch (FileNotFoundException e) {
-			Logger.printUserError("Cannot create file '" + sbed.toString() + "'.");
-			Logger.printUserError("Exception Message: " + e.getMessage());
-			System.exit(1);
+			Logger.handleException(e, "Cannot create file '" + sbed.toString() + "'.");
 		}
 
 		try {
@@ -123,10 +119,7 @@ public class NonTransWriteBedSNPMajor {
 			}
 			os.close();
 		} catch (IOException e) {
-			Logger.printUserError("An exception occurred when writing file '" + sbed.toString() + ".");
-			Logger.printUserError("Exception Message: " + e.getMessage());
-			Logger.getDevLogger().log(Level.SEVERE, "Writing bed file", e);
-			System.exit(1);
+			Logger.handleException(e, "An exception occurred when writing file '" + sbed.toString() + ".");
 		}
 	}
 

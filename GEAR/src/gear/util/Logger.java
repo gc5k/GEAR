@@ -3,6 +3,7 @@ package gear.util;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.PrintWriter;
+import java.util.logging.Level;
 
 public class Logger {
 
@@ -30,9 +31,7 @@ public class Logger {
 			userLogWriter = new PrintWriter(userLogFileName);
 		}
 		catch (FileNotFoundException e) {
-			System.err.println("Unable to create the log file '" + userLogFileName + "'");
-			System.err.println("Exception Message: " + e.getMessage());
-			System.exit(1);
+			handleException(e, "Unable to create the log file '" + userLogFileName + "'");
 		}
 		
 		String devLogFileName = namePrefix + "_dev.log";
@@ -42,9 +41,7 @@ public class Logger {
 			devLogger.addHandler(devLogHandler);
 		}
 		catch (IOException e) {
-			System.err.println("Unable to create the log file '" + devLogFileName + "'");
-			System.err.println("Exception Message: " + e.getMessage());
-			System.exit(1);
+			handleException(e, "Unable to create the log file '" + devLogFileName + "'");
 		}
 	}
 	
@@ -64,6 +61,13 @@ public class Logger {
 	
 	public static java.util.logging.Logger getDevLogger() {
 		return devLogger;
+	}
+	
+	public static void handleException(Exception e, String msg) {
+		printUserError(msg);
+		printUserError("Exception Message: " + e.getMessage());
+		devLogger.log(Level.SEVERE, msg, e);
+		System.exit(1);
 	}
 	
 }

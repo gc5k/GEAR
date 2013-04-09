@@ -7,7 +7,6 @@ import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
-import java.util.logging.Level;
 
 public class BIMReader extends MapFile {
 
@@ -21,10 +20,7 @@ public class BIMReader extends MapFile {
 		try {
 			reader = new BufferedReader(new FileReader(mapfile));
 		} catch (IOException e) {
-			Logger.printUserError("Can't open the map file.");
-			Logger.printUserError("Exception Message: " + e.getMessage());
-			Logger.getDevLogger().log(Level.SEVERE, "Creating BufferedReader", e);
-			System.exit(1);
+			Logger.handleException(e, "Can't open the file '" + mf + "'.");
 		}
 
 		String line = null;
@@ -47,10 +43,7 @@ public class BIMReader extends MapFile {
 			}
 			reader.close();
 		} catch (IOException e) {
-			Logger.printUserError("An exception occurred when reading the map file '" + mf + "'.");
-			Logger.printUserError("Exception Message: " + e.getMessage());
-			Logger.getDevLogger().log(Level.SEVERE, "Parsing the map file", e);
-			System.exit(1);
+			Logger.handleException(e, "An exception occurred when reading the map file '" + mf + "'.");
 		}
 
 		if (badline != null) {

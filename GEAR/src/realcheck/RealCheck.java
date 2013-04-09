@@ -7,7 +7,6 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Iterator;
-import java.util.logging.Level;
 
 import org.apache.commons.math.random.RandomDataImpl;
 
@@ -256,10 +255,7 @@ public class RealCheck {
 				}
 			}
 		} catch (IOException e) {
-			Logger.printUserError("An exception occurred when reading the real-check SNPs.");
-			Logger.printUserError("Exception Message: " + e.getMessage());
-			Logger.getDevLogger().log(Level.SEVERE, "Reading real-check SNPs", e);
-			System.exit(1);
+			Logger.handleException(e, "An exception occurred when reading the real-check SNPs.");
 		}
 		Logger.printUserLog(selectedSNP.size() + " marker(s) is read in " + Parameter.INSTANCE.getRealCheckParameter().getSnps() + ".");
 		return selectedSNP;

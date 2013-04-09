@@ -913,9 +913,7 @@ public enum Parameter {
 		try {
 			cl = parser.parse(ops, args);
 		} catch (ParseException e) {
-			Logger.printUserError("Failed to parse the command-line arguments.");
-			Logger.printUserError("Exception Message: " + e.getMessage());
-			System.exit(1);
+			Logger.handleException(e, "Failed to parse the command-line arguments.");
 		}
 
 		if (cl.hasOption(cmd_help)) {

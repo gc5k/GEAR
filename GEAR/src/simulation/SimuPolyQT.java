@@ -14,9 +14,6 @@ import java.io.IOException;
 import java.io.PrintWriter;
 import java.text.DecimalFormat;
 import java.util.Arrays;
-import java.util.Calendar;
-import java.util.logging.Level;
-
 
 import org.apache.commons.math.linear.Array2DRowRealMatrix;
 import org.apache.commons.math.linear.RealMatrix;
@@ -53,10 +50,8 @@ public class SimuPolyQT {
 
 	private String A1 = "A";
 	private String A2 = "C";
-	public static StringBuilder LOG = new StringBuilder();
 
 	public SimuPolyQT() {
-
 		M = Parameter.INSTANCE.polyLoci;
 		M_null = Parameter.INSTANCE.polyLociNull;
 		U = Parameter.INSTANCE.polyU;
@@ -82,25 +77,22 @@ public class SimuPolyQT {
 		phenotype = new double[sample];
 		BV = new double[sample];
 
-		Calendar calendar = Calendar.getInstance();
-		LOG.append("\nThe analysis was implemented at: " + calendar.getTime()
-				+ "\n");
-		LOG.append("Simulation polygenic model for quantitative traits.\n");
-		LOG.append("seed: " + seed + "\n");
+		Logger.printUserLog("Simulation polygenic model for quantitative traits.");
+		Logger.printUserLog("seed: " + seed);
 
-		LOG.append("MAF: " + Parameter.INSTANCE.polyFreq + "\n");
-		LOG.append("Marker: " + M + "\n");
-		LOG.append("Null marker: " + M + "\n");
+		Logger.printUserLog("MAF: " + Parameter.INSTANCE.polyFreq);
+		Logger.printUserLog("Marker: " + M);
+		Logger.printUserLog("Null marker: " + M);
 		if (Parameter.INSTANCE.polyEffectFlag) {
-			LOG.append("genetic effect file: " + Parameter.INSTANCE.polyEffectFile + "\n");
+			Logger.printUserLog("genetic effect file: " + Parameter.INSTANCE.polyEffectFile);
 		} else {
-			LOG.append("Uniform Effect: " + U + "\n");
+			Logger.printUserLog("Uniform Effect: " + U);
 		}
-		LOG.append("LD: " + ld + "\n");
-		LOG.append("Sample size: " + sample + "\n");
-		LOG.append("h2: " + h2 + "\n");
-		LOG.append("out: " + out + "\n");
-		LOG.append("\n");
+		Logger.printUserLog("LD: " + ld);
+		Logger.printUserLog("Sample size: " + sample);
+		Logger.printUserLog("h2: " + h2);
+		Logger.printUserLog("out: " + out);
+		Logger.printUserLog("");
 	}
 
 	public static void main(String[] args) {
@@ -114,27 +106,6 @@ public class SimuPolyQT {
 		} else {
 			writeFile();
 		}
-		writeLog();
-	}
-	
-	public void writeLog() {
-
-		Calendar calendar = Calendar.getInstance();
-		LOG.append("\nThe analysis was completed at: " + calendar.getTime()
-				+ "\n");
-		PrintWriter log = null;
-		try {
-			log = new PrintWriter(new BufferedWriter(new FileWriter(out
-					+ ".plog")));
-		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-		log.println(LOG.toString());
-		log.close();
-
-		Logger.printUserLog(LOG.toString());
-
 	}
 
 	public void GenerateSampleNoSelection() {
@@ -163,13 +134,13 @@ public class SimuPolyQT {
 		double vg = StatUtils.variance(BV);
 		double ve = vg * (1-h2) / h2;
 		double E = Math.sqrt(ve);
-		LOG.append("Vg=" + fmt.format(vg) + "\n");
+		Logger.printUserLog("Vg=" + fmt.format(vg));
 		for (int i = 0; i < sample; i++) {
 			phenotype[i] = BV[i] + rnd.nextGaussian(0, E);
 		}
 		double vp = StatUtils.variance(phenotype);
-		LOG.append("Vp=" + fmt.format(vp) + "\n");
-		LOG.append("total individuals visited (no selection): " + count + "\n");
+		Logger.printUserLog("Vp=" + fmt.format(vp));
+		Logger.printUserLog("total individuals visited (no selection): " + count + "\n");
 	}
 
 	public RealMatrix GenerateEffects() {
@@ -361,17 +332,12 @@ public class SimuPolyQT {
 		PrintWriter cov = null;
 		PrintWriter geno = null;
 		try {
-			pedout = new PrintWriter(new BufferedWriter(new FileWriter(out
-					+ ".ped")));
-			map = new PrintWriter(new BufferedWriter(new FileWriter(out
-					+ ".map")));
-			cov = new PrintWriter(new BufferedWriter(new FileWriter(out
-					+ ".cov")));
-			geno = new PrintWriter(new BufferedWriter(new FileWriter(out
-					+ ".add")));
+			pedout = new PrintWriter(new BufferedWriter(new FileWriter(out + ".ped")));
+			map = new PrintWriter(new BufferedWriter(new FileWriter(out + ".map")));
+			cov = new PrintWriter(new BufferedWriter(new FileWriter(out + ".cov")));
+			geno = new PrintWriter(new BufferedWriter(new FileWriter(out + ".add")));
 		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+			Logger.handleException(e, "An exception occurred when writing files.");
 		}
 
 		for (int i = 0; i < genotype.length; i++) {
@@ -450,10 +416,7 @@ public class SimuPolyQT {
 				}
 			}
 		} catch (IOException e) {
-			Logger.printUserError("An exception occurred when reading the poly-effect file '" + Parameter.INSTANCE.polyEffectFile + "'.");
-			Logger.printUserError("Exception Message: " + e.getMessage());
-			Logger.getDevLogger().log(Level.SEVERE, "Reading poly-effect file", e);
-			System.exit(1);
+			Logger.handleException(e, "An exception occurred when reading the poly-effect file '" + Parameter.INSTANCE.polyEffectFile + "'.");
 		}
 		RealMatrix Eff = new Array2DRowRealMatrix(effect);
 		

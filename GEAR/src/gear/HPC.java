@@ -3,7 +3,6 @@ package gear;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.PrintWriter;
-import java.util.logging.Level;
 
 import gear.util.Logger;
 
@@ -18,9 +17,7 @@ public class HPC {
 		try {
 			pw = new PrintWriter(sb.toString());
 		} catch (FileNotFoundException e) {
-			Logger.printUserError("Cannot create the script file '" + sb.toString() + "'.");
-			Logger.printUserError("Exception Message: " + e.getMessage());
-			System.exit(1);
+			Logger.handleException(e, "Cannot create the script file '" + sb.toString() + "'.");
 		}
 
 		pw.println("#$ -cwd");
@@ -52,10 +49,7 @@ public class HPC {
 			try {
 				rt.exec(cmd);
 			} catch (IOException e) {
-				Logger.printUserError("Failed to execute command '" + cmd + "'.");
-				Logger.printUserError("Exception Message: " + e.getMessage());
-				Logger.getDevLogger().log(Level.SEVERE, "Executing qsub command", e);
-				System.exit(1);
+				Logger.handleException(e, "Failed to execute command '" + cmd + "'.");
 			}
 		}
 	}

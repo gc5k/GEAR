@@ -13,7 +13,6 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Set;
-import java.util.logging.Level;
 import java.util.zip.GZIPInputStream;
 
 import org.apache.commons.math.MathException;
@@ -356,9 +355,7 @@ public class HECalculate {
 				try {
 					fileStream = new FileInputStream(Parameter.INSTANCE.getHEParameter().getGrm());
 				} catch (FileNotFoundException e) {
-					Logger.printUserError("Cannot open the GRM file '" + Parameter.INSTANCE.getHEParameter().getGrm() + "'.");
-					Logger.printUserError("Exception Message: " + e.getMessage());
-					System.exit(1);
+					Logger.handleException(e, "Cannot open the GRM file '" + Parameter.INSTANCE.getHEParameter().getGrm() + "'.");
 				}
 				DataInputStream bigEndianDataStream = new DataInputStream(fileStream);
 				LittleEndianDataInputStream littleEndianDataStream = new LittleEndianDataInputStream(bigEndianDataStream, Float.SIZE);
@@ -371,10 +368,7 @@ public class HECalculate {
 								g = littleEndianDataStream.readFloat();
 							}
 						} catch (IOException e) {
-							Logger.printUserError("An exception occurred when reading the GRM file '" + Parameter.INSTANCE.getHEParameter().getGrm() + "'.");
-							Logger.printUserError("Exception Message: " + e.getMessage());
-							Logger.getDevLogger().log(Level.SEVERE, "Reading GRM file", e);
-							System.exit(1);
+							Logger.handleException(e, "An exception occurred when reading the GRM file '" + Parameter.INSTANCE.getHEParameter().getGrm() + "'.");
 						}
 
 						int id1 = i;

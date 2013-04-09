@@ -5,7 +5,6 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Hashtable;
 import java.util.Iterator;
-import java.util.logging.Level;
 
 
 import family.pedigree.Hukou;
@@ -199,10 +198,7 @@ public class SampleFilter {
 				indList.add(l[1]);
 			}
 		} catch (IOException e) {
-			Logger.printUserError("An exception occurred when reading the kept-individual file '" + Parameter.INSTANCE.keepFile + "'.");
-			Logger.printUserError("Exception Message: " + e.getMessage());
-			Logger.getDevLogger().log(Level.SEVERE, "Reading kept-individual file", e);
-			System.exit(1);
+			Logger.handleException(e, "An exception occurred when reading the kept-individual file '" + Parameter.INSTANCE.keepFile + "'.");
 		}
 		indKeep = new String[2][];
 		indKeep[0] = (String[]) famList.toArray(new String[0]);
@@ -222,10 +218,7 @@ public class SampleFilter {
 				indList.add(l[1]);
 			}
 		} catch (IOException e) {
-			Logger.printUserError("An exception occurred when reading the removed-individual file '" + Parameter.INSTANCE.removeFile + "'.");
-			Logger.printUserError("Exception Message: " + e.getMessage());
-			Logger.getDevLogger().log(Level.SEVERE, "Reading removed-individual file", e);
-			System.exit(1);
+			Logger.handleException(e, "An exception occurred when reading the removed-individual file '" + Parameter.INSTANCE.removeFile + "'.");
 		}
 		indExclude = new String[2][];
 		indExclude[0] = (String[]) famList.toArray(new String[0]);

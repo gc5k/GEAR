@@ -7,7 +7,6 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashSet;
 import java.util.Random;
-import java.util.logging.Level;
 
 import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.math.random.RandomDataImpl;
@@ -207,10 +206,7 @@ public class RealDataSimulation {
 					cl.add(l[0]);
 				}
 			} catch (IOException e) {
-				Logger.printUserError("An exception occurred when reading the casual-loci file '" + casualLociFile + "'.");
-				Logger.printUserError("Exception Message: " + e.getMessage());
-				Logger.getDevLogger().log(Level.SEVERE, "Reading casual-loci file", e);
-				System.exit(1);
+				Logger.handleException(e, "An exception occurred when reading the casual-loci file '" + casualLociFile + "'.");
 			}
 		}
 
