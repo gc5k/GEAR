@@ -13,6 +13,7 @@ public class HPC {
 		StringBuilder sb = new StringBuilder();
 		sb.append(Parameter.INSTANCE.getHpcParameter().getName());
 		sb.append(".sh");
+		
 		PrintWriter pw = null;
 		try {
 			pw = new PrintWriter(sb.toString());
@@ -22,23 +23,29 @@ public class HPC {
 			System.exit(1);
 		}
 
-		StringBuilder shell = new StringBuilder();
-		shell.append("#$ -cwd" + "\n");
-		shell.append("#$ -l vf=" + Parameter.INSTANCE.getHpcParameter().getRam() + "\n");
-		shell.append("#$ -N " + Parameter.INSTANCE.getHpcParameter().getName() + "\n");
-		shell.append("#$ -m eas\n");
-		shell.append("#$ -M " + Parameter.INSTANCE.getHpcParameter().getEmail() + "\n");
+		pw.println("#$ -cwd");
+		pw.println("#$ -l vf=" + Parameter.INSTANCE.getHpcParameter().getRam());
+		pw.println("#$ -N " + Parameter.INSTANCE.getHpcParameter().getName());
+		pw.println("#$ -m eas");
+		pw.println("#$ -M " + Parameter.INSTANCE.getHpcParameter().getEmail());
 
-		shell.append("java -jar -Xmx" + Parameter.INSTANCE.getHpcParameter().getRam() + " ");
-		shell.append(HPC.class.getProtectionDomain().getCodeSource().getLocation().getPath() + " ");
+		pw.print("java -jar -Xmx" + Parameter.INSTANCE.getHpcParameter().getRam() + " ");
+		pw.print(HPC.class.getProtectionDomain().getCodeSource().getLocation().getPath() + " ");
 		for (int i = 0; i < args.length; i++) {
-			if (args[i].compareTo("--shell") == 0 || args[i].compareTo("--qsub") == 0)
+			String arg = args[i];
+			if (arg.equals("--shell") || arg.equals("--qsub")) {
 				continue;
-			shell.append(args[i] + " ");
+			}
+			if (arg.equals("--email") || arg.equals("--ram") || arg.equals("--name")) {
+				++i;
+				continue;
+			}
+			pw.print(arg + " ");
 		}
-		shell.append("\n");
-		pw.append(shell);
+		pw.println();
+		
 		pw.close();
+		
 		if (Parameter.INSTANCE.getHpcParameter().isQsubSet()) {
 			Runtime rt = Runtime.getRuntime();
 			String cmd = "qsub " + sb.toString();
