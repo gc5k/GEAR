@@ -12,7 +12,6 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.PrintWriter;
-import java.util.logging.Level;
 import java.util.zip.GZIPInputStream;
 
 
@@ -87,10 +86,7 @@ public class GRMStat {
 			}
 			reader.close();
 		} catch (IOException e) {
-			Logger.printUserError("An exception occurred when reading the ID file '" + Parameter.INSTANCE.getHEParameter().getGrmId() + "'.");
-			Logger.printUserError("Exception Message: " + e.getMessage());
-			Logger.getDevLogger().log(Level.SEVERE, "Reading grm IDs", e);
-			System.exit(1);
+			Logger.handleException(e, "An exception occurred when reading the ID file '" + Parameter.INSTANCE.getHEParameter().getGrmId() + "'.");
 		}
 
 		// *************************************read grm file
@@ -98,9 +94,7 @@ public class GRMStat {
 		try {
 			fileStream = new FileInputStream(Parameter.INSTANCE.getHEParameter().getGrm());
 		} catch (FileNotFoundException e) {
-			Logger.printUserError("Cannot open the GRM file '" + Parameter.INSTANCE.getHEParameter().getGrm() + "'.");
-			Logger.printUserError("Exception Message: " + e.getMessage());
-			System.exit(1);
+			Logger.handleException(e, "Cannot open the GRM file '" + Parameter.INSTANCE.getHEParameter().getGrm() + "'.");
 		}
 		DataInputStream bigEndianDataStream = new DataInputStream(fileStream);
 		LittleEndianDataInputStream littleEndianDataStream = new LittleEndianDataInputStream(bigEndianDataStream, Float.SIZE);
@@ -114,10 +108,7 @@ public class GRMStat {
 						g = littleEndianDataStream.readFloat();
 					}
 				} catch (IOException e) {
-					Logger.printUserError("An exception occurred when reading the GRM file '" + Parameter.INSTANCE.getHEParameter().getGrm() + "'.");
-					Logger.printUserError("Exception Message: " + e.getMessage());
-					Logger.getDevLogger().log(Level.SEVERE, "Reading GRM file", e);
-					System.exit(1);
+					Logger.handleException(e, "An exception occurred when reading the GRM file '" + Parameter.INSTANCE.getHEParameter().getGrm() + "'.");
 				}
 
 				int id1 = i;
@@ -145,18 +136,14 @@ public class GRMStat {
 		try {
 			fin = new FileInputStream(Parameter.INSTANCE.getHEParameter().getGrm());
 		} catch (FileNotFoundException e) {
-			Logger.printUserError("Cannot open the GRM file '" + Parameter.INSTANCE.getHEParameter().getGrm() + "'.");
-			Logger.printUserError("Exception Message: " + e.getMessage());
-			System.exit(1);
+			Logger.handleException(e, "Cannot open the GRM file '" + Parameter.INSTANCE.getHEParameter().getGrm() + "'.");
 		}
 		
 		GZIPInputStream gzis = null;
 		try {
 			gzis = new GZIPInputStream(fin);
 		} catch (IOException e) {
-			Logger.printUserError("Cannot open the GRM archive '" + Parameter.INSTANCE.getHEParameter().getGrm() + "'.");
-			Logger.printUserError("Exception Message: " + e.getMessage());
-			System.exit(1);
+			Logger.handleException(e, "Cannot open the GRM archive '" + Parameter.INSTANCE.getHEParameter().getGrm() + "'.");
 		}
 		InputStreamReader xover = new InputStreamReader(gzis);
 
@@ -185,17 +172,13 @@ public class GRMStat {
 				N++;
 			}
 		} catch (IOException e) {
-			Logger.printUserError("An exception occurred when reading the GRM archive '" + Parameter.INSTANCE.getHEParameter().getGrm() + "'.");
-			Logger.printUserError("Exception Message: " + e.getMessage());
-			Logger.getDevLogger().log(Level.SEVERE, "Reading GRM archive", e);
-			System.exit(1);
+			Logger.handleException(e, "An exception occurred when reading the GRM archive '" + Parameter.INSTANCE.getHEParameter().getGrm() + "'.");
 		}
 
 		getEffectiveNumber();
 	}
 
 	private void txtGRM() {
-
 		BufferedReader grmFile = FileProcessor.FileOpen(Parameter.INSTANCE.getHEParameter().getGrm());
 
 		String line;
@@ -221,10 +204,7 @@ public class GRMStat {
 				N++;
 			}
 		} catch (IOException e) {
-			Logger.printUserError("An exception occurred when reading the GRM file '" + Parameter.INSTANCE.getHEParameter().getGrm() + "'.");
-			Logger.printUserError("Exception Message: " + e.getMessage());
-			Logger.getDevLogger().log(Level.SEVERE, "Reading GRM file", e);
-			System.exit(1);
+			Logger.handleException(e, "An exception occurred when reading the GRM file '" + Parameter.INSTANCE.getHEParameter().getGrm() + "'.");
 		}
 
 		getEffectiveNumber();

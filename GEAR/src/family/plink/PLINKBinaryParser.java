@@ -1,7 +1,6 @@
 package family.plink;
 
 import java.io.IOException;
-import java.util.logging.Level;
 
 import family.pedigree.file.BEDReader;
 import family.pedigree.file.BIMReader;
@@ -58,10 +57,7 @@ public class PLINKBinaryParser extends PLINKParser {
 		try {
 			pedData.parseLinkage(pedigreeFile, mapData.getMarkerNumberOriginal(), snpFilter.getWorkingSNP());
 		} catch (IOException e) {
-			Logger.printUserError("An exception occurred when parsing the pedigree files.");
-			Logger.printUserError("Exception Message: " + e.getMessage());
-			Logger.getDevLogger().log(Level.SEVERE, "Parsing pedigree files", e);
-			System.exit(1);
+			Logger.handleException(e, "An exception occurred when parsing the pedigree files.");
 		}
 	}
 }

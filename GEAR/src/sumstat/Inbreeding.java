@@ -8,7 +8,6 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Set;
-import java.util.logging.Level;
 
 import sumstat.qc.rowqc.SumStatQC;
 
@@ -177,10 +176,7 @@ public class Inbreeding {
 				}
 			}
 		} catch (IOException e) {
-			Logger.printUserError("An exception occurred when reading the FST file '" + Parameter.INSTANCE.fst_file + "'.");
-			Logger.printUserError("Exception Message: " + e.getMessage());
-			Logger.getDevLogger().log(Level.SEVERE, "Reading FST file", e);
-			System.exit(1);
+			Logger.handleException(e, "An exception occurred when reading the FST file '" + Parameter.INSTANCE.fst_file + "'.");
 		}
 		indKeep = new String[3][];
 		indKeep[0] = (String[]) famList.toArray(new String[0]);

@@ -14,8 +14,6 @@ import java.io.IOException;
 import java.io.PrintWriter;
 import java.util.Arrays;
 import java.util.Calendar;
-import java.util.logging.Level;
-
 
 import org.apache.commons.math.MathException;
 import org.apache.commons.math.distribution.NormalDistributionImpl;
@@ -472,8 +470,7 @@ public class SimuPolyCC {
 					+ ".cov")));
 			geno = new PrintWriter(new BufferedWriter(new FileWriter(out + ".add")));
 		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+			Logger.handleException(e, "An exception occurred when writing files.");
 		}
 
 		for (int i = 0; i < genotype.length; i++) {
@@ -571,10 +568,7 @@ public class SimuPolyCC {
 				}
 			}
 		} catch (IOException e) {
-			Logger.printUserError("An exception occurred when reading the poly-effect file '" + Parameter.INSTANCE.polyEffectFile + "'.");
-			Logger.printUserError("Exception Message: " + e.getMessage());
-			Logger.getDevLogger().log(Level.SEVERE, "Reading poly-effect file", e);
-			System.exit(1);
+			Logger.handleException(e, "An exception occurred when reading the poly-effect file '" + Parameter.INSTANCE.polyEffectFile + "'.");
 		}
 		RealMatrix Eff = new Array2DRowRealMatrix(effect);
 		

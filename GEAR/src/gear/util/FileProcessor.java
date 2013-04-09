@@ -21,9 +21,7 @@ public class FileProcessor {
 		try {
 			reader = new BufferedReader(new FileReader(new File(file)));
 		} catch (IOException e) {
-			Logger.printUserError("Cannot open '" + file + "'.");
-			Logger.printUserError("Exception Message: " + e.getMessage());
-			System.exit(1);
+			Logger.handleException(e, "Cannot open '" + file + "'.");
 		}
 		return reader;
 	}
@@ -31,10 +29,9 @@ public class FileProcessor {
 	public static PrintStream CreatePrintStream(String file) {
 		PrintStream ps = null;
 		try {
-			ps = new PrintStream(file);
+			return new PrintStream(file);
 		} catch (FileNotFoundException e) {
-			Logger.printUserError("File '" + file + "' does not exist.");
-			System.exit(1);
+			Logger.handleException(e, "File '" + file + "' does not exist.");
 		}
 		return ps;
 	}
@@ -44,16 +41,14 @@ public class FileProcessor {
 		try {
 			fin = new FileInputStream(file);
 		} catch (FileNotFoundException e) {
-			Logger.printUserError("File '" + file + "' does not exist.");
-			System.exit(1);
+			Logger.handleException(e, "File '" + file + "' does not exist.");
 		}
 		GZIPInputStream gzis = null;
 		try {
 			gzis = new GZIPInputStream(fin);
 		} catch (IOException e) {
-			Logger.printUserError("Cannot open the archive '" + file + "'.");
-			Logger.printUserError("Exception Message: " + e.getMessage());
-			System.exit(1);
+			Logger.handleException(e, "Cannot open the archive '" + file + "'.");
+
 		}
 		InputStreamReader xover = new InputStreamReader(gzis);
 		BufferedReader is = new BufferedReader(xover);

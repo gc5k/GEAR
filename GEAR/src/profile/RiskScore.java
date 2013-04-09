@@ -6,7 +6,6 @@ import java.io.PrintStream;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
-import java.util.logging.Level;
 
 import profile.struct.QScore;
 import profile.struct.ScoreUnit;
@@ -78,10 +77,7 @@ public class RiskScore {
 				Score.put(su.getSNP(), su);
 			}
 		} catch (IOException e) {
-			Logger.printUserError("An exception occurred when reading the score file '" + scoreFile + "'.");
-			Logger.printUserError("Exception Message: " + e.getMessage());
-			Logger.getDevLogger().log(Level.SEVERE, "Reading score file", e);
-			System.exit(1);
+			Logger.handleException(e, "An exception occurred when reading the score file '" + scoreFile + "'.");
 		}
 
 		Logger.printUserLog("Number of predictors: " + Score.size());
@@ -103,10 +99,7 @@ public class RiskScore {
 					QS.put(qs.getSNP(), qs);
 				}
 			} catch (IOException e) {
-				Logger.printUserError("An exception occurred when reading the q-score file '" + q_score_file + "'.");
-				Logger.printUserError("Exception Message: " + e.getMessage());
-				Logger.getDevLogger().log(Level.SEVERE, "Reading q-score file", e);
-				System.exit(1);
+				Logger.handleException(e, "An exception occurred when reading the q-score file '" + q_score_file + "'.");
 			}
 			
 			if (QS.size() == 0) {
@@ -135,10 +128,7 @@ public class RiskScore {
 					QR.add(qr);
 				}
 			} catch (IOException e) {
-				Logger.printUserError("An exception occurred when reading the q-range file '" + q_score_range_file + "'.");
-				Logger.printUserError("Exception Message: " + e.getMessage());
-				Logger.getDevLogger().log(Level.SEVERE, "Reading q-range file", e);
-				System.exit(1);
+				Logger.handleException(e, "An exception occurred when reading the q-range file '" + q_score_range_file + "'.");
 			}
 			
 			if (QR.size() == 0) {

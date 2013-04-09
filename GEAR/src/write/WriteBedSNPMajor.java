@@ -7,8 +7,6 @@ import java.io.IOException;
 import java.io.PrintStream;
 import java.util.ArrayList;
 import java.util.Iterator;
-import java.util.logging.Level;
-
 
 import family.pedigree.PersonIndex;
 import family.pedigree.file.SNP;
@@ -126,10 +124,7 @@ public class WriteBedSNPMajor {
 			}
 			os.close();
 		} catch (IOException e) {
-			Logger.printUserError("An exception occurred when writing the bed file '" + sbed.toString() + "'.");
-			Logger.printUserError("Exception Message: " + e.getMessage());
-			Logger.getDevLogger().log(Level.SEVERE, "Writing bed file", e);
-			System.exit(1);
+			Logger.handleException(e, "An exception occurred when writing the bed file '" + sbed.toString() + "'.");
 		}
 	}
 

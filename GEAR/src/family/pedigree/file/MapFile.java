@@ -9,7 +9,6 @@ import java.io.FileReader;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.logging.Level;
 
 public class MapFile {
 
@@ -45,10 +44,7 @@ public class MapFile {
 		try {
 			reader = new BufferedReader(new FileReader(mapfile));
 		} catch (IOException e) {
-			Logger.printUserError("Could not open the map file.");
-			Logger.printUserError("Exception Message: " + e.getMessage());
-			Logger.getDevLogger().log(Level.SEVERE, "Creating BufferedReader", e);
-			System.exit(1);
+			Logger.handleException(e, "Cannot open the map file '" + mapfile + "'.");
 		}
 
 		String line = null;
@@ -71,10 +67,7 @@ public class MapFile {
 			}
 			reader.close();
 		} catch (IOException e) {
-			Logger.printUserError("An exception occured when reading the map file '" + mf + "'.");
-			Logger.printUserError("Exception Message: " + e.getMessage());
-			Logger.getDevLogger().log(Level.SEVERE, "Parsing map file", e);
-			System.exit(1);
+			Logger.handleException(e, "An exception occured when reading the map file '" + mf + "'.");
 		}
 
 		if (badline != null) {
@@ -145,8 +138,8 @@ public class MapFile {
 	
 	public void setPolymorphism(char[][] p, short[][] freq) {
 		if (p.length != snpList.size()) {
-			Logger.printUserError("The map file and the pedigree file do not match.\n");
-			Logger.getDevLogger().info("p.length != snpList.size()");
+			Logger.printUserError("The map file and the pedigree file do not match.");
+			Logger.getDevLogger().severe("p.length != snpList.size()");
 			System.exit(1);
 		} else {
 			for(int i = 0; i < p.length; i++) {

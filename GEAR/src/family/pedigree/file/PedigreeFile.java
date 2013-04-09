@@ -165,9 +165,8 @@ public class PedigreeFile {
 						} else {
 							per.addMarker(flag, 0, 0, c);
 						}
-					} catch (NumberFormatException nfe) {
-						Logger.printUserError("An invalid genotype is found in the ped file at line " + (k + 1) + " for marker " + (c+1) + ".");
-						System.exit(1);
+					} catch (NumberFormatException e) {
+						Logger.handleException(e, "An invalid genotype is found in the ped file at line " + (k + 1) + " for marker " + (c+1) + ".");
 					}
 					c++;
 				}

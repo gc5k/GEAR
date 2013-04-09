@@ -6,7 +6,6 @@ import java.io.PrintStream;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
-import java.util.logging.Level;
 
 import family.pedigree.file.SNP;
 import family.plink.PLINKBinaryParser;
@@ -223,10 +222,7 @@ public class MakePredictor {
 				predictorList.add(maf);
 			}
 		} catch (IOException e) {
-			Logger.printUserError("An exception occurred when parsing the predictor file.");
-			Logger.printUserError("Exception Message: " + e.getMessage());
-			Logger.getDevLogger().log(Level.SEVERE, "Parsing the predictor file", e);
-			System.exit(1);
+			Logger.handleException(e, "An exception occurred when parsing the predictor file.");
 		}
 
 	}

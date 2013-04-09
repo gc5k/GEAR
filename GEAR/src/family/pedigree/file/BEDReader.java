@@ -89,9 +89,7 @@ public class BEDReader extends PedigreeFile {
 		try {
 			in = new BufferedInputStream(new FileInputStream(new File(pedfile)));
 		} catch (FileNotFoundException e) {
-			Logger.printUserError("Cannot open the pedigree file '" + pedfile + "'.");
-			Logger.printUserError("Exception Message: " + e.getMessage());
-			System.exit(1);
+			Logger.handleException(e, "Cannot open the pedigree file '" + pedfile + "'.");
 		}
 		byte[] magic = new byte[3];
 		in.read(magic, 0, 3);
