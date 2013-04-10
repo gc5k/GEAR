@@ -23,42 +23,71 @@ public enum Parameter {
 	
 	CommandLine cl;
 
-// PLINK binary input file options Begin
-	public boolean hasBFileOption() { return bfileOption; }
-	public String getBedFile() { return bedfile; }
-	public String getBimFile() { return bimfile; }
-	public String getFamFile() { return famfile; }
+	public class BfileParameter {
+		
+		@SuppressWarnings("static-access")
+		private BfileParameter(String desc, String opt) {
+			ops.addOption(OptionBuilder.withDescription(desc).hasArg().create(opt));
+			this.cmd_bfile = opt;
+		}
+		
+		public boolean isSet() {
+			return cl.hasOption(cmd_bfile);
+		}
+		
+		public String getBedFile() {
+			String bfile = cl.getOptionValue(cmd_bfile);
+			return bfile == null ? null : bfile + ".bed";
+		}
+		
+		public String getBimFile() {
+			String bfile = cl.getOptionValue(cmd_bfile);
+			return bfile == null ? null : bfile + ".bim";
+		}
+		
+		public String getFamFile() {
+			String bfile = cl.getOptionValue(cmd_bfile);
+			return bfile == null ? null : bfile + ".fam";
+		}
+		
+		private String cmd_bfile;
+		
+	}
 	
-	private final String cmd_bfile = "bfile";
-	private String bedfile = null;
-	private String bimfile = null;
-	private String famfile = null;
-	private boolean bfileOption = false;
-// PLINK binary input file options End
+	public BfileParameter getBfileParameter(int i) {
+		return bfileParameters[i];
+	}
+	
+	private BfileParameter[] bfileParameters;
 
-// PLINK text input file options Begin
-	public boolean hasFileOption() { return fileOption; }
-	public String getPedFile() { return pedfile; }
-	public String getMapFile() { return mapfile; }
+	public class FileParameter {
+		
+		@SuppressWarnings("static-access")
+		private FileParameter() {
+			ops.addOption(OptionBuilder.withDescription("PLINK format text input file").hasArg().create(cmd_file));
+		}
+		
+		public boolean isSet() {
+			return cl.hasOption(cmd_file);
+		}
 	
-	private final String cmd_file = "file";
-	private String pedfile = null;
-	private String mapfile = null;
-	private boolean fileOption = false;
-// PLINK text input file options End
+		public String getPedFile() {
+			String file = cl.getOptionValue(cmd_file);
+			return file == null ? null : file + ".ped";
+		}
+		
+		public String getMapFile() {
+			String file = cl.getOptionValue(cmd_file);
+			return file == null ? null : file + ".map";
+		}
+		
+		private static final String cmd_file = "file";
 	
-// bfile2 options Begin
-	public boolean hasBFile2Option() { return bfile2Option; }
-	public String getBedFile2() { return bedfile2; }
-	public String getBimFile2() { return bimfile2; }
-	public String getFamFile2() { return famfile2; }
+	}
 	
-	private final String cmd_bfile2 = "bfile2";
-	private String bedfile2 = null;
-	private String bimfile2 = null;
-	private String famfile2 = null;
-	private boolean bfile2Option = false;
-// bfile2 options End
+	public FileParameter getFileParameter() { return fileParameter; }
+	
+	private FileParameter fileParameter;
 	
 // Real-check options Begin
 	public boolean hasRealCheckOption() { return realcheckFlag; }
@@ -735,10 +764,10 @@ public enum Parameter {
 	@SuppressWarnings("static-access")
 	private Parameter() {
 		ops = new Options();
-		
-		ops.addOption(OptionBuilder.withDescription("file ").hasArg().create(cmd_file));
-		ops.addOption(OptionBuilder.withDescription("bfile ").hasArg().create(cmd_bfile));
-		ops.addOption(OptionBuilder.withDescription("bfile2 ").hasArg().create(cmd_bfile2));
+		fileParameter = new FileParameter();
+		bfileParameters = new BfileParameter[2];
+		bfileParameters[0] = new BfileParameter("PLINK format binary input file", "bfile");
+		bfileParameters[1] = new BfileParameter("The second PLINK format binary input file", "bfile2");
 
 		// real-check
 		ops.addOption(OptionBuilder.withDescription("realcheck ").create(cmd_realcheck));
@@ -920,29 +949,6 @@ public enum Parameter {
 			HelpFormatter formatter = new HelpFormatter();
 			formatter.printHelp("HE Regression", ops);
 			System.exit(0);
-		}
-
-		if (cl.hasOption(cmd_file)) {
-			String file = cl.getOptionValue(cmd_file);
-			pedfile = (new StringBuffer(file)).append(".ped").toString();
-			mapfile = (new StringBuffer(file)).append(".map").toString();
-			fileOption = true;
-		}
-
-		if (cl.hasOption(cmd_bfile)) {
-			String bfile = cl.getOptionValue(cmd_bfile);
-			bedfile = (new StringBuffer(bfile)).append(".bed").toString();
-			bimfile = (new StringBuffer(bfile)).append(".bim").toString();
-			famfile = (new StringBuffer(bfile)).append(".fam").toString();
-			bfileOption = true;
-		}
-		
-		if (cl.hasOption(cmd_bfile2)) {
-			String bfile2 = cl.getOptionValue(cmd_bfile2);
-			bedfile2 = (new StringBuffer(bfile2)).append(".bed").toString();
-			bimfile2 = (new StringBuffer(bfile2)).append(".bim").toString();
-			famfile2 = (new StringBuffer(bfile2)).append(".fam").toString();
-			bfile2Option = true;
 		}
 
 		realcheckFlag = cl.hasOption(cmd_realcheck);

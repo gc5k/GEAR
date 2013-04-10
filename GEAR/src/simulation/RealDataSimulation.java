@@ -42,14 +42,14 @@ public class RealDataSimulation {
 	private double accept_ctrl;
 
 	public RealDataSimulation() {
-		if (Parameter.INSTANCE.hasFileOption()) {
-			pp = new PLINKParser (Parameter.INSTANCE.getPedFile(),
-					              Parameter.INSTANCE.getMapFile());
+		if (Parameter.INSTANCE.getFileParameter().isSet()) {
+			pp = new PLINKParser (Parameter.INSTANCE.getFileParameter().getPedFile(),
+					              Parameter.INSTANCE.getFileParameter().getMapFile());
 		}
-		else if (Parameter.INSTANCE.hasBFileOption()) {
-			pp = new PLINKBinaryParser (Parameter.INSTANCE.getBedFile(),
-					                    Parameter.INSTANCE.getBimFile(),
-					                    Parameter.INSTANCE.getFamFile());
+		else if (Parameter.INSTANCE.getBfileParameter(0).isSet()) {
+			pp = new PLINKBinaryParser (Parameter.INSTANCE.getBfileParameter(0).getBedFile(),
+					                    Parameter.INSTANCE.getBfileParameter(0).getBimFile(),
+					                    Parameter.INSTANCE.getBfileParameter(0).getFamFile());
 		} else {
 			Logger.printUserError("No input files.");
 			System.exit(1);

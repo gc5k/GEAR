@@ -56,14 +56,14 @@ public class MergeTwoFile {
 	public MergeTwoFile() {
 		PLINKParser pp1 = null;
 		PLINKParser pp2 = null;
-		if (Parameter.INSTANCE.hasBFileOption() && Parameter.INSTANCE.hasBFile2Option()) {
-			pp1 = new PLINKBinaryParser (Parameter.INSTANCE.getBedFile(),
-					                     Parameter.INSTANCE.getBimFile(),
-					                     Parameter.INSTANCE.getFamFile());
+		if (Parameter.INSTANCE.getBfileParameter(0).isSet() && Parameter.INSTANCE.getBfileParameter(1).isSet()) {
+			pp1 = new PLINKBinaryParser (Parameter.INSTANCE.getBfileParameter(0).getBedFile(),
+					                     Parameter.INSTANCE.getBfileParameter(0).getBimFile(),
+					                     Parameter.INSTANCE.getBfileParameter(0).getFamFile());
 			
-			pp2 = new PLINKBinaryParser (Parameter.INSTANCE.getBedFile2(),
-					                     Parameter.INSTANCE.getBimFile2(),
-					                     Parameter.INSTANCE.getFamFile2());
+			pp2 = new PLINKBinaryParser (Parameter.INSTANCE.getBfileParameter(1).getBedFile(),
+					                     Parameter.INSTANCE.getBfileParameter(1).getBimFile(),
+					                     Parameter.INSTANCE.getBfileParameter(1).getFamFile());
 		} else {
 			Logger.printUserError("--bfile or --bfile2 is not set.");
 			System.exit(1);

@@ -29,13 +29,13 @@ public class FrequencyCalculator {
 	private int[][] N;
 	public FrequencyCalculator() {
 		PLINKParser pp = null;
-		if (Parameter.INSTANCE.hasFileOption()) {
-			pp = new PLINKParser (Parameter.INSTANCE.getPedFile(),
-					              Parameter.INSTANCE.getMapFile());
-		} else if (Parameter.INSTANCE.hasBFileOption()) {
-			pp = new PLINKBinaryParser (Parameter.INSTANCE.getBedFile(),
-					                    Parameter.INSTANCE.getBimFile(),
-					                    Parameter.INSTANCE.getFamFile());
+		if (Parameter.INSTANCE.getFileParameter().isSet()) {
+			pp = new PLINKParser (Parameter.INSTANCE.getFileParameter().getPedFile(),
+					              Parameter.INSTANCE.getFileParameter().getMapFile());
+		} else if (Parameter.INSTANCE.getBfileParameter(0).isSet()) {
+			pp = new PLINKBinaryParser (Parameter.INSTANCE.getBfileParameter(0).getBedFile(),
+					                    Parameter.INSTANCE.getBfileParameter(0).getBimFile(),
+					                    Parameter.INSTANCE.getBfileParameter(0).getFamFile());
 		} else {
 			Logger.printUserError("No input files.");
 			System.exit(1);

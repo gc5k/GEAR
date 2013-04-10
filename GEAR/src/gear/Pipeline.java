@@ -42,7 +42,7 @@ public class Pipeline {
 		if (Parameter.INSTANCE.getHpcParameter().isSet()) {
 			HPC.genScript(args);
 		} else if (Parameter.INSTANCE.scoreFlag) {
-			if (Parameter.INSTANCE.hasBFileOption()) {
+			if (Parameter.INSTANCE.getBfileParameter(0).isSet()) {
 				RiskScore rs = new RiskScore();
 				rs.makeProfile();
 			} else {
@@ -62,7 +62,7 @@ public class Pipeline {
 			MakePredictor2 mp2 = new MakePredictor2();
 			mp2.BuildPredictor();
 		} else if (Parameter.INSTANCE.hasRealCheckOption()) {
-			if (Parameter.INSTANCE.hasBFile2Option()) {
+			if (Parameter.INSTANCE.getBfileParameter(0).isSet()) {
 				RealCheck realcheck = new RealCheck();
 				realcheck.Check();
 			} else {
