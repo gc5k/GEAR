@@ -42,10 +42,10 @@ public class MakePredictor2 {
 		readPredictor();
 
 		PLINKParser pp1 = null;
-		if (Parameter.INSTANCE.hasBFileOption()) {
-			pp1 = new PLINKBinaryParser (Parameter.INSTANCE.getBedFile(),
-					                     Parameter.INSTANCE.getBimFile(),
-					                     Parameter.INSTANCE.getFamFile());
+		if (Parameter.INSTANCE.getBfileParameter(0).isSet()) {
+			pp1 = new PLINKBinaryParser (Parameter.INSTANCE.getBfileParameter(0).getBedFile(),
+					                     Parameter.INSTANCE.getBfileParameter(0).getBimFile(),
+					                     Parameter.INSTANCE.getBfileParameter(0).getFamFile());
 		} else {
 			Logger.printUserError("--bfile is not set");
 			System.exit(1);
