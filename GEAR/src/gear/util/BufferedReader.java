@@ -29,6 +29,14 @@ public class BufferedReader {
 		return line;
 	}
 	
+	public String[] readTokens() {
+		String line = readLine();
+		if (line != null) {
+			return line.trim().split("\\s+");
+		}
+		return null;
+	}
+	
 	public String getFileName() {
 		return fileName;
 	}

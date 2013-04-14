@@ -43,13 +43,11 @@ public class ScoreUnit {
 		ScoreUnit scoreUnit = null;
 		
 		while (true) {
-			String line = reader.readLine();
+			String tokens[] = reader.readTokens();
 			
-			if (line == null) {
+			if (tokens == null) {
 				break;
 			}
-			
-			String tokens[] = line.split("\\s+");
 			
 			if (tokens.length == 0) {
 				continue;
