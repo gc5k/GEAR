@@ -53,6 +53,18 @@ public class BufferedReader {
 		return tokens;
 	}
 	
+	public String[] readTokens(int expectedNumCols) {
+		String[] tokens = readTokens();
+		if (tokens != null && tokens.length != expectedNumCols) {
+			Logger.printUserError(
+				"The format of the " + fileType + " file '" + fileName + "' is incorrect: " +
+				"A " + fileType + " file should consists of " + expectedNumCols + " columns, but line " + curLineNum + " contains " + tokens.length + " column(s)."
+			);
+			System.exit(1);
+		}
+		return tokens;
+	}
+	
 	public String getFileName() {
 		return fileName;
 	}
