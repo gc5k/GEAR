@@ -4,6 +4,8 @@ import java.util.Calendar;
 
 import merge.MergeTwoFile;
 import write.WriteBedSNPMajor;
+import gear.profile.MaCHDosageProfile;
+import gear.profile.RiskScore;
 import gear.util.Logger;
 import grm.GRMStat;
 import he.HECalculate;
@@ -21,8 +23,6 @@ import strand.MakePredictor2;
 import strand.Strand;
 import sumstat.FrequencyCalculator;
 import sumstat.Inbreeding;
-import profile.MaCHDosageProfile;
-import profile.RiskScore;
 import pscontrol.NonTransmitted;
 
 public class Pipeline {
