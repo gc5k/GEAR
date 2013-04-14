@@ -1,6 +1,9 @@
-package profile;
+package gear.profile;
 
 import gear.Parameter;
+import gear.profile.struct.DosageInfor;
+import gear.profile.struct.QScore;
+import gear.profile.struct.ScoreUnit;
 import gear.util.FileProcessor;
 import gear.util.Logger;
 import gear.util.NewIt;
@@ -14,9 +17,6 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 
-import profile.struct.DosageInfor;
-import profile.struct.ScoreUnit;
-import profile.struct.QScore;
 
 public class MaCHDosageProfile {
 	private String delim = "\\s+";
@@ -45,16 +45,10 @@ public class MaCHDosageProfile {
 		//read score file
 		scoreFile = Parameter.INSTANCE.scoreFile;
 		if(scoreFile != null) {
-			BufferedReader readerScoreFile = FileProcessor.FileOpen(scoreFile);
-			String lineScore = null;
-			try {
-				while((lineScore = readerScoreFile.readLine())!=null) {
-					if (lineScore.length() == 0) continue;
-					ScoreUnit su = new ScoreUnit(lineScore);
-					Score.put(su.getSNP(), su);
-				}
-			} catch (IOException e) {
-				Logger.handleException(e, "An exception occurred when reading the score file '" + scoreFile + "'.");
+			gear.util.BufferedReader scoreReader = new gear.util.BufferedReader(scoreFile, "score");
+			ScoreUnit scoreUnit = null;
+			while((scoreUnit = ScoreUnit.readNextScoreUnit(scoreReader)) != null) {
+				Score.put(scoreUnit.getSNP(), scoreUnit);
 			}
 			hasScore = true;
 		} else {
@@ -249,7 +243,7 @@ public class MaCHDosageProfile {
 					}
 
 				} else if (!hasScore) {
-					su = new ScoreUnit(snp, refA, "1");
+					su = new ScoreUnit(snp, refA, 1.0);
 					cSNP++;
 				} else {
 					continue;

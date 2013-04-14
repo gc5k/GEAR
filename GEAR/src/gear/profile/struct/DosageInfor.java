@@ -1,4 +1,4 @@
-package profile.struct;
+package gear.profile.struct;
 
 import gear.util.SNPMatch;
 
