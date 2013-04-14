@@ -29,12 +29,28 @@ public class BufferedReader {
 		return line;
 	}
 	
+	/**
+	 * @return split tokens on the next non-empty line
+	 */
 	public String[] readTokens() {
-		String line = readLine();
-		if (line != null) {
-			return line.trim().split("\\s+");
+		String[] tokens = null;
+		
+		while (true) {
+			String line = readLine();
+			
+			if (line == null) {
+				tokens = null;
+				break;
+			}
+			
+			tokens = line.trim().split("\\s+");
+			
+			if (tokens.length > 0) {
+				break;
+			}
 		}
-		return null;
+		
+		return tokens;
 	}
 	
 	public String getFileName() {
