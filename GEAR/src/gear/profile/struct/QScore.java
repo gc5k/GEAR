@@ -37,18 +37,10 @@ public class QScore {
 		QScore qScore = null;
 		
 		while (true) {
-			String tokens[] = reader.readTokens();
+			String tokens[] = reader.readTokens(2);
 			
 			if (tokens == null) {
 				break;
-			}
-			
-			if (tokens.length != 2) {
-				Logger.printUserError(
-					"The format of the q-score file '" + reader.getFileName() + "' is incorrect: " +
-					"A q-score file should consists of 2 columns, but line " + reader.getCurLineNum() + " contains " + tokens.length + " column(s)."
-				);
-				System.exit(1);
 			}
 			
 			if (Parameter.INSTANCE.isNA(tokens[1])) {

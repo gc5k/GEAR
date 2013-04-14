@@ -43,18 +43,10 @@ public class ScoreUnit {
 		ScoreUnit scoreUnit = null;
 		
 		while (true) {
-			String tokens[] = reader.readTokens();
+			String tokens[] = reader.readTokens(3);
 			
 			if (tokens == null) {
 				break;
-			}
-			
-			if (tokens.length != 3) {
-				Logger.printUserError(
-					"The format of the score file '" + reader.getFileName() + "' is incorrect: " +
-					"A score file should consists of 3 columns, but line " + reader.getCurLineNum() + " contains " + tokens.length + " column(s)."
-				);
-				System.exit(1);
 			}
 			
 			if (Parameter.INSTANCE.isNA(tokens[2])) {
