@@ -39,7 +39,7 @@ public class ScoreUnit {
 		return isMissing;
 	}
 
-	public static ScoreUnit readNextScoreUnit(gear.util.BufferedReader reader) {
+	public static ScoreUnit getNextScoreUnit(gear.util.BufferedReader reader) {
 		ScoreUnit scoreUnit = null;
 		
 		while (true) {
@@ -47,10 +47,6 @@ public class ScoreUnit {
 			
 			if (tokens == null) {
 				break;
-			}
-			
-			if (tokens.length == 0) {
-				continue;
 			}
 			
 			if (tokens.length != 3) {

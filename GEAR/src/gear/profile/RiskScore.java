@@ -66,9 +66,9 @@ public class RiskScore {
 		// read score file
 		scoreFile = Parameter.INSTANCE.scoreFile;
 		gear.util.BufferedReader scoreReader = new gear.util.BufferedReader(scoreFile, "score");
-		ScoreUnit scoreUnit = null;
+		ScoreUnit scoreUnit;
 		Logger.printUserLog("Reading the score file '" + scoreFile + "'.");
-		while ((scoreUnit = ScoreUnit.readNextScoreUnit(scoreReader)) != null) {
+		while ((scoreUnit = ScoreUnit.getNextScoreUnit(scoreReader)) != null) {
 			Score.put(scoreUnit.getSNP(), scoreUnit);
 		}
 		
@@ -80,18 +80,10 @@ public class RiskScore {
 			
 			// q score file
 			q_score_file = Parameter.INSTANCE.q_score_file;
-			BufferedReader readerQScoreFile = FileProcessor.FileOpen(q_score_file);
-			String lineQScore = null;
-			try {
-				while ((lineQScore = readerQScoreFile.readLine()) != null) {
-					if (lineQScore.length() == 0)
-						continue;
-					lineQScore.trim();
-					QScore qs = new QScore(lineQScore);
-					QS.put(qs.getSNP(), qs);
-				}
-			} catch (IOException e) {
-				Logger.handleException(e, "An exception occurred when reading the q-score file '" + q_score_file + "'.");
+			gear.util.BufferedReader qScoreReader = new gear.util.BufferedReader(Parameter.INSTANCE.q_score_file, "q-score");
+			QScore qScore;
+			while ((qScore = QScore.getNextQScore(qScoreReader)) != null) {
+				QS.put(qScore.getSNP(), qScore);
 			}
 			
 			if (QS.size() == 0) {
