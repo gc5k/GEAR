@@ -9,6 +9,7 @@ import write.WriteBedSNPMajor;
 import gear.profile.MaCHDosageProfile;
 import gear.profile.RiskScore;
 import gear.util.Logger;
+import grm.MakeGRM;
 import he.HECalculate;
 import he.HEPermutation;
 import he.HERead;
@@ -128,6 +129,9 @@ public class Pipeline {
 			GRMStat gs = new GRMStat();
 			gs.GetGRMStats();
 			
+		} else if (Parameter.INSTANCE.GRMFlag) {
+			MakeGRM mg = new MakeGRM();
+			mg.makeGeneticRelationshipScore();
 		}
 		
 		Logger.printUserLog("Analysis finished: " + Calendar.getInstance().getTime());
