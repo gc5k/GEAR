@@ -74,20 +74,18 @@ public class MaCHDosageProfile {
 
 			//q range file
 			q_score_range_file = Parameter.INSTANCE.q_score_range_file;
-			BufferedReader readerQRangeFile = FileProcessor.FileOpen(q_score_range_file);
-			String lineQRange = null;
+			gear.util.BufferedReader qRangeReader = new gear.util.BufferedReader(q_score_range_file, "q-score-range");
 			ArrayList<ArrayList<String>> QR = NewIt.newArrayList();
-			try {
-				while ((lineQRange = readerQRangeFile.readLine()) != null) {
-					if (lineQRange.length() == 0) continue;
-					String[] s = lineQRange.split(delim);
-					if(s.length<3) continue;
-					ArrayList<String> qr = NewIt.newArrayList();
-					qr.add(s[0]); qr.add(s[1]); qr.add(s[2]);
-					QR.add(qr);
+			while (true) {
+				String[] tokens = qRangeReader.readTokens(3);
+				if (tokens == null) {
+					break;
 				}
-			} catch (IOException e) {
-				Logger.handleException(e, "An exception occurred when reading the q-range file '" + q_score_range_file + "'.");
+				ArrayList<String> qr = NewIt.newArrayList();
+				qr.add(tokens[0]);  // label
+				qr.add(tokens[1]);  // lower bound
+				qr.add(tokens[2]);  // upper bound
+				QR.add(qr);
 			}
 			
 			if (QR.size() == 0) {

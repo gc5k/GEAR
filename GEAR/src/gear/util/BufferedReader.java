@@ -1,5 +1,7 @@
 package gear.util;
 
+import java.util.logging.Level;
+
 public class BufferedReader {
 	
 	public BufferedReader(String fileName, String fileType) {
@@ -13,6 +15,17 @@ public class BufferedReader {
 		this.fileName = fileName;
 		this.fileType = fileType;
 		curLineNum = 1;
+	}
+	
+	public void close() {
+		try {
+			innerReader.close();
+		}
+		catch (java.io.IOException e) {
+			String msg = "An I/O exception occurred when closing the " + fileType + " file '" + fileName + "'.";
+			Logger.printUserError(msg);
+			Logger.getDevLogger().log(Level.WARNING, msg, e);
+		}
 	}
 	
 	public String readLine() {
