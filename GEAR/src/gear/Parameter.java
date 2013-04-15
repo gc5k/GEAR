@@ -572,6 +572,23 @@ public enum Parameter {
 	private HEParameter heParameter;
 // HE regression options End
 	
+//make grm options start
+
+	private final String cmd_ref_freq = "ref_freq";
+	private final String cmd_ref_freq_long = "ref-freq";
+	public String ref_freq = null;
+
+	public boolean GRMFlag = false;
+	
+	private final String cmd_make_grm = "make_grm";
+	private String cmd_make_grm_long = "make-grm";
+	public boolean makeGRMFlag = false;
+	
+	private final String cmd_make_grm_txt = "make_grm_txt";
+	private String cmd_make_grm_txt_long = "make-grm-txt";
+	public boolean makeGRMTXTFlag = false;
+//make grm options end	
+	
 	//quantitative covariates
 	private final String cmd_qcovar = "qcovar";
 	public String qcovar_file = null;
@@ -900,6 +917,12 @@ public enum Parameter {
 		ops.addOption(OptionBuilder.withDescription("h2 ").hasArg().create(cmd_eh2));
 		
 		heParameter = new HEParameter();
+
+		ops.addOption(OptionBuilder.withLongOpt(cmd_ref_freq_long).withDescription("reference allele frequency").create(cmd_ref_freq));
+
+		ops.addOption(OptionBuilder.withLongOpt(cmd_make_grm_long).withDescription("generate genetic relationship matirx").create(cmd_make_grm));
+
+		ops.addOption(OptionBuilder.withLongOpt(cmd_make_grm_txt_long).withDescription("generate genetic relationship matirx and save in the plain text format").create(cmd_make_grm_txt));
 
 		ops.addOption(OptionBuilder.withDescription("covariate file").hasArg().create(cmd_covar));
 
@@ -1252,6 +1275,16 @@ public enum Parameter {
 		}
 
 		heParameter.commandListener();
+
+		if (cl.hasOption(cmd_make_grm)) {
+			makeGRMFlag = true;
+			GRMFlag = true;
+		}
+
+		if (cl.hasOption(cmd_make_grm_txt)) {
+			makeGRMTXTFlag = true;
+			GRMFlag = true;
+		}
 
 		if (cl.hasOption(cmd_covar)) {
 			covar_file = cl.getOptionValue(cmd_covar);

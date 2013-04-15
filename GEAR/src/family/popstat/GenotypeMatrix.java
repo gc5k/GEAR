@@ -58,22 +58,6 @@ public class GenotypeMatrix {
 //		}
 	}
 
-	public int getGenotypeScore(int idx, int i) {
-		int posByte = i >> shift;
-		int posBite = (i & 0xf) << 1;
-		int g = (genotypeMat[idx][posByte] >> (posBite)) & 3;
-		return g;
-//		if (g == 1) {// 01
-//			return 2;
-//		} else {
-//			if (g == 2) {
-//				return 1;
-//			} else {
-//				return g;
-//			}
-//		}
-	}
-
 	public int[] getBiAlleleGenotype(int idx, int i) {
 		int posByte = i >> shift;
 		int posBite = (i & 0xf) << 1;
