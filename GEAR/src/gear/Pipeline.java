@@ -2,12 +2,13 @@ package gear;
 
 import java.util.Calendar;
 
+import epem.GRMStat;
+
 import merge.MergeTwoFile;
 import write.WriteBedSNPMajor;
 import gear.profile.MaCHDosageProfile;
 import gear.profile.RiskScore;
 import gear.util.Logger;
-import grm.GRMStat;
 import he.HECalculate;
 import he.HEPermutation;
 import he.HERead;
