@@ -1,7 +1,5 @@
 package gear.profile;
 
-import java.io.BufferedReader;
-import java.io.IOException;
 import java.io.PrintStream;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -21,7 +19,7 @@ import gear.util.NewIt;
 import gear.util.SNPMatch;
 
 public class RiskScore {
-	private String delim = "\\s+";
+
 	private GenotypeMatrix G1;
 
 	private HashMap<String, ScoreUnit> Score = NewIt.newHashMap();
@@ -71,6 +69,7 @@ public class RiskScore {
 		while ((scoreUnit = ScoreUnit.getNextScoreUnit(scoreReader)) != null) {
 			Score.put(scoreUnit.getSNP(), scoreUnit);
 		}
+		scoreReader.close();
 		
 		Logger.printUserLog("Number of predictors: " + Score.size());
 
@@ -85,6 +84,7 @@ public class RiskScore {
 			while ((qScore = QScore.getNextQScore(qScoreReader)) != null) {
 				QS.put(qScore.getSNP(), qScore);
 			}
+			qScoreReader.close();
 			
 			if (QS.size() == 0) {
 				Logger.printUserError("Nothing is selected in '" + q_score_file + "'.");
@@ -95,25 +95,20 @@ public class RiskScore {
 
 			// q range file
 			q_score_range_file = Parameter.INSTANCE.q_score_range_file;
-			BufferedReader readerQRangeFile = FileProcessor.FileOpen(q_score_range_file);
-			String lineQRange = null;
+			gear.util.BufferedReader qRangeReader = new gear.util.BufferedReader(q_score_range_file, "q-score-range");
 			ArrayList<ArrayList<String>> QR = NewIt.newArrayList();
-			try {
-				while ((lineQRange = readerQRangeFile.readLine()) != null) {
-					if (lineQRange.length() == 0)
-						continue;
-					String[] s = lineQRange.split(delim);
-					if (s.length < 3)
-						continue;
-					ArrayList<String> qr = NewIt.newArrayList();
-					qr.add(s[0]);
-					qr.add(s[1]);
-					qr.add(s[2]);
-					QR.add(qr);
+			while (true) {
+				String[] tokens = qRangeReader.readTokens(3);
+				if (tokens == null) {
+					break;
 				}
-			} catch (IOException e) {
-				Logger.handleException(e, "An exception occurred when reading the q-range file '" + q_score_range_file + "'.");
+				ArrayList<String> qr = NewIt.newArrayList();
+				qr.add(tokens[0]);  // range label
+				qr.add(tokens[1]);  // lower bound
+				qr.add(tokens[2]);  // upper bound
+				QR.add(qr);
 			}
+			qRangeReader.close();
 			
 			if (QR.size() == 0) {
 				Logger.printUserError("Nothing is selected in '" + q_score_range_file + "'.");
@@ -133,7 +128,6 @@ public class RiskScore {
 
 			isQ = true;
 		}
-
 	}
 	
 	public void makeProfile() {
@@ -284,7 +278,6 @@ public class RiskScore {
 	}
 
 	public void singleProfile() {
-
 		int Total = 0;
 		int CCSNP = 0;
 		int ATGCLocus = 0;
@@ -306,7 +299,7 @@ public class RiskScore {
 			ScoreUnit su = null;
 			boolean isMatch = true;
 			double sc = 0;
-			if (Score.containsKey(snp.getName()) ) {
+			if (Score.containsKey(snp.getName())) {
 				Total++;
 				if (isATGC) {
 					ATGCLocus++;
@@ -319,24 +312,23 @@ public class RiskScore {
 					continue;
 				}
 
-				if (su.getRefAllele().compareTo(Character.toString(a1)) == 0) {
+				if (su.getRefAllele().equals(Character.toString(a1))) {
 					isMatch = true;
 					matchScheme[0]++;
 					ArrayList<String> s = s4.get(0);
 					s.add(snp.getName());
-				} else if (su.getRefAllele().compareTo(Character.toString(a2)) == 0) {
+				} else if (su.getRefAllele().equals(Character.toString(a2))) {
 					isMatch = false;
 					matchScheme[1]++;
 					ArrayList<String> s = s4.get(1);
 					s.add(snp.getName());
-
-				} else if (su.getRefAllele().compareTo(SNPMatch.Flip(Character.toString(a1)))==0){
+				} else if (su.getRefAllele().equals(SNPMatch.Flip(Character.toString(a1)))){
 					isMatch = true;
 					matchScheme[2]++;
 					ArrayList<String> s = s4.get(2);
 					s.add(snp.getName());
 
-				} else if (su.getRefAllele().compareTo(SNPMatch.Flip(Character.toString(a2)))==0) {
+				} else if (su.getRefAllele().equals(SNPMatch.Flip(Character.toString(a2)))) {
 					isMatch = false;
 					matchScheme[3]++;
 					ArrayList<String> s = s4.get(3);
