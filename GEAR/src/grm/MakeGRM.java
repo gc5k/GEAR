@@ -74,7 +74,7 @@ public class MakeGRM {
 					grm.println((i+1) + "\t" + (j+1) + "\t" + s[0] + "\t" + s[1]);
 				} else {
 					try {
-						grmGZ.append((i+1) + "\t" + (j+1) + "\t" + s[0] + "\t" + s[1]);
+						grmGZ.append((i+1) + "\t" + (j+1) + "\t" + s[0] + "\t" + s[1] + "\n");
 					} catch (IOException e) {
 						Logger.handleException(e, "error in writing '" + sb.toString() + "' for " + (i+1) + " " + (j+1) + ".");
 					}
