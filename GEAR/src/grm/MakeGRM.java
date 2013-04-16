@@ -1,13 +1,16 @@
 package grm;
 
+import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.IOException;
 import java.io.PrintStream;
 import java.util.ArrayList;
+import java.util.HashMap;
 
 import family.pedigree.Hukou;
 import family.pedigree.file.MapFile;
 import family.pedigree.file.PedigreeFile;
+import family.pedigree.file.SNP;
 import family.pedigree.genotype.BPerson;
 import family.plink.PLINKBinaryParser;
 import family.plink.PLINKParser;
@@ -16,17 +19,17 @@ import family.qc.rowqc.SampleFilter;
 import gear.Parameter;
 import gear.util.FileProcessor;
 import gear.util.Logger;
+import gear.util.NewIt;
+import gear.util.structure.MAF;
 import sumstat.qc.rowqc.SumStatQC;
 
 public class MakeGRM {
-	private double maf_threshold = 1e-8;
+	private double maf_threshold = 1e-7;
 
 	private GenotypeMatrix G;
 	private int numMarker;
 	private double[][] allelefreq;
-	private double[][] genotypefreq;
 	private MapFile snpMap;
-	private SumStatQC ssQC;
 	private PedigreeFile pf;
 	
 	public MakeGRM() {
@@ -87,7 +90,7 @@ public class MakeGRM {
 			try {
 				grmGZ.close();
 			} catch (IOException e) {
-				Logger.handleException(e, "error in closing '" + sb.toString() + "'.");
+				Logger.handleException(e, " error in closing '" + sb.toString() + "'.");
 			}
 		}
 		Logger.printUserLog("Writing GRM scores into '" + sb.toString() + "'.");		
@@ -148,7 +151,40 @@ public class MakeGRM {
 	}
 
 	private void getRefFreq() {
-		Logger.printUserLog("Got reference allele frequency from the " + Parameter.INSTANCE.ref_freq + ".\n");		
+		HashMap<String, MAF> refMap = NewIt.newHashMap();
+		BufferedReader reader = FileProcessor.FileOpen(Parameter.INSTANCE.ref_freq);
+		String line;
+		try {
+			line = reader.readLine();
+			int idx = 0;
+			while((line = reader.readLine())!=null) {
+				line = line.trim();
+				MAF maf = new MAF(line, ++idx);
+				refMap.put(maf.getSNP(), maf);
+			}
+			Logger.printUserLog("Read " + idx + " SNPs in '" +  Parameter.INSTANCE.ref_freq + "'.\n");
+
+		} catch (IOException e) {
+			Logger.handleException(e, "An exception occurred when reading the maf file '" + Parameter.INSTANCE.ref_freq + "'.");
+		}
+
+		ArrayList<SNP> snpList = snpMap.getMarkerList();
+		int c = 0;
+		for (int i = 0; i < snpList.size(); i++) {
+			SNP snp = snpList.get(i);
+			String snpName = snp.getName();
+			double f = 0;
+			if(refMap.containsKey(snpName)) {
+				f = refMap.get(snpName).getMAF();
+			}
+			if (f < Parameter.INSTANCE.freq_range[0] || f > Parameter.INSTANCE.freq_range[1]) {
+				allelefreq[i][1] = 0;
+			} else {
+				allelefreq[i][1] = f;				
+			}
+			c++;
+		}
+		Logger.printUserLog("Got " + c + " matched reference alleles.\n");
 	}
 
 	private void calAlleleFrequency() {
@@ -158,7 +194,6 @@ public class MakeGRM {
 				int[] c = G.getBiAlleleGenotype(i, j);
 				allelefreq[j][c[0]]++;
 				allelefreq[j][c[1]]++;
-				int idx = G.getAdditiveScore(i, j);
 			}
 		}
 
@@ -173,7 +208,11 @@ public class MakeGRM {
 			} else {
 				allelefreq[i][2] = 1;
 			}
-		}		
+			if (allelefreq[i][1] < Parameter.INSTANCE.freq_range[0] || allelefreq[i][1] > Parameter.INSTANCE.freq_range[1]) {
+				allelefreq[i][1] = 0;
+			}
+		}
+
 		Logger.printUserLog("Calculated the reference allele frequency.");
 	}
 

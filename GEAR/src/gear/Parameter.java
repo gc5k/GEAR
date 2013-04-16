@@ -587,6 +587,10 @@ public enum Parameter {
 	private final String cmd_make_grm_txt = "make_grm_txt";
 	private String cmd_make_grm_txt_long = "make-grm-txt";
 	public boolean makeGRMTXTFlag = false;
+	
+	private final String cmd_freq_range = "freq_range";
+	private final String cmd_freq_range_long = "freq-range";
+	public double[] freq_range = {0, 1};
 //make grm options end	
 	
 	//quantitative covariates
@@ -918,7 +922,9 @@ public enum Parameter {
 		
 		heParameter = new HEParameter();
 
-		ops.addOption(OptionBuilder.withLongOpt(cmd_ref_freq_long).withDescription("reference allele frequency").create(cmd_ref_freq));
+		ops.addOption(OptionBuilder.withLongOpt(cmd_ref_freq_long).withDescription("reference allele frequency").hasArg().create(cmd_ref_freq));
+
+		ops.addOption(OptionBuilder.withLongOpt(cmd_freq_range_long).withDescription("only allele frequencies withwin this range (inclusive) will be used ").hasArg().create(cmd_freq_range));
 
 		ops.addOption(OptionBuilder.withLongOpt(cmd_make_grm_long).withDescription("generate genetic relationship matirx").create(cmd_make_grm));
 
@@ -1275,6 +1281,19 @@ public enum Parameter {
 		}
 
 		heParameter.commandListener();
+
+		if (cl.hasOption(cmd_ref_freq)) {
+			ref_freq = cl.getOptionValue(cmd_ref_freq);
+			exists(ref_freq);
+		}
+
+		if (cl.hasOption(cmd_freq_range)) {
+			String s = cl.getOptionValue(cmd_freq_range);
+			String[] ss=s.split(",");
+			freq_range = new double[2];
+			freq_range[0] = Double.parseDouble(ss[0]);
+			freq_range[1] = Double.parseDouble(ss[1]);
+		}
 
 		if (cl.hasOption(cmd_make_grm)) {
 			makeGRMFlag = true;
