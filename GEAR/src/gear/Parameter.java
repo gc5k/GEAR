@@ -588,9 +588,15 @@ public enum Parameter {
 	private String cmd_make_grm_txt_long = "make-grm-txt";
 	public boolean makeGRMTXTFlag = false;
 	
-	private final String cmd_freq_range = "freq_range";
-	private final String cmd_freq_range_long = "freq-range";
-	public double[] freq_range = {0, 1};
+	private final String cmd_maf_range = "maf_range";
+	private final String cmd_maf_range_long = "maf-range";
+	public double[] maf_range = {0, 1};
+	
+	private final String cmd_grm_range = "grm_range";
+	private final String cmd_grm_range_long = "grm-range";
+	public int[] grm_range = {0, 1};
+	public boolean grmRangeFlag = false;
+	
 //make grm options end	
 	
 	//quantitative covariates
@@ -924,7 +930,9 @@ public enum Parameter {
 
 		ops.addOption(OptionBuilder.withLongOpt(cmd_ref_freq_long).withDescription("reference allele frequency").hasArg().create(cmd_ref_freq));
 
-		ops.addOption(OptionBuilder.withLongOpt(cmd_freq_range_long).withDescription("only allele frequencies withwin this range (inclusive) will be used ").hasArg().create(cmd_freq_range));
+		ops.addOption(OptionBuilder.withLongOpt(cmd_maf_range_long).withDescription("only maf withwin this range (inclusive) will be used ").hasArg().create(cmd_maf_range));
+
+		ops.addOption(OptionBuilder.withLongOpt(cmd_grm_range_long).withDescription("only grm withwin this range (inclusive) will be calculated ").hasArg().create(cmd_grm_range));
 
 		ops.addOption(OptionBuilder.withLongOpt(cmd_make_grm_long).withDescription("generate genetic relationship matirx").create(cmd_make_grm));
 
@@ -1287,12 +1295,19 @@ public enum Parameter {
 			exists(ref_freq);
 		}
 
-		if (cl.hasOption(cmd_freq_range)) {
-			String s = cl.getOptionValue(cmd_freq_range);
+		if (cl.hasOption(cmd_maf_range)) {
+			String s = cl.getOptionValue(cmd_maf_range);
 			String[] ss=s.split(",");
-			freq_range = new double[2];
-			freq_range[0] = Double.parseDouble(ss[0]);
-			freq_range[1] = Double.parseDouble(ss[1]);
+			maf_range[0] = Double.parseDouble(ss[0]);
+			maf_range[1] = Double.parseDouble(ss[1]);
+		}
+
+		if (cl.hasOption(cmd_grm_range)) {
+			String s = cl.getOptionValue(cmd_grm_range);
+			String[] ss=s.split(",");
+			grm_range[0] = Integer.parseInt(ss[0]);
+			grm_range[1] = Integer.parseInt(ss[1]);
+			grmRangeFlag = true;
 		}
 
 		if (cl.hasOption(cmd_make_grm)) {
