@@ -109,6 +109,79 @@ public class MakeGRM {
 		Logger.printUserLog("Writing individual information into '" + sb_id.toString() + "'.");
 	}
 
+	public void makeGeneticRelationshipScore(int n0, int n1) {
+		if (n0 <1 || n1 > (G.getGRow() * G.getGRow())/2) {
+			Logger.printUserError("incorrect range for grm pairs : " + n0 + "," +n1);
+			System.exit(0);
+		} else {
+			Logger.printUserLog("generating grm scores for the pairs from " + n0 + " to " + n1);
+		}
+
+		prepareMAF();
+		StringBuffer sb = new StringBuffer();
+		sb.append(Parameter.INSTANCE.out);
+		PrintStream grm = null;
+		BufferedWriter grmGZ = null;
+		if (Parameter.INSTANCE.makeGRMTXTFlag) {
+			sb.append(".grm.txt");
+			grm = FileProcessor.CreatePrintStream(sb.toString());
+		} else if (Parameter.INSTANCE.makeGRMFlag) {
+			sb.append(".grm.gz");
+			grmGZ = FileProcessor.ZipFielWriter(sb.toString());
+		}
+
+		int i = 0, j = 0;
+		for (; i < G.getGRow(); i++) {
+			if( (i+1) * (i+1+1) / 2 >= n0) break;
+		}
+		j = n0 - i * (i+1)/2 - 1;
+		int c = n0;
+
+		while ( c <= n1 ) {
+			double[] s = GRMScore(i,j);
+			if (Parameter.INSTANCE.makeGRMTXTFlag) {
+				grm.println((i+1) + "\t" + (j+1) + "\t" + s[0] + "\t" + s[1]);
+			} else {
+				try {
+					grmGZ.append((i+1) + "\t" + (j+1) + "\t" + s[0] + "\t" + s[1] + "\n");
+				} catch (IOException e) {
+					Logger.handleException(e, "error in writing '" + sb.toString() + "' for " + (i+1) + " " + (j+1) + ".");
+				}
+			}
+			if ( j < i) {
+				j++;
+			} else {
+				i++;
+				j = 0;
+			}
+			c++;
+		}
+
+		if (Parameter.INSTANCE.makeGRMTXTFlag) {
+			grm.close();
+		} else {
+			try {
+				grmGZ.close();
+			} catch (IOException e) {
+				Logger.handleException(e, " error in closing '" + sb.toString() + "'.");
+			}
+		}
+		Logger.printUserLog("Writing GRM scores into '" + sb.toString() + "'.");		
+		StringBuffer sb_id = new StringBuffer();
+		sb_id.append(Parameter.INSTANCE.out);
+		PrintStream grm_id = null;
+		sb_id.append(".grm.id");
+		grm_id = FileProcessor.CreatePrintStream(sb_id.toString());
+
+		ArrayList<Hukou> H = pf.getHukouBook();
+		for (int k = 0; k < H.size(); k++) {
+			Hukou h = H.get(k);
+			grm_id.println(h.getFamilyID() + "\t" + h.getIndividualID());
+		}
+		grm_id.close();
+		Logger.printUserLog("Writing individual information into '" + sb_id.toString() + "'.");
+	}
+	
 	private double[] GRMScore(int idx1, int idx2) {
 		double[] s = { 0, 0 };
 
@@ -177,11 +250,20 @@ public class MakeGRM {
 			if(refMap.containsKey(snpName)) {
 				f = refMap.get(snpName).getMAF();
 			}
-			if (f < Parameter.INSTANCE.freq_range[0] || f > Parameter.INSTANCE.freq_range[1]) {
-				allelefreq[i][1] = 0;
+			if (allelefreq[i][1] <= 0.5) {
+				if (allelefreq[i][1] < Parameter.INSTANCE.maf_range[0] || allelefreq[i][1] > Parameter.INSTANCE.maf_range[1]) {
+					allelefreq[i][1] = 0;
+				} else {
+					allelefreq[i][1] = f;				
+				}
 			} else {
-				allelefreq[i][1] = f;				
+				if ( (1 - allelefreq[i][1]) < Parameter.INSTANCE.maf_range[0] || (1 - allelefreq[i][1]) > Parameter.INSTANCE.maf_range[1]) {
+					allelefreq[i][1] = 0;
+				} else {
+					allelefreq[i][1] = f;				
+				}
 			}
+
 			c++;
 		}
 		Logger.printUserLog("Got " + c + " matched reference alleles.\n");
@@ -208,8 +290,14 @@ public class MakeGRM {
 			} else {
 				allelefreq[i][2] = 1;
 			}
-			if (allelefreq[i][1] < Parameter.INSTANCE.freq_range[0] || allelefreq[i][1] > Parameter.INSTANCE.freq_range[1]) {
-				allelefreq[i][1] = 0;
+			if (allelefreq[i][1] <= 0.5) {
+				if (allelefreq[i][1] < Parameter.INSTANCE.maf_range[0] || allelefreq[i][1] > Parameter.INSTANCE.maf_range[1]) {
+					allelefreq[i][1] = 0;
+				}
+			} else {
+				if ( (1 - allelefreq[i][1]) < Parameter.INSTANCE.maf_range[0] || (1 - allelefreq[i][1]) > Parameter.INSTANCE.maf_range[1]) {
+					allelefreq[i][1] = 0;
+				}				
 			}
 		}
 

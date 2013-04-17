@@ -131,7 +131,11 @@ public class Pipeline {
 			
 		} else if (Parameter.INSTANCE.GRMFlag) {
 			MakeGRM mg = new MakeGRM();
-			mg.makeGeneticRelationshipScore();
+			if (Parameter.INSTANCE.grmRangeFlag) {
+				mg.makeGeneticRelationshipScore(Parameter.INSTANCE.grm_range[0], Parameter.INSTANCE.grm_range[1]);
+			} else {
+				mg.makeGeneticRelationshipScore();
+			}
 		}
 		
 		Logger.printUserLog("Analysis finished: " + Calendar.getInstance().getTime());
