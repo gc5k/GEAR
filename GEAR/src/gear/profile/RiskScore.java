@@ -143,6 +143,7 @@ public class RiskScore {
 
 	public void multipleProfile() {
 		int Total = 0;
+		int monoLocus = 0;
 		int ATGCLocus = 0;
 		int[] CCSNP = new int[QRName.length];
 		int[][] GCInd = new int[G1.getGRow()][QRName.length];
@@ -165,6 +166,11 @@ public class RiskScore {
 			double sc = 0;
 			if (Score.containsKey(snp.getName()) ) {
 				Total++;
+				if(SNPMatch.IsBiallelic(a1, a2)) {
+					monoLocus++;
+					continue;
+				}
+
 				if (isATGC) {
 					ATGCLocus++;
 					if (!Parameter.INSTANCE.keepATGC()) {
@@ -250,6 +256,7 @@ public class RiskScore {
 		}
 
 		Logger.printUserLog("Number of SNPs mapped to the score file: " + Total);
+		Logger.printUserLog("Number of monomorphic loci removed: " + monoLocus);
 		Logger.printUserLog("Number of ATGC loci " + (Parameter.INSTANCE.keepATGC() ? "detected: " : "removed: ") + ATGCLocus);
 				
 		for (int i = 0; i < QRName.length; i++) {
@@ -282,6 +289,7 @@ public class RiskScore {
 
 	public void singleProfile() {
 		int Total = 0;
+		int monoLocus = 0;
 		int CCSNP = 0;
 		int ATGCLocus = 0;
 		int[] matchScheme = new int[5];
@@ -304,6 +312,11 @@ public class RiskScore {
 			double sc = 0;
 			if (Score.containsKey(snp.getName())) {
 				Total++;
+				if(SNPMatch.IsBiallelic(a1, a2)) {
+					monoLocus++;
+					continue;
+				}
+
 				if (isATGC) {
 					ATGCLocus++;
 					if (!Parameter.INSTANCE.keepATGC()) {
@@ -372,6 +385,7 @@ public class RiskScore {
 		}
 
 		Logger.printUserLog("Number of SNPs mapped to the score file: " + Total);
+		Logger.printUserLog("Number of monomorphic loci removed: " + monoLocus);
 		Logger.printUserLog("Number of ATGC loci " + (Parameter.INSTANCE.keepATGC() ? "detected: " : "removed: ") + ATGCLocus);
 		Logger.printUserLog("Number of SNP scores in the score file: " + CCSNP);
 

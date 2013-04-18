@@ -174,6 +174,7 @@ public class MaCHDosageProfile {
 
 	public void multipleProfile() {
 
+		int monoLocus = 0;
 		int[] CC = new int[QRName.length];
 		int[] CCSNP = new int[QRName.length];
 		double[][] riskProfile= null;
@@ -204,6 +205,10 @@ public class MaCHDosageProfile {
 				String snp = di.getSNP();
 				String refA = di.getRefAllele();
 				String refB = di.getSecAllele();
+				if(SNPMatch.IsBiallelic(refA.charAt(0), refB.charAt(0))) {
+					monoLocus++;
+					continue;
+				}
 
 				if(di.isATGCLocus()) {
 					ATGCLocus++;
@@ -293,12 +298,13 @@ public class MaCHDosageProfile {
 			}
 		}
 
-		Logger.printUserLog("Number of ATGC loci " + (Parameter.INSTANCE.keepATGC() ? "detected: " : "removed: ") + ATGCLocus);
-		Logger.printUserLog("Number of SNPs mapped to the score file in total: " + sumSNPMapped);
-
 		for (int i = 0; i < CCSNP.length; i++) {
 			Logger.printUserLog(CCSNP[i] + " SNP(s) mapped to the range " + q_score_range[i][0] + " " + q_score_range[i][1]);
 		}
+
+		Logger.printUserLog("Number of monomorphic loci removed: " + monoLocus);
+		Logger.printUserLog("Number of ATGC loci " + (Parameter.INSTANCE.keepATGC() ? "detected: " : "removed: ") + ATGCLocus);
+		Logger.printUserLog("Number of SNPs mapped to the score file in total: " + sumSNPMapped);
 
 		StringBuffer sbim = new StringBuffer();
 		sbim.append(Parameter.INSTANCE.out);
@@ -323,6 +329,7 @@ public class MaCHDosageProfile {
 
 	public void singleProfile() {
 
+		int monoLocus = 0;
 		int CC = 0;
 		int CCSNP = 0;
 		double[] riskProfile = null;
@@ -345,7 +352,11 @@ public class MaCHDosageProfile {
 				String snp = di.getSNP();
 				String refA = di.getRefAllele();
 				String refB = di.getSecAllele();
-				
+				if(SNPMatch.IsBiallelic(refA.charAt(0), refB.charAt(0))) {
+					monoLocus++;
+					continue;
+				}
+
 				if(di.isATGCLocus()) {
 					ATGCLocus++;
 					if (Parameter.INSTANCE.keepATGC()) {
@@ -397,7 +408,8 @@ public class MaCHDosageProfile {
 				riskProfile[i] /= 2*CC;
 			}
 		}
-		
+
+		Logger.printUserLog("Number of monomorphic loci removed: " + monoLocus);
 		Logger.printUserLog("Number of ATGC loci " + (Parameter.INSTANCE.keepATGC() ? "detected: " : "removed: ") + ATGCLocus);
 		Logger.printUserLog("Number of SNPs mapped to the score file in total: " + CCSNP);
 		Logger.printUserLog("Number of SNPs having scores: " + CC);
