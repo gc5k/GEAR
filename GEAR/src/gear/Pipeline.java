@@ -36,9 +36,17 @@ public class Pipeline {
 		Logger.printUserLog(AboutInfo.WELCOME_MESSAGE);
 		Logger.printUserLog("Analysis started: " + Calendar.getInstance().getTime() + "\n");
 		Logger.printUserLog("Options received: ");
+		StringBuffer sb = null;
 		for (int i = 0; i < args.length; i++) {
-			Logger.printUserLog(args[i] + " ");
+			if(args[i].startsWith("--")) {
+				if (i > 1) {
+					Logger.printUserLog(sb.toString());
+				}
+				sb = new StringBuffer("  ");
+			}
+			sb.append(args[i] + " ");
 		}
+		Logger.printUserLog(sb.toString());
 		Logger.printUserLog("");
 
 		if (Parameter.INSTANCE.getHpcParameter().isSet()) {
@@ -134,11 +142,13 @@ public class Pipeline {
 			MakeGRM mg = new MakeGRM();
 			if (Parameter.INSTANCE.grmRangeFlag) {
 				mg.makeGeneticRelationshipScore(Parameter.INSTANCE.grm_range[0], Parameter.INSTANCE.grm_range[1]);
+			} else if (Parameter.INSTANCE.grmPartitionFlag) {
+				mg.GRMPartitioning(args);
 			} else {
 				mg.makeGeneticRelationshipScore();
 			}
 		}
-		
+		Logger.printUserLog("");
 		Logger.printUserLog("Analysis finished: " + Calendar.getInstance().getTime());
 	}
 

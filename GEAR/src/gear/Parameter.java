@@ -583,7 +583,7 @@ public enum Parameter {
 	private final String cmd_make_grm = "make_grm";
 	private String cmd_make_grm_long = "make-grm";
 	public boolean makeGRMFlag = false;
-	
+
 	private final String cmd_make_grm_txt = "make_grm_txt";
 	private String cmd_make_grm_txt_long = "make-grm-txt";
 	public boolean makeGRMTXTFlag = false;
@@ -596,7 +596,12 @@ public enum Parameter {
 	private final String cmd_grm_range_long = "grm-range";
 	public int[] grm_range = {0, 1};
 	public boolean grmRangeFlag = false;
-	
+
+	private final String cmd_grm_partition = "grm_partition";
+	private final String cmd_grm_partition_long = "grm-partition";
+	public int grmPartition = 0;
+	public boolean grmPartitionFlag = false;
+
 //make grm options end	
 	
 	//quantitative covariates
@@ -933,6 +938,8 @@ public enum Parameter {
 		ops.addOption(OptionBuilder.withLongOpt(cmd_maf_range_long).withDescription("only maf withwin this range (inclusive) will be used ").hasArg().create(cmd_maf_range));
 
 		ops.addOption(OptionBuilder.withLongOpt(cmd_grm_range_long).withDescription("only grm withwin this range (inclusive) will be calculated ").hasArg().create(cmd_grm_range));
+
+		ops.addOption(OptionBuilder.withLongOpt(cmd_grm_partition_long).withDescription("partitioning grm into even subdivisions. ").hasArg().create(cmd_grm_partition));
 
 		ops.addOption(OptionBuilder.withLongOpt(cmd_make_grm_long).withDescription("generate genetic relationship matirx").create(cmd_make_grm));
 
@@ -1308,6 +1315,11 @@ public enum Parameter {
 			grm_range[0] = Integer.parseInt(ss[0]);
 			grm_range[1] = Integer.parseInt(ss[1]);
 			grmRangeFlag = true;
+		}
+
+		if (cl.hasOption(cmd_grm_partition)) {
+			grmPartitionFlag = true;
+			grmPartition = Integer.parseInt(cl.getOptionValue(cmd_grm_partition));
 		}
 
 		if (cl.hasOption(cmd_make_grm)) {

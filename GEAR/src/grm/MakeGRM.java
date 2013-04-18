@@ -2,8 +2,10 @@ package grm;
 
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.PrintStream;
+import java.io.PrintWriter;
 import java.util.ArrayList;
 import java.util.HashMap;
 
@@ -16,6 +18,7 @@ import family.plink.PLINKBinaryParser;
 import family.plink.PLINKParser;
 import family.popstat.GenotypeMatrix;
 import family.qc.rowqc.SampleFilter;
+import gear.HPC;
 import gear.Parameter;
 import gear.util.FileProcessor;
 import gear.util.Logger;
@@ -107,6 +110,68 @@ public class MakeGRM {
 		}
 		grm_id.close();
 		Logger.printUserLog("Writing individual information into '" + sb_id.toString() + "'.");
+	}
+
+	public void GRMPartitioning(String[] args) {
+		int N = G.getGRow();
+		long T = N*(N+1)/2;
+
+		int size = (int) Math.floor(T/N);
+		
+
+		for (int P = 1; P<=Parameter.INSTANCE.grmPartition; P++) {
+			StringBuilder sb = new StringBuilder();
+			sb.append(Parameter.INSTANCE.getHpcParameter().getName());
+			sb.append("." + P + ".sh");
+		
+			PrintWriter pw = null;
+			try {
+				pw = new PrintWriter(sb.toString());
+			} catch (FileNotFoundException e) {
+				Logger.handleException(e, "Cannot create the script file '" + sb.toString() + "'.");
+			}
+
+			pw.println("#$ -cwd");
+			pw.println("#$ -l vf=" + Parameter.INSTANCE.getHpcParameter().getRam());
+			StringBuilder nb = new StringBuilder();
+			nb.append(Parameter.INSTANCE.getHpcParameter().getName()+"."+ P);
+			pw.println("#$ -N " + nb.toString());
+			pw.println("#$ -m eas");
+			pw.println("#$ -M " + Parameter.INSTANCE.getHpcParameter().getEmail());
+
+			pw.print("java -jar -Xmx" + Parameter.INSTANCE.getHpcParameter().getRam() + " ");
+			pw.print(HPC.class.getProtectionDomain().getCodeSource().getLocation().getPath() + " ");
+			for (int i = 0; i < args.length; i++) {
+				String arg = args[i];
+				if (arg.equals("--shell") || arg.equals("--qsub")) {
+					continue;
+				}
+				if (arg.equals("--email") || arg.equals("--ram") || arg.equals("--name") || arg.equals("--grm-partition") || arg.equals("--grm_partition") || arg.equals("--out")) {
+					++i;
+					continue;
+				}
+				pw.print(arg + " ");
+			}
+			if (P != N) {
+				pw.print("--grm-range " + (size*(P-1)+1) + "," + (size*P) + " ");
+			} else {
+				pw.print("--grm-range " + (size*(P-1)+1) + "," + T + " ");
+			}
+			pw.print("--out " + Parameter.INSTANCE.out + "." + P);
+			pw.println();
+
+			pw.close();
+			Logger.printUserLog("Generated '" + nb.toString() + "'.");
+
+			Runtime rt = Runtime.getRuntime();
+			String cmd = "qsub " + sb.toString();
+			Logger.printUserLog("Submitted '" + nb.toString() + "'.");
+			try {
+				rt.exec(cmd);
+			} catch (IOException e) {
+				Logger.handleException(e, "Failed to execute command '" + cmd + "'.");
+			}
+		}
 	}
 
 	public void makeGeneticRelationshipScore(int n0, int n1) {
