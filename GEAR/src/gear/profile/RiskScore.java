@@ -44,12 +44,15 @@ public class RiskScore {
 		initial();
 
 		PLINKParser pp1 = null;
-		if (Parameter.INSTANCE.getBfileParameter(0).isSet()) {
+		if (Parameter.INSTANCE.getFileParameter().isSet()) {
+			pp1 = new PLINKParser (Parameter.INSTANCE.getFileParameter().getPedFile(),
+								   Parameter.INSTANCE.getFileParameter().getMapFile());
+		} else if (Parameter.INSTANCE.getBfileParameter(0).isSet()) {
 			pp1 = new PLINKBinaryParser (Parameter.INSTANCE.getBfileParameter(0).getBedFile(),
 					                     Parameter.INSTANCE.getBfileParameter(0).getBimFile(),
 					                     Parameter.INSTANCE.getBfileParameter(0).getFamFile());
 		} else {
-			Logger.printUserError("--bfile is not set.");
+			Logger.printUserError("Neither --file nor --bfile is set.");
 			System.exit(1);
 		}
 		pp1.Parse();
