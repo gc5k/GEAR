@@ -44,7 +44,8 @@ public class Pipeline {
 		if (Parameter.INSTANCE.getHpcParameter().isSet()) {
 			HPC.genScript(args);
 		} else if (Parameter.INSTANCE.scoreFlag) {
-			if (Parameter.INSTANCE.getBfileParameter(0).isSet()) {
+			if (Parameter.INSTANCE.getFileParameter().isSet() ||
+				Parameter.INSTANCE.getBfileParameter(0).isSet()) {
 				RiskScore rs = new RiskScore();
 				rs.makeProfile();
 			} else {
