@@ -1,6 +1,16 @@
 package gear.util;
 
+import gear.Parameter;
+
 public class SNPMatch {
+
+	public static boolean IsBiallelic(char a1, char a2) {
+		boolean f = true;
+		if (a1 == Parameter.INSTANCE.missing_allele.charAt(0) || a1 == Parameter.INSTANCE.missing_allele.charAt(0)) {
+			f = false;
+		}
+		return f;
+	}
 
 	public static String Flip(String a) {
 		String f = "A";
@@ -75,10 +85,10 @@ public class SNPMatch {
 	}
 	
 	public static boolean IsBiallelic(char a1, char a2, char b1, char b2) {
-		char La1= a1;
-		char La2=a2;
-		char Lb1=b1;
-		char Lb2=b2;
+		char La1 = a1;
+		char La2 = a2;
+		char Lb1 = b1;
+		char Lb2 = b2;
 
 		boolean f = true;
 		if((La1 - La2) > 0) {
