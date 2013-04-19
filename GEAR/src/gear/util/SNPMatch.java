@@ -6,7 +6,7 @@ public class SNPMatch {
 
 	public static boolean IsBiallelic(char a1, char a2) {
 		boolean f = true;
-		if (a1 == Parameter.INSTANCE.missing_allele.charAt(0) || a1 == Parameter.INSTANCE.missing_allele.charAt(0)) {
+		if (a1 == Parameter.INSTANCE.missing_allele.charAt(0) || a2 == Parameter.INSTANCE.missing_allele.charAt(0)) {
 			f = false;
 		}
 		return f;
