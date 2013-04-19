@@ -116,14 +116,13 @@ public class MakeGRM {
 		int N = G.getGRow();
 		long T = N*(N+1)/2;
 
-		int size = (int) Math.floor(T/N);
-		
+		int size = (int) Math.floor(T/Parameter.INSTANCE.grmPartition);		
 
 		for (int P = 1; P<=Parameter.INSTANCE.grmPartition; P++) {
 			StringBuilder sb = new StringBuilder();
 			sb.append(Parameter.INSTANCE.getHpcParameter().getName());
 			sb.append("." + P + ".sh");
-		
+
 			PrintWriter pw = null;
 			try {
 				pw = new PrintWriter(sb.toString());
@@ -133,13 +132,15 @@ public class MakeGRM {
 
 			pw.println("#$ -cwd");
 			pw.println("#$ -l vf=" + Parameter.INSTANCE.getHpcParameter().getRam());
+			pw.println("#$ -l h_vmem=" + Parameter.INSTANCE.getHpcParameter().getRam());
+			
 			StringBuilder nb = new StringBuilder();
 			nb.append(Parameter.INSTANCE.getHpcParameter().getName()+"."+ P);
 			pw.println("#$ -N " + nb.toString());
 			pw.println("#$ -m eas");
 			pw.println("#$ -M " + Parameter.INSTANCE.getHpcParameter().getEmail());
 
-			pw.print("java -jar -Xmx" + Parameter.INSTANCE.getHpcParameter().getRam() + " ");
+			pw.print("java -jar -Xmx" + Parameter.INSTANCE.getHpcParameter().getRam());
 			pw.print(HPC.class.getProtectionDomain().getCodeSource().getLocation().getPath() + " ");
 			for (int i = 0; i < args.length; i++) {
 				String arg = args[i];
@@ -161,11 +162,11 @@ public class MakeGRM {
 			pw.println();
 
 			pw.close();
-			Logger.printUserLog("Generated '" + nb.toString() + "'.");
+			Logger.printUserLog("Generated '" + sb.toString() + "'.");
 
 			Runtime rt = Runtime.getRuntime();
 			String cmd = "qsub " + sb.toString();
-			Logger.printUserLog("Submitted '" + nb.toString() + "'.");
+			Logger.printUserLog("Submitted '" + sb.toString() + "'.");
 			try {
 				rt.exec(cmd);
 			} catch (IOException e) {
