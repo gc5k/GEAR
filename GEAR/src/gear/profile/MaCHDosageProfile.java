@@ -260,7 +260,7 @@ public class MaCHDosageProfile
 				String snp = di.getSNP();
 				String refA = di.getRefAllele();
 				String refB = di.getSecAllele();
-				if (SNPMatch.IsBiallelic(refA.charAt(0), refB.charAt(0)))
+				if (!SNPMatch.IsBiallelic(refA.charAt(0), refB.charAt(0)))
 				{
 					monoLocus++;
 					continue;
@@ -456,7 +456,7 @@ public class MaCHDosageProfile
 				String snp = di.getSNP();
 				String refA = di.getRefAllele();
 				String refB = di.getSecAllele();
-				if (SNPMatch.IsBiallelic(refA.charAt(0), refB.charAt(0)))
+				if (!SNPMatch.IsBiallelic(refA.charAt(0), refB.charAt(0)))
 				{
 					monoLocus++;
 					continue;

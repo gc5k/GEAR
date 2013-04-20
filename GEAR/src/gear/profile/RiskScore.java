@@ -199,7 +199,7 @@ public class RiskScore
 			if (Score.containsKey(snp.getName()))
 			{
 				Total++;
-				if (SNPMatch.IsBiallelic(a1, a2))
+				if (!SNPMatch.IsBiallelic(a1, a2))
 				{
 					monoLocus++;
 					continue;
@@ -393,7 +393,7 @@ public class RiskScore
 			if (Score.containsKey(snp.getName()))
 			{
 				Total++;
-				if (SNPMatch.IsBiallelic(a1, a2))
+				if (!SNPMatch.IsBiallelic(a1, a2))
 				{
 					monoLocus++;
 					continue;
