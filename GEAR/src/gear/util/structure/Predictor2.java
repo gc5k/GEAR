@@ -2,8 +2,9 @@ package gear.util.structure;
 
 import gear.util.Logger;
 
-public class Predictor2 {
-	private String delim= "\\s+";
+public class Predictor2
+{
+	private String delim = "\\s+";
 	private String SNP;
 	private char A1;
 	private char A2;
@@ -11,44 +12,55 @@ public class Predictor2 {
 	private double NInd;
 	private String[] field;
 
-	public Predictor2(String line, int length, int lineIdx) {
+	public Predictor2(String line, int length, int lineIdx)
+	{
 		String[] s = line.split(delim);
-		if(s.length == length) {
+		if (s.length == length)
+		{
 			SNP = s[0];
 			A1 = s[1].charAt(0);
 			A2 = s[2].charAt(0);
 			maf = Double.parseDouble(s[3]);
 			NInd = Double.parseDouble(s[4]);
-			field = new String[length-5];
+			field = new String[length - 5];
 			System.arraycopy(s, 5, field, 0, field.length);
-		} else {
-			Logger.printUserLog("Predictor informtion incorrect at line " + lineIdx + ", expect " + length + " column(s), but read " + s.length);
+		} else
+		{
+			Logger.printUserLog("Predictor informtion incorrect at line "
+					+ lineIdx + ", expect " + length + " column(s), but read "
+					+ s.length);
 			System.exit(1);
 		}
 	}
 
-	public String getSNP() {
+	public String getSNP()
+	{
 		return SNP;
 	}
 
-	public char getA1() {
+	public char getA1()
+	{
 		return A1;
 	}
 
-	public char getA2() {
+	public char getA2()
+	{
 		return A2;
 	}
-	
-	public double getMAF() {
+
+	public double getMAF()
+	{
 		return maf;
 	}
-	
-	public double getNInd() {
+
+	public double getNInd()
+	{
 		return NInd;
 	}
 
-	public String getField(int idx) {
+	public String getField(int idx)
+	{
 		return field[idx];
 	}
-	
+
 }

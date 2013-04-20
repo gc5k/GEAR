@@ -18,7 +18,8 @@ import gear.util.Logger;
 import gear.util.NewIt;
 import gear.util.SNPMatch;
 
-public class RiskScore {
+public class RiskScore
+{
 
 	private GenotypeMatrix G1;
 
@@ -26,7 +27,7 @@ public class RiskScore {
 
 	private String q_score_file;
 	private String q_score_range_file;
-	
+
 	private String scoreFile;
 	private ArrayList<SNP> snpList1;
 	private HashMap<String, QScore> QS = NewIt.newHashMap();
@@ -38,20 +39,26 @@ public class RiskScore {
 
 	private SampleFilter sf1;
 
-	public RiskScore() {
+	public RiskScore()
+	{
 		Logger.printUserLog("Generating risk profile for genotypes.");
-		
+
 		initial();
 
 		PLINKParser pp1 = null;
-		if (Parameter.INSTANCE.getFileParameter().isSet()) {
-			pp1 = new PLINKParser (Parameter.INSTANCE.getFileParameter().getPedFile(),
-								   Parameter.INSTANCE.getFileParameter().getMapFile());
-		} else if (Parameter.INSTANCE.getBfileParameter(0).isSet()) {
-			pp1 = new PLINKBinaryParser (Parameter.INSTANCE.getBfileParameter(0).getBedFile(),
-					                     Parameter.INSTANCE.getBfileParameter(0).getBimFile(),
-					                     Parameter.INSTANCE.getBfileParameter(0).getFamFile());
-		} else {
+		if (Parameter.INSTANCE.getFileParameter().isSet())
+		{
+			pp1 = new PLINKParser(Parameter.INSTANCE.getFileParameter()
+					.getPedFile(), Parameter.INSTANCE.getFileParameter()
+					.getMapFile());
+		} else if (Parameter.INSTANCE.getBfileParameter(0).isSet())
+		{
+			pp1 = new PLINKBinaryParser(Parameter.INSTANCE.getBfileParameter(0)
+					.getBedFile(), Parameter.INSTANCE.getBfileParameter(0)
+					.getBimFile(), Parameter.INSTANCE.getBfileParameter(0)
+					.getFamFile());
+		} else
+		{
 			Logger.printUserError("Neither --file nor --bfile is set.");
 			System.exit(1);
 		}
@@ -63,66 +70,86 @@ public class RiskScore {
 
 	}
 
-	private void initial() {
+	private void initial()
+	{
 		// read score file
 		scoreFile = Parameter.INSTANCE.scoreFile;
-		gear.util.BufferedReader scoreReader = new gear.util.BufferedReader(scoreFile, "score");
+		gear.util.BufferedReader scoreReader = new gear.util.BufferedReader(
+				scoreFile, "score");
 		ScoreUnit scoreUnit;
 		Logger.printUserLog("Reading the score file '" + scoreFile + "'.");
-		while ((scoreUnit = ScoreUnit.getNextScoreUnit(scoreReader)) != null) {
+		while ((scoreUnit = ScoreUnit.getNextScoreUnit(scoreReader)) != null)
+		{
 			Score.put(scoreUnit.getSNP(), scoreUnit);
 		}
 		scoreReader.close();
-		
+
 		Logger.printUserLog("Number of predictors: " + Score.size());
 
 		// read q score file and q range file
-		if (Parameter.INSTANCE.q_score_file != null && Parameter.INSTANCE.q_score_range_file != null) {
-			Logger.printUserLog("Reading the q-score file '" + Parameter.INSTANCE.q_score_file + " and the q-range file '" + Parameter.INSTANCE.q_score_range_file + "'.");
-			
+		if (Parameter.INSTANCE.q_score_file != null
+				&& Parameter.INSTANCE.q_score_range_file != null)
+		{
+			Logger.printUserLog("Reading the q-score file '"
+					+ Parameter.INSTANCE.q_score_file
+					+ " and the q-range file '"
+					+ Parameter.INSTANCE.q_score_range_file + "'.");
+
 			// q score file
 			q_score_file = Parameter.INSTANCE.q_score_file;
-			gear.util.BufferedReader qScoreReader = new gear.util.BufferedReader(Parameter.INSTANCE.q_score_file, "q-score");
+			gear.util.BufferedReader qScoreReader = new gear.util.BufferedReader(
+					Parameter.INSTANCE.q_score_file, "q-score");
 			QScore qScore;
-			while ((qScore = QScore.getNextQScore(qScoreReader)) != null) {
+			while ((qScore = QScore.getNextQScore(qScoreReader)) != null)
+			{
 				QS.put(qScore.getSNP(), qScore);
 			}
 			qScoreReader.close();
-			
-			if (QS.size() == 0) {
-				Logger.printUserError("Nothing is selected in '" + q_score_file + "'.");
+
+			if (QS.size() == 0)
+			{
+				Logger.printUserError("Nothing is selected in '" + q_score_file
+						+ "'.");
 				System.exit(1);
-			} else {
+			} else
+			{
 				Logger.printUserLog("Number of q-scores: " + QS.size());
 			}
 
 			// q range file
 			q_score_range_file = Parameter.INSTANCE.q_score_range_file;
-			gear.util.BufferedReader qRangeReader = new gear.util.BufferedReader(q_score_range_file, "q-score-range");
+			gear.util.BufferedReader qRangeReader = new gear.util.BufferedReader(
+					q_score_range_file, "q-score-range");
 			ArrayList<ArrayList<String>> QR = NewIt.newArrayList();
-			while (true) {
+			while (true)
+			{
 				String[] tokens = qRangeReader.readTokens(3);
-				if (tokens == null) {
+				if (tokens == null)
+				{
 					break;
 				}
 				ArrayList<String> qr = NewIt.newArrayList();
-				qr.add(tokens[0]);  // range label
-				qr.add(tokens[1]);  // lower bound
-				qr.add(tokens[2]);  // upper bound
+				qr.add(tokens[0]); // range label
+				qr.add(tokens[1]); // lower bound
+				qr.add(tokens[2]); // upper bound
 				QR.add(qr);
 			}
 			qRangeReader.close();
-			
-			if (QR.size() == 0) {
-				Logger.printUserError("Nothing is selected in '" + q_score_range_file + "'.");
-			} else {
+
+			if (QR.size() == 0)
+			{
+				Logger.printUserError("Nothing is selected in '"
+						+ q_score_range_file + "'.");
+			} else
+			{
 				Logger.printUserLog("Number of q-ranges: " + QR.size());
 			}
 
 			q_score_range = new double[QR.size()][2];
 			QRName = new String[QR.size()];
 
-			for (int i = 0; i < QR.size(); i++) {
+			for (int i = 0; i < QR.size(); i++)
+			{
 				ArrayList<String> qr = QR.get(i);
 				QRName[i] = qr.get(0);
 				q_score_range[i][0] = Double.parseDouble(qr.get(1));
@@ -132,16 +159,20 @@ public class RiskScore {
 			isQ = true;
 		}
 	}
-	
-	public void makeProfile() {
-		if (isQ) {
+
+	public void makeProfile()
+	{
+		if (isQ)
+		{
 			multipleProfile();
-		} else {
+		} else
+		{
 			singleProfile();
 		}
 	}
 
-	public void multipleProfile() {
+	public void multipleProfile()
+	{
 		int Total = 0;
 		int monoLocus = 0;
 		int ATGCLocus = 0;
@@ -150,8 +181,9 @@ public class RiskScore {
 		int[] matchScheme = new int[5];
 
 		double[][] riskProfile = new double[G1.getGRow()][QRName.length];
-//		int[] CC = new int[G1.getGRow()];
-		for(int i = 0; i < snpList1.size(); i++) {
+		// int[] CC = new int[G1.getGRow()];
+		for (int i = 0; i < snpList1.size(); i++)
+		{
 
 			boolean[] qsL2Flag = new boolean[QRName.length];
 			Arrays.fill(qsL2Flag, false);
@@ -164,122 +196,167 @@ public class RiskScore {
 			ScoreUnit su = null;
 			boolean isMatch = true;
 			double sc = 0;
-			if (Score.containsKey(snp.getName()) ) {
+			if (Score.containsKey(snp.getName()))
+			{
 				Total++;
-				if(SNPMatch.IsBiallelic(a1, a2)) {
+				if (SNPMatch.IsBiallelic(a1, a2))
+				{
 					monoLocus++;
 					continue;
 				}
 
-				if (isATGC) {
+				if (isATGC)
+				{
 					ATGCLocus++;
-					if (!Parameter.INSTANCE.keepATGC()) {
+					if (!Parameter.INSTANCE.keepATGC())
+					{
 						continue;
 					}
 				}
 				su = Score.get(snp.getName());
-				if (su.isMissing()) {
+				if (su.isMissing())
+				{
 					continue;
 				}
 
-				if(QS.containsKey(snp.getName())) {
+				if (QS.containsKey(snp.getName()))
+				{
 					QScore qs = QS.get(snp.getName());
-					if (!qs.isMissing()) {
-						for (int k = 0; k < QRName.length; k++) {
-							if (qs.getQScore() >= q_score_range[k][0] && qs.getQScore() <= q_score_range[k][1]) {
+					if (!qs.isMissing())
+					{
+						for (int k = 0; k < QRName.length; k++)
+						{
+							if (qs.getQScore() >= q_score_range[k][0]
+									&& qs.getQScore() <= q_score_range[k][1])
+							{
 								qsL2Flag[k] = true;
 								CCSNP[k]++;
 							}
 						}
 					}
-				} else {
+				} else
+				{
 					continue;
 				}
 
-				if (su.getRefAllele().compareTo(Character.toString(a1)) == 0) {
+				if (su.getRefAllele().compareTo(Character.toString(a1)) == 0)
+				{
 					isMatch = true;
 					matchScheme[0]++;
 
-				} else if (su.getRefAllele().compareTo(Character.toString(a2)) == 0) {
+				} else if (su.getRefAllele().compareTo(Character.toString(a2)) == 0)
+				{
 					isMatch = false;
 					matchScheme[1]++;
 
-				} else if (su.getRefAllele().compareTo(SNPMatch.Flip(Character.toString(a1)))==0){
+				} else if (su.getRefAllele().compareTo(
+						SNPMatch.Flip(Character.toString(a1))) == 0)
+				{
 					isMatch = true;
 					matchScheme[2]++;
 
-				} else if (su.getRefAllele().compareTo(SNPMatch.Flip(Character.toString(a2)))==0) {
+				} else if (su.getRefAllele().compareTo(
+						SNPMatch.Flip(Character.toString(a2))) == 0)
+				{
 					isMatch = false;
 					matchScheme[3]++;
 
-				} else {
+				} else
+				{
 					matchScheme[4]++;
 					continue;
 				}
 
 				sc = su.getScore();
-				if(Parameter.INSTANCE.getTranFunction() == gear.RegressionModel.LOGIT) {
-					if(isMatch) {
+				if (Parameter.INSTANCE.getTranFunction() == gear.RegressionModel.LOGIT)
+				{
+					if (isMatch)
+					{
 						sc = Math.log(sc);
-					} else {
+					} else
+					{
 						sc = -1 * Math.log(sc);
 					}
-				} else {
-					if(!isMatch) {
-						sc = -1 * sc; 
+				} else
+				{
+					if (!isMatch)
+					{
+						sc = -1 * sc;
 					}
 				}
-			} else {// this snp is not in the predictor panel;
+			} else
+			{// this snp is not in the predictor panel;
 				continue;
 			}
 
-			for(int k = 0; k < qsL2Flag.length; k++) {
-				if (!qsL2Flag[k]) continue;
+			for (int k = 0; k < qsL2Flag.length; k++)
+			{
+				if (!qsL2Flag[k])
+					continue;
 				CCSNP[k]++;
-				for(int j = 0; j < G1.getGRow(); j++) {
-					if (G1.getAdditiveScore(j, i)!=GenotypeMatrix.missing) {
-						riskProfile[j][k] += sc * (2-G1.getAdditiveScore(j, i));
+				for (int j = 0; j < G1.getGRow(); j++)
+				{
+					if (G1.getAdditiveScore(j, i) != GenotypeMatrix.missing)
+					{
+						riskProfile[j][k] += sc
+								* (2 - G1.getAdditiveScore(j, i));
 						GCInd[j][k]++;
 					}
 				}
 			}
 		}
 
-		for (int i = 0; i < riskProfile.length; i++) {
-			for (int j = 0; j < QRName.length; j++) {
-				if (GCInd[i][j] == 0) {
+		for (int i = 0; i < riskProfile.length; i++)
+		{
+			for (int j = 0; j < QRName.length; j++)
+			{
+				if (GCInd[i][j] == 0)
+				{
 					riskProfile[i][j] = 0;
-				} else {
-					riskProfile[i][j] /= 2*GCInd[i][j];
+				} else
+				{
+					riskProfile[i][j] /= 2 * GCInd[i][j];
 				}
 			}
 		}
 
 		Logger.printUserLog("Number of SNPs mapped to the score file: " + Total);
 		Logger.printUserLog("Number of monomorphic loci removed: " + monoLocus);
-		Logger.printUserLog("Number of ATGC loci " + (Parameter.INSTANCE.keepATGC() ? "detected: " : "removed: ") + ATGCLocus);
-				
-		for (int i = 0; i < QRName.length; i++) {
-			Logger.printUserLog("Number of SNPs mapped into " + QRName[i] + ": " + CCSNP[i]);
+		Logger.printUserLog("Number of ATGC loci "
+				+ (Parameter.INSTANCE.keepATGC() ? "detected: " : "removed: ")
+				+ ATGCLocus);
+
+		for (int i = 0; i < QRName.length; i++)
+		{
+			Logger.printUserLog("Number of SNPs mapped into " + QRName[i]
+					+ ": " + CCSNP[i]);
 		}
 
-		for (int i = 0; i < 4; i++) {
-			Logger.printUserLog("Number of SNPs matching Scheme " + (1+i) + ": " + matchScheme[i]);
+		for (int i = 0; i < 4; i++)
+		{
+			Logger.printUserLog("Number of SNPs matching Scheme " + (1 + i)
+					+ ": " + matchScheme[i]);
 		}
 
 		StringBuffer sbim = new StringBuffer();
 		sbim.append(Parameter.INSTANCE.out);
 		sbim.append(".profile");
-		PrintStream predictorFile = FileProcessor.CreatePrintStream(sbim.toString());
-		
+		PrintStream predictorFile = FileProcessor.CreatePrintStream(sbim
+				.toString());
+
 		predictorFile.print("FID\tIID\tPHENO");
-		for (int i = 0; i < QRName.length; i++) {
-			predictorFile.print("\tScore."+ QRName[i]);
+		for (int i = 0; i < QRName.length; i++)
+		{
+			predictorFile.print("\tScore." + QRName[i]);
 		}
 		predictorFile.println();
-		for (int i = 0; i < riskProfile.length; i++) {
-			predictorFile.print(sf1.getSample().get(i).getFamilyID() + "\t" + sf1.getSample().get(i).getIndividualID() + "\t"+ sf1.getHukouBook().get(i).getCol6());
-			for (int j = 0; j < riskProfile[i].length; j++) {
+		for (int i = 0; i < riskProfile.length; i++)
+		{
+			predictorFile.print(sf1.getSample().get(i).getFamilyID() + "\t"
+					+ sf1.getSample().get(i).getIndividualID() + "\t"
+					+ sf1.getHukouBook().get(i).getCol6());
+			for (int j = 0; j < riskProfile[i].length; j++)
+			{
 				predictorFile.print("\t" + riskProfile[i][j]);
 			}
 			predictorFile.println();
@@ -287,7 +364,8 @@ public class RiskScore {
 		predictorFile.close();
 	}
 
-	public void singleProfile() {
+	public void singleProfile()
+	{
 		int Total = 0;
 		int monoLocus = 0;
 		int CCSNP = 0;
@@ -295,13 +373,15 @@ public class RiskScore {
 		int[] matchScheme = new int[5];
 
 		ArrayList<ArrayList<String>> s4 = NewIt.newArrayList();
-		for(int i = 0; i < 4; i++) {
+		for (int i = 0; i < 4; i++)
+		{
 			ArrayList<String> s = NewIt.newArrayList();
 			s4.add(s);
 		}
 		double[] riskProfile = new double[G1.getGRow()];
 		int[] GCInd = new int[G1.getGRow()];
-		for(int i = 0; i < snpList1.size(); i++) {
+		for (int i = 0; i < snpList1.size(); i++)
+		{
 			SNP snp = snpList1.get(i);
 			char a1 = snp.getRefAllele();
 			char a2 = snp.getSecAllele();
@@ -310,96 +390,126 @@ public class RiskScore {
 			ScoreUnit su = null;
 			boolean isMatch = true;
 			double sc = 0;
-			if (Score.containsKey(snp.getName())) {
+			if (Score.containsKey(snp.getName()))
+			{
 				Total++;
-				if(SNPMatch.IsBiallelic(a1, a2)) {
+				if (SNPMatch.IsBiallelic(a1, a2))
+				{
 					monoLocus++;
 					continue;
 				}
 
-				if (isATGC) {
+				if (isATGC)
+				{
 					ATGCLocus++;
-					if (!Parameter.INSTANCE.keepATGC()) {
+					if (!Parameter.INSTANCE.keepATGC())
+					{
 						continue;
 					}
 				}
 				su = Score.get(snp.getName());
-				if (su.isMissing()) {
+				if (su.isMissing())
+				{
 					continue;
 				}
 
-				if (su.getRefAllele().equals(Character.toString(a1))) {
+				if (su.getRefAllele().equals(Character.toString(a1)))
+				{
 					isMatch = true;
 					matchScheme[0]++;
 					ArrayList<String> s = s4.get(0);
 					s.add(snp.getName());
-				} else if (su.getRefAllele().equals(Character.toString(a2))) {
+				} else if (su.getRefAllele().equals(Character.toString(a2)))
+				{
 					isMatch = false;
 					matchScheme[1]++;
 					ArrayList<String> s = s4.get(1);
 					s.add(snp.getName());
-				} else if (su.getRefAllele().equals(SNPMatch.Flip(Character.toString(a1)))){
+				} else if (su.getRefAllele().equals(
+						SNPMatch.Flip(Character.toString(a1))))
+				{
 					isMatch = true;
 					matchScheme[2]++;
 					ArrayList<String> s = s4.get(2);
 					s.add(snp.getName());
 
-				} else if (su.getRefAllele().equals(SNPMatch.Flip(Character.toString(a2)))) {
+				} else if (su.getRefAllele().equals(
+						SNPMatch.Flip(Character.toString(a2))))
+				{
 					isMatch = false;
 					matchScheme[3]++;
 					ArrayList<String> s = s4.get(3);
 					s.add(snp.getName());
 
-				} else {
+				} else
+				{
 					matchScheme[4]++;
 					continue;
 				}
 				CCSNP++;
 
 				sc = su.getScore();
-				if (Parameter.INSTANCE.getTranFunction() == gear.RegressionModel.LOGIT) {//logit s
-					if(isMatch) {
+				if (Parameter.INSTANCE.getTranFunction() == gear.RegressionModel.LOGIT)
+				{// logit s
+					if (isMatch)
+					{
 						sc = Math.log(sc);
-					} else {
+					} else
+					{
 						sc = -1 * Math.log(sc);
 					}
 				}
-			} else {// this snp is not in the predictor panel;
+			} else
+			{// this snp is not in the predictor panel;
 				continue;
 			}
 
-			for(int j = 0; j < G1.getGRow(); j++) {
-				if(G1.getAdditiveScore(j, i) != GenotypeMatrix.missing) {
-					riskProfile[j] += sc * (2-G1.getAdditiveScore(j, i));
+			for (int j = 0; j < G1.getGRow(); j++)
+			{
+				if (G1.getAdditiveScore(j, i) != GenotypeMatrix.missing)
+				{
+					riskProfile[j] += sc * (2 - G1.getAdditiveScore(j, i));
 					GCInd[j]++;
 				}
 			}
 		}
 
-		for (int i = 0; i < riskProfile.length; i++) {
-			if (GCInd[i] == 0) {
+		for (int i = 0; i < riskProfile.length; i++)
+		{
+			if (GCInd[i] == 0)
+			{
 				riskProfile[i] = 0;
-			} else {
-				riskProfile[i] /= 2*GCInd[i];
+			} else
+			{
+				riskProfile[i] /= 2 * GCInd[i];
 			}
 		}
 
 		Logger.printUserLog("Number of SNPs mapped to the score file: " + Total);
 		Logger.printUserLog("Number of monomorphic loci removed: " + monoLocus);
-		Logger.printUserLog("Number of ATGC loci " + (Parameter.INSTANCE.keepATGC() ? "detected: " : "removed: ") + ATGCLocus);
+		Logger.printUserLog("Number of ATGC loci "
+				+ (Parameter.INSTANCE.keepATGC() ? "detected: " : "removed: ")
+				+ ATGCLocus);
 		Logger.printUserLog("Number of SNP scores in the score file: " + CCSNP);
 
-		for (int i = 0; i < 4; i++) {
-			Logger.printUserLog("Number of SNPs matching Scheme " + (1+i) + ": "+ matchScheme[i]);
+		for (int i = 0; i < 4; i++)
+		{
+			Logger.printUserLog("Number of SNPs matching Scheme " + (1 + i)
+					+ ": " + matchScheme[i]);
 		}
 
 		StringBuffer sbim = new StringBuffer();
 		sbim.append(Parameter.INSTANCE.out);
 		sbim.append(".profile");
-		PrintStream predictorFile = FileProcessor.CreatePrintStream(sbim.toString());
+		PrintStream predictorFile = FileProcessor.CreatePrintStream(sbim
+				.toString());
 		predictorFile.println("FID\tIID\tPHENO\tSCORE");
-		for (int i = 0; i < riskProfile.length; i++) {
-			predictorFile.println(sf1.getSample().get(i).getFamilyID() + "\t" + sf1.getSample().get(i).getIndividualID() + "\t"+ sf1.getHukouBook().get(i).getCol6() + "\t" + riskProfile[i]);
+		for (int i = 0; i < riskProfile.length; i++)
+		{
+			predictorFile.println(sf1.getSample().get(i).getFamilyID() + "\t"
+					+ sf1.getSample().get(i).getIndividualID() + "\t"
+					+ sf1.getHukouBook().get(i).getCol6() + "\t"
+					+ riskProfile[i]);
 		}
 		predictorFile.close();
 	}

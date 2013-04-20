@@ -1,5 +1,6 @@
 package sumstat.gm;
 
-public class SumStatGenotypeMatrix {
+public class SumStatGenotypeMatrix
+{
 
 }

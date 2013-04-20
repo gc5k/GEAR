@@ -26,8 +26,8 @@ import gear.util.FileProcessor;
 import gear.util.Logger;
 import he.endian.LittleEndianDataInputStream;
 
-
-public class HECalculate {
+public class HECalculate
+{
 
 	private final String delim = "\\s+";
 	private HERead heReader;
@@ -35,41 +35,51 @@ public class HECalculate {
 	private int Len = 0;
 	private double grmCutoff = 0;
 
-	public HECalculate(HERead h) {
+	public HECalculate(HERead h)
+	{
 		heReader = h;
 		Calculate();
 	}
 
-	public void Calculate() {
+	public void Calculate()
+	{
 
 		heReader.lambda = new Lambda();
 
-		if (Parameter.INSTANCE.getHEParameter().isAbsGrmCutoff()) {
+		if (Parameter.INSTANCE.getHEParameter().isAbsGrmCutoff())
+		{
 			grmCutoff = Parameter.INSTANCE.getHEParameter().AbsGrmCutoff();
-		} else if (Parameter.INSTANCE.getHEParameter().isGrmCutoff()) {
+		} else if (Parameter.INSTANCE.getHEParameter().isGrmCutoff())
+		{
 			grmCutoff = Parameter.INSTANCE.getHEParameter().GrmCutoff();
 		}
 		String line;
-		
+
 		// ************************keep
-		if (heReader.keepFile != null) {
+		if (heReader.keepFile != null)
+		{
 			BufferedReader reader = FileProcessor.FileOpen(heReader.keepFile);
 			boolean[] ff = new boolean[heReader.flag.length];
 			Arrays.fill(ff, false);
-			try {
-				while ((line = reader.readLine()) != null) {
+			try
+			{
+				while ((line = reader.readLine()) != null)
+				{
 					String[] s = line.split(delim);
 					StringBuilder sb = new StringBuilder(s[0] + "." + s[1]);
-					if (heReader.ID2Idx.containsKey(sb.toString())) {
+					if (heReader.ID2Idx.containsKey(sb.toString()))
+					{
 						int ii = heReader.ID2Idx.get(sb.toString());
 						ff[ii] = true;
 					}
 				}
 				reader.close();
-			} catch (IOException e) {
+			} catch (IOException e)
+			{
 				e.printStackTrace();
 			}
-			for (int i = 0; i < ff.length; i++) {
+			for (int i = 0; i < ff.length; i++)
+			{
 				heReader.flag[i] &= ff[i];
 			}
 		}
@@ -77,34 +87,42 @@ public class HECalculate {
 		for (int i = 0; i < heReader.flag.length; i++)
 			if (heReader.flag[i])
 				Len++;
-		
+
 		// ************************************standardising
 		double[] ss = new double[heReader.y[0].length - 1];
 		double[] ssx = new double[heReader.y[0].length - 1];
-		for (int i = 0; i < heReader.flag.length; i++) {
+		for (int i = 0; i < heReader.flag.length; i++)
+		{
 			if (!heReader.flag[i])
 				continue;
-			for (int j = 0; j < ss.length; j++) {
+			for (int j = 0; j < ss.length; j++)
+			{
 				ss[j] += heReader.y[i][j + 1];
 				ssx[j] += heReader.y[i][j + 1] * heReader.y[i][j + 1];
 			}
 		}
 		double[] sd = new double[ssx.length];
-		for (int i = 0; i < sd.length; i++) {
+		for (int i = 0; i < sd.length; i++)
+		{
 			ss[i] /= Len;
 			sd[i] = Math.sqrt((ssx[i] - Len * ss[i] * ss[i]) / (Len - 1));
 		}
-		if (Parameter.INSTANCE.scale) {
+		if (Parameter.INSTANCE.scale)
+		{
 			Logger.printUserLog("Standardising phentoype.");
-			for (int i = 0; i < heReader.flag.length; i++) {
+			for (int i = 0; i < heReader.flag.length; i++)
+			{
 				if (!heReader.flag[i])
 					continue;
-				for (int j = 1; j < heReader.y[i].length; j++) {
-					heReader.y[i][j] = (heReader.y[i][j] - ss[j - 1]) / sd[j - 1];
+				for (int j = 1; j < heReader.y[i].length; j++)
+				{
+					heReader.y[i][j] = (heReader.y[i][j] - ss[j - 1])
+							/ sd[j - 1];
 				}
 			}
 		}
-		if (heReader.reverse) {
+		if (heReader.reverse)
+		{
 			// try {
 			// while ((line = heReader.is.readLine()) != null) {
 			// String[] s = line.split(delim);
@@ -141,17 +159,22 @@ public class HECalculate {
 			// } catch (IOException e) {
 			// e.printStackTrace();
 			// }
-		} else {
-			if (Parameter.INSTANCE.getHEParameter().isGrmTxt()) {
+		} else
+		{
+			if (Parameter.INSTANCE.getHEParameter().isGrmTxt())
+			{
 				heReader.XtX = new double[2][2];
 				heReader.XtY = new double[2];
 
 				// *************************************read grm text file
-				BufferedReader grmFile = FileProcessor.FileOpen(heReader.grmFile);
+				BufferedReader grmFile = FileProcessor
+						.FileOpen(heReader.grmFile);
 
-				try {
+				try
+				{
 					HashMap<Double, Integer> cat = new HashMap<Double, Integer>();
-					while ((line = grmFile.readLine()) != null) {
+					while ((line = grmFile.readLine()) != null)
+					{
 						String[] s = line.split(delim);
 						int id1 = Integer.parseInt(s[0]) - 1;
 						int id2 = Integer.parseInt(s[1]) - 1;
@@ -161,21 +184,28 @@ public class HECalculate {
 							continue;
 						double g = Double.parseDouble(s[3]);
 
-						if (Parameter.INSTANCE.getHEParameter().isAbsGrmCutoff()) {
-							if (Math.abs(g) > grmCutoff) continue;
-						} else if (Parameter.INSTANCE.getHEParameter().isGrmCutoff()) {
-							if (g > grmCutoff) continue;
+						if (Parameter.INSTANCE.getHEParameter()
+								.isAbsGrmCutoff())
+						{
+							if (Math.abs(g) > grmCutoff)
+								continue;
+						} else if (Parameter.INSTANCE.getHEParameter()
+								.isGrmCutoff())
+						{
+							if (g > grmCutoff)
+								continue;
 						}
 						double ds = 0;
-						
-						switch (heReader.heType) {
+
+						switch (heReader.heType)
+						{
 						case SD:
-							ds = (heReader.y[id1][1] - heReader.y[id2][1]) *
-							     (heReader.y[id1][1] - heReader.y[id2][1]);
+							ds = (heReader.y[id1][1] - heReader.y[id2][1])
+									* (heReader.y[id1][1] - heReader.y[id2][1]);
 							break;
 						case SS:
-							ds = (heReader.y[id1][1] + heReader.y[id2][1]) *
-							     (heReader.y[id1][1] + heReader.y[id2][1]);
+							ds = (heReader.y[id1][1] + heReader.y[id2][1])
+									* (heReader.y[id1][1] + heReader.y[id2][1]);
 							break;
 						case CP:
 							ds = heReader.y[id1][1] * heReader.y[id2][1];
@@ -185,18 +215,22 @@ public class HECalculate {
 							break;
 						}
 
-						if (cat.containsKey(heReader.y[id1][1])) {
+						if (cat.containsKey(heReader.y[id1][1]))
+						{
 							Integer I = (Integer) cat.get(heReader.y[id1][1]);
 							I++;
 							cat.put(heReader.y[id1][1], I);
-						} else {
+						} else
+						{
 							cat.put(heReader.y[id1][1], 1);
 						}
-						if (cat.containsKey(heReader.y[id2][1])) {
+						if (cat.containsKey(heReader.y[id2][1]))
+						{
 							Integer I = (Integer) cat.get(heReader.y[id2][1]);
 							I++;
 							cat.put(heReader.y[id2][1], I);
-						} else {
+						} else
+						{
 							cat.put(heReader.y[id2][1], 1);
 						}
 						heReader.yyProd += ds * ds;
@@ -216,7 +250,8 @@ public class HECalculate {
 						heReader.lambda.N++;
 					}
 
-					if (cat.size() == 2) {
+					if (cat.size() == 2)
+					{
 						heReader.isCC = true;
 						Set<Double> set = cat.keySet();
 						Iterator<Double> it = set.iterator();
@@ -225,42 +260,52 @@ public class HECalculate {
 						Integer c1 = cat.get(k1);
 						Integer c2 = cat.get(k2);
 
-						if (k1 > k2) {
+						if (k1 > k2)
+						{
 							heReader.P = c1.doubleValue()
 									/ (c1.doubleValue() + c2.doubleValue());
-						} else {
+						} else
+						{
 							heReader.P = c2.doubleValue()
 									/ (c1.doubleValue() + c2.doubleValue());
 						}
 					}
 					grmFile.close();
 
-				} catch (IOException e) {
+				} catch (IOException e)
+				{
 					e.printStackTrace();
 				}
-			} else if (!Parameter.INSTANCE.getHEParameter().isGrmBinary()) {
+			} else if (!Parameter.INSTANCE.getHEParameter().isGrmBinary())
+			{
 				heReader.XtX = new double[2][2];
 				heReader.XtY = new double[2];
 				// *************************************read grm file
 				FileInputStream fin = null;
-				try {
+				try
+				{
 					fin = new FileInputStream(heReader.grmFile);
-				} catch (FileNotFoundException e1) {
+				} catch (FileNotFoundException e1)
+				{
 					e1.printStackTrace();
 				}
 				GZIPInputStream gzis = null;
-				try {
+				try
+				{
 					gzis = new GZIPInputStream(fin);
-				} catch (IOException e1) {
+				} catch (IOException e1)
+				{
 					e1.printStackTrace();
 				}
 				InputStreamReader xover = new InputStreamReader(gzis);
 
 				BufferedReader grmFile = new BufferedReader(xover);
 
-				try {
+				try
+				{
 					HashMap<Double, Integer> cat = new HashMap<Double, Integer>();
-					while ((line = grmFile.readLine()) != null) {
+					while ((line = grmFile.readLine()) != null)
+					{
 						String[] s = line.split(delim);
 						int id1 = Integer.parseInt(s[0]) - 1;
 						int id2 = Integer.parseInt(s[1]) - 1;
@@ -270,22 +315,29 @@ public class HECalculate {
 							continue;
 						double g = Double.parseDouble(s[3]);
 
-						if (Parameter.INSTANCE.getHEParameter().isAbsGrmCutoff()) {
-							if (Math.abs(g) > grmCutoff) continue;
-						} else if (Parameter.INSTANCE.getHEParameter().isGrmCutoff()) {
-							if (g > grmCutoff) continue;
+						if (Parameter.INSTANCE.getHEParameter()
+								.isAbsGrmCutoff())
+						{
+							if (Math.abs(g) > grmCutoff)
+								continue;
+						} else if (Parameter.INSTANCE.getHEParameter()
+								.isGrmCutoff())
+						{
+							if (g > grmCutoff)
+								continue;
 						}
 
 						double ds = 0;
-						
-						switch (heReader.heType) {
+
+						switch (heReader.heType)
+						{
 						case SD:
-							ds = (heReader.y[id1][1] - heReader.y[id2][1]) *
-							     (heReader.y[id1][1] - heReader.y[id2][1]);
+							ds = (heReader.y[id1][1] - heReader.y[id2][1])
+									* (heReader.y[id1][1] - heReader.y[id2][1]);
 							break;
 						case SS:
-							ds = (heReader.y[id1][1] + heReader.y[id2][1]) *
-							     (heReader.y[id1][1] + heReader.y[id2][1]);
+							ds = (heReader.y[id1][1] + heReader.y[id2][1])
+									* (heReader.y[id1][1] + heReader.y[id2][1]);
 							break;
 						case CP:
 							ds = heReader.y[id1][1] * heReader.y[id2][1];
@@ -295,18 +347,22 @@ public class HECalculate {
 							break;
 						}
 
-						if (cat.containsKey(heReader.y[id1][1])) {
+						if (cat.containsKey(heReader.y[id1][1]))
+						{
 							Integer I = (Integer) cat.get(heReader.y[id1][1]);
 							I++;
 							cat.put(heReader.y[id1][1], I);
-						} else {
+						} else
+						{
 							cat.put(heReader.y[id1][1], 1);
 						}
-						if (cat.containsKey(heReader.y[id2][1])) {
+						if (cat.containsKey(heReader.y[id2][1]))
+						{
 							Integer I = (Integer) cat.get(heReader.y[id2][1]);
 							I++;
 							cat.put(heReader.y[id2][1], I);
-						} else {
+						} else
+						{
 							cat.put(heReader.y[id2][1], 1);
 						}
 						heReader.yyProd += ds * ds;
@@ -326,7 +382,8 @@ public class HECalculate {
 						heReader.lambda.N++;
 					}
 
-					if (cat.size() == 2) {
+					if (cat.size() == 2)
+					{
 						heReader.isCC = true;
 						Set<Double> set = cat.keySet();
 						Iterator<Double> it = set.iterator();
@@ -335,40 +392,60 @@ public class HECalculate {
 						Integer c1 = cat.get(k1);
 						Integer c2 = cat.get(k2);
 
-						if (k1 > k2) {
+						if (k1 > k2)
+						{
 							heReader.P = c1.doubleValue()
 									/ (c1.doubleValue() + c2.doubleValue());
-						} else {
+						} else
+						{
 							heReader.P = c2.doubleValue()
 									/ (c1.doubleValue() + c2.doubleValue());
 						}
 					}
 					grmFile.close();
 
-				} catch (IOException e) {
+				} catch (IOException e)
+				{
 					e.printStackTrace();
 				}
-			} else {//grm.bin
+			} else
+			{// grm.bin
 				HashMap<Double, Integer> cat = new HashMap<Double, Integer>();
 
 				FileInputStream fileStream = null;
-				try {
-					fileStream = new FileInputStream(Parameter.INSTANCE.getHEParameter().getGrm());
-				} catch (FileNotFoundException e) {
-					Logger.handleException(e, "Cannot open the GRM file '" + Parameter.INSTANCE.getHEParameter().getGrm() + "'.");
+				try
+				{
+					fileStream = new FileInputStream(Parameter.INSTANCE
+							.getHEParameter().getGrm());
+				} catch (FileNotFoundException e)
+				{
+					Logger.handleException(e, "Cannot open the GRM file '"
+							+ Parameter.INSTANCE.getHEParameter().getGrm()
+							+ "'.");
 				}
-				DataInputStream bigEndianDataStream = new DataInputStream(fileStream);
-				LittleEndianDataInputStream littleEndianDataStream = new LittleEndianDataInputStream(bigEndianDataStream, Float.SIZE);
+				DataInputStream bigEndianDataStream = new DataInputStream(
+						fileStream);
+				LittleEndianDataInputStream littleEndianDataStream = new LittleEndianDataInputStream(
+						bigEndianDataStream, Float.SIZE);
 
-				for (int i = 0; i < heReader.flag.length; i++) {
-					for (int j = 0; j <= i; j++) {
+				for (int i = 0; i < heReader.flag.length; i++)
+				{
+					for (int j = 0; j <= i; j++)
+					{
 						float g = 0;
-						try {
-							if (littleEndianDataStream.available()>0) {
+						try
+						{
+							if (littleEndianDataStream.available() > 0)
+							{
 								g = littleEndianDataStream.readFloat();
 							}
-						} catch (IOException e) {
-							Logger.handleException(e, "An exception occurred when reading the GRM file '" + Parameter.INSTANCE.getHEParameter().getGrm() + "'.");
+						} catch (IOException e)
+						{
+							Logger.handleException(e,
+									"An exception occurred when reading the GRM file '"
+											+ Parameter.INSTANCE
+													.getHEParameter().getGrm()
+											+ "'.");
 						}
 
 						int id1 = i;
@@ -378,22 +455,29 @@ public class HECalculate {
 						if (!(heReader.flag[id1] & heReader.flag[id2]))
 							continue;
 
-						if (Parameter.INSTANCE.getHEParameter().isAbsGrmCutoff()) {
-							if (Math.abs(g) > grmCutoff) continue;
-						} else if (Parameter.INSTANCE.getHEParameter().isGrmCutoff()) {
-							if (g > grmCutoff) continue;
+						if (Parameter.INSTANCE.getHEParameter()
+								.isAbsGrmCutoff())
+						{
+							if (Math.abs(g) > grmCutoff)
+								continue;
+						} else if (Parameter.INSTANCE.getHEParameter()
+								.isGrmCutoff())
+						{
+							if (g > grmCutoff)
+								continue;
 						}
 
 						double ds = 0;
-						
-						switch (heReader.heType) {
+
+						switch (heReader.heType)
+						{
 						case SD:
-							ds = (heReader.y[id1][1] - heReader.y[id2][1]) *
-							     (heReader.y[id1][1] - heReader.y[id2][1]);
+							ds = (heReader.y[id1][1] - heReader.y[id2][1])
+									* (heReader.y[id1][1] - heReader.y[id2][1]);
 							break;
 						case SS:
-							ds = (heReader.y[id1][1] + heReader.y[id2][1]) *
-							     (heReader.y[id1][1] + heReader.y[id2][1]);
+							ds = (heReader.y[id1][1] + heReader.y[id2][1])
+									* (heReader.y[id1][1] + heReader.y[id2][1]);
 							break;
 						case CP:
 							ds = heReader.y[id1][1] * heReader.y[id2][1];
@@ -403,18 +487,22 @@ public class HECalculate {
 							break;
 						}
 
-						if (cat.containsKey(heReader.y[id1][1])) {
+						if (cat.containsKey(heReader.y[id1][1]))
+						{
 							Integer I = (Integer) cat.get(heReader.y[id1][1]);
 							I++;
 							cat.put(heReader.y[id1][1], I);
-						} else {
+						} else
+						{
 							cat.put(heReader.y[id1][1], 1);
 						}
-						if (cat.containsKey(heReader.y[id2][1])) {
+						if (cat.containsKey(heReader.y[id2][1]))
+						{
 							Integer I = (Integer) cat.get(heReader.y[id2][1]);
 							I++;
 							cat.put(heReader.y[id2][1], I);
-						} else {
+						} else
+						{
 							cat.put(heReader.y[id2][1], 1);
 						}
 						heReader.yyProd += ds * ds;
@@ -438,14 +526,17 @@ public class HECalculate {
 			}
 		}
 
-		for (int i = 0; i < heReader.XtX[0].length; i++) {
-			for (int j = 0; j < i; j++) {
+		for (int i = 0; i < heReader.XtX[0].length; i++)
+		{
+			for (int j = 0; j < i; j++)
+			{
 				heReader.XtX[i][j] = heReader.XtX[j][i];
 			}
 		}
 	}
 
-	public void Regression() {
+	public void Regression()
+	{
 
 		DecimalFormat fmt = new DecimalFormat("#.###E0");
 
@@ -462,8 +553,9 @@ public class HECalculate {
 		RealMatrix v = Mat_XtX_Inv.scalarMultiply(mse);
 
 		heReader.sb.append("HE mode: ");
-		
-		switch (heReader.heType) {
+
+		switch (heReader.heType)
+		{
 		case SD:
 			heReader.sb.append("squared difference (yi-yj)^2\n");
 			break;
@@ -476,15 +568,17 @@ public class HECalculate {
 		default:
 			// TODO: assert false or throw exception
 		}
-		
+
 		heReader.sb.append("grm: " + heReader.grmFile + "\n");
 		heReader.sb.append("grm id: " + heReader.grmID + "\n");
-		
-		if (Parameter.INSTANCE.getHEParameter().isGrmCutoff()) {
+
+		if (Parameter.INSTANCE.getHEParameter().isGrmCutoff())
+		{
 			heReader.sb.append("grm cutoff is: " + grmCutoff + "\n");
 		}
 
-		if (Parameter.INSTANCE.getHEParameter().isAbsGrmCutoff()) {
+		if (Parameter.INSTANCE.getHEParameter().isAbsGrmCutoff())
+		{
 			heReader.sb.append("grm absolute cutoff is: |" + grmCutoff + "|\n");
 		}
 
@@ -492,62 +586,80 @@ public class HECalculate {
 		heReader.sb.append("pheno: " + heReader.phenoFile + "\n");
 		heReader.sb.append("mpheno: ");
 
-		for (int i = 0; i < heReader.mpheno.length; i++) {
+		for (int i = 0; i < heReader.mpheno.length; i++)
+		{
 			heReader.sb.append(heReader.mpheno[i] + " ");
 		}
 		heReader.sb.append("\n");
 
-		if (Parameter.INSTANCE.qcovar_file != null) {
-			heReader.sb.append("quantitative covariate file: " + Parameter.INSTANCE.qcovar_file + "\n");
+		if (Parameter.INSTANCE.qcovar_file != null)
+		{
+			heReader.sb.append("quantitative covariate file: "
+					+ Parameter.INSTANCE.qcovar_file + "\n");
 			heReader.sb.append("quantitative covariate index: ");
-			if (Parameter.INSTANCE.qcovar_num == null) {
+			if (Parameter.INSTANCE.qcovar_num == null)
+			{
 				heReader.sb.append("all");
-			} else {
-				for (int i = 0; i < Parameter.INSTANCE.qcovar_num.length; i++) {
+			} else
+			{
+				for (int i = 0; i < Parameter.INSTANCE.qcovar_num.length; i++)
+				{
 					heReader.sb.append(Parameter.INSTANCE.qcovar_num[i] + " ");
 				}
 			}
 			heReader.sb.append("\n");
 		}
 
-		if (Parameter.INSTANCE.covar_file != null) {
-			heReader.sb.append("quality covariate file: " + Parameter.INSTANCE.covar_file + "\n");
+		if (Parameter.INSTANCE.covar_file != null)
+		{
+			heReader.sb.append("quality covariate file: "
+					+ Parameter.INSTANCE.covar_file + "\n");
 			heReader.sb.append("quality covariate index: ");
-			if (Parameter.INSTANCE.covar_num == null) {
+			if (Parameter.INSTANCE.covar_num == null)
+			{
 				heReader.sb.append("all");
-			} else {
-				for (int i = 0; i < Parameter.INSTANCE.covar_num.length; i++) {
+			} else
+			{
+				for (int i = 0; i < Parameter.INSTANCE.covar_num.length; i++)
+				{
 					heReader.sb.append(Parameter.INSTANCE.covar_num[i] + " ");
 				}
 			}
 			heReader.sb.append("\n");
 		}
 
-		if (Parameter.INSTANCE.eh2Flag) {
-			heReader.sb.append("Empirical h2: " + Parameter.INSTANCE.eh2 + "\n");
+		if (Parameter.INSTANCE.eh2Flag)
+		{
+			heReader.sb
+					.append("Empirical h2: " + Parameter.INSTANCE.eh2 + "\n");
 		}
 
 		heReader.sb.append("reverse: " + heReader.reverse + "\n");
 		heReader.sb.append("Scale : " + Parameter.INSTANCE.scale + "\n");
-		if (heReader.k_button) {
+		if (heReader.k_button)
+		{
 			heReader.sb.append("k: " + heReader.k + "\n");
 		}
-		
+
 		heReader.sb.append("In total " + Len + " matched individuals.\n");
-		heReader.sb.append("In total read " + ((int) (heReader.lambda.N)) + " lines in the grm file.\n");
+		heReader.sb.append("In total read " + ((int) (heReader.lambda.N))
+				+ " lines in the grm file.\n");
 		heReader.sb.append("\n========================\n");
 		heReader.sb.append("Coef\t" + "Estimate \t" + "se" + "\n");
 
-		for (int i = 0; i < Mat_B.getRowDimension(); i++) {
+		for (int i = 0; i < Mat_B.getRowDimension(); i++)
+		{
 			heReader.sb.append("b" + i + "\t"
 					+ fmt.format(Mat_B.getEntry(i, 0)) + "\t"
 					+ fmt.format(Math.sqrt(v.getEntry(i, i))) + "\n");
 		}
 
-		if (!heReader.reverse) {
+		if (!heReader.reverse)
+		{
 			double h_o = 0;
-			
-			switch (heReader.heType) {
+
+			switch (heReader.heType)
+			{
 			case SD:
 				h_o = Mat_B.getEntry(1, 0) / Mat_B.getEntry(0, 0) * (-1);
 				break;
@@ -560,7 +672,7 @@ public class HECalculate {
 			default:
 				// TODO: assert false or throw exception
 			}
-			
+
 			double u_b0 = Mat_B.getEntry(0, 0);
 			double u_b1 = Mat_B.getEntry(1, 0);
 
@@ -571,18 +683,22 @@ public class HECalculate {
 					* (u_b1 / u_b0)
 					* (v_b0 / (u_b0 * u_b0) + v_b1 / (u_b1 * u_b1) - 2
 							* v.getEntry(0, 1) / (u_b0 * u_b1));
-			if (heReader.heType == gear.HEType.CP) {
+			if (heReader.heType == gear.HEType.CP)
+			{
 				v_ho = Math.sqrt(v_b1);
 			}
 			heReader.sb.append("h2(o): " + fmt.format(h_o) + "\t"
 					+ fmt.format(v_ho) + "\n");
 
-			if (heReader.k_button && heReader.isCC) {
+			if (heReader.k_button && heReader.isCC)
+			{
 				NormalDistributionImpl Norm = new NormalDistributionImpl();
 				double q = 0;
-				try {
+				try
+				{
 					q = Norm.inverseCumulativeProbability(1 - heReader.k);
-				} catch (MathException e) {
+				} catch (MathException e)
+				{
 					e.printStackTrace();
 				}
 				double z = 1 / (Math.sqrt(2 * 3.1416926))
@@ -601,8 +717,10 @@ public class HECalculate {
 
 		heReader.sb.append("\n");
 		heReader.sb.append("variance-covariance\n");
-		for (int i = 0; i < v.getRowDimension(); i++) {
-			for (int j = 0; j <= i; j++) {
+		for (int i = 0; i < v.getRowDimension(); i++)
+		{
+			for (int j = 0; j <= i; j++)
+			{
 				heReader.sb.append(fmt.format(v.getEntry(i, j)) + " ");
 			}
 			heReader.sb.append("\n");
@@ -616,22 +734,27 @@ public class HECalculate {
 		heReader.sb.append("var(X): " + fmt.format(heReader.lambda.getVar())
 				+ "\n");
 
-		if (Parameter.INSTANCE.eh2Flag) {
-			double Lmd = heReader.lambda.getLambda(-1 * Mat_B.getEntry(0, 0) * Parameter.INSTANCE.eh2);
+		if (Parameter.INSTANCE.eh2Flag)
+		{
+			double Lmd = heReader.lambda.getLambda(-1 * Mat_B.getEntry(0, 0)
+					* Parameter.INSTANCE.eh2);
 			heReader.sb.append("Lambda: " + fmt.format(Lmd));
 		}
 
 		Logger.printUserLog(heReader.sb.toString());
 
-		if (heReader.output != null) {
+		if (heReader.output != null)
+		{
 			StringBuilder fsb = new StringBuilder();
 			fsb.append(heReader.output);
 			fsb.append(".he");
 			File of = new File(fsb.toString());
 			PrintWriter pw = null;
-			try {
+			try
+			{
 				pw = new PrintWriter(of);
-			} catch (FileNotFoundException e) {
+			} catch (FileNotFoundException e)
+			{
 				e.printStackTrace();
 			}
 			pw.append(heReader.sb);
@@ -639,7 +762,8 @@ public class HECalculate {
 		}
 	}
 
-	public RealMatrix getB() {
+	public RealMatrix getB()
+	{
 		return Mat_B;
 	}
 }

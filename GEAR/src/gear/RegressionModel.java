@@ -1,6 +1,6 @@
 package gear;
 
-public enum RegressionModel {
-	LOGIT,
-	LINEAR
+public enum RegressionModel
+{
+	LOGIT, LINEAR
 }

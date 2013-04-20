@@ -26,7 +26,8 @@ import gear.util.NewIt;
 import gear.util.structure.MAF;
 import sumstat.qc.rowqc.SumStatQC;
 
-public class MakeGRM {
+public class MakeGRM
+{
 	private double maf_threshold = 1e-7;
 
 	private GenotypeMatrix G;
@@ -34,24 +35,32 @@ public class MakeGRM {
 	private double[][] allelefreq;
 	private MapFile snpMap;
 	private PedigreeFile pf;
-	
-	public MakeGRM() {
+
+	public MakeGRM()
+	{
 		PLINKParser pp = null;
-		if (Parameter.INSTANCE.getFileParameter().isSet()) {
-			pp = new PLINKParser (Parameter.INSTANCE.getFileParameter().getPedFile(),
-					              Parameter.INSTANCE.getFileParameter().getMapFile());
-		} else if (Parameter.INSTANCE.getBfileParameter(0).isSet()) {
-			pp = new PLINKBinaryParser (Parameter.INSTANCE.getBfileParameter(0).getBedFile(),
-					                    Parameter.INSTANCE.getBfileParameter(0).getBimFile(),
-					                    Parameter.INSTANCE.getBfileParameter(0).getFamFile());
-		} else {
+		if (Parameter.INSTANCE.getFileParameter().isSet())
+		{
+			pp = new PLINKParser(Parameter.INSTANCE.getFileParameter()
+					.getPedFile(), Parameter.INSTANCE.getFileParameter()
+					.getMapFile());
+		} else if (Parameter.INSTANCE.getBfileParameter(0).isSet())
+		{
+			pp = new PLINKBinaryParser(Parameter.INSTANCE.getBfileParameter(0)
+					.getBedFile(), Parameter.INSTANCE.getBfileParameter(0)
+					.getBimFile(), Parameter.INSTANCE.getBfileParameter(0)
+					.getFamFile());
+		} else
+		{
 			Logger.printUserError("No input files.");
 			System.exit(1);
 		}
 		pp.Parse();
 		pf = pp.getPedigreeData();
-		SampleFilter sf = new SampleFilter(pp.getPedigreeData(), pp.getMapData());
-		SumStatQC ssQC = new SumStatQC(pp.getPedigreeData(), pp.getMapData(), sf);
+		SampleFilter sf = new SampleFilter(pp.getPedigreeData(),
+				pp.getMapData());
+		SumStatQC ssQC = new SumStatQC(pp.getPedigreeData(), pp.getMapData(),
+				sf);
 		snpMap = pp.getMapData();
 		GenotypeMatrix gm = new GenotypeMatrix(ssQC.getSample());
 		G = gm;
@@ -59,44 +68,62 @@ public class MakeGRM {
 		allelefreq = new double[numMarker][3];
 	}
 
-	public void makeGeneticRelationshipScore() {
+	public void makeGeneticRelationshipScore()
+	{
 		prepareMAF();
 		StringBuffer sb = new StringBuffer();
 		sb.append(Parameter.INSTANCE.out);
 		PrintStream grm = null;
 		BufferedWriter grmGZ = null;
-		if (Parameter.INSTANCE.makeGRMTXTFlag) {
+		if (Parameter.INSTANCE.makeGRMTXTFlag)
+		{
 			sb.append(".grm.txt");
 			grm = FileProcessor.CreatePrintStream(sb.toString());
-		} else if (Parameter.INSTANCE.makeGRMFlag) {
+		} else if (Parameter.INSTANCE.makeGRMFlag)
+		{
 			sb.append(".grm.gz");
 			grmGZ = FileProcessor.ZipFielWriter(sb.toString());
 		}
 
-		for (int i = 0; i < G.getGRow(); i++) {
-			for (int j = 0; j <= i; j++) {
-				double[] s = GRMScore(i,j);
-				if (Parameter.INSTANCE.makeGRMTXTFlag) {
-					grm.println((i+1) + "\t" + (j+1) + "\t" + s[0] + "\t" + s[1]);
-				} else {
-					try {
-						grmGZ.append((i+1) + "\t" + (j+1) + "\t" + s[0] + "\t" + s[1] + "\n");
-					} catch (IOException e) {
-						Logger.handleException(e, "error in writing '" + sb.toString() + "' for " + (i+1) + " " + (j+1) + ".");
+		for (int i = 0; i < G.getGRow(); i++)
+		{
+			for (int j = 0; j <= i; j++)
+			{
+				double[] s = GRMScore(i, j);
+				if (Parameter.INSTANCE.makeGRMTXTFlag)
+				{
+					grm.println((i + 1) + "\t" + (j + 1) + "\t" + s[0] + "\t"
+							+ s[1]);
+				} else
+				{
+					try
+					{
+						grmGZ.append((i + 1) + "\t" + (j + 1) + "\t" + s[0]
+								+ "\t" + s[1] + "\n");
+					} catch (IOException e)
+					{
+						Logger.handleException(e,
+								"error in writing '" + sb.toString() + "' for "
+										+ (i + 1) + " " + (j + 1) + ".");
 					}
 				}
 			}
 		}
-		if (Parameter.INSTANCE.makeGRMTXTFlag) {
+		if (Parameter.INSTANCE.makeGRMTXTFlag)
+		{
 			grm.close();
-		} else {
-			try {
+		} else
+		{
+			try
+			{
 				grmGZ.close();
-			} catch (IOException e) {
-				Logger.handleException(e, " error in closing '" + sb.toString() + "'.");
+			} catch (IOException e)
+			{
+				Logger.handleException(e, " error in closing '" + sb.toString()
+						+ "'.");
 			}
 		}
-		Logger.printUserLog("Writing GRM scores into '" + sb.toString() + "'.");		
+		Logger.printUserLog("Writing GRM scores into '" + sb.toString() + "'.");
 		StringBuffer sb_id = new StringBuffer();
 		sb_id.append(Parameter.INSTANCE.out);
 		PrintStream grm_id = null;
@@ -104,59 +131,81 @@ public class MakeGRM {
 		grm_id = FileProcessor.CreatePrintStream(sb_id.toString());
 
 		ArrayList<Hukou> H = pf.getHukouBook();
-		for (int i = 0; i < H.size(); i++) {
+		for (int i = 0; i < H.size(); i++)
+		{
 			Hukou h = H.get(i);
 			grm_id.println(h.getFamilyID() + "\t" + h.getIndividualID());
 		}
 		grm_id.close();
-		Logger.printUserLog("Writing individual information into '" + sb_id.toString() + "'.");
+		Logger.printUserLog("Writing individual information into '"
+				+ sb_id.toString() + "'.");
 	}
 
-	public void GRMPartitioning(String[] args) {
+	public void GRMPartitioning(String[] args)
+	{
 		int N = G.getGRow();
-		long T = N*(N+1)/2;
+		long T = N * (N + 1) / 2;
 
-		int size = (int) Math.floor(T/Parameter.INSTANCE.grmPartition);		
+		int size = (int) Math.floor(T / Parameter.INSTANCE.grmPartition);
 
-		for (int P = 1; P<=Parameter.INSTANCE.grmPartition; P++) {
+		for (int P = 1; P <= Parameter.INSTANCE.grmPartition; P++)
+		{
 			StringBuilder sb = new StringBuilder();
 			sb.append(Parameter.INSTANCE.getHpcParameter().getName());
 			sb.append("." + P + ".sh");
 
 			PrintWriter pw = null;
-			try {
+			try
+			{
 				pw = new PrintWriter(sb.toString());
-			} catch (FileNotFoundException e) {
-				Logger.handleException(e, "Cannot create the script file '" + sb.toString() + "'.");
+			} catch (FileNotFoundException e)
+			{
+				Logger.handleException(e, "Cannot create the script file '"
+						+ sb.toString() + "'.");
 			}
 
 			pw.println("#$ -cwd");
-			pw.println("#$ -l vf=" + Parameter.INSTANCE.getHpcParameter().getRam());
-			pw.println("#$ -l h_vmem=" + Parameter.INSTANCE.getHpcParameter().getRam());
-			
+			pw.println("#$ -l vf="
+					+ Parameter.INSTANCE.getHpcParameter().getRam());
+			pw.println("#$ -l h_vmem="
+					+ Parameter.INSTANCE.getHpcParameter().getRam());
+
 			StringBuilder nb = new StringBuilder();
-			nb.append(Parameter.INSTANCE.getHpcParameter().getName()+"."+ P);
+			nb.append(Parameter.INSTANCE.getHpcParameter().getName() + "." + P);
 			pw.println("#$ -N " + nb.toString());
 			pw.println("#$ -m eas");
-			pw.println("#$ -M " + Parameter.INSTANCE.getHpcParameter().getEmail());
+			pw.println("#$ -M "
+					+ Parameter.INSTANCE.getHpcParameter().getEmail());
 
-			pw.print("java -jar -Xmx" + Parameter.INSTANCE.getHpcParameter().getRam());
-			pw.print(HPC.class.getProtectionDomain().getCodeSource().getLocation().getPath() + " ");
-			for (int i = 0; i < args.length; i++) {
+			pw.print("java -jar -Xmx"
+					+ Parameter.INSTANCE.getHpcParameter().getRam());
+			pw.print(HPC.class.getProtectionDomain().getCodeSource()
+					.getLocation().getPath()
+					+ " ");
+			for (int i = 0; i < args.length; i++)
+			{
 				String arg = args[i];
-				if (arg.equals("--shell") || arg.equals("--qsub")) {
+				if (arg.equals("--shell") || arg.equals("--qsub"))
+				{
 					continue;
 				}
-				if (arg.equals("--email") || arg.equals("--ram") || arg.equals("--name") || arg.equals("--grm-partition") || arg.equals("--grm_partition") || arg.equals("--out")) {
+				if (arg.equals("--email") || arg.equals("--ram")
+						|| arg.equals("--name")
+						|| arg.equals("--grm-partition")
+						|| arg.equals("--grm_partition") || arg.equals("--out"))
+				{
 					++i;
 					continue;
 				}
 				pw.print(arg + " ");
 			}
-			if (P != N) {
-				pw.print("--grm-range " + (size*(P-1)+1) + "," + (size*P) + " ");
-			} else {
-				pw.print("--grm-range " + (size*(P-1)+1) + "," + T + " ");
+			if (P != N)
+			{
+				pw.print("--grm-range " + (size * (P - 1) + 1) + ","
+						+ (size * P) + " ");
+			} else
+			{
+				pw.print("--grm-range " + (size * (P - 1) + 1) + "," + T + " ");
 			}
 			pw.print("--out " + Parameter.INSTANCE.out + "." + P);
 			pw.println();
@@ -167,20 +216,28 @@ public class MakeGRM {
 			Runtime rt = Runtime.getRuntime();
 			String cmd = "qsub " + sb.toString();
 			Logger.printUserLog("Submitted '" + sb.toString() + "'.");
-			try {
+			try
+			{
 				rt.exec(cmd);
-			} catch (IOException e) {
-				Logger.handleException(e, "Failed to execute command '" + cmd + "'.");
+			} catch (IOException e)
+			{
+				Logger.handleException(e, "Failed to execute command '" + cmd
+						+ "'.");
 			}
 		}
 	}
 
-	public void makeGeneticRelationshipScore(int n0, int n1) {
-		if (n0 <1 || n1 > (G.getGRow() * G.getGRow())/2) {
-			Logger.printUserError("incorrect range for grm pairs : " + n0 + "," +n1);
+	public void makeGeneticRelationshipScore(int n0, int n1)
+	{
+		if (n0 < 1 || n1 > (G.getGRow() * G.getGRow()) / 2)
+		{
+			Logger.printUserError("incorrect range for grm pairs : " + n0 + ","
+					+ n1);
 			System.exit(0);
-		} else {
-			Logger.printUserLog("generating grm scores for the pairs from " + n0 + " to " + n1);
+		} else
+		{
+			Logger.printUserLog("generating grm scores for the pairs from "
+					+ n0 + " to " + n1);
 		}
 
 		prepareMAF();
@@ -188,51 +245,71 @@ public class MakeGRM {
 		sb.append(Parameter.INSTANCE.out);
 		PrintStream grm = null;
 		BufferedWriter grmGZ = null;
-		if (Parameter.INSTANCE.makeGRMTXTFlag) {
+		if (Parameter.INSTANCE.makeGRMTXTFlag)
+		{
 			sb.append(".grm.txt");
 			grm = FileProcessor.CreatePrintStream(sb.toString());
-		} else if (Parameter.INSTANCE.makeGRMFlag) {
+		} else if (Parameter.INSTANCE.makeGRMFlag)
+		{
 			sb.append(".grm.gz");
 			grmGZ = FileProcessor.ZipFielWriter(sb.toString());
 		}
 
 		int i = 0, j = 0;
-		for (; i < G.getGRow(); i++) {
-			if( (i+1) * (i+1+1) / 2 >= n0) break;
+		for (; i < G.getGRow(); i++)
+		{
+			if ((i + 1) * (i + 1 + 1) / 2 >= n0)
+				break;
 		}
-		j = n0 - i * (i+1)/2 - 1;
+		j = n0 - i * (i + 1) / 2 - 1;
 		int c = n0;
 
-		while ( c <= n1 ) {
-			double[] s = GRMScore(i,j);
-			if (Parameter.INSTANCE.makeGRMTXTFlag) {
-				grm.println((i+1) + "\t" + (j+1) + "\t" + s[0] + "\t" + s[1]);
-			} else {
-				try {
-					grmGZ.append((i+1) + "\t" + (j+1) + "\t" + s[0] + "\t" + s[1] + "\n");
-				} catch (IOException e) {
-					Logger.handleException(e, "error in writing '" + sb.toString() + "' for " + (i+1) + " " + (j+1) + ".");
+		while (c <= n1)
+		{
+			double[] s = GRMScore(i, j);
+			if (Parameter.INSTANCE.makeGRMTXTFlag)
+			{
+				grm.println((i + 1) + "\t" + (j + 1) + "\t" + s[0] + "\t"
+						+ s[1]);
+			} else
+			{
+				try
+				{
+					grmGZ.append((i + 1) + "\t" + (j + 1) + "\t" + s[0] + "\t"
+							+ s[1] + "\n");
+				} catch (IOException e)
+				{
+					Logger.handleException(e,
+							"error in writing '" + sb.toString() + "' for "
+									+ (i + 1) + " " + (j + 1) + ".");
 				}
 			}
-			if ( j < i) {
+			if (j < i)
+			{
 				j++;
-			} else {
+			} else
+			{
 				i++;
 				j = 0;
 			}
 			c++;
 		}
 
-		if (Parameter.INSTANCE.makeGRMTXTFlag) {
+		if (Parameter.INSTANCE.makeGRMTXTFlag)
+		{
 			grm.close();
-		} else {
-			try {
+		} else
+		{
+			try
+			{
 				grmGZ.close();
-			} catch (IOException e) {
-				Logger.handleException(e, " error in closing '" + sb.toString() + "'.");
+			} catch (IOException e)
+			{
+				Logger.handleException(e, " error in closing '" + sb.toString()
+						+ "'.");
 			}
 		}
-		Logger.printUserLog("Writing GRM scores into '" + sb.toString() + "'.");		
+		Logger.printUserLog("Writing GRM scores into '" + sb.toString() + "'.");
 		StringBuffer sb_id = new StringBuffer();
 		sb_id.append(Parameter.INSTANCE.out);
 		PrintStream grm_id = null;
@@ -240,93 +317,126 @@ public class MakeGRM {
 		grm_id = FileProcessor.CreatePrintStream(sb_id.toString());
 
 		ArrayList<Hukou> H = pf.getHukouBook();
-		for (int k = 0; k < H.size(); k++) {
+		for (int k = 0; k < H.size(); k++)
+		{
 			Hukou h = H.get(k);
 			grm_id.println(h.getFamilyID() + "\t" + h.getIndividualID());
 		}
 		grm_id.close();
-		Logger.printUserLog("Writing individual information into '" + sb_id.toString() + "'.");
+		Logger.printUserLog("Writing individual information into '"
+				+ sb_id.toString() + "'.");
 	}
-	
-	private double[] GRMScore(int idx1, int idx2) {
+
+	private double[] GRMScore(int idx1, int idx2)
+	{
 		double[] s = { 0, 0 };
 
-		for (int i = 0; i < allelefreq.length; i++) {
+		for (int i = 0; i < allelefreq.length; i++)
+		{
 
 			int g1 = G.getAdditiveScore(idx1, i);
 			int g2 = G.getAdditiveScore(idx2, i);
 			double m = allelefreq[i][1];
 			if (g1 == BPerson.MissingGenotypeCode
-					|| g2 == BPerson.MissingGenotypeCode) {
+					|| g2 == BPerson.MissingGenotypeCode)
+			{
 				continue;
-			} else {
-				if (m < maf_threshold) {//ignor too little maf
+			} else
+			{
+				if (m < maf_threshold)
+				{// ignor too little maf
 					continue;
-				} else {
+				} else
+				{
 					s[0]++;
-					if (m < 0.5) {
-						s[1] += (g1 - 2*m) * (g2 - 2*m)/(2 * m * (1-m));
-					} else {
-						s[1] += ((2-g1) - 2*(1-m)) * ((2-g2) - 2*(1-m))/(2 * m * (1-m));						
+					if (m < 0.5)
+					{
+						s[1] += (g1 - 2 * m) * (g2 - 2 * m) / (2 * m * (1 - m));
+					} else
+					{
+						s[1] += ((2 - g1) - 2 * (1 - m))
+								* ((2 - g2) - 2 * (1 - m)) / (2 * m * (1 - m));
 					}
 				}
 			}
 		}
 
-		if (s[0] > 0) {
+		if (s[0] > 0)
+		{
 			s[1] /= s[0];
 		}
 
 		return s;
 	}
 
-	private void prepareMAF() {
-		if (Parameter.INSTANCE.ref_freq != null) {
+	private void prepareMAF()
+	{
+		if (Parameter.INSTANCE.ref_freq != null)
+		{
 			getRefFreq();
 
-		} else {
+		} else
+		{
 			calAlleleFrequency();
 		}
 	}
 
-	private void getRefFreq() {
+	private void getRefFreq()
+	{
 		HashMap<String, MAF> refMap = NewIt.newHashMap();
-		BufferedReader reader = FileProcessor.FileOpen(Parameter.INSTANCE.ref_freq);
+		BufferedReader reader = FileProcessor
+				.FileOpen(Parameter.INSTANCE.ref_freq);
 		String line;
-		try {
+		try
+		{
 			line = reader.readLine();
 			int idx = 0;
-			while((line = reader.readLine())!=null) {
+			while ((line = reader.readLine()) != null)
+			{
 				line = line.trim();
 				MAF maf = new MAF(line, ++idx);
 				refMap.put(maf.getSNP(), maf);
 			}
-			Logger.printUserLog("Read " + idx + " SNPs in '" +  Parameter.INSTANCE.ref_freq + "'.\n");
+			Logger.printUserLog("Read " + idx + " SNPs in '"
+					+ Parameter.INSTANCE.ref_freq + "'.\n");
 
-		} catch (IOException e) {
-			Logger.handleException(e, "An exception occurred when reading the maf file '" + Parameter.INSTANCE.ref_freq + "'.");
+		} catch (IOException e)
+		{
+			Logger.handleException(e,
+					"An exception occurred when reading the maf file '"
+							+ Parameter.INSTANCE.ref_freq + "'.");
 		}
 
 		ArrayList<SNP> snpList = snpMap.getMarkerList();
 		int c = 0;
-		for (int i = 0; i < snpList.size(); i++) {
+		for (int i = 0; i < snpList.size(); i++)
+		{
 			SNP snp = snpList.get(i);
 			String snpName = snp.getName();
 			double f = 0;
-			if(refMap.containsKey(snpName)) {
+			if (refMap.containsKey(snpName))
+			{
 				f = refMap.get(snpName).getMAF();
 			}
-			if (allelefreq[i][1] <= 0.5) {
-				if (allelefreq[i][1] < Parameter.INSTANCE.maf_range[0] || allelefreq[i][1] > Parameter.INSTANCE.maf_range[1]) {
+			if (allelefreq[i][1] <= 0.5)
+			{
+				if (allelefreq[i][1] < Parameter.INSTANCE.maf_range[0]
+						|| allelefreq[i][1] > Parameter.INSTANCE.maf_range[1])
+				{
 					allelefreq[i][1] = 0;
-				} else {
-					allelefreq[i][1] = f;				
+				} else
+				{
+					allelefreq[i][1] = f;
 				}
-			} else {
-				if ( (1 - allelefreq[i][1]) < Parameter.INSTANCE.maf_range[0] || (1 - allelefreq[i][1]) > Parameter.INSTANCE.maf_range[1]) {
+			} else
+			{
+				if ((1 - allelefreq[i][1]) < Parameter.INSTANCE.maf_range[0]
+						|| (1 - allelefreq[i][1]) > Parameter.INSTANCE.maf_range[1])
+				{
 					allelefreq[i][1] = 0;
-				} else {
-					allelefreq[i][1] = f;				
+				} else
+				{
+					allelefreq[i][1] = f;
 				}
 			}
 
@@ -335,35 +445,48 @@ public class MakeGRM {
 		Logger.printUserLog("Got " + c + " matched reference alleles.\n");
 	}
 
-	private void calAlleleFrequency() {
+	private void calAlleleFrequency()
+	{
 		int[][] g = G.getG();
-		for (int i = 0; i < g.length; i++) {
-			for (int j = 0; j < numMarker; j++) {
+		for (int i = 0; i < g.length; i++)
+		{
+			for (int j = 0; j < numMarker; j++)
+			{
 				int[] c = G.getBiAlleleGenotype(i, j);
 				allelefreq[j][c[0]]++;
 				allelefreq[j][c[1]]++;
 			}
 		}
 
-		for (int i = 0; i < numMarker; i++) {
+		for (int i = 0; i < numMarker; i++)
+		{
 			double wa = allelefreq[i][0] + allelefreq[i][1];
 			double a = allelefreq[i][0] + allelefreq[i][1] + allelefreq[i][2];
-			if (wa > 0) {
-				for (int j = 0; j < allelefreq[i].length - 1; j++) {
+			if (wa > 0)
+			{
+				for (int j = 0; j < allelefreq[i].length - 1; j++)
+				{
 					allelefreq[i][j] /= wa;
 				}
 				allelefreq[i][2] /= a;
-			} else {
+			} else
+			{
 				allelefreq[i][2] = 1;
 			}
-			if (allelefreq[i][1] <= 0.5) {
-				if (allelefreq[i][1] < Parameter.INSTANCE.maf_range[0] || allelefreq[i][1] > Parameter.INSTANCE.maf_range[1]) {
+			if (allelefreq[i][1] <= 0.5)
+			{
+				if (allelefreq[i][1] < Parameter.INSTANCE.maf_range[0]
+						|| allelefreq[i][1] > Parameter.INSTANCE.maf_range[1])
+				{
 					allelefreq[i][1] = 0;
 				}
-			} else {
-				if ( (1 - allelefreq[i][1]) < Parameter.INSTANCE.maf_range[0] || (1 - allelefreq[i][1]) > Parameter.INSTANCE.maf_range[1]) {
+			} else
+			{
+				if ((1 - allelefreq[i][1]) < Parameter.INSTANCE.maf_range[0]
+						|| (1 - allelefreq[i][1]) > Parameter.INSTANCE.maf_range[1])
+				{
 					allelefreq[i][1] = 0;
-				}				
+				}
 			}
 		}
 

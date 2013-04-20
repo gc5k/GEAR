@@ -11,7 +11,6 @@ import java.util.ArrayList;
 
 import org.apache.commons.lang3.ArrayUtils;
 
-
 import family.pedigree.Hukou;
 import family.pedigree.genotype.BFamilyStruct;
 import family.pedigree.genotype.BPerson;
@@ -19,14 +18,16 @@ import family.plink.PLINKBinaryParser;
 import gear.util.Logger;
 import gear.util.NewIt;
 
-public class BEDReader extends PedigreeFile {
+public class BEDReader extends PedigreeFile
+{
 	public String FamFile;
 	private int n_individual = 0;
 	private ArrayList<String> Famid;
 	private ArrayList<BPerson> persons;
 	private MapFile mapData;
 
-	public BEDReader(String famF, int numMark, MapFile mapdata) {
+	public BEDReader(String famF, int numMark, MapFile mapdata)
+	{
 		super();
 		FamFile = famF;
 		this.num_marker = numMark;
@@ -34,14 +35,16 @@ public class BEDReader extends PedigreeFile {
 	}
 
 	@Override
-	public void initial() throws IOException {
+	public void initial() throws IOException
+	{
 		Famid = NewIt.newArrayList();
 		persons = NewIt.newArrayList();
 
 		BufferedReader reader = new BufferedReader(new FileReader(FamFile));
 		AlleleSet = new char[num_marker][];
 		AlleleFreq = new short[num_marker][2];
-		for (int i = 0; i < mapData.snpList.size(); i++) {
+		for (int i = 0; i < mapData.snpList.size(); i++)
+		{
 			SNP snp = mapData.snpList.get(i);
 			AlleleSet[i] = snp.getSNP();
 		}
@@ -49,7 +52,8 @@ public class BEDReader extends PedigreeFile {
 
 		HukouBook = NewIt.newArrayList();
 		Hukou hukou;
-		while ((line = reader.readLine()) != null) {
+		while ((line = reader.readLine()) != null)
+		{
 			String[] tokens = line.split("\\s+");
 
 			BPerson person = new BPerson(num_marker);
@@ -62,15 +66,20 @@ public class BEDReader extends PedigreeFile {
 			person.setGender(Integer.parseInt(tokens[4]));
 			person.setAffectedStatus(tokens[5]);
 			SixthCol.add(tokens[5]);
-			
-			hukou = new Hukou(tokens[0], tokens[1], tokens[2], tokens[3], tokens[4], tokens[5]);
+
+			hukou = new Hukou(tokens[0], tokens[1], tokens[2], tokens[3],
+					tokens[4], tokens[5]);
 			BFamilyStruct famstr = familystructure.get(tokens[0]);
-			if (famstr == null) {
+			if (famstr == null)
+			{
 				famstr = new BFamilyStruct(tokens[0]);
 				familystructure.put(tokens[0], famstr);
 			}
-			if (famstr.getPersons().containsKey(person.getPersonID())) {
-				throw new IOException("Person " + person.getPersonID() + " in family " + person.getFamilyID() + " appears more than once.");
+			if (famstr.getPersons().containsKey(person.getPersonID()))
+			{
+				throw new IOException("Person " + person.getPersonID()
+						+ " in family " + person.getFamilyID()
+						+ " appears more than once.");
 			}
 			HukouBook.add(hukou);
 			famstr.addPerson(person);
@@ -81,63 +90,81 @@ public class BEDReader extends PedigreeFile {
 	}
 
 	@Override
-	public void parseLinkage(String infile, int numMarkerInFile, int[] WSNP) throws IOException {
+	public void parseLinkage(String infile, int numMarkerInFile, int[] WSNP)
+			throws IOException
+	{
 		initial();
 		pedfile = infile;
 		BufferedInputStream in = null;
 
-		try {
+		try
+		{
 			in = new BufferedInputStream(new FileInputStream(new File(pedfile)));
-		} catch (FileNotFoundException e) {
-			Logger.handleException(e, "Cannot open the pedigree file '" + pedfile + "'.");
+		} catch (FileNotFoundException e)
+		{
+			Logger.handleException(e, "Cannot open the pedigree file '"
+					+ pedfile + "'.");
 		}
 		byte[] magic = new byte[3];
 		in.read(magic, 0, 3);
-		if (magic[2] == 1) {
+		if (magic[2] == 1)
+		{
 			Logger.printUserLog("Reading data in PLINK SNP-major mode.");
 			snp_major(in, numMarkerInFile, WSNP);
-		} else {
+		} else
+		{
 			Logger.printUserLog("Reading data in PLINK individual-major mode.");
 			individual_major(in, numMarkerInFile, WSNP);
 		}
 		in.close();
 	}
 
-	private void individual_major(BufferedInputStream in, int numMarkerInFile, int[] WSNP) throws IOException {
+	private void individual_major(BufferedInputStream in, int numMarkerInFile,
+			int[] WSNP) throws IOException
+	{
 		int L = 0;
-		if (numMarkerInFile % 4 == 0) {
+		if (numMarkerInFile % 4 == 0)
+		{
 			L = numMarkerInFile / 4;
-		} else {
+		} else
+		{
 			L = numMarkerInFile / 4 + 1;
 		}
 		int exL = 0;
-		if (WSNP.length % 4 == 0) {
+		if (WSNP.length % 4 == 0)
+		{
 			exL = WSNP.length / 4;
-		} else {
+		} else
+		{
 			exL = WSNP.length / 4 + 1;
 		}
 		byte[] geno = new byte[L];
 		byte[] extract_geno = new byte[exL];
-		for (int i = 0; i < n_individual; i++) {
+		for (int i = 0; i < n_individual; i++)
+		{
 			in.read(geno, 0, L);
 			extract_geno = extractGenotype(geno, numMarkerInFile, WSNP);
-			persons.get(i).addAllMarker(extract_geno);			
+			persons.get(i).addAllMarker(extract_geno);
 		}
 		Famid = null;
 		persons = null;
 	}
-	
-	private byte[] extractGenotype(byte[] g, int numMarkerInFile, int[] WSNP) {
+
+	private byte[] extractGenotype(byte[] g, int numMarkerInFile, int[] WSNP)
+	{
 
 		int exL = 0;
-		if (WSNP.length % 4 == 0) {
+		if (WSNP.length % 4 == 0)
+		{
 			exL = WSNP.length / 4;
-		} else {
+		} else
+		{
 			exL = WSNP.length / 4 + 1;
 		}
 		byte[] Exg = new byte[exL];
 		int c = 0;
-		for (int i = 0; i < numMarkerInFile; i++) {
+		for (int i = 0; i < numMarkerInFile; i++)
+		{
 			int idx = ArrayUtils.indexOf(WSNP, i);
 			if (idx < 0)
 				continue;
@@ -148,43 +175,67 @@ public class BEDReader extends PedigreeFile {
 			int ExposByte = c >> 2;
 			int ExposBite = (c & 0x3) << 1;
 			Exg[ExposByte] |= g1 << ExposBite;
-			if (g1 == 0) {
+			if (g1 == 0)
+			{
 				AlleleFreq[c][0] += 2;
-			} else if (g1 == 2) {
+			} else if (g1 == 2)
+			{
 				AlleleFreq[c][0]++;
 				AlleleFreq[c][1]++;
-			} else if (g1 == 3) {
+			} else if (g1 == 3)
+			{
 				AlleleFreq[c][1] += 2;
 			}
 			c++;
 		}
 		return Exg;
 	}
-	
-	private static int[][] constructSnpMajorGenotypeByteConvertTable() {
-		int [][] table = new int[0x100][4];
-		for (int byteValue = 0; byteValue <= 0xff; ++byteValue) {
-			for (int indIdx = 0; indIdx < 4; ++indIdx) {
-				table[byteValue][indIdx] = PLINKBinaryParser.convertToGearGenotype((byteValue >> (indIdx << 1)) & 0x3);
+
+	private static int[][] constructSnpMajorGenotypeByteConvertTable()
+	{
+		int[][] table = new int[0x100][4];
+		for (int byteValue = 0; byteValue <= 0xff; ++byteValue)
+		{
+			for (int indIdx = 0; indIdx < 4; ++indIdx)
+			{
+				table[byteValue][indIdx] = PLINKBinaryParser
+						.convertToGearGenotype((byteValue >> (indIdx << 1)) & 0x3);
 			}
 		}
 		return table;
 	}
 
-	private void snp_major(BufferedInputStream in, int numMarkerInFile, int[] WSNP) throws IOException {
+	private void snp_major(BufferedInputStream in, int numMarkerInFile,
+			int[] WSNP) throws IOException
+	{
 		byte[] g = new byte[(n_individual + 3) / 4];
 		int[][] genoByteCvtTable = constructSnpMajorGenotypeByteConvertTable();
 		int snpIdx = 0;
-		for (int i = 0; i < numMarkerInFile; i++) {
+		for (int i = 0; i < numMarkerInFile; i++)
+		{
 			in.read(g, 0, g.length);
-			if (ArrayUtils.indexOf(WSNP, i) >= 0) {
+			if (ArrayUtils.indexOf(WSNP, i) >= 0)
+			{
 				int indIdx = 0;
 				int posByte = snpIdx >> BPerson.shift;
 				int posBite = (i & 0xf) << 1;
-				for (int byteIdx = 0; byteIdx < g.length; ++byteIdx) {
-					int[] genoValues = genoByteCvtTable[g[byteIdx] & 0xff];  // 0xff is necessary here, otherwise Java will sign extend the byte
-					for (int j = 0; j < 4 && indIdx < n_individual; ++j, ++indIdx) {
-						persons.get(indIdx).addByteGenotype(genoValues[j], posByte, posBite);
+				for (int byteIdx = 0; byteIdx < g.length; ++byteIdx)
+				{
+					int[] genoValues = genoByteCvtTable[g[byteIdx] & 0xff]; // 0xff
+																			// is
+																			// necessary
+																			// here,
+																			// otherwise
+																			// Java
+																			// will
+																			// sign
+																			// extend
+																			// the
+																			// byte
+					for (int j = 0; j < 4 && indIdx < n_individual; ++j, ++indIdx)
+					{
+						persons.get(indIdx).addByteGenotype(genoValues[j],
+								posByte, posBite);
 					}
 				}
 				snpIdx++;

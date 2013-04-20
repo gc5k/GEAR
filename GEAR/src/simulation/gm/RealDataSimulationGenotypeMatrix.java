@@ -6,7 +6,8 @@ import family.pedigree.PersonIndex;
 import gear.Parameter;
 import simulation.qc.rowqc.RealDataSimulationQC;
 
-public class RealDataSimulationGenotypeMatrix {
+public class RealDataSimulationGenotypeMatrix
+{
 
 	protected int[][] genotypeMat;
 	protected int lenMat;
@@ -14,18 +15,22 @@ public class RealDataSimulationGenotypeMatrix {
 	protected final int shift = 4;
 	protected int numMarker = 0;
 	protected ArrayList<PersonIndex> pidx;
-	
-	public RealDataSimulationGenotypeMatrix(RealDataSimulationQC cb) {
+
+	public RealDataSimulationGenotypeMatrix(RealDataSimulationQC cb)
+	{
 		pidx = cb.getSample();
 		initial();
 	}
 
-	protected void initial() {
+	protected void initial()
+	{
 		genotypeMat = new int[pidx.size()][];
 
 		int c1 = 0;
-		for (PersonIndex pi : pidx) {
-			if (!pi.isPseudo()) {
+		for (PersonIndex pi : pidx)
+		{
+			if (!pi.isPseudo())
+			{
 				genotypeMat[c1++] = pi.getPerson().getAlleleArray();
 			}
 		}
@@ -33,57 +38,71 @@ public class RealDataSimulationGenotypeMatrix {
 
 	}
 
-	public int getNumMarker() {
+	public int getNumMarker()
+	{
 		return numMarker;
 	}
 
-	public int getGenotypeScore(int idx, int i) {
+	public int getGenotypeScore(int idx, int i)
+	{
 		int posByte = i >> shift;
 		int posBite = (i & 0xf) << 1;
 		int g = (genotypeMat[idx][posByte] >> (posBite)) & 3;
-		if (g == 1) {// 01
+		if (g == 1)
+		{// 01
 			return 2;
-		} else {
-			if (g == 2) {
+		} else
+		{
+			if (g == 2)
+			{
 				return 1;
-			} else {
+			} else
+			{
 				return g;
 			}
 		}
 	}
 
-	public int[] getBiAlleleGenotype(int idx, int i) {
+	public int[] getBiAlleleGenotype(int idx, int i)
+	{
 		int posByte = i >> shift;
 		int posBite = (i & 0xf) << 1;
 		int g = (genotypeMat[idx][posByte] >> posBite) & 3;
 		int[] b = { 2, 2 };
-		if (g != 1) {
+		if (g != 1)
+		{
 			b[0] = (g >> 1) & 1;
 			b[1] = g & 1;
 		}
 		return b;
 	}
 
-	public String getGenotypeScoreString(int idx, int i) {
+	public String getGenotypeScoreString(int idx, int i)
+	{
 		int posByte = i >> shift;
 		int posBite = (i & 0xf) << 1;
 		int g = (genotypeMat[idx][posByte] >> (posBite)) & 3;
-		if (g == 3) {// 01
+		if (g == 3)
+		{// 01
 			return Parameter.INSTANCE.missingGenotype;
-		} else {
+		} else
+		{
 			return Integer.toString(g);
 		}
 	}
 
-	public int[][] getG() {
+	public int[][] getG()
+	{
 		return genotypeMat;
 	}
 
-	public int getGRow() {
+	public int getGRow()
+	{
 		return genotypeMat.length;
 	}
-	
-	public int getGCol() {
+
+	public int getGCol()
+	{
 		return genotypeMat[0].length;
 	}
 

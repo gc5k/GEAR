@@ -20,12 +20,13 @@ import org.apache.commons.math.linear.RealMatrix;
 import org.apache.commons.math.random.RandomDataImpl;
 import org.apache.commons.math.stat.StatUtils;
 
-public class SimuPolyQT {
+public class SimuPolyQT
+{
 
 	private byte byte1 = 108;
 	private byte byte2 = 27;
 	private byte byte3 = 1;
-	
+
 	private RandomDataImpl rnd;
 	private long seed = 2011;
 
@@ -51,7 +52,8 @@ public class SimuPolyQT {
 	private String A1 = "A";
 	private String A2 = "C";
 
-	public SimuPolyQT() {
+	public SimuPolyQT()
+	{
 		M = Parameter.INSTANCE.polyLoci;
 		M_null = Parameter.INSTANCE.polyLociNull;
 		U = Parameter.INSTANCE.polyU;
@@ -83,9 +85,12 @@ public class SimuPolyQT {
 		Logger.printUserLog("MAF: " + Parameter.INSTANCE.polyFreq);
 		Logger.printUserLog("Marker: " + M);
 		Logger.printUserLog("Null marker: " + M);
-		if (Parameter.INSTANCE.polyEffectFlag) {
-			Logger.printUserLog("genetic effect file: " + Parameter.INSTANCE.polyEffectFile);
-		} else {
+		if (Parameter.INSTANCE.polyEffectFlag)
+		{
+			Logger.printUserLog("genetic effect file: "
+					+ Parameter.INSTANCE.polyEffectFile);
+		} else
+		{
 			Logger.printUserLog("Uniform Effect: " + U);
 		}
 		Logger.printUserLog("LD: " + ld);
@@ -95,31 +100,39 @@ public class SimuPolyQT {
 		Logger.printUserLog("");
 	}
 
-	public static void main(String[] args) {
+	public static void main(String[] args)
+	{
 		Parameter.INSTANCE.commandListener(args);
 	}
 
-	public void generateSample() {
+	public void generateSample()
+	{
 		GenerateSampleNoSelection();
-		if(Parameter.INSTANCE.makebedFlag) {
+		if (Parameter.INSTANCE.makebedFlag)
+		{
 			writeBFile();
-		} else {
+		} else
+		{
 			writeFile();
 		}
 	}
 
-	public void GenerateSampleNoSelection() {
+	public void GenerateSampleNoSelection()
+	{
 		DecimalFormat fmt = new DecimalFormat("#.###E0");
 
 		int count = 0;
 		RealMatrix effect = null;
-		if (Parameter.INSTANCE.polyEffectFlag) {
+		if (Parameter.INSTANCE.polyEffectFlag)
+		{
 			effect = readEffects();
-		} else {
+		} else
+		{
 			effect = GenerateEffects();
 		}
 
-		while (count < sample) {
+		while (count < sample)
+		{
 			RealMatrix chr = SampleChromosome();
 			RealMatrix res = chr.transpose().multiply(effect);
 
@@ -132,45 +145,56 @@ public class SimuPolyQT {
 		}
 
 		double vg = StatUtils.variance(BV);
-		double ve = vg * (1-h2) / h2;
+		double ve = vg * (1 - h2) / h2;
 		double E = Math.sqrt(ve);
 		Logger.printUserLog("Vg=" + fmt.format(vg));
-		for (int i = 0; i < sample; i++) {
+		for (int i = 0; i < sample; i++)
+		{
 			phenotype[i] = BV[i] + rnd.nextGaussian(0, E);
 		}
 		double vp = StatUtils.variance(phenotype);
 		Logger.printUserLog("Vp=" + fmt.format(vp));
-		Logger.printUserLog("total individuals visited (no selection): " + count + "\n");
+		Logger.printUserLog("total individuals visited (no selection): "
+				+ count + "\n");
 	}
 
-	public RealMatrix GenerateEffects() {
+	public RealMatrix GenerateEffects()
+	{
 
 		double[] effect = new double[M];
-		if (U) {
-			for (int i = 0; i < M - M_null; i++) {
+		if (U)
+		{
+			for (int i = 0; i < M - M_null; i++)
+			{
 				double sigma_b = Math.sqrt((vy * h2)
-						/ ( (M - M_null) * 2 * freq[i] * (1 - freq[i])));
+						/ ((M - M_null) * 2 * freq[i] * (1 - freq[i])));
 				effect[i] = sigma_b;
 			}
-		} else {
-			for (int i = 0; i < M - M_null; i++) {
+		} else
+		{
+			for (int i = 0; i < M - M_null; i++)
+			{
 				effect[i] = rnd.nextGaussian(0, 1);
 			}
 		}
 
-		if (Parameter.INSTANCE.simuOrderFlag) {
+		if (Parameter.INSTANCE.simuOrderFlag)
+		{
 			Arrays.sort(effect);
 		}
 
 		PrintWriter eff = null;
-		try {
+		try
+		{
 			eff = new PrintWriter(new BufferedWriter(new FileWriter(out
 					+ ".rnd")));
-		} catch (IOException e) {
+		} catch (IOException e)
+		{
 			e.printStackTrace();
 		}
 
-		for (int i = 0; i < effect.length; i++) {
+		for (int i = 0; i < effect.length; i++)
+		{
 			eff.println("rs" + i + " " + A2 + " " + effect[i]);
 		}
 		eff.close();
@@ -181,17 +205,22 @@ public class SimuPolyQT {
 
 	}
 
-	public RealMatrix SampleChromosome() {
+	public RealMatrix SampleChromosome()
+	{
 
 		double[] g = new double[freq.length];
 		double[][] v = new double[freq.length][2];
-		for (int i = 0; i < freq.length; i++) {
-			for (int j = 0; j < 2; j++) {
+		for (int i = 0; i < freq.length; i++)
+		{
+			for (int j = 0; j < 2; j++)
+			{
 				double r = rnd.nextUniform(0, 1);
 				double z = r < freq[i] ? 0 : 1;
-				if (i == 0) {
+				if (i == 0)
+				{
 					v[i][j] = z;
-				} else {
+				} else
+				{
 					double d = rnd.nextUniform(0, 1);
 					int a = (int) v[i - 1][j];
 					double f1 = a == 0 ? freq[i - 1] : (1 - freq[i - 1]);
@@ -208,34 +237,39 @@ public class SimuPolyQT {
 
 	}
 
-	public double getMean(RealMatrix effect) {
+	public double getMean(RealMatrix effect)
+	{
 		int local_sample = 10000;
 		double[] P = new double[local_sample];
 		int c = 0;
-		while(c < local_sample) {
-			
+		while (c < local_sample)
+		{
+
 			RealMatrix chr = SampleChromosome();
 			RealMatrix res = chr.transpose().multiply(effect);
 			P[c++] = res.getEntry(0, 0) + rnd.nextGaussian(0, E);
 
 		}
 
-		Logger.printUserLog("Mean: " + StatUtils.mean(P) + ", Variance: " + StatUtils.variance(P));
+		Logger.printUserLog("Mean: " + StatUtils.mean(P) + ", Variance: "
+				+ StatUtils.variance(P));
 		return StatUtils.mean(P);
 	}
 
-	public void writeBFile() {
+	public void writeBFile()
+	{
 		DataOutputStream bedout = null;
 		PrintWriter fam = null;
 		PrintWriter bim = null;
 		PrintWriter phe = null;
 		PrintWriter cov = null;
 		PrintWriter geno = null;
-		try {
-			bedout = new DataOutputStream (new FileOutputStream(out
-					+ ".bed"));
-			
-			fam = new PrintWriter(new BufferedWriter(new FileWriter(out + ".fam")));
+		try
+		{
+			bedout = new DataOutputStream(new FileOutputStream(out + ".bed"));
+
+			fam = new PrintWriter(new BufferedWriter(new FileWriter(out
+					+ ".fam")));
 			bim = new PrintWriter(new BufferedWriter(new FileWriter(out
 					+ ".bim")));
 
@@ -243,12 +277,15 @@ public class SimuPolyQT {
 					+ ".phe")));
 			cov = new PrintWriter(new BufferedWriter(new FileWriter(out
 					+ ".cov")));
-			geno = new PrintWriter(new BufferedWriter(new FileWriter(out + ".add")));
-		} catch (IOException e) {
+			geno = new PrintWriter(new BufferedWriter(new FileWriter(out
+					+ ".add")));
+		} catch (IOException e)
+		{
 			e.printStackTrace();
 		}
 
-		for (int i = 0; i < genotype.length; i++) {
+		for (int i = 0; i < genotype.length; i++)
+		{
 			fam.print("sample_" + i + " ");
 			fam.print(1 + " ");
 			fam.print(0 + " ");
@@ -265,52 +302,71 @@ public class SimuPolyQT {
 			cov.println(phenotype[i]);
 		}
 
-		for (int i = 0; i < genotype.length; i++) {
-			for (int j = 0; j < genotype[i].length; j++) {
-				geno.print(((int) genotype[i][j] + 1) + " "); 
+		for (int i = 0; i < genotype.length; i++)
+		{
+			for (int j = 0; j < genotype[i].length; j++)
+			{
+				geno.print(((int) genotype[i][j] + 1) + " ");
 			}
 			geno.println();
 		}
 
 		geno.close();
 
-		try {
+		try
+		{
 			bedout.writeByte(byte1);
 			bedout.writeByte(byte2);
 			bedout.writeByte(byte3);
-			for (int i = 0; i < M; i++) {
+			for (int i = 0; i < M; i++)
+			{
 				byte gbyte = 0;
 				int idx = 0;
-				for (int j = 0; j < sample; j++) {
+				for (int j = 0; j < sample; j++)
+				{
 					int g = (int) genotype[j][i] + 1;
-					switch(g) {
-						case 0: g = 0; break;
-						case 1: g = 2; break;
-						case 2: g = 3; break;
-						default: g = 1; break; //missing
+					switch (g)
+					{
+					case 0:
+						g = 0;
+						break;
+					case 1:
+						g = 2;
+						break;
+					case 2:
+						g = 3;
+						break;
+					default:
+						g = 1;
+						break; // missing
 					}
 
 					g <<= 2 * idx;
 					gbyte |= g;
 					idx++;
 
-					if (j != (sample - 1) ) {
-						if (idx == 4) {
+					if (j != (sample - 1))
+					{
+						if (idx == 4)
+						{
 							bedout.writeByte(gbyte);
 							gbyte = 0;
 							idx = 0;
 						}
-					} else {
+					} else
+					{
 						bedout.writeByte(gbyte);
 					}
 				}
 			}
 			bedout.close();
-		} catch (IOException e) {
+		} catch (IOException e)
+		{
 			e.printStackTrace();
 		}
 
-		for (int i = 0; i < M; i++) {
+		for (int i = 0; i < M; i++)
+		{
 			bim.print(1 + " ");
 			bim.print("rs" + i + " ");
 			bim.print(i / (M * 1.0) + " ");
@@ -325,22 +381,30 @@ public class SimuPolyQT {
 
 	}
 
-	
-	public void writeFile() {
+	public void writeFile()
+	{
 		PrintWriter pedout = null;
 		PrintWriter map = null;
 		PrintWriter cov = null;
 		PrintWriter geno = null;
-		try {
-			pedout = new PrintWriter(new BufferedWriter(new FileWriter(out + ".ped")));
-			map = new PrintWriter(new BufferedWriter(new FileWriter(out + ".map")));
-			cov = new PrintWriter(new BufferedWriter(new FileWriter(out + ".cov")));
-			geno = new PrintWriter(new BufferedWriter(new FileWriter(out + ".add")));
-		} catch (IOException e) {
-			Logger.handleException(e, "An exception occurred when writing files.");
+		try
+		{
+			pedout = new PrintWriter(new BufferedWriter(new FileWriter(out
+					+ ".ped")));
+			map = new PrintWriter(new BufferedWriter(new FileWriter(out
+					+ ".map")));
+			cov = new PrintWriter(new BufferedWriter(new FileWriter(out
+					+ ".cov")));
+			geno = new PrintWriter(new BufferedWriter(new FileWriter(out
+					+ ".add")));
+		} catch (IOException e)
+		{
+			Logger.handleException(e,
+					"An exception occurred when writing files.");
 		}
 
-		for (int i = 0; i < genotype.length; i++) {
+		for (int i = 0; i < genotype.length; i++)
+		{
 
 			pedout.print("sample_" + i + " ");
 			pedout.print(1 + " ");
@@ -349,13 +413,17 @@ public class SimuPolyQT {
 			pedout.print(1 + " ");
 			pedout.print(1 + " ");
 
-			for (int j = 0; j < genotype[i].length; j++) {
+			for (int j = 0; j < genotype[i].length; j++)
+			{
 				int g = (int) genotype[i][j];
-				if (g == -1) {
+				if (g == -1)
+				{
 					pedout.print(A1 + " " + A1 + "  ");
-				} else if (g == 0) {
+				} else if (g == 0)
+				{
 					pedout.print(A1 + " " + A2 + "  ");
-				} else {
+				} else
+				{
 					pedout.print(A2 + " " + A2 + "  ");
 				}
 			}
@@ -366,15 +434,18 @@ public class SimuPolyQT {
 			cov.println(phenotype[i]);
 		}
 
-		for (int i = 0; i < M; i++) {
+		for (int i = 0; i < M; i++)
+		{
 			map.print(1 + " ");
 			map.print("rs" + i + " ");
 			map.print(i / (M * 1.0) + " ");
 			map.println(i * 100);
 		}
 
-		for (int i = 0; i < genotype.length; i++) {
-			for (int j = 0; j < genotype[i].length; j++) {
+		for (int i = 0; i < genotype.length; i++)
+		{
+			for (int j = 0; j < genotype[i].length; j++)
+			{
 				geno.print(((int) genotype[i][j] + 1) + " ");
 			}
 			geno.println();
@@ -386,53 +457,72 @@ public class SimuPolyQT {
 		geno.close();
 	}
 
-	public double[] CalculateDprime(double[] f, double[] dprime) {
+	public double[] CalculateDprime(double[] f, double[] dprime)
+	{
 
 		double[] D = new double[dprime.length];
 
-		for (int i = 0; i < D.length; i++) {
-			if(dprime[i]>0) {
-				D[i]=dprime[i]*Math.min(f[i]*(1-f[i+1]), f[i+1]*(1-f[i]));
-			} else {
-				D[i]=dprime[i]*Math.min(f[i]*f[i+1], (1-f[i])*(1-f[i+1]));
+		for (int i = 0; i < D.length; i++)
+		{
+			if (dprime[i] > 0)
+			{
+				D[i] = dprime[i]
+						* Math.min(f[i] * (1 - f[i + 1]), f[i + 1] * (1 - f[i]));
+			} else
+			{
+				D[i] = dprime[i]
+						* Math.min(f[i] * f[i + 1], (1 - f[i]) * (1 - f[i + 1]));
 			}
 		}
 
 		return D;
 	}
-	
-	public RealMatrix readEffects() {
-		BufferedReader reader = FileProcessor.FileOpen(Parameter.INSTANCE.polyEffectFile);
+
+	public RealMatrix readEffects()
+	{
+		BufferedReader reader = FileProcessor
+				.FileOpen(Parameter.INSTANCE.polyEffectFile);
 		double[] effect = new double[M];
-		int c= 0;
+		int c = 0;
 		String line = null;
-		try {
-			while ((line = reader.readLine()) != null) {
+		try
+		{
+			while ((line = reader.readLine()) != null)
+			{
 				line.trim();
 				String[] l = line.split(TextHelper.WHITESPACE_DELIMITER);
-				if(l.length < 1) continue;
-				if( c < (M - M_null)) {
+				if (l.length < 1)
+					continue;
+				if (c < (M - M_null))
+				{
 					effect[c++] = Double.parseDouble(l[0]);
 				}
 			}
-		} catch (IOException e) {
-			Logger.handleException(e, "An exception occurred when reading the poly-effect file '" + Parameter.INSTANCE.polyEffectFile + "'.");
+		} catch (IOException e)
+		{
+			Logger.handleException(e,
+					"An exception occurred when reading the poly-effect file '"
+							+ Parameter.INSTANCE.polyEffectFile + "'.");
 		}
 		RealMatrix Eff = new Array2DRowRealMatrix(effect);
-		
-		if (Parameter.INSTANCE.simuOrderFlag) {
+
+		if (Parameter.INSTANCE.simuOrderFlag)
+		{
 			Arrays.sort(effect);
 		}
 
 		PrintWriter eff = null;
-		try {
+		try
+		{
 			eff = new PrintWriter(new BufferedWriter(new FileWriter(out
 					+ ".rnd")));
-		} catch (IOException e) {
+		} catch (IOException e)
+		{
 			e.printStackTrace();
 		}
 
-		for (int i = 0; i < effect.length; i++) {
+		for (int i = 0; i < effect.length; i++)
+		{
 			eff.println("rs" + i + " " + A2 + " " + effect[i]);
 		}
 		eff.close();

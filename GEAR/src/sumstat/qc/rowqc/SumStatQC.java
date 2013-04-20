@@ -7,7 +7,8 @@ import family.pedigree.file.MapFile;
 import family.pedigree.file.PedigreeFile;
 import family.qc.rowqc.SampleFilter;
 
-public class SumStatQC {
+public class SumStatQC
+{
 
 	private SampleFilter samFilter;
 	protected MapFile MapData;
@@ -18,8 +19,9 @@ public class SumStatQC {
 	protected int[][] num_qualified;//
 	protected boolean[][] keep;
 
-	public SumStatQC(PedigreeFile ped, MapFile map, SampleFilter sf) {
-		
+	public SumStatQC(PedigreeFile ped, MapFile map, SampleFilter sf)
+	{
+
 		samFilter = sf;
 		PedData = ped;
 		MapData = map;
@@ -29,11 +31,13 @@ public class SumStatQC {
 
 	}
 
-	public void QC() {
-		
+	public void QC()
+	{
+
 	}
 
-	public ArrayList<PersonIndex> getSample() {
+	public ArrayList<PersonIndex> getSample()
+	{
 		return PersonTable;
 	}
 

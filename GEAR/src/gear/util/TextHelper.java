@@ -1,5 +1,6 @@
 package gear.util;
 
-public class TextHelper {
+public class TextHelper
+{
 	public static final String WHITESPACE_DELIMITER = "\\s+";
 }

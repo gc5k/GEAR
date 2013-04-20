@@ -14,43 +14,56 @@ import java.io.PrintStream;
 import java.util.zip.GZIPInputStream;
 import java.util.zip.GZIPOutputStream;
 
-public class FileProcessor {
-	public static BufferedReader FileOpen(String file) {
+public class FileProcessor
+{
+	public static BufferedReader FileOpen(String file)
+	{
 		File f = new File(file);
-		if (!f.exists()) {
+		if (!f.exists())
+		{
 			Logger.printUserError("File '" + file + "' does not exist.");
 			System.exit(1);
 		}
 		BufferedReader reader = null;
-		try {
+		try
+		{
 			reader = new BufferedReader(new FileReader(new File(file)));
-		} catch (IOException e) {
+		} catch (IOException e)
+		{
 			Logger.handleException(e, "Cannot open '" + file + "'.");
 		}
 		return reader;
 	}
-	
-	public static PrintStream CreatePrintStream(String file) {
+
+	public static PrintStream CreatePrintStream(String file)
+	{
 		PrintStream ps = null;
-		try {
+		try
+		{
 			return new PrintStream(file);
-		} catch (FileNotFoundException e) {
+		} catch (FileNotFoundException e)
+		{
 			Logger.handleException(e, "File '" + file + "' does not exist.");
 		}
 		return ps;
 	}
-	
-	public static BufferedReader ZipFileOpen(String file) {
+
+	public static BufferedReader ZipFileOpen(String file)
+	{
 		FileInputStream fin = null;
-		try {
+		try
+		{
 			fin = new FileInputStream(file);
-		} catch (FileNotFoundException e) {
+		} catch (FileNotFoundException e)
+		{
 			Logger.handleException(e, "File '" + file + "' does not exist.");
 		}
 		GZIPInputStream gzis = null;
-		try {
+		try
+		{
 			gzis = new GZIPInputStream(fin);
-		} catch (IOException e) {
+		} catch (IOException e)
+		{
 			Logger.handleException(e, "Cannot open the archive '" + file + "'.");
 
 		}
@@ -58,17 +71,21 @@ public class FileProcessor {
 		BufferedReader is = new BufferedReader(xover);
 		return is;
 	}
-	
-	public static BufferedWriter ZipFielWriter(String file) {
+
+	public static BufferedWriter ZipFielWriter(String file)
+	{
 		BufferedWriter writer = null;
-    	try
-    	{
-    		GZIPOutputStream zip = new GZIPOutputStream(new FileOutputStream(new File(file)));
-    		writer = new BufferedWriter(new OutputStreamWriter(zip, "UTF-8"));
-    	} catch (IOException e) {
-			Logger.handleException(e, "Cannot create the archive '" + file + "'.");
-    	}
-    	return writer;
+		try
+		{
+			GZIPOutputStream zip = new GZIPOutputStream(new FileOutputStream(
+					new File(file)));
+			writer = new BufferedWriter(new OutputStreamWriter(zip, "UTF-8"));
+		} catch (IOException e)
+		{
+			Logger.handleException(e, "Cannot create the archive '" + file
+					+ "'.");
+		}
+		return writer;
 	}
 
 }

@@ -13,7 +13,8 @@ import family.qc.rowqc.SampleFilter;
  * @author Guo-Bo Chen, chenguobo@gmail.com
  */
 
-public class RealDataSimulationQC {
+public class RealDataSimulationQC
+{
 
 	protected MapFile MapData;
 	protected PedigreeFile PedData;
@@ -24,7 +25,8 @@ public class RealDataSimulationQC {
 	protected int[][] num_qualified;//
 	protected boolean[][] keep;
 
-	public RealDataSimulationQC(PedigreeFile ped, MapFile map, SampleFilter sf) {
+	public RealDataSimulationQC(PedigreeFile ped, MapFile map, SampleFilter sf)
+	{
 		PedData = ped;
 		MapData = map;
 		PersonTable = sf.getSample();
@@ -32,31 +34,38 @@ public class RealDataSimulationQC {
 		QC();
 	}
 
-	public void QC() {
+	public void QC()
+	{
 		qualification();
 	}
 
-	private void qualification() {
+	private void qualification()
+	{
 
 	}
 
-	public int getNumberMarker() {
+	public int getNumberMarker()
+	{
 		return MapData.getMarkerNumber();
 	}
 
-	public MapFile getMapFile() {
+	public MapFile getMapFile()
+	{
 		return MapData;
 	}
 
-	public int SampleSize() {
+	public int SampleSize()
+	{
 		return PersonTable.size();
 	}
 
-	public ArrayList<PersonIndex> getSample() {
+	public ArrayList<PersonIndex> getSample()
+	{
 		return PersonTable;
 	}
 
-	public ArrayList<Hukou> getHukouBook() {
+	public ArrayList<Hukou> getHukouBook()
+	{
 		return HukouBook;
 	}
 }

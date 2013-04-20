@@ -6,9 +6,10 @@ import family.pedigree.PersonIndex;
 import family.pedigree.genotype.BPerson;
 import gear.Parameter;
 
-public class GenotypeMatrix {
+public class GenotypeMatrix
+{
 
-	public static int missing=3;
+	public static int missing = 3;
 	protected int[][] genotypeMat;
 	protected int lenMat;
 	protected int lenMatF;
@@ -16,17 +17,21 @@ public class GenotypeMatrix {
 	protected int numMarker = 0;
 	protected ArrayList<PersonIndex> pidx;
 
-	public GenotypeMatrix(ArrayList<PersonIndex> pi) {
+	public GenotypeMatrix(ArrayList<PersonIndex> pi)
+	{
 		pidx = pi;
 		initial();
 	}
 
-	protected void initial() {
+	protected void initial()
+	{
 		genotypeMat = new int[pidx.size()][];
 
 		int c1 = 0;
-		for (PersonIndex pi : pidx) {
-			if (!pi.isPseudo()) {
+		for (PersonIndex pi : pidx)
+		{
+			if (!pi.isPseudo())
+			{
 				genotypeMat[c1++] = pi.getPerson().getAlleleArray();
 			}
 		}
@@ -34,64 +39,86 @@ public class GenotypeMatrix {
 
 	}
 
-	public int getNumMarker() {
+	public int getNumMarker()
+	{
 		return numMarker;
 	}
 
-	public int getAdditiveScore(int idx, int i) {
-		//0 homozygote 1/1
-		//1 heterozygosity 1/2
-		//2 homozygote 2/2
-		//3 missing
+	public int getAdditiveScore(int idx, int i)
+	{
+		// 0 homozygote 1/1
+		// 1 heterozygosity 1/2
+		// 2 homozygote 2/2
+		// 3 missing
 		int posByte = i >> shift;
 		int posBite = (i & 0xf) << 1;
 		int g = (genotypeMat[idx][posByte] >> (posBite)) & 3;
 		return g;
-//		if (g == 1) {// 01
-//			return 3;
-//		} else if (g == 0) {
-//			return 0;
-//		} else if (g == 2) {
-//			return 1;
-//		} else {
-//			return 2;
-//		}
+		// if (g == 1) {// 01
+		// return 3;
+		// } else if (g == 0) {
+		// return 0;
+		// } else if (g == 2) {
+		// return 1;
+		// } else {
+		// return 2;
+		// }
 	}
 
-	public int[] getBiAlleleGenotype(int idx, int i) {
+	public int[] getBiAlleleGenotype(int idx, int i)
+	{
 		int posByte = i >> shift;
 		int posBite = (i & 0xf) << 1;
 		int g = (genotypeMat[idx][posByte] >> posBite) & 3;
 		int[] b = { 0, 0 };
-		switch(g) {
-			case 0: b[0] = 0; b[1] = 0; break;
-			case 1: b[0] = 0; b[1] = 1; break;
-			case 2: b[0] = 1; b[1] = 1; break;
-			default: b[0] = BPerson.MissingAlleleCode; b[1] = BPerson.MissingAlleleCode; break;
+		switch (g)
+		{
+		case 0:
+			b[0] = 0;
+			b[1] = 0;
+			break;
+		case 1:
+			b[0] = 0;
+			b[1] = 1;
+			break;
+		case 2:
+			b[0] = 1;
+			b[1] = 1;
+			break;
+		default:
+			b[0] = BPerson.MissingAlleleCode;
+			b[1] = BPerson.MissingAlleleCode;
+			break;
 		}
 		return b;
 	}
 
-	public String getGenotypeScoreString(int idx, int i) {
+	public String getGenotypeScoreString(int idx, int i)
+	{
 		int posByte = i >> shift;
 		int posBite = (i & 0xf) << 1;
 		int g = (genotypeMat[idx][posByte] >> (posBite)) & 3;
-		if (g == 3) {// 01
+		if (g == 3)
+		{// 01
 			return Parameter.INSTANCE.missingGenotype;
-		} else {
+		} else
+		{
 			return Integer.toString(g);
 		}
 	}
 
-	public int getGRow() {
+	public int getGRow()
+	{
 		return genotypeMat.length;
 	}
-	
-	public int getGCol() {
+
+	public int getGCol()
+	{
 		return genotypeMat[0].length;
 	}
 
-	public int[][] getG() {
+	public int[][] getG()
+	{
 		return genotypeMat;
 	}
 

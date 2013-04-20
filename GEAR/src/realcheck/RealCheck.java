@@ -23,7 +23,8 @@ import gear.util.Logger;
 import gear.util.NewIt;
 import gear.util.TextHelper;
 
-public class RealCheck {
+public class RealCheck
+{
 	private GenotypeMatrix G1;
 	private GenotypeMatrix G2;
 
@@ -40,19 +41,24 @@ public class RealCheck {
 	private SampleFilter sf1;
 	private SampleFilter sf2;
 
-	public RealCheck() {
+	public RealCheck()
+	{
 		PLINKParser pp1 = null;
 		PLINKParser pp2 = null;
-		if (Parameter.INSTANCE.getBfileParameter(0).isSet() &&
-			Parameter.INSTANCE.getBfileParameter(1).isSet()) {
-			pp1 = new PLINKBinaryParser (Parameter.INSTANCE.getBfileParameter(0).getBedFile(),
-					                     Parameter.INSTANCE.getBfileParameter(0).getBimFile(),
-					                     Parameter.INSTANCE.getBfileParameter(0).getFamFile());
-			
-			pp2 = new PLINKBinaryParser (Parameter.INSTANCE.getBfileParameter(1).getBedFile(),
-					                     Parameter.INSTANCE.getBfileParameter(1).getBimFile(),
-					                     Parameter.INSTANCE.getBfileParameter(1).getFamFile());
-		} else {
+		if (Parameter.INSTANCE.getBfileParameter(0).isSet()
+				&& Parameter.INSTANCE.getBfileParameter(1).isSet())
+		{
+			pp1 = new PLINKBinaryParser(Parameter.INSTANCE.getBfileParameter(0)
+					.getBedFile(), Parameter.INSTANCE.getBfileParameter(0)
+					.getBimFile(), Parameter.INSTANCE.getBfileParameter(0)
+					.getFamFile());
+
+			pp2 = new PLINKBinaryParser(Parameter.INSTANCE.getBfileParameter(1)
+					.getBedFile(), Parameter.INSTANCE.getBfileParameter(1)
+					.getBimFile(), Parameter.INSTANCE.getBfileParameter(1)
+					.getFamFile());
+		} else
+		{
 			Logger.printUserError("--bfile or --bfile2 is not set.");
 			System.exit(1);
 		}
@@ -69,33 +75,42 @@ public class RealCheck {
 
 	}
 
-	public void Check() {
+	public void Check()
+	{
 		StringBuffer sb = new StringBuffer();
 		sb.append(Parameter.INSTANCE.out);
 		sb.append(".real");
 		PrintStream ps = FileProcessor.CreatePrintStream(sb.toString());
 
-		getCommonSNP(sf1.getMapFile().getMarkerList(), sf2.getMapFile().getMarkerList());
+		getCommonSNP(sf1.getMapFile().getMarkerList(), sf2.getMapFile()
+				.getMarkerList());
 
-		if (Parameter.INSTANCE.getRealCheckParameter().getSnps() != null) {
+		if (Parameter.INSTANCE.getRealCheckParameter().getSnps() != null)
+		{
 			Logger.printUserLog("A similarity matrix is generated with real-check SNPs.");
 			getSelectedMarker();
-		} else {
+		} else
+		{
 			getRandomMarker();
 		}
-		
+
 		ps.print("file1.famid file1.id file2.famid file2.id score nmiss/loci\n");
-		for (int i = 0; i < G1.getGRow(); i++) {
-			for (int j = 0; j < G2.getGRow(); j++) {
+		for (int i = 0; i < G1.getGRow(); i++)
+		{
+			for (int j = 0; j < G2.getGRow(); j++)
+			{
 				double[] s = similarityScore(i, j);
-				if (s[0] > Parameter.INSTANCE.getRealCheckParameter().getThresholdLower() && s[0] <= Parameter.INSTANCE.getRealCheckParameter().getThresholdUpper()) {
+				if (s[0] > Parameter.INSTANCE.getRealCheckParameter()
+						.getThresholdLower()
+						&& s[0] <= Parameter.INSTANCE.getRealCheckParameter()
+								.getThresholdUpper())
+				{
 					PersonIndex ps1 = PersonTable1.get(i);
 					PersonIndex ps2 = PersonTable2.get(j);
-					ps.print(ps1.getFamilyID() + " "
-							+ ps1.getIndividualID() + " "
-							+ ps2.getFamilyID() + " "
-							+ ps2.getIndividualID() + " " + s[0] + " "
-							+ s[1] + "/" + markerIdx.length + "\n");
+					ps.print(ps1.getFamilyID() + " " + ps1.getIndividualID()
+							+ " " + ps2.getFamilyID() + " "
+							+ ps2.getIndividualID() + " " + s[0] + " " + s[1]
+							+ "/" + markerIdx.length + "\n");
 				}
 			}
 		}
@@ -103,44 +118,52 @@ public class RealCheck {
 
 	}
 
-	private double[] similarityScore(int idx1, int idx2) {
+	private double[] similarityScore(int idx1, int idx2)
+	{
 		double[] s = { 0, 0 };
 
-		for (int i = 0; i < markerIdx.length; i++) {
-			
+		for (int i = 0; i < markerIdx.length; i++)
+		{
+
 			int idx = markerIdx[i];
-			
+
 			int g1 = G1.getAdditiveScore(idx1, comSNPIdx[0][idx]);
 			int g2 = G2.getAdditiveScore(idx2, comSNPIdx[1][idx]);
 			if (g1 == BPerson.MissingGenotypeCode
 					|| g2 == BPerson.MissingGenotypeCode)
 				continue;
-			if (g1 == g2) {
+			if (g1 == g2)
+			{
 				s[0]++;
 			}
 			s[1]++;
 		}
 
-		if (s[1] > 0) {
+		if (s[1] > 0)
+		{
 			s[0] = s[0] / s[1];
 		}
 
 		return s;
 	}
 
-	public void getSelectedMarker() {
+	public void getSelectedMarker()
+	{
 		ArrayList<String> snps = readRealcheckSNPs();
 		ArrayList<Integer> Idx = NewIt.newArrayList();
-		for(int i = 0; i < snps.size(); i++) {
+		for (int i = 0; i < snps.size(); i++)
+		{
 			String snp_name = snps.get(i);
-			if(comSNPIdxMap.containsKey(snp_name)) {
+			if (comSNPIdxMap.containsKey(snp_name))
+			{
 				Idx.add(comSNPIdxMap.get(snp_name));
 			}
 		}
 
 		markerIdx = new int[Idx.size()];
 
-		for (int i = 0; i < Idx.size(); i++) markerIdx[i] = Idx.get(i).intValue();
+		for (int i = 0; i < Idx.size(); i++)
+			markerIdx[i] = Idx.get(i).intValue();
 		Arrays.sort(markerIdx);
 
 		StringBuffer sb = new StringBuffer();
@@ -148,7 +171,8 @@ public class RealCheck {
 		sb.append(".realsnp");
 
 		PrintStream ps = FileProcessor.CreatePrintStream(sb.toString());
-		for (int i = 0; i < markerIdx.length; i++) {
+		for (int i = 0; i < markerIdx.length; i++)
+		{
 			int idx = markerIdx[i];
 			SNP snp = snpList.get(comSNPIdx[0][idx]);
 			ps.print(snp.getChromosome() + " " + snp.getName() + " "
@@ -158,12 +182,17 @@ public class RealCheck {
 		ps.close();
 	}
 
-	public void getRandomMarker() {
+	public void getRandomMarker()
+	{
 		int mn = 0;
-		if (Parameter.INSTANCE.getRealCheckParameter().getMarkerNumber() > comSNPIdxMap.size()) {
-			Logger.printUserLog("Realcheck marker number was reduced to " + comSNPIdxMap.size() + "\n");
+		if (Parameter.INSTANCE.getRealCheckParameter().getMarkerNumber() > comSNPIdxMap
+				.size())
+		{
+			Logger.printUserLog("Realcheck marker number was reduced to "
+					+ comSNPIdxMap.size() + "\n");
 			mn = comSNPIdxMap.size();
-		} else {
+		} else
+		{
 			mn = Parameter.INSTANCE.getRealCheckParameter().getMarkerNumber();
 		}
 
@@ -171,7 +200,7 @@ public class RealCheck {
 		RandomDataImpl rd = new RandomDataImpl();
 		rd.reSeed(Parameter.INSTANCE.seed);
 
-		markerIdx = rd.nextPermutation(comSNPIdxMap.size(),	mn);
+		markerIdx = rd.nextPermutation(comSNPIdxMap.size(), mn);
 
 		Arrays.sort(markerIdx);
 		StringBuffer sb = new StringBuffer();
@@ -179,7 +208,8 @@ public class RealCheck {
 		sb.append(".realsnp");
 
 		PrintStream ps = FileProcessor.CreatePrintStream(sb.toString());
-		for (int i = 0; i < markerIdx.length; i++) {
+		for (int i = 0; i < markerIdx.length; i++)
+		{
 			int idx = markerIdx[i];
 			SNP snp = snpList.get(comSNPIdx[0][idx]);
 			ps.print(snp.getChromosome() + " " + snp.getName() + " "
@@ -189,22 +219,28 @@ public class RealCheck {
 		ps.close();
 	}
 
-	private void getCommonSNP(ArrayList<SNP> snplist1, ArrayList<SNP> snplist2) {
+	private void getCommonSNP(ArrayList<SNP> snplist1, ArrayList<SNP> snplist2)
+	{
 		HashMap<String, Integer> SNPMap = NewIt.newHashMap();
 		HashMap<String, String> SNPRef = NewIt.newHashMap();
-		for (Iterator<SNP> e = snplist1.iterator(); e.hasNext();) {
+		for (Iterator<SNP> e = snplist1.iterator(); e.hasNext();)
+		{
 			SNP snp = e.next();
 			SNPMap.put(snp.getName(), 0);
 			SNPRef.put(snp.getName(), Character.toString(snp.getRefAllele()));
 		}
 
-		int c=0;
+		int c = 0;
 		HashMap<String, Integer> SNPMapList2 = NewIt.newHashMap();
-		for (int i = 0; i < snplist2.size(); i++) {
+		for (int i = 0; i < snplist2.size(); i++)
+		{
 			SNP snp = snplist2.get(i);
 			String snp_name = snp.getName();
-			if (SNPMap.containsKey(snp_name)) {
-				if (SNPRef.get(snp_name).compareTo(Character.toString(snp.getRefAllele())) == 0) {
+			if (SNPMap.containsKey(snp_name))
+			{
+				if (SNPRef.get(snp_name).compareTo(
+						Character.toString(snp.getRefAllele())) == 0)
+				{
 					SNPMap.put(snp_name, 1);
 					SNPMapList2.put(snp_name, i);
 					c++;
@@ -212,30 +248,39 @@ public class RealCheck {
 			}
 		}
 
-		for (Iterator<SNP> e = snplist2.iterator(); e.hasNext();) {
+		for (Iterator<SNP> e = snplist2.iterator(); e.hasNext();)
+		{
 			SNP snp = e.next();
-			if (SNPMap.containsKey(snp.getName())) {
-				if (SNPRef.get(snp.getName()).compareTo(Character.toString(snp.getRefAllele())) == 0) {
+			if (SNPMap.containsKey(snp.getName()))
+			{
+				if (SNPRef.get(snp.getName()).compareTo(
+						Character.toString(snp.getRefAllele())) == 0)
+				{
 					SNPMap.put(snp.getName(), 1);
 					c++;
 				}
 			}
 		}
 
-		if (c == 0) {
+		if (c == 0)
+		{
 			Logger.printUserError("Common SNPs between the two SNP files: None");
 			System.exit(1);
-		} else {
+		} else
+		{
 			Logger.printUserLog("Common SNP(s) between the two SNP files: " + c);
 		}
 
 		comSNPIdx = new int[2][c];
 		comSNPIdxMap = NewIt.newHashMap();
 		int idx1 = 0;
-		for (int i = 0; i < snplist1.size(); i++ ) {
+		for (int i = 0; i < snplist1.size(); i++)
+		{
 			SNP snp = snplist1.get(i);
 			String snp_name = snp.getName();
-			if (SNPMap.containsKey(snp_name) && SNPMap.get(snp_name).intValue() > 0) {
+			if (SNPMap.containsKey(snp_name)
+					&& SNPMap.get(snp_name).intValue() > 0)
+			{
 				comSNPIdxMap.put(snp.getName(), idx1);
 				comSNPIdx[0][idx1] = i;
 				comSNPIdx[1][idx1] = SNPMapList2.get(snp_name).intValue();
@@ -244,21 +289,29 @@ public class RealCheck {
 		}
 	}
 
-	private ArrayList<String> readRealcheckSNPs() {
-		BufferedReader reader = FileProcessor.FileOpen(Parameter.INSTANCE.getRealCheckParameter().getSnps());
+	private ArrayList<String> readRealcheckSNPs()
+	{
+		BufferedReader reader = FileProcessor.FileOpen(Parameter.INSTANCE
+				.getRealCheckParameter().getSnps());
 		String line = null;
 		ArrayList<String> selectedSNP = NewIt.newArrayList();
-		try {
-			while ((line = reader.readLine()) != null) {
+		try
+		{
+			while ((line = reader.readLine()) != null)
+			{
 				String[] l = line.split(TextHelper.WHITESPACE_DELIMITER);
-				for (int i = 0; i < l.length; i++) {
+				for (int i = 0; i < l.length; i++)
+				{
 					selectedSNP.add(l[i]);
 				}
 			}
-		} catch (IOException e) {
-			Logger.handleException(e, "An exception occurred when reading the real-check SNPs.");
+		} catch (IOException e)
+		{
+			Logger.handleException(e,
+					"An exception occurred when reading the real-check SNPs.");
 		}
-		Logger.printUserLog(selectedSNP.size() + " marker(s) is read in " + Parameter.INSTANCE.getRealCheckParameter().getSnps() + ".");
+		Logger.printUserLog(selectedSNP.size() + " marker(s) is read in "
+				+ Parameter.INSTANCE.getRealCheckParameter().getSnps() + ".");
 		return selectedSNP;
 	}
 }
