@@ -988,8 +988,6 @@ public enum Parameter
 
 	public boolean transFlag = false;
 
-	public String missing_allele = "0";
-
 	public boolean status_shiftFlag = false;
 
 	public String missing_phenotype = "-9";

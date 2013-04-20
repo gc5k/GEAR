@@ -14,6 +14,7 @@ import org.apache.commons.lang3.ArrayUtils;
 import family.pedigree.Hukou;
 import family.pedigree.genotype.BFamilyStruct;
 import family.pedigree.genotype.BPerson;
+import gear.ConstValues;
 import gear.Parameter;
 import gear.util.Logger;
 import gear.util.NewIt;
@@ -129,8 +130,7 @@ public class PedigreeFile
 		AlleleFreq = new short[num_marker][2];
 		for (int i = 0; i < num_marker; i++)
 		{
-			AlleleSet[i][0] = AlleleSet[i][1] = Parameter.INSTANCE.missing_allele
-					.charAt(0);
+			AlleleSet[i][0] = AlleleSet[i][1] = ConstValues.MISSING_ALLELE_CHAR;
 		}
 		int numMarkers = 0;
 		BufferedReader reader = new BufferedReader(new FileReader(new File(
@@ -183,10 +183,8 @@ public class PedigreeFile
 					{
 						String[] allele = { tokenizer[6 + j * 2],
 								tokenizer[6 + j * 2 + 1] };
-						boolean flag = (allele[0]
-								.compareTo(Parameter.INSTANCE.missing_allele) != 0)
-								&& (allele[1]
-										.compareTo(Parameter.INSTANCE.missing_allele) != 0);
+						boolean flag = !allele[0].equals(ConstValues.MISSING_ALLELE_STRING) &&
+								       !allele[1].equals(ConstValues.MISSING_ALLELE_STRING);
 						if (flag)
 						{
 							int[] code = recode(c, allele);
@@ -265,7 +263,7 @@ public class PedigreeFile
 	{
 		int[] code = { -1, -1 };
 		char[] ref = AlleleSet[idx];
-		if (ref[1] != Parameter.INSTANCE.missing_allele.charAt(0))
+		if (ref[1] != ConstValues.MISSING_ALLELE_CHAR)
 		{
 			// two detected alleles
 			for (int i = 0; i < 2; i++)
@@ -290,7 +288,7 @@ public class PedigreeFile
 			if (allele[0].compareTo(allele[1]) == 0)
 			{
 				// 1 when both alleles are same
-				if (ref[0] == Parameter.INSTANCE.missing_allele.charAt(0))
+				if (ref[0] == ConstValues.MISSING_ALLELE_CHAR)
 				{
 					// zero detected alleles
 					ref[0] = allele[0].charAt(0);
@@ -310,14 +308,15 @@ public class PedigreeFile
 			} else
 			{
 				// 2 when both alleles are different
-				if (ref[0] == Parameter.INSTANCE.missing_allele.charAt(0))
+				if (ref[0] == ConstValues.MISSING_ALLELE_CHAR)
 				{
 					// zero detected alleles
 					ref[0] = allele[0].charAt(0);
 					ref[1] = allele[1].charAt(0);
 					code[0] = 0;
 					code[1] = 1;
-				} else
+				}
+				else
 				{
 					// one detected alleles
 					if (ref[0] == allele[0].charAt(0))
@@ -325,12 +324,14 @@ public class PedigreeFile
 						ref[1] = allele[1].charAt(0);
 						code[0] = 0;
 						code[1] = 1;
-					} else if (ref[0] == allele[1].charAt(0))
+					}
+					else if (ref[0] == allele[1].charAt(0))
 					{
 						ref[1] = allele[0].charAt(0);
 						code[0] = 1;
 						code[1] = 0;
-					} else
+					}
+					else
 					{
 						Logger.printUserError("There're more than 3 alleles in marker column "
 								+ (idx + 1));
