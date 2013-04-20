@@ -22,7 +22,7 @@ public enum Parameter
 
 	INSTANCE;
 
-	CommandLine cl;
+	private CommandLine cl;
 
 	public class BfileParameter
 	{
