@@ -1,7 +1,6 @@
 package gear;
 
-public enum HEType {
-	SD,
-	SS,
-	CP
+public enum HEType
+{
+	SD, SS, CP
 }

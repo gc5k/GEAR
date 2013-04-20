@@ -20,8 +20,8 @@ import gear.util.NewIt;
 import gear.util.SNPMatch;
 import gear.util.structure.Predictor;
 
-
-public class MakePredictor {
+public class MakePredictor
+{
 	private GenotypeMatrix G1;
 
 	private int[][] comSNPIdx;
@@ -36,16 +36,20 @@ public class MakePredictor {
 	ArrayList<Integer> scoreCoding = NewIt.newArrayList();
 
 	private SampleFilter sf1;
-	
-	public MakePredictor() {
+
+	public MakePredictor()
+	{
 		readPredictor();
 
 		PLINKParser pp1 = null;
-		if (Parameter.INSTANCE.getBfileParameter(0).isSet()) {
-			pp1 = new PLINKBinaryParser (Parameter.INSTANCE.getBfileParameter(0).getBedFile(),
-					                     Parameter.INSTANCE.getBfileParameter(0).getBimFile(),
-					                     Parameter.INSTANCE.getBfileParameter(0).getFamFile());
-		} else {
+		if (Parameter.INSTANCE.getBfileParameter(0).isSet())
+		{
+			pp1 = new PLINKBinaryParser(Parameter.INSTANCE.getBfileParameter(0)
+					.getBedFile(), Parameter.INSTANCE.getBfileParameter(0)
+					.getBimFile(), Parameter.INSTANCE.getBfileParameter(0)
+					.getFamFile());
+		} else
+		{
 			Logger.printUserError("--bfile is not set.");
 			System.exit(1);
 		}
@@ -57,7 +61,8 @@ public class MakePredictor {
 
 	}
 
-	public void BuildPredictor() {
+	public void BuildPredictor()
+	{
 		StringBuffer sb = new StringBuffer();
 		sb.append(Parameter.INSTANCE.out);
 		sb.append(".mergesnp");
@@ -73,7 +78,8 @@ public class MakePredictor {
 		getCommonSNP(snpList1);
 
 		int qualified_snp = 0;
-		for (int i = 0; i < comSNPIdx[0].length; i++) {
+		for (int i = 0; i < comSNPIdx[0].length; i++)
+		{
 			int scheme = 0;
 			boolean ATGCLocus = false;
 			boolean flip = false;
@@ -86,36 +92,45 @@ public class MakePredictor {
 
 			boolean f = true;
 
-			if (a1_1 == a2_1) {// scheme1
+			if (a1_1 == a2_1)
+			{// scheme1
 				scheme = 1;
-				if (SNPMatch.Confusion(a1_1, a1_2)) {
+				if (SNPMatch.Confusion(a1_1, a1_2))
+				{
 					ATGCLocus = true;
 				}
 				scoreCoding.add(0);
-			} else if (a1_2 == a2_1) {// scheme2
+			} else if (a1_2 == a2_1)
+			{// scheme2
 				scheme = 2;
-				if (SNPMatch.Confusion(a1_1, a1_2)) {
+				if (SNPMatch.Confusion(a1_1, a1_2))
+				{
 					ATGCLocus = true;
 				}
 				scoreCoding.add(1);
-			} else if (a1_1 == SNPMatch.Flip(a2_1)) {// scheme3
+			} else if (a1_1 == SNPMatch.Flip(a2_1))
+			{// scheme3
 				scheme = 3;
 				flip = true;
 				scoreCoding.add(0);
-			} else if (a1_2 == SNPMatch.Flip(a2_1)) {// scheme4
+			} else if (a1_2 == SNPMatch.Flip(a2_1))
+			{// scheme4
 				scheme = 4;
 				flip = true;
 				scoreCoding.add(1);
-			} else {// outlier
+			} else
+			{// outlier
 				scheme = 5;
 				f = false;
 				scoreCoding.add(0);
 			}
 
-			if (!Parameter.INSTANCE.keepATGC() && ATGCLocus) {
+			if (!Parameter.INSTANCE.keepATGC() && ATGCLocus)
+			{
 				f = false;
 			}
-			if (Parameter.INSTANCE.removeFlip() && flip) {
+			if (Parameter.INSTANCE.removeFlip() && flip)
+			{
 				f = false;
 			}
 			flag.add(f);
@@ -130,142 +145,186 @@ public class MakePredictor {
 		}
 
 		ps.close();
-		if (qualified_snp == 0) {
+		if (qualified_snp == 0)
+		{
 			Logger.printUserError("Common SNPs between the two SNP files: None");
 			System.exit(1);
-		} else {
-			Logger.printUserLog("Common SNP(s) between the two SNP files:" + qualified_snp);
+		} else
+		{
+			Logger.printUserLog("Common SNP(s) between the two SNP files:"
+					+ qualified_snp);
 		}
 
 		WritePredictor();
 	}
 
-	private void getCommonSNP(ArrayList<SNP> snplist1) {
+	private void getCommonSNP(ArrayList<SNP> snplist1)
+	{
 		HashMap<String, Integer> SNPMap = NewIt.newHashMap();
-		for (Iterator<SNP> e = snplist1.iterator(); e.hasNext();) {
+		for (Iterator<SNP> e = snplist1.iterator(); e.hasNext();)
+		{
 			SNP snp = e.next();
 			SNPMap.put(snp.getName(), 0);
 		}
 
-		int c=0;
+		int c = 0;
 		HashMap<String, Integer> SNPMapList2 = NewIt.newHashMap();
-		for (int i = 0; i < predictorList.size(); i++) {
+		for (int i = 0; i < predictorList.size(); i++)
+		{
 			Predictor maf = predictorList.get(i);
 			String snp_name = maf.getSNP();
-			if (SNPMap.containsKey(snp_name)) {
+			if (SNPMap.containsKey(snp_name))
+			{
 				SNPMap.put(snp_name, 1);
 				SNPMapList2.put(snp_name, i);
 				c++;
-			} else {
+			} else
+			{
 				SNPMap.put(snp_name, 0);
 			}
 		}
 
-		if (c == 0) {
+		if (c == 0)
+		{
 			Logger.printUserError("No common SNPs between two snp files.");
 			System.exit(1);
-		} else {
+		} else
+		{
 			Logger.printUserLog(c + " common SNP(s) between two snp files.");
 		}
 
 		comSNPIdx = new int[2][c];
 		int idx1 = 0;
-		for (int i = 0; i < snplist1.size(); i++ ) {
+		for (int i = 0; i < snplist1.size(); i++)
+		{
 			SNP snp = snplist1.get(i);
 			String snp_name = snp.getName();
-			if (SNPMap.containsKey(snp_name) && SNPMap.get(snp_name).intValue() == 1) {
+			if (SNPMap.containsKey(snp_name)
+					&& SNPMap.get(snp_name).intValue() == 1)
+			{
 				comSNPIdx[0][idx1] = i;
 				comSNPIdx[1][idx1] = SNPMapList2.get(snp_name).intValue();
 				idx1++;
 			}
 		}
-		Logger.printUserLog("idx1 "+ idx1);
+		Logger.printUserLog("idx1 " + idx1);
 
 	}
 
-	public void CalculateAlleleFrequency(GenotypeMatrix G, double[][] frq, double[] n) {
+	public void CalculateAlleleFrequency(GenotypeMatrix G, double[][] frq,
+			double[] n)
+	{
 		int[][] g = G.getG();
-		for (int i = 0; i < g.length; i++) {
-			for (int j = 0; j < G.getNumMarker(); j++) {
+		for (int i = 0; i < g.length; i++)
+		{
+			for (int j = 0; j < G.getNumMarker(); j++)
+			{
 				int[] c = G.getBiAlleleGenotype(i, j);
 				frq[j][c[0]]++;
 				frq[j][c[1]]++;
 			}
 		}
-		for (int i = 0; i < G.getNumMarker(); i++) {
+		for (int i = 0; i < G.getNumMarker(); i++)
+		{
 			double w = frq[i][0] + frq[i][1];
 			n[i] = frq[i][0] + frq[i][1] + frq[i][2];
-			if (w > 0) {
-				for (int j = 0; j < frq[i].length - 1; j++) {
+			if (w > 0)
+			{
+				for (int j = 0; j < frq[i].length - 1; j++)
+				{
 					frq[i][j] /= w;
 				}
 				frq[i][2] /= n[i];
-			} else {
+			} else
+			{
 				frq[i][2] = 1;
 			}
 		}
 	}
 
-	public void readPredictor() {
+	public void readPredictor()
+	{
 
-		BufferedReader reader = FileProcessor.FileOpen(Parameter.INSTANCE.getPredictorFile());
+		BufferedReader reader = FileProcessor.FileOpen(Parameter.INSTANCE
+				.getPredictorFile());
 		String line;
-		try {
+		try
+		{
 			line = reader.readLine();
 			int idx = 1;
 			line = line.trim();
 			title = line.split("\\s+");
-			
-			while((line = reader.readLine())!=null) {
+
+			while ((line = reader.readLine()) != null)
+			{
 				line = line.trim();
 				Predictor maf = new Predictor(line, title.length, idx++);
 				predictorList.add(maf);
 			}
-		} catch (IOException e) {
-			Logger.handleException(e, "An exception occurred when parsing the predictor file.");
+		} catch (IOException e)
+		{
+			Logger.handleException(e,
+					"An exception occurred when parsing the predictor file.");
 		}
 
 	}
 
-	public void WritePredictor() {
+	public void WritePredictor()
+	{
 		StringBuffer sbim = new StringBuffer();
 		sbim.append(Parameter.INSTANCE.out);
 		sbim.append(".predictor");
-		PrintStream predictorFile = FileProcessor.CreatePrintStream(sbim.toString());
-		
+		PrintStream predictorFile = FileProcessor.CreatePrintStream(sbim
+				.toString());
+
 		int NMiss = 0;
-		for (int i = 0; i < comSNPIdx[0].length; i++) {
-			if(!flag.get(i)) {
+		for (int i = 0; i < comSNPIdx[0].length; i++)
+		{
+			if (!flag.get(i))
+			{
 				continue;
 			}
 			SNP snp = snpList1.get(comSNPIdx[0][i]);
 			Predictor pd = predictorList.get(comSNPIdx[1][i]);
-			if (Parameter.INSTANCE.isNA(pd.getField(Parameter.INSTANCE.getPredictorIdx()))) {
+			if (Parameter.INSTANCE.isNA(pd.getField(Parameter.INSTANCE
+					.getPredictorIdx())))
+			{
 				NMiss++;
 				continue;
-			} else {
-				double s = Double.parseDouble(pd.getField(Parameter.INSTANCE.getPredictorIdx()));
-				if (Parameter.INSTANCE.getTranFunction() == RegressionModel.LINEAR) {
-					if (scoreCoding.get(i).intValue() == 1) {
+			} else
+			{
+				double s = Double.parseDouble(pd.getField(Parameter.INSTANCE
+						.getPredictorIdx()));
+				if (Parameter.INSTANCE.getTranFunction() == RegressionModel.LINEAR)
+				{
+					if (scoreCoding.get(i).intValue() == 1)
+					{
 						s *= -1;
 					}
-				} else {
-					if (s < 0) {
+				} else
+				{
+					if (s < 0)
+					{
 						NMiss++;
 						continue;
-					} else {
-						if (scoreCoding.get(i).intValue() == 1) {
-							s = Math.log(1/s);
-						} else {
+					} else
+					{
+						if (scoreCoding.get(i).intValue() == 1)
+						{
+							s = Math.log(1 / s);
+						} else
+						{
 							s = Math.log(s);
 						}
 					}
 				}
-				predictorFile.append(snp.getName() + "\t" +  snp.getRefAllele() + "\t" + s +"\n");				
+				predictorFile.append(snp.getName() + "\t" + snp.getRefAllele()
+						+ "\t" + s + "\n");
 			}
 		}
 		predictorFile.close();
 		Logger.printUserLog("Write preditor to " + sbim.toString());
-		Logger.printUserLog(NMiss + " SNP(s) have missing values and were not printed.");
+		Logger.printUserLog(NMiss
+				+ " SNP(s) have missing values and were not printed.");
 	}
 }

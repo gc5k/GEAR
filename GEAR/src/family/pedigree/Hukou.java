@@ -1,6 +1,7 @@
 package family.pedigree;
 
-public class Hukou {
+public class Hukou
+{
 
 	private String FamilyID;
 	private String IndividualID;
@@ -8,10 +9,12 @@ public class Hukou {
 	private String MotherID;
 	private String Sex;
 	private String col6;
-	
+
 	private boolean isAvailable;
 
-	public Hukou (String fid, String iid, String fa, String mo, String sex, String c6) {
+	public Hukou(String fid, String iid, String fa, String mo, String sex,
+			String c6)
+	{
 		FamilyID = fid;
 		IndividualID = iid;
 		FatherID = fa;
@@ -20,40 +23,49 @@ public class Hukou {
 		col6 = c6;
 	}
 
-	public Hukou (String fid, String iid) {
+	public Hukou(String fid, String iid)
+	{
 		FamilyID = fid;
 		IndividualID = iid;
 	}
 
-	public String getFamilyID() {
+	public String getFamilyID()
+	{
 		return FamilyID;
 	}
-	
-	public String getIndividualID() {
+
+	public String getIndividualID()
+	{
 		return IndividualID;
 	}
-	
-	public String getFatherID() {
+
+	public String getFatherID()
+	{
 		return FatherID;
 	}
-	
-	public String getMotherID() {
+
+	public String getMotherID()
+	{
 		return MotherID;
 	}
-	
-	public String getSet() {
+
+	public String getSet()
+	{
 		return Sex;
 	}
 
-	public String getCol6() {
+	public String getCol6()
+	{
 		return col6;
 	}
-	
-	public void setAvailable(boolean a) {
+
+	public void setAvailable(boolean a)
+	{
 		isAvailable = a;
 	}
-	
-	public boolean isAvailable() {
+
+	public boolean isAvailable()
+	{
 		return isAvailable;
 	}
 }

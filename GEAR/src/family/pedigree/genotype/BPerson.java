@@ -9,7 +9,8 @@ import gear.Parameter;
  * 
  * @author Guo-Bo Chen, chenguobo@gmail.com
  */
-public class BPerson {
+public class BPerson
+{
 
 	protected String familyID;
 	protected String personID;
@@ -26,17 +27,21 @@ public class BPerson {
 	public static int MissingGenotypeCode = 3;
 	public static int MissingAlleleCode = 2;
 
-	public BPerson(int numMarkers) {
+	public BPerson(int numMarkers)
+	{
 		this.numMarkers = numMarkers;
-		if (numMarkers % intL == 0) {
+		if (numMarkers % intL == 0)
+		{
 			genoLen = numMarkers / intL;
-		} else {
+		} else
+		{
 			genoLen = numMarkers / intL + 1;
 		}
 		alleles = new int[genoLen];
 	}
 
-	public BPerson(BPerson p) {
+	public BPerson(BPerson p)
+	{
 		familyID = p.getFamilyID();
 		personID = p.getPersonID() + "ajhg2008";
 		momID = p.getMomID();
@@ -44,9 +49,11 @@ public class BPerson {
 		gender = p.getGender();
 		affectedStatus = p.getAffectedStatus();
 		this.numMarkers = p.getNumMarkers();
-		if (numMarkers % intL == 0) {
+		if (numMarkers % intL == 0)
+		{
 			genoLen = numMarkers / intL;
-		} else {
+		} else
+		{
 			genoLen = numMarkers / intL + 1;
 		}
 		alleles = new int[genoLen];
@@ -57,7 +64,8 @@ public class BPerson {
 	 * 
 	 * @return The familyID for this person
 	 */
-	public String getFamilyID() {
+	public String getFamilyID()
+	{
 		return familyID;
 	}
 
@@ -66,7 +74,8 @@ public class BPerson {
 	 * 
 	 * @param familyID
 	 */
-	public void setFamilyID(String familyID) {
+	public void setFamilyID(String familyID)
+	{
 		this.familyID = familyID;
 	}
 
@@ -75,7 +84,8 @@ public class BPerson {
 	 * 
 	 * @return The personID for this person
 	 */
-	public String getPersonID() {
+	public String getPersonID()
+	{
 		return personID;
 	}
 
@@ -84,7 +94,8 @@ public class BPerson {
 	 * 
 	 * @param personID
 	 */
-	public void setPersonID(String personID) {
+	public void setPersonID(String personID)
+	{
 		this.personID = personID;
 	}
 
@@ -93,7 +104,8 @@ public class BPerson {
 	 * 
 	 * @return momID
 	 */
-	public String getMomID() {
+	public String getMomID()
+	{
 		return momID;
 	}
 
@@ -102,7 +114,8 @@ public class BPerson {
 	 * 
 	 * @param momID
 	 */
-	public void setMomID(String momID) {
+	public void setMomID(String momID)
+	{
 		this.momID = momID;
 	}
 
@@ -111,7 +124,8 @@ public class BPerson {
 	 * 
 	 * @return dadID
 	 */
-	public String getDadID() {
+	public String getDadID()
+	{
 		return dadID;
 	}
 
@@ -120,7 +134,8 @@ public class BPerson {
 	 * 
 	 * @param dadID
 	 */
-	public void setDadID(String dadID) {
+	public void setDadID(String dadID)
+	{
 		this.dadID = dadID;
 	}
 
@@ -129,7 +144,8 @@ public class BPerson {
 	 * 
 	 * @return gender
 	 */
-	public int getGender() {
+	public int getGender()
+	{
 		return gender;
 	}
 
@@ -138,7 +154,8 @@ public class BPerson {
 	 * 
 	 * @param gender
 	 */
-	public void setGender(int gender) {
+	public void setGender(int gender)
+	{
 		this.gender = gender;
 	}
 
@@ -147,7 +164,8 @@ public class BPerson {
 	 * 
 	 * @return affectedStatus
 	 */
-	public String getAffectedStatus() {
+	public String getAffectedStatus()
+	{
 		return affectedStatus;
 	}
 
@@ -156,7 +174,8 @@ public class BPerson {
 	 * 
 	 * @param affectedStatus
 	 */
-	public void setAffectedStatus(String affectedStatus) {
+	public void setAffectedStatus(String affectedStatus)
+	{
 		this.affectedStatus = affectedStatus;
 	}
 
@@ -165,74 +184,95 @@ public class BPerson {
 	 * 
 	 * @return integer count of markers
 	 */
-	public int getNumMarkers() {
+	public int getNumMarkers()
+	{
 		return numMarkers;
 	}
 
-	public void addMarker(boolean flag, int a1, int a2, int i) {
+	public void addMarker(boolean flag, int a1, int a2, int i)
+	{
 		int posByte = i >> shift;
 		int posBite = (i & 0xf) << 1;
-		if (flag) {
-			if (a2 == a1) {// add 00 or 11
-				int c = (a1+a2) << posBite;
+		if (flag)
+		{
+			if (a2 == a1)
+			{// add 00 or 11
+				int c = (a1 + a2) << posBite;
 				alleles[posByte] |= c;
-			} else {// add 10
+			} else
+			{// add 10
 				int c = 1 << posBite;
 				alleles[posByte] |= c;
 			}
-		} else {// add 01
+		} else
+		{// add 01
 			alleles[posByte] |= (3 << posBite);
 		}
 	}
 
-	public void addByteGenotype(int g, int posByte, int posBite) {
+	public void addByteGenotype(int g, int posByte, int posBite)
+	{
 		alleles[posByte] |= g << posBite;
 	}
 
-	public void addAllMarker(byte[] genoBytes) {
-		for (int genoByteIdx = 0; genoByteIdx < genoBytes.length; ++genoByteIdx) {
-			int alleleIntIdx = genoByteIdx >> 2;  // one int consists of 4 bytes
+	public void addAllMarker(byte[] genoBytes)
+	{
+		for (int genoByteIdx = 0; genoByteIdx < genoBytes.length; ++genoByteIdx)
+		{
+			int alleleIntIdx = genoByteIdx >> 2; // one int consists of 4 bytes
 			int bitPosInIntOfThisByte = (genoByteIdx & 0x3) << 3;
-			
+
 			// One byte can store 4 genotypes
-			for (int genoIdxInByte = 0; genoIdxInByte < 4; ++genoIdxInByte) {
+			for (int genoIdxInByte = 0; genoIdxInByte < 4; ++genoIdxInByte)
+			{
 				int plinkGeno = (genoBytes[genoByteIdx] >> (genoIdxInByte << 1)) & 0x3;
-				int gearGeno = PLINKBinaryParser.convertToGearGenotype(plinkGeno);
+				int gearGeno = PLINKBinaryParser
+						.convertToGearGenotype(plinkGeno);
 				alleles[alleleIntIdx] |= gearGeno << bitPosInIntOfThisByte << (genoIdxInByte << 1);
 			}
 		}
 	}
 
-	public String getGenotypeScoreString(int i) {
+	public String getGenotypeScoreString(int i)
+	{
 		int posByte = i >> shift;
 		int posBite = (i & 0xf) << 1;
 		int g = (alleles[posByte] >> (posBite)) & 3;
-		if (g == 1) {// 01
+		if (g == 1)
+		{// 01
 			return Parameter.INSTANCE.missingGenotype;
-		} else {
-			if (g == 2) {
+		} else
+		{
+			if (g == 2)
+			{
 				return Integer.toString(1);
-			} else {
+			} else
+			{
 				return Integer.toString(g);
 			}
 		}
 	}
 
-	public int getAlleleArrayLength() {
+	public int getAlleleArrayLength()
+	{
 		return genoLen;
 	}
 
-	public int[] getAlleleArray() {
+	public int[] getAlleleArray()
+	{
 		return alleles;
 	}
 
-	public String getBiAlleleGenotypeString(int i) {
+	public String getBiAlleleGenotypeString(int i)
+	{
 		int posByte = i >> shift;
 		int posBite = (i & 0xf) << 1;
 		int g = (alleles[posByte] >> posBite) & 3;
-		if (g == 3) {
+		if (g == 3)
+		{
 			return Parameter.INSTANCE.missingGenotype;
-		} else {
+		} else
+		{
 			StringBuffer sb = new StringBuffer();
 			sb.append((alleles[posByte] >> (posBite + 1)) & 1);
 			sb.append(alleles[posByte] >> posBite & 1);
@@ -240,50 +280,73 @@ public class BPerson {
 		}
 	}
 
-	public int getGenotypeScore(int i) {
+	public int getGenotypeScore(int i)
+	{
 		int posByte = i >> shift;
 		int posBite = (i & 0xf) << 1;
 		int g = (alleles[posByte] >> (posBite)) & 3;
 		return g;
-//		if (g == 1) {// 01
-//			return 2;
-//		} else {
-//			if (g == 2) {
-//				return 1;
-//			} else {
-//				return g;
-//			}
-//		}
+		// if (g == 1) {// 01
+		// return 2;
+		// } else {
+		// if (g == 2) {
+		// return 1;
+		// } else {
+		// return g;
+		// }
+		// }
 	}
 
-	public byte getOriginalGenotypeScore(int i) {//this only for write back to bed file purpose
+	public byte getOriginalGenotypeScore(int i)
+	{// this only for write back to bed file purpose
 		int posByte = i >> shift;
 		int posBite = (i & 0xf) << 1;
 		int g = (alleles[posByte] >> (posBite)) & 3;
-		switch(g) {
-			case 0: g = 0; break;
-			case 1: g = 2; break;
-			case 2: g = 3; break;
-			default: g = 1; break; //missing
+		switch (g)
+		{
+		case 0:
+			g = 0;
+			break;
+		case 1:
+			g = 2;
+			break;
+		case 2:
+			g = 3;
+			break;
+		default:
+			g = 1;
+			break; // missing
 		}
 		return (byte) g;
 	}
 
-	public byte getOriginalGenotypeScore(int posByte, int posBite) {//this only for write back to bed file purpose
+	public byte getOriginalGenotypeScore(int posByte, int posBite)
+	{// this only for write back to bed file purpose
 		int g = (alleles[posByte] >> (posBite)) & 3;
-		switch(g) {
-			case 0: g = 0; break;
-			case 1: g = 2; break;
-			case 2: g = 3; break;
-			default: g = 1; break; //missing
+		switch (g)
+		{
+		case 0:
+			g = 0;
+			break;
+		case 1:
+			g = 2;
+			break;
+		case 2:
+			g = 3;
+			break;
+		default:
+			g = 1;
+			break; // missing
 		}
 		return (byte) g;
 	}
-	
-	public void setNonTransmittedGenotype(int index, String geno) {
+
+	public void setNonTransmittedGenotype(int index, String geno)
+	{
 		int a = Integer.parseInt(geno.substring(0, 1));
 		int b = Integer.parseInt(geno.substring(1, 2));
-		boolean flag = geno.compareTo(Parameter.INSTANCE.missingGenotype) == 0 ? false : true;
+		boolean flag = geno.compareTo(Parameter.INSTANCE.missingGenotype) == 0 ? false
+				: true;
 		addMarker(flag, a, b, index);
 	}
 }

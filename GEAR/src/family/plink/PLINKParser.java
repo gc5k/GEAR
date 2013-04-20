@@ -2,7 +2,6 @@ package family.plink;
 
 import java.io.IOException;
 
-
 import family.qc.colqc.SNPFilter;
 import family.qc.colqc.SNPFilterI;
 import family.qc.colqc.SNPFilterInterface;
@@ -11,37 +10,45 @@ import family.pedigree.file.PedigreeFile;
 import gear.Parameter;
 import gear.util.Logger;
 
-public class PLINKParser {
+public class PLINKParser
+{
 
 	protected MapFile mapData = null;
 	protected PedigreeFile pedData = null;
-//	protected PhenotypeFile phenoData = null;
+	// protected PhenotypeFile phenoData = null;
 	protected SNPFilterInterface snpFilter;
 	protected String pedigreeFile;
 	protected String phenotypeFile;
 	protected String mapFile;
 
-	public PLINKParser(String ped, String map) {
+	public PLINKParser(String ped, String map)
+	{
 		pedigreeFile = ped;
 		mapFile = map;
 	}
 
-	public void Parse() {
+	public void Parse()
+	{
 		mapData = new MapFile(mapFile);
 
 		pedData = new PedigreeFile();
 		pedData.setHeader(false);
 
-		if (mapFile != null) {//bim
+		if (mapFile != null)
+		{// bim
 			ParseMapFile();
 			Logger.printUserLog("Reading '" + mapFile + "'.");
-			Logger.printUserLog("Marker Numeber: " + mapData.getMarkerNumberOriginal());
-			Logger.printUserLog("Selected Marker Number: " + mapData.getMarkerNumber());
+			Logger.printUserLog("Marker Numeber: "
+					+ mapData.getMarkerNumberOriginal());
+			Logger.printUserLog("Selected Marker Number: "
+					+ mapData.getMarkerNumber());
 			pedData.setHeader(false);
 			ParsePedFile();
 			Logger.printUserLog("Reading '" + pedigreeFile + "'.");
-			Logger.printUserLog("Individual Number: " + pedData.getNumIndividuals());
-		} else {
+			Logger.printUserLog("Individual Number: "
+					+ pedData.getNumIndividuals());
+		} else
+		{
 			pedData.setHeader(true);
 			ParsePedFile();
 			mapData.setMarker(pedData.getNumMarker());
@@ -51,13 +58,17 @@ public class PLINKParser {
 
 	}
 
-	public void ParseMapFile() {
-		if (mapFile != null) {
+	public void ParseMapFile()
+	{
+		if (mapFile != null)
+		{
 			mapData.parseMap();
 		}
-		if (Parameter.INSTANCE.transFlag) {
+		if (Parameter.INSTANCE.transFlag)
+		{
 			snpFilter = new SNPFilterI(mapData);
-		} else {
+		} else
+		{
 			snpFilter = new SNPFilter(mapData);
 		}
 		snpFilter.Select();
@@ -68,29 +79,40 @@ public class PLINKParser {
 	/**
 	 * Initialize basic implementation of the genotype file.
 	 * 
-	 * @param Ped	the name of the pedigree file
+	 * @param Ped
+	 *            the name of the pedigree file
 	 */
-	public void ParsePedFile() {
-		try {
-			pedData.parseLinkage(pedigreeFile, mapData.getMarkerNumberOriginal(), snpFilter.getWorkingSNP());
-		} catch (IOException e) {
-			Logger.handleException(e, "An exception occurred when parsing the pedigree files.");
+	public void ParsePedFile()
+	{
+		try
+		{
+			pedData.parseLinkage(pedigreeFile,
+					mapData.getMarkerNumberOriginal(),
+					snpFilter.getWorkingSNP());
+		} catch (IOException e)
+		{
+			Logger.handleException(e,
+					"An exception occurred when parsing the pedigree files.");
 		}
 	}
 
-	public PedigreeFile getPedigreeData() {
+	public PedigreeFile getPedigreeData()
+	{
 		return pedData;
 	}
 
-	public MapFile getMapData() {
+	public MapFile getMapData()
+	{
 		return mapData;
 	}
 
-	public SNPFilterInterface getSNPFilter() {
+	public SNPFilterInterface getSNPFilter()
+	{
 		return snpFilter;
 	}
 
-	public void setAlleleFrequency(double[][] freq) {
+	public void setAlleleFrequency(double[][] freq)
+	{
 		mapData.setAlleleFrequency(freq);
 	}
 }

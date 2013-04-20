@@ -6,22 +6,26 @@ import family.pedigree.file.BEDReader;
 import family.pedigree.file.BIMReader;
 import gear.util.Logger;
 
-public class PLINKBinaryParser extends PLINKParser {
-	
+public class PLINKBinaryParser extends PLINKParser
+{
+
 	public static final int HOMOZYGOTE_FIRST = 0x0;
 	public static final int HETEROZYGOTE = 0x2;
 	public static final int HOMOZYGOTE_SECOND = 0x3;
 	public static final int MISSING_GENOTYPE = 0x1;
 
 	protected String FamFile;
-	
-	public PLINKBinaryParser(String ped, String map, String fam) {
+
+	public PLINKBinaryParser(String ped, String map, String fam)
+	{
 		super(ped, map);
 		FamFile = fam;
 	}
-	
-	public static int convertToGearGenotype(int plinkGenotype) {
-		switch (plinkGenotype) {
+
+	public static int convertToGearGenotype(int plinkGenotype)
+	{
+		switch (plinkGenotype)
+		{
 		case PLINKBinaryParser.HOMOZYGOTE_FIRST:
 			return gear.ConstValues.BINARY_HOMOZYGOTE_FIRST;
 		case PLINKBinaryParser.HETEROZYGOTE:
@@ -37,27 +41,38 @@ public class PLINKBinaryParser extends PLINKParser {
 	}
 
 	@Override
-	public void Parse() {
+	public void Parse()
+	{
 		mapData = new BIMReader(mapFile);
-		if (mapFile != null) {
+		if (mapFile != null)
+		{
 			ParseMapFile();
 			Logger.printUserLog("Reading '" + mapFile + "'.");
-			Logger.printUserLog("Marker Number: " + mapData.getMarkerNumberOriginal());
-			pedData = new BEDReader(FamFile, snpFilter.getWorkingSNP().length, mapData);
+			Logger.printUserLog("Marker Number: "
+					+ mapData.getMarkerNumberOriginal());
+			pedData = new BEDReader(FamFile, snpFilter.getWorkingSNP().length,
+					mapData);
 			pedData.setHeader(false);
 			ParsePedFile();
 			Logger.printUserLog("Reading '" + pedigreeFile + "'.");
-			Logger.printUserLog("Individual Number: " + pedData.getNumIndividuals());
+			Logger.printUserLog("Individual Number: "
+					+ pedData.getNumIndividuals());
 		}
 		pedData.cleanup();
 	}
 
 	@Override
-	public void ParsePedFile() {
-		try {
-			pedData.parseLinkage(pedigreeFile, mapData.getMarkerNumberOriginal(), snpFilter.getWorkingSNP());
-		} catch (IOException e) {
-			Logger.handleException(e, "An exception occurred when parsing the pedigree files.");
+	public void ParsePedFile()
+	{
+		try
+		{
+			pedData.parseLinkage(pedigreeFile,
+					mapData.getMarkerNumberOriginal(),
+					snpFilter.getWorkingSNP());
+		} catch (IOException e)
+		{
+			Logger.handleException(e,
+					"An exception occurred when parsing the pedigree files.");
 		}
 	}
 }

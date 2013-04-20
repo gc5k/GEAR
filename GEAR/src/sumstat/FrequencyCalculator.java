@@ -18,7 +18,8 @@ import gear.Parameter;
 import gear.util.Logger;
 import gear.util.stat.FastFisherExactTest;
 
-public class FrequencyCalculator {
+public class FrequencyCalculator
+{
 	private GenotypeMatrix G;
 	private int numMarker;
 	private double[][] allelefreq;
@@ -27,28 +28,38 @@ public class FrequencyCalculator {
 
 	private double[][] hw;
 	private int[][] N;
-	public FrequencyCalculator() {
+
+	public FrequencyCalculator()
+	{
 		PLINKParser pp = null;
-		if (Parameter.INSTANCE.getFileParameter().isSet()) {
-			pp = new PLINKParser (Parameter.INSTANCE.getFileParameter().getPedFile(),
-					              Parameter.INSTANCE.getFileParameter().getMapFile());
-		} else if (Parameter.INSTANCE.getBfileParameter(0).isSet()) {
-			pp = new PLINKBinaryParser (Parameter.INSTANCE.getBfileParameter(0).getBedFile(),
-					                    Parameter.INSTANCE.getBfileParameter(0).getBimFile(),
-					                    Parameter.INSTANCE.getBfileParameter(0).getFamFile());
-		} else {
+		if (Parameter.INSTANCE.getFileParameter().isSet())
+		{
+			pp = new PLINKParser(Parameter.INSTANCE.getFileParameter()
+					.getPedFile(), Parameter.INSTANCE.getFileParameter()
+					.getMapFile());
+		} else if (Parameter.INSTANCE.getBfileParameter(0).isSet())
+		{
+			pp = new PLINKBinaryParser(Parameter.INSTANCE.getBfileParameter(0)
+					.getBedFile(), Parameter.INSTANCE.getBfileParameter(0)
+					.getBimFile(), Parameter.INSTANCE.getBfileParameter(0)
+					.getFamFile());
+		} else
+		{
 			Logger.printUserError("No input files.");
 			System.exit(1);
 		}
 		pp.Parse();
-		SampleFilter sf = new SampleFilter(pp.getPedigreeData(), pp.getMapData());
-		SumStatQC ssQC = new SumStatQC(pp.getPedigreeData(), pp.getMapData(), sf);
+		SampleFilter sf = new SampleFilter(pp.getPedigreeData(),
+				pp.getMapData());
+		SumStatQC ssQC = new SumStatQC(pp.getPedigreeData(), pp.getMapData(),
+				sf);
 		snpMap = pp.getMapData();
 		GenotypeMatrix gm = new GenotypeMatrix(ssQC.getSample());
 		setup(gm);
 	}
 
-	public void setup(GenotypeMatrix gm) {
+	public void setup(GenotypeMatrix gm)
+	{
 		G = gm;
 		numMarker = G.getNumMarker();
 		allelefreq = new double[numMarker][3];
@@ -57,62 +68,79 @@ public class FrequencyCalculator {
 		N = new int[numMarker][4];
 	}
 
-	public void CalculateAlleleFrequency() {
+	public void CalculateAlleleFrequency()
+	{
 		int[][] g = G.getG();
-		for (int i = 0; i < g.length; i++) {
-			for (int j = 0; j < numMarker; j++) {
+		for (int i = 0; i < g.length; i++)
+		{
+			for (int j = 0; j < numMarker; j++)
+			{
 				int[] c = G.getBiAlleleGenotype(i, j);
 				allelefreq[j][c[0]]++;
 				allelefreq[j][c[1]]++;
 				int idx = G.getAdditiveScore(i, j);
 				genotypefreq[j][idx]++;
-				if(idx == 0) {
+				if (idx == 0)
+				{
 					N[j][0] += 2;
 					N[j][3]++;
-				} else if (idx == 1) {
+				} else if (idx == 1)
+				{
 					N[j][0] += 1;
 					N[j][1] += 1;
 					N[j][2] += 1;
 					N[j][3]++;
-				} else if (idx == 2) {
+				} else if (idx == 2)
+				{
 					N[j][2] += 1;
 					N[j][3]++;
 				}
 			}
 		}
 
-		for (int i = 0; i < numMarker; i++) {
+		for (int i = 0; i < numMarker; i++)
+		{
 
 			double wa = allelefreq[i][0] + allelefreq[i][1];
 			double a = allelefreq[i][0] + allelefreq[i][1] + allelefreq[i][2];
-			if (wa > 0) {
-				for (int j = 0; j < allelefreq[i].length - 1; j++) {
+			if (wa > 0)
+			{
+				for (int j = 0; j < allelefreq[i].length - 1; j++)
+				{
 					allelefreq[i][j] /= wa;
 				}
 				allelefreq[i][2] /= a;
-			} else {
+			} else
+			{
 				allelefreq[i][2] = 1;
 			}
 
-			double wb = genotypefreq[i][0] + genotypefreq[i][1] + genotypefreq[i][2];
-			double b = genotypefreq[i][0] + genotypefreq[i][1] + genotypefreq[i][2] + genotypefreq[i][3];
-			if (wb > 0) {
-				for (int j = 0; j < genotypefreq[i].length - 1; j++) {
+			double wb = genotypefreq[i][0] + genotypefreq[i][1]
+					+ genotypefreq[i][2];
+			double b = genotypefreq[i][0] + genotypefreq[i][1]
+					+ genotypefreq[i][2] + genotypefreq[i][3];
+			if (wb > 0)
+			{
+				for (int j = 0; j < genotypefreq[i].length - 1; j++)
+				{
 					genotypefreq[i][j] /= wb;
 				}
 				genotypefreq[i][3] /= b;
-			} else {
+			} else
+			{
 				genotypefreq[i][3] = 1;
 			}
 
-			FastFisherExactTest ff = new FastFisherExactTest(N[i][3], N[i][1], N[i][0]);
+			FastFisherExactTest ff = new FastFisherExactTest(N[i][3], N[i][1],
+					N[i][0]);
 			hw[i][0] = ff.HDP();
 			hw[i][1] = chiHWE(N[i][3], N[i][1], N[i][0]);
 
 		}
 	}
 
-	public double chiHWE(int N, int NAB, int NA) {
+	public double chiHWE(int N, int NAB, int NA)
+	{
 		int n = N;
 		int na = NA;
 		int nb = 2 * N - na;
@@ -121,44 +149,58 @@ public class FrequencyCalculator {
 		double n_d = n * 1.0;
 		double na_d = na * 1.0;
 		double nb_d = nb * 1.0;
-		double[] E = { na_d * na_d / (4 * n_d), na_d * nb_d * 2 / (4 * n_d), nb_d * nb_d / (4 * n_d) };
+		double[] E = { na_d * na_d / (4 * n_d), na_d * nb_d * 2 / (4 * n_d),
+				nb_d * nb_d / (4 * n_d) };
 
 		ChiSquareTestImpl chi = new ChiSquareTestImpl();
 		double p = 0;
-		try {
+		try
+		{
 			p = chi.chiSquareTest(E, O);
-		} catch (IllegalArgumentException e) {
+		} catch (IllegalArgumentException e)
+		{
 			e.printStackTrace();
-		} catch (MathException e) {
+		} catch (MathException e)
+		{
 			e.printStackTrace();
 		}
 		return p;
 	}
 
-	public double[][] getAlleleFrequency() {
+	public double[][] getAlleleFrequency()
+	{
 		return allelefreq;
 	}
 
-	public String toString() {
+	public String toString()
+	{
 		NumberFormat fmt = new DecimalFormat(".###E0");
 
 		StringBuffer sb = new StringBuffer();
-		if(Parameter.INSTANCE.freqFlag) {
+		if (Parameter.INSTANCE.freqFlag)
+		{
 			sb.append("chr\tsnp\tA1\tA2\tfrq(A1)\tfrq(A2)\tMiss\tNChr");
-		} else {
+		} else
+		{
 			sb.append("chr\tsnp\tA1\tA2\tfrq(A1A1)\tfrq(A1A2)\tfrq(A2A2)\tMiss\tNChr\tp(Fisher)");
 		}
 		sb.append(System.getProperty("line.separator"));
-		for (int i = 0; i < allelefreq.length; i++) {
+		for (int i = 0; i < allelefreq.length; i++)
+		{
 			SNP snp = snpMap.getSNP(i);
-			sb.append(snp.getChromosome() + "\t" + snp.getName() + "\t" + snp.getRefAllele() + "\t"  + snp.getSecAllele() + "\t");
-			if (Parameter.INSTANCE.freqFlag) {
-				sb.append(fmt.format(allelefreq[i][0]) + "\t" + fmt.format(allelefreq[i][1]) + "\t"
-					+ fmt.format(allelefreq[i][2]) + "\t" + N[i][3] * 2);
-			} else if (Parameter.INSTANCE.genoFreqFlag){
+			sb.append(snp.getChromosome() + "\t" + snp.getName() + "\t"
+					+ snp.getRefAllele() + "\t" + snp.getSecAllele() + "\t");
+			if (Parameter.INSTANCE.freqFlag)
+			{
+				sb.append(fmt.format(allelefreq[i][0]) + "\t"
+						+ fmt.format(allelefreq[i][1]) + "\t"
+						+ fmt.format(allelefreq[i][2]) + "\t" + N[i][3] * 2);
+			} else if (Parameter.INSTANCE.genoFreqFlag)
+			{
 				sb.append(fmt.format(genotypefreq[i][0]) + "\t"
-					+ fmt.format(genotypefreq[i][1]) + "\t" + fmt.format(genotypefreq[i][2]) + "\t"
-					+ N[i][3] * 2 + "\t" + hw[i][0]);
+						+ fmt.format(genotypefreq[i][1]) + "\t"
+						+ fmt.format(genotypefreq[i][2]) + "\t" + N[i][3] * 2
+						+ "\t" + hw[i][0]);
 			}
 			sb.append(System.getProperty("line.separator"));
 		}
