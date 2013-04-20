@@ -8,7 +8,7 @@ import java.util.ArrayList;
 
 import family.pedigree.genotype.BFamilyStruct;
 import family.pedigree.genotype.BPerson;
-import gear.Parameter;
+import gear.ConstValues;
 import gear.util.Logger;
 import gear.util.NewIt;
 
@@ -49,8 +49,7 @@ public class TransposePedigreeReader extends PedigreeFile
 		AlleleSet = new char[num_marker][2];
 		for (int i = 0; i < num_marker; i++)
 		{
-			AlleleSet[i][0] = AlleleSet[i][1] = Parameter.INSTANCE.missing_allele
-					.charAt(0);
+			AlleleSet[i][0] = AlleleSet[i][1] = ConstValues.MISSING_ALLELE_CHAR;
 		}
 		AlleleFreq = new short[num_marker][2];
 
@@ -112,10 +111,8 @@ public class TransposePedigreeReader extends PedigreeFile
 					per = bf.getPerson(Individualid.get(i));
 					String[] allele = { tokenizer[4 + i * 2],
 							tokenizer[4 + i * 2 + 1] };
-					boolean flag = (allele[0]
-							.compareTo(Parameter.INSTANCE.missing_allele) != 0)
-							&& (allele[1]
-									.compareTo(Parameter.INSTANCE.missing_allele) != 0);
+					boolean flag = !allele[0].equals(ConstValues.MISSING_ALLELE_STRING)	&&
+							       !allele[1].equals(ConstValues.MISSING_ALLELE_STRING);
 					if (flag)
 					{
 						int[] code = recode(k, allele);

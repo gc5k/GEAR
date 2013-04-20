@@ -1,19 +1,12 @@
 package gear.util;
 
-import gear.Parameter;
+import gear.ConstValues;
 
 public class SNPMatch
 {
-
 	public static boolean IsBiallelic(char a1, char a2)
 	{
-		boolean f = true;
-		if (a1 == Parameter.INSTANCE.missing_allele.charAt(0)
-				|| a2 == Parameter.INSTANCE.missing_allele.charAt(0))
-		{
-			f = false;
-		}
-		return f;
+		return a1 != ConstValues.MISSING_ALLELE_CHAR && a2 != ConstValues.MISSING_ALLELE_CHAR;
 	}
 
 	public static String Flip(String a)
