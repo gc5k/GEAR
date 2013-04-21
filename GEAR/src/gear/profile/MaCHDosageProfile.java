@@ -134,10 +134,23 @@ public class MaCHDosageProfile
 		}
 		else
 		{
-			gear.util.BufferedReader reader1 = new gear.util.BufferedReader(Parameter.INSTANCE.getProfileParameter().getMachDosageBatchFile(), "MaCH dosage batch");
+			String dosageBatchFile = Parameter.INSTANCE.getProfileParameter().getMachDosageBatchFile();
+			if (dosageBatchFile == null)
+			{
+				Logger.printUserError("--mach-dosage-batch is not set.");
+				System.exit(1);
+			}
+			String infoBatchFile = Parameter.INSTANCE.getProfileParameter().getMachInfoBatchFile();
+			if (infoBatchFile == null)
+			{
+				Logger.printUserError("--mach-infor-batch is not set.");
+				System.exit(1);
+			}
+			
+			gear.util.BufferedReader dosageBatchReader = new gear.util.BufferedReader(dosageBatchFile, "MaCH dosage batch");
 			ArrayList<String> l1 = NewIt.newArrayList();
 			String line = null;
-			while ((line = reader1.readLine()) != null)
+			while ((line = dosageBatchReader.readLine()) != null)
 			{
 				if (line.length() == 0)
 					continue;
@@ -155,9 +168,9 @@ public class MaCHDosageProfile
 				}
 			}
 
-			gear.util.BufferedReader reader2 = new gear.util.BufferedReader(Parameter.INSTANCE.getProfileParameter().getMachInfoBatchFile(), "MaCH information batch");
+			gear.util.BufferedReader infoBatchReader = new gear.util.BufferedReader(infoBatchFile, "MaCH information batch");
 			ArrayList<String> l2 = NewIt.newArrayList();
-			while ((line = reader2.readLine()) != null)
+			while ((line = infoBatchReader.readLine()) != null)
 			{
 				if (line.length() == 0)
 					continue;
