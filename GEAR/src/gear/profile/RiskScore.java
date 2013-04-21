@@ -25,10 +25,6 @@ public class RiskScore
 
 	private HashMap<String, ScoreUnit> Score = NewIt.newHashMap();
 
-	private String q_score_file;
-	private String q_score_range_file;
-
-	private String scoreFile;
 	private ArrayList<SNP> snpList1;
 	private HashMap<String, QScore> QS = NewIt.newHashMap();
 	private double[][] q_score_range;
@@ -73,11 +69,9 @@ public class RiskScore
 	private void initial()
 	{
 		// read score file
-		scoreFile = Parameter.INSTANCE.scoreFile;
 		gear.util.BufferedReader scoreReader = new gear.util.BufferedReader(
-				scoreFile, "score");
+				Parameter.INSTANCE.getProfileParameter().getScoreFile(), "score");
 		ScoreUnit scoreUnit;
-		Logger.printUserLog("Reading the score file '" + scoreFile + "'.");
 		while ((scoreUnit = ScoreUnit.getNextScoreUnit(scoreReader)) != null)
 		{
 			Score.put(scoreUnit.getSNP(), scoreUnit);
@@ -87,18 +81,12 @@ public class RiskScore
 		Logger.printUserLog("Number of predictors: " + Score.size());
 
 		// read q score file and q range file
-		if (Parameter.INSTANCE.q_score_file != null
-				&& Parameter.INSTANCE.q_score_range_file != null)
+		String qScoreFile = Parameter.INSTANCE.getProfileParameter().getQScoreFile(),
+			   qScoreRangeFile = Parameter.INSTANCE.getProfileParameter().getQScoreRangeFile();
+		if (qScoreFile != null && qScoreRangeFile != null)
 		{
-			Logger.printUserLog("Reading the q-score file '"
-					+ Parameter.INSTANCE.q_score_file
-					+ " and the q-range file '"
-					+ Parameter.INSTANCE.q_score_range_file + "'.");
-
 			// q score file
-			q_score_file = Parameter.INSTANCE.q_score_file;
-			gear.util.BufferedReader qScoreReader = new gear.util.BufferedReader(
-					Parameter.INSTANCE.q_score_file, "q-score");
+			gear.util.BufferedReader qScoreReader = new gear.util.BufferedReader(qScoreFile, "q-score");
 			QScore qScore;
 			while ((qScore = QScore.getNextQScore(qScoreReader)) != null)
 			{
@@ -108,8 +96,7 @@ public class RiskScore
 
 			if (QS.size() == 0)
 			{
-				Logger.printUserError("Nothing is selected in '" + q_score_file
-						+ "'.");
+				Logger.printUserError("Nothing is selected in '" + qScoreFile + "'.");
 				System.exit(1);
 			} else
 			{
@@ -117,9 +104,7 @@ public class RiskScore
 			}
 
 			// q range file
-			q_score_range_file = Parameter.INSTANCE.q_score_range_file;
-			gear.util.BufferedReader qRangeReader = new gear.util.BufferedReader(
-					q_score_range_file, "q-score-range");
+			gear.util.BufferedReader qRangeReader = new gear.util.BufferedReader(qScoreRangeFile, "q-score-range");
 			ArrayList<ArrayList<String>> QR = NewIt.newArrayList();
 			while (true)
 			{
@@ -136,10 +121,9 @@ public class RiskScore
 			}
 			qRangeReader.close();
 
-			if (QR.size() == 0)
+			if (QR.isEmpty())
 			{
-				Logger.printUserError("Nothing is selected in '"
-						+ q_score_range_file + "'.");
+				Logger.printUserError("Nothing is selected in '" + qScoreRangeFile + "'.");
 			} else
 			{
 				Logger.printUserLog("Number of q-ranges: " + QR.size());

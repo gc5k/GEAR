@@ -22,14 +22,9 @@ public class MaCHDosageProfile
 	private String delim = "\\s+";
 	private String[] dosageFile;
 	private String[] inforFile;
-	private String scoreFile;
-	private boolean hasScore = true;
 	private HashMap<String, ScoreUnit> Score = NewIt.newHashMap();
 
 	private ArrayList<String> ID = NewIt.newArrayList();
-
-	private String q_score_file;
-	private String q_score_range_file;
 
 	private HashMap<String, QScore> QS = NewIt.newHashMap();
 	private double[][] q_score_range;
@@ -45,30 +40,24 @@ public class MaCHDosageProfile
 	private void initial()
 	{
 		// read score file
-		scoreFile = Parameter.INSTANCE.scoreFile;
+		String scoreFile = Parameter.INSTANCE.getProfileParameter().getScoreFile();
 		if (scoreFile != null)
 		{
-			gear.util.BufferedReader scoreReader = new gear.util.BufferedReader(
-					scoreFile, "score");
+			gear.util.BufferedReader scoreReader = new gear.util.BufferedReader(scoreFile, "score");
 			ScoreUnit scoreUnit;
 			while ((scoreUnit = ScoreUnit.getNextScoreUnit(scoreReader)) != null)
 			{
 				Score.put(scoreUnit.getSNP(), scoreUnit);
 			}
-			hasScore = true;
-		} else
-		{
-			hasScore = false;
 		}
 
 		// read q score file and q range file
-		if (Parameter.INSTANCE.q_score_file != null
-				&& Parameter.INSTANCE.q_score_range_file != null)
+		String qScoreFile = Parameter.INSTANCE.getProfileParameter().getQScoreFile(),
+			   qScoreRangeFile = Parameter.INSTANCE.getProfileParameter().getQScoreRangeFile();
+		if (qScoreFile != null && qScoreRangeFile != null)
 		{
 			// q score file
-			q_score_file = Parameter.INSTANCE.q_score_file;
-			gear.util.BufferedReader qScoreReader = new gear.util.BufferedReader(
-					q_score_file, "q-score");
+			gear.util.BufferedReader qScoreReader = new gear.util.BufferedReader(qScoreFile, "q-score");
 			QScore qScore;
 			while ((qScore = QScore.getNextQScore(qScoreReader)) != null)
 			{
@@ -77,19 +66,15 @@ public class MaCHDosageProfile
 
 			if (QS.size() == 0)
 			{
-				Logger.printUserError("Nothing is selected in '" + q_score_file
-						+ "'.");
+				Logger.printUserError("Nothing is selected in '" + qScoreFile + "'.");
 				System.exit(1);
 			} else
 			{
-				Logger.printUserLog("Number of SNP scores read from the q-score file '"
-						+ q_score_file + "': " + QS.size());
+				Logger.printUserLog("Number of SNP scores read from the q-score file '" + qScoreFile + "': " + QS.size());
 			}
 
 			// q range file
-			q_score_range_file = Parameter.INSTANCE.q_score_range_file;
-			gear.util.BufferedReader qRangeReader = new gear.util.BufferedReader(
-					q_score_range_file, "q-score-range");
+			gear.util.BufferedReader qRangeReader = new gear.util.BufferedReader(qScoreRangeFile, "q-score-range");
 			ArrayList<ArrayList<String>> QR = NewIt.newArrayList();
 			while (true)
 			{
@@ -107,12 +92,10 @@ public class MaCHDosageProfile
 
 			if (QR.size() == 0)
 			{
-				Logger.printUserError("Nothing is selected in the q-range file '"
-						+ q_score_range_file + "'.");
+				Logger.printUserError("Nothing is selected in the q-range file '" + qScoreRangeFile + "'.");
 			} else
 			{
-				Logger.printUserLog("Number of scores read from the q-range file '"
-						+ q_score_range_file + "': " + QR.size());
+				Logger.printUserLog("Number of scores read from the q-range file '" + qScoreRangeFile + "': " + QR.size());
 			}
 
 			q_score_range = new double[QR.size()][2];
@@ -129,83 +112,65 @@ public class MaCHDosageProfile
 			isQ = true;
 		}
 
-		if (Parameter.INSTANCE.MaCH_Dosage != null)
+		String machDosageFile = Parameter.INSTANCE.getProfileParameter().getMachDosageFile();
+		if (machDosageFile != null)
 		{
 			dosageFile = new String[1];
-			dosageFile[0] = Parameter.INSTANCE.MaCH_Dosage;
+			dosageFile[0] = machDosageFile;
 			File f = new File(dosageFile[0]);
 			if (!f.exists())
 			{
-				Logger.printUserError("The dosage file '" + dosageFile[0]
-						+ "' does not exist");
+				Logger.printUserError("The dosage file '" + dosageFile[0] + "' does not exist");
 				System.exit(1);
 			}
 			inforFile = new String[1];
-			inforFile[0] = Parameter.INSTANCE.MaCH_Infor;
+			inforFile[0] = Parameter.INSTANCE.getProfileParameter().getMachInfoFile();
 			f = new File(inforFile[0]);
 			if (!f.exists())
 			{
-				Logger.printUserError("The information file " + inforFile[0]
-						+ "' does not exist");
+				Logger.printUserError("The information file " + inforFile[0] + "' does not exist");
 				System.exit(1);
 			}
-		} else
+		}
+		else
 		{
-			BufferedReader reader1 = FileProcessor
-					.FileOpen(Parameter.INSTANCE.MaCH_Dosage_Batch);
+			gear.util.BufferedReader reader1 = new gear.util.BufferedReader(Parameter.INSTANCE.getProfileParameter().getMachDosageBatchFile(), "MaCH dosage batch");
 			ArrayList<String> l1 = NewIt.newArrayList();
 			String line = null;
-			try
+			while ((line = reader1.readLine()) != null)
 			{
-				while ((line = reader1.readLine()) != null)
-				{
-					if (line.length() == 0)
-						continue;
-					l1.add(line);
-				}
-			} catch (IOException e)
-			{
-				Logger.handleException(e,
-						"An exception occurred when reading the dosage batch '"
-								+ Parameter.INSTANCE.MaCH_Dosage_Batch + "'.");
+				if (line.length() == 0)
+					continue;
+				l1.add(line);
 			}
+			
 			dosageFile = (String[]) l1.toArray(new String[0]);
 			for (int i = 0; i < dosageFile.length; i++)
 			{
 				File f = new File(dosageFile[i]);
 				if (!f.exists())
 				{
-					Logger.printUserError("The dosage file '" + dosageFile[i]
-							+ "' does not exist.");
+					Logger.printUserError("The dosage file '" + dosageFile[i] + "' does not exist.");
 					System.exit(1);
 				}
 			}
 
-			BufferedReader reader2 = FileProcessor
-					.FileOpen(Parameter.INSTANCE.MaCH_Infor_Batch);
+			gear.util.BufferedReader reader2 = new gear.util.BufferedReader(Parameter.INSTANCE.getProfileParameter().getMachInfoBatchFile(), "MaCH information batch");
 			ArrayList<String> l2 = NewIt.newArrayList();
-			try
+			while ((line = reader2.readLine()) != null)
 			{
-				while ((line = reader2.readLine()) != null)
-				{
-					if (line.length() == 0)
-						continue;
-					l2.add(line);
-				}
-			} catch (IOException e)
-			{
-				Logger.handleException(e,
-						"An exception occurred when reading the information batch '"
-								+ Parameter.INSTANCE.MaCH_Infor_Batch + "'.");
+				if (line.length() == 0)
+					continue;
+				l2.add(line);
 			}
+			
 			inforFile = (String[]) l2.toArray(new String[0]);
 			for (int i = 0; i < inforFile.length; i++)
 			{
 				File f = new File(inforFile[i]);
 				if (!f.exists())
 				{
-					Logger.printUserError("The information file '"
-							+ inforFile[i] + "' does not exist.");
+					Logger.printUserError("The information file '" + inforFile[i] + "' does not exist.");
 					System.exit(1);
 				}
 			}
@@ -303,11 +268,13 @@ public class MaCHDosageProfile
 						}
 					}
 
-				} else if (!hasScore)
+				}
+				else if (Parameter.INSTANCE.getProfileParameter().getScoreFile() == null)
 				{
 					su = new ScoreUnit(snp, refA, 1.0);
 					cSNP++;
-				} else
+				}
+				else
 				{
 					continue;
 				}
