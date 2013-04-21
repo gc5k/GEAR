@@ -19,10 +19,319 @@ import org.apache.commons.cli.PosixParser;
 // singleton implemented in enum way
 public enum Parameter
 {
-
 	INSTANCE;
 
 	private CommandLine cl;
+	
+	private Options ops = new Options();
+
+	private CommandLineParser parser = new PosixParser();
+
+	@SuppressWarnings("static-access")
+	private Parameter()
+	{
+		ops = new Options();
+		fileParameter = new FileParameter();
+		bfileParameters = new BfileParameter[2];
+		bfileParameters[0] = new BfileParameter("PLINK format binary input file", "bfile");
+		bfileParameters[1] = new BfileParameter("The second PLINK format binary input file", "bfile2");
+		profileParameter = new ProfileParameter();
+
+		// real-check
+		ops.addOption(OptionBuilder.withDescription("realcheck ").create(
+				cmd_realcheck));
+		realCheckParameter.commandInitial();
+
+		// merge
+		ops.addOption(OptionBuilder.withDescription("merge ").create(cmd_merge));
+		mergeParameter.commandInitial();
+
+		// make predictor
+		ops.addOption(OptionBuilder.withLongOpt(cmd_make_predictor_long)
+				.withDescription("make predictor").create(cmd_make_predictor));
+
+		ops.addOption(OptionBuilder.withLongOpt(cmd_make_predictor2_long)
+				.withDescription("make predictor2").create(cmd_make_predictor2));
+
+		ops.addOption(OptionBuilder.withLongOpt(cmd_predictor_idx_long)
+				.withDescription("predictor index").hasArg()
+				.create(cmd_predictor_idx));
+
+		ops.addOption(OptionBuilder.withLongOpt(cmd_predictor_file_long)
+				.withDescription("predictor file").hasArg()
+				.create(cmd_predictor_file));
+
+		ops.addOption(OptionBuilder.withDescription("linear")
+				.create(cmd_linear));
+
+		ops.addOption(OptionBuilder.withDescription("logit").create(cmd_logit));
+
+		ops.addOption(OptionBuilder.withLongOpt(cmd_keep_atgc_long)
+				.withDescription("remove A/T and G/C loci")
+				.create(cmd_keep_atgc));
+		ops.addOption(OptionBuilder.withLongOpt(cmd_remove_Flip_long)
+				.withDescription("remove flipped loci").create(cmd_remove_Flip));
+
+		// simulation nuclear fam
+		ops.addOption(OptionBuilder.withLongOpt(cmd_simu_fam_long)
+				.withDescription("simulation nuclear family ")
+				.create(cmd_simu_fam));
+
+		ops.addOption(OptionBuilder.withLongOpt(cmd_simu_fam_size_long)
+				.withDescription("simulation nuclear family size ").hasArg()
+				.create(cmd_simu_fam_size));
+
+		ops.addOption(OptionBuilder.withLongOpt(cmd_simu_fam_marker_long)
+				.withDescription("simulation number for nuclear family ")
+				.hasArg().create(cmd_simu_fam_marker));
+
+		// simulation real data
+		ops.addOption(OptionBuilder.withLongOpt(cmd_simu_realdata_long)
+				.withDescription("gwas simulations ").hasArg()
+				.create(cmd_simu_realdata));
+
+		ops.addOption(OptionBuilder.withLongOpt(cmd_simu_seed_long)
+				.withDescription("gwas simulation seed ").hasArg()
+				.create(cmd_simu_seed));
+
+		ops.addOption(OptionBuilder.withLongOpt(cmd_simu_rep_long)
+				.withDescription("gwas simulation replication ").hasArg()
+				.create(cmd_simu_rep));
+
+		ops.addOption(OptionBuilder.withLongOpt(cmd_simu_casual_loci_long)
+				.withDescription("gwas simulation casual loci ").hasArg()
+				.create(cmd_simu_casual_loci));
+
+		ops.addOption(OptionBuilder.withLongOpt(cmd_simu_rnd_casual_loci_long)
+				.withDescription("gwas simulation casual loci number ")
+				.hasArg().create(cmd_simu_rnd_casual_loci));
+
+		ops.addOption(OptionBuilder.withLongOpt(cmd_simu_hsq_long)
+				.withDescription("gwas simulation heritability ").hasArg()
+				.create(cmd_simu_hsq));
+
+		ops.addOption(OptionBuilder.withLongOpt(cmd_simu_qt_long)
+				.withDescription("gwas simulate quantitative traits ").hasArg()
+				.create(cmd_simu_qt));
+
+		ops.addOption(OptionBuilder.withLongOpt(cmd_simu_order_long)
+				.withDescription("order SNP effects ascendingly ")
+				.create(cmd_simu_order));
+
+		ops.addOption(OptionBuilder.withLongOpt(cmd_simu_cc_long)
+				.withDescription("gwas simulate case-control ").hasArgs(2)
+				.create(cmd_simu_cc));
+
+		ops.addOption(OptionBuilder.withLongOpt(cmd_simu_k_long)
+				.withDescription("gwas prevalence of the binary trait ")
+				.hasArg().create(cmd_simu_k));
+
+		// nontransmitted
+		ops.addOption(OptionBuilder.withDescription("nontransmitted ").create(
+				cmd_nontrans));
+
+		ops.addOption(OptionBuilder.withLongOpt(cmd_nontrans_cases_long)
+				.withDescription("nontransmitted filter cases ")
+				.create(cmd_nontrans_cases));
+
+		ops.addOption(OptionBuilder.withLongOpt(cmd_nontrans_controls_long)
+				.withDescription("nontransmitted filter controls ")
+				.create(cmd_nontrans_controls));
+
+		ops.addOption(OptionBuilder.withLongOpt(cmd_nontrans_seed_long)
+				.withDescription("gwas prevalence of the binary trait ")
+				.hasArg().create(cmd_nontrans_seed));
+
+		// simulation polygenic model
+
+		ops.addOption(OptionBuilder
+				.withLongOpt(cmd_poly_loci_long)
+				.withDescription(
+						"number of polygenic loci, defualt= " + polyLoci)
+				.hasArg().create(cmd_poly_loci));
+
+		ops.addOption(OptionBuilder
+				.withLongOpt(cmd_poly_loci_null_long)
+				.withDescription(
+						"number of null polygenic loci, defualt= " + polyLoci)
+				.hasArg().create(cmd_poly_loci_null));
+
+		ops.addOption(OptionBuilder.withLongOpt(cmd_poly_LD_long)
+				.withDescription("LD (correlation), defualt= " + polyLD)
+				.hasArg().create(cmd_poly_LD));
+
+		ops.addOption(OptionBuilder
+				.withLongOpt(cmd_poly_U_long)
+				.withDescription("polygenic model has Uniform Effect? " + polyU)
+				.create(cmd_poly_U));
+
+		ops.addOption(OptionBuilder
+				.withLongOpt(cmd_poly_freq_long)
+				.withDescription(
+						"minor allele frequency for polygenic model? "
+								+ polyFreq).hasArg().create(cmd_poly_freq));
+
+		ops.addOption(OptionBuilder
+				.withLongOpt(cmd_poly_effect_long)
+				.withDescription(
+						"effect for polygenic model? " + polyEffectFile)
+				.hasArg().create(cmd_poly_effect));
+
+		// pop stat
+		ops.addOption(OptionBuilder.withDescription("calculate MAF frequency ")
+				.create(cmd_freq));
+
+		ops.addOption(OptionBuilder.withLongOpt(cmd_geno_freq_long)
+				.withDescription("calculate genotype frequency ")
+				.create(cmd_geno_freq));
+
+		ops.addOption(OptionBuilder.withDescription("calculate fst ").hasArg()
+				.create(cmd_fst));
+
+		// snp selection
+		ops.addOption(OptionBuilder.withDescription("select chromosomes")
+				.hasArgs().create(cmd_chr));
+		ops.addOption(OptionBuilder.withDescription("select snps").hasArgs()
+				.create(cmd_snps));
+
+		// individual selection
+
+		ops.addOption(OptionBuilder.withDescription("remove individuals")
+				.hasArg().create(cmd_remove));
+
+		ops.addOption(OptionBuilder.withDescription("keep individuals")
+				.hasArg().create(cmd_keep));
+
+		ops.addOption(OptionBuilder.withDescription("keep males only")
+				.withLongOpt(cmd_keep_male_long).create(cmd_keep_male));
+		ops.addOption(OptionBuilder.withDescription("keep females only")
+				.withLongOpt(cmd_keep_female_long).create(cmd_keep_female));
+		ops.addOption(OptionBuilder.withDescription("exclude unknown sex")
+				.withLongOpt(cmd_ex_nosex_long).create(cmd_ex_nosex));
+
+		// make bed
+
+		ops.addOption(OptionBuilder.withLongOpt(cmd_reference_allele_long)
+				.withDescription("set reference allele ").hasArg()
+				.create(cmd_reference_allele));
+
+		ops.addOption(OptionBuilder.withLongOpt(cmd_make_bed_long)
+				.withDescription("make bed ").create(cmd_make_bed));
+
+		ops.addOption(OptionBuilder.withDescription("solve strand ").hasArg()
+				.create(cmd_strand));
+
+		// grm-stat
+		ops.addOption(OptionBuilder.withLongOpt(cmd_grm_stat_long)
+				.withDescription("grm statistics").create(cmd_grm_stat));
+
+		// ops.addOption(OptionBuilder.withLongOpt(cmd_exclude_diag_long).withDescription("grm statistics excluded diagonal elements").create(cmd_exclude_diag));
+
+		// haseman-elston regression
+		ops.addOption(OptionBuilder.withDescription("h2 ").hasArg()
+				.create(cmd_eh2));
+
+		heParameter = new HEParameter();
+
+		ops.addOption(OptionBuilder.withLongOpt(cmd_ref_freq_long)
+				.withDescription("reference allele frequency").hasArg()
+				.create(cmd_ref_freq));
+
+		ops.addOption(OptionBuilder
+				.withLongOpt(cmd_maf_range_long)
+				.withDescription(
+						"only maf withwin this range (inclusive) will be used ")
+				.hasArg().create(cmd_maf_range));
+
+		ops.addOption(OptionBuilder
+				.withLongOpt(cmd_grm_range_long)
+				.withDescription(
+						"only grm withwin this range (inclusive) will be calculated ")
+				.hasArg().create(cmd_grm_range));
+
+		ops.addOption(OptionBuilder.withLongOpt(cmd_grm_partition_long)
+				.withDescription("partitioning grm into even subdivisions. ")
+				.hasArg().create(cmd_grm_partition));
+
+		ops.addOption(OptionBuilder.withLongOpt(cmd_make_grm_long)
+				.withDescription("generate genetic relationship matirx")
+				.create(cmd_make_grm));
+
+		ops.addOption(OptionBuilder
+				.withLongOpt(cmd_make_grm_txt_long)
+				.withDescription(
+						"generate genetic relationship matirx and save in the plain text format")
+				.create(cmd_make_grm_txt));
+
+		ops.addOption(OptionBuilder.withDescription("covariate file").hasArg()
+				.create(cmd_covar));
+
+		ops.addOption(OptionBuilder.withLongOpt(cmd_covar_num_long)
+				.withDescription("covariate index").hasArg()
+				.create(cmd_covar_num));
+
+		ops.addOption(OptionBuilder
+				.withDescription("quantitative covariate file").hasArg()
+				.create(cmd_qcovar));
+
+		ops.addOption(OptionBuilder.withLongOpt(cmd_qcovar_num_long)
+				.withDescription("quantitative covariate index").hasArg()
+				.create(cmd_qcovar_num));
+
+		ops.addOption(OptionBuilder.withDescription("reverse ").create(
+				cmd_reverse));
+
+		ops.addOption(OptionBuilder
+				.withDescription("standardise the phenotype").create(cmd_scale));
+
+		ops.addOption(OptionBuilder.withDescription("perm ").hasArg()
+				.create(cmd_perm));
+
+		ops.addOption(OptionBuilder.withDescription("prevalence ").hasArg()
+				.create(cmd_k));
+
+		ops.addOption(OptionBuilder.withDescription("na ").hasArg()
+				.create(cmd_na));
+
+		hpcParameter = new HpcParameter();
+
+		// /////transform heritability
+		ops.addOption(OptionBuilder
+				.withLongOpt(cmd_cal_k_long)
+				.withDescription(
+						"calculate heritability on the liability/observed scale with value K "
+								+ cmd_cal_k).hasArg().create(cmd_cal_k));
+
+		ops.addOption(OptionBuilder
+				.withLongOpt(cmd_cal_hl_long)
+				.withDescription(
+						"calculate heritability on the liability/observed scale "
+								+ cmd_cal_hl_long).hasArg().create(cmd_cal_hl));
+
+		ops.addOption(OptionBuilder
+				.withLongOpt(cmd_cal_ho_long)
+				.withDescription(
+						"calculate heritability on the liability/observed scale "
+								+ cmd_cal_ho_long).hasArg().create(cmd_cal_ho));
+
+		ops.addOption(OptionBuilder.withLongOpt(cmd_cal_cc_long)
+				.withDescription("number of case and controls " + cmd_cal_cc)
+				.hasArg().create(cmd_cal_cc));
+
+		ops.addOption(OptionBuilder
+				.withLongOpt(cmd_cal_h2_se_long)
+				.withDescription(
+						"se of heritability on the liability/observed scale ")
+				.hasArg().create(cmd_cal_h2_se));
+
+		ops.addOption(OptionBuilder
+				.withDescription("root file, default = " + out).hasArg()
+				.create(cmd_out));
+
+		ops.addOption(OptionBuilder.withDescription("help manual.").create(
+				cmd_help));
+
+	}
 
 	public class BfileParameter
 	{
@@ -30,9 +339,8 @@ public enum Parameter
 		@SuppressWarnings("static-access")
 		private BfileParameter(String desc, String opt)
 		{
-			ops.addOption(OptionBuilder.withDescription(desc).hasArg()
-					.create(opt));
-			this.cmd_bfile = opt;
+			ops.addOption(OptionBuilder.withDescription(desc).hasArg().create(opt));
+			cmd_bfile = opt;
 		}
 
 		public boolean isSet()
@@ -71,13 +379,10 @@ public enum Parameter
 
 	public class FileParameter
 	{
-
 		@SuppressWarnings("static-access")
 		private FileParameter()
 		{
-			ops.addOption(OptionBuilder
-					.withDescription("PLINK format text input file").hasArg()
-					.create(cmd_file));
+			ops.addOption(OptionBuilder.withDescription("PLINK format text input file").hasArg().create(cmd_file));
 		}
 
 		public boolean isSet()
@@ -523,32 +828,67 @@ public enum Parameter
 	public boolean fstFlag = false;
 	public String fst_file = null;
 
-	// profile
-
-	private final String cmd_score = "score";
-	private final String cmd_MaCH_Infor = "mach_infor";
-	private final String cmd_MaCH_Infor_long = "mach-infor";
-	private final String cmd_MaCH_Dosage = "mach_dosage";
-	private final String cmd_MaCH_Dosage_long = "mach-dosage";
-
-	private final String cmd_MaCH_Infor_Batch = "mach_infor_batch";
-	private final String cmd_MaCH_Infor_Batch_long = "mach-infor-batch";
-	private final String cmd_MaCH_Dosage_Batch = "mach_dosage_batch";
-	private final String cmd_MaCH_Dosage_Batch_long = "mach-dosage-batch";
-
-	private final String cmd_q_score_file = "q_score_file";
-	private final String cmd_q_score_file_long = "q-score-file";
-	private final String cmd_q_score_range = "q_score_range";
-	private final String cmd_q_score_range_long = "q-score-range";
-
-	public boolean scoreFlag = false;
-	public String scoreFile = null;
-	public String MaCH_Infor = null;
-	public String MaCH_Dosage = null;
-	public String MaCH_Infor_Batch = null;
-	public String MaCH_Dosage_Batch = null;
-	public String q_score_file = null;
-	public String q_score_range_file = null;
+	public class ProfileParameter
+	{
+		@SuppressWarnings("static-access")
+		private ProfileParameter()
+		{
+			ops.addOption(OptionBuilder.withDescription("score file used for profiling").hasArg().create("score"));
+			ops.addOption(OptionBuilder.withLongOpt("mach-dosage").withDescription("MaCH dosage file").hasArg().create());
+			ops.addOption(OptionBuilder.withLongOpt("mach-infor").withDescription("MaCH dosage information file").hasArg().create());
+			ops.addOption(OptionBuilder.withLongOpt("mach-dosage-batch").withDescription("MaCH dosage batch file").hasArg().create());
+			ops.addOption(OptionBuilder.withLongOpt("mach-infor-batch").withDescription("MaCH dosage information batch file").hasArg().create());
+			ops.addOption(OptionBuilder.withLongOpt("q-score-file").withDescription("q score file").hasArg().create());
+			ops.addOption(OptionBuilder.withLongOpt("q-score-range").withDescription("q score range").hasArg().create());
+		}
+		
+		public boolean isSet()
+		{
+			return getScoreFile() != null;
+		}
+		
+		public String getScoreFile()
+		{
+			return cl.getOptionValue("score", null);
+		}
+		
+		public String getMachDosageFile()
+		{
+			return cl.getOptionValue("mach-dosage", null);
+		}
+		
+		public String getMachInfoFile()
+		{
+			return cl.getOptionValue("mach-infor", null);
+		}
+		
+		public String getMachDosageBatchFile()
+		{
+			return cl.getOptionValue("mach-dosage-batch", null);
+		}
+		
+		public String getMachInfoBatchFile()
+		{
+			return cl.getOptionValue("mach-infor-batch", null);
+		}
+		
+		public String getQScoreFile()
+		{
+			return cl.getOptionValue("q-score-file", null);
+		}
+		
+		public String getQScoreRangeFile()
+		{
+			return cl.getOptionValue("q-score-range", null);
+		}
+	}
+	
+	public ProfileParameter getProfileParameter()
+	{
+		return profileParameter;
+	}
+	
+	private ProfileParameter profileParameter;
 
 	// grm statistics
 	private final String cmd_grm_stat = "grm_stat";
@@ -1014,345 +1354,6 @@ public enum Parameter
 
 	private final String cmd_help = "help";
 
-	private Options ops = new Options();
-
-	private CommandLineParser parser = new PosixParser();
-
-	@SuppressWarnings("static-access")
-	private Parameter()
-	{
-		ops = new Options();
-		fileParameter = new FileParameter();
-		bfileParameters = new BfileParameter[2];
-		bfileParameters[0] = new BfileParameter(
-				"PLINK format binary input file", "bfile");
-		bfileParameters[1] = new BfileParameter(
-				"The second PLINK format binary input file", "bfile2");
-
-		// real-check
-		ops.addOption(OptionBuilder.withDescription("realcheck ").create(
-				cmd_realcheck));
-		realCheckParameter.commandInitial();
-
-		// merge
-		ops.addOption(OptionBuilder.withDescription("merge ").create(cmd_merge));
-		mergeParameter.commandInitial();
-
-		// make predictor
-		ops.addOption(OptionBuilder.withLongOpt(cmd_make_predictor_long)
-				.withDescription("make predictor").create(cmd_make_predictor));
-
-		ops.addOption(OptionBuilder.withLongOpt(cmd_make_predictor2_long)
-				.withDescription("make predictor2").create(cmd_make_predictor2));
-
-		ops.addOption(OptionBuilder.withLongOpt(cmd_predictor_idx_long)
-				.withDescription("predictor index").hasArg()
-				.create(cmd_predictor_idx));
-
-		ops.addOption(OptionBuilder.withLongOpt(cmd_predictor_file_long)
-				.withDescription("predictor file").hasArg()
-				.create(cmd_predictor_file));
-
-		ops.addOption(OptionBuilder.withDescription("linear")
-				.create(cmd_linear));
-
-		ops.addOption(OptionBuilder.withDescription("logit").create(cmd_logit));
-
-		ops.addOption(OptionBuilder.withLongOpt(cmd_keep_atgc_long)
-				.withDescription("remove A/T and G/C loci")
-				.create(cmd_keep_atgc));
-		ops.addOption(OptionBuilder.withLongOpt(cmd_remove_Flip_long)
-				.withDescription("remove flipped loci").create(cmd_remove_Flip));
-
-		// simulation nuclear fam
-		ops.addOption(OptionBuilder.withLongOpt(cmd_simu_fam_long)
-				.withDescription("simulation nuclear family ")
-				.create(cmd_simu_fam));
-
-		ops.addOption(OptionBuilder.withLongOpt(cmd_simu_fam_size_long)
-				.withDescription("simulation nuclear family size ").hasArg()
-				.create(cmd_simu_fam_size));
-
-		ops.addOption(OptionBuilder.withLongOpt(cmd_simu_fam_marker_long)
-				.withDescription("simulation number for nuclear family ")
-				.hasArg().create(cmd_simu_fam_marker));
-
-		// simulation real data
-		ops.addOption(OptionBuilder.withLongOpt(cmd_simu_realdata_long)
-				.withDescription("gwas simulations ").hasArg()
-				.create(cmd_simu_realdata));
-
-		ops.addOption(OptionBuilder.withLongOpt(cmd_simu_seed_long)
-				.withDescription("gwas simulation seed ").hasArg()
-				.create(cmd_simu_seed));
-
-		ops.addOption(OptionBuilder.withLongOpt(cmd_simu_rep_long)
-				.withDescription("gwas simulation replication ").hasArg()
-				.create(cmd_simu_rep));
-
-		ops.addOption(OptionBuilder.withLongOpt(cmd_simu_casual_loci_long)
-				.withDescription("gwas simulation casual loci ").hasArg()
-				.create(cmd_simu_casual_loci));
-
-		ops.addOption(OptionBuilder.withLongOpt(cmd_simu_rnd_casual_loci_long)
-				.withDescription("gwas simulation casual loci number ")
-				.hasArg().create(cmd_simu_rnd_casual_loci));
-
-		ops.addOption(OptionBuilder.withLongOpt(cmd_simu_hsq_long)
-				.withDescription("gwas simulation heritability ").hasArg()
-				.create(cmd_simu_hsq));
-
-		ops.addOption(OptionBuilder.withLongOpt(cmd_simu_qt_long)
-				.withDescription("gwas simulate quantitative traits ").hasArg()
-				.create(cmd_simu_qt));
-
-		ops.addOption(OptionBuilder.withLongOpt(cmd_simu_order_long)
-				.withDescription("order SNP effects ascendingly ")
-				.create(cmd_simu_order));
-
-		ops.addOption(OptionBuilder.withLongOpt(cmd_simu_cc_long)
-				.withDescription("gwas simulate case-control ").hasArgs(2)
-				.create(cmd_simu_cc));
-
-		ops.addOption(OptionBuilder.withLongOpt(cmd_simu_k_long)
-				.withDescription("gwas prevalence of the binary trait ")
-				.hasArg().create(cmd_simu_k));
-
-		// nontransmitted
-		ops.addOption(OptionBuilder.withDescription("nontransmitted ").create(
-				cmd_nontrans));
-
-		ops.addOption(OptionBuilder.withLongOpt(cmd_nontrans_cases_long)
-				.withDescription("nontransmitted filter cases ")
-				.create(cmd_nontrans_cases));
-
-		ops.addOption(OptionBuilder.withLongOpt(cmd_nontrans_controls_long)
-				.withDescription("nontransmitted filter controls ")
-				.create(cmd_nontrans_controls));
-
-		ops.addOption(OptionBuilder.withLongOpt(cmd_nontrans_seed_long)
-				.withDescription("gwas prevalence of the binary trait ")
-				.hasArg().create(cmd_nontrans_seed));
-
-		// simulation polygenic model
-
-		ops.addOption(OptionBuilder
-				.withLongOpt(cmd_poly_loci_long)
-				.withDescription(
-						"number of polygenic loci, defualt= " + polyLoci)
-				.hasArg().create(cmd_poly_loci));
-
-		ops.addOption(OptionBuilder
-				.withLongOpt(cmd_poly_loci_null_long)
-				.withDescription(
-						"number of null polygenic loci, defualt= " + polyLoci)
-				.hasArg().create(cmd_poly_loci_null));
-
-		ops.addOption(OptionBuilder.withLongOpt(cmd_poly_LD_long)
-				.withDescription("LD (correlation), defualt= " + polyLD)
-				.hasArg().create(cmd_poly_LD));
-
-		ops.addOption(OptionBuilder
-				.withLongOpt(cmd_poly_U_long)
-				.withDescription("polygenic model has Uniform Effect? " + polyU)
-				.create(cmd_poly_U));
-
-		ops.addOption(OptionBuilder
-				.withLongOpt(cmd_poly_freq_long)
-				.withDescription(
-						"minor allele frequency for polygenic model? "
-								+ polyFreq).hasArg().create(cmd_poly_freq));
-
-		ops.addOption(OptionBuilder
-				.withLongOpt(cmd_poly_effect_long)
-				.withDescription(
-						"effect for polygenic model? " + polyEffectFile)
-				.hasArg().create(cmd_poly_effect));
-
-		// pop stat
-		ops.addOption(OptionBuilder.withDescription("calculate MAF frequency ")
-				.create(cmd_freq));
-
-		ops.addOption(OptionBuilder.withLongOpt(cmd_geno_freq_long)
-				.withDescription("calculate genotype frequency ")
-				.create(cmd_geno_freq));
-
-		ops.addOption(OptionBuilder.withDescription("calculate fst ").hasArg()
-				.create(cmd_fst));
-
-		// snp selection
-		ops.addOption(OptionBuilder.withDescription("select chromosomes")
-				.hasArgs().create(cmd_chr));
-		ops.addOption(OptionBuilder.withDescription("select snps").hasArgs()
-				.create(cmd_snps));
-
-		// individual selection
-
-		ops.addOption(OptionBuilder.withDescription("remove individuals")
-				.hasArg().create(cmd_remove));
-
-		ops.addOption(OptionBuilder.withDescription("keep individuals")
-				.hasArg().create(cmd_keep));
-
-		ops.addOption(OptionBuilder.withDescription("keep males only")
-				.withLongOpt(cmd_keep_male_long).create(cmd_keep_male));
-		ops.addOption(OptionBuilder.withDescription("keep females only")
-				.withLongOpt(cmd_keep_female_long).create(cmd_keep_female));
-		ops.addOption(OptionBuilder.withDescription("exclude unknown sex")
-				.withLongOpt(cmd_ex_nosex_long).create(cmd_ex_nosex));
-
-		// make bed
-
-		ops.addOption(OptionBuilder.withLongOpt(cmd_reference_allele_long)
-				.withDescription("set reference allele ").hasArg()
-				.create(cmd_reference_allele));
-
-		ops.addOption(OptionBuilder.withLongOpt(cmd_make_bed_long)
-				.withDescription("make bed ").create(cmd_make_bed));
-
-		ops.addOption(OptionBuilder.withDescription("solve strand ").hasArg()
-				.create(cmd_strand));
-
-		// profile
-		ops.addOption(OptionBuilder.withDescription("profile score").hasArg()
-				.create(cmd_score));
-
-		ops.addOption(OptionBuilder.withLongOpt(cmd_MaCH_Dosage_long)
-				.withDescription("Mach dosage file").hasArg()
-				.create(cmd_MaCH_Dosage));
-
-		ops.addOption(OptionBuilder.withLongOpt(cmd_MaCH_Infor_long)
-				.withDescription("Mach dosage information file").hasArg()
-				.create(cmd_MaCH_Infor));
-
-		ops.addOption(OptionBuilder.withLongOpt(cmd_MaCH_Dosage_Batch_long)
-				.withDescription("Mach dosage batch file").hasArg()
-				.create(cmd_MaCH_Dosage_Batch));
-
-		ops.addOption(OptionBuilder.withLongOpt(cmd_MaCH_Infor_Batch_long)
-				.withDescription("Mach dosage information batch file").hasArg()
-				.create(cmd_MaCH_Infor_Batch));
-
-		ops.addOption(OptionBuilder.withLongOpt(cmd_q_score_file_long)
-				.withDescription("q score file").hasArg()
-				.create(cmd_q_score_file));
-
-		ops.addOption(OptionBuilder.withLongOpt(cmd_q_score_range_long)
-				.withDescription("q score range").hasArg()
-				.create(cmd_q_score_range));
-
-		// grm-stat
-		ops.addOption(OptionBuilder.withLongOpt(cmd_grm_stat_long)
-				.withDescription("grm statistics").create(cmd_grm_stat));
-
-		// ops.addOption(OptionBuilder.withLongOpt(cmd_exclude_diag_long).withDescription("grm statistics excluded diagonal elements").create(cmd_exclude_diag));
-
-		// haseman-elston regression
-		ops.addOption(OptionBuilder.withDescription("h2 ").hasArg()
-				.create(cmd_eh2));
-
-		heParameter = new HEParameter();
-
-		ops.addOption(OptionBuilder.withLongOpt(cmd_ref_freq_long)
-				.withDescription("reference allele frequency").hasArg()
-				.create(cmd_ref_freq));
-
-		ops.addOption(OptionBuilder
-				.withLongOpt(cmd_maf_range_long)
-				.withDescription(
-						"only maf withwin this range (inclusive) will be used ")
-				.hasArg().create(cmd_maf_range));
-
-		ops.addOption(OptionBuilder
-				.withLongOpt(cmd_grm_range_long)
-				.withDescription(
-						"only grm withwin this range (inclusive) will be calculated ")
-				.hasArg().create(cmd_grm_range));
-
-		ops.addOption(OptionBuilder.withLongOpt(cmd_grm_partition_long)
-				.withDescription("partitioning grm into even subdivisions. ")
-				.hasArg().create(cmd_grm_partition));
-
-		ops.addOption(OptionBuilder.withLongOpt(cmd_make_grm_long)
-				.withDescription("generate genetic relationship matirx")
-				.create(cmd_make_grm));
-
-		ops.addOption(OptionBuilder
-				.withLongOpt(cmd_make_grm_txt_long)
-				.withDescription(
-						"generate genetic relationship matirx and save in the plain text format")
-				.create(cmd_make_grm_txt));
-
-		ops.addOption(OptionBuilder.withDescription("covariate file").hasArg()
-				.create(cmd_covar));
-
-		ops.addOption(OptionBuilder.withLongOpt(cmd_covar_num_long)
-				.withDescription("covariate index").hasArg()
-				.create(cmd_covar_num));
-
-		ops.addOption(OptionBuilder
-				.withDescription("quantitative covariate file").hasArg()
-				.create(cmd_qcovar));
-
-		ops.addOption(OptionBuilder.withLongOpt(cmd_qcovar_num_long)
-				.withDescription("quantitative covariate index").hasArg()
-				.create(cmd_qcovar_num));
-
-		ops.addOption(OptionBuilder.withDescription("reverse ").create(
-				cmd_reverse));
-
-		ops.addOption(OptionBuilder
-				.withDescription("standardise the phenotype").create(cmd_scale));
-
-		ops.addOption(OptionBuilder.withDescription("perm ").hasArg()
-				.create(cmd_perm));
-
-		ops.addOption(OptionBuilder.withDescription("prevalence ").hasArg()
-				.create(cmd_k));
-
-		ops.addOption(OptionBuilder.withDescription("na ").hasArg()
-				.create(cmd_na));
-
-		hpcParameter = new HpcParameter();
-
-		// /////transform heritability
-		ops.addOption(OptionBuilder
-				.withLongOpt(cmd_cal_k_long)
-				.withDescription(
-						"calculate heritability on the liability/observed scale with value K "
-								+ cmd_cal_k).hasArg().create(cmd_cal_k));
-
-		ops.addOption(OptionBuilder
-				.withLongOpt(cmd_cal_hl_long)
-				.withDescription(
-						"calculate heritability on the liability/observed scale "
-								+ cmd_cal_hl_long).hasArg().create(cmd_cal_hl));
-
-		ops.addOption(OptionBuilder
-				.withLongOpt(cmd_cal_ho_long)
-				.withDescription(
-						"calculate heritability on the liability/observed scale "
-								+ cmd_cal_ho_long).hasArg().create(cmd_cal_ho));
-
-		ops.addOption(OptionBuilder.withLongOpt(cmd_cal_cc_long)
-				.withDescription("number of case and controls " + cmd_cal_cc)
-				.hasArg().create(cmd_cal_cc));
-
-		ops.addOption(OptionBuilder
-				.withLongOpt(cmd_cal_h2_se_long)
-				.withDescription(
-						"se of heritability on the liability/observed scale ")
-				.hasArg().create(cmd_cal_h2_se));
-
-		ops.addOption(OptionBuilder
-				.withDescription("root file, default = " + out).hasArg()
-				.create(cmd_out));
-
-		ops.addOption(OptionBuilder.withDescription("help manual.").create(
-				cmd_help));
-
-	}
-
 	public void commandListener(String[] args)
 	{
 		try
@@ -1671,50 +1672,6 @@ public enum Parameter
 			polyEffectFlag = true;
 			polyEffectFile = cl.getOptionValue(cmd_poly_effect);
 			exists(polyEffectFile);
-		}
-
-		// profile
-		if (cl.hasOption(cmd_score))
-		{
-			scoreFlag = true;
-			scoreFile = cl.getOptionValue(cmd_score);
-			exists(scoreFile);
-		}
-
-		if (cl.hasOption(cmd_MaCH_Infor))
-		{
-			MaCH_Infor = cl.getOptionValue(cmd_MaCH_Infor);
-			exists(MaCH_Infor);
-		}
-
-		if (cl.hasOption(cmd_MaCH_Dosage))
-		{
-			MaCH_Dosage = cl.getOptionValue(cmd_MaCH_Dosage);
-			exists(MaCH_Dosage);
-		}
-
-		if (cl.hasOption(cmd_MaCH_Infor_Batch))
-		{
-			MaCH_Infor_Batch = cl.getOptionValue(cmd_MaCH_Infor_Batch);
-			exists(MaCH_Infor_Batch);
-		}
-
-		if (cl.hasOption(cmd_MaCH_Dosage_Batch))
-		{
-			MaCH_Dosage_Batch = cl.getOptionValue(cmd_MaCH_Dosage_Batch);
-			exists(MaCH_Dosage_Batch);
-		}
-
-		if (cl.hasOption(cmd_q_score_file))
-		{
-			q_score_file = cl.getOptionValue(cmd_q_score_file);
-			exists(q_score_file);
-		}
-
-		if (cl.hasOption(cmd_q_score_range))
-		{
-			q_score_range_file = cl.getOptionValue(cmd_q_score_range);
-			exists(q_score_range_file);
 		}
 
 		// grm statistics
