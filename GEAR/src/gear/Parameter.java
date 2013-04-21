@@ -849,37 +849,37 @@ public enum Parameter
 		
 		public String getScoreFile()
 		{
-			return cl.getOptionValue("score", null);
+			return cl.getOptionValue("score");
 		}
 		
 		public String getMachDosageFile()
 		{
-			return cl.getOptionValue("mach-dosage", null);
+			return cl.getOptionValue("mach-dosage");
 		}
 		
 		public String getMachInfoFile()
 		{
-			return cl.getOptionValue("mach-infor", null);
+			return cl.getOptionValue("mach-infor");
 		}
 		
 		public String getMachDosageBatchFile()
 		{
-			return cl.getOptionValue("mach-dosage-batch", null);
+			return cl.getOptionValue("mach-dosage-batch");
 		}
 		
 		public String getMachInfoBatchFile()
 		{
-			return cl.getOptionValue("mach-infor-batch", null);
+			return cl.getOptionValue("mach-infor-batch");
 		}
 		
 		public String getQScoreFile()
 		{
-			return cl.getOptionValue("q-score-file", null);
+			return cl.getOptionValue("q-score-file");
 		}
 		
 		public String getQScoreRangeFile()
 		{
-			return cl.getOptionValue("q-score-range", null);
+			return cl.getOptionValue("q-score-range");
 		}
 	}
 	
