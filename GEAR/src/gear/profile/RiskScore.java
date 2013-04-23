@@ -173,7 +173,7 @@ public class RiskScore
 			Arrays.fill(qsL2Flag, false);
 
 			SNP snp = snpList1.get(i);
-			char a1 = snp.getRefAllele();
+			char a1 = snp.getFirstAllele();
 			char a2 = snp.getSecAllele();
 			boolean isATGC = SNPMatch.Confusion(a1, a2);
 
@@ -367,7 +367,7 @@ public class RiskScore
 		for (int i = 0; i < snpList1.size(); i++)
 		{
 			SNP snp = snpList1.get(i);
-			char a1 = snp.getRefAllele();
+			char a1 = snp.getFirstAllele();
 			char a2 = snp.getSecAllele();
 			boolean isATGC = SNPMatch.Confusion(a1, a2);
 

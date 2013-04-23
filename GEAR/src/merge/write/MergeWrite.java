@@ -75,7 +75,7 @@ public class MergeWrite
 			SNP snp = e.next();
 			pbim.append(snp.getChromosome() + "\t" + snp.getName() + "\t"
 					+ snp.getDistance() + "\t" + snp.getPosition() + "\t"
-					+ snp.getRefAllele() + "\t" + snp.getSecAllele() + "\n");
+					+ snp.getFirstAllele() + "\t" + snp.getSecAllele() + "\n");
 		}
 		pbim.close();
 
@@ -164,7 +164,7 @@ public class MergeWrite
 			SNP snp = e.next();
 			pbim.append(snp.getChromosome() + "\t" + snp.getName() + "\t"
 					+ snp.getDistance() + "\t" + snp.getPosition() + "\t"
-					+ snp.getRefAllele() + "\t" + snp.getSecAllele() + "\n");
+					+ snp.getFirstAllele() + "\t" + snp.getSecAllele() + "\n");
 		}
 		pbim.close();
 

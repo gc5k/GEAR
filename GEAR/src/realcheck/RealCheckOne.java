@@ -141,7 +141,7 @@ public class RealCheckOne
 			SNP snp = snpList.get(idx);
 			ps.print(snp.getChromosome() + " " + snp.getName() + " "
 					+ snp.getDistance() + " " + snp.getPosition() + " "
-					+ snp.getRefAllele() + " " + snp.getSecAllele() + "\n");
+					+ snp.getFirstAllele() + " " + snp.getSecAllele() + "\n");
 		}
 		ps.close();
 	}
@@ -188,7 +188,7 @@ public class RealCheckOne
 			SNP snp = snpList.get(idx);
 			ps.print(snp.getChromosome() + " " + snp.getName() + " "
 					+ snp.getDistance() + " " + snp.getPosition() + " "
-					+ snp.getRefAllele() + " " + snp.getSecAllele() + "\n");
+					+ snp.getFirstAllele() + " " + snp.getSecAllele() + "\n");
 		}
 		ps.close();
 	}

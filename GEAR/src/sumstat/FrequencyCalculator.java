@@ -189,7 +189,7 @@ public class FrequencyCalculator
 		{
 			SNP snp = snpMap.getSNP(i);
 			sb.append(snp.getChromosome() + "\t" + snp.getName() + "\t"
-					+ snp.getRefAllele() + "\t" + snp.getSecAllele() + "\t");
+					+ snp.getFirstAllele() + "\t" + snp.getSecAllele() + "\t");
 			if (Parameter.INSTANCE.freqFlag)
 			{
 				sb.append(fmt.format(allelefreq[i][0]) + "\t"

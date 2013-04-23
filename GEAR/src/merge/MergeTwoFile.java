@@ -123,9 +123,9 @@ public class MergeTwoFile
 			boolean flip = false;
 			SNP snp1 = snpList1.get(comSNPIdx[0][i]);
 			SNP snp2 = snpList2.get(comSNPIdx[1][i]);
-			char a1_1 = snp1.getRefAllele();
+			char a1_1 = snp1.getFirstAllele();
 			char a1_2 = snp1.getSecAllele();
-			char a2_1 = snp2.getRefAllele();
+			char a2_1 = snp2.getFirstAllele();
 			char a2_2 = snp2.getSecAllele();
 
 			double ref1 = allelefreq1[comSNPIdx[0][i]][0];
@@ -462,7 +462,7 @@ public class MergeTwoFile
 			SNP snp = snpList1.get(comSNPIdx[0][i]);
 			pbim.append(snp.getChromosome() + "\t" + snp.getName() + "\t"
 					+ snp.getDistance() + "\t" + snp.getPosition() + "\t"
-					+ snp.getRefAllele() + "\t" + snp.getSecAllele() + "\n");
+					+ snp.getFirstAllele() + "\t" + snp.getSecAllele() + "\n");
 		}
 		pbim.close();
 

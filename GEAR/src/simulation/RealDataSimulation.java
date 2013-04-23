@@ -122,7 +122,7 @@ public class RealDataSimulation
 		for (int i = 0; i < casualLociIdx.length; i++)
 		{
 			SNP snp = snpList.get(casualLociIdx[i]);
-			ps1.append(snp.getName() + " " + snp.getRefAllele() + " "
+			ps1.append(snp.getName() + " " + snp.getFirstAllele() + " "
 					+ snp.getSecAllele() + " " + b[i] + "\n");
 		}
 		ps1.close();
