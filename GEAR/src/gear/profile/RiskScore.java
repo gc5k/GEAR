@@ -178,7 +178,7 @@ public class RiskScore
 			boolean isATGC = SNPMatch.Confusion(a1, a2);
 
 			ScoreUnit su = null;
-			boolean isMatch = true;
+			boolean isMatchRef = true;
 			double sc = 0;
 			if (Score.containsKey(snp.getName()))
 			{
@@ -225,28 +225,29 @@ public class RiskScore
 
 				if (su.getRefAllele().compareTo(Character.toString(a1)) == 0)
 				{
-					isMatch = true;
+					isMatchRef = false;
 					matchScheme[0]++;
 
 				} else if (su.getRefAllele().compareTo(Character.toString(a2)) == 0)
 				{
-					isMatch = false;
+					isMatchRef = true;
 					matchScheme[1]++;
 
 				} else if (su.getRefAllele().compareTo(
 						SNPMatch.Flip(Character.toString(a1))) == 0)
 				{
-					isMatch = true;
+					isMatchRef = false;
 					matchScheme[2]++;
 
 				} else if (su.getRefAllele().compareTo(
 						SNPMatch.Flip(Character.toString(a2))) == 0)
 				{
-					isMatch = false;
+					isMatchRef = true;
 					matchScheme[3]++;
 
 				} else
 				{
+					isMatchRef = false;
 					matchScheme[4]++;
 					continue;
 				}
@@ -254,7 +255,7 @@ public class RiskScore
 				sc = su.getScore();
 				if (Parameter.INSTANCE.getTranFunction() == gear.RegressionModel.LOGIT)
 				{
-					if (isMatch)
+					if (isMatchRef)
 					{
 						sc = Math.log(sc);
 					} else
@@ -263,7 +264,7 @@ public class RiskScore
 					}
 				} else
 				{
-					if (!isMatch)
+					if (!isMatchRef)
 					{
 						sc = -1 * sc;
 					}
@@ -282,8 +283,7 @@ public class RiskScore
 				{
 					if (G1.getAdditiveScore(j, i) != GenotypeMatrix.missing)
 					{
-						riskProfile[j][k] += sc
-								* (2 - G1.getAdditiveScore(j, i));
+						riskProfile[j][k] += sc * G1.getAdditiveScore(j, i);
 						GCInd[j][k]++;
 					}
 				}
@@ -372,7 +372,7 @@ public class RiskScore
 			boolean isATGC = SNPMatch.Confusion(a1, a2);
 
 			ScoreUnit su = null;
-			boolean isMatch = true;
+			boolean isMatchRef = false;
 			double sc = 0;
 			if (Score.containsKey(snp.getName()))
 			{
@@ -399,20 +399,20 @@ public class RiskScore
 
 				if (su.getRefAllele().equals(Character.toString(a1)))
 				{
-					isMatch = true;
+					isMatchRef = false;
 					matchScheme[0]++;
 					ArrayList<String> s = s4.get(0);
 					s.add(snp.getName());
 				} else if (su.getRefAllele().equals(Character.toString(a2)))
 				{
-					isMatch = false;
+					isMatchRef = true;
 					matchScheme[1]++;
 					ArrayList<String> s = s4.get(1);
 					s.add(snp.getName());
 				} else if (su.getRefAllele().equals(
 						SNPMatch.Flip(Character.toString(a1))))
 				{
-					isMatch = true;
+					isMatchRef = false;
 					matchScheme[2]++;
 					ArrayList<String> s = s4.get(2);
 					s.add(snp.getName());
@@ -420,13 +420,14 @@ public class RiskScore
 				} else if (su.getRefAllele().equals(
 						SNPMatch.Flip(Character.toString(a2))))
 				{
-					isMatch = false;
+					isMatchRef = true;
 					matchScheme[3]++;
 					ArrayList<String> s = s4.get(3);
 					s.add(snp.getName());
 
 				} else
 				{
+					isMatchRef = false;
 					matchScheme[4]++;
 					continue;
 				}
@@ -435,7 +436,7 @@ public class RiskScore
 				sc = su.getScore();
 				if (Parameter.INSTANCE.getTranFunction() == gear.RegressionModel.LOGIT)
 				{// logit s
-					if (isMatch)
+					if (isMatchRef)
 					{
 						sc = Math.log(sc);
 					} else
@@ -452,7 +453,7 @@ public class RiskScore
 			{
 				if (G1.getAdditiveScore(j, i) != GenotypeMatrix.missing)
 				{
-					riskProfile[j] += sc * (2 - G1.getAdditiveScore(j, i));
+					riskProfile[j] += sc * G1.getAdditiveScore(j, i);
 					GCInd[j]++;
 				}
 			}
