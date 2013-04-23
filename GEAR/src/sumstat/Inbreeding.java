@@ -151,7 +151,7 @@ public class Inbreeding
 			fstOut.print(snpMap.getSNP(i).getChromosome() + "\t"
 					+ snpMap.getMarkerName(i) + "\t"
 					+ snpMap.getSNP(i).getPosition() + "\t"
-					+ snpMap.getSNP(i).getRefAllele() + "\t");
+					+ snpMap.getSNP(i).getFirstAllele() + "\t");
 			for (int j = 0; j < groupID.size(); j++)
 			{
 				f += w[i][j] * 2 * mafGroup[i][j] * (1 - mafGroup[i][j]);

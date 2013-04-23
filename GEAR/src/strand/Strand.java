@@ -107,7 +107,7 @@ public class Strand
 
 			SNP snp1 = snpList1.get(comSNPIdx[0][i]);
 			MAF maf2 = mafList.get(comSNPIdx[1][i]);
-			char a1_1 = snp1.getRefAllele();
+			char a1_1 = snp1.getFirstAllele();
 			char a1_2 = snp1.getSecAllele();
 			char a2_1 = maf2.getA1();
 			char a2_2 = maf2.getA2();
@@ -473,7 +473,7 @@ public class Strand
 			SNP snp = snpList1.get(comSNPIdx[0][i]);
 			pbim.append(snp.getChromosome() + "\t" + snp.getName() + "\t"
 					+ snp.getDistance() + "\t" + snp.getPosition() + "\t"
-					+ snp.getRefAllele() + "\t" + snp.getSecAllele() + "\n");
+					+ snp.getFirstAllele() + "\t" + snp.getSecAllele() + "\n");
 		}
 		pbim.close();
 

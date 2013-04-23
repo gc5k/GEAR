@@ -161,7 +161,7 @@ public class SNP implements Comparable<SNP>
 		return sb.toString();
 	}
 
-	public char getRefAllele()
+	public char getFirstAllele()
 	{
 		return snp[0];
 	}

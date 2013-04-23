@@ -88,7 +88,7 @@ public class MakePredictor2
 
 			SNP snp1 = snpList1.get(comSNPIdx[0][i]);
 			Predictor2 maf2 = predictorList.get(comSNPIdx[1][i]);
-			char a1_1 = snp1.getRefAllele();
+			char a1_1 = snp1.getFirstAllele();
 			char a1_2 = snp1.getSecAllele();
 			char a2_1 = maf2.getA1();
 			char a2_2 = maf2.getA2();
@@ -481,7 +481,7 @@ public class MakePredictor2
 						}
 					}
 				}
-				predictorFile.append(snp.getName() + "\t" + snp.getRefAllele()
+				predictorFile.append(snp.getName() + "\t" + snp.getFirstAllele()
 						+ "\t" + s + "\n");
 			}
 		}

@@ -177,7 +177,7 @@ public class RealCheck
 			SNP snp = snpList.get(comSNPIdx[0][idx]);
 			ps.print(snp.getChromosome() + " " + snp.getName() + " "
 					+ snp.getDistance() + " " + snp.getPosition() + " "
-					+ snp.getRefAllele() + " " + snp.getSecAllele() + "\n");
+					+ snp.getFirstAllele() + " " + snp.getSecAllele() + "\n");
 		}
 		ps.close();
 	}
@@ -214,7 +214,7 @@ public class RealCheck
 			SNP snp = snpList.get(comSNPIdx[0][idx]);
 			ps.print(snp.getChromosome() + " " + snp.getName() + " "
 					+ snp.getDistance() + " " + snp.getPosition() + " "
-					+ snp.getRefAllele() + " " + snp.getSecAllele() + "\n");
+					+ snp.getFirstAllele() + " " + snp.getSecAllele() + "\n");
 		}
 		ps.close();
 	}
@@ -227,7 +227,7 @@ public class RealCheck
 		{
 			SNP snp = e.next();
 			SNPMap.put(snp.getName(), 0);
-			SNPRef.put(snp.getName(), Character.toString(snp.getRefAllele()));
+			SNPRef.put(snp.getName(), Character.toString(snp.getFirstAllele()));
 		}
 
 		int c = 0;
@@ -239,7 +239,7 @@ public class RealCheck
 			if (SNPMap.containsKey(snp_name))
 			{
 				if (SNPRef.get(snp_name).compareTo(
-						Character.toString(snp.getRefAllele())) == 0)
+						Character.toString(snp.getFirstAllele())) == 0)
 				{
 					SNPMap.put(snp_name, 1);
 					SNPMapList2.put(snp_name, i);
@@ -254,7 +254,7 @@ public class RealCheck
 			if (SNPMap.containsKey(snp.getName()))
 			{
 				if (SNPRef.get(snp.getName()).compareTo(
-						Character.toString(snp.getRefAllele())) == 0)
+						Character.toString(snp.getFirstAllele())) == 0)
 				{
 					SNPMap.put(snp.getName(), 1);
 					c++;
