@@ -46,9 +46,9 @@ public class MakePredictor2
 		if (CmdArgs.INSTANCE.getBinaryDataArgs(0).isSet())
 		{
 			pp1 = new PLINKBinaryParser(CmdArgs.INSTANCE.getBinaryDataArgs(0)
-					.getBedFile(), CmdArgs.INSTANCE.getBinaryDataArgs(0)
-					.getBimFile(), CmdArgs.INSTANCE.getBinaryDataArgs(0)
-					.getFamFile());
+					.getBed(), CmdArgs.INSTANCE.getBinaryDataArgs(0)
+					.getBim(), CmdArgs.INSTANCE.getBinaryDataArgs(0)
+					.getFam());
 		} else
 		{
 			Logger.printUserError("--bfile is not set");

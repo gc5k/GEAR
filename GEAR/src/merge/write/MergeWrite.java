@@ -33,18 +33,18 @@ public class MergeWrite
 	{
 		par = p;
 		PLINKParser pp = null;
-		if (CmdArgs.INSTANCE.getTextDataArgs().isSet())
+		if (CmdArgs.INSTANCE.getFileArgs().isSet())
 		{
-			pp = new PLINKParser(CmdArgs.INSTANCE.getTextDataArgs()
-					.getPedFile(), CmdArgs.INSTANCE.getTextDataArgs()
-					.getMapFile());
+			pp = new PLINKParser(CmdArgs.INSTANCE.getFileArgs()
+					.getPed(), CmdArgs.INSTANCE.getFileArgs()
+					.getMap());
 		}
 		if (CmdArgs.INSTANCE.getBinaryDataArgs(0).isSet())
 		{
 			pp = new PLINKBinaryParser(CmdArgs.INSTANCE.getBinaryDataArgs(0)
-					.getBedFile(), CmdArgs.INSTANCE.getBinaryDataArgs(0)
-					.getBimFile(), CmdArgs.INSTANCE.getBinaryDataArgs(0)
-					.getFamFile());
+					.getBed(), CmdArgs.INSTANCE.getBinaryDataArgs(0)
+					.getBim(), CmdArgs.INSTANCE.getBinaryDataArgs(0)
+					.getFam());
 		} else
 		{
 			Logger.printUserError("No input files.");

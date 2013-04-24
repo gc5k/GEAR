@@ -30,10 +30,10 @@ public enum CmdArgs
 	private CmdArgs()
 	{
 		ops = new Options();
-		textDataArgs = new TextDataArgs();
-		binaryDataArgs = new BinaryDataArgs[2];
-		binaryDataArgs[0] = new BinaryDataArgs("PLINK format binary input file", "bfile");
-		binaryDataArgs[1] = new BinaryDataArgs("The second PLINK format binary input file", "bfile2");
+		fileArgs = new FileArgs();
+		binaryDataArgs = new BFileArgs[2];
+		binaryDataArgs[0] = new BFileArgs("PLINK format binary input file", "bfile");
+		binaryDataArgs[1] = new BFileArgs("The second PLINK format binary input file", "bfile2");
 		profileArgs = new ProfileArgs();
 
 		// real-check
@@ -332,11 +332,11 @@ public enum CmdArgs
 
 	}
 
-	public class BinaryDataArgs
+	public class BFileArgs
 	{
 
 		@SuppressWarnings("static-access")
-		private BinaryDataArgs(String desc, String opt)
+		private BFileArgs(String desc, String opt)
 		{
 			ops.addOption(OptionBuilder.withDescription(desc).hasArg().create(opt));
 			cmd_bfile = opt;
@@ -347,70 +347,66 @@ public enum CmdArgs
 			return cl.hasOption(cmd_bfile);
 		}
 
-		public String getBedFile()
+		public String getBed()
 		{
 			String bfile = cl.getOptionValue(cmd_bfile);
 			return bfile == null ? null : bfile + ".bed";
 		}
 
-		public String getBimFile()
+		public String getBim()
 		{
 			String bfile = cl.getOptionValue(cmd_bfile);
 			return bfile == null ? null : bfile + ".bim";
 		}
 
-		public String getFamFile()
+		public String getFam()
 		{
 			String bfile = cl.getOptionValue(cmd_bfile);
 			return bfile == null ? null : bfile + ".fam";
 		}
 
 		private String cmd_bfile;
-
 	}
 
-	public BinaryDataArgs getBinaryDataArgs(int i)
+	public BFileArgs getBinaryDataArgs(int i)
 	{
 		return binaryDataArgs[i];
 	}
 
-	private BinaryDataArgs[] binaryDataArgs;
+	private BFileArgs[] binaryDataArgs;
 
-	public class TextDataArgs
+	public class FileArgs
 	{
 		@SuppressWarnings("static-access")
-		private TextDataArgs()
+		private FileArgs()
 		{
-			ops.addOption(OptionBuilder.withDescription("PLINK format text input file").hasArg().create(cmd_file));
+			ops.addOption(OptionBuilder.withDescription("PLINK format text input file").hasArg().create("file"));
 		}
 
 		public boolean isSet()
 		{
-			return cl.hasOption(cmd_file);
+			return cl.hasOption("file");
 		}
 
-		public String getPedFile()
+		public String getPed()
 		{
-			String file = cl.getOptionValue(cmd_file);
+			String file = cl.getOptionValue("file");
 			return file == null ? null : file + ".ped";
 		}
 
-		public String getMapFile()
+		public String getMap()
 		{
-			String file = cl.getOptionValue(cmd_file);
+			String file = cl.getOptionValue("file");
 			return file == null ? null : file + ".map";
 		}
-
-		private static final String cmd_file = "file";
-
 	}
 
-	public TextDataArgs getTextDataArgs()
+	public FileArgs getFileArgs()
 	{
-		return textDataArgs;
+		return fileArgs;
 	}
 
-	private TextDataArgs textDataArgs;
+	private FileArgs fileArgs;
 
 	// Real-check options Begin
 	public boolean hasRealCheckOption()
