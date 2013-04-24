@@ -14,7 +14,7 @@ import family.plink.PLINKBinaryParser;
 import family.plink.PLINKParser;
 import family.popstat.GenotypeMatrix;
 import family.qc.rowqc.SampleFilter;
-import gear.Parameter;
+import gear.CmdArgs;
 import gear.util.Logger;
 import gear.util.stat.FastFisherExactTest;
 
@@ -32,16 +32,16 @@ public class FrequencyCalculator
 	public FrequencyCalculator()
 	{
 		PLINKParser pp = null;
-		if (Parameter.INSTANCE.getFileParameter().isSet())
+		if (CmdArgs.INSTANCE.getTextDataArgs().isSet())
 		{
-			pp = new PLINKParser(Parameter.INSTANCE.getFileParameter()
-					.getPedFile(), Parameter.INSTANCE.getFileParameter()
+			pp = new PLINKParser(CmdArgs.INSTANCE.getTextDataArgs()
+					.getPedFile(), CmdArgs.INSTANCE.getTextDataArgs()
 					.getMapFile());
-		} else if (Parameter.INSTANCE.getBfileParameter(0).isSet())
+		} else if (CmdArgs.INSTANCE.getBinaryDataArgs(0).isSet())
 		{
-			pp = new PLINKBinaryParser(Parameter.INSTANCE.getBfileParameter(0)
-					.getBedFile(), Parameter.INSTANCE.getBfileParameter(0)
-					.getBimFile(), Parameter.INSTANCE.getBfileParameter(0)
+			pp = new PLINKBinaryParser(CmdArgs.INSTANCE.getBinaryDataArgs(0)
+					.getBedFile(), CmdArgs.INSTANCE.getBinaryDataArgs(0)
+					.getBimFile(), CmdArgs.INSTANCE.getBinaryDataArgs(0)
 					.getFamFile());
 		} else
 		{
@@ -177,7 +177,7 @@ public class FrequencyCalculator
 		NumberFormat fmt = new DecimalFormat(".###E0");
 
 		StringBuffer sb = new StringBuffer();
-		if (Parameter.INSTANCE.freqFlag)
+		if (CmdArgs.INSTANCE.freqFlag)
 		{
 			sb.append("chr\tsnp\tA1\tA2\tfrq(A1)\tfrq(A2)\tMiss\tNChr");
 		} else
@@ -190,12 +190,12 @@ public class FrequencyCalculator
 			SNP snp = snpMap.getSNP(i);
 			sb.append(snp.getChromosome() + "\t" + snp.getName() + "\t"
 					+ snp.getFirstAllele() + "\t" + snp.getSecAllele() + "\t");
-			if (Parameter.INSTANCE.freqFlag)
+			if (CmdArgs.INSTANCE.freqFlag)
 			{
 				sb.append(fmt.format(allelefreq[i][0]) + "\t"
 						+ fmt.format(allelefreq[i][1]) + "\t"
 						+ fmt.format(allelefreq[i][2]) + "\t" + N[i][3] * 2);
-			} else if (Parameter.INSTANCE.genoFreqFlag)
+			} else if (CmdArgs.INSTANCE.genoFreqFlag)
 			{
 				sb.append(fmt.format(genotypefreq[i][0]) + "\t"
 						+ fmt.format(genotypefreq[i][1]) + "\t"

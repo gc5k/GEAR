@@ -3,7 +3,7 @@ package family.RabinowitzLairdAlgorithm.lou;
 import java.util.TreeMap;
 
 import family.RabinowitzLairdAlgorithm.AbstractGenoDistribution;
-import gear.Parameter;
+import gear.CmdArgs;
 
 /**
  * Class extends GenoDristribution Treat the situation of one heterozygous
@@ -50,13 +50,13 @@ public class HomozygousParent extends AbstractGenoDistribution
 		String tran = new String(transmitted);
 		String pgeno;
 
-		if (transmitted.compareTo(Parameter.INSTANCE.missingGenotype) == 0)
+		if (transmitted.compareTo(CmdArgs.INSTANCE.missingGenotype) == 0)
 		{
 			tran = RandomAssign();
-			if (tran.compareTo(Parameter.INSTANCE.missingGenotype) == 0)
+			if (tran.compareTo(CmdArgs.INSTANCE.missingGenotype) == 0)
 			{
-				String nontran_tran[] = { Parameter.INSTANCE.missingGenotype,
-						Parameter.INSTANCE.missingGenotype };
+				String nontran_tran[] = { CmdArgs.INSTANCE.missingGenotype,
+						CmdArgs.INSTANCE.missingGenotype };
 				return nontran_tran;
 			}
 		}

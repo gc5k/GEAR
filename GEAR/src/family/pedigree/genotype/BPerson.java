@@ -1,7 +1,7 @@
 package family.pedigree.genotype;
 
 import family.plink.PLINKBinaryParser;
-import gear.Parameter;
+import gear.CmdArgs;
 
 /**
  * stores the genotypes of each individual. this class is not thread safe
@@ -240,7 +240,7 @@ public class BPerson
 		int g = (alleles[posByte] >> (posBite)) & 3;
 		if (g == 1)
 		{// 01
-			return Parameter.INSTANCE.missingGenotype;
+			return CmdArgs.INSTANCE.missingGenotype;
 		} else
 		{
 			if (g == 2)
@@ -270,7 +270,7 @@ public class BPerson
 		int g = (alleles[posByte] >> posBite) & 3;
 		if (g == 3)
 		{
-			return Parameter.INSTANCE.missingGenotype;
+			return CmdArgs.INSTANCE.missingGenotype;
 		} else
 		{
 			StringBuffer sb = new StringBuffer();
@@ -345,7 +345,7 @@ public class BPerson
 	{
 		int a = Integer.parseInt(geno.substring(0, 1));
 		int b = Integer.parseInt(geno.substring(1, 2));
-		boolean flag = geno.compareTo(Parameter.INSTANCE.missingGenotype) == 0 ? false
+		boolean flag = geno.compareTo(CmdArgs.INSTANCE.missingGenotype) == 0 ? false
 				: true;
 		addMarker(flag, a, b, index);
 	}

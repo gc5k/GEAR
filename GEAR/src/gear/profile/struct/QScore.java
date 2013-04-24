@@ -1,6 +1,6 @@
 package gear.profile.struct;
 
-import gear.Parameter;
+import gear.CmdArgs;
 import gear.util.BufferedReader;
 import gear.util.Logger;
 
@@ -52,7 +52,7 @@ public class QScore
 				break;
 			}
 
-			if (Parameter.INSTANCE.isNA(tokens[1]))
+			if (CmdArgs.INSTANCE.isNA(tokens[1]))
 			{
 				qScore = new QScore(/* SNP = */tokens[0]);
 			} else

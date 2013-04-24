@@ -12,7 +12,7 @@ public class HPC
 	public static void genScript(String[] args)
 	{
 		StringBuilder sb = new StringBuilder();
-		sb.append(Parameter.INSTANCE.getHpcParameter().getName());
+		sb.append(CmdArgs.INSTANCE.getHpcArgs().getName());
 		sb.append(".sh");
 
 		PrintWriter pw = null;
@@ -26,13 +26,13 @@ public class HPC
 		}
 
 		pw.println("#$ -cwd");
-		pw.println("#$ -l vf=" + Parameter.INSTANCE.getHpcParameter().getRam());
-		pw.println("#$ -N " + Parameter.INSTANCE.getHpcParameter().getName());
+		pw.println("#$ -l vf=" + CmdArgs.INSTANCE.getHpcArgs().getRam());
+		pw.println("#$ -N " + CmdArgs.INSTANCE.getHpcArgs().getName());
 		pw.println("#$ -m eas");
-		pw.println("#$ -M " + Parameter.INSTANCE.getHpcParameter().getEmail());
+		pw.println("#$ -M " + CmdArgs.INSTANCE.getHpcArgs().getEmail());
 
 		pw.print("java -jar -Xmx"
-				+ Parameter.INSTANCE.getHpcParameter().getRam() + " ");
+				+ CmdArgs.INSTANCE.getHpcArgs().getRam() + " ");
 		pw.print(HPC.class.getProtectionDomain().getCodeSource().getLocation()
 				.getPath()
 				+ " ");
@@ -55,7 +55,7 @@ public class HPC
 
 		pw.close();
 
-		if (Parameter.INSTANCE.getHpcParameter().isQsubSet())
+		if (CmdArgs.INSTANCE.getHpcArgs().isQsubSet())
 		{
 			Runtime rt = Runtime.getRuntime();
 			String cmd = "qsub " + sb.toString();

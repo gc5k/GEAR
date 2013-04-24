@@ -6,7 +6,7 @@ package family.RabinowitzLairdAlgorithm.lou;
 import java.util.TreeMap;
 
 import family.RabinowitzLairdAlgorithm.AbstractGenoDistribution;
-import gear.Parameter;
+import gear.CmdArgs;
 
 /**
  * Class for observing both parental genotypes.
@@ -53,7 +53,7 @@ public class ObservedParents extends AbstractGenoDistribution
 				{ p2.charAt(0), p2.charAt(1) } };
 		char allele[] = new char[2];
 
-		if (transmitted.compareTo(Parameter.INSTANCE.missingGenotype) == 0)
+		if (transmitted.compareTo(CmdArgs.INSTANCE.missingGenotype) == 0)
 		{// missing
 			// data
 			int index1 = (rnd.nextFloat() > 0.5) ? 0 : 1;

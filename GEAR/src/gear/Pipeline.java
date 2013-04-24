@@ -32,9 +32,9 @@ public class Pipeline
 
 	public static void main(String[] args)
 	{
-		Parameter.INSTANCE.commandListener(args);
+		CmdArgs.INSTANCE.commandListener(args);
 
-		Logger.setLogFiles(Parameter.INSTANCE.out);
+		Logger.setLogFiles(CmdArgs.INSTANCE.out);
 		Logger.printUserLog(AboutInfo.WELCOME_MESSAGE);
 		Logger.printUserLog("Analysis started: "
 				+ Calendar.getInstance().getTime() + "\n");
@@ -57,14 +57,14 @@ public class Pipeline
 		Logger.printUserLog(sb.toString());
 		Logger.printUserLog("");
 
-		if (Parameter.INSTANCE.getHpcParameter().isSet())
+		if (CmdArgs.INSTANCE.getHpcArgs().isSet())
 		{
 			HPC.genScript(args);
 		}
-		else if (Parameter.INSTANCE.getProfileParameter().isSet())
+		else if (CmdArgs.INSTANCE.getProfileArgs().isSet())
 		{
-			if (Parameter.INSTANCE.getFileParameter().isSet() ||
-				Parameter.INSTANCE.getBfileParameter(0).isSet())
+			if (CmdArgs.INSTANCE.getTextDataArgs().isSet() ||
+				CmdArgs.INSTANCE.getBinaryDataArgs(0).isSet())
 			{
 				RiskScore rs = new RiskScore();
 				rs.makeProfile();
@@ -75,29 +75,29 @@ public class Pipeline
 				mach.makeProfile();
 			}
 		}
-		else if (Parameter.INSTANCE.hasStrandOption())
+		else if (CmdArgs.INSTANCE.hasStrandOption())
 		{
 			Strand strand = new Strand();
 			strand.Merge();
 		}
-		else if (Parameter.INSTANCE.hasMergeOption())
+		else if (CmdArgs.INSTANCE.hasMergeOption())
 		{
 			MergeTwoFile mtf = new MergeTwoFile();
 			mtf.Merge();
 		}
-		else if (Parameter.INSTANCE.hasMakePredictorOption())
+		else if (CmdArgs.INSTANCE.hasMakePredictorOption())
 		{
 			MakePredictor mp = new MakePredictor();
 			mp.BuildPredictor();
 		}
-		else if (Parameter.INSTANCE.hasMakePredictor2Option())
+		else if (CmdArgs.INSTANCE.hasMakePredictor2Option())
 		{
 			MakePredictor2 mp2 = new MakePredictor2();
 			mp2.BuildPredictor();
 		}
-		else if (Parameter.INSTANCE.hasRealCheckOption())
+		else if (CmdArgs.INSTANCE.hasRealCheckOption())
 		{
-			if (Parameter.INSTANCE.getBfileParameter(0).isSet())
+			if (CmdArgs.INSTANCE.getBinaryDataArgs(0).isSet())
 			{
 				RealCheck realcheck = new RealCheck();
 				realcheck.Check();
@@ -108,98 +108,98 @@ public class Pipeline
 				realcheckone.Check();
 			}
 		}
-		else if (Parameter.INSTANCE.simufamFlag)
+		else if (CmdArgs.INSTANCE.simufamFlag)
 		{
 			SimuFamily simuFam = new SimuFamily(
-					Parameter.INSTANCE.simu_fam_size,
-					Parameter.INSTANCE.simu_fam_marker, Parameter.INSTANCE.seed);
+					CmdArgs.INSTANCE.simu_fam_size,
+					CmdArgs.INSTANCE.simu_fam_marker, CmdArgs.INSTANCE.seed);
 			simuFam.generateSample();
 
 		}
-		else if (Parameter.INSTANCE.simuRealData)
+		else if (CmdArgs.INSTANCE.simuRealData)
 		{
 			RealDataSimulation rdSimu = new RealDataSimulation();
 			rdSimu.GenerateSample();
 
 		}
-		else if (Parameter.INSTANCE.simupolyCCFlag)
+		else if (CmdArgs.INSTANCE.simupolyCCFlag)
 		{
 			SimuPolyCC polyCC = new SimuPolyCC();
 			polyCC.GenerateSample();
 
 		}
-		else if (Parameter.INSTANCE.simupolyQTFlag)
+		else if (CmdArgs.INSTANCE.simupolyQTFlag)
 		{
 			SimuPolyQT polyQT = new SimuPolyQT();
 			polyQT.generateSample();
 
 		}
-		else if (Parameter.INSTANCE.sumStatFlag)
+		else if (CmdArgs.INSTANCE.sumStatFlag)
 		{
-			if (Parameter.INSTANCE.freqFlag)
+			if (CmdArgs.INSTANCE.freqFlag)
 			{
 				FrequencyCalculator fc = new FrequencyCalculator();
 				fc.CalculateAlleleFrequency();
 				Logger.printUserLog(fc.toString());
 
-			} else if (Parameter.INSTANCE.genoFreqFlag)
+			} else if (CmdArgs.INSTANCE.genoFreqFlag)
 			{
 				FrequencyCalculator fc = new FrequencyCalculator();
 				fc.CalculateAlleleFrequency();
 				Logger.printUserLog(fc.toString());
 
-			} else if (Parameter.INSTANCE.fstFlag)
+			} else if (CmdArgs.INSTANCE.fstFlag)
 			{
 				Inbreeding inb = new Inbreeding();
 				inb.CalculateFst();
 			}
 		}
-		else if (Parameter.INSTANCE.makebedFlag)
+		else if (CmdArgs.INSTANCE.makebedFlag)
 		{
 			WriteBedSNPMajor bedWriter = new WriteBedSNPMajor();
 			bedWriter.WriteFile();
 
 		}
-		else if (Parameter.INSTANCE.calOption)
+		else if (CmdArgs.INSTANCE.calOption)
 		{
 			H2Transformer H2 = new H2Transformer();
 			H2.H2();
 
 		}
-		else if (Parameter.INSTANCE.nontransFlag)
+		else if (CmdArgs.INSTANCE.nontransFlag)
 		{
 			NonTransmitted nt = new NonTransmitted();
 			nt.GenerateNonTransmitted();
 
 		}
-		else if (Parameter.INSTANCE.hasHEOption())
+		else if (CmdArgs.INSTANCE.hasHEOption())
 		{
 			HERead hr = new HERead();
 			HECalculate HC = new HECalculate(hr);
 			HC.Regression();
 
-			if (Parameter.INSTANCE.permFlag)
+			if (CmdArgs.INSTANCE.permFlag)
 			{
 				HEPermutation hp = new HEPermutation(hr);
 				hp.Permutation();
 			}
 		}
-		else if (Parameter.INSTANCE.grmstatFlag)
+		else if (CmdArgs.INSTANCE.grmstatFlag)
 		{
 			GRMStat gs = new GRMStat();
 			gs.GetGRMStats();
 
 		}
-		else if (Parameter.INSTANCE.GRMFlag)
+		else if (CmdArgs.INSTANCE.GRMFlag)
 		{
 			MakeGRM mg = new MakeGRM();
-			if (Parameter.INSTANCE.grmRangeFlag)
+			if (CmdArgs.INSTANCE.grmRangeFlag)
 			{
 				mg.makeGeneticRelationshipScore(
-						Parameter.INSTANCE.grm_range[0],
-						Parameter.INSTANCE.grm_range[1]);
+						CmdArgs.INSTANCE.grm_range[0],
+						CmdArgs.INSTANCE.grm_range[1]);
 			}
-			else if (Parameter.INSTANCE.grmPartitionFlag)
+			else if (CmdArgs.INSTANCE.grmPartitionFlag)
 			{
 				mg.GRMPartitioning(args);
 			}

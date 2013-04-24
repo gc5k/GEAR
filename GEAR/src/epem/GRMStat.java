@@ -1,6 +1,6 @@
 package epem;
 
-import gear.Parameter;
+import gear.CmdArgs;
 import gear.util.FileProcessor;
 import gear.util.Logger;
 import he.endian.LittleEndianDataInputStream;
@@ -32,23 +32,23 @@ public class GRMStat
 
 	public GRMStat()
 	{
-		if (Parameter.INSTANCE.getHEParameter().isAbsGrmCutoff())
+		if (CmdArgs.INSTANCE.getHEArgs().isAbsGrmCutoff())
 		{
-			grmCutoff = Parameter.INSTANCE.getHEParameter().AbsGrmCutoff();
-		} else if (Parameter.INSTANCE.getHEParameter().isGrmCutoff())
+			grmCutoff = CmdArgs.INSTANCE.getHEArgs().AbsGrmCutoff();
+		} else if (CmdArgs.INSTANCE.getHEArgs().isGrmCutoff())
 		{
-			grmCutoff = Parameter.INSTANCE.getHEParameter().GrmCutoff();
+			grmCutoff = CmdArgs.INSTANCE.getHEArgs().GrmCutoff();
 		}
 
 	}
 
 	public void GetGRMStats()
 	{
-		if (Parameter.INSTANCE.getHEParameter().isGrmBinary())
+		if (CmdArgs.INSTANCE.getHEArgs().isGrmBinary())
 		{
 			BinaryGRM();
 		}
-		if (Parameter.INSTANCE.getHEParameter().isGrmTxt())
+		if (CmdArgs.INSTANCE.getHEArgs().isGrmTxt())
 		{
 			txtGRM();
 		} else
@@ -58,7 +58,7 @@ public class GRMStat
 
 		double s = Nt - N;
 
-		sb.append("grm file: " + Parameter.INSTANCE.getHEParameter().getGrm()
+		sb.append("grm file: " + CmdArgs.INSTANCE.getHEArgs().getGrm()
 				+ "\n");
 
 		sb.append("Total lines in grm: " + Nt + "\n");
@@ -72,7 +72,7 @@ public class GRMStat
 		Logger.printUserLog(sb.toString());
 
 		StringBuilder fsb = new StringBuilder();
-		fsb.append(Parameter.INSTANCE.out);
+		fsb.append(CmdArgs.INSTANCE.out);
 		fsb.append(".gs");
 		PrintWriter pw = null;
 		try
@@ -89,8 +89,8 @@ public class GRMStat
 
 	private void BinaryGRM()
 	{
-		BufferedReader reader = FileProcessor.FileOpen(Parameter.INSTANCE
-				.getHEParameter().getGrmId());
+		BufferedReader reader = FileProcessor.FileOpen(CmdArgs.INSTANCE
+				.getHEArgs().getGrmId());
 
 		int size = 0;
 		try
@@ -104,7 +104,7 @@ public class GRMStat
 		{
 			Logger.handleException(e,
 					"An exception occurred when reading the ID file '"
-							+ Parameter.INSTANCE.getHEParameter().getGrmId()
+							+ CmdArgs.INSTANCE.getHEArgs().getGrmId()
 							+ "'.");
 		}
 
@@ -112,12 +112,12 @@ public class GRMStat
 		FileInputStream fileStream = null;
 		try
 		{
-			fileStream = new FileInputStream(Parameter.INSTANCE
-					.getHEParameter().getGrm());
+			fileStream = new FileInputStream(CmdArgs.INSTANCE
+					.getHEArgs().getGrm());
 		} catch (FileNotFoundException e)
 		{
 			Logger.handleException(e, "Cannot open the GRM file '"
-					+ Parameter.INSTANCE.getHEParameter().getGrm() + "'.");
+					+ CmdArgs.INSTANCE.getHEArgs().getGrm() + "'.");
 		}
 		DataInputStream bigEndianDataStream = new DataInputStream(fileStream);
 		LittleEndianDataInputStream littleEndianDataStream = new LittleEndianDataInputStream(
@@ -139,7 +139,7 @@ public class GRMStat
 				{
 					Logger.handleException(e,
 							"An exception occurred when reading the GRM file '"
-									+ Parameter.INSTANCE.getHEParameter()
+									+ CmdArgs.INSTANCE.getHEArgs()
 											.getGrm() + "'.");
 				}
 
@@ -148,11 +148,11 @@ public class GRMStat
 				if (id1 == id2)
 					continue;
 
-				if (Parameter.INSTANCE.getHEParameter().isAbsGrmCutoff())
+				if (CmdArgs.INSTANCE.getHEArgs().isAbsGrmCutoff())
 				{
 					if (Math.abs(g) > grmCutoff)
 						continue;
-				} else if (Parameter.INSTANCE.getHEParameter().isGrmCutoff())
+				} else if (CmdArgs.INSTANCE.getHEArgs().isGrmCutoff())
 				{
 					if (g > grmCutoff)
 						continue;
@@ -172,12 +172,12 @@ public class GRMStat
 		FileInputStream fin = null;
 		try
 		{
-			fin = new FileInputStream(Parameter.INSTANCE.getHEParameter()
+			fin = new FileInputStream(CmdArgs.INSTANCE.getHEArgs()
 					.getGrm());
 		} catch (FileNotFoundException e)
 		{
 			Logger.handleException(e, "Cannot open the GRM file '"
-					+ Parameter.INSTANCE.getHEParameter().getGrm() + "'.");
+					+ CmdArgs.INSTANCE.getHEArgs().getGrm() + "'.");
 		}
 
 		GZIPInputStream gzis = null;
@@ -187,7 +187,7 @@ public class GRMStat
 		} catch (IOException e)
 		{
 			Logger.handleException(e, "Cannot open the GRM archive '"
-					+ Parameter.INSTANCE.getHEParameter().getGrm() + "'.");
+					+ CmdArgs.INSTANCE.getHEArgs().getGrm() + "'.");
 		}
 		InputStreamReader xover = new InputStreamReader(gzis);
 
@@ -207,11 +207,11 @@ public class GRMStat
 					continue;
 				double g = Double.parseDouble(s[3]);
 
-				if (Parameter.INSTANCE.getHEParameter().isAbsGrmCutoff())
+				if (CmdArgs.INSTANCE.getHEArgs().isAbsGrmCutoff())
 				{
 					if (Math.abs(g) > grmCutoff)
 						continue;
-				} else if (Parameter.INSTANCE.getHEParameter().isGrmCutoff())
+				} else if (CmdArgs.INSTANCE.getHEArgs().isGrmCutoff())
 				{
 					if (g > grmCutoff)
 						continue;
@@ -225,7 +225,7 @@ public class GRMStat
 		{
 			Logger.handleException(e,
 					"An exception occurred when reading the GRM archive '"
-							+ Parameter.INSTANCE.getHEParameter().getGrm()
+							+ CmdArgs.INSTANCE.getHEArgs().getGrm()
 							+ "'.");
 		}
 
@@ -234,8 +234,8 @@ public class GRMStat
 
 	private void txtGRM()
 	{
-		BufferedReader grmFile = FileProcessor.FileOpen(Parameter.INSTANCE
-				.getHEParameter().getGrm());
+		BufferedReader grmFile = FileProcessor.FileOpen(CmdArgs.INSTANCE
+				.getHEArgs().getGrm());
 
 		String line;
 		try
@@ -251,11 +251,11 @@ public class GRMStat
 					continue;
 				double g = Double.parseDouble(s[3]);
 
-				if (Parameter.INSTANCE.getHEParameter().isAbsGrmCutoff())
+				if (CmdArgs.INSTANCE.getHEArgs().isAbsGrmCutoff())
 				{
 					if (Math.abs(g) > grmCutoff)
 						continue;
-				} else if (Parameter.INSTANCE.getHEParameter().isGrmCutoff())
+				} else if (CmdArgs.INSTANCE.getHEArgs().isGrmCutoff())
 				{
 					if (g > grmCutoff)
 						continue;
@@ -269,7 +269,7 @@ public class GRMStat
 		{
 			Logger.handleException(e,
 					"An exception occurred when reading the GRM file '"
-							+ Parameter.INSTANCE.getHEParameter().getGrm()
+							+ CmdArgs.INSTANCE.getHEArgs().getGrm()
 							+ "'.");
 		}
 

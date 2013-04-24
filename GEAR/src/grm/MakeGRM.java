@@ -19,7 +19,7 @@ import family.plink.PLINKParser;
 import family.popstat.GenotypeMatrix;
 import family.qc.rowqc.SampleFilter;
 import gear.HPC;
-import gear.Parameter;
+import gear.CmdArgs;
 import gear.util.FileProcessor;
 import gear.util.Logger;
 import gear.util.NewIt;
@@ -39,16 +39,16 @@ public class MakeGRM
 	public MakeGRM()
 	{
 		PLINKParser pp = null;
-		if (Parameter.INSTANCE.getFileParameter().isSet())
+		if (CmdArgs.INSTANCE.getTextDataArgs().isSet())
 		{
-			pp = new PLINKParser(Parameter.INSTANCE.getFileParameter()
-					.getPedFile(), Parameter.INSTANCE.getFileParameter()
+			pp = new PLINKParser(CmdArgs.INSTANCE.getTextDataArgs()
+					.getPedFile(), CmdArgs.INSTANCE.getTextDataArgs()
 					.getMapFile());
-		} else if (Parameter.INSTANCE.getBfileParameter(0).isSet())
+		} else if (CmdArgs.INSTANCE.getBinaryDataArgs(0).isSet())
 		{
-			pp = new PLINKBinaryParser(Parameter.INSTANCE.getBfileParameter(0)
-					.getBedFile(), Parameter.INSTANCE.getBfileParameter(0)
-					.getBimFile(), Parameter.INSTANCE.getBfileParameter(0)
+			pp = new PLINKBinaryParser(CmdArgs.INSTANCE.getBinaryDataArgs(0)
+					.getBedFile(), CmdArgs.INSTANCE.getBinaryDataArgs(0)
+					.getBimFile(), CmdArgs.INSTANCE.getBinaryDataArgs(0)
 					.getFamFile());
 		} else
 		{
@@ -72,14 +72,14 @@ public class MakeGRM
 	{
 		prepareMAF();
 		StringBuffer sb = new StringBuffer();
-		sb.append(Parameter.INSTANCE.out);
+		sb.append(CmdArgs.INSTANCE.out);
 		PrintStream grm = null;
 		BufferedWriter grmGZ = null;
-		if (Parameter.INSTANCE.makeGRMTXTFlag)
+		if (CmdArgs.INSTANCE.makeGRMTXTFlag)
 		{
 			sb.append(".grm.txt");
 			grm = FileProcessor.CreatePrintStream(sb.toString());
-		} else if (Parameter.INSTANCE.makeGRMFlag)
+		} else if (CmdArgs.INSTANCE.makeGRMFlag)
 		{
 			sb.append(".grm.gz");
 			grmGZ = FileProcessor.ZipFielWriter(sb.toString());
@@ -90,7 +90,7 @@ public class MakeGRM
 			for (int j = 0; j <= i; j++)
 			{
 				double[] s = GRMScore(i, j);
-				if (Parameter.INSTANCE.makeGRMTXTFlag)
+				if (CmdArgs.INSTANCE.makeGRMTXTFlag)
 				{
 					grm.println((i + 1) + "\t" + (j + 1) + "\t" + s[0] + "\t"
 							+ s[1]);
@@ -109,7 +109,7 @@ public class MakeGRM
 				}
 			}
 		}
-		if (Parameter.INSTANCE.makeGRMTXTFlag)
+		if (CmdArgs.INSTANCE.makeGRMTXTFlag)
 		{
 			grm.close();
 		} else
@@ -125,7 +125,7 @@ public class MakeGRM
 		}
 		Logger.printUserLog("Writing GRM scores into '" + sb.toString() + "'.");
 		StringBuffer sb_id = new StringBuffer();
-		sb_id.append(Parameter.INSTANCE.out);
+		sb_id.append(CmdArgs.INSTANCE.out);
 		PrintStream grm_id = null;
 		sb_id.append(".grm.id");
 		grm_id = FileProcessor.CreatePrintStream(sb_id.toString());
@@ -146,12 +146,12 @@ public class MakeGRM
 		int N = G.getGRow();
 		long T = N * (N + 1) / 2;
 
-		int size = (int) Math.floor(T / Parameter.INSTANCE.grmPartition);
+		int size = (int) Math.floor(T / CmdArgs.INSTANCE.grmPartition);
 
-		for (int P = 1; P <= Parameter.INSTANCE.grmPartition; P++)
+		for (int P = 1; P <= CmdArgs.INSTANCE.grmPartition; P++)
 		{
 			StringBuilder sb = new StringBuilder();
-			sb.append(Parameter.INSTANCE.getHpcParameter().getName());
+			sb.append(CmdArgs.INSTANCE.getHpcArgs().getName());
 			sb.append("." + P + ".sh");
 
 			PrintWriter pw = null;
@@ -166,19 +166,19 @@ public class MakeGRM
 
 			pw.println("#$ -cwd");
 			pw.println("#$ -l vf="
-					+ Parameter.INSTANCE.getHpcParameter().getRam());
+					+ CmdArgs.INSTANCE.getHpcArgs().getRam());
 			pw.println("#$ -l h_vmem="
-					+ Parameter.INSTANCE.getHpcParameter().getRam());
+					+ CmdArgs.INSTANCE.getHpcArgs().getRam());
 
 			StringBuilder nb = new StringBuilder();
-			nb.append(Parameter.INSTANCE.getHpcParameter().getName() + "." + P);
+			nb.append(CmdArgs.INSTANCE.getHpcArgs().getName() + "." + P);
 			pw.println("#$ -N " + nb.toString());
 			pw.println("#$ -m eas");
 			pw.println("#$ -M "
-					+ Parameter.INSTANCE.getHpcParameter().getEmail());
+					+ CmdArgs.INSTANCE.getHpcArgs().getEmail());
 
 			pw.print("java -jar -Xmx"
-					+ Parameter.INSTANCE.getHpcParameter().getRam());
+					+ CmdArgs.INSTANCE.getHpcArgs().getRam());
 			pw.print(HPC.class.getProtectionDomain().getCodeSource()
 					.getLocation().getPath()
 					+ " ");
@@ -207,7 +207,7 @@ public class MakeGRM
 			{
 				pw.print("--grm-range " + (size * (P - 1) + 1) + "," + T + " ");
 			}
-			pw.print("--out " + Parameter.INSTANCE.out + "." + P);
+			pw.print("--out " + CmdArgs.INSTANCE.out + "." + P);
 			pw.println();
 
 			pw.close();
@@ -242,14 +242,14 @@ public class MakeGRM
 
 		prepareMAF();
 		StringBuffer sb = new StringBuffer();
-		sb.append(Parameter.INSTANCE.out);
+		sb.append(CmdArgs.INSTANCE.out);
 		PrintStream grm = null;
 		BufferedWriter grmGZ = null;
-		if (Parameter.INSTANCE.makeGRMTXTFlag)
+		if (CmdArgs.INSTANCE.makeGRMTXTFlag)
 		{
 			sb.append(".grm.txt");
 			grm = FileProcessor.CreatePrintStream(sb.toString());
-		} else if (Parameter.INSTANCE.makeGRMFlag)
+		} else if (CmdArgs.INSTANCE.makeGRMFlag)
 		{
 			sb.append(".grm.gz");
 			grmGZ = FileProcessor.ZipFielWriter(sb.toString());
@@ -267,7 +267,7 @@ public class MakeGRM
 		while (c <= n1)
 		{
 			double[] s = GRMScore(i, j);
-			if (Parameter.INSTANCE.makeGRMTXTFlag)
+			if (CmdArgs.INSTANCE.makeGRMTXTFlag)
 			{
 				grm.println((i + 1) + "\t" + (j + 1) + "\t" + s[0] + "\t"
 						+ s[1]);
@@ -295,7 +295,7 @@ public class MakeGRM
 			c++;
 		}
 
-		if (Parameter.INSTANCE.makeGRMTXTFlag)
+		if (CmdArgs.INSTANCE.makeGRMTXTFlag)
 		{
 			grm.close();
 		} else
@@ -311,7 +311,7 @@ public class MakeGRM
 		}
 		Logger.printUserLog("Writing GRM scores into '" + sb.toString() + "'.");
 		StringBuffer sb_id = new StringBuffer();
-		sb_id.append(Parameter.INSTANCE.out);
+		sb_id.append(CmdArgs.INSTANCE.out);
 		PrintStream grm_id = null;
 		sb_id.append(".grm.id");
 		grm_id = FileProcessor.CreatePrintStream(sb_id.toString());
@@ -371,7 +371,7 @@ public class MakeGRM
 
 	private void prepareMAF()
 	{
-		if (Parameter.INSTANCE.ref_freq != null)
+		if (CmdArgs.INSTANCE.ref_freq != null)
 		{
 			getRefFreq();
 
@@ -385,7 +385,7 @@ public class MakeGRM
 	{
 		HashMap<String, MAF> refMap = NewIt.newHashMap();
 		BufferedReader reader = FileProcessor
-				.FileOpen(Parameter.INSTANCE.ref_freq);
+				.FileOpen(CmdArgs.INSTANCE.ref_freq);
 		String line;
 		try
 		{
@@ -398,13 +398,13 @@ public class MakeGRM
 				refMap.put(maf.getSNP(), maf);
 			}
 			Logger.printUserLog("Read " + idx + " SNPs in '"
-					+ Parameter.INSTANCE.ref_freq + "'.\n");
+					+ CmdArgs.INSTANCE.ref_freq + "'.\n");
 
 		} catch (IOException e)
 		{
 			Logger.handleException(e,
 					"An exception occurred when reading the maf file '"
-							+ Parameter.INSTANCE.ref_freq + "'.");
+							+ CmdArgs.INSTANCE.ref_freq + "'.");
 		}
 
 		ArrayList<SNP> snpList = snpMap.getMarkerList();
@@ -420,8 +420,8 @@ public class MakeGRM
 			}
 			if (allelefreq[i][1] <= 0.5)
 			{
-				if (allelefreq[i][1] < Parameter.INSTANCE.maf_range[0]
-						|| allelefreq[i][1] > Parameter.INSTANCE.maf_range[1])
+				if (allelefreq[i][1] < CmdArgs.INSTANCE.maf_range[0]
+						|| allelefreq[i][1] > CmdArgs.INSTANCE.maf_range[1])
 				{
 					allelefreq[i][1] = 0;
 				} else
@@ -430,8 +430,8 @@ public class MakeGRM
 				}
 			} else
 			{
-				if ((1 - allelefreq[i][1]) < Parameter.INSTANCE.maf_range[0]
-						|| (1 - allelefreq[i][1]) > Parameter.INSTANCE.maf_range[1])
+				if ((1 - allelefreq[i][1]) < CmdArgs.INSTANCE.maf_range[0]
+						|| (1 - allelefreq[i][1]) > CmdArgs.INSTANCE.maf_range[1])
 				{
 					allelefreq[i][1] = 0;
 				} else
@@ -475,15 +475,15 @@ public class MakeGRM
 			}
 			if (allelefreq[i][1] <= 0.5)
 			{
-				if (allelefreq[i][1] < Parameter.INSTANCE.maf_range[0]
-						|| allelefreq[i][1] > Parameter.INSTANCE.maf_range[1])
+				if (allelefreq[i][1] < CmdArgs.INSTANCE.maf_range[0]
+						|| allelefreq[i][1] > CmdArgs.INSTANCE.maf_range[1])
 				{
 					allelefreq[i][1] = 0;
 				}
 			} else
 			{
-				if ((1 - allelefreq[i][1]) < Parameter.INSTANCE.maf_range[0]
-						|| (1 - allelefreq[i][1]) > Parameter.INSTANCE.maf_range[1])
+				if ((1 - allelefreq[i][1]) < CmdArgs.INSTANCE.maf_range[0]
+						|| (1 - allelefreq[i][1]) > CmdArgs.INSTANCE.maf_range[1])
 				{
 					allelefreq[i][1] = 0;
 				}

@@ -17,7 +17,7 @@ import family.plink.PLINKBinaryParser;
 import family.plink.PLINKParser;
 import family.popstat.GenotypeMatrix;
 import family.qc.rowqc.SampleFilter;
-import gear.Parameter;
+import gear.CmdArgs;
 import gear.util.FileProcessor;
 import gear.util.Logger;
 import gear.util.NewIt;
@@ -56,17 +56,17 @@ public class MergeTwoFile
 	{
 		PLINKParser pp1 = null;
 		PLINKParser pp2 = null;
-		if (Parameter.INSTANCE.getBfileParameter(0).isSet()
-				&& Parameter.INSTANCE.getBfileParameter(1).isSet())
+		if (CmdArgs.INSTANCE.getBinaryDataArgs(0).isSet()
+				&& CmdArgs.INSTANCE.getBinaryDataArgs(1).isSet())
 		{
-			pp1 = new PLINKBinaryParser(Parameter.INSTANCE.getBfileParameter(0)
-					.getBedFile(), Parameter.INSTANCE.getBfileParameter(0)
-					.getBimFile(), Parameter.INSTANCE.getBfileParameter(0)
+			pp1 = new PLINKBinaryParser(CmdArgs.INSTANCE.getBinaryDataArgs(0)
+					.getBedFile(), CmdArgs.INSTANCE.getBinaryDataArgs(0)
+					.getBimFile(), CmdArgs.INSTANCE.getBinaryDataArgs(0)
 					.getFamFile());
 
-			pp2 = new PLINKBinaryParser(Parameter.INSTANCE.getBfileParameter(1)
-					.getBedFile(), Parameter.INSTANCE.getBfileParameter(1)
-					.getBimFile(), Parameter.INSTANCE.getBfileParameter(1)
+			pp2 = new PLINKBinaryParser(CmdArgs.INSTANCE.getBinaryDataArgs(1)
+					.getBedFile(), CmdArgs.INSTANCE.getBinaryDataArgs(1)
+					.getBimFile(), CmdArgs.INSTANCE.getBinaryDataArgs(1)
 					.getFamFile());
 		} else
 		{
@@ -92,13 +92,13 @@ public class MergeTwoFile
 		DecimalFormat fmt = new DecimalFormat("#.###E0");
 
 		StringBuffer sb = new StringBuffer();
-		sb.append(Parameter.INSTANCE.out);
+		sb.append(CmdArgs.INSTANCE.out);
 		sb.append(".mergesnp");
 		PrintStream ps = FileProcessor.CreatePrintStream(sb.toString());
 		ps.append("SNP\tChr\tPos\tA1_1st\tA2_1st\tA1_2nd\tA2_2nd\tMAF_A1_1st\tMAF_A1_2nd\tFlip\tMerged\tP\tScheme\n");
 
 		StringBuffer sb1 = new StringBuffer();
-		sb1.append(Parameter.INSTANCE.out);
+		sb1.append(CmdArgs.INSTANCE.out);
 		sb1.append(".mergebadsnp");
 
 		PrintStream ps1 = FileProcessor.CreatePrintStream(sb.toString());
@@ -142,10 +142,10 @@ public class MergeTwoFile
 						ATGCLocus = true;
 						if (ref1 < 0.5 && ref2 < 0.5)
 						{
-							if (ref1 < Parameter.INSTANCE.getMergeParameter()
+							if (ref1 < CmdArgs.INSTANCE.getMergeArgs()
 									.getMafCutoff()
-									&& ref2 < Parameter.INSTANCE
-											.getMergeParameter().getMafCutoff())
+									&& ref2 < CmdArgs.INSTANCE
+											.getMergeArgs().getMafCutoff())
 							{
 								f = true;
 							} else
@@ -157,10 +157,10 @@ public class MergeTwoFile
 
 						} else if (ref1 < 0.5 && ref2 > 0.5)
 						{
-							if (ref1 < Parameter.INSTANCE.getMergeParameter()
+							if (ref1 < CmdArgs.INSTANCE.getMergeArgs()
 									.getMafCutoff()
-									&& ref2 > 1 - Parameter.INSTANCE
-											.getMergeParameter().getMafCutoff())
+									&& ref2 > 1 - CmdArgs.INSTANCE
+											.getMergeArgs().getMafCutoff())
 							{
 								f = true;
 							} else
@@ -173,10 +173,10 @@ public class MergeTwoFile
 
 						} else if (ref1 > 0.5 && ref2 < 0.5)
 						{
-							if (ref1 > 1 - Parameter.INSTANCE
-									.getMergeParameter().getMafCutoff()
-									&& ref2 < Parameter.INSTANCE
-											.getMergeParameter().getMafCutoff())
+							if (ref1 > 1 - CmdArgs.INSTANCE
+									.getMergeArgs().getMafCutoff()
+									&& ref2 < CmdArgs.INSTANCE
+											.getMergeArgs().getMafCutoff())
 							{
 								f = true;
 							} else
@@ -189,10 +189,10 @@ public class MergeTwoFile
 
 						} else
 						{
-							if (ref1 > 1 - Parameter.INSTANCE
-									.getMergeParameter().getMafCutoff()
-									&& ref2 > 1 - Parameter.INSTANCE
-											.getMergeParameter().getMafCutoff())
+							if (ref1 > 1 - CmdArgs.INSTANCE
+									.getMergeArgs().getMafCutoff()
+									&& ref2 > 1 - CmdArgs.INSTANCE
+											.getMergeArgs().getMafCutoff())
 							{
 								f = true;
 							} else
@@ -219,10 +219,10 @@ public class MergeTwoFile
 						ATGCLocus = true;
 						if (ref1 < 0.5 && (1 - ref2) < 0.5)
 						{
-							if (ref1 < Parameter.INSTANCE.getMergeParameter()
+							if (ref1 < CmdArgs.INSTANCE.getMergeArgs()
 									.getMafCutoff()
-									&& (1 - ref2) < Parameter.INSTANCE
-											.getMergeParameter().getMafCutoff())
+									&& (1 - ref2) < CmdArgs.INSTANCE
+											.getMergeArgs().getMafCutoff())
 							{
 								f = true;
 							} else
@@ -234,10 +234,10 @@ public class MergeTwoFile
 							flip = true;
 						} else if (ref1 < 0.5 && (1 - ref2) > 0.5)
 						{
-							if (ref1 < Parameter.INSTANCE.getMergeParameter()
+							if (ref1 < CmdArgs.INSTANCE.getMergeArgs()
 									.getMafCutoff()
-									&& (1 - ref2) > 1 - Parameter.INSTANCE
-											.getMergeParameter().getMafCutoff())
+									&& (1 - ref2) > 1 - CmdArgs.INSTANCE
+											.getMergeArgs().getMafCutoff())
 							{
 								f = true;
 							} else
@@ -249,10 +249,10 @@ public class MergeTwoFile
 
 						} else if (ref1 > 0.5 && (1 - ref2) < 0.5)
 						{
-							if (ref1 > 1 - Parameter.INSTANCE
-									.getMergeParameter().getMafCutoff()
-									&& 1 - ref2 < Parameter.INSTANCE
-											.getMergeParameter().getMafCutoff())
+							if (ref1 > 1 - CmdArgs.INSTANCE
+									.getMergeArgs().getMafCutoff()
+									&& 1 - ref2 < CmdArgs.INSTANCE
+											.getMergeArgs().getMafCutoff())
 							{
 								f = true;
 							} else
@@ -264,10 +264,10 @@ public class MergeTwoFile
 
 						} else
 						{
-							if (ref1 > 1 - Parameter.INSTANCE
-									.getMergeParameter().getMafCutoff()
-									&& 1 - ref2 > 1 - Parameter.INSTANCE
-											.getMergeParameter().getMafCutoff())
+							if (ref1 > 1 - CmdArgs.INSTANCE
+									.getMergeArgs().getMafCutoff()
+									&& 1 - ref2 > 1 - CmdArgs.INSTANCE
+											.getMergeArgs().getMafCutoff())
 							{
 								f = true;
 							} else
@@ -312,15 +312,15 @@ public class MergeTwoFile
 
 				double p = Z.OddsRatioTestPvalueTwoTail(ref1, ref2,
 						N1[comSNPIdx[0][i]], N2[comSNPIdx[1][i]]);
-				if (p < Parameter.INSTANCE.getMergeParameter().getPCutoff())
+				if (p < CmdArgs.INSTANCE.getMergeArgs().getPCutoff())
 				{
 					f = false;
 				}
-				if (!Parameter.INSTANCE.keepATGC() && ATGCLocus)
+				if (!CmdArgs.INSTANCE.keepATGC() && ATGCLocus)
 				{
 					f = false;
 				}
-				if (Parameter.INSTANCE.removeFlip() && flip)
+				if (CmdArgs.INSTANCE.removeFlip() && flip)
 				{
 					f = false;
 				}
@@ -449,7 +449,7 @@ public class MergeTwoFile
 	public void WriteTwoFile()
 	{
 		StringBuffer sbim = new StringBuffer();
-		sbim.append(Parameter.INSTANCE.out);
+		sbim.append(CmdArgs.INSTANCE.out);
 		sbim.append(".bim");
 		PrintStream pbim = FileProcessor.CreatePrintStream(sbim.toString());
 
@@ -467,7 +467,7 @@ public class MergeTwoFile
 		pbim.close();
 
 		StringBuffer sfam = new StringBuffer();
-		sfam.append(Parameter.INSTANCE.out);
+		sfam.append(CmdArgs.INSTANCE.out);
 		sfam.append(".fam");
 		PrintStream pfam = FileProcessor.CreatePrintStream(sfam.toString());
 		for (Iterator<PersonIndex> e = PersonTable1.iterator(); e.hasNext();)
@@ -491,7 +491,7 @@ public class MergeTwoFile
 		pfam.close();
 
 		StringBuffer sbed = new StringBuffer();
-		sbed.append(Parameter.INSTANCE.out);
+		sbed.append(CmdArgs.INSTANCE.out);
 		sbed.append(".bed");
 		try
 		{

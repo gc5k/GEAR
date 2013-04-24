@@ -1,6 +1,6 @@
 package family.RabinowitzLairdAlgorithm;
 
-import gear.Parameter;
+import gear.CmdArgs;
 import gear.util.NewIt;
 
 import java.util.ArrayList;
@@ -127,7 +127,7 @@ public abstract class AbstractGenoDistribution
 	 */
 	protected String RandomAssign()
 	{
-		String geno = new String(Parameter.INSTANCE.missingGenotype);
+		String geno = new String(CmdArgs.INSTANCE.missingGenotype);
 		if (isParentGenotyped())
 		{
 			String p1 = (String) parentGeno.get(0);

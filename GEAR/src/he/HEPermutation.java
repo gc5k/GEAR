@@ -1,6 +1,6 @@
 package he;
 
-import gear.Parameter;
+import gear.CmdArgs;
 import gear.util.Logger;
 import gear.util.NewIt;
 import gear.util.Sample;
@@ -151,7 +151,7 @@ public class HEPermutation
 			// }
 		} else
 		{
-			if (!Parameter.INSTANCE.getHEParameter().isGrmBinary())
+			if (!CmdArgs.INSTANCE.getHEArgs().isGrmBinary())
 			{
 				heReader.XtX = new double[2][2];
 				heReader.XtY = new double[2];
@@ -276,8 +276,8 @@ public class HEPermutation
 				FileInputStream fileStream = null;
 				try
 				{
-					fileStream = new FileInputStream(Parameter.INSTANCE
-							.getHEParameter().getGrm());
+					fileStream = new FileInputStream(CmdArgs.INSTANCE
+							.getHEArgs().getGrm());
 				} catch (FileNotFoundException e)
 				{
 					// TODO Auto-generated catch block

@@ -17,7 +17,7 @@ import family.plink.PLINKBinaryParser;
 import family.plink.PLINKParser;
 import family.popstat.GenotypeMatrix;
 import family.qc.rowqc.SampleFilter;
-import gear.Parameter;
+import gear.CmdArgs;
 import gear.util.FileProcessor;
 import gear.util.Logger;
 import gear.util.NewIt;
@@ -45,17 +45,17 @@ public class RealCheck
 	{
 		PLINKParser pp1 = null;
 		PLINKParser pp2 = null;
-		if (Parameter.INSTANCE.getBfileParameter(0).isSet()
-				&& Parameter.INSTANCE.getBfileParameter(1).isSet())
+		if (CmdArgs.INSTANCE.getBinaryDataArgs(0).isSet()
+				&& CmdArgs.INSTANCE.getBinaryDataArgs(1).isSet())
 		{
-			pp1 = new PLINKBinaryParser(Parameter.INSTANCE.getBfileParameter(0)
-					.getBedFile(), Parameter.INSTANCE.getBfileParameter(0)
-					.getBimFile(), Parameter.INSTANCE.getBfileParameter(0)
+			pp1 = new PLINKBinaryParser(CmdArgs.INSTANCE.getBinaryDataArgs(0)
+					.getBedFile(), CmdArgs.INSTANCE.getBinaryDataArgs(0)
+					.getBimFile(), CmdArgs.INSTANCE.getBinaryDataArgs(0)
 					.getFamFile());
 
-			pp2 = new PLINKBinaryParser(Parameter.INSTANCE.getBfileParameter(1)
-					.getBedFile(), Parameter.INSTANCE.getBfileParameter(1)
-					.getBimFile(), Parameter.INSTANCE.getBfileParameter(1)
+			pp2 = new PLINKBinaryParser(CmdArgs.INSTANCE.getBinaryDataArgs(1)
+					.getBedFile(), CmdArgs.INSTANCE.getBinaryDataArgs(1)
+					.getBimFile(), CmdArgs.INSTANCE.getBinaryDataArgs(1)
 					.getFamFile());
 		} else
 		{
@@ -78,14 +78,14 @@ public class RealCheck
 	public void Check()
 	{
 		StringBuffer sb = new StringBuffer();
-		sb.append(Parameter.INSTANCE.out);
+		sb.append(CmdArgs.INSTANCE.out);
 		sb.append(".real");
 		PrintStream ps = FileProcessor.CreatePrintStream(sb.toString());
 
 		getCommonSNP(sf1.getMapFile().getMarkerList(), sf2.getMapFile()
 				.getMarkerList());
 
-		if (Parameter.INSTANCE.getRealCheckParameter().getSnps() != null)
+		if (CmdArgs.INSTANCE.getRealCheckParameter().getSnps() != null)
 		{
 			Logger.printUserLog("A similarity matrix is generated with real-check SNPs.");
 			getSelectedMarker();
@@ -100,9 +100,9 @@ public class RealCheck
 			for (int j = 0; j < G2.getGRow(); j++)
 			{
 				double[] s = similarityScore(i, j);
-				if (s[0] > Parameter.INSTANCE.getRealCheckParameter()
+				if (s[0] > CmdArgs.INSTANCE.getRealCheckParameter()
 						.getThresholdLower()
-						&& s[0] <= Parameter.INSTANCE.getRealCheckParameter()
+						&& s[0] <= CmdArgs.INSTANCE.getRealCheckParameter()
 								.getThresholdUpper())
 				{
 					PersonIndex ps1 = PersonTable1.get(i);
@@ -167,7 +167,7 @@ public class RealCheck
 		Arrays.sort(markerIdx);
 
 		StringBuffer sb = new StringBuffer();
-		sb.append(Parameter.INSTANCE.out);
+		sb.append(CmdArgs.INSTANCE.out);
 		sb.append(".realsnp");
 
 		PrintStream ps = FileProcessor.CreatePrintStream(sb.toString());
@@ -185,7 +185,7 @@ public class RealCheck
 	public void getRandomMarker()
 	{
 		int mn = 0;
-		if (Parameter.INSTANCE.getRealCheckParameter().getMarkerNumber() > comSNPIdxMap
+		if (CmdArgs.INSTANCE.getRealCheckParameter().getMarkerNumber() > comSNPIdxMap
 				.size())
 		{
 			Logger.printUserLog("Realcheck marker number was reduced to "
@@ -193,18 +193,18 @@ public class RealCheck
 			mn = comSNPIdxMap.size();
 		} else
 		{
-			mn = Parameter.INSTANCE.getRealCheckParameter().getMarkerNumber();
+			mn = CmdArgs.INSTANCE.getRealCheckParameter().getMarkerNumber();
 		}
 
 		markerIdx = new int[mn];
 		RandomDataImpl rd = new RandomDataImpl();
-		rd.reSeed(Parameter.INSTANCE.seed);
+		rd.reSeed(CmdArgs.INSTANCE.seed);
 
 		markerIdx = rd.nextPermutation(comSNPIdxMap.size(), mn);
 
 		Arrays.sort(markerIdx);
 		StringBuffer sb = new StringBuffer();
-		sb.append(Parameter.INSTANCE.out);
+		sb.append(CmdArgs.INSTANCE.out);
 		sb.append(".realsnp");
 
 		PrintStream ps = FileProcessor.CreatePrintStream(sb.toString());
@@ -291,7 +291,7 @@ public class RealCheck
 
 	private ArrayList<String> readRealcheckSNPs()
 	{
-		BufferedReader reader = FileProcessor.FileOpen(Parameter.INSTANCE
+		BufferedReader reader = FileProcessor.FileOpen(CmdArgs.INSTANCE
 				.getRealCheckParameter().getSnps());
 		String line = null;
 		ArrayList<String> selectedSNP = NewIt.newArrayList();
@@ -311,7 +311,7 @@ public class RealCheck
 					"An exception occurred when reading the real-check SNPs.");
 		}
 		Logger.printUserLog(selectedSNP.size() + " marker(s) is read in "
-				+ Parameter.INSTANCE.getRealCheckParameter().getSnps() + ".");
+				+ CmdArgs.INSTANCE.getRealCheckParameter().getSnps() + ".");
 		return selectedSNP;
 	}
 }

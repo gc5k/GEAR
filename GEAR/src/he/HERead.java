@@ -5,7 +5,7 @@ import java.io.IOException;
 import java.util.Arrays;
 import java.util.HashMap;
 
-import gear.Parameter;
+import gear.CmdArgs;
 import gear.util.FileProcessor;
 import gear.util.Logger;
 
@@ -44,18 +44,18 @@ public class HERead
 
 	public HERead()
 	{
-		grmFile = Parameter.INSTANCE.getHEParameter().getGrm();
-		grmID = Parameter.INSTANCE.getHEParameter().getGrmId();
-		keepFile = Parameter.INSTANCE.keepFile;
-		phenoFile = Parameter.INSTANCE.getHEParameter().getPheno();
-		mpheno = Parameter.INSTANCE.getHEParameter().getMPheno();
-		reverse = Parameter.INSTANCE.reverse;
-		k_button = Parameter.INSTANCE.k_button;
-		k = Parameter.INSTANCE.k;
-		output = Parameter.INSTANCE.out;
-		heType = Parameter.INSTANCE.getHEParameter().getType();
-		permFlag = Parameter.INSTANCE.permFlag;
-		perm = Parameter.INSTANCE.perm;
+		grmFile = CmdArgs.INSTANCE.getHEArgs().getGrm();
+		grmID = CmdArgs.INSTANCE.getHEArgs().getGrmId();
+		keepFile = CmdArgs.INSTANCE.keepFile;
+		phenoFile = CmdArgs.INSTANCE.getHEArgs().getPheno();
+		mpheno = CmdArgs.INSTANCE.getHEArgs().getMPheno();
+		reverse = CmdArgs.INSTANCE.reverse;
+		k_button = CmdArgs.INSTANCE.k_button;
+		k = CmdArgs.INSTANCE.k;
+		output = CmdArgs.INSTANCE.out;
+		heType = CmdArgs.INSTANCE.getHEArgs().getType();
+		permFlag = CmdArgs.INSTANCE.permFlag;
+		perm = CmdArgs.INSTANCE.perm;
 
 		XtX = new double[mpheno.length + 1][mpheno.length + 1];
 		XtY = new double[mpheno.length + 1];
@@ -104,7 +104,7 @@ public class HERead
 					y[ii][0] = 1;
 					for (int j = 0; j < mpheno.length; j++)
 					{
-						if (Parameter.INSTANCE.isNA(s[1 + mpheno[j]]))
+						if (CmdArgs.INSTANCE.isNA(s[1 + mpheno[j]]))
 						{
 							f = false;
 							break;
@@ -178,7 +178,7 @@ public class HERead
 			sd[i] = Math.sqrt((ssx[i] - Len * ss[i] * ss[i]) / (Len - 1));
 		}
 
-		if (Parameter.INSTANCE.scale)
+		if (CmdArgs.INSTANCE.scale)
 		{
 			Logger.printUserLog("Standardising phentoype.");
 			for (int i = 0; i < flag.length; i++)
@@ -195,7 +195,7 @@ public class HERead
 
 	public static void main(String[] args)
 	{
-		Parameter.INSTANCE.commandListener(args);
+		CmdArgs.INSTANCE.commandListener(args);
 	}
 
 }

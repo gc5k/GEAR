@@ -1,6 +1,6 @@
 package gear.profile;
 
-import gear.Parameter;
+import gear.CmdArgs;
 import gear.profile.struct.DosageInfor;
 import gear.profile.struct.QScore;
 import gear.profile.struct.ScoreUnit;
@@ -40,7 +40,7 @@ public class MaCHDosageProfile
 	private void initial()
 	{
 		// read score file
-		String scoreFile = Parameter.INSTANCE.getProfileParameter().getScoreFile();
+		String scoreFile = CmdArgs.INSTANCE.getProfileArgs().getScoreFile();
 		if (scoreFile != null)
 		{
 			gear.util.BufferedReader scoreReader = new gear.util.BufferedReader(scoreFile, "score");
@@ -52,8 +52,8 @@ public class MaCHDosageProfile
 		}
 
 		// read q score file and q range file
-		String qScoreFile = Parameter.INSTANCE.getProfileParameter().getQScoreFile(),
-			   qScoreRangeFile = Parameter.INSTANCE.getProfileParameter().getQScoreRangeFile();
+		String qScoreFile = CmdArgs.INSTANCE.getProfileArgs().getQScoreFile(),
+			   qScoreRangeFile = CmdArgs.INSTANCE.getProfileArgs().getQScoreRangeFile();
 		if (qScoreFile != null && qScoreRangeFile != null)
 		{
 			// q score file
@@ -112,7 +112,7 @@ public class MaCHDosageProfile
 			isQ = true;
 		}
 
-		String machDosageFile = Parameter.INSTANCE.getProfileParameter().getMachDosageFile();
+		String machDosageFile = CmdArgs.INSTANCE.getProfileArgs().getMachDosageFile();
 		if (machDosageFile != null)
 		{
 			dosageFile = new String[1];
@@ -124,7 +124,7 @@ public class MaCHDosageProfile
 				System.exit(1);
 			}
 			inforFile = new String[1];
-			inforFile[0] = Parameter.INSTANCE.getProfileParameter().getMachInfoFile();
+			inforFile[0] = CmdArgs.INSTANCE.getProfileArgs().getMachInfoFile();
 			f = new File(inforFile[0]);
 			if (!f.exists())
 			{
@@ -134,13 +134,13 @@ public class MaCHDosageProfile
 		}
 		else
 		{
-			String dosageBatchFile = Parameter.INSTANCE.getProfileParameter().getMachDosageBatchFile();
+			String dosageBatchFile = CmdArgs.INSTANCE.getProfileArgs().getMachDosageBatchFile();
 			if (dosageBatchFile == null)
 			{
 				Logger.printUserError("--mach-dosage-batch is not set.");
 				System.exit(1);
 			}
-			String infoBatchFile = Parameter.INSTANCE.getProfileParameter().getMachInfoBatchFile();
+			String infoBatchFile = CmdArgs.INSTANCE.getProfileArgs().getMachInfoBatchFile();
 			if (infoBatchFile == null)
 			{
 				Logger.printUserError("--mach-infor-batch is not set.");
@@ -247,7 +247,7 @@ public class MaCHDosageProfile
 				if (di.isATGCLocus())
 				{
 					ATGCLocus++;
-					if (!Parameter.INSTANCE.keepATGC())
+					if (!CmdArgs.INSTANCE.keepATGC())
 					{
 						continue;
 					}
@@ -282,7 +282,7 @@ public class MaCHDosageProfile
 					}
 
 				}
-				else if (Parameter.INSTANCE.getProfileParameter().getScoreFile() == null)
+				else if (CmdArgs.INSTANCE.getProfileArgs().getScoreFile() == null)
 				{
 					su = new ScoreUnit(snp, refA, 1.0);
 					cSNP++;
@@ -377,13 +377,13 @@ public class MaCHDosageProfile
 
 		Logger.printUserLog("Number of monomorphic loci removed: " + monoLocus);
 		Logger.printUserLog("Number of ATGC loci "
-				+ (Parameter.INSTANCE.keepATGC() ? "detected: " : "removed: ")
+				+ (CmdArgs.INSTANCE.keepATGC() ? "detected: " : "removed: ")
 				+ ATGCLocus);
 		Logger.printUserLog("Number of SNPs mapped to the score file in total: "
 				+ sumSNPMapped);
 
 		StringBuffer sbim = new StringBuffer();
-		sbim.append(Parameter.INSTANCE.out);
+		sbim.append(CmdArgs.INSTANCE.out);
 		sbim.append(".profile");
 		PrintStream predictorFile = FileProcessor.CreatePrintStream(sbim
 				.toString());
@@ -445,7 +445,7 @@ public class MaCHDosageProfile
 				if (di.isATGCLocus())
 				{
 					ATGCLocus++;
-					if (Parameter.INSTANCE.keepATGC())
+					if (CmdArgs.INSTANCE.keepATGC())
 					{
 						continue;
 					}
@@ -518,14 +518,14 @@ public class MaCHDosageProfile
 
 		Logger.printUserLog("Number of monomorphic loci removed: " + monoLocus);
 		Logger.printUserLog("Number of ATGC loci "
-				+ (Parameter.INSTANCE.keepATGC() ? "detected: " : "removed: ")
+				+ (CmdArgs.INSTANCE.keepATGC() ? "detected: " : "removed: ")
 				+ ATGCLocus);
 		Logger.printUserLog("Number of SNPs mapped to the score file in total: "
 				+ CCSNP);
 		Logger.printUserLog("Number of SNPs having scores: " + CC);
 
 		StringBuffer sbim = new StringBuffer();
-		sbim.append(Parameter.INSTANCE.out);
+		sbim.append(CmdArgs.INSTANCE.out);
 		sbim.append(".profile");
 		PrintStream predictorFile = FileProcessor.CreatePrintStream(sbim
 				.toString());

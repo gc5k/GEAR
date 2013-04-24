@@ -9,7 +9,7 @@ import family.pedigree.PersonIndex;
 import family.plink.PLINKBinaryParser;
 import family.plink.PLINKParser;
 import family.qc.rowqc.SampleFilter;
-import gear.Parameter;
+import gear.CmdArgs;
 import gear.util.Logger;
 import gear.util.NewIt;
 
@@ -23,11 +23,11 @@ public class NonTransmitted
 	{
 		Logger.printUserLog("--nontrans procedure.");
 
-		if (Parameter.INSTANCE.getBfileParameter(0).isSet())
+		if (CmdArgs.INSTANCE.getBinaryDataArgs(0).isSet())
 		{
-			pp = new PLINKBinaryParser(Parameter.INSTANCE.getBfileParameter(0)
-					.getBedFile(), Parameter.INSTANCE.getBfileParameter(0)
-					.getBimFile(), Parameter.INSTANCE.getBfileParameter(0)
+			pp = new PLINKBinaryParser(CmdArgs.INSTANCE.getBinaryDataArgs(0)
+					.getBedFile(), CmdArgs.INSTANCE.getBinaryDataArgs(0)
+					.getBimFile(), CmdArgs.INSTANCE.getBinaryDataArgs(0)
 					.getFamFile());
 		} else
 		{
@@ -41,7 +41,7 @@ public class NonTransmitted
 	public void GenerateNonTransmitted()
 	{
 		AJHG2008 ajhg2008 = new AJHG2008(pp.getPedigreeData(), pp.getMapData());
-		ajhg2008.setSeed(Parameter.INSTANCE.nontransSeed);
+		ajhg2008.setSeed(CmdArgs.INSTANCE.nontransSeed);
 		ajhg2008.RevvingUp(sf.getSample());
 
 		ArrayList<PersonIndex> sample = ajhg2008.getSample();
@@ -53,14 +53,14 @@ public class NonTransmitted
 			PersonIndex pi = e.next();
 			if (pi.isPseudo())
 			{
-				if (Parameter.INSTANCE.nontranscasesFlag)
+				if (CmdArgs.INSTANCE.nontranscasesFlag)
 				{
 					if (pi.getPerson().getAffectedStatus().compareTo("2") != 0)
 					{
 						continue;
 					}
 				}
-				if (Parameter.INSTANCE.nontranscontrolsFlag)
+				if (CmdArgs.INSTANCE.nontranscontrolsFlag)
 				{
 					if (pi.getPerson().getAffectedStatus().compareTo("1") != 0)
 					{
@@ -74,7 +74,7 @@ public class NonTransmitted
 		NonTransWriteBedSNPMajor writeSNP = new NonTransWriteBedSNPMajor(ps,
 				ajhg2008.getMapFile().getMarkerList());
 		StringBuilder out = new StringBuilder();
-		out.append(Parameter.INSTANCE.out);
+		out.append(CmdArgs.INSTANCE.out);
 		out.append(".nt");
 		writeSNP.WriteFile(out.toString());
 	}
