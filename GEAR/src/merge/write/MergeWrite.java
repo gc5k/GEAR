@@ -39,11 +39,11 @@ public class MergeWrite
 					.getPed(), CmdArgs.INSTANCE.getFileArgs()
 					.getMap());
 		}
-		if (CmdArgs.INSTANCE.getBinaryDataArgs(0).isSet())
+		if (CmdArgs.INSTANCE.getBFileArgs(0).isSet())
 		{
-			pp = new PLINKBinaryParser(CmdArgs.INSTANCE.getBinaryDataArgs(0)
-					.getBed(), CmdArgs.INSTANCE.getBinaryDataArgs(0)
-					.getBim(), CmdArgs.INSTANCE.getBinaryDataArgs(0)
+			pp = new PLINKBinaryParser(CmdArgs.INSTANCE.getBFileArgs(0)
+					.getBed(), CmdArgs.INSTANCE.getBFileArgs(0)
+					.getBim(), CmdArgs.INSTANCE.getBFileArgs(0)
 					.getFam());
 		} else
 		{

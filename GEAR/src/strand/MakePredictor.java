@@ -42,11 +42,11 @@ public class MakePredictor
 		readPredictor();
 
 		PLINKParser pp1 = null;
-		if (CmdArgs.INSTANCE.getBinaryDataArgs(0).isSet())
+		if (CmdArgs.INSTANCE.getBFileArgs(0).isSet())
 		{
-			pp1 = new PLINKBinaryParser(CmdArgs.INSTANCE.getBinaryDataArgs(0)
-					.getBed(), CmdArgs.INSTANCE.getBinaryDataArgs(0)
-					.getBim(), CmdArgs.INSTANCE.getBinaryDataArgs(0)
+			pp1 = new PLINKBinaryParser(CmdArgs.INSTANCE.getBFileArgs(0)
+					.getBed(), CmdArgs.INSTANCE.getBFileArgs(0)
+					.getBim(), CmdArgs.INSTANCE.getBFileArgs(0)
 					.getFam());
 		} else
 		{

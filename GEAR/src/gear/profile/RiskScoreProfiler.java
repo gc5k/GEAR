@@ -3,7 +3,6 @@ package gear.profile;
 import java.io.PrintStream;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.HashMap;
 
 import family.pedigree.file.SNP;
 import family.plink.PLINKBinaryParser;
@@ -18,42 +17,31 @@ import gear.util.Logger;
 import gear.util.NewIt;
 import gear.util.SNPMatch;
 
-public class RiskScore
+public class RiskScoreProfiler extends ProfilerBase
 {
-
 	private GenotypeMatrix G1;
 
-	private HashMap<String, ScoreUnit> Score = NewIt.newHashMap();
-
 	private ArrayList<SNP> snpList1;
-	private HashMap<String, QScore> QS = NewIt.newHashMap();
-	private double[][] q_score_range;
-	private String[] QRName;
-	private boolean isQ = false;
 
 	ArrayList<Integer> scoreCoding = NewIt.newArrayList();
 
 	private SampleFilter sf1;
 
-	public RiskScore()
+	public RiskScoreProfiler()
 	{
-		Logger.printUserLog("Generating risk profile for genotypes.");
-
-		initial();
-
 		PLINKParser pp1 = null;
 		if (CmdArgs.INSTANCE.getFileArgs().isSet())
 		{
-			pp1 = new PLINKParser(CmdArgs.INSTANCE.getFileArgs()
-					.getPed(), CmdArgs.INSTANCE.getFileArgs()
-					.getMap());
-		} else if (CmdArgs.INSTANCE.getBinaryDataArgs(0).isSet())
+			pp1 = new PLINKParser(CmdArgs.INSTANCE.getFileArgs().getPed(),
+					              CmdArgs.INSTANCE.getFileArgs().getMap());
+		}
+		else if (CmdArgs.INSTANCE.getBFileArgs(0).isSet())
 		{
-			pp1 = new PLINKBinaryParser(CmdArgs.INSTANCE.getBinaryDataArgs(0)
-					.getBed(), CmdArgs.INSTANCE.getBinaryDataArgs(0)
-					.getBim(), CmdArgs.INSTANCE.getBinaryDataArgs(0)
-					.getFam());
-		} else
+			pp1 = new PLINKBinaryParser(CmdArgs.INSTANCE.getBFileArgs(0).getBed(),
+					                    CmdArgs.INSTANCE.getBFileArgs(0).getBim(),
+					                    CmdArgs.INSTANCE.getBFileArgs(0).getFam());
+		}
+		else
 		{
 			Logger.printUserError("Neither --file nor --bfile is set.");
 			System.exit(1);
@@ -64,95 +52,6 @@ public class RiskScore
 		G1 = new GenotypeMatrix(sf1.getSample());
 		snpList1 = sf1.getMapFile().getMarkerList();
 
-	}
-
-	private void initial()
-	{
-		// read score file
-		gear.util.BufferedReader scoreReader = new gear.util.BufferedReader(
-				CmdArgs.INSTANCE.getProfileArgs().getScoreFile(), "score");
-		ScoreUnit scoreUnit;
-		while ((scoreUnit = ScoreUnit.getNextScoreUnit(scoreReader)) != null)
-		{
-			Score.put(scoreUnit.getSNP(), scoreUnit);
-		}
-		scoreReader.close();
-
-		Logger.printUserLog("Number of predictors: " + Score.size());
-
-		// read q score file and q range file
-		String qScoreFile = CmdArgs.INSTANCE.getProfileArgs().getQScoreFile(),
-			   qScoreRangeFile = CmdArgs.INSTANCE.getProfileArgs().getQScoreRangeFile();
-		if (qScoreFile != null && qScoreRangeFile != null)
-		{
-			// q score file
-			gear.util.BufferedReader qScoreReader = new gear.util.BufferedReader(qScoreFile, "q-score");
-			QScore qScore;
-			while ((qScore = QScore.getNextQScore(qScoreReader)) != null)
-			{
-				QS.put(qScore.getSNP(), qScore);
-			}
-			qScoreReader.close();
-
-			if (QS.size() == 0)
-			{
-				Logger.printUserError("Nothing is selected in '" + qScoreFile + "'.");
-				System.exit(1);
-			} else
-			{
-				Logger.printUserLog("Number of q-scores: " + QS.size());
-			}
-
-			// q range file
-			gear.util.BufferedReader qRangeReader = new gear.util.BufferedReader(qScoreRangeFile, "q-score-range");
-			ArrayList<ArrayList<String>> QR = NewIt.newArrayList();
-			while (true)
-			{
-				String[] tokens = qRangeReader.readTokens(3);
-				if (tokens == null)
-				{
-					break;
-				}
-				ArrayList<String> qr = NewIt.newArrayList();
-				qr.add(tokens[0]); // range label
-				qr.add(tokens[1]); // lower bound
-				qr.add(tokens[2]); // upper bound
-				QR.add(qr);
-			}
-			qRangeReader.close();
-
-			if (QR.isEmpty())
-			{
-				Logger.printUserError("Nothing is selected in '" + qScoreRangeFile + "'.");
-			} else
-			{
-				Logger.printUserLog("Number of q-ranges: " + QR.size());
-			}
-
-			q_score_range = new double[QR.size()][2];
-			QRName = new String[QR.size()];
-
-			for (int i = 0; i < QR.size(); i++)
-			{
-				ArrayList<String> qr = QR.get(i);
-				QRName[i] = qr.get(0);
-				q_score_range[i][0] = Double.parseDouble(qr.get(1));
-				q_score_range[i][1] = Double.parseDouble(qr.get(2));
-			}
-
-			isQ = true;
-		}
-	}
-
-	public void makeProfile()
-	{
-		if (isQ)
-		{
-			multipleProfile();
-		} else
-		{
-			singleProfile();
-		}
 	}
 
 	public void multipleProfile()

@@ -15,103 +15,17 @@ import java.io.IOException;
 import java.io.PrintStream;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.HashMap;
 
-public class MaCHDosageProfile
+public class MachDosageProfiler extends ProfilerBase
 {
 	private String delim = "\\s+";
 	private String[] dosageFile;
 	private String[] inforFile;
-	private HashMap<String, ScoreUnit> Score = NewIt.newHashMap();
 
 	private ArrayList<String> ID = NewIt.newArrayList();
 
-	private HashMap<String, QScore> QS = NewIt.newHashMap();
-	private double[][] q_score_range;
-	private String[] QRName;
-	private boolean isQ = false;
-
-	public MaCHDosageProfile()
+	public MachDosageProfiler()
 	{
-		Logger.printUserLog("Generating risk profiles for mach dosage.");
-		initial();
-	}
-
-	private void initial()
-	{
-		// read score file
-		String scoreFile = CmdArgs.INSTANCE.getProfileArgs().getScoreFile();
-		if (scoreFile != null)
-		{
-			gear.util.BufferedReader scoreReader = new gear.util.BufferedReader(scoreFile, "score");
-			ScoreUnit scoreUnit;
-			while ((scoreUnit = ScoreUnit.getNextScoreUnit(scoreReader)) != null)
-			{
-				Score.put(scoreUnit.getSNP(), scoreUnit);
-			}
-		}
-
-		// read q score file and q range file
-		String qScoreFile = CmdArgs.INSTANCE.getProfileArgs().getQScoreFile(),
-			   qScoreRangeFile = CmdArgs.INSTANCE.getProfileArgs().getQScoreRangeFile();
-		if (qScoreFile != null && qScoreRangeFile != null)
-		{
-			// q score file
-			gear.util.BufferedReader qScoreReader = new gear.util.BufferedReader(qScoreFile, "q-score");
-			QScore qScore;
-			while ((qScore = QScore.getNextQScore(qScoreReader)) != null)
-			{
-				QS.put(qScore.getSNP(), qScore);
-			}
-
-			if (QS.size() == 0)
-			{
-				Logger.printUserError("Nothing is selected in '" + qScoreFile + "'.");
-				System.exit(1);
-			} else
-			{
-				Logger.printUserLog("Number of SNP scores read from the q-score file '" + qScoreFile + "': " + QS.size());
-			}
-
-			// q range file
-			gear.util.BufferedReader qRangeReader = new gear.util.BufferedReader(qScoreRangeFile, "q-score-range");
-			ArrayList<ArrayList<String>> QR = NewIt.newArrayList();
-			while (true)
-			{
-				String[] tokens = qRangeReader.readTokens(3);
-				if (tokens == null)
-				{
-					break;
-				}
-				ArrayList<String> qr = NewIt.newArrayList();
-				qr.add(tokens[0]); // label
-				qr.add(tokens[1]); // lower bound
-				qr.add(tokens[2]); // upper bound
-				QR.add(qr);
-			}
-
-			if (QR.size() == 0)
-			{
-				Logger.printUserError("Nothing is selected in the q-range file '" + qScoreRangeFile + "'.");
-			} else
-			{
-				Logger.printUserLog("Number of scores read from the q-range file '" + qScoreRangeFile + "': " + QR.size());
-			}
-
-			q_score_range = new double[QR.size()][2];
-			QRName = new String[QR.size()];
-
-			for (int i = 0; i < QR.size(); i++)
-			{
-				ArrayList<String> qr = QR.get(i);
-				QRName[i] = qr.get(0);
-				q_score_range[i][0] = Double.parseDouble(qr.get(1));
-				q_score_range[i][1] = Double.parseDouble(qr.get(2));
-			}
-
-			isQ = true;
-		}
-
 		String machDosageFile = CmdArgs.INSTANCE.getProfileArgs().getMachDosageFile();
 		if (machDosageFile != null)
 		{
@@ -187,17 +101,6 @@ public class MaCHDosageProfile
 					System.exit(1);
 				}
 			}
-		}
-	}
-
-	public void makeProfile()
-	{
-		if (isQ)
-		{
-			multipleProfile();
-		} else
-		{
-			singleProfile();
 		}
 	}
 
