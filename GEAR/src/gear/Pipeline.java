@@ -63,7 +63,7 @@ public class Pipeline
 		}
 		else if (CmdArgs.INSTANCE.getProfileArgs().isSet())
 		{
-			if (CmdArgs.INSTANCE.getTextDataArgs().isSet() ||
+			if (CmdArgs.INSTANCE.getFileArgs().isSet() ||
 				CmdArgs.INSTANCE.getBinaryDataArgs(0).isSet())
 			{
 				RiskScore rs = new RiskScore();

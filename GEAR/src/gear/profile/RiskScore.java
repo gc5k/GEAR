@@ -42,17 +42,17 @@ public class RiskScore
 		initial();
 
 		PLINKParser pp1 = null;
-		if (CmdArgs.INSTANCE.getTextDataArgs().isSet())
+		if (CmdArgs.INSTANCE.getFileArgs().isSet())
 		{
-			pp1 = new PLINKParser(CmdArgs.INSTANCE.getTextDataArgs()
-					.getPedFile(), CmdArgs.INSTANCE.getTextDataArgs()
-					.getMapFile());
+			pp1 = new PLINKParser(CmdArgs.INSTANCE.getFileArgs()
+					.getPed(), CmdArgs.INSTANCE.getFileArgs()
+					.getMap());
 		} else if (CmdArgs.INSTANCE.getBinaryDataArgs(0).isSet())
 		{
 			pp1 = new PLINKBinaryParser(CmdArgs.INSTANCE.getBinaryDataArgs(0)
-					.getBedFile(), CmdArgs.INSTANCE.getBinaryDataArgs(0)
-					.getBimFile(), CmdArgs.INSTANCE.getBinaryDataArgs(0)
-					.getFamFile());
+					.getBed(), CmdArgs.INSTANCE.getBinaryDataArgs(0)
+					.getBim(), CmdArgs.INSTANCE.getBinaryDataArgs(0)
+					.getFam());
 		} else
 		{
 			Logger.printUserError("Neither --file nor --bfile is set.");

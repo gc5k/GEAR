@@ -60,14 +60,14 @@ public class MergeTwoFile
 				&& CmdArgs.INSTANCE.getBinaryDataArgs(1).isSet())
 		{
 			pp1 = new PLINKBinaryParser(CmdArgs.INSTANCE.getBinaryDataArgs(0)
-					.getBedFile(), CmdArgs.INSTANCE.getBinaryDataArgs(0)
-					.getBimFile(), CmdArgs.INSTANCE.getBinaryDataArgs(0)
-					.getFamFile());
+					.getBed(), CmdArgs.INSTANCE.getBinaryDataArgs(0)
+					.getBim(), CmdArgs.INSTANCE.getBinaryDataArgs(0)
+					.getFam());
 
 			pp2 = new PLINKBinaryParser(CmdArgs.INSTANCE.getBinaryDataArgs(1)
-					.getBedFile(), CmdArgs.INSTANCE.getBinaryDataArgs(1)
-					.getBimFile(), CmdArgs.INSTANCE.getBinaryDataArgs(1)
-					.getFamFile());
+					.getBed(), CmdArgs.INSTANCE.getBinaryDataArgs(1)
+					.getBim(), CmdArgs.INSTANCE.getBinaryDataArgs(1)
+					.getFam());
 		} else
 		{
 			Logger.printUserError("--bfile or --bfile2 is not set.");
