@@ -1,6 +1,6 @@
 package gear.profile.struct;
 
-import gear.Parameter;
+import gear.CmdArgs;
 import gear.util.Logger;
 
 public class ScoreUnit
@@ -59,7 +59,7 @@ public class ScoreUnit
 				break;
 			}
 
-			if (Parameter.INSTANCE.isNA(tokens[2]))
+			if (CmdArgs.INSTANCE.isNA(tokens[2]))
 			{
 				scoreUnit = new ScoreUnit(/* SNP = */tokens[0], /* RefAllele = */
 						tokens[1]);

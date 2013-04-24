@@ -1,6 +1,6 @@
 package gear.util;
 
-import gear.Parameter;
+import gear.CmdArgs;
 
 import java.util.Random;
 
@@ -12,7 +12,7 @@ import java.util.Random;
 public class Sample
 {
 	public static long seed = 2011;
-	public static Random U = new Random(Parameter.INSTANCE.seed);
+	public static Random U = new Random(CmdArgs.INSTANCE.seed);
 
 	public static void setSeed(long s)
 	{

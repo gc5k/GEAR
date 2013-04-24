@@ -4,7 +4,7 @@ import java.util.HashSet;
 
 import family.popstat.AlleleFrequency;
 import family.qc.colqc.SNPFilterInterface;
-import gear.Parameter;
+import gear.CmdArgs;
 import gear.util.Logger;
 import gear.util.NewIt;
 
@@ -40,9 +40,9 @@ public class SoftSNPFilter
 			{
 				int idx = wseq[i];
 				boolean flag = true;
-				if (Parameter.INSTANCE.genoFlag)
+				if (CmdArgs.INSTANCE.genoFlag)
 				{
-					if (allelefreq[idx][2] > Parameter.INSTANCE.geno)
+					if (allelefreq[idx][2] > CmdArgs.INSTANCE.geno)
 					{
 						flag = false;
 						continue;
@@ -50,17 +50,17 @@ public class SoftSNPFilter
 				}
 				double f = allelefreq[idx][0] < allelefreq[idx][1] ? allelefreq[idx][0]
 						: allelefreq[idx][1];
-				if (Parameter.INSTANCE.mafFlag)
+				if (CmdArgs.INSTANCE.mafFlag)
 				{
-					if (f < Parameter.INSTANCE.maf)
+					if (f < CmdArgs.INSTANCE.maf)
 					{
 						flag = false;
 						continue;
 					}
 				}
-				if (Parameter.INSTANCE.maxmafFlag)
+				if (CmdArgs.INSTANCE.maxmafFlag)
 				{
-					if (f > Parameter.INSTANCE.max_maf)
+					if (f > CmdArgs.INSTANCE.max_maf)
 					{
 						flag = false;
 						continue;

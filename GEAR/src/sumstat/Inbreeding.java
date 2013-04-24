@@ -18,7 +18,7 @@ import family.plink.PLINKBinaryParser;
 import family.plink.PLINKParser;
 import family.popstat.GenotypeMatrix;
 import family.qc.rowqc.SampleFilter;
-import gear.Parameter;
+import gear.CmdArgs;
 import gear.util.FileProcessor;
 import gear.util.Logger;
 import gear.util.NewIt;
@@ -47,16 +47,16 @@ public class Inbreeding
 	public Inbreeding()
 	{
 		PLINKParser pp = null;
-		if (Parameter.INSTANCE.getFileParameter().isSet())
+		if (CmdArgs.INSTANCE.getTextDataArgs().isSet())
 		{
-			pp = new PLINKParser(Parameter.INSTANCE.getFileParameter()
-					.getPedFile(), Parameter.INSTANCE.getFileParameter()
+			pp = new PLINKParser(CmdArgs.INSTANCE.getTextDataArgs()
+					.getPedFile(), CmdArgs.INSTANCE.getTextDataArgs()
 					.getMapFile());
-		} else if (Parameter.INSTANCE.getBfileParameter(0).isSet())
+		} else if (CmdArgs.INSTANCE.getBinaryDataArgs(0).isSet())
 		{
-			pp = new PLINKBinaryParser(Parameter.INSTANCE.getBfileParameter(0)
-					.getBedFile(), Parameter.INSTANCE.getBfileParameter(0)
-					.getBimFile(), Parameter.INSTANCE.getBfileParameter(0)
+			pp = new PLINKBinaryParser(CmdArgs.INSTANCE.getBinaryDataArgs(0)
+					.getBedFile(), CmdArgs.INSTANCE.getBinaryDataArgs(0)
+					.getBimFile(), CmdArgs.INSTANCE.getBinaryDataArgs(0)
 					.getFamFile());
 		} else
 		{
@@ -119,7 +119,7 @@ public class Inbreeding
 		try
 		{
 			fstOut = new PrintWriter(
-					new String(Parameter.INSTANCE.out + ".fst"));
+					new String(CmdArgs.INSTANCE.out + ".fst"));
 		} catch (IOException e)
 		{
 			e.printStackTrace();
@@ -194,7 +194,7 @@ public class Inbreeding
 	private void readKeepFile()
 	{
 		BufferedReader reader = FileProcessor
-				.FileOpen(Parameter.INSTANCE.fst_file);
+				.FileOpen(CmdArgs.INSTANCE.fst_file);
 		String line = null;
 		ArrayList<String> famList = NewIt.newArrayList();
 		ArrayList<String> indList = NewIt.newArrayList();
@@ -221,7 +221,7 @@ public class Inbreeding
 		{
 			Logger.handleException(e,
 					"An exception occurred when reading the FST file '"
-							+ Parameter.INSTANCE.fst_file + "'.");
+							+ CmdArgs.INSTANCE.fst_file + "'.");
 		}
 		indKeep = new String[3][];
 		indKeep[0] = (String[]) famList.toArray(new String[0]);
@@ -240,7 +240,7 @@ public class Inbreeding
 		PrintWriter fstGrp = null;
 		try
 		{
-			fstGrp = new PrintWriter(new String(Parameter.INSTANCE.out
+			fstGrp = new PrintWriter(new String(CmdArgs.INSTANCE.out
 					+ ".fst.grp"));
 		} catch (IOException e)
 		{

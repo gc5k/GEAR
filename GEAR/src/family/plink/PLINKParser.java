@@ -7,7 +7,7 @@ import family.qc.colqc.SNPFilterI;
 import family.qc.colqc.SNPFilterInterface;
 import family.pedigree.file.MapFile;
 import family.pedigree.file.PedigreeFile;
-import gear.Parameter;
+import gear.CmdArgs;
 import gear.util.Logger;
 
 public class PLINKParser
@@ -64,7 +64,7 @@ public class PLINKParser
 		{
 			mapData.parseMap();
 		}
-		if (Parameter.INSTANCE.transFlag)
+		if (CmdArgs.INSTANCE.transFlag)
 		{
 			snpFilter = new SNPFilterI(mapData);
 		} else

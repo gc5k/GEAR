@@ -1,6 +1,6 @@
 package simulation;
 
-import gear.Parameter;
+import gear.CmdArgs;
 import gear.util.FileProcessor;
 import gear.util.Logger;
 import gear.util.TextHelper;
@@ -54,14 +54,14 @@ public class SimuPolyQT
 
 	public SimuPolyQT()
 	{
-		M = Parameter.INSTANCE.polyLoci;
-		M_null = Parameter.INSTANCE.polyLociNull;
-		U = Parameter.INSTANCE.polyU;
-		ld = Parameter.INSTANCE.polyLD;
-		seed = Parameter.INSTANCE.simuSeed;
-		sample = Parameter.INSTANCE.poly_sample_QT;
-		h2 = Parameter.INSTANCE.simuHsq;
-		out = Parameter.INSTANCE.out;
+		M = CmdArgs.INSTANCE.polyLoci;
+		M_null = CmdArgs.INSTANCE.polyLociNull;
+		U = CmdArgs.INSTANCE.polyU;
+		ld = CmdArgs.INSTANCE.polyLD;
+		seed = CmdArgs.INSTANCE.simuSeed;
+		sample = CmdArgs.INSTANCE.poly_sample_QT;
+		h2 = CmdArgs.INSTANCE.simuHsq;
+		out = CmdArgs.INSTANCE.out;
 
 		E = Math.sqrt(1 - h2);
 
@@ -71,7 +71,7 @@ public class SimuPolyQT
 		freq = new double[M];
 		DPrime = new double[M - 1];
 
-		Arrays.fill(freq, Parameter.INSTANCE.polyFreq);
+		Arrays.fill(freq, CmdArgs.INSTANCE.polyFreq);
 		Arrays.fill(DPrime, ld);
 		LD = CalculateDprime(freq, DPrime);
 
@@ -82,13 +82,13 @@ public class SimuPolyQT
 		Logger.printUserLog("Simulation polygenic model for quantitative traits.");
 		Logger.printUserLog("seed: " + seed);
 
-		Logger.printUserLog("MAF: " + Parameter.INSTANCE.polyFreq);
+		Logger.printUserLog("MAF: " + CmdArgs.INSTANCE.polyFreq);
 		Logger.printUserLog("Marker: " + M);
 		Logger.printUserLog("Null marker: " + M);
-		if (Parameter.INSTANCE.polyEffectFlag)
+		if (CmdArgs.INSTANCE.polyEffectFlag)
 		{
 			Logger.printUserLog("genetic effect file: "
-					+ Parameter.INSTANCE.polyEffectFile);
+					+ CmdArgs.INSTANCE.polyEffectFile);
 		} else
 		{
 			Logger.printUserLog("Uniform Effect: " + U);
@@ -102,13 +102,13 @@ public class SimuPolyQT
 
 	public static void main(String[] args)
 	{
-		Parameter.INSTANCE.commandListener(args);
+		CmdArgs.INSTANCE.commandListener(args);
 	}
 
 	public void generateSample()
 	{
 		GenerateSampleNoSelection();
-		if (Parameter.INSTANCE.makebedFlag)
+		if (CmdArgs.INSTANCE.makebedFlag)
 		{
 			writeBFile();
 		} else
@@ -123,7 +123,7 @@ public class SimuPolyQT
 
 		int count = 0;
 		RealMatrix effect = null;
-		if (Parameter.INSTANCE.polyEffectFlag)
+		if (CmdArgs.INSTANCE.polyEffectFlag)
 		{
 			effect = readEffects();
 		} else
@@ -178,7 +178,7 @@ public class SimuPolyQT
 			}
 		}
 
-		if (Parameter.INSTANCE.simuOrderFlag)
+		if (CmdArgs.INSTANCE.simuOrderFlag)
 		{
 			Arrays.sort(effect);
 		}
@@ -481,7 +481,7 @@ public class SimuPolyQT
 	public RealMatrix readEffects()
 	{
 		BufferedReader reader = FileProcessor
-				.FileOpen(Parameter.INSTANCE.polyEffectFile);
+				.FileOpen(CmdArgs.INSTANCE.polyEffectFile);
 		double[] effect = new double[M];
 		int c = 0;
 		String line = null;
@@ -502,11 +502,11 @@ public class SimuPolyQT
 		{
 			Logger.handleException(e,
 					"An exception occurred when reading the poly-effect file '"
-							+ Parameter.INSTANCE.polyEffectFile + "'.");
+							+ CmdArgs.INSTANCE.polyEffectFile + "'.");
 		}
 		RealMatrix Eff = new Array2DRowRealMatrix(effect);
 
-		if (Parameter.INSTANCE.simuOrderFlag)
+		if (CmdArgs.INSTANCE.simuOrderFlag)
 		{
 			Arrays.sort(effect);
 		}

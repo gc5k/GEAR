@@ -3,7 +3,6 @@ package gear;
 import gear.util.Logger;
 import gear.util.NewIt;
 
-import java.io.File;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Random;
@@ -17,7 +16,7 @@ import org.apache.commons.cli.ParseException;
 import org.apache.commons.cli.PosixParser;
 
 // singleton implemented in enum way
-public enum Parameter
+public enum CmdArgs
 {
 	INSTANCE;
 
@@ -28,14 +27,14 @@ public enum Parameter
 	private CommandLineParser parser = new PosixParser();
 
 	@SuppressWarnings("static-access")
-	private Parameter()
+	private CmdArgs()
 	{
 		ops = new Options();
-		fileParameter = new FileParameter();
-		bfileParameters = new BfileParameter[2];
-		bfileParameters[0] = new BfileParameter("PLINK format binary input file", "bfile");
-		bfileParameters[1] = new BfileParameter("The second PLINK format binary input file", "bfile2");
-		profileParameter = new ProfileParameter();
+		textDataArgs = new TextDataArgs();
+		binaryDataArgs = new BinaryDataArgs[2];
+		binaryDataArgs[0] = new BinaryDataArgs("PLINK format binary input file", "bfile");
+		binaryDataArgs[1] = new BinaryDataArgs("The second PLINK format binary input file", "bfile2");
+		profileArgs = new ProfileArgs();
 
 		// real-check
 		ops.addOption(OptionBuilder.withDescription("realcheck ").create(
@@ -44,7 +43,7 @@ public enum Parameter
 
 		// merge
 		ops.addOption(OptionBuilder.withDescription("merge ").create(cmd_merge));
-		mergeParameter.commandInitial();
+		mergeArgs.commandInitial();
 
 		// make predictor
 		ops.addOption(OptionBuilder.withLongOpt(cmd_make_predictor_long)
@@ -231,7 +230,7 @@ public enum Parameter
 		ops.addOption(OptionBuilder.withDescription("h2 ").hasArg()
 				.create(cmd_eh2));
 
-		heParameter = new HEParameter();
+		heArgs = new HEArgs();
 
 		ops.addOption(OptionBuilder.withLongOpt(cmd_ref_freq_long)
 				.withDescription("reference allele frequency").hasArg()
@@ -293,7 +292,7 @@ public enum Parameter
 		ops.addOption(OptionBuilder.withDescription("na ").hasArg()
 				.create(cmd_na));
 
-		hpcParameter = new HpcParameter();
+		hpcArgs = new HpcArgs();
 
 		// /////transform heritability
 		ops.addOption(OptionBuilder
@@ -333,11 +332,11 @@ public enum Parameter
 
 	}
 
-	public class BfileParameter
+	public class BinaryDataArgs
 	{
 
 		@SuppressWarnings("static-access")
-		private BfileParameter(String desc, String opt)
+		private BinaryDataArgs(String desc, String opt)
 		{
 			ops.addOption(OptionBuilder.withDescription(desc).hasArg().create(opt));
 			cmd_bfile = opt;
@@ -370,17 +369,17 @@ public enum Parameter
 
 	}
 
-	public BfileParameter getBfileParameter(int i)
+	public BinaryDataArgs getBinaryDataArgs(int i)
 	{
-		return bfileParameters[i];
+		return binaryDataArgs[i];
 	}
 
-	private BfileParameter[] bfileParameters;
+	private BinaryDataArgs[] binaryDataArgs;
 
-	public class FileParameter
+	public class TextDataArgs
 	{
 		@SuppressWarnings("static-access")
-		private FileParameter()
+		private TextDataArgs()
 		{
 			ops.addOption(OptionBuilder.withDescription("PLINK format text input file").hasArg().create(cmd_file));
 		}
@@ -406,12 +405,12 @@ public enum Parameter
 
 	}
 
-	public FileParameter getFileParameter()
+	public TextDataArgs getTextDataArgs()
 	{
-		return fileParameter;
+		return textDataArgs;
 	}
 
-	private FileParameter fileParameter;
+	private TextDataArgs textDataArgs;
 
 	// Real-check options Begin
 	public boolean hasRealCheckOption()
@@ -422,9 +421,9 @@ public enum Parameter
 	private final String cmd_realcheck = "realcheck";
 	private boolean realcheckFlag = false;
 
-	public class RealCheckParameter
+	public class RealCheckArgs
 	{
-		private RealCheckParameter()
+		private RealCheckArgs()
 		{
 		}
 
@@ -533,9 +532,9 @@ public enum Parameter
 		private String snps = null;
 	} // class RealCheckParameter
 
-	private RealCheckParameter realCheckParameter = new RealCheckParameter();
+	private RealCheckArgs realCheckParameter = new RealCheckArgs();
 
-	public RealCheckParameter getRealCheckParameter()
+	public RealCheckArgs getRealCheckParameter()
 	{
 		return realCheckParameter;
 	}
@@ -551,9 +550,9 @@ public enum Parameter
 	private final String cmd_merge = "merge";
 	private boolean mergeFlag = false;
 
-	public class MergeParameter
+	public class MergeArgs
 	{
-		private MergeParameter()
+		private MergeArgs()
 		{
 		}
 
@@ -611,11 +610,11 @@ public enum Parameter
 		private double p_cutoff = 0.05;
 	}
 
-	private MergeParameter mergeParameter = new MergeParameter();
+	private MergeArgs mergeArgs = new MergeArgs();
 
-	public MergeParameter getMergeParameter()
+	public MergeArgs getMergeArgs()
 	{
-		return mergeParameter;
+		return mergeArgs;
 	}
 
 	// Merge options End
@@ -828,10 +827,10 @@ public enum Parameter
 	public boolean fstFlag = false;
 	public String fst_file = null;
 
-	public class ProfileParameter
+	public class ProfileArgs
 	{
 		@SuppressWarnings("static-access")
-		private ProfileParameter()
+		private ProfileArgs()
 		{
 			ops.addOption(OptionBuilder.withDescription("score file used for profiling").hasArg().create("score"));
 			ops.addOption(OptionBuilder.withLongOpt("mach-dosage").withDescription("MaCH dosage file").hasArg().create());
@@ -883,12 +882,12 @@ public enum Parameter
 		}
 	}
 	
-	public ProfileParameter getProfileParameter()
+	public ProfileArgs getProfileArgs()
 	{
-		return profileParameter;
+		return profileArgs;
 	}
 	
-	private ProfileParameter profileParameter;
+	private ProfileArgs profileArgs;
 
 	// grm statistics
 	private final String cmd_grm_stat = "grm_stat";
@@ -907,11 +906,11 @@ public enum Parameter
 
 	private boolean heFlag = false;
 
-	public class HEParameter
+	public class HEArgs
 	{
 
 		@SuppressWarnings("static-access")
-		private HEParameter()
+		private HEArgs()
 		{
 			ops.addOption(OptionBuilder.withLongOpt(cmd_grm_cutoff_long)
 					.withDescription("grm cut-off").hasArg()
@@ -1116,12 +1115,12 @@ public enum Parameter
 
 	}
 
-	public HEParameter getHEParameter()
+	public HEArgs getHEArgs()
 	{
-		return heParameter;
+		return heArgs;
 	}
 
-	private HEParameter heParameter;
+	private HEArgs heArgs;
 	// HE regression options End
 
 	// make grm options start
@@ -1219,63 +1218,50 @@ public enum Parameter
 	private final String cmd_na = "na";
 	public String[] na = { "-9", "NA", "na", "-Inf", "Inf" };
 
-	public class HpcParameter
+	public class HpcArgs
 	{
-
 		@SuppressWarnings("static-access")
-		private HpcParameter()
+		private HpcArgs()
 		{
-			ops.addOption(OptionBuilder.withDescription("qsub")
-					.create(cmd_qsub));
-			ops.addOption(OptionBuilder.withDescription("generate shell")
-					.create(cmd_sh));
-			ops.addOption(OptionBuilder.withDescription("email").hasArg()
-					.create(cmd_email));
-			ops.addOption(OptionBuilder.withDescription("ram").hasArg()
-					.create(cmd_ram));
-			ops.addOption(OptionBuilder.withDescription("name").hasArg()
-					.create(cmd_name));
+			ops.addOption(OptionBuilder.withDescription("qsub").create("qsub"));
+			ops.addOption(OptionBuilder.withDescription("generate shell").create("shell"));
+			ops.addOption(OptionBuilder.withDescription("email").hasArg().create("email"));
+			ops.addOption(OptionBuilder.withDescription("ram").hasArg().create("ram"));
+			ops.addOption(OptionBuilder.withDescription("name").hasArg().create("name"));
 		}
 
 		public boolean isSet()
 		{
-			return cl.hasOption(cmd_qsub) || cl.hasOption(cmd_sh);
+			return cl.hasOption("qsub") || cl.hasOption("shell");
 		}
 
 		public boolean isQsubSet()
 		{
-			return cl.hasOption(cmd_qsub);
+			return cl.hasOption("qsub");
 		}
 
 		public String getEmail()
 		{
-			return cl.getOptionValue(cmd_email, "guobo.chen@uq.edu.au");
+			return cl.getOptionValue("email", "guobo.chen@uq.edu.au");
 		}
 
 		public String getRam()
 		{
-			return cl.getOptionValue(cmd_ram, "10G");
+			return cl.getOptionValue("ram", "10G");
 		}
 
 		public String getName()
 		{
-			return cl.getOptionValue(cmd_name, "gear");
+			return cl.getOptionValue("name", "gear");
 		}
-
-		private static final String cmd_qsub = "qsub";
-		private static final String cmd_sh = "shell";
-		private static final String cmd_email = "email";
-		private static final String cmd_ram = "ram";
-		private final String cmd_name = "name";
-
 	}
 
-	public HpcParameter getHpcParameter()
+	public HpcArgs getHpcArgs()
 	{
-		return hpcParameter;
+		return hpcArgs;
 	}
 
-	private HpcParameter hpcParameter;
+	private HpcArgs hpcArgs;
 
 	// /////////////////level 1 snp selection
 	private final String cmd_chr = "chr";
@@ -1376,7 +1362,7 @@ public enum Parameter
 		realCheckParameter.commandListener(cl);
 
 		mergeFlag = cl.hasOption(cmd_merge);
-		mergeParameter.commandListener(cl);
+		mergeArgs.commandListener(cl);
 
 		// make predictor
 		makePredictorFlag = cl.hasOption(cmd_make_predictor);
@@ -1692,7 +1678,7 @@ public enum Parameter
 			eh2 = Double.parseDouble(cl.getOptionValue(cmd_eh2));
 		}
 
-		heParameter.commandListener();
+		heArgs.commandListener();
 
 		if (cl.hasOption(cmd_ref_freq))
 		{
@@ -1915,7 +1901,7 @@ public enum Parameter
 
 	private void exists(String file)
 	{
-		File f = new File(file);
+		java.io.File f = new java.io.File(file);
 		if (!f.exists())
 		{
 			Logger.printUserError("File '" + file + "' does not exist.");

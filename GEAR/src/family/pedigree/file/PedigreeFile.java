@@ -15,7 +15,7 @@ import family.pedigree.Hukou;
 import family.pedigree.genotype.BFamilyStruct;
 import family.pedigree.genotype.BPerson;
 import gear.ConstValues;
-import gear.Parameter;
+import gear.CmdArgs;
 import gear.util.Logger;
 import gear.util.NewIt;
 
@@ -231,11 +231,11 @@ public class PedigreeFile
 	{
 		for (String c : SixthCol)
 		{
-			if (Parameter.INSTANCE.status_shiftFlag)
+			if (CmdArgs.INSTANCE.status_shiftFlag)
 			{
 				if (c.compareTo("1") != 0
 						&& c.compareTo("0") != 0
-						&& c.compareTo(Parameter.INSTANCE.missing_phenotype) != 0)
+						&& c.compareTo(CmdArgs.INSTANCE.missing_phenotype) != 0)
 				{
 					IsSixthColBinary = false;
 					break;
@@ -245,7 +245,7 @@ public class PedigreeFile
 				if (c.compareTo("2") != 0
 						&& c.compareTo("1") != 0
 						&& c.compareTo("0") != 0
-						&& c.compareTo(Parameter.INSTANCE.missing_phenotype) != 0)
+						&& c.compareTo(CmdArgs.INSTANCE.missing_phenotype) != 0)
 				{
 					IsSixthColBinary = false;
 					break;

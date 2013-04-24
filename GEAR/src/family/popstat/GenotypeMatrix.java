@@ -4,7 +4,7 @@ import java.util.ArrayList;
 
 import family.pedigree.PersonIndex;
 import family.pedigree.genotype.BPerson;
-import gear.Parameter;
+import gear.CmdArgs;
 
 public class GenotypeMatrix
 {
@@ -100,7 +100,7 @@ public class GenotypeMatrix
 		int g = (genotypeMat[idx][posByte] >> (posBite)) & 3;
 		if (g == 3)
 		{// 01
-			return Parameter.INSTANCE.missingGenotype;
+			return CmdArgs.INSTANCE.missingGenotype;
 		} else
 		{
 			return Integer.toString(g);

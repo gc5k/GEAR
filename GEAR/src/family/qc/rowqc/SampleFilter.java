@@ -12,7 +12,7 @@ import family.pedigree.file.MapFile;
 import family.pedigree.file.PedigreeFile;
 import family.pedigree.genotype.BFamilyStruct;
 import family.pedigree.genotype.BPerson;
-import gear.Parameter;
+import gear.CmdArgs;
 import gear.util.FileProcessor;
 import gear.util.Logger;
 import gear.util.NewIt;
@@ -137,10 +137,10 @@ public class SampleFilter
 	{
 		boolean flag = true;
 
-		if (Parameter.INSTANCE.keepFlag)
+		if (CmdArgs.INSTANCE.keepFlag)
 		{
 			Logger.printUserLog("Reading kept individuals from '"
-					+ Parameter.INSTANCE.keepFile + "'.");
+					+ CmdArgs.INSTANCE.keepFile + "'.");
 			readKeepFile();
 			flag = false;
 			String fi = p.getFamilyID();
@@ -154,10 +154,10 @@ public class SampleFilter
 					break;
 				}
 			}
-		} else if (Parameter.INSTANCE.removeFlag)
+		} else if (CmdArgs.INSTANCE.removeFlag)
 		{
 			Logger.printUserLog("Reading removed individuals from '"
-					+ Parameter.INSTANCE.removeFile + "'.");
+					+ CmdArgs.INSTANCE.removeFile + "'.");
 			readRemoveFile();
 			String fi = p.getFamilyID();
 			String pi = p.getPersonID();
@@ -172,15 +172,15 @@ public class SampleFilter
 			}
 		}
 
-		if (flag && Parameter.INSTANCE.keep_maleFlag)
+		if (flag && CmdArgs.INSTANCE.keep_maleFlag)
 		{
 			return flag = p.getGender() == 1 ? true : false;
 		}
-		if (flag && Parameter.INSTANCE.keep_femaleFlag)
+		if (flag && CmdArgs.INSTANCE.keep_femaleFlag)
 		{
 			return flag = p.getGender() == 2 ? true : false;
 		}
-		if (flag && Parameter.INSTANCE.ex_nosexFlag)
+		if (flag && CmdArgs.INSTANCE.ex_nosexFlag)
 		{
 			return flag = (p.getGender() == 1 || p.getGender() == 2) ? true
 					: false;
@@ -216,7 +216,7 @@ public class SampleFilter
 	private void readKeepFile()
 	{
 		BufferedReader reader = FileProcessor
-				.FileOpen(Parameter.INSTANCE.keepFile);
+				.FileOpen(CmdArgs.INSTANCE.keepFile);
 		String line = null;
 		ArrayList<String> famList = NewIt.newArrayList();
 		ArrayList<String> indList = NewIt.newArrayList();
@@ -235,7 +235,7 @@ public class SampleFilter
 		{
 			Logger.handleException(e,
 					"An exception occurred when reading the kept-individual file '"
-							+ Parameter.INSTANCE.keepFile + "'.");
+							+ CmdArgs.INSTANCE.keepFile + "'.");
 		}
 		indKeep = new String[2][];
 		indKeep[0] = (String[]) famList.toArray(new String[0]);
@@ -245,7 +245,7 @@ public class SampleFilter
 	private void readRemoveFile()
 	{
 		BufferedReader reader = FileProcessor
-				.FileOpen(Parameter.INSTANCE.removeFile);
+				.FileOpen(CmdArgs.INSTANCE.removeFile);
 		ArrayList<String> famList = NewIt.newArrayList();
 		ArrayList<String> indList = NewIt.newArrayList();
 		String line = null;
@@ -263,7 +263,7 @@ public class SampleFilter
 		{
 			Logger.handleException(e,
 					"An exception occurred when reading the removed-individual file '"
-							+ Parameter.INSTANCE.removeFile + "'.");
+							+ CmdArgs.INSTANCE.removeFile + "'.");
 		}
 		indExclude = new String[2][];
 		indExclude[0] = (String[]) famList.toArray(new String[0]);

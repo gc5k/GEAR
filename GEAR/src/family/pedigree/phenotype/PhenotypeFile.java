@@ -12,7 +12,7 @@ import java.util.Hashtable;
 import family.pedigree.Hukou;
 import family.pedigree.phenotype.FamilyUnit;
 import family.pedigree.phenotype.Subject;
-import gear.Parameter;
+import gear.CmdArgs;
 import gear.util.NewIt;
 
 /**
@@ -66,7 +66,7 @@ public class PhenotypeFile
 
 			if (k == 0)
 			{
-				if (Parameter.INSTANCE.covar_header_flag)
+				if (CmdArgs.INSTANCE.covar_header_flag)
 				{
 
 					String[] t = line.split("\\s+");

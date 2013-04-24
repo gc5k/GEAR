@@ -1,6 +1,6 @@
 package family.pedigree.genotype;
 
-import gear.Parameter;
+import gear.CmdArgs;
 import gear.util.NewIt;
 
 import java.util.TreeMap;
@@ -43,11 +43,11 @@ public class GenoSet
 			genotypedParents += parentsGenoMap.get(p).intValue();
 		}
 
-		if (parentsGenoMap.containsKey(Parameter.INSTANCE.missingGenotype))
+		if (parentsGenoMap.containsKey(CmdArgs.INSTANCE.missingGenotype))
 		{
 			ungenotypedParents = ((Integer) parentsGenoMap
-					.get(Parameter.INSTANCE.missingGenotype)).intValue();
-			parentsGenoMap.remove(Parameter.INSTANCE.missingGenotype);
+					.get(CmdArgs.INSTANCE.missingGenotype)).intValue();
+			parentsGenoMap.remove(CmdArgs.INSTANCE.missingGenotype);
 		}
 		genotypedParents -= ungenotypedParents;
 
@@ -56,11 +56,11 @@ public class GenoSet
 			genotypedChildren += childrenGenoMap.get(c).intValue();
 		}
 
-		if (childrenGenoMap.containsKey(Parameter.INSTANCE.missingGenotype))
+		if (childrenGenoMap.containsKey(CmdArgs.INSTANCE.missingGenotype))
 		{
 			ungenotypedChildren = childrenGenoMap.get(
-					Parameter.INSTANCE.missingGenotype).intValue();
-			childrenGenoMap.remove(Parameter.INSTANCE.missingGenotype);
+					CmdArgs.INSTANCE.missingGenotype).intValue();
+			childrenGenoMap.remove(CmdArgs.INSTANCE.missingGenotype);
 		}
 		genotypedChildren -= ungenotypedChildren;
 	}

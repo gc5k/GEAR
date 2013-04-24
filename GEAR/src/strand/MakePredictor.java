@@ -12,7 +12,7 @@ import family.plink.PLINKBinaryParser;
 import family.plink.PLINKParser;
 import family.popstat.GenotypeMatrix;
 import family.qc.rowqc.SampleFilter;
-import gear.Parameter;
+import gear.CmdArgs;
 import gear.RegressionModel;
 import gear.util.FileProcessor;
 import gear.util.Logger;
@@ -42,11 +42,11 @@ public class MakePredictor
 		readPredictor();
 
 		PLINKParser pp1 = null;
-		if (Parameter.INSTANCE.getBfileParameter(0).isSet())
+		if (CmdArgs.INSTANCE.getBinaryDataArgs(0).isSet())
 		{
-			pp1 = new PLINKBinaryParser(Parameter.INSTANCE.getBfileParameter(0)
-					.getBedFile(), Parameter.INSTANCE.getBfileParameter(0)
-					.getBimFile(), Parameter.INSTANCE.getBfileParameter(0)
+			pp1 = new PLINKBinaryParser(CmdArgs.INSTANCE.getBinaryDataArgs(0)
+					.getBedFile(), CmdArgs.INSTANCE.getBinaryDataArgs(0)
+					.getBimFile(), CmdArgs.INSTANCE.getBinaryDataArgs(0)
 					.getFamFile());
 		} else
 		{
@@ -64,7 +64,7 @@ public class MakePredictor
 	public void BuildPredictor()
 	{
 		StringBuffer sb = new StringBuffer();
-		sb.append(Parameter.INSTANCE.out);
+		sb.append(CmdArgs.INSTANCE.out);
 		sb.append(".mergesnp");
 		PrintStream ps = FileProcessor.CreatePrintStream(sb.toString());
 		ps.append("SNP\tChr\tPos\tA1_1st\tA2_1st\tA1_2nd\tA2_2nd\tMAF_A1_1st\tMAF_A1_2nd\tFlip\tMerged\tP\tScheme\n");
@@ -125,11 +125,11 @@ public class MakePredictor
 				scoreCoding.add(0);
 			}
 
-			if (!Parameter.INSTANCE.keepATGC() && ATGCLocus)
+			if (!CmdArgs.INSTANCE.keepATGC() && ATGCLocus)
 			{
 				f = false;
 			}
-			if (Parameter.INSTANCE.removeFlip() && flip)
+			if (CmdArgs.INSTANCE.removeFlip() && flip)
 			{
 				f = false;
 			}
@@ -245,7 +245,7 @@ public class MakePredictor
 	public void readPredictor()
 	{
 
-		BufferedReader reader = FileProcessor.FileOpen(Parameter.INSTANCE
+		BufferedReader reader = FileProcessor.FileOpen(CmdArgs.INSTANCE
 				.getPredictorFile());
 		String line;
 		try
@@ -272,7 +272,7 @@ public class MakePredictor
 	public void WritePredictor()
 	{
 		StringBuffer sbim = new StringBuffer();
-		sbim.append(Parameter.INSTANCE.out);
+		sbim.append(CmdArgs.INSTANCE.out);
 		sbim.append(".predictor");
 		PrintStream predictorFile = FileProcessor.CreatePrintStream(sbim
 				.toString());
@@ -286,16 +286,16 @@ public class MakePredictor
 			}
 			SNP snp = snpList1.get(comSNPIdx[0][i]);
 			Predictor pd = predictorList.get(comSNPIdx[1][i]);
-			if (Parameter.INSTANCE.isNA(pd.getField(Parameter.INSTANCE
+			if (CmdArgs.INSTANCE.isNA(pd.getField(CmdArgs.INSTANCE
 					.getPredictorIdx())))
 			{
 				NMiss++;
 				continue;
 			} else
 			{
-				double s = Double.parseDouble(pd.getField(Parameter.INSTANCE
+				double s = Double.parseDouble(pd.getField(CmdArgs.INSTANCE
 						.getPredictorIdx()));
-				if (Parameter.INSTANCE.getTranFunction() == RegressionModel.LINEAR)
+				if (CmdArgs.INSTANCE.getTranFunction() == RegressionModel.LINEAR)
 				{
 					if (scoreCoding.get(i).intValue() == 1)
 					{

@@ -18,7 +18,7 @@ import family.plink.PLINKBinaryParser;
 import family.plink.PLINKParser;
 import family.popstat.GenotypeMatrix;
 import family.qc.rowqc.SampleFilter;
-import gear.Parameter;
+import gear.CmdArgs;
 import gear.util.FileProcessor;
 import gear.util.Logger;
 import gear.util.NewIt;
@@ -55,11 +55,11 @@ public class Strand
 		readStrand();
 
 		PLINKParser pp1 = null;
-		if (Parameter.INSTANCE.getBfileParameter(0).isSet())
+		if (CmdArgs.INSTANCE.getBinaryDataArgs(0).isSet())
 		{
-			pp1 = new PLINKBinaryParser(Parameter.INSTANCE.getBfileParameter(0)
-					.getBedFile(), Parameter.INSTANCE.getBfileParameter(0)
-					.getBimFile(), Parameter.INSTANCE.getBfileParameter(0)
+			pp1 = new PLINKBinaryParser(CmdArgs.INSTANCE.getBinaryDataArgs(0)
+					.getBedFile(), CmdArgs.INSTANCE.getBinaryDataArgs(0)
+					.getBimFile(), CmdArgs.INSTANCE.getBinaryDataArgs(0)
 					.getFamFile());
 		} else
 		{
@@ -79,13 +79,13 @@ public class Strand
 		DecimalFormat fmt = new DecimalFormat("#.###E0");
 
 		StringBuffer sb = new StringBuffer();
-		sb.append(Parameter.INSTANCE.out);
+		sb.append(CmdArgs.INSTANCE.out);
 		sb.append(".mergesnp");
 		PrintStream ps = FileProcessor.CreatePrintStream(sb.toString());
 		ps.append("SNP\tChr\tPos\tA1_1st\tA2_1st\tA1_2nd\tA2_2nd\tMAF_A1_1st\tMAF_A1_2nd\tFlip\tMerged\tP\tScheme\n");
 
 		StringBuffer sb1 = new StringBuffer();
-		sb1.append(Parameter.INSTANCE.out);
+		sb1.append(CmdArgs.INSTANCE.out);
 		sb1.append(".mergebadsnp");
 		PrintStream ps1 = FileProcessor.CreatePrintStream(sb.toString());
 		ps1.append("SNP\tChr\tPos\tA1_1st\tA2_1st\tA1_2nd\tA2_2nd\tMAF_A1_1st\tMAF_A1_2nd\tFlip\tMerged\tP\tScheme\n");
@@ -126,10 +126,10 @@ public class Strand
 						ATGCLocus = true;
 						if (ref1 < 0.5 && ref2 < 0.5)
 						{
-							if (ref1 < Parameter.INSTANCE.getMergeParameter()
+							if (ref1 < CmdArgs.INSTANCE.getMergeArgs()
 									.getMafCutoff()
-									&& ref2 < Parameter.INSTANCE
-											.getMergeParameter().getMafCutoff())
+									&& ref2 < CmdArgs.INSTANCE
+											.getMergeArgs().getMafCutoff())
 							{
 								f = true;
 							} else
@@ -141,10 +141,10 @@ public class Strand
 
 						} else if (ref1 < 0.5 && ref2 > 0.5)
 						{
-							if (ref1 < Parameter.INSTANCE.getMergeParameter()
+							if (ref1 < CmdArgs.INSTANCE.getMergeArgs()
 									.getMafCutoff()
-									&& ref2 > 1 - Parameter.INSTANCE
-											.getMergeParameter().getMafCutoff())
+									&& ref2 > 1 - CmdArgs.INSTANCE
+											.getMergeArgs().getMafCutoff())
 							{
 								f = true;
 							} else
@@ -157,10 +157,10 @@ public class Strand
 
 						} else if (ref1 > 0.5 && ref2 < 0.5)
 						{
-							if (ref1 > 1 - Parameter.INSTANCE
-									.getMergeParameter().getMafCutoff()
-									&& ref2 < Parameter.INSTANCE
-											.getMergeParameter().getMafCutoff())
+							if (ref1 > 1 - CmdArgs.INSTANCE
+									.getMergeArgs().getMafCutoff()
+									&& ref2 < CmdArgs.INSTANCE
+											.getMergeArgs().getMafCutoff())
 							{
 								f = true;
 							} else
@@ -173,10 +173,10 @@ public class Strand
 
 						} else
 						{
-							if (ref1 > 1 - Parameter.INSTANCE
-									.getMergeParameter().getMafCutoff()
-									&& ref2 > 1 - Parameter.INSTANCE
-											.getMergeParameter().getMafCutoff())
+							if (ref1 > 1 - CmdArgs.INSTANCE
+									.getMergeArgs().getMafCutoff()
+									&& ref2 > 1 - CmdArgs.INSTANCE
+											.getMergeArgs().getMafCutoff())
 							{
 								f = true;
 							} else
@@ -203,10 +203,10 @@ public class Strand
 						ATGCLocus = true;
 						if (ref1 < 0.5 && (1 - ref2) < 0.5)
 						{
-							if (ref1 < Parameter.INSTANCE.getMergeParameter()
+							if (ref1 < CmdArgs.INSTANCE.getMergeArgs()
 									.getMafCutoff()
-									&& 1 - ref2 < Parameter.INSTANCE
-											.getMergeParameter().getMafCutoff())
+									&& 1 - ref2 < CmdArgs.INSTANCE
+											.getMergeArgs().getMafCutoff())
 							{
 								f = true;
 							} else
@@ -218,10 +218,10 @@ public class Strand
 							flip = true;
 						} else if (ref1 < 0.5 && (1 - ref2) > 0.5)
 						{
-							if (ref1 < Parameter.INSTANCE.getMergeParameter()
+							if (ref1 < CmdArgs.INSTANCE.getMergeArgs()
 									.getMafCutoff()
-									&& 1 - ref2 > 1 - Parameter.INSTANCE
-											.getMergeParameter().getMafCutoff())
+									&& 1 - ref2 > 1 - CmdArgs.INSTANCE
+											.getMergeArgs().getMafCutoff())
 							{
 								f = true;
 							} else
@@ -233,10 +233,10 @@ public class Strand
 
 						} else if (ref1 > 0.5 && (1 - ref2) < 0.5)
 						{
-							if (ref1 > 1 - Parameter.INSTANCE
-									.getMergeParameter().getMafCutoff()
-									&& 1 - ref2 < Parameter.INSTANCE
-											.getMergeParameter().getMafCutoff())
+							if (ref1 > 1 - CmdArgs.INSTANCE
+									.getMergeArgs().getMafCutoff()
+									&& 1 - ref2 < CmdArgs.INSTANCE
+											.getMergeArgs().getMafCutoff())
 							{
 								f = true;
 							} else
@@ -248,10 +248,10 @@ public class Strand
 
 						} else
 						{
-							if (ref1 > 1 - Parameter.INSTANCE
-									.getMergeParameter().getMafCutoff()
-									&& 1 - ref2 > 1 - Parameter.INSTANCE
-											.getMergeParameter().getMafCutoff())
+							if (ref1 > 1 - CmdArgs.INSTANCE
+									.getMergeArgs().getMafCutoff()
+									&& 1 - ref2 > 1 - CmdArgs.INSTANCE
+											.getMergeArgs().getMafCutoff())
 							{
 								f = true;
 							} else
@@ -296,15 +296,15 @@ public class Strand
 
 				double p = Z.OddsRatioTestPvalueTwoTail(ref1, ref2,
 						N1[comSNPIdx[0][i]], N2[comSNPIdx[1][i]]);
-				if (p < Parameter.INSTANCE.getMergeParameter().getMafCutoff())
+				if (p < CmdArgs.INSTANCE.getMergeArgs().getMafCutoff())
 				{
 					f = false;
 				}
-				if (!Parameter.INSTANCE.keepATGC() && ATGCLocus)
+				if (!CmdArgs.INSTANCE.keepATGC() && ATGCLocus)
 				{
 					f = false;
 				}
-				if (Parameter.INSTANCE.removeFlip() && flip)
+				if (CmdArgs.INSTANCE.removeFlip() && flip)
 				{
 					f = false;
 				}
@@ -436,7 +436,7 @@ public class Strand
 
 	public void readStrand()
 	{
-		BufferedReader reader = FileProcessor.FileOpen(Parameter.INSTANCE
+		BufferedReader reader = FileProcessor.FileOpen(CmdArgs.INSTANCE
 				.getStrandFile());
 		String line;
 		try
@@ -453,14 +453,14 @@ public class Strand
 		{
 			Logger.handleException(e,
 					"An exception occurred when reading the strand file '"
-							+ Parameter.INSTANCE.getStrandFile() + "'.");
+							+ CmdArgs.INSTANCE.getStrandFile() + "'.");
 		}
 	}
 
 	public void WriteFile()
 	{
 		StringBuffer sbim = new StringBuffer();
-		sbim.append(Parameter.INSTANCE.out);
+		sbim.append(CmdArgs.INSTANCE.out);
 		sbim.append(".bim");
 		PrintStream pbim = FileProcessor.CreatePrintStream(sbim.toString());
 
@@ -478,7 +478,7 @@ public class Strand
 		pbim.close();
 
 		StringBuffer sfam = new StringBuffer();
-		sfam.append(Parameter.INSTANCE.out);
+		sfam.append(CmdArgs.INSTANCE.out);
 		sfam.append(".fam");
 		PrintStream pfam = FileProcessor.CreatePrintStream(sfam.toString());
 		for (Iterator<PersonIndex> e = PersonTable1.iterator(); e.hasNext();)
@@ -493,7 +493,7 @@ public class Strand
 		pfam.close();
 
 		StringBuffer sbed = new StringBuffer();
-		sbed.append(Parameter.INSTANCE.out);
+		sbed.append(CmdArgs.INSTANCE.out);
 		sbed.append(".bed");
 		try
 		{

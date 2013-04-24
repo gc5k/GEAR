@@ -14,7 +14,7 @@ import family.pedigree.genotype.BPerson;
 import family.plink.PLINKBinaryParser;
 import family.plink.PLINKParser;
 import family.qc.rowqc.SampleFilter;
-import gear.Parameter;
+import gear.CmdArgs;
 import gear.util.FileProcessor;
 import gear.util.Logger;
 
@@ -31,16 +31,16 @@ public class NonTransWriteBedSNPMajor
 	public NonTransWriteBedSNPMajor()
 	{
 		PLINKParser pp = null;
-		if (Parameter.INSTANCE.getFileParameter().isSet())
+		if (CmdArgs.INSTANCE.getTextDataArgs().isSet())
 		{
-			pp = new PLINKParser(Parameter.INSTANCE.getFileParameter()
-					.getPedFile(), Parameter.INSTANCE.getFileParameter()
+			pp = new PLINKParser(CmdArgs.INSTANCE.getTextDataArgs()
+					.getPedFile(), CmdArgs.INSTANCE.getTextDataArgs()
 					.getMapFile());
-		} else if (Parameter.INSTANCE.getBfileParameter(0).isSet())
+		} else if (CmdArgs.INSTANCE.getBinaryDataArgs(0).isSet())
 		{
-			pp = new PLINKBinaryParser(Parameter.INSTANCE.getBfileParameter(0)
-					.getBedFile(), Parameter.INSTANCE.getBfileParameter(0)
-					.getBimFile(), Parameter.INSTANCE.getBfileParameter(0)
+			pp = new PLINKBinaryParser(CmdArgs.INSTANCE.getBinaryDataArgs(0)
+					.getBedFile(), CmdArgs.INSTANCE.getBinaryDataArgs(0)
+					.getBimFile(), CmdArgs.INSTANCE.getBinaryDataArgs(0)
 					.getFamFile());
 		} else
 		{

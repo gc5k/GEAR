@@ -21,7 +21,7 @@ import org.apache.commons.math.linear.LUDecompositionImpl;
 import org.apache.commons.math.linear.RealMatrix;
 import org.apache.commons.math.linear.Array2DRowRealMatrix;
 
-import gear.Parameter;
+import gear.CmdArgs;
 import gear.util.FileProcessor;
 import gear.util.Logger;
 import he.endian.LittleEndianDataInputStream;
@@ -46,12 +46,12 @@ public class HECalculate
 
 		heReader.lambda = new Lambda();
 
-		if (Parameter.INSTANCE.getHEParameter().isAbsGrmCutoff())
+		if (CmdArgs.INSTANCE.getHEArgs().isAbsGrmCutoff())
 		{
-			grmCutoff = Parameter.INSTANCE.getHEParameter().AbsGrmCutoff();
-		} else if (Parameter.INSTANCE.getHEParameter().isGrmCutoff())
+			grmCutoff = CmdArgs.INSTANCE.getHEArgs().AbsGrmCutoff();
+		} else if (CmdArgs.INSTANCE.getHEArgs().isGrmCutoff())
 		{
-			grmCutoff = Parameter.INSTANCE.getHEParameter().GrmCutoff();
+			grmCutoff = CmdArgs.INSTANCE.getHEArgs().GrmCutoff();
 		}
 		String line;
 
@@ -107,7 +107,7 @@ public class HECalculate
 			ss[i] /= Len;
 			sd[i] = Math.sqrt((ssx[i] - Len * ss[i] * ss[i]) / (Len - 1));
 		}
-		if (Parameter.INSTANCE.scale)
+		if (CmdArgs.INSTANCE.scale)
 		{
 			Logger.printUserLog("Standardising phentoype.");
 			for (int i = 0; i < heReader.flag.length; i++)
@@ -161,7 +161,7 @@ public class HECalculate
 			// }
 		} else
 		{
-			if (Parameter.INSTANCE.getHEParameter().isGrmTxt())
+			if (CmdArgs.INSTANCE.getHEArgs().isGrmTxt())
 			{
 				heReader.XtX = new double[2][2];
 				heReader.XtY = new double[2];
@@ -184,12 +184,12 @@ public class HECalculate
 							continue;
 						double g = Double.parseDouble(s[3]);
 
-						if (Parameter.INSTANCE.getHEParameter()
+						if (CmdArgs.INSTANCE.getHEArgs()
 								.isAbsGrmCutoff())
 						{
 							if (Math.abs(g) > grmCutoff)
 								continue;
-						} else if (Parameter.INSTANCE.getHEParameter()
+						} else if (CmdArgs.INSTANCE.getHEArgs()
 								.isGrmCutoff())
 						{
 							if (g > grmCutoff)
@@ -276,7 +276,7 @@ public class HECalculate
 				{
 					e.printStackTrace();
 				}
-			} else if (!Parameter.INSTANCE.getHEParameter().isGrmBinary())
+			} else if (!CmdArgs.INSTANCE.getHEArgs().isGrmBinary())
 			{
 				heReader.XtX = new double[2][2];
 				heReader.XtY = new double[2];
@@ -315,12 +315,12 @@ public class HECalculate
 							continue;
 						double g = Double.parseDouble(s[3]);
 
-						if (Parameter.INSTANCE.getHEParameter()
+						if (CmdArgs.INSTANCE.getHEArgs()
 								.isAbsGrmCutoff())
 						{
 							if (Math.abs(g) > grmCutoff)
 								continue;
-						} else if (Parameter.INSTANCE.getHEParameter()
+						} else if (CmdArgs.INSTANCE.getHEArgs()
 								.isGrmCutoff())
 						{
 							if (g > grmCutoff)
@@ -415,12 +415,12 @@ public class HECalculate
 				FileInputStream fileStream = null;
 				try
 				{
-					fileStream = new FileInputStream(Parameter.INSTANCE
-							.getHEParameter().getGrm());
+					fileStream = new FileInputStream(CmdArgs.INSTANCE
+							.getHEArgs().getGrm());
 				} catch (FileNotFoundException e)
 				{
 					Logger.handleException(e, "Cannot open the GRM file '"
-							+ Parameter.INSTANCE.getHEParameter().getGrm()
+							+ CmdArgs.INSTANCE.getHEArgs().getGrm()
 							+ "'.");
 				}
 				DataInputStream bigEndianDataStream = new DataInputStream(
@@ -443,8 +443,8 @@ public class HECalculate
 						{
 							Logger.handleException(e,
 									"An exception occurred when reading the GRM file '"
-											+ Parameter.INSTANCE
-													.getHEParameter().getGrm()
+											+ CmdArgs.INSTANCE
+													.getHEArgs().getGrm()
 											+ "'.");
 						}
 
@@ -455,12 +455,12 @@ public class HECalculate
 						if (!(heReader.flag[id1] & heReader.flag[id2]))
 							continue;
 
-						if (Parameter.INSTANCE.getHEParameter()
+						if (CmdArgs.INSTANCE.getHEArgs()
 								.isAbsGrmCutoff())
 						{
 							if (Math.abs(g) > grmCutoff)
 								continue;
-						} else if (Parameter.INSTANCE.getHEParameter()
+						} else if (CmdArgs.INSTANCE.getHEArgs()
 								.isGrmCutoff())
 						{
 							if (g > grmCutoff)
@@ -572,12 +572,12 @@ public class HECalculate
 		heReader.sb.append("grm: " + heReader.grmFile + "\n");
 		heReader.sb.append("grm id: " + heReader.grmID + "\n");
 
-		if (Parameter.INSTANCE.getHEParameter().isGrmCutoff())
+		if (CmdArgs.INSTANCE.getHEArgs().isGrmCutoff())
 		{
 			heReader.sb.append("grm cutoff is: " + grmCutoff + "\n");
 		}
 
-		if (Parameter.INSTANCE.getHEParameter().isAbsGrmCutoff())
+		if (CmdArgs.INSTANCE.getHEArgs().isAbsGrmCutoff())
 		{
 			heReader.sb.append("grm absolute cutoff is: |" + grmCutoff + "|\n");
 		}
@@ -592,50 +592,50 @@ public class HECalculate
 		}
 		heReader.sb.append("\n");
 
-		if (Parameter.INSTANCE.qcovar_file != null)
+		if (CmdArgs.INSTANCE.qcovar_file != null)
 		{
 			heReader.sb.append("quantitative covariate file: "
-					+ Parameter.INSTANCE.qcovar_file + "\n");
+					+ CmdArgs.INSTANCE.qcovar_file + "\n");
 			heReader.sb.append("quantitative covariate index: ");
-			if (Parameter.INSTANCE.qcovar_num == null)
+			if (CmdArgs.INSTANCE.qcovar_num == null)
 			{
 				heReader.sb.append("all");
 			} else
 			{
-				for (int i = 0; i < Parameter.INSTANCE.qcovar_num.length; i++)
+				for (int i = 0; i < CmdArgs.INSTANCE.qcovar_num.length; i++)
 				{
-					heReader.sb.append(Parameter.INSTANCE.qcovar_num[i] + " ");
+					heReader.sb.append(CmdArgs.INSTANCE.qcovar_num[i] + " ");
 				}
 			}
 			heReader.sb.append("\n");
 		}
 
-		if (Parameter.INSTANCE.covar_file != null)
+		if (CmdArgs.INSTANCE.covar_file != null)
 		{
 			heReader.sb.append("quality covariate file: "
-					+ Parameter.INSTANCE.covar_file + "\n");
+					+ CmdArgs.INSTANCE.covar_file + "\n");
 			heReader.sb.append("quality covariate index: ");
-			if (Parameter.INSTANCE.covar_num == null)
+			if (CmdArgs.INSTANCE.covar_num == null)
 			{
 				heReader.sb.append("all");
 			} else
 			{
-				for (int i = 0; i < Parameter.INSTANCE.covar_num.length; i++)
+				for (int i = 0; i < CmdArgs.INSTANCE.covar_num.length; i++)
 				{
-					heReader.sb.append(Parameter.INSTANCE.covar_num[i] + " ");
+					heReader.sb.append(CmdArgs.INSTANCE.covar_num[i] + " ");
 				}
 			}
 			heReader.sb.append("\n");
 		}
 
-		if (Parameter.INSTANCE.eh2Flag)
+		if (CmdArgs.INSTANCE.eh2Flag)
 		{
 			heReader.sb
-					.append("Empirical h2: " + Parameter.INSTANCE.eh2 + "\n");
+					.append("Empirical h2: " + CmdArgs.INSTANCE.eh2 + "\n");
 		}
 
 		heReader.sb.append("reverse: " + heReader.reverse + "\n");
-		heReader.sb.append("Scale : " + Parameter.INSTANCE.scale + "\n");
+		heReader.sb.append("Scale : " + CmdArgs.INSTANCE.scale + "\n");
 		if (heReader.k_button)
 		{
 			heReader.sb.append("k: " + heReader.k + "\n");
@@ -734,10 +734,10 @@ public class HECalculate
 		heReader.sb.append("var(X): " + fmt.format(heReader.lambda.getVar())
 				+ "\n");
 
-		if (Parameter.INSTANCE.eh2Flag)
+		if (CmdArgs.INSTANCE.eh2Flag)
 		{
 			double Lmd = heReader.lambda.getLambda(-1 * Mat_B.getEntry(0, 0)
-					* Parameter.INSTANCE.eh2);
+					* CmdArgs.INSTANCE.eh2);
 			heReader.sb.append("Lambda: " + fmt.format(Lmd));
 		}
 

@@ -6,7 +6,7 @@ import java.util.TreeSet;
 import java.util.ArrayList;
 
 import family.RabinowitzLairdAlgorithm.AbstractGenoDistribution;
-import gear.Parameter;
+import gear.CmdArgs;
 import gear.util.NewIt;
 
 /**
@@ -42,16 +42,16 @@ public class UnobservedParents extends AbstractGenoDistribution
 	 */
 	public String[] getNontransmitted(final String transmitted)
 	{
-		String nontran = new String(Parameter.INSTANCE.missingGenotype);
+		String nontran = new String(CmdArgs.INSTANCE.missingGenotype);
 		String tran = new String(transmitted);
 
-		if (transmitted.compareTo(Parameter.INSTANCE.missingGenotype) == 0)
+		if (transmitted.compareTo(CmdArgs.INSTANCE.missingGenotype) == 0)
 		{
 			tran = RandomAssign();
-			if (tran.compareTo(Parameter.INSTANCE.missingGenotype) == 0)
+			if (tran.compareTo(CmdArgs.INSTANCE.missingGenotype) == 0)
 			{
-				String nontran_tran[] = { Parameter.INSTANCE.missingGenotype,
-						Parameter.INSTANCE.missingGenotype };
+				String nontran_tran[] = { CmdArgs.INSTANCE.missingGenotype,
+						CmdArgs.INSTANCE.missingGenotype };
 				return nontran_tran;
 			}
 		}

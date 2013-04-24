@@ -6,7 +6,7 @@ import java.util.Random;
 import family.pedigree.PersonIndex;
 import family.pedigree.file.MapFile;
 import family.pedigree.file.PedigreeFile;
-import gear.Parameter;
+import gear.CmdArgs;
 import gear.util.NewIt;
 
 /**
@@ -33,7 +33,7 @@ public abstract class ChenBase implements ChenInterface
 
 	public ChenBase(PedigreeFile ped, MapFile map)
 	{
-		rnd.setSeed(Parameter.INSTANCE.nontransSeed);
+		rnd.setSeed(CmdArgs.INSTANCE.nontransSeed);
 		PedData = ped;
 		MapData = map;
 

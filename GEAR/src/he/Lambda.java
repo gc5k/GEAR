@@ -1,6 +1,6 @@
 package he;
 
-import gear.Parameter;
+import gear.CmdArgs;
 
 public class Lambda
 {
@@ -20,7 +20,7 @@ public class Lambda
 
 	public Lambda()
 	{
-		switch (Parameter.INSTANCE.getHEParameter().getType())
+		switch (CmdArgs.INSTANCE.getHEArgs().getType())
 		{
 		case SD:
 		case SS:

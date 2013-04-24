@@ -3,7 +3,7 @@ package simulation.gm;
 import java.util.ArrayList;
 
 import family.pedigree.PersonIndex;
-import gear.Parameter;
+import gear.CmdArgs;
 import simulation.qc.rowqc.RealDataSimulationQC;
 
 public class RealDataSimulationGenotypeMatrix
@@ -84,7 +84,7 @@ public class RealDataSimulationGenotypeMatrix
 		int g = (genotypeMat[idx][posByte] >> (posBite)) & 3;
 		if (g == 3)
 		{// 01
-			return Parameter.INSTANCE.missingGenotype;
+			return CmdArgs.INSTANCE.missingGenotype;
 		} else
 		{
 			return Integer.toString(g);

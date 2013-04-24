@@ -13,7 +13,7 @@ import family.plink.PLINKBinaryParser;
 import family.plink.PLINKParser;
 import family.popstat.GenotypeMatrix;
 import family.qc.rowqc.SampleFilter;
-import gear.Parameter;
+import gear.CmdArgs;
 import gear.util.FileProcessor;
 import gear.util.Logger;
 
@@ -32,11 +32,11 @@ public class RealCheckOne
 	public RealCheckOne()
 	{
 		PLINKParser pp1 = null;
-		if (Parameter.INSTANCE.getBfileParameter(0).isSet())
+		if (CmdArgs.INSTANCE.getBinaryDataArgs(0).isSet())
 		{
-			pp1 = new PLINKBinaryParser(Parameter.INSTANCE.getBfileParameter(0)
-					.getBedFile(), Parameter.INSTANCE.getBfileParameter(0)
-					.getBimFile(), Parameter.INSTANCE.getBfileParameter(0)
+			pp1 = new PLINKBinaryParser(CmdArgs.INSTANCE.getBinaryDataArgs(0)
+					.getBedFile(), CmdArgs.INSTANCE.getBinaryDataArgs(0)
+					.getBimFile(), CmdArgs.INSTANCE.getBinaryDataArgs(0)
 					.getFamFile());
 		} else
 		{
@@ -56,11 +56,11 @@ public class RealCheckOne
 	{
 
 		StringBuffer sb = new StringBuffer();
-		sb.append(Parameter.INSTANCE.out);
+		sb.append(CmdArgs.INSTANCE.out);
 		sb.append(".real");
 		PrintStream ps = FileProcessor.CreatePrintStream(sb.toString());
 
-		if (Parameter.INSTANCE.getRealCheckParameter().getSnps() != null)
+		if (CmdArgs.INSTANCE.getRealCheckParameter().getSnps() != null)
 		{
 			Logger.printUserLog("A similarity matrix is generated with real-check SNPs.");
 			getSelectedMarker();
@@ -75,9 +75,9 @@ public class RealCheckOne
 			for (int j = i; j < G1.getGRow(); j++)
 			{
 				double[] s = similarityScore(i, j);
-				if (s[0] > Parameter.INSTANCE.getRealCheckParameter()
+				if (s[0] > CmdArgs.INSTANCE.getRealCheckParameter()
 						.getThresholdLower()
-						&& s[0] <= Parameter.INSTANCE.getRealCheckParameter()
+						&& s[0] <= CmdArgs.INSTANCE.getRealCheckParameter()
 								.getThresholdUpper())
 				{
 					PersonIndex ps1 = PersonTable1.get(i);
@@ -131,7 +131,7 @@ public class RealCheckOne
 			markerIdx[i] = i;
 
 		StringBuffer sb = new StringBuffer();
-		sb.append(Parameter.INSTANCE.out);
+		sb.append(CmdArgs.INSTANCE.out);
 		sb.append(".realsnp");
 
 		PrintStream ps = FileProcessor.CreatePrintStream(sb.toString());
@@ -150,21 +150,21 @@ public class RealCheckOne
 	{
 		int mn = 0;
 		int nMarker = sf1.getMapFile().getMarkerList().size();
-		if (Parameter.INSTANCE.getRealCheckParameter().getMarkerNumberFlag())
+		if (CmdArgs.INSTANCE.getRealCheckParameter().getMarkerNumberFlag())
 		{
-			if (Parameter.INSTANCE.getRealCheckParameter().getMarkerNumber() > nMarker)
+			if (CmdArgs.INSTANCE.getRealCheckParameter().getMarkerNumber() > nMarker)
 			{
 				Logger.printUserLog("Real-check marker number is reduced to "
 						+ nMarker + ".");
 				mn = nMarker;
 			} else
 			{
-				mn = Parameter.INSTANCE.getRealCheckParameter()
+				mn = CmdArgs.INSTANCE.getRealCheckParameter()
 						.getMarkerNumber();
 			}
 			markerIdx = new int[mn];
 			RandomDataImpl rd = new RandomDataImpl();
-			rd.reSeed(Parameter.INSTANCE.seed);
+			rd.reSeed(CmdArgs.INSTANCE.seed);
 
 			markerIdx = rd.nextPermutation(markerIdx.length, mn);
 			Arrays.sort(markerIdx);
@@ -178,7 +178,7 @@ public class RealCheckOne
 		}
 
 		StringBuffer sb = new StringBuffer();
-		sb.append(Parameter.INSTANCE.out);
+		sb.append(CmdArgs.INSTANCE.out);
 		sb.append(".realsnp");
 
 		PrintStream ps = FileProcessor.CreatePrintStream(sb.toString());

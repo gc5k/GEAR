@@ -23,7 +23,7 @@ import family.pedigree.file.MapFile;
 import family.pedigree.file.PedigreeFile;
 import family.pedigree.genotype.BFamilyStruct;
 import family.pedigree.genotype.BPerson;
-import gear.Parameter;
+import gear.CmdArgs;
 import gear.util.NewIt;
 
 public class AJHG2008 extends ChenBase
@@ -159,7 +159,7 @@ public class AJHG2008 extends ChenBase
 					sb.append("ajhg2008");
 					pseudoper = fam.getPerson(sb.toString());
 					String g = per.getBiAlleleGenotypeString(i);
-					boolean f = g.compareTo(Parameter.INSTANCE.missingGenotype) != 0;
+					boolean f = g.compareTo(CmdArgs.INSTANCE.missingGenotype) != 0;
 					String[] nontran_tran = new String[2];
 					if (f)
 					{

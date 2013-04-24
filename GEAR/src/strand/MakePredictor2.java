@@ -13,7 +13,7 @@ import family.plink.PLINKBinaryParser;
 import family.plink.PLINKParser;
 import family.popstat.GenotypeMatrix;
 import family.qc.rowqc.SampleFilter;
-import gear.Parameter;
+import gear.CmdArgs;
 import gear.util.FileProcessor;
 import gear.util.Logger;
 import gear.util.NewIt;
@@ -43,11 +43,11 @@ public class MakePredictor2
 		readPredictor();
 
 		PLINKParser pp1 = null;
-		if (Parameter.INSTANCE.getBfileParameter(0).isSet())
+		if (CmdArgs.INSTANCE.getBinaryDataArgs(0).isSet())
 		{
-			pp1 = new PLINKBinaryParser(Parameter.INSTANCE.getBfileParameter(0)
-					.getBedFile(), Parameter.INSTANCE.getBfileParameter(0)
-					.getBimFile(), Parameter.INSTANCE.getBfileParameter(0)
+			pp1 = new PLINKBinaryParser(CmdArgs.INSTANCE.getBinaryDataArgs(0)
+					.getBedFile(), CmdArgs.INSTANCE.getBinaryDataArgs(0)
+					.getBimFile(), CmdArgs.INSTANCE.getBinaryDataArgs(0)
 					.getFamFile());
 		} else
 		{
@@ -66,7 +66,7 @@ public class MakePredictor2
 		DecimalFormat fmt = new DecimalFormat("#.###E0");
 
 		StringBuffer sb = new StringBuffer();
-		sb.append(Parameter.INSTANCE.out);
+		sb.append(CmdArgs.INSTANCE.out);
 		sb.append(".mergesnp");
 		PrintStream ps = FileProcessor.CreatePrintStream(sb.toString());
 		ps.append("SNP\tChr\tPos\tA1_1st\tA2_1st\tA1_2nd\tA2_2nd\tMAF_A1_1st\tMAF_A1_2nd\tFlip\tMerged\tP\tScheme\n");
@@ -107,10 +107,10 @@ public class MakePredictor2
 						ATGCLocus = true;
 						if (ref1 < 0.5 && ref2 < 0.5)
 						{
-							if (ref1 < Parameter.INSTANCE.getMergeParameter()
+							if (ref1 < CmdArgs.INSTANCE.getMergeArgs()
 									.getMafCutoff()
-									&& ref2 < Parameter.INSTANCE
-											.getMergeParameter().getMafCutoff())
+									&& ref2 < CmdArgs.INSTANCE
+											.getMergeArgs().getMafCutoff())
 							{
 								f = true;
 							} else
@@ -122,10 +122,10 @@ public class MakePredictor2
 
 						} else if (ref1 < 0.5 && ref2 > 0.5)
 						{
-							if (ref1 < Parameter.INSTANCE.getMergeParameter()
+							if (ref1 < CmdArgs.INSTANCE.getMergeArgs()
 									.getMafCutoff()
-									&& ref2 > 1 - Parameter.INSTANCE
-											.getMergeParameter().getMafCutoff())
+									&& ref2 > 1 - CmdArgs.INSTANCE
+											.getMergeArgs().getMafCutoff())
 							{
 								f = true;
 							} else
@@ -138,10 +138,10 @@ public class MakePredictor2
 
 						} else if (ref1 > 0.5 && ref2 < 0.5)
 						{
-							if (ref1 > 1 - Parameter.INSTANCE
-									.getMergeParameter().getMafCutoff()
-									&& ref2 < Parameter.INSTANCE
-											.getMergeParameter().getMafCutoff())
+							if (ref1 > 1 - CmdArgs.INSTANCE
+									.getMergeArgs().getMafCutoff()
+									&& ref2 < CmdArgs.INSTANCE
+											.getMergeArgs().getMafCutoff())
 							{
 								f = true;
 							} else
@@ -154,10 +154,10 @@ public class MakePredictor2
 
 						} else
 						{
-							if (ref1 > 1 - Parameter.INSTANCE
-									.getMergeParameter().getMafCutoff()
-									&& ref2 > 1 - Parameter.INSTANCE
-											.getMergeParameter().getMafCutoff())
+							if (ref1 > 1 - CmdArgs.INSTANCE
+									.getMergeArgs().getMafCutoff()
+									&& ref2 > 1 - CmdArgs.INSTANCE
+											.getMergeArgs().getMafCutoff())
 							{
 								f = true;
 							} else
@@ -184,10 +184,10 @@ public class MakePredictor2
 						ATGCLocus = true;
 						if (ref1 < 0.5 && (1 - ref2) < 0.5)
 						{
-							if (ref1 < Parameter.INSTANCE.getMergeParameter()
+							if (ref1 < CmdArgs.INSTANCE.getMergeArgs()
 									.getMafCutoff()
-									&& (1 - ref2) < Parameter.INSTANCE
-											.getMergeParameter().getMafCutoff())
+									&& (1 - ref2) < CmdArgs.INSTANCE
+											.getMergeArgs().getMafCutoff())
 							{
 								f = true;
 							} else
@@ -199,10 +199,10 @@ public class MakePredictor2
 							flip = true;
 						} else if (ref1 < 0.5 && (1 - ref2) > 0.5)
 						{
-							if (ref1 < Parameter.INSTANCE.getMergeParameter()
+							if (ref1 < CmdArgs.INSTANCE.getMergeArgs()
 									.getMafCutoff()
-									&& (1 - ref2) > 1 - Parameter.INSTANCE
-											.getMergeParameter().getMafCutoff())
+									&& (1 - ref2) > 1 - CmdArgs.INSTANCE
+											.getMergeArgs().getMafCutoff())
 							{
 								f = true;
 							} else
@@ -214,10 +214,10 @@ public class MakePredictor2
 
 						} else if (ref1 > 0.5 && (1 - ref2) < 0.5)
 						{
-							if (ref1 > 1 - Parameter.INSTANCE
-									.getMergeParameter().getMafCutoff()
-									&& (1 - ref2) < Parameter.INSTANCE
-											.getMergeParameter().getMafCutoff())
+							if (ref1 > 1 - CmdArgs.INSTANCE
+									.getMergeArgs().getMafCutoff()
+									&& (1 - ref2) < CmdArgs.INSTANCE
+											.getMergeArgs().getMafCutoff())
 							{
 								f = true;
 							} else
@@ -229,10 +229,10 @@ public class MakePredictor2
 
 						} else
 						{
-							if (ref1 > 1 - Parameter.INSTANCE
-									.getMergeParameter().getMafCutoff()
-									&& (1 - ref2) > 1 - Parameter.INSTANCE
-											.getMergeParameter().getMafCutoff())
+							if (ref1 > 1 - CmdArgs.INSTANCE
+									.getMergeArgs().getMafCutoff()
+									&& (1 - ref2) > 1 - CmdArgs.INSTANCE
+											.getMergeArgs().getMafCutoff())
 							{
 								f = true;
 							} else
@@ -277,15 +277,15 @@ public class MakePredictor2
 
 				double p = Z.OddsRatioTestPvalueTwoTail(ref1, ref2,
 						N1[comSNPIdx[0][i]], maf2.getNInd() * 2);
-				if (p < Parameter.INSTANCE.getMergeParameter().getPCutoff())
+				if (p < CmdArgs.INSTANCE.getMergeArgs().getPCutoff())
 				{
 					f = false;
 				}
-				if (!Parameter.INSTANCE.keepATGC() && ATGCLocus)
+				if (!CmdArgs.INSTANCE.keepATGC() && ATGCLocus)
 				{
 					f = false;
 				}
-				if (Parameter.INSTANCE.removeFlip() && flip)
+				if (CmdArgs.INSTANCE.removeFlip() && flip)
 				{
 					f = false;
 				}
@@ -410,7 +410,7 @@ public class MakePredictor2
 	public void readPredictor()
 	{
 
-		BufferedReader reader = FileProcessor.FileOpen(Parameter.INSTANCE
+		BufferedReader reader = FileProcessor.FileOpen(CmdArgs.INSTANCE
 				.getPredictorFile());
 		String line;
 		try
@@ -436,7 +436,7 @@ public class MakePredictor2
 	public void WritePredictor()
 	{
 		StringBuffer sbim = new StringBuffer();
-		sbim.append(Parameter.INSTANCE.out);
+		sbim.append(CmdArgs.INSTANCE.out);
 		sbim.append(".predictor");
 		PrintStream predictorFile = FileProcessor.CreatePrintStream(sbim
 				.toString());
@@ -450,16 +450,16 @@ public class MakePredictor2
 			}
 			SNP snp = snpList1.get(comSNPIdx[0][i]);
 			Predictor2 pd = predictorList.get(comSNPIdx[1][i]);
-			if (Parameter.INSTANCE.isNA(pd.getField(Parameter.INSTANCE
+			if (CmdArgs.INSTANCE.isNA(pd.getField(CmdArgs.INSTANCE
 					.getPredictorIdx())))
 			{
 				NMiss++;
 				continue;
 			} else
 			{
-				double s = Double.parseDouble(pd.getField(Parameter.INSTANCE
+				double s = Double.parseDouble(pd.getField(CmdArgs.INSTANCE
 						.getPredictorIdx()));
-				if (Parameter.INSTANCE.getTranFunction() == gear.RegressionModel.LINEAR)
+				if (CmdArgs.INSTANCE.getTranFunction() == gear.RegressionModel.LINEAR)
 				{
 					if (scoreCoding.get(i).intValue() == 1)
 					{

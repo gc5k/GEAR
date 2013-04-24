@@ -9,7 +9,7 @@ import org.apache.commons.lang3.ArrayUtils;
 
 import family.pedigree.file.MapFile;
 import family.pedigree.file.SNP;
-import gear.Parameter;
+import gear.CmdArgs;
 import gear.util.NewIt;
 
 public class SNPFilter implements SNPFilterInterface
@@ -44,7 +44,7 @@ public class SNPFilter implements SNPFilterInterface
 		 * if (Parameter.bgsnpFlag) { selectBackgroundSNP(); filterFlag = true;
 		 * }
 		 */
-		if (Parameter.INSTANCE.inchrFlag || Parameter.INSTANCE.exchrFlag)
+		if (CmdArgs.INSTANCE.inchrFlag || CmdArgs.INSTANCE.exchrFlag)
 		{
 			selectChromosome();
 			filterFlag = true;
@@ -83,13 +83,13 @@ public class SNPFilter implements SNPFilterInterface
 	private void selectChromosome()
 	{
 
-		if (Parameter.INSTANCE.inchrFlag)
+		if (CmdArgs.INSTANCE.inchrFlag)
 		{
 			for (int i = 0; i < snpList.size(); i++)
 			{
 				SNP snp = snpList.get(i);
 				String chr = snp.getChromosome();
-				int idx = ArrayUtils.indexOf(Parameter.INSTANCE.inchr, chr);
+				int idx = ArrayUtils.indexOf(CmdArgs.INSTANCE.inchr, chr);
 				if (idx >= 0)
 				{
 					includeSNP(i);
@@ -97,13 +97,13 @@ public class SNPFilter implements SNPFilterInterface
 			}
 		}
 
-		if (Parameter.INSTANCE.exchrFlag)
+		if (CmdArgs.INSTANCE.exchrFlag)
 		{
 			for (int i = 0; i < snpList.size(); i++)
 			{
 				SNP snp = snpList.get(i);
 				String chr = snp.getChromosome();
-				int idx = ArrayUtils.indexOf(Parameter.INSTANCE.exchr, chr);
+				int idx = ArrayUtils.indexOf(CmdArgs.INSTANCE.exchr, chr);
 				if (idx >= 0)
 				{
 					excludeSNP(i);

@@ -10,7 +10,7 @@ import family.plink.PLINKBinaryParser;
 import family.plink.PLINKParser;
 import family.popstat.GenotypeMatrix;
 import family.qc.rowqc.SampleFilter;
-import gear.Parameter;
+import gear.CmdArgs;
 import gear.profile.struct.QScore;
 import gear.profile.struct.ScoreUnit;
 import gear.util.FileProcessor;
@@ -42,16 +42,16 @@ public class RiskScore
 		initial();
 
 		PLINKParser pp1 = null;
-		if (Parameter.INSTANCE.getFileParameter().isSet())
+		if (CmdArgs.INSTANCE.getTextDataArgs().isSet())
 		{
-			pp1 = new PLINKParser(Parameter.INSTANCE.getFileParameter()
-					.getPedFile(), Parameter.INSTANCE.getFileParameter()
+			pp1 = new PLINKParser(CmdArgs.INSTANCE.getTextDataArgs()
+					.getPedFile(), CmdArgs.INSTANCE.getTextDataArgs()
 					.getMapFile());
-		} else if (Parameter.INSTANCE.getBfileParameter(0).isSet())
+		} else if (CmdArgs.INSTANCE.getBinaryDataArgs(0).isSet())
 		{
-			pp1 = new PLINKBinaryParser(Parameter.INSTANCE.getBfileParameter(0)
-					.getBedFile(), Parameter.INSTANCE.getBfileParameter(0)
-					.getBimFile(), Parameter.INSTANCE.getBfileParameter(0)
+			pp1 = new PLINKBinaryParser(CmdArgs.INSTANCE.getBinaryDataArgs(0)
+					.getBedFile(), CmdArgs.INSTANCE.getBinaryDataArgs(0)
+					.getBimFile(), CmdArgs.INSTANCE.getBinaryDataArgs(0)
 					.getFamFile());
 		} else
 		{
@@ -70,7 +70,7 @@ public class RiskScore
 	{
 		// read score file
 		gear.util.BufferedReader scoreReader = new gear.util.BufferedReader(
-				Parameter.INSTANCE.getProfileParameter().getScoreFile(), "score");
+				CmdArgs.INSTANCE.getProfileArgs().getScoreFile(), "score");
 		ScoreUnit scoreUnit;
 		while ((scoreUnit = ScoreUnit.getNextScoreUnit(scoreReader)) != null)
 		{
@@ -81,8 +81,8 @@ public class RiskScore
 		Logger.printUserLog("Number of predictors: " + Score.size());
 
 		// read q score file and q range file
-		String qScoreFile = Parameter.INSTANCE.getProfileParameter().getQScoreFile(),
-			   qScoreRangeFile = Parameter.INSTANCE.getProfileParameter().getQScoreRangeFile();
+		String qScoreFile = CmdArgs.INSTANCE.getProfileArgs().getQScoreFile(),
+			   qScoreRangeFile = CmdArgs.INSTANCE.getProfileArgs().getQScoreRangeFile();
 		if (qScoreFile != null && qScoreRangeFile != null)
 		{
 			// q score file
@@ -192,7 +192,7 @@ public class RiskScore
 				if (isATGC)
 				{
 					ATGCLocus++;
-					if (!Parameter.INSTANCE.keepATGC())
+					if (!CmdArgs.INSTANCE.keepATGC())
 					{
 						continue;
 					}
@@ -253,7 +253,7 @@ public class RiskScore
 				}
 
 				sc = su.getScore();
-				if (Parameter.INSTANCE.getTranFunction() == gear.RegressionModel.LOGIT)
+				if (CmdArgs.INSTANCE.getTranFunction() == gear.RegressionModel.LOGIT)
 				{
 					if (isMatchRef)
 					{
@@ -307,7 +307,7 @@ public class RiskScore
 		Logger.printUserLog("Number of SNPs mapped to the score file: " + Total);
 		Logger.printUserLog("Number of monomorphic loci removed: " + monoLocus);
 		Logger.printUserLog("Number of ATGC loci "
-				+ (Parameter.INSTANCE.keepATGC() ? "detected: " : "removed: ")
+				+ (CmdArgs.INSTANCE.keepATGC() ? "detected: " : "removed: ")
 				+ ATGCLocus);
 
 		for (int i = 0; i < QRName.length; i++)
@@ -323,7 +323,7 @@ public class RiskScore
 		}
 
 		StringBuffer sbim = new StringBuffer();
-		sbim.append(Parameter.INSTANCE.out);
+		sbim.append(CmdArgs.INSTANCE.out);
 		sbim.append(".profile");
 		PrintStream predictorFile = FileProcessor.CreatePrintStream(sbim
 				.toString());
@@ -386,7 +386,7 @@ public class RiskScore
 				if (isATGC)
 				{
 					ATGCLocus++;
-					if (!Parameter.INSTANCE.keepATGC())
+					if (!CmdArgs.INSTANCE.keepATGC())
 					{
 						continue;
 					}
@@ -434,7 +434,7 @@ public class RiskScore
 				CCSNP++;
 
 				sc = su.getScore();
-				if (Parameter.INSTANCE.getTranFunction() == gear.RegressionModel.LOGIT)
+				if (CmdArgs.INSTANCE.getTranFunction() == gear.RegressionModel.LOGIT)
 				{// logit s
 					if (isMatchRef)
 					{
@@ -473,7 +473,7 @@ public class RiskScore
 		Logger.printUserLog("Number of SNPs mapped to the score file: " + Total);
 		Logger.printUserLog("Number of monomorphic loci removed: " + monoLocus);
 		Logger.printUserLog("Number of ATGC loci "
-				+ (Parameter.INSTANCE.keepATGC() ? "detected: " : "removed: ")
+				+ (CmdArgs.INSTANCE.keepATGC() ? "detected: " : "removed: ")
 				+ ATGCLocus);
 		Logger.printUserLog("Number of SNP scores in the score file: " + CCSNP);
 
@@ -484,7 +484,7 @@ public class RiskScore
 		}
 
 		StringBuffer sbim = new StringBuffer();
-		sbim.append(Parameter.INSTANCE.out);
+		sbim.append(CmdArgs.INSTANCE.out);
 		sbim.append(".profile");
 		PrintStream predictorFile = FileProcessor.CreatePrintStream(sbim
 				.toString());

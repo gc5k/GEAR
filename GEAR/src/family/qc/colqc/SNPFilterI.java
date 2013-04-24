@@ -9,7 +9,7 @@ import org.apache.commons.lang3.ArrayUtils;
 
 import family.pedigree.file.MapFile;
 import family.pedigree.file.SNP;
-import gear.Parameter;
+import gear.CmdArgs;
 import gear.util.Logger;
 import gear.util.NewIt;
 
@@ -63,7 +63,7 @@ public class SNPFilterI implements SNPFilterInterface
 				WSNP[c++] = V.intValue();
 			}
 			Arrays.sort(WSNP);
-		} else if (Parameter.INSTANCE.transFlag)
+		} else if (CmdArgs.INSTANCE.transFlag)
 		{
 			Logger.printUserError("No SNP is selected.");
 			System.exit(1);

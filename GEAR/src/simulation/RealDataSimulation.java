@@ -18,7 +18,7 @@ import family.pedigree.genotype.BPerson;
 import family.plink.PLINKBinaryParser;
 import family.plink.PLINKParser;
 import family.qc.rowqc.SampleFilter;
-import gear.Parameter;
+import gear.CmdArgs;
 import gear.util.FileProcessor;
 import gear.util.Logger;
 import gear.util.NewIt;
@@ -44,16 +44,16 @@ public class RealDataSimulation
 
 	public RealDataSimulation()
 	{
-		if (Parameter.INSTANCE.getFileParameter().isSet())
+		if (CmdArgs.INSTANCE.getTextDataArgs().isSet())
 		{
-			pp = new PLINKParser(Parameter.INSTANCE.getFileParameter()
-					.getPedFile(), Parameter.INSTANCE.getFileParameter()
+			pp = new PLINKParser(CmdArgs.INSTANCE.getTextDataArgs()
+					.getPedFile(), CmdArgs.INSTANCE.getTextDataArgs()
 					.getMapFile());
-		} else if (Parameter.INSTANCE.getBfileParameter(0).isSet())
+		} else if (CmdArgs.INSTANCE.getBinaryDataArgs(0).isSet())
 		{
-			pp = new PLINKBinaryParser(Parameter.INSTANCE.getBfileParameter(0)
-					.getBedFile(), Parameter.INSTANCE.getBfileParameter(0)
-					.getBimFile(), Parameter.INSTANCE.getBfileParameter(0)
+			pp = new PLINKBinaryParser(CmdArgs.INSTANCE.getBinaryDataArgs(0)
+					.getBedFile(), CmdArgs.INSTANCE.getBinaryDataArgs(0)
+					.getBimFile(), CmdArgs.INSTANCE.getBinaryDataArgs(0)
 					.getFamFile());
 		} else
 		{
@@ -67,46 +67,46 @@ public class RealDataSimulation
 
 	public void GenerateSample()
 	{
-		rnd = new Random(Parameter.INSTANCE.simuSeed);
-		if (Parameter.INSTANCE.simuCasualLoci != null)
+		rnd = new Random(CmdArgs.INSTANCE.simuSeed);
+		if (CmdArgs.INSTANCE.simuCasualLoci != null)
 		{
 			getCasualLoci();
 		} else
 		{
-			getRandomCasualLoci(Parameter.INSTANCE.simuRndCasualLoci);
+			getRandomCasualLoci(CmdArgs.INSTANCE.simuRndCasualLoci);
 		}
 		RealDataSimulationQC rdSimuQC = new RealDataSimulationQC(
 				pp.getPedigreeData(), pp.getMapData(), sf);
 		GM = new RealDataSimulationGenotypeMatrix(rdSimuQC);
 		sampleSize = GM.getGRow();
-		T = new double[Parameter.INSTANCE.simuRep];
-		flag = new int[Parameter.INSTANCE.simuRep][];
+		T = new double[CmdArgs.INSTANCE.simuRep];
+		flag = new int[CmdArgs.INSTANCE.simuRep][];
 
-		accept_cs = (Parameter.INSTANCE.simuCC[0] / (1.0 * sampleSize))
-				/ Parameter.INSTANCE.simuK;
-		accept_ctrl = (Parameter.INSTANCE.simuCC[1] / (1.0 * sampleSize))
-				/ (1 - Parameter.INSTANCE.simuK);
+		accept_cs = (CmdArgs.INSTANCE.simuCC[0] / (1.0 * sampleSize))
+				/ CmdArgs.INSTANCE.simuK;
+		accept_ctrl = (CmdArgs.INSTANCE.simuCC[1] / (1.0 * sampleSize))
+				/ (1 - CmdArgs.INSTANCE.simuK);
 
 		if (accept_cs > 1 || accept_ctrl > 1)
 		{
 			Logger.printUserLog("It is impossible to generate the case-control sampel with K = "
-					+ Parameter.INSTANCE.simuK
+					+ CmdArgs.INSTANCE.simuK
 					+ " with --simu-cc "
-					+ Parameter.INSTANCE.simuCC[0]
+					+ CmdArgs.INSTANCE.simuCC[0]
 					+ " "
-					+ Parameter.INSTANCE.simuCC[1]);
+					+ CmdArgs.INSTANCE.simuCC[1]);
 		}
 
-		bv = new double[Parameter.INSTANCE.simuRep][sampleSize];
+		bv = new double[CmdArgs.INSTANCE.simuRep][sampleSize];
 		b = generateAddEffects(casualLociIdx.length);
-		y = new double[Parameter.INSTANCE.simuRep][];
-		int cut_off = (int) (sampleSize * (1 - Parameter.INSTANCE.simuK));
-		for (int i = 0; i < Parameter.INSTANCE.simuRep; i++)
+		y = new double[CmdArgs.INSTANCE.simuRep][];
+		int cut_off = (int) (sampleSize * (1 - CmdArgs.INSTANCE.simuK));
+		for (int i = 0; i < CmdArgs.INSTANCE.simuRep; i++)
 		{
 			bv[i] = calculateBV(b);
 			double v = StatUtils.variance(bv[i]);
-			double se = Math.sqrt(v / (Parameter.INSTANCE.simuHsq)
-					* (1 - Parameter.INSTANCE.simuHsq));
+			double se = Math.sqrt(v / (CmdArgs.INSTANCE.simuHsq)
+					* (1 - CmdArgs.INSTANCE.simuHsq));
 			y[i] = generateY(bv[i], se);
 			double[] t = new double[sampleSize];
 			System.arraycopy(y[i], 0, t, 0, sampleSize);
@@ -115,7 +115,7 @@ public class RealDataSimulation
 			flag[i] = sample1(T[i], y[i]);
 		}
 
-		StringBuffer sb1 = new StringBuffer(Parameter.INSTANCE.out);
+		StringBuffer sb1 = new StringBuffer(CmdArgs.INSTANCE.out);
 		sb1.append(".eff");
 		PrintStream ps1 = FileProcessor.CreatePrintStream(sb1.toString());
 		ArrayList<SNP> snpList = pp.getMapData().getMarkerList();
@@ -127,7 +127,7 @@ public class RealDataSimulation
 		}
 		ps1.close();
 
-		StringBuffer sb2 = new StringBuffer(Parameter.INSTANCE.out);
+		StringBuffer sb2 = new StringBuffer(CmdArgs.INSTANCE.out);
 		sb2.append(".phen");
 		PrintStream ps2 = FileProcessor.CreatePrintStream(sb2.toString());
 		ArrayList<PersonIndex> personTable = rdSimuQC.getSample();
@@ -136,7 +136,7 @@ public class RealDataSimulation
 		{
 			PersonIndex pi = personTable.get(i);
 			ps2.append(pi.getFamilyID() + " " + pi.getIndividualID() + " ");
-			for (int j = 0; j < Parameter.INSTANCE.simuRep; j++)
+			for (int j = 0; j < CmdArgs.INSTANCE.simuRep; j++)
 			{
 				ps2.append(flag[j][i] + " ");
 			}
@@ -149,14 +149,14 @@ public class RealDataSimulation
 	{
 		int[] indicator = new int[y.length];
 
-		int filler = Integer.parseInt(Parameter.INSTANCE.missing_phenotype);
+		int filler = Integer.parseInt(CmdArgs.INSTANCE.missing_phenotype);
 
 		Arrays.fill(indicator, filler);
 		int cs = 0;
 		int ctrl = 0;
 		int i = 0;
-		while (cs < Parameter.INSTANCE.simuCC[0]
-				&& ctrl < Parameter.INSTANCE.simuCC[1])
+		while (cs < CmdArgs.INSTANCE.simuCC[0]
+				&& ctrl < CmdArgs.INSTANCE.simuCC[1])
 		{
 			if (i == y.length)
 				i = 0;
@@ -229,7 +229,7 @@ public class RealDataSimulation
 		ArrayList<SNP> snpList = pp.getMapData().getMarkerList();
 
 		RandomDataImpl rd = new RandomDataImpl();
-		rd.reSeed(Parameter.INSTANCE.simuSeed);
+		rd.reSeed(CmdArgs.INSTANCE.simuSeed);
 		casualLociIdx = rd.nextPermutation(snpList.size(), num);
 	}
 
@@ -238,9 +238,9 @@ public class RealDataSimulation
 		ArrayList<String> cl = NewIt.newArrayList();
 		ArrayList<SNP> snpList = pp.getMapData().getMarkerList();
 
-		if (Parameter.INSTANCE.simuCasualLoci != null)
+		if (CmdArgs.INSTANCE.simuCasualLoci != null)
 		{
-			casualLociFile = Parameter.INSTANCE.simuCasualLoci;
+			casualLociFile = CmdArgs.INSTANCE.simuCasualLoci;
 			BufferedReader reader = FileProcessor.FileOpen(casualLociFile);
 			String line = null;
 			try

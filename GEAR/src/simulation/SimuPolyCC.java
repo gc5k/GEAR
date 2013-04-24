@@ -1,6 +1,6 @@
 package simulation;
 
-import gear.Parameter;
+import gear.CmdArgs;
 import gear.util.FileProcessor;
 import gear.util.Logger;
 import gear.util.TextHelper;
@@ -64,17 +64,17 @@ public class SimuPolyCC
 	public SimuPolyCC()
 	{
 
-		M = Parameter.INSTANCE.polyLoci;
-		M_null = Parameter.INSTANCE.polyLociNull;
-		U = Parameter.INSTANCE.polyU;
-		ld = Parameter.INSTANCE.polyLD;
-		seed = Parameter.INSTANCE.simuSeed;
-		sample = Parameter.INSTANCE.simuCC[0] + Parameter.INSTANCE.simuCC[1];
-		N_case = Parameter.INSTANCE.simuCC[0];
-		N_control = Parameter.INSTANCE.simuCC[1];
-		h2 = Parameter.INSTANCE.simuHsq;
-		K = Parameter.INSTANCE.simuK;
-		out = Parameter.INSTANCE.out;
+		M = CmdArgs.INSTANCE.polyLoci;
+		M_null = CmdArgs.INSTANCE.polyLociNull;
+		U = CmdArgs.INSTANCE.polyU;
+		ld = CmdArgs.INSTANCE.polyLD;
+		seed = CmdArgs.INSTANCE.simuSeed;
+		sample = CmdArgs.INSTANCE.simuCC[0] + CmdArgs.INSTANCE.simuCC[1];
+		N_case = CmdArgs.INSTANCE.simuCC[0];
+		N_control = CmdArgs.INSTANCE.simuCC[1];
+		h2 = CmdArgs.INSTANCE.simuHsq;
+		K = CmdArgs.INSTANCE.simuK;
+		out = CmdArgs.INSTANCE.out;
 
 		E = Math.sqrt(1 - h2);
 
@@ -85,7 +85,7 @@ public class SimuPolyCC
 		freq = new double[M];
 		DPrime = new double[M - 1];
 
-		Arrays.fill(freq, Parameter.INSTANCE.polyFreq);
+		Arrays.fill(freq, CmdArgs.INSTANCE.polyFreq);
 		Arrays.fill(DPrime, ld);
 		LD = CalculateDprime(freq, DPrime);
 
@@ -98,13 +98,13 @@ public class SimuPolyCC
 		LOG.append("\nThe analysis was implemented at: " + calendar.getTime()
 				+ "\n");
 		LOG.append("seed: " + seed + "\n");
-		LOG.append("MAF: " + Parameter.INSTANCE.polyFreq + "\n");
+		LOG.append("MAF: " + CmdArgs.INSTANCE.polyFreq + "\n");
 		LOG.append("Marker: " + M + "\n");
 		LOG.append("Null Marker: " + M_null + "\n");
-		if (Parameter.INSTANCE.polyEffectFlag)
+		if (CmdArgs.INSTANCE.polyEffectFlag)
 		{
 			LOG.append("genetic effect file: "
-					+ Parameter.INSTANCE.polyEffectFile + "\n");
+					+ CmdArgs.INSTANCE.polyEffectFile + "\n");
 		} else
 		{
 			LOG.append("Uniform Effect: " + U + "\n");
@@ -115,7 +115,7 @@ public class SimuPolyCC
 		LOG.append("K: " + K + "\n");
 		LOG.append("h2: " + h2 + "\n");
 		LOG.append("out: " + out + "\n");
-		if (Parameter.INSTANCE.makebedFlag)
+		if (CmdArgs.INSTANCE.makebedFlag)
 		{
 			LOG.append("make bed");
 		}
@@ -124,7 +124,7 @@ public class SimuPolyCC
 
 	public static void main(String[] args)
 	{
-		Parameter.INSTANCE.commandListener(args);
+		CmdArgs.INSTANCE.commandListener(args);
 	}
 
 	public void writeLog()
@@ -152,7 +152,7 @@ public class SimuPolyCC
 	public void GenerateSample()
 	{
 		GenerateSampleSelection();
-		if (Parameter.INSTANCE.makebedFlag)
+		if (CmdArgs.INSTANCE.makebedFlag)
 		{
 			writeBFile();
 		} else
@@ -169,7 +169,7 @@ public class SimuPolyCC
 		int count = 0;
 
 		RealMatrix effect = null;
-		if (Parameter.INSTANCE.polyEffectFlag)
+		if (CmdArgs.INSTANCE.polyEffectFlag)
 		{
 			effect = readEffects();
 		} else
@@ -305,7 +305,7 @@ public class SimuPolyCC
 			}
 		}
 
-		if (Parameter.INSTANCE.simuOrderFlag)
+		if (CmdArgs.INSTANCE.simuOrderFlag)
 		{
 			Arrays.sort(effect);
 		}
@@ -656,7 +656,7 @@ public class SimuPolyCC
 	public RealMatrix readEffects()
 	{
 		BufferedReader reader = FileProcessor
-				.FileOpen(Parameter.INSTANCE.polyEffectFile);
+				.FileOpen(CmdArgs.INSTANCE.polyEffectFile);
 		double[] effect = new double[M];
 		int c = 0;
 		String line = null;
@@ -677,11 +677,11 @@ public class SimuPolyCC
 		{
 			Logger.handleException(e,
 					"An exception occurred when reading the poly-effect file '"
-							+ Parameter.INSTANCE.polyEffectFile + "'.");
+							+ CmdArgs.INSTANCE.polyEffectFile + "'.");
 		}
 		RealMatrix Eff = new Array2DRowRealMatrix(effect);
 
-		if (Parameter.INSTANCE.simuOrderFlag)
+		if (CmdArgs.INSTANCE.simuOrderFlag)
 		{
 			Arrays.sort(effect);
 		}
