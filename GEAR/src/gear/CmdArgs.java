@@ -31,9 +31,9 @@ public enum CmdArgs
 	{
 		ops = new Options();
 		fileArgs = new FileArgs();
-		binaryDataArgs = new BFileArgs[2];
-		binaryDataArgs[0] = new BFileArgs("PLINK format binary input file", "bfile");
-		binaryDataArgs[1] = new BFileArgs("The second PLINK format binary input file", "bfile2");
+		bfileArgs = new BFileArgs[2];
+		bfileArgs[0] = new BFileArgs("PLINK format binary input file", "bfile");
+		bfileArgs[1] = new BFileArgs("The second PLINK format binary input file", "bfile2");
 		profileArgs = new ProfileArgs();
 
 		// real-check
@@ -368,12 +368,12 @@ public enum CmdArgs
 		private String cmd_bfile;
 	}
 
-	public BFileArgs getBinaryDataArgs(int i)
+	public BFileArgs getBFileArgs(int i)
 	{
-		return binaryDataArgs[i];
+		return bfileArgs[i];
 	}
 
-	private BFileArgs[] binaryDataArgs;
+	private BFileArgs[] bfileArgs;
 
 	public class FileArgs
 	{

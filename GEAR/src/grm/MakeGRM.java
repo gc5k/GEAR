@@ -44,11 +44,11 @@ public class MakeGRM
 			pp = new PLINKParser(CmdArgs.INSTANCE.getFileArgs()
 					.getPed(), CmdArgs.INSTANCE.getFileArgs()
 					.getMap());
-		} else if (CmdArgs.INSTANCE.getBinaryDataArgs(0).isSet())
+		} else if (CmdArgs.INSTANCE.getBFileArgs(0).isSet())
 		{
-			pp = new PLINKBinaryParser(CmdArgs.INSTANCE.getBinaryDataArgs(0)
-					.getBed(), CmdArgs.INSTANCE.getBinaryDataArgs(0)
-					.getBim(), CmdArgs.INSTANCE.getBinaryDataArgs(0)
+			pp = new PLINKBinaryParser(CmdArgs.INSTANCE.getBFileArgs(0)
+					.getBed(), CmdArgs.INSTANCE.getBFileArgs(0)
+					.getBim(), CmdArgs.INSTANCE.getBFileArgs(0)
 					.getFam());
 		} else
 		{

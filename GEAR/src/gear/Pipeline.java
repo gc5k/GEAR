@@ -6,8 +6,9 @@ import epem.GRMStat;
 
 import merge.MergeTwoFile;
 import write.WriteBedSNPMajor;
-import gear.profile.MaCHDosageProfile;
-import gear.profile.RiskScore;
+import gear.profile.MachDosageProfiler;
+import gear.profile.ProfilerBase;
+import gear.profile.RiskScoreProfiler;
 import gear.util.Logger;
 import grm.MakeGRM;
 import he.HECalculate;
@@ -29,15 +30,13 @@ import pscontrol.NonTransmitted;
 
 public class Pipeline
 {
-
 	public static void main(String[] args)
 	{
 		CmdArgs.INSTANCE.commandListener(args);
 
 		Logger.setLogFiles(CmdArgs.INSTANCE.out);
 		Logger.printUserLog(AboutInfo.WELCOME_MESSAGE);
-		Logger.printUserLog("Analysis started: "
-				+ Calendar.getInstance().getTime() + "\n");
+		Logger.printUserLog("Analysis started: " + Calendar.getInstance().getTime() + "\n");
 		
 		// Print the options set.
 		Logger.printUserLog("Options received: ");
@@ -63,17 +62,18 @@ public class Pipeline
 		}
 		else if (CmdArgs.INSTANCE.getProfileArgs().isSet())
 		{
-			if (CmdArgs.INSTANCE.getFileArgs().isSet() ||
-				CmdArgs.INSTANCE.getBinaryDataArgs(0).isSet())
+			ProfilerBase profiler;
+			if (CmdArgs.INSTANCE.getFileArgs().isSet() || CmdArgs.INSTANCE.getBFileArgs(0).isSet())
 			{
-				RiskScore rs = new RiskScore();
-				rs.makeProfile();
+				Logger.printUserLog("Generating risk profiles for genotypes.");
+				profiler = new RiskScoreProfiler();
 			}
 			else
 			{
-				MaCHDosageProfile mach = new MaCHDosageProfile();
-				mach.makeProfile();
+				Logger.printUserLog("Generating risk profiles for MaCH dosage.");
+				profiler = new MachDosageProfiler();
 			}
+			profiler.makeProfile();
 		}
 		else if (CmdArgs.INSTANCE.hasStrandOption())
 		{
@@ -97,7 +97,7 @@ public class Pipeline
 		}
 		else if (CmdArgs.INSTANCE.hasRealCheckOption())
 		{
-			if (CmdArgs.INSTANCE.getBinaryDataArgs(0).isSet())
+			if (CmdArgs.INSTANCE.getBFileArgs(0).isSet())
 			{
 				RealCheck realcheck = new RealCheck();
 				realcheck.Check();
