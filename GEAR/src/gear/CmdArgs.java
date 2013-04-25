@@ -329,6 +329,8 @@ public enum CmdArgs
 
 		ops.addOption(OptionBuilder.withDescription("help manual.").create(
 				cmd_help));
+		
+		ops.addOption(OptionBuilder.withDescription("greedy, a generic option.").create(cmd_greedy));
 
 	}
 
@@ -1333,6 +1335,9 @@ public enum CmdArgs
 	public boolean maxmafFlag = false;
 
 	public double max_maf = 0.55;
+	
+	private final String cmd_greedy = "greedy";
+	public boolean greedy = false;
 
 	private final String cmd_help = "help";
 
@@ -1873,6 +1878,11 @@ public enum CmdArgs
 		{
 			cal_h2_se = Double.parseDouble(cl.getOptionValue(cmd_cal_h2_se));
 			cal_h2seFlag = true;
+		}
+		
+		if (cl.hasOption(cmd_greedy)) 
+		{
+			greedy = true;
 		}
 	}
 

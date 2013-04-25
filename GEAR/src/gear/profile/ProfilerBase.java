@@ -5,6 +5,7 @@ import gear.profile.struct.QScore;
 import gear.profile.struct.ScoreUnit;
 import gear.util.Logger;
 import gear.util.NewIt;
+import gear.util.SNPMatch;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -99,6 +100,61 @@ public abstract class ProfilerBase
 			singleProfile();
 		}
 	}
+	
+	protected int AsIs(ScoreUnit su, char a1, char a2, int[] matchScheme)
+	{
+		int T = 0;
+		if (su.getRefAllele().equals(Character.toString(a1)))
+		{
+			T = ProfileConstant.MatchAltAllele;
+			matchScheme[0]++;
+		} else if (su.getRefAllele().equals(Character.toString(a2)))
+		{
+			T = ProfileConstant.MatchRefAllele;
+			matchScheme[1]++;
+		} else
+		{
+			T = ProfileConstant.MatchNeither;
+			matchScheme[2]++;
+		}
+
+		return T;
+	}
+
+	protected int Greedy(ScoreUnit su, char alt, char ref, int[] matchScheme)
+	{
+		int T = 0;
+		if (su.getRefAllele().equals(Character.toString(alt)))
+		{
+			T = ProfileConstant.MatchAltAllele;
+			matchScheme[0]++;
+
+		} else if (su.getRefAllele().equals(Character.toString(ref)))
+		{
+			T = ProfileConstant.MatchRefAllele;
+			matchScheme[1]++;
+
+		} else if (su.getRefAllele().equals(
+				SNPMatch.Flip(Character.toString(alt))))
+		{
+			T = ProfileConstant.MatchAltAllele;
+			matchScheme[2]++;
+
+		} else if (su.getRefAllele().equals(
+				SNPMatch.Flip(Character.toString(ref))))
+		{
+			T = ProfileConstant.MatchRefAllele;
+			matchScheme[3]++;
+
+		} else
+		{
+			T = ProfileConstant.MatchNeither;
+			matchScheme[4]++;
+		}
+
+		return T;
+	}
+
 	
 	protected abstract void multipleProfile();
 	

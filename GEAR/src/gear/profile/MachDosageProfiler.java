@@ -114,7 +114,16 @@ public class MachDosageProfiler extends ProfilerBase
 		int ATGCLocus = 0;
 
 		int sumSNPMapped = 0;
-
+		int Tag = 0;
+		int[] matchScheme;
+		if (CmdArgs.INSTANCE.greedy)
+		{
+			matchScheme = new int[5];
+		} else
+		{
+			matchScheme = new int[3];
+		}
+		
 		for (int i = 0; i < inforFile.length; i++)
 		{
 
@@ -157,6 +166,7 @@ public class MachDosageProfiler extends ProfilerBase
 				}
 
 				ScoreUnit su = null;
+				double sc = 0;
 				if (Score.containsKey(snp))
 				{
 					su = Score.get(snp);
@@ -184,11 +194,21 @@ public class MachDosageProfiler extends ProfilerBase
 						}
 					}
 
-				}
-				else if (CmdArgs.INSTANCE.getProfileArgs().getScoreFile() == null)
-				{
-					su = new ScoreUnit(snp, refA, 1.0);
-					cSNP++;
+					if (!CmdArgs.INSTANCE.greedy)
+					{
+						Tag = AsIs(su, refB.charAt(0), refA.charAt(0), matchScheme);
+					} else
+					{
+						Tag = Greedy(su, refB.charAt(0), refA.charAt(0), matchScheme);
+					}
+					
+					if (CmdArgs.INSTANCE.getTranFunction() == gear.RegressionModel.LOGIT)
+					{// logit s
+						sc = Math.log(su.getScore());
+					} else
+					{
+						sc = su.getScore();
+					}
 				}
 				else
 				{
@@ -200,29 +220,22 @@ public class MachDosageProfiler extends ProfilerBase
 					continue;
 				}
 
+				if (Tag == ProfileConstant.MatchNeither) 
+				{
+					continue;
+				}
+
 				for (int k = 0; k < dosage.size(); k++)
 				{
 
 					double locusScore = 0;
-					if (refA.compareTo(su.getRefAllele()) == 0)
+					
+					if (Tag == ProfileConstant.MatchRefAllele) 
 					{
-						locusScore += dosage.get(k).get(j).doubleValue()
-								* su.getScore();
-					} else if (refB.compareTo(su.getRefAllele()) == 0)
+						locusScore += dosage.get(k).get(j).doubleValue() * sc;
+					} else if (Tag == ProfileConstant.MatchAltAllele)
 					{
-						locusScore += (2 - dosage.get(k).get(j).doubleValue())
-								* su.getScore();
-					} else if (SNPMatch.Flip(refA).compareTo(su.getRefAllele()) == 0)
-					{
-						locusScore += dosage.get(k).get(j).doubleValue()
-								* su.getScore();
-					} else if (SNPMatch.Flip(refB).compareTo(su.getRefAllele()) == 0)
-					{
-						locusScore += (2 - dosage.get(k).get(j).doubleValue())
-								* su.getScore();
-					} else
-					{
-						continue;
+						locusScore += (2 - dosage.get(k).get(j).doubleValue()) * sc;
 					}
 
 					for (int l = 0; l < qsL2Flag.length; l++)
@@ -319,6 +332,17 @@ public class MachDosageProfiler extends ProfilerBase
 		double[] riskProfile = null;
 
 		int ATGCLocus = 0;
+		int Tag = 0;
+		
+		int[] matchScheme;
+		if (CmdArgs.INSTANCE.greedy)
+		{
+			matchScheme = new int[5];
+		} else
+		{
+			matchScheme = new int[3];
+		}
+
 		for (int i = 0; i < inforFile.length; i++)
 		{
 
@@ -368,28 +392,32 @@ public class MachDosageProfiler extends ProfilerBase
 				{
 					continue;
 				}
+				
+				if (!CmdArgs.INSTANCE.greedy)
+				{
+					Tag = AsIs(su, refB.charAt(0), refA.charAt(0), matchScheme);
+				} else
+				{
+					Tag = Greedy(su, refB.charAt(0), refA.charAt(0), matchScheme);
+				}
+
+				double sc = 0;
+				if (CmdArgs.INSTANCE.getTranFunction() == gear.RegressionModel.LOGIT)
+				{// logit s
+					sc = Math.log(su.getScore());
+				} else
+				{
+					sc = su.getScore();
+				}
 
 				for (int k = 0; k < dosage.size(); k++)
 				{
-					if (refA.compareTo(su.getRefAllele()) == 0)
+					if (Tag == ProfileConstant.MatchRefAllele) 
 					{
-						rs[k] += dosage.get(k).get(j).doubleValue()
-								* su.getScore();
-					} else if (refB.compareTo(su.getRefAllele()) == 0)
+						rs[k] += dosage.get(k).get(j).doubleValue() * sc;
+					} else if (Tag == ProfileConstant.MatchAltAllele)
 					{
-						rs[k] += (2 - dosage.get(k).get(j).doubleValue())
-								* su.getScore();
-					} else if (SNPMatch.Flip(refA).compareTo(su.getRefAllele()) == 0)
-					{
-						rs[k] += dosage.get(k).get(j).doubleValue()
-								* su.getScore();
-					} else if (SNPMatch.Flip(refB).compareTo(su.getRefAllele()) == 0)
-					{
-						rs[k] += (2 - dosage.get(k).get(j).doubleValue())
-								* su.getScore();
-					} else
-					{
-						continue;
+						rs[k] += (2 - dosage.get(k).get(j).doubleValue()) * sc;
 					}
 					if (k == 0)
 					{
@@ -426,6 +454,12 @@ public class MachDosageProfiler extends ProfilerBase
 		Logger.printUserLog("Number of SNPs mapped to the score file in total: "
 				+ CCSNP);
 		Logger.printUserLog("Number of SNPs having scores: " + CC);
+
+		for (int i = 0; i < matchScheme.length; i++)
+		{
+			Logger.printUserLog("Number of SNPs matching Scheme " + (1 + i)
+					+ ": " + matchScheme[i]);
+		}
 
 		StringBuffer sbim = new StringBuffer();
 		sbim.append(CmdArgs.INSTANCE.out);
