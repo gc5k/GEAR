@@ -33,15 +33,13 @@ public class RiskScoreProfiler extends ProfilerBase
 		if (CmdArgs.INSTANCE.getFileArgs().isSet())
 		{
 			pp1 = new PLINKParser(CmdArgs.INSTANCE.getFileArgs().getPed(),
-					              CmdArgs.INSTANCE.getFileArgs().getMap());
-		}
-		else if (CmdArgs.INSTANCE.getBFileArgs(0).isSet())
+					CmdArgs.INSTANCE.getFileArgs().getMap());
+		} else if (CmdArgs.INSTANCE.getBFileArgs(0).isSet())
 		{
-			pp1 = new PLINKBinaryParser(CmdArgs.INSTANCE.getBFileArgs(0).getBed(),
-					                    CmdArgs.INSTANCE.getBFileArgs(0).getBim(),
-					                    CmdArgs.INSTANCE.getBFileArgs(0).getFam());
-		}
-		else
+			pp1 = new PLINKBinaryParser(CmdArgs.INSTANCE.getBFileArgs(0)
+					.getBed(), CmdArgs.INSTANCE.getBFileArgs(0).getBim(),
+					CmdArgs.INSTANCE.getBFileArgs(0).getFam());
+		} else
 		{
 			Logger.printUserError("Neither --file nor --bfile is set.");
 			System.exit(1);
@@ -61,7 +59,14 @@ public class RiskScoreProfiler extends ProfilerBase
 		int ATGCLocus = 0;
 		int[] CCSNP = new int[QRName.length];
 		int[][] GCInd = new int[G1.getGRow()][QRName.length];
-		int[] matchScheme = new int[5];
+		int[] matchScheme;
+		if (CmdArgs.INSTANCE.greedy)
+		{
+			matchScheme = new int[5];
+		} else
+		{
+			matchScheme = new int[3];
+		}
 
 		double[][] riskProfile = new double[G1.getGRow()][QRName.length];
 		// int[] CC = new int[G1.getGRow()];
@@ -77,8 +82,8 @@ public class RiskScoreProfiler extends ProfilerBase
 			boolean isATGC = SNPMatch.Confusion(a1, a2);
 
 			ScoreUnit su = null;
-			boolean isMatchRef = true;
 			double sc = 0;
+			int Tag = 0;
 			if (Score.containsKey(snp.getName()))
 			{
 				Total++;
@@ -122,57 +127,31 @@ public class RiskScoreProfiler extends ProfilerBase
 					continue;
 				}
 
-				if (su.getRefAllele().compareTo(Character.toString(a1)) == 0)
+				if (!CmdArgs.INSTANCE.greedy)
 				{
-					isMatchRef = false;
-					matchScheme[0]++;
-
-				} else if (su.getRefAllele().compareTo(Character.toString(a2)) == 0)
-				{
-					isMatchRef = true;
-					matchScheme[1]++;
-
-				} else if (su.getRefAllele().compareTo(
-						SNPMatch.Flip(Character.toString(a1))) == 0)
-				{
-					isMatchRef = false;
-					matchScheme[2]++;
-
-				} else if (su.getRefAllele().compareTo(
-						SNPMatch.Flip(Character.toString(a2))) == 0)
-				{
-					isMatchRef = true;
-					matchScheme[3]++;
-
+					Tag = AsIs(su, a1, a2, matchScheme);
 				} else
 				{
-					isMatchRef = false;
-					matchScheme[4]++;
-					continue;
+					Tag = Greedy(su, a1, a2, matchScheme);
 				}
 
-				sc = su.getScore();
 				if (CmdArgs.INSTANCE.getTranFunction() == gear.RegressionModel.LOGIT)
-				{
-					if (isMatchRef)
-					{
-						sc = Math.log(sc);
-					} else
-					{
-						sc = -1 * Math.log(sc);
-					}
+				{// logit s
+					sc = Math.log(su.getScore());
 				} else
 				{
-					if (!isMatchRef)
-					{
-						sc = -1 * sc;
-					}
+					sc = su.getScore();
 				}
+
 			} else
 			{// this snp is not in the predictor panel;
 				continue;
 			}
 
+			if (Tag == ProfileConstant.MatchNeither) 
+			{
+				continue;
+			}
 			for (int k = 0; k < qsL2Flag.length; k++)
 			{
 				if (!qsL2Flag[k])
@@ -183,6 +162,15 @@ public class RiskScoreProfiler extends ProfilerBase
 					if (G1.getAdditiveScore(j, i) != GenotypeMatrix.missing)
 					{
 						riskProfile[j][k] += sc * G1.getAdditiveScore(j, i);
+
+						if (Tag == ProfileConstant.MatchRefAllele)
+						{
+							riskProfile[j][k] += sc * G1.getAdditiveScore(j, i);
+						} else if (Tag == ProfileConstant.MatchAltAllele)
+						{
+							riskProfile[j][k] += sc
+								* (2 - G1.getAdditiveScore(j, i));
+						}
 						GCInd[j][k]++;
 					}
 				}
@@ -215,7 +203,7 @@ public class RiskScoreProfiler extends ProfilerBase
 					+ ": " + CCSNP[i]);
 		}
 
-		for (int i = 0; i < 4; i++)
+		for (int i = 0; i < matchScheme.length; i++)
 		{
 			Logger.printUserLog("Number of SNPs matching Scheme " + (1 + i)
 					+ ": " + matchScheme[i]);
@@ -253,7 +241,14 @@ public class RiskScoreProfiler extends ProfilerBase
 		int monoLocus = 0;
 		int CCSNP = 0;
 		int ATGCLocus = 0;
-		int[] matchScheme = new int[5];
+		int[] matchScheme;
+		if (CmdArgs.INSTANCE.greedy)
+		{
+			matchScheme = new int[5];
+		} else
+		{
+			matchScheme = new int[3];
+		}
 
 		ArrayList<ArrayList<String>> s4 = NewIt.newArrayList();
 		for (int i = 0; i < 4; i++)
@@ -271,8 +266,9 @@ public class RiskScoreProfiler extends ProfilerBase
 			boolean isATGC = SNPMatch.Confusion(a1, a2);
 
 			ScoreUnit su = null;
-			boolean isMatchRef = false;
 			double sc = 0;
+			int Tag = 0;
+
 			if (Score.containsKey(snp.getName()))
 			{
 				Total++;
@@ -296,66 +292,48 @@ public class RiskScoreProfiler extends ProfilerBase
 					continue;
 				}
 
-				if (su.getRefAllele().equals(Character.toString(a1)))
+				if (!CmdArgs.INSTANCE.greedy)
 				{
-					isMatchRef = false;
-					matchScheme[0]++;
-					ArrayList<String> s = s4.get(0);
-					s.add(snp.getName());
-				} else if (su.getRefAllele().equals(Character.toString(a2)))
-				{
-					isMatchRef = true;
-					matchScheme[1]++;
-					ArrayList<String> s = s4.get(1);
-					s.add(snp.getName());
-				} else if (su.getRefAllele().equals(
-						SNPMatch.Flip(Character.toString(a1))))
-				{
-					isMatchRef = false;
-					matchScheme[2]++;
-					ArrayList<String> s = s4.get(2);
-					s.add(snp.getName());
-
-				} else if (su.getRefAllele().equals(
-						SNPMatch.Flip(Character.toString(a2))))
-				{
-					isMatchRef = true;
-					matchScheme[3]++;
-					ArrayList<String> s = s4.get(3);
-					s.add(snp.getName());
-
+					Tag = AsIs(su, a1, a2, matchScheme);
 				} else
 				{
-					isMatchRef = false;
-					matchScheme[4]++;
-					continue;
+					Tag = Greedy(su, a1, a2, matchScheme);
 				}
 				CCSNP++;
 
-				sc = su.getScore();
 				if (CmdArgs.INSTANCE.getTranFunction() == gear.RegressionModel.LOGIT)
 				{// logit s
-					if (isMatchRef)
-					{
-						sc = Math.log(sc);
-					} else
-					{
-						sc = -1 * Math.log(sc);
-					}
+					sc = Math.log(su.getScore());
+				} else
+				{
+					sc = su.getScore();
 				}
 			} else
 			{// this snp is not in the predictor panel;
 				continue;
 			}
 
+			if (Tag == ProfileConstant.MatchNeither)
+			{
+				continue;
+			}
+			
 			for (int j = 0; j < G1.getGRow(); j++)
 			{
 				if (G1.getAdditiveScore(j, i) != GenotypeMatrix.missing)
 				{
-					riskProfile[j] += sc * G1.getAdditiveScore(j, i);
+					if (Tag == ProfileConstant.MatchRefAllele)
+					{
+						riskProfile[j] += sc * G1.getAdditiveScore(j, i);
+					} else if (Tag == ProfileConstant.MatchAltAllele)
+					{
+						riskProfile[j] += sc
+									* (2 - G1.getAdditiveScore(j, i));
+					}
 					GCInd[j]++;
 				}
 			}
+			
 		}
 
 		for (int i = 0; i < riskProfile.length; i++)
@@ -376,7 +354,7 @@ public class RiskScoreProfiler extends ProfilerBase
 				+ ATGCLocus);
 		Logger.printUserLog("Number of SNP scores in the score file: " + CCSNP);
 
-		for (int i = 0; i < 4; i++)
+		for (int i = 0; i < matchScheme.length; i++)
 		{
 			Logger.printUserLog("Number of SNPs matching Scheme " + (1 + i)
 					+ ": " + matchScheme[i]);
@@ -397,4 +375,5 @@ public class RiskScoreProfiler extends ProfilerBase
 		}
 		predictorFile.close();
 	}
+
 }
