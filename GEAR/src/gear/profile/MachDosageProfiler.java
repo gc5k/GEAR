@@ -116,7 +116,7 @@ public class MachDosageProfiler extends ProfilerBase
 		int sumSNPMapped = 0;
 		int Tag = 0;
 		int[] matchScheme;
-		if (CmdArgs.INSTANCE.greedy)
+		if (CmdArgs.INSTANCE.greedyFlag)
 		{
 			matchScheme = new int[5];
 		} else
@@ -194,7 +194,7 @@ public class MachDosageProfiler extends ProfilerBase
 						}
 					}
 
-					if (!CmdArgs.INSTANCE.greedy)
+					if (!CmdArgs.INSTANCE.greedyFlag)
 					{
 						Tag = AsIs(su, refB.charAt(0), refA.charAt(0), matchScheme);
 					} else
@@ -335,7 +335,7 @@ public class MachDosageProfiler extends ProfilerBase
 		int Tag = 0;
 		
 		int[] matchScheme;
-		if (CmdArgs.INSTANCE.greedy)
+		if (CmdArgs.INSTANCE.greedyFlag)
 		{
 			matchScheme = new int[5];
 		} else
@@ -393,7 +393,7 @@ public class MachDosageProfiler extends ProfilerBase
 					continue;
 				}
 				
-				if (!CmdArgs.INSTANCE.greedy)
+				if (!CmdArgs.INSTANCE.greedyFlag)
 				{
 					Tag = AsIs(su, refB.charAt(0), refA.charAt(0), matchScheme);
 				} else

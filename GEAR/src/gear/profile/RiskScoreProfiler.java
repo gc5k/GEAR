@@ -60,7 +60,7 @@ public class RiskScoreProfiler extends ProfilerBase
 		int[] CCSNP = new int[QRName.length];
 		int[][] GCInd = new int[G1.getGRow()][QRName.length];
 		int[] matchScheme;
-		if (CmdArgs.INSTANCE.greedy)
+		if (CmdArgs.INSTANCE.greedyFlag)
 		{
 			matchScheme = new int[5];
 		} else
@@ -127,7 +127,7 @@ public class RiskScoreProfiler extends ProfilerBase
 					continue;
 				}
 
-				if (!CmdArgs.INSTANCE.greedy)
+				if (!CmdArgs.INSTANCE.greedyFlag)
 				{
 					Tag = AsIs(su, a1, a2, matchScheme);
 				} else
@@ -161,15 +161,13 @@ public class RiskScoreProfiler extends ProfilerBase
 				{
 					if (G1.getAdditiveScore(j, i) != GenotypeMatrix.missing)
 					{
-						riskProfile[j][k] += sc * G1.getAdditiveScore(j, i);
-
 						if (Tag == ProfileConstant.MatchRefAllele)
 						{
-							riskProfile[j][k] += sc * G1.getAdditiveScore(j, i);
+							riskProfile[j][k] += sc * Model(G1.getAdditiveScore(j, i));
 						} else if (Tag == ProfileConstant.MatchAltAllele)
 						{
 							riskProfile[j][k] += sc
-								* (2 - G1.getAdditiveScore(j, i));
+								* Model((2 - G1.getAdditiveScore(j, i)));
 						}
 						GCInd[j][k]++;
 					}
@@ -184,6 +182,9 @@ public class RiskScoreProfiler extends ProfilerBase
 				if (GCInd[i][j] == 0)
 				{
 					riskProfile[i][j] = 0;
+				} else if (CmdArgs.INSTANCE.addFlag || CmdArgs.INSTANCE.domFlag || CmdArgs.INSTANCE.recFlag)
+				{
+					riskProfile[i][j] /= GCInd[i][j];
 				} else
 				{
 					riskProfile[i][j] /= 2 * GCInd[i][j];
@@ -242,7 +243,7 @@ public class RiskScoreProfiler extends ProfilerBase
 		int CCSNP = 0;
 		int ATGCLocus = 0;
 		int[] matchScheme;
-		if (CmdArgs.INSTANCE.greedy)
+		if (CmdArgs.INSTANCE.greedyFlag)
 		{
 			matchScheme = new int[5];
 		} else
@@ -292,7 +293,7 @@ public class RiskScoreProfiler extends ProfilerBase
 					continue;
 				}
 
-				if (!CmdArgs.INSTANCE.greedy)
+				if (!CmdArgs.INSTANCE.greedyFlag)
 				{
 					Tag = AsIs(su, a1, a2, matchScheme);
 				} else
@@ -324,16 +325,15 @@ public class RiskScoreProfiler extends ProfilerBase
 				{
 					if (Tag == ProfileConstant.MatchRefAllele)
 					{
-						riskProfile[j] += sc * G1.getAdditiveScore(j, i);
+						riskProfile[j] += sc * Model(G1.getAdditiveScore(j, i));
 					} else if (Tag == ProfileConstant.MatchAltAllele)
 					{
 						riskProfile[j] += sc
-									* (2 - G1.getAdditiveScore(j, i));
+									* Model(2 - G1.getAdditiveScore(j, i));
 					}
 					GCInd[j]++;
 				}
 			}
-			
 		}
 
 		for (int i = 0; i < riskProfile.length; i++)
@@ -341,7 +341,10 @@ public class RiskScoreProfiler extends ProfilerBase
 			if (GCInd[i] == 0)
 			{
 				riskProfile[i] = 0;
-			} else
+			} else if (CmdArgs.INSTANCE.addFlag || CmdArgs.INSTANCE.domFlag || CmdArgs.INSTANCE.recFlag)
+			{
+				riskProfile[i] /=  GCInd[i];
+			} else 
 			{
 				riskProfile[i] /= 2 * GCInd[i];
 			}
@@ -362,7 +365,23 @@ public class RiskScoreProfiler extends ProfilerBase
 
 		StringBuffer sbim = new StringBuffer();
 		sbim.append(CmdArgs.INSTANCE.out);
+		if (CmdArgs.INSTANCE.addFlag)
+		{
+			Logger.printUserLog("Additive model is used.");
+			sbim.append(".add");
+		} else if (CmdArgs.INSTANCE.domFlag) 
+		{
+			Logger.printUserLog("Dominant model is used.");
+			sbim.append(".dom");
+		} else if (CmdArgs.INSTANCE.recFlag)
+		{
+			Logger.printUserLog("Recessive model is used.");
+			sbim.append(".rec");
+		} else {
+			Logger.printUserLog("Allelic model is used.");
+		}
 		sbim.append(".profile");
+		Logger.printUserLog("Writing the profile into '" + sbim.toString() + "'.");
 		PrintStream predictorFile = FileProcessor.CreatePrintStream(sbim
 				.toString());
 		predictorFile.println("FID\tIID\tPHENO\tSCORE");
