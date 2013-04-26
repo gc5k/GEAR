@@ -332,6 +332,12 @@ public enum CmdArgs
 		
 		ops.addOption(OptionBuilder.withDescription("greedy, a generic option.").create(cmd_greedy));
 
+		ops.addOption(OptionBuilder.withDescription("additive model.").create(cmd_add));
+
+		ops.addOption(OptionBuilder.withDescription("dominant model.").create(cmd_dom));
+
+		ops.addOption(OptionBuilder.withDescription("recessive model.").create(cmd_rec));
+
 	}
 
 	public class BFileArgs
@@ -1337,7 +1343,16 @@ public enum CmdArgs
 	public double max_maf = 0.55;
 	
 	private final String cmd_greedy = "greedy";
-	public boolean greedy = false;
+	public boolean greedyFlag = false;
+
+	private final String cmd_add = "add";
+	public boolean addFlag = false;
+	
+	private final String cmd_dom = "dom";
+	public boolean domFlag = false;
+	
+	private final String cmd_rec = "rec";
+	public boolean recFlag = false;
 
 	private final String cmd_help = "help";
 
@@ -1879,11 +1894,27 @@ public enum CmdArgs
 			cal_h2_se = Double.parseDouble(cl.getOptionValue(cmd_cal_h2_se));
 			cal_h2seFlag = true;
 		}
-		
+
 		if (cl.hasOption(cmd_greedy)) 
 		{
-			greedy = true;
+			greedyFlag = true;
 		}
+		
+		if (cl.hasOption(cmd_add)) 
+		{
+			addFlag = true;
+		}
+
+		if (cl.hasOption(cmd_dom)) 
+		{
+			domFlag = true;
+		}
+
+		if (cl.hasOption(cmd_rec)) 
+		{
+			recFlag = true;
+		}
+
 	}
 
 	public Options getOptions()

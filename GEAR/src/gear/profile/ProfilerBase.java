@@ -101,6 +101,35 @@ public abstract class ProfilerBase
 		}
 	}
 	
+	protected int Model(int g) 
+	{
+		int gs = 0;
+		if (CmdArgs.INSTANCE.addFlag) 
+		{
+			gs = g;
+		} else if (CmdArgs.INSTANCE.domFlag) 
+		{
+			if ( g > 0) 
+			{
+				gs = 1;
+			} else 
+			{
+				gs = 0;
+			}
+		} else if (CmdArgs.INSTANCE.recFlag) {
+			if (g > 1) 
+			{
+				gs = 1;
+			} else 
+			{
+				gs = 0;
+			}
+		} else 
+		{
+			gs = g;
+		}
+		return gs;
+	}
 	protected int AsIs(ScoreUnit su, char a1, char a2, int[] matchScheme)
 	{
 		int T = 0;
