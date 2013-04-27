@@ -119,7 +119,8 @@ public class MachDosageProfiler extends ProfilerBase
 		if (CmdArgs.INSTANCE.greedyFlag)
 		{
 			matchScheme = new int[5];
-		} else
+		} 
+		else
 		{
 			matchScheme = new int[3];
 		}
@@ -197,7 +198,8 @@ public class MachDosageProfiler extends ProfilerBase
 					if (!CmdArgs.INSTANCE.greedyFlag)
 					{
 						Tag = AsIs(su, refB.charAt(0), refA.charAt(0), matchScheme);
-					} else
+					} 
+					else
 					{
 						Tag = Greedy(su, refB.charAt(0), refA.charAt(0), matchScheme);
 					}
@@ -205,7 +207,8 @@ public class MachDosageProfiler extends ProfilerBase
 					if (CmdArgs.INSTANCE.getTranFunction() == gear.RegressionModel.LOGIT)
 					{// logit s
 						sc = Math.log(su.getScore());
-					} else
+					} 
+					else
 					{
 						sc = su.getScore();
 					}
@@ -233,7 +236,8 @@ public class MachDosageProfiler extends ProfilerBase
 					if (Tag == ProfileConstant.MatchRefAllele) 
 					{
 						locusScore += dosage.get(k).get(j).doubleValue() * sc;
-					} else if (Tag == ProfileConstant.MatchAltAllele)
+					} 
+					else if (Tag == ProfileConstant.MatchAltAllele)
 					{
 						locusScore += (2 - dosage.get(k).get(j).doubleValue()) * sc;
 					}
@@ -278,7 +282,8 @@ public class MachDosageProfiler extends ProfilerBase
 				if (CC[j] == 0)
 				{
 					riskProfile[i][j] = 0;
-				} else
+				} 
+				else
 				{
 					riskProfile[i][j] /= 2 * CC[j];
 				}
@@ -338,7 +343,8 @@ public class MachDosageProfiler extends ProfilerBase
 		if (CmdArgs.INSTANCE.greedyFlag)
 		{
 			matchScheme = new int[5];
-		} else
+		} 
+		else
 		{
 			matchScheme = new int[3];
 		}
@@ -388,7 +394,8 @@ public class MachDosageProfiler extends ProfilerBase
 					}
 					cSNP++;
 					CCSNP++;
-				} else
+				} 
+				else
 				{
 					continue;
 				}
@@ -396,7 +403,8 @@ public class MachDosageProfiler extends ProfilerBase
 				if (!CmdArgs.INSTANCE.greedyFlag)
 				{
 					Tag = AsIs(su, refB.charAt(0), refA.charAt(0), matchScheme);
-				} else
+				} 
+				else
 				{
 					Tag = Greedy(su, refB.charAt(0), refA.charAt(0), matchScheme);
 				}
@@ -405,7 +413,8 @@ public class MachDosageProfiler extends ProfilerBase
 				if (CmdArgs.INSTANCE.getTranFunction() == gear.RegressionModel.LOGIT)
 				{// logit s
 					sc = Math.log(su.getScore());
-				} else
+				} 
+				else
 				{
 					sc = su.getScore();
 				}
@@ -415,7 +424,8 @@ public class MachDosageProfiler extends ProfilerBase
 					if (Tag == ProfileConstant.MatchRefAllele) 
 					{
 						rs[k] += dosage.get(k).get(j).doubleValue() * sc;
-					} else if (Tag == ProfileConstant.MatchAltAllele)
+					} 
+					else if (Tag == ProfileConstant.MatchAltAllele)
 					{
 						rs[k] += (2 - dosage.get(k).get(j).doubleValue()) * sc;
 					}
@@ -441,7 +451,8 @@ public class MachDosageProfiler extends ProfilerBase
 			if (CC == 0)
 			{
 				riskProfile[i] = 0;
-			} else
+			} 
+			else
 			{
 				riskProfile[i] /= 2 * CC;
 			}
@@ -492,7 +503,8 @@ public class MachDosageProfiler extends ProfilerBase
 				DosageInfor di = new DosageInfor(lineScore);
 				SD.add(di);
 			}
-		} catch (IOException e)
+		} 
+		catch (IOException e)
 		{
 			Logger.handleException(e,
 					"An exception occurred when reading the dosage information file '"
@@ -524,7 +536,8 @@ public class MachDosageProfiler extends ProfilerBase
 				}
 				dosage.add(d);
 			}
-		} catch (IOException e)
+		} 
+		catch (IOException e)
 		{
 			Logger.handleException(e,
 					"An exception occurred when reading the dosage file '"

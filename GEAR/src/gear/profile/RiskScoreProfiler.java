@@ -34,12 +34,14 @@ public class RiskScoreProfiler extends ProfilerBase
 		{
 			pp1 = new PLINKParser(CmdArgs.INSTANCE.getFileArgs().getPed(),
 					CmdArgs.INSTANCE.getFileArgs().getMap());
-		} else if (CmdArgs.INSTANCE.getBFileArgs(0).isSet())
+		} 
+		else if (CmdArgs.INSTANCE.getBFileArgs(0).isSet())
 		{
 			pp1 = new PLINKBinaryParser(CmdArgs.INSTANCE.getBFileArgs(0)
 					.getBed(), CmdArgs.INSTANCE.getBFileArgs(0).getBim(),
 					CmdArgs.INSTANCE.getBFileArgs(0).getFam());
-		} else
+		} 
+		else
 		{
 			Logger.printUserError("Neither --file nor --bfile is set.");
 			System.exit(1);
@@ -63,7 +65,8 @@ public class RiskScoreProfiler extends ProfilerBase
 		if (CmdArgs.INSTANCE.greedyFlag)
 		{
 			matchScheme = new int[5];
-		} else
+		} 
+		else
 		{
 			matchScheme = new int[3];
 		}
@@ -122,7 +125,8 @@ public class RiskScoreProfiler extends ProfilerBase
 							}
 						}
 					}
-				} else
+				} 
+				else
 				{
 					continue;
 				}
@@ -130,7 +134,8 @@ public class RiskScoreProfiler extends ProfilerBase
 				if (!CmdArgs.INSTANCE.greedyFlag)
 				{
 					Tag = AsIs(su, a1, a2, matchScheme);
-				} else
+				} 
+				else
 				{
 					Tag = Greedy(su, a1, a2, matchScheme);
 				}
@@ -138,12 +143,14 @@ public class RiskScoreProfiler extends ProfilerBase
 				if (CmdArgs.INSTANCE.getTranFunction() == gear.RegressionModel.LOGIT)
 				{// logit s
 					sc = Math.log(su.getScore());
-				} else
+				} 
+				else
 				{
 					sc = su.getScore();
 				}
 
-			} else
+			} 
+			else
 			{// this snp is not in the predictor panel;
 				continue;
 			}
@@ -164,7 +171,8 @@ public class RiskScoreProfiler extends ProfilerBase
 						if (Tag == ProfileConstant.MatchRefAllele)
 						{
 							riskProfile[j][k] += sc * Model(G1.getAdditiveScore(j, i));
-						} else if (Tag == ProfileConstant.MatchAltAllele)
+						} 
+						else if (Tag == ProfileConstant.MatchAltAllele)
 						{
 							riskProfile[j][k] += sc
 								* Model((2 - G1.getAdditiveScore(j, i)));
@@ -182,10 +190,12 @@ public class RiskScoreProfiler extends ProfilerBase
 				if (GCInd[i][j] == 0)
 				{
 					riskProfile[i][j] = 0;
-				} else if (CmdArgs.INSTANCE.addFlag || CmdArgs.INSTANCE.domFlag || CmdArgs.INSTANCE.recFlag)
+				} 
+				else if (CmdArgs.INSTANCE.addFlag || CmdArgs.INSTANCE.domFlag || CmdArgs.INSTANCE.recFlag)
 				{
 					riskProfile[i][j] /= GCInd[i][j];
-				} else
+				} 
+				else
 				{
 					riskProfile[i][j] /= 2 * GCInd[i][j];
 				}
@@ -246,7 +256,8 @@ public class RiskScoreProfiler extends ProfilerBase
 		if (CmdArgs.INSTANCE.greedyFlag)
 		{
 			matchScheme = new int[5];
-		} else
+		} 
+		else
 		{
 			matchScheme = new int[3];
 		}
@@ -296,7 +307,8 @@ public class RiskScoreProfiler extends ProfilerBase
 				if (!CmdArgs.INSTANCE.greedyFlag)
 				{
 					Tag = AsIs(su, a1, a2, matchScheme);
-				} else
+				} 
+				else
 				{
 					Tag = Greedy(su, a1, a2, matchScheme);
 				}
@@ -305,11 +317,13 @@ public class RiskScoreProfiler extends ProfilerBase
 				if (CmdArgs.INSTANCE.getTranFunction() == gear.RegressionModel.LOGIT)
 				{// logit s
 					sc = Math.log(su.getScore());
-				} else
+				} 
+				else
 				{
 					sc = su.getScore();
 				}
-			} else
+			} 
+			else
 			{// this snp is not in the predictor panel;
 				continue;
 			}
@@ -326,7 +340,8 @@ public class RiskScoreProfiler extends ProfilerBase
 					if (Tag == ProfileConstant.MatchRefAllele)
 					{
 						riskProfile[j] += sc * Model(G1.getAdditiveScore(j, i));
-					} else if (Tag == ProfileConstant.MatchAltAllele)
+					} 
+					else if (Tag == ProfileConstant.MatchAltAllele)
 					{
 						riskProfile[j] += sc
 									* Model(2 - G1.getAdditiveScore(j, i));
@@ -341,10 +356,12 @@ public class RiskScoreProfiler extends ProfilerBase
 			if (GCInd[i] == 0)
 			{
 				riskProfile[i] = 0;
-			} else if (CmdArgs.INSTANCE.addFlag || CmdArgs.INSTANCE.domFlag || CmdArgs.INSTANCE.recFlag)
+			} 
+			else if (CmdArgs.INSTANCE.addFlag || CmdArgs.INSTANCE.domFlag || CmdArgs.INSTANCE.recFlag)
 			{
 				riskProfile[i] /=  GCInd[i];
-			} else 
+			} 
+			else 
 			{
 				riskProfile[i] /= 2 * GCInd[i];
 			}
@@ -369,15 +386,18 @@ public class RiskScoreProfiler extends ProfilerBase
 		{
 			Logger.printUserLog("Additive model is used.");
 			sbim.append(".add");
-		} else if (CmdArgs.INSTANCE.domFlag) 
+		} 
+		else if (CmdArgs.INSTANCE.domFlag) 
 		{
 			Logger.printUserLog("Dominant model is used.");
 			sbim.append(".dom");
-		} else if (CmdArgs.INSTANCE.recFlag)
+		} 
+		else if (CmdArgs.INSTANCE.recFlag)
 		{
 			Logger.printUserLog("Recessive model is used.");
 			sbim.append(".rec");
-		} else {
+		} 
+		else {
 			Logger.printUserLog("Allelic model is used.");
 		}
 		sbim.append(".profile");
