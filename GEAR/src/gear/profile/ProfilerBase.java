@@ -43,7 +43,8 @@ public abstract class ProfilerBase
 			{
 				Logger.printUserError("Nothing is selected in '" + qScoreFile + "'.");
 				System.exit(1);
-			} else
+			}
+			else
 			{
 				Logger.printUserLog("Number of q-scores: " + QS.size());
 			}
@@ -69,7 +70,8 @@ public abstract class ProfilerBase
 			if (QR.isEmpty())
 			{
 				Logger.printUserError("Nothing is selected in '" + qScoreRangeFile + "'.");
-			} else
+			} 
+			else
 			{
 				Logger.printUserLog("Number of q-ranges: " + QR.size());
 			}
@@ -107,24 +109,29 @@ public abstract class ProfilerBase
 		if (CmdArgs.INSTANCE.addFlag) 
 		{
 			gs = g;
-		} else if (CmdArgs.INSTANCE.domFlag) 
+		} 
+		else if (CmdArgs.INSTANCE.domFlag) 
 		{
 			if ( g > 0) 
 			{
 				gs = 1;
-			} else 
+			} 
+			else 
 			{
 				gs = 0;
 			}
-		} else if (CmdArgs.INSTANCE.recFlag) {
+		} 
+		else if (CmdArgs.INSTANCE.recFlag) {
 			if (g > 1) 
 			{
 				gs = 1;
-			} else 
+			} 
+			else 
 			{
 				gs = 0;
 			}
-		} else 
+		} 
+		else 
 		{
 			gs = g;
 		}
@@ -137,11 +144,13 @@ public abstract class ProfilerBase
 		{
 			T = ProfileConstant.MatchAltAllele;
 			matchScheme[0]++;
-		} else if (su.getRefAllele().equals(Character.toString(a2)))
+		} 
+		else if (su.getRefAllele().equals(Character.toString(a2)))
 		{
 			T = ProfileConstant.MatchRefAllele;
 			matchScheme[1]++;
-		} else
+		} 
+		else
 		{
 			T = ProfileConstant.MatchNeither;
 			matchScheme[2]++;
@@ -158,24 +167,28 @@ public abstract class ProfilerBase
 			T = ProfileConstant.MatchAltAllele;
 			matchScheme[0]++;
 
-		} else if (su.getRefAllele().equals(Character.toString(ref)))
+		} 
+		else if (su.getRefAllele().equals(Character.toString(ref)))
 		{
 			T = ProfileConstant.MatchRefAllele;
 			matchScheme[1]++;
 
-		} else if (su.getRefAllele().equals(
+		} 
+		else if (su.getRefAllele().equals(
 				SNPMatch.Flip(Character.toString(alt))))
 		{
 			T = ProfileConstant.MatchAltAllele;
 			matchScheme[2]++;
 
-		} else if (su.getRefAllele().equals(
+		} 
+		else if (su.getRefAllele().equals(
 				SNPMatch.Flip(Character.toString(ref))))
 		{
 			T = ProfileConstant.MatchRefAllele;
 			matchScheme[3]++;
 
-		} else
+		} 
+		else
 		{
 			T = ProfileConstant.MatchNeither;
 			matchScheme[4]++;
