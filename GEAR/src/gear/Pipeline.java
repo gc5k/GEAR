@@ -97,7 +97,7 @@ public class Pipeline
 		}
 		else if (CmdArgs.INSTANCE.hasRealCheckOption())
 		{
-			if (CmdArgs.INSTANCE.getBFileArgs(0).isSet())
+			if (CmdArgs.INSTANCE.getBFileArgs(1).isSet())
 			{
 				RealCheck realcheck = new RealCheck();
 				realcheck.Check();
