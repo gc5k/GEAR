@@ -23,6 +23,7 @@ import gear.CmdArgs;
 import gear.util.FileProcessor;
 import gear.util.Logger;
 import gear.util.NewIt;
+import gear.util.pop.PopStat;
 import gear.util.structure.MAF;
 import sumstat.qc.rowqc.SumStatQC;
 
@@ -94,7 +95,8 @@ public class MakeGRM
 				{
 					grm.println((i + 1) + "\t" + (j + 1) + "\t" + s[0] + "\t"
 							+ s[1]);
-				} else
+				} 
+				else
 				{
 					try
 					{
@@ -117,7 +119,8 @@ public class MakeGRM
 			try
 			{
 				grmGZ.close();
-			} catch (IOException e)
+			} 
+			catch (IOException e)
 			{
 				Logger.handleException(e, " error in closing '" + sb.toString()
 						+ "'.");
@@ -158,7 +161,8 @@ public class MakeGRM
 			try
 			{
 				pw = new PrintWriter(sb.toString());
-			} catch (FileNotFoundException e)
+			} 
+			catch (FileNotFoundException e)
 			{
 				Logger.handleException(e, "Cannot create the script file '"
 						+ sb.toString() + "'.");
@@ -219,7 +223,8 @@ public class MakeGRM
 			try
 			{
 				rt.exec(cmd);
-			} catch (IOException e)
+			} 
+			catch (IOException e)
 			{
 				Logger.handleException(e, "Failed to execute command '" + cmd
 						+ "'.");
@@ -234,7 +239,8 @@ public class MakeGRM
 			Logger.printUserError("incorrect range for grm pairs : " + n0 + ","
 					+ n1);
 			System.exit(0);
-		} else
+		} 
+		else
 		{
 			Logger.printUserLog("generating grm scores for the pairs from "
 					+ n0 + " to " + n1);
@@ -249,7 +255,8 @@ public class MakeGRM
 		{
 			sb.append(".grm.txt");
 			grm = FileProcessor.CreatePrintStream(sb.toString());
-		} else if (CmdArgs.INSTANCE.makeGRMFlag)
+		} 
+		else if (CmdArgs.INSTANCE.makeGRMFlag)
 		{
 			sb.append(".grm.gz");
 			grmGZ = FileProcessor.ZipFielWriter(sb.toString());
@@ -277,7 +284,8 @@ public class MakeGRM
 				{
 					grmGZ.append((i + 1) + "\t" + (j + 1) + "\t" + s[0] + "\t"
 							+ s[1] + "\n");
-				} catch (IOException e)
+				} 
+				catch (IOException e)
 				{
 					Logger.handleException(e,
 							"error in writing '" + sb.toString() + "' for "
@@ -287,7 +295,8 @@ public class MakeGRM
 			if (j < i)
 			{
 				j++;
-			} else
+			} 
+			else
 			{
 				i++;
 				j = 0;
@@ -303,7 +312,8 @@ public class MakeGRM
 			try
 			{
 				grmGZ.close();
-			} catch (IOException e)
+			} 
+			catch (IOException e)
 			{
 				Logger.handleException(e, " error in closing '" + sb.toString()
 						+ "'.");
@@ -346,13 +356,15 @@ public class MakeGRM
 				if (m < maf_threshold)
 				{// ignor too little maf
 					continue;
-				} else
+				} 
+				else
 				{
 					s[0]++;
 					if (m < 0.5)
 					{
 						s[1] += (g1 - 2 * m) * (g2 - 2 * m) / (2 * m * (1 - m));
-					} else
+					} 
+					else
 					{
 						s[1] += ((2 - g1) - 2 * (1 - m))
 								* ((2 - g2) - 2 * (1 - m)) / (2 * m * (1 - m));
@@ -377,7 +389,7 @@ public class MakeGRM
 
 		} else
 		{
-			calAlleleFrequency();
+			allelefreq = PopStat.calAlleleFrequency(G, numMarker);
 		}
 	}
 
@@ -400,7 +412,8 @@ public class MakeGRM
 			Logger.printUserLog("Read " + idx + " SNPs in '"
 					+ CmdArgs.INSTANCE.ref_freq + "'.\n");
 
-		} catch (IOException e)
+		} 
+		catch (IOException e)
 		{
 			Logger.handleException(e,
 					"An exception occurred when reading the maf file '"
@@ -428,13 +441,15 @@ public class MakeGRM
 				{
 					allelefreq[i][1] = f;
 				}
-			} else
+			} 
+			else
 			{
 				if ((1 - allelefreq[i][1]) < CmdArgs.INSTANCE.maf_range[0]
 						|| (1 - allelefreq[i][1]) > CmdArgs.INSTANCE.maf_range[1])
 				{
 					allelefreq[i][1] = 0;
-				} else
+				} 
+				else
 				{
 					allelefreq[i][1] = f;
 				}
@@ -443,54 +458,6 @@ public class MakeGRM
 			c++;
 		}
 		Logger.printUserLog("Got " + c + " matched reference alleles.\n");
-	}
-
-	private void calAlleleFrequency()
-	{
-		int[][] g = G.getG();
-		for (int i = 0; i < g.length; i++)
-		{
-			for (int j = 0; j < numMarker; j++)
-			{
-				int[] c = G.getBiAlleleGenotype(i, j);
-				allelefreq[j][c[0]]++;
-				allelefreq[j][c[1]]++;
-			}
-		}
-
-		for (int i = 0; i < numMarker; i++)
-		{
-			double wa = allelefreq[i][0] + allelefreq[i][1];
-			double a = allelefreq[i][0] + allelefreq[i][1] + allelefreq[i][2];
-			if (wa > 0)
-			{
-				for (int j = 0; j < allelefreq[i].length - 1; j++)
-				{
-					allelefreq[i][j] /= wa;
-				}
-				allelefreq[i][2] /= a;
-			} else
-			{
-				allelefreq[i][2] = 1;
-			}
-			if (allelefreq[i][1] <= 0.5)
-			{
-				if (allelefreq[i][1] < CmdArgs.INSTANCE.maf_range[0]
-						|| allelefreq[i][1] > CmdArgs.INSTANCE.maf_range[1])
-				{
-					allelefreq[i][1] = 0;
-				}
-			} else
-			{
-				if ((1 - allelefreq[i][1]) < CmdArgs.INSTANCE.maf_range[0]
-						|| (1 - allelefreq[i][1]) > CmdArgs.INSTANCE.maf_range[1])
-				{
-					allelefreq[i][1] = 0;
-				}
-			}
-		}
-
-		Logger.printUserLog("Calculated the reference allele frequency.");
 	}
 
 }
