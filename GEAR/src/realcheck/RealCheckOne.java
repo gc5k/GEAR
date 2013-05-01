@@ -40,7 +40,8 @@ public class RealCheckOne
 					.getBed(), CmdArgs.INSTANCE.getBFileArgs(0)
 					.getBim(), CmdArgs.INSTANCE.getBFileArgs(0)
 					.getFam());
-		} else
+		} 
+		else
 		{
 			Logger.printUserError("--bfile is not set.");
 			System.exit(1);
@@ -68,27 +69,35 @@ public class RealCheckOne
 		{
 			Logger.printUserLog("A similarity matrix is generated with real-check SNPs.");
 			getSelectedMarker();
-		} else
+		} 
+		else
 		{
 			getRandomMarker();
 		}
 
-		ps.print("file1.famid1 file1.id1 file1.famid2 file1.id2 score nmiss/loci\n");
+		ps.print("FID1 ID1 FID2 ID2 Match ExpMatch Score nmiss/loci\n");
 		for (int i = 0; i < G1.getGRow(); i++)
 		{
 			for (int j = i; j < G1.getGRow(); j++)
 			{
 				double[] s = similarityScore(i, j);
-				if (s[0] > CmdArgs.INSTANCE.getRealCheckParameter()
+				double ES = 0;
+				double OS = 0;
+				if (s[1] > 0)
+				{
+					ES = s[2]/s[1];
+					OS = (s[0] - s[2]) / (s[1] - s[2]);
+				}
+				if (OS > CmdArgs.INSTANCE.getRealCheckParameter()
 						.getThresholdLower()
-						&& s[0] <= CmdArgs.INSTANCE.getRealCheckParameter()
+						&& OS <= CmdArgs.INSTANCE.getRealCheckParameter()
 								.getThresholdUpper())
 				{
 					PersonIndex ps1 = PersonTable1.get(i);
 					PersonIndex ps2 = PersonTable1.get(j);
 					ps.print(ps1.getFamilyID() + " " + ps1.getIndividualID()
 							+ " " + ps2.getFamilyID() + " "
-							+ ps2.getIndividualID() + " " + s[0] + " " + s[1]
+							+ ps2.getIndividualID() + " " + s[0] + " " + (ES * s[1]) + " " + OS + " " + s[1]
 							+ "/" + markerIdx.length + "\n");
 				}
 			}
@@ -121,11 +130,6 @@ public class RealCheckOne
 			s[1]++;
 			double p = allelefreq[idx][1];
 			s[2] += p * p * p * p + 4 * p * p * (1-p) * (1-p) + (1-p) * (1-p) * (1-p) * (1-p);
-		}
-
-		if (s[1] > 0)
-		{
-			s[0] = (s[0] - s[2]) / (s[1] - s[2]);
 		}
 
 		return s;

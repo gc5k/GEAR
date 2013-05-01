@@ -524,7 +524,7 @@ public enum CmdArgs
 
 		private final String cmd_threshold_lower = "realcheck_threshold_lower";
 		private final String cmd_threshold_lower_long = "realcheck-threshold-lower";
-		private double thresholdLower = 0;
+		private double thresholdLower = -1;
 
 		private final String cmd_marker_number = "realcheck_marker_number";
 		private final String cmd_marker_number_long = "realcheck-marker-number";
