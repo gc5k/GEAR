@@ -95,6 +95,9 @@ public class RealCheckOne
 		}
 		ps.close();
 
+		long N = G1.getGRow() * G1.getGRow();
+		Logger.printUserLog("In total " + N + " individual pairs were compared.");
+		Logger.printUserLog("The result has been saved into '" + sb.toString() + "'.");
 	}
 
 	private double[] similarityScore(int idx1, int idx2)
