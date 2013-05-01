@@ -95,7 +95,7 @@ public class RealCheckOne
 		}
 		ps.close();
 
-		long N = G1.getGRow() * G1.getGRow();
+		long N = G1.getGRow() * (G1.getGRow() + 1)/2;
 		Logger.printUserLog("In total " + N + " individual pairs were compared.");
 		Logger.printUserLog("The result has been saved into '" + sb.toString() + "'.");
 	}
