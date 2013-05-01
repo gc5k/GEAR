@@ -16,11 +16,13 @@ import family.qc.rowqc.SampleFilter;
 import gear.CmdArgs;
 import gear.util.FileProcessor;
 import gear.util.Logger;
+import gear.util.pop.PopStat;
 
 public class RealCheckOne
 {
 	private GenotypeMatrix G1;
 
+	private double[][] allelefreq;
 	private int[] markerIdx;
 
 	private ArrayList<SNP> snpList;
@@ -54,6 +56,8 @@ public class RealCheckOne
 
 	public void Check()
 	{
+
+		allelefreq = PopStat.calAlleleFrequency(G1, snpList.size());
 
 		StringBuffer sb = new StringBuffer();
 		sb.append(CmdArgs.INSTANCE.out);
@@ -95,7 +99,7 @@ public class RealCheckOne
 
 	private double[] similarityScore(int idx1, int idx2)
 	{
-		double[] s = { 0, 0 };
+		double[] s = { 0, 0, 0};
 
 		for (int i = 0; i < markerIdx.length; i++)
 		{
@@ -112,11 +116,13 @@ public class RealCheckOne
 				s[0]++;
 			}
 			s[1]++;
+			double p = allelefreq[idx][1];
+			s[2] += p * p * p * p + 4 * p * p * (1-p) * (1-p) + (1-p) * (1-p) * (1-p) * (1-p);
 		}
 
 		if (s[1] > 0)
 		{
-			s[0] = s[0] / s[1];
+			s[0] = (s[0] - s[2]) / (s[1] - s[2]);
 		}
 
 		return s;
@@ -157,7 +163,8 @@ public class RealCheckOne
 				Logger.printUserLog("Real-check marker number is reduced to "
 						+ nMarker + ".");
 				mn = nMarker;
-			} else
+			} 
+			else
 			{
 				mn = CmdArgs.INSTANCE.getRealCheckParameter()
 						.getMarkerNumber();
@@ -168,7 +175,8 @@ public class RealCheckOne
 
 			markerIdx = rd.nextPermutation(markerIdx.length, mn);
 			Arrays.sort(markerIdx);
-		} else
+		} 
+		else
 		{
 			markerIdx = new int[snpList.size()];
 			for (int i = 0; i < markerIdx.length; i++)
