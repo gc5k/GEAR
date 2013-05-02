@@ -67,7 +67,6 @@ public class RealCheckOne
 
 		if (CmdArgs.INSTANCE.getRealCheckParameter().getSnps() != null)
 		{
-			Logger.printUserLog("A similarity matrix is generated with real-check SNPs.");
 			getSelectedMarker();
 		} 
 		else
@@ -75,6 +74,14 @@ public class RealCheckOne
 			getRandomMarker();
 		}
 
+		StringBuffer sb1 = new StringBuffer();
+		sb1.append(CmdArgs.INSTANCE.out);
+		sb1.append(".realsnp");
+		Logger.printUserLog(markerIdx.length + " realcheck SNPs have been saved into '" + sb1.toString() + "'.");
+
+		double es = 0;
+		double ss = 0;
+		int n = 0;
 		ps.print("FID1 ID1 FID2 ID2 Match ExpMatch Score nmiss/loci\n");
 		for (int i = 0; i < G1.getGRow(); i++)
 		{
@@ -100,13 +107,36 @@ public class RealCheckOne
 							+ ps2.getIndividualID() + " " + s[0] + " " + (ES * s[1]) + " " + OS + " " + s[1]
 							+ "/" + markerIdx.length + "\n");
 				}
+				if(i != j) 
+				{
+					es += OS;
+					ss += OS * OS;
+					n++;
+				}
 			}
 		}
 		ps.close();
 
+		double E = 0;
+		double v = 0;
+		if (n > 0 ) 
+		{
+			E = es/n;
+			v = Math.sqrt(ss/n - E * E);
+		}
+		else 
+		{
+			E = 0;
+			v = 0;
+		}
+		
 		long N = G1.getGRow() * (G1.getGRow() + 1)/2;
-		Logger.printUserLog("In total " + N + " individual pairs were compared.");
+		Logger.printUserLog("In total " + N + " individual pairs were compared.\n");
+		Logger.printUserLog("Mean is: " + E);
+		Logger.printUserLog("Standard deviation is: " + v);
+		Logger.printUserLog("Mean and SD were calculated with the exclusion of the pair of the individual.\n");
 		Logger.printUserLog("The result has been saved into '" + sb.toString() + "'.");
+
 	}
 
 	private double[] similarityScore(int idx1, int idx2)
