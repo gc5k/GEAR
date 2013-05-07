@@ -29,7 +29,7 @@ import sumstat.qc.rowqc.SumStatQC;
 
 public class MakeGRM
 {
-	private double maf_threshold = 1e-7;
+	private double maf_threshold = 1e-5;
 
 	private GenotypeMatrix G;
 	private int numMarker;
@@ -102,7 +102,8 @@ public class MakeGRM
 					{
 						grmGZ.append((i + 1) + "\t" + (j + 1) + "\t" + s[0]
 								+ "\t" + s[1] + "\n");
-					} catch (IOException e)
+					} 
+					catch (IOException e)
 					{
 						Logger.handleException(e,
 								"error in writing '" + sb.toString() + "' for "
@@ -114,7 +115,8 @@ public class MakeGRM
 		if (CmdArgs.INSTANCE.makeGRMTXTFlag)
 		{
 			grm.close();
-		} else
+		} 
+		else
 		{
 			try
 			{
@@ -169,10 +171,11 @@ public class MakeGRM
 			}
 
 			pw.println("#$ -cwd");
+			int G = Integer.parseInt(CmdArgs.INSTANCE.getHpcArgs().getRam().substring(0, CmdArgs.INSTANCE.getHpcArgs().getRam().length()-1)) + 2;
 			pw.println("#$ -l vf="
-					+ CmdArgs.INSTANCE.getHpcArgs().getRam());
+					+ G + "G");
 			pw.println("#$ -l h_vmem="
-					+ CmdArgs.INSTANCE.getHpcArgs().getRam());
+					+ G + "G");
 
 			StringBuilder nb = new StringBuilder();
 			nb.append(CmdArgs.INSTANCE.getHpcArgs().getName() + "." + P);
@@ -182,7 +185,7 @@ public class MakeGRM
 					+ CmdArgs.INSTANCE.getHpcArgs().getEmail());
 
 			pw.print("java -jar -Xmx"
-					+ CmdArgs.INSTANCE.getHpcArgs().getRam());
+					+ CmdArgs.INSTANCE.getHpcArgs().getRam() + " ");
 			pw.print(HPC.class.getProtectionDomain().getCodeSource()
 					.getLocation().getPath()
 					+ " ");
@@ -207,7 +210,8 @@ public class MakeGRM
 			{
 				pw.print("--grm-range " + (size * (P - 1) + 1) + ","
 						+ (size * P) + " ");
-			} else
+			} 
+			else
 			{
 				pw.print("--grm-range " + (size * (P - 1) + 1) + "," + T + " ");
 			}
@@ -278,7 +282,8 @@ public class MakeGRM
 			{
 				grm.println((i + 1) + "\t" + (j + 1) + "\t" + s[0] + "\t"
 						+ s[1]);
-			} else
+			} 
+			else
 			{
 				try
 				{
@@ -307,7 +312,8 @@ public class MakeGRM
 		if (CmdArgs.INSTANCE.makeGRMTXTFlag)
 		{
 			grm.close();
-		} else
+		} 
+		else
 		{
 			try
 			{
@@ -344,6 +350,10 @@ public class MakeGRM
 		for (int i = 0; i < allelefreq.length; i++)
 		{
 
+			if(allelefreq[i][1] == Double.NaN)
+			{
+				continue;
+			}
 			int g1 = G.getAdditiveScore(idx1, i);
 			int g2 = G.getAdditiveScore(idx2, i);
 			double m = allelefreq[i][1];
@@ -351,31 +361,30 @@ public class MakeGRM
 					|| g2 == BPerson.MissingGenotypeCode)
 			{
 				continue;
-			} else
+			}
+			else
 			{
-				if (m < maf_threshold)
+				if (m < maf_threshold || m > (1-maf_threshold))
 				{// ignor too little maf
 					continue;
-				} 
+				}
 				else
 				{
 					s[0]++;
-					if (m < 0.5)
-					{
-						s[1] += (g1 - 2 * m) * (g2 - 2 * m) / (2 * m * (1 - m));
-					} 
-					else
-					{
-						s[1] += ((2 - g1) - 2 * (1 - m))
-								* ((2 - g2) - 2 * (1 - m)) / (2 * m * (1 - m));
-					}
+					s[1] += (g1 - 2 * m) * (g2 - 2 * m) / (2 * m * (1 - m));
 				}
 			}
 		}
 
 		if (s[0] > 0)
 		{
+			System.out.println(s[0] + " " + s[1]);
 			s[1] /= s[0];
+		}
+		else 
+		{
+			s[0] = 0;
+			s[1] = 0;
 		}
 
 		return s;
@@ -387,7 +396,8 @@ public class MakeGRM
 		{
 			getRefFreq();
 
-		} else
+		} 
+		else
 		{
 			allelefreq = PopStat.calAlleleFrequency(G, numMarker);
 		}
@@ -437,7 +447,8 @@ public class MakeGRM
 						|| allelefreq[i][1] > CmdArgs.INSTANCE.maf_range[1])
 				{
 					allelefreq[i][1] = 0;
-				} else
+				} 
+				else
 				{
 					allelefreq[i][1] = f;
 				}

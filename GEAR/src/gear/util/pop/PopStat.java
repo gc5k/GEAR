@@ -29,9 +29,11 @@ public class PopStat
 					allelefreq[i][j] /= wa;
 				}
 				allelefreq[i][2] /= a;
-			} 
+			}
 			else
 			{
+				allelefreq[i][0] = Double.NaN;
+				allelefreq[i][0] = Double.NaN;
 				allelefreq[i][2] = 1;
 			}
 			if (allelefreq[i][1] <= 0.5)

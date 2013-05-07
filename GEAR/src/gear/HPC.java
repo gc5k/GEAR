@@ -26,7 +26,11 @@ public class HPC
 		}
 
 		pw.println("#$ -cwd");
-		pw.println("#$ -l vf=" + CmdArgs.INSTANCE.getHpcArgs().getRam());
+
+		int G = Integer.parseInt(CmdArgs.INSTANCE.getHpcArgs().getRam().substring(0, CmdArgs.INSTANCE.getHpcArgs().getRam().length()-1)) + 2;
+
+		pw.println("#$ -l vf=" + G + "G");
+		pw.println("#$ -l h_vmem=" + G + "G");
 		pw.println("#$ -N " + CmdArgs.INSTANCE.getHpcArgs().getName());
 		pw.println("#$ -m eas");
 		pw.println("#$ -M " + CmdArgs.INSTANCE.getHpcArgs().getEmail());
