@@ -1,5 +1,8 @@
 package sumstat;
 
+import java.util.logging.Level;
+import java.io.FileNotFoundException;
+import java.io.PrintWriter;
 import java.text.DecimalFormat;
 import java.text.NumberFormat;
 
@@ -37,13 +40,15 @@ public class FrequencyCalculator
 			pp = new PLINKParser(CmdArgs.INSTANCE.getFileArgs()
 					.getPed(), CmdArgs.INSTANCE.getFileArgs()
 					.getMap());
-		} else if (CmdArgs.INSTANCE.getBFileArgs(0).isSet())
+		} 
+		else if (CmdArgs.INSTANCE.getBFileArgs(0).isSet())
 		{
 			pp = new PLINKBinaryParser(CmdArgs.INSTANCE.getBFileArgs(0)
 					.getBed(), CmdArgs.INSTANCE.getBFileArgs(0)
 					.getBim(), CmdArgs.INSTANCE.getBFileArgs(0)
 					.getFam());
-		} else
+		} 
+		else
 		{
 			Logger.printUserError("No input files.");
 			System.exit(1);
@@ -126,16 +131,24 @@ public class FrequencyCalculator
 					genotypefreq[i][j] /= wb;
 				}
 				genotypefreq[i][3] /= b;
-			} else
+			}
+			else
 			{
 				genotypefreq[i][3] = 1;
 			}
 
-			FastFisherExactTest ff = new FastFisherExactTest(N[i][3], N[i][1],
+			if (N[i][3] != 0) 
+			{
+				FastFisherExactTest ff = new FastFisherExactTest(N[i][3], N[i][1],
 					N[i][0]);
-			hw[i][0] = ff.HDP();
-			hw[i][1] = chiHWE(N[i][3], N[i][1], N[i][0]);
-
+				hw[i][0] = ff.HDP();
+				hw[i][1] = chiHWE(N[i][3], N[i][1], N[i][0]);
+			}
+			else 
+			{
+				hw[i][0] = Double.NaN;
+				hw[i][1] = Double.NaN;
+			}
 		}
 	}
 
@@ -154,15 +167,26 @@ public class FrequencyCalculator
 
 		ChiSquareTestImpl chi = new ChiSquareTestImpl();
 		double p = 0;
+		for (int i = 0; i < E.length; i++) 
+		{
+			if (E[i] < 1e-8) 
+			{
+				p = Double.NaN;
+				return p;
+			}
+		}
+
 		try
 		{
 			p = chi.chiSquareTest(E, O);
-		} catch (IllegalArgumentException e)
+		}
+		catch (IllegalArgumentException e)
 		{
-			e.printStackTrace();
-		} catch (MathException e)
+			Logger.getDevLogger().log(Level.SEVERE, "Illegal Argument Exception in Chi-sq test for Hardy-Weinburg proportion", e);
+		} 
+		catch (MathException e)
 		{
-			e.printStackTrace();
+			Logger.getDevLogger().log(Level.SEVERE, "Math exception in Chi-sq test for Hardy-Weinburg proportion", e);
 		}
 		return p;
 	}
@@ -170,6 +194,67 @@ public class FrequencyCalculator
 	public double[][] getAlleleFrequency()
 	{
 		return allelefreq;
+	}
+
+	public void PrintOut() 
+	{
+		NumberFormat fmt = new DecimalFormat(".###E0");
+
+		StringBuffer sf = new StringBuffer(CmdArgs.INSTANCE.out);
+		if (CmdArgs.INSTANCE.freqFlag)
+		{
+			sf.append(".frq");
+		}
+		else
+		{
+			sf.append(".geno");
+		}
+		
+		PrintWriter pw = null;
+		try
+		{
+			pw = new PrintWriter(sf.toString());
+		} 
+		catch (FileNotFoundException e)
+		{
+			Logger.handleException(e, "Cannot create the script file '"
+					+ sf.toString() + "'.");
+		}
+
+		if (CmdArgs.INSTANCE.freqFlag)
+		{
+			pw.append("chr\tsnp\tA1\tA2\tfrq(A1)\tfrq(A2)\tMiss\tNChr");
+		}
+		else
+		{
+			sf.append(".geno");
+			pw.append("chr\tsnp\tA1\tA2\tfrq(A1A1)\tfrq(A1A2)\tfrq(A2A2)\tMiss\tNChr\tp(Fisher)");
+		}
+		
+		pw.append(System.getProperty("line.separator"));
+
+		for (int i = 0; i < allelefreq.length; i++)
+		{
+			SNP snp = snpMap.getSNP(i);
+			pw.append(snp.getChromosome() + "\t" + snp.getName() + "\t"
+					+ snp.getFirstAllele() + "\t" + snp.getSecAllele() + "\t");
+			if (CmdArgs.INSTANCE.freqFlag)
+			{
+				pw.append(fmt.format(allelefreq[i][0]) + "\t"
+						+ fmt.format(allelefreq[i][1]) + "\t"
+						+ fmt.format(allelefreq[i][2]) + "\t" + N[i][3] * 2);
+			}
+			else if (CmdArgs.INSTANCE.genoFreqFlag)
+			{
+				pw.append(fmt.format(genotypefreq[i][0]) + "\t"
+						+ fmt.format(genotypefreq[i][1]) + "\t"
+						+ fmt.format(genotypefreq[i][2]) + "\t" + N[i][3] * 2
+						+ "\t" + hw[i][0]);
+			}
+			pw.append(System.getProperty("line.separator"));
+		}
+
+		pw.close();
 	}
 
 	public String toString()
@@ -180,7 +265,8 @@ public class FrequencyCalculator
 		if (CmdArgs.INSTANCE.freqFlag)
 		{
 			sb.append("chr\tsnp\tA1\tA2\tfrq(A1)\tfrq(A2)\tMiss\tNChr");
-		} else
+		} 
+		else
 		{
 			sb.append("chr\tsnp\tA1\tA2\tfrq(A1A1)\tfrq(A1A2)\tfrq(A2A2)\tMiss\tNChr\tp(Fisher)");
 		}
@@ -195,7 +281,8 @@ public class FrequencyCalculator
 				sb.append(fmt.format(allelefreq[i][0]) + "\t"
 						+ fmt.format(allelefreq[i][1]) + "\t"
 						+ fmt.format(allelefreq[i][2]) + "\t" + N[i][3] * 2);
-			} else if (CmdArgs.INSTANCE.genoFreqFlag)
+			} 
+			else if (CmdArgs.INSTANCE.genoFreqFlag)
 			{
 				sb.append(fmt.format(genotypefreq[i][0]) + "\t"
 						+ fmt.format(genotypefreq[i][1]) + "\t"

@@ -1,5 +1,6 @@
 package gear.util.structure;
 
+import gear.CmdArgs;
 import gear.util.Logger;
 
 public class MAF
@@ -21,7 +22,14 @@ public class MAF
 			SNP = s[1];
 			A1 = s[2].charAt(0);
 			A2 = s[3].charAt(0);
-			maf = Double.parseDouble(s[4]);
+			if(CmdArgs.INSTANCE.isNA(s[4])) 
+			{
+				maf = Double.NaN;
+			}
+			else 
+			{
+				maf = Double.parseDouble(s[4]);
+			}
 			NChr = Double.parseDouble(s[5]);
 		} else
 		{

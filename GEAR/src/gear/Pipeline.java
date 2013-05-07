@@ -45,7 +45,7 @@ public class Pipeline
 		{
 			if (args[i].startsWith("--"))
 			{
-				if (i > 1)
+				if (i >= 1)
 				{
 					Logger.printUserLog(sb.toString());
 				}
@@ -140,13 +140,13 @@ public class Pipeline
 			{
 				FrequencyCalculator fc = new FrequencyCalculator();
 				fc.CalculateAlleleFrequency();
-				Logger.printUserLog(fc.toString());
+				fc.PrintOut();
 
 			} else if (CmdArgs.INSTANCE.genoFreqFlag)
 			{
 				FrequencyCalculator fc = new FrequencyCalculator();
 				fc.CalculateAlleleFrequency();
-				Logger.printUserLog(fc.toString());
+				fc.PrintOut();
 
 			} else if (CmdArgs.INSTANCE.fstFlag)
 			{
