@@ -32,27 +32,16 @@ public class Logger
 
 	public static void setLogFiles(String namePrefix)
 	{
+		logFileNamePrefix = namePrefix;
+		
 		String userLogFileName = namePrefix + ".log";
 		try
 		{
 			userLogWriter = new PrintWriter(userLogFileName);
-		} catch (FileNotFoundException e)
-		{
-			handleException(e, "Unable to create the log file '"
-					+ userLogFileName + "'");
 		}
-
-		String devLogFileName = namePrefix + "_dev.log";
-		try
+		catch (FileNotFoundException e)
 		{
-			java.util.logging.FileHandler devLogHandler = new java.util.logging.FileHandler(
-					devLogFileName);
-			devLogHandler.setFormatter(new java.util.logging.SimpleFormatter());
-			devLogger.addHandler(devLogHandler);
-		} catch (IOException e)
-		{
-			handleException(e, "Unable to create the log file '"
-					+ devLogFileName + "'");
+			handleException(e, "Unable to create the log file '" + userLogFileName + "'");
 		}
 	}
 
@@ -76,15 +65,39 @@ public class Logger
 
 	public static java.util.logging.Logger getDevLogger()
 	{
+		initDevLogger();
 		return devLogger;
 	}
 
 	public static void handleException(Exception e, String msg)
 	{
+		initDevLogger();
 		printUserError(msg);
 		printUserError("Exception Message: " + e.getMessage());
 		devLogger.log(Level.SEVERE, msg, e);
 		System.exit(1);
 	}
+	
+	public static void initDevLogger()
+	{
+		if (!isDevLoggerInited)
+		{
+			String devLogFileName = logFileNamePrefix + "_dev.log";
+			try
+			{
+				java.util.logging.FileHandler devLogHandler =
+						new java.util.logging.FileHandler(devLogFileName);
+				devLogHandler.setFormatter(new java.util.logging.SimpleFormatter());
+				devLogger.addHandler(devLogHandler);
+			}
+			catch (IOException e)
+			{
+				handleException(e, "Unable to create the log file '" + devLogFileName + "'");
+			}
+			isDevLoggerInited = true;	
+		}
+	}
 
+	private static String logFileNamePrefix;
+	private static boolean isDevLoggerInited = false;
 }
