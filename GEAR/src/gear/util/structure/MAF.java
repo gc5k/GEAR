@@ -1,6 +1,6 @@
 package gear.util.structure;
 
-import gear.CmdArgs;
+import gear.ConstValues;
 import gear.util.Logger;
 
 public class MAF
@@ -22,16 +22,10 @@ public class MAF
 			SNP = s[1];
 			A1 = s[2].charAt(0);
 			A2 = s[3].charAt(0);
-			if(CmdArgs.INSTANCE.isNA(s[4])) 
-			{
-				maf = Double.NaN;
-			}
-			else 
-			{
-				maf = Double.parseDouble(s[4]);
-			}
+			maf = ConstValues.isNA(s[4]) ? Double.NaN : Double.parseDouble(s[4]);
 			NChr = Double.parseDouble(s[5]);
-		} else
+		}
+		else
 		{
 			Logger.printUserError("MAF informtion incorrect at line " + (idx)
 					+ ", expect 6 columns, but read " + s.length);

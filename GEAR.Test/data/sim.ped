@@ -1,0 +1,6 @@
+fam0 per0 0 0 1 2 D D d D d D D d 0 0
+fam0 per1 0 0 2 2 d d D D D D D d D D
+fam0 per2 per0 per1 2 2 d d D D d D D d d D
+per3 per3 0 0 2 2 D d D D d D d d d D
+per4 per4 0 0 2 1 D D D D d D D d D D
+per5 per5 0 0 2 1 d d d D d D D d D D

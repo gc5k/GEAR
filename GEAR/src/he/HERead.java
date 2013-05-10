@@ -6,6 +6,7 @@ import java.util.Arrays;
 import java.util.HashMap;
 
 import gear.CmdArgs;
+import gear.ConstValues;
 import gear.util.FileProcessor;
 import gear.util.Logger;
 
@@ -104,7 +105,7 @@ public class HERead
 					y[ii][0] = 1;
 					for (int j = 0; j < mpheno.length; j++)
 					{
-						if (CmdArgs.INSTANCE.isNA(s[1 + mpheno[j]]))
+						if (ConstValues.isNA(s[1 + mpheno[j]]))
 						{
 							f = false;
 							break;

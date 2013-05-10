@@ -18,10 +18,10 @@ import family.plink.PLINKParser;
 import family.popstat.GenotypeMatrix;
 import family.qc.rowqc.SampleFilter;
 import gear.CmdArgs;
+import gear.ConstValues;
 import gear.util.FileProcessor;
 import gear.util.Logger;
 import gear.util.NewIt;
-import gear.util.TextHelper;
 
 public class RealCheck
 {
@@ -299,7 +299,7 @@ public class RealCheck
 		{
 			while ((line = reader.readLine()) != null)
 			{
-				String[] l = line.split(TextHelper.WHITESPACE_DELIMITER);
+				String[] l = line.split(ConstValues.WHITESPACE_DELIMITER);
 				for (int i = 0; i < l.length; i++)
 				{
 					selectedSNP.add(l[i]);

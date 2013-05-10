@@ -15,7 +15,7 @@ public class SNP implements Comparable<SNP>
 	private float distance = 0;
 	private int position = 0;
 	private String minor;
-	private char[] snp;
+	private char[] alleles;
 	private double[] freq;
 
 	public SNP(String n)
@@ -30,16 +30,20 @@ public class SNP implements Comparable<SNP>
 		distance = d;
 		position = p;
 	}
+	
+	public SNP(String name, char allele1, char allele2)
+	{
+		this.name = name;
+		this.alleles = new char[] { allele1, allele2 };
+	}
 
-	public SNP(String c, String n, float d, int p, char a1, char a2)
+	public SNP(String c, String n, float d, int p, char allele1, char allele2)
 	{
 		chr = c;
 		name = n;
 		distance = d;
 		position = p;
-		snp = new char[2];
-		snp[0] = a1;
-		snp[1] = a2;
+		alleles = new char[] { allele1, allele2 };
 	}
 
 	/**
@@ -82,8 +86,8 @@ public class SNP implements Comparable<SNP>
 					+ ".");
 			System.exit(1);
 		}
-		snp = new char[2];
-		System.arraycopy(a, 0, snp, 0, 2);
+		alleles = new char[2];
+		System.arraycopy(a, 0, alleles, 0, 2);
 
 		this.freq = new double[freq.length];
 		System.arraycopy(freq, 0, this.freq, 0, freq.length);
@@ -97,8 +101,8 @@ public class SNP implements Comparable<SNP>
 
 	public void setAllelePolymorphism(char[] a)
 	{
-		snp = new char[2];
-		System.arraycopy(a, 0, snp, 0, 2);
+		alleles = new char[2];
+		System.arraycopy(a, 0, alleles, 0, 2);
 	}
 
 	public String getPolymorphism(String g)
@@ -107,26 +111,26 @@ public class SNP implements Comparable<SNP>
 		switch (Integer.parseInt(g))
 		{
 		case 0:
-			sb.append(snp[0]);
-			sb.append(snp[0]);
+			sb.append(alleles[0]);
+			sb.append(alleles[0]);
 			break;
 		case 1:
-			sb.append(snp[0]);
-			sb.append(snp[1]);
+			sb.append(alleles[0]);
+			sb.append(alleles[1]);
 			break;
 		case 2:
-			sb.append(snp[1]);
-			sb.append(snp[0]);
+			sb.append(alleles[1]);
+			sb.append(alleles[0]);
 		case 3:
-			sb.append(snp[1]);
-			sb.append(snp[1]);
+			sb.append(alleles[1]);
+			sb.append(alleles[1]);
 		}
 		return sb.toString();
 	}
 
 	public char[] getSNP()
 	{
-		return snp;
+		return alleles;
 	}
 
 	public String toString()
@@ -149,10 +153,10 @@ public class SNP implements Comparable<SNP>
 		}
 		if (d0 < d1)
 		{
-			sb.append(snp[0] + ", " + fmt.format(d0 / (d0 + d1)) + ", ");
+			sb.append(alleles[0] + ", " + fmt.format(d0 / (d0 + d1)) + ", ");
 		} else
 		{
-			sb.append(snp[1] + ", " + fmt.format(d1 / (d0 + d1)) + ", ");
+			sb.append(alleles[1] + ", " + fmt.format(d1 / (d0 + d1)) + ", ");
 		}
 		if (minor != null)
 		{
@@ -163,12 +167,12 @@ public class SNP implements Comparable<SNP>
 
 	public char getFirstAllele()
 	{
-		return snp[0];
+		return alleles[0];
 	}
 
 	public char getSecAllele()
 	{
-		return snp[1];
+		return alleles[1];
 	}
 
 	@Override

@@ -13,10 +13,10 @@ import family.pedigree.file.PedigreeFile;
 import family.pedigree.genotype.BFamilyStruct;
 import family.pedigree.genotype.BPerson;
 import gear.CmdArgs;
+import gear.ConstValues;
 import gear.util.FileProcessor;
 import gear.util.Logger;
 import gear.util.NewIt;
-import gear.util.TextHelper;
 
 /**
  * 
@@ -225,7 +225,7 @@ public class SampleFilter
 		{
 			while ((line = reader.readLine()) != null)
 			{
-				String[] l = line.split(TextHelper.WHITESPACE_DELIMITER);
+				String[] l = line.split(ConstValues.WHITESPACE_DELIMITER);
 				if (l.length < 2)
 					continue;
 				famList.add(l[0]);
@@ -253,7 +253,7 @@ public class SampleFilter
 		{
 			while ((line = reader.readLine()) != null)
 			{
-				String[] l = line.split(TextHelper.WHITESPACE_DELIMITER);
+				String[] l = line.split(ConstValues.WHITESPACE_DELIMITER);
 				if (l.length < 2)
 					continue;
 				famList.add(l[0]);

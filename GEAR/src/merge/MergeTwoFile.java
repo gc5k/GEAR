@@ -137,7 +137,7 @@ public class MergeTwoFile
 				if (a1_1 == a2_1)
 				{// scheme1
 					scheme = 1;
-					if (SNPMatch.Confusion(a1_1, a1_2))
+					if (SNPMatch.isAmbiguous(a1_1, a1_2))
 					{
 						ATGCLocus = true;
 						if (ref1 < 0.5 && ref2 < 0.5)
@@ -214,7 +214,7 @@ public class MergeTwoFile
 				} else if (a1_1 == a2_2)
 				{// scheme2
 					scheme = 2;
-					if (SNPMatch.Confusion(a1_1, a1_2))
+					if (SNPMatch.isAmbiguous(a1_1, a1_2))
 					{
 						ATGCLocus = true;
 						if (ref1 < 0.5 && (1 - ref2) < 0.5)
