@@ -6,9 +6,7 @@ import epem.GRMStat;
 
 import merge.MergeTwoFile;
 import write.WriteBedSNPMajor;
-import gear.profile.MachDosageProfiler;
-import gear.profile.ProfilerBase;
-import gear.profile.RiskScoreProfiler;
+import gear.profile.Profiler;
 import gear.util.Logger;
 import grm.MakeGRM;
 import he.HECalculate;
@@ -62,18 +60,7 @@ public class Pipeline
 		}
 		else if (CmdArgs.INSTANCE.getProfileArgs().isSet())
 		{
-			ProfilerBase profiler;
-			if (CmdArgs.INSTANCE.getFileArgs().isSet() || CmdArgs.INSTANCE.getBFileArgs(0).isSet())
-			{
-				Logger.printUserLog("Generating risk profiles for genotypes.");
-				profiler = new RiskScoreProfiler();
-			}
-			else
-			{
-				Logger.printUserLog("Generating risk profiles for MaCH dosage.");
-				profiler = new MachDosageProfiler();
-			}
-			profiler.makeProfile();
+			Profiler.makeProfile();
 		}
 		else if (CmdArgs.INSTANCE.hasStrandOption())
 		{

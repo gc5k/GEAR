@@ -8,8 +8,6 @@ import gear.CmdArgs;
 
 public class GenotypeMatrix
 {
-
-	public static int missing = 3;
 	protected int[][] genotypeMat;
 	protected int lenMat;
 	protected int lenMatF;

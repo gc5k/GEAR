@@ -41,9 +41,10 @@ public class FileProcessor
 		try
 		{
 			return new PrintStream(file);
-		} catch (FileNotFoundException e)
+		}
+		catch (FileNotFoundException e)
 		{
-			Logger.handleException(e, "File '" + file + "' does not exist.");
+			Logger.handleException(e, "Unable to create file '" + file + "'.");
 		}
 		return ps;
 	}

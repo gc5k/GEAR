@@ -4,7 +4,7 @@ import gear.ConstValues;
 
 public class SNPMatch
 {
-	public static boolean IsBiallelic(char a1, char a2)
+	public static boolean isBiallelic(char a1, char a2)
 	{
 		return a1 != ConstValues.MISSING_ALLELE_CHAR && a2 != ConstValues.MISSING_ALLELE_CHAR;
 	}
@@ -54,50 +54,31 @@ public class SNPMatch
 		return f;
 	}
 
-	public static boolean Confusion(String a, String b)
+	public static boolean isAmbiguous(String a1, String a2)
 	{
-		boolean f = false;
-		char a1 = a.charAt(0);
-		char a2 = b.charAt(0);
-		if (a1 > a2)
-		{
-			char t = a1;
-			a1 = a2;
-			a2 = t;
-		}
-
-		if (a1 == 'A' && a2 == 'T')
-		{
-			f = true;
-		}
-		if (a1 == 'C' && a2 == 'G')
-		{
-			f = true;
-		}
-
-		return f;
+		return isAmbiguous(a1.charAt(0), a2.charAt(0));
 	}
 
-	public static boolean Confusion(char a1, char a2)
+	public static boolean isAmbiguous(char a1, char a2)
 	{
-		boolean f = false;
 		if (a1 > a2)
 		{
 			char t = a1;
 			a1 = a2;
 			a2 = t;
 		}
-
+		
 		if (a1 == 'A' && a2 == 'T')
 		{
-			f = true;
+			return true;
 		}
+		
 		if (a1 == 'C' && a2 == 'G')
 		{
-			f = true;
+			return true;
 		}
-
-		return f;
+		
+		return false;
 	}
 
 	public static boolean IsBiallelic(char a1, char a2, char b1, char b2)

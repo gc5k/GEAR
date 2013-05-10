@@ -2,6 +2,8 @@ package gear;
 
 public class ConstValues
 {
+	public static final String WHITESPACE_DELIMITER = "\\s+";
+	
 	public static final int BINARY_HOMOZYGOTE_FIRST = 0x0;
 	public static final int BINARY_HETEROZYGOTE = 0x1;
 	public static final int BINARY_HOMOZYGOTYE_SECOND = 0x2;
@@ -9,4 +11,27 @@ public class ConstValues
 	
 	public static final char MISSING_ALLELE_CHAR = '0';
 	public static final String MISSING_ALLELE_STRING = "0";
+	
+	public static boolean isNA(String s)
+	{
+		for (String naStr : naStrs)
+		{
+			if (naStr.equals(s))
+			{
+				return true;
+			}
+		}
+		return false;
+	}
+	
+	private static final String[] naStrs = initNAStrs();
+	
+	private static String[] initNAStrs()
+	{
+		if (CmdArgs.INSTANCE.getNA() == null)
+		{
+			return new String[] { "-9", "NA", "na", "-Inf", "Inf" };
+		}
+		return CmdArgs.INSTANCE.getNA().trim().split(",");
+	}
 }

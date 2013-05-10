@@ -8,7 +8,6 @@ import gear.util.Logger;
 
 public class HPC
 {
-
 	public static void genScript(String[] args)
 	{
 		StringBuilder sb = new StringBuilder();
@@ -19,10 +18,10 @@ public class HPC
 		try
 		{
 			pw = new PrintWriter(sb.toString());
-		} catch (FileNotFoundException e)
+		}
+		catch (FileNotFoundException e)
 		{
-			Logger.handleException(e,
-					"Cannot create the script file '" + sb.toString() + "'.");
+			Logger.handleException(e, "Cannot create the script file '" + sb.toString() + "'.");
 		}
 
 		pw.println("#$ -cwd");
@@ -35,11 +34,8 @@ public class HPC
 		pw.println("#$ -m eas");
 		pw.println("#$ -M " + CmdArgs.INSTANCE.getHpcArgs().getEmail());
 
-		pw.print("java -jar -Xmx"
-				+ CmdArgs.INSTANCE.getHpcArgs().getRam() + " ");
-		pw.print(HPC.class.getProtectionDomain().getCodeSource().getLocation()
-				.getPath()
-				+ " ");
+		pw.print("java -jar -Xmx" + CmdArgs.INSTANCE.getHpcArgs().getRam() + " ");
+		pw.print(HPC.class.getProtectionDomain().getCodeSource().getLocation().getPath() + " ");
 		for (int i = 0; i < args.length; i++)
 		{
 			String arg = args[i];
@@ -47,8 +43,7 @@ public class HPC
 			{
 				continue;
 			}
-			if (arg.equals("--email") || arg.equals("--ram")
-					|| arg.equals("--name"))
+			if (arg.equals("--email") || arg.equals("--ram") || arg.equals("--name"))
 			{
 				++i;
 				continue;
@@ -66,12 +61,11 @@ public class HPC
 			try
 			{
 				rt.exec(cmd);
-			} catch (IOException e)
+			}
+			catch (IOException e)
 			{
-				Logger.handleException(e, "Failed to execute command '" + cmd
-						+ "'.");
+				Logger.handleException(e, "Failed to execute command '" + cmd + "'.");
 			}
 		}
 	}
-
 }

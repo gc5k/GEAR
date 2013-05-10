@@ -1,40 +1,32 @@
-package gear.test;
-
-import java.util.*;
-
-import family.pedigree.genotype.BFamilyStruct;
-import family.pedigree.genotype.BPerson;
-import family.pedigree.file.SNP;
-import family.pedigree.file.MapFile;
-import family.pedigree.file.PedigreeFile;
-import family.plink.PLINKBinaryParser;
+package gear;
 
 import static org.junit.Assert.*;
 
+import java.util.Hashtable;
+
 import org.junit.Test;
 
-public class PLINKBinaryParserTest {
+import family.pedigree.file.MapFile;
+import family.pedigree.file.PedigreeFile;
+import family.pedigree.file.SNP;
+import family.pedigree.genotype.BFamilyStruct;
+import family.pedigree.genotype.BPerson;
+import family.plink.PLINKParser;
 
+public class PlinkTextDataTest
+{
 	@Test
-	public void testSnpMajor() {
-		test("data/sim.bed", "data/sim.bim", "data/sim.fam");
-	}
-	
-	@Test
-	public void testIndividualMajor() {
-		test("data/sim_ind_major.bed", "data/sim_ind_major.bim", "data/sim_ind_major.fam");
-	}
-	
-	public void test(String bed, String bim, String fam) {
-		PLINKBinaryParser parser = new PLINKBinaryParser(bed, bim, fam);
-		parser.Parse();
+	public void testTextData()
+	{
+		PLINKParser parser = new PLINKParser("data/sim.ped", "data/sim.map");
+parser.Parse();
 		
 		PedigreeFile pedData = parser.getPedigreeData();
 		
 		assertEquals(6, pedData.getNumIndividuals());
 		assertEquals(5, pedData.getNumMarker());
 
-		// fam begin
+		// individual info begin
 		Hashtable<String, BFamilyStruct> familyStructs = pedData.getFamilyStruct();
 		assertEquals(4, familyStructs.size());
 		
@@ -95,9 +87,9 @@ public class PLINKBinaryParserTest {
 		assertEquals("0", per5.getMomID());
 		assertEquals(2, per5.getGender());
 		assertEquals("1", per5.getAffectedStatus());
-		// fam end
+		// individual info end
 		
-		// bim begin
+		// locus info begin
 		MapFile mapData = parser.getMapData();
 		assertEquals(5, mapData.getMarkerNumber());
 		
@@ -133,22 +125,22 @@ public class PLINKBinaryParserTest {
 		assertEquals("1", snp4.getChromosome());
 		assertEquals("null_4", snp4.getName());
 		assertEquals(5, snp4.getPosition());
-		assertEquals('d', snp4.getSNP()[0]);
-		assertEquals('D', snp4.getSNP()[1]);
-		// bim end
+		assertEquals('D', snp4.getSNP()[0]);
+		assertEquals('d', snp4.getSNP()[1]);
+		// locus info end
 		
-		// bed begin
+		// genotypes begin
 		assertEquals("00", per0.getBiAlleleGenotypeString(0));
 		assertEquals("01", per0.getBiAlleleGenotypeString(1));
 		assertEquals("01", per0.getBiAlleleGenotypeString(2));
 		assertEquals("01", per0.getBiAlleleGenotypeString(3));
-		assertEquals("10", per0.getBiAlleleGenotypeString(4));
+		assertEquals("22", per0.getBiAlleleGenotypeString(4));
 		
 		assertEquals("10", per1.getBiAlleleGenotypeString(0));
 		assertEquals("10", per1.getBiAlleleGenotypeString(1));
 		assertEquals("10", per1.getBiAlleleGenotypeString(2));
 		assertEquals("01", per1.getBiAlleleGenotypeString(3));
-		assertEquals("10", per1.getBiAlleleGenotypeString(4));
+		assertEquals("00", per1.getBiAlleleGenotypeString(4));
 		
 		assertEquals("10", per2.getBiAlleleGenotypeString(0));
 		assertEquals("10", per2.getBiAlleleGenotypeString(1));
@@ -166,14 +158,13 @@ public class PLINKBinaryParserTest {
 		assertEquals("10", per4.getBiAlleleGenotypeString(1));
 		assertEquals("01", per4.getBiAlleleGenotypeString(2));
 		assertEquals("01", per4.getBiAlleleGenotypeString(3));
-		assertEquals("10", per4.getBiAlleleGenotypeString(4));
+		assertEquals("00", per4.getBiAlleleGenotypeString(4));
 		
 		assertEquals("10", per5.getBiAlleleGenotypeString(0));
 		assertEquals("01", per5.getBiAlleleGenotypeString(1));
 		assertEquals("01", per5.getBiAlleleGenotypeString(2));
 		assertEquals("01", per5.getBiAlleleGenotypeString(3));
-		assertEquals("10", per5.getBiAlleleGenotypeString(4));
-		// bed end
+		assertEquals("00", per5.getBiAlleleGenotypeString(4));
+		// genotypes end
 	}
-
 }

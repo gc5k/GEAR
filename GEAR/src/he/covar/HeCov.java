@@ -1,6 +1,6 @@
 package he.covar;
 
-import gear.CmdArgs;
+import gear.ConstValues;
 import gear.util.FileProcessor;
 import gear.util.Logger;
 import gear.util.NewIt;
@@ -93,7 +93,7 @@ public class HeCov
 						c = NewIt.newArrayList();
 						for (int i = 0; i < qcov_idx.length; i++)
 						{
-							if (CmdArgs.INSTANCE.isNA(s[1 + qcov_idx[i]]))
+							if (ConstValues.isNA(s[1 + qcov_idx[i]]))
 							{
 								f = false;
 							}
@@ -167,7 +167,7 @@ public class HeCov
 						c = NewIt.newArrayList();
 						for (int i = 0; i < cov_idx.length; i++)
 						{
-							if (CmdArgs.INSTANCE.isNA(s[1 + cov_idx[i]]))
+							if (ConstValues.isNA(s[1 + cov_idx[i]]))
 							{
 								f = false;
 							} else

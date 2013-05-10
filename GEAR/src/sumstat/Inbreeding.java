@@ -19,10 +19,10 @@ import family.plink.PLINKParser;
 import family.popstat.GenotypeMatrix;
 import family.qc.rowqc.SampleFilter;
 import gear.CmdArgs;
+import gear.ConstValues;
 import gear.util.FileProcessor;
 import gear.util.Logger;
 import gear.util.NewIt;
-import gear.util.TextHelper;
 
 public class Inbreeding
 {
@@ -205,7 +205,7 @@ public class Inbreeding
 			while ((line = reader.readLine()) != null)
 			{
 				line.trim();
-				String[] l = line.split(TextHelper.WHITESPACE_DELIMITER);
+				String[] l = line.split(ConstValues.WHITESPACE_DELIMITER);
 				if (l.length < 3)
 					continue;
 				famList.add(l[0]);

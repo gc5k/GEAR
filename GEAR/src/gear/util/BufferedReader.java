@@ -1,21 +1,56 @@
 package gear.util;
 
+import java.io.FileNotFoundException;
+import java.io.IOException;
 import java.util.logging.Level;
+import java.util.zip.GZIPInputStream;
 
 public class BufferedReader
 {
-
-	public BufferedReader(String fileName, String fileType)
+	public static BufferedReader openTextFile(String fileName, String fileType)
 	{
+		java.io.BufferedReader reader = null;
 		try
 		{
-			innerReader = new java.io.BufferedReader(new java.io.FileReader(
-					fileName));
-		} catch (Exception e)
-		{
-			Logger.handleException(e, "Cannot open the " + fileType + " file '"
-					+ fileName + "'.");
+			reader = new java.io.BufferedReader(new java.io.FileReader(fileName));
 		}
+		catch (Exception e)
+		{
+			Logger.handleException(e, "Cannot open the " + fileType + " file '" + fileName + "'.");
+		}
+		return new BufferedReader(reader, fileName, fileType);
+	}
+	
+	public static BufferedReader openZipFile(String fileName, String fileType)
+	{
+		java.io.FileInputStream fileInStrm = null;
+		try
+		{
+			fileInStrm = new java.io.FileInputStream(fileName);
+		}
+		catch (FileNotFoundException e)
+		{
+			Logger.handleException(e, "File '" + fileName + "' does not exist.");
+		}
+		
+		GZIPInputStream gzip = null;
+		try
+		{
+			gzip = new GZIPInputStream(fileInStrm);
+		}
+		catch (IOException e)
+		{
+			Logger.handleException(e, "Cannot open the archive '" + fileName + "'.");
+		}
+		
+		java.io.InputStreamReader inStrmReader = new java.io.InputStreamReader(gzip);
+		java.io.BufferedReader bufferedReader = new java.io.BufferedReader(inStrmReader);
+		return new BufferedReader(bufferedReader, fileName, fileType);
+	}
+	
+	private BufferedReader(java.io.BufferedReader reader, String fileName, String fileType)
+	{
+		innerReader = reader; 
 		this.fileName = fileName;
 		this.fileType = fileType;
 		curLineNum = 1;
@@ -26,10 +61,10 @@ public class BufferedReader
 		try
 		{
 			innerReader.close();
-		} catch (java.io.IOException e)
+		}
+		catch (java.io.IOException e)
 		{
-			String msg = "An I/O exception occurred when closing the "
-					+ fileType + " file '" + fileName + "'.";
+			String msg = "An I/O exception occurred when closing the " + fileType + " file '" + fileName + "'.";
 			Logger.printUserError(msg);
 			Logger.getDevLogger().log(Level.WARNING, msg, e);
 		}
@@ -38,19 +73,37 @@ public class BufferedReader
 	public String readLine()
 	{
 		String line = null;
+		
 		try
 		{
 			line = innerReader.readLine();
-		} catch (java.io.IOException e)
-		{
-			Logger.handleException(e,
-					"An I/O exception occurred when reading to line "
-							+ curLineNum + " of the " + fileType + " file '"
-							+ fileName + "'.");
 		}
+		catch (java.io.IOException e)
+		{
+			String msg = "";
+			msg += "An I/O exception occurred when reading to line " + curLineNum;
+			msg += " of the " + fileType + " file '" + fileName + "'.";
+			Logger.handleException(e, msg);
+		}
+		
 		if (line != null)
 		{
 			++curLineNum;
+		}
+		
+		return line;
+	}
+
+	public String readNonEmptyLine()
+	{
+		String line = null;
+		while ((line = readLine()) != null)
+		{
+			line = line.trim();
+			if (!line.isEmpty())
+			{
+				break;
+			}
 		}
 		return line;
 	}
@@ -88,11 +141,11 @@ public class BufferedReader
 		String[] tokens = readTokens();
 		if (tokens != null && tokens.length != expectedNumCols)
 		{
-			Logger.printUserError("The format of the " + fileType + " file '"
-					+ fileName + "' is incorrect: " + "A " + fileType
-					+ " file should consists of " + expectedNumCols
-					+ " columns, but line " + curLineNum + " contains "
-					+ tokens.length + " column(s).");
+			String msg = "";
+			msg += "The format of the " + fileType + " file '" + fileName + "' is incorrect: ";
+			msg += "A " + fileType + " file should consists of " + expectedNumCols + " columns, ";
+			msg += "but line " + curLineNum + " contains " + tokens.length + " column(s).";
+			Logger.printUserError(msg);
 			System.exit(1);
 		}
 		return tokens;
@@ -107,6 +160,15 @@ public class BufferedReader
 	{
 		return curLineNum;
 	}
+	
+	public void reportFormatError(String msg)
+	{
+		String begin = "";
+		begin += "Line " + getCurLineNum() + " of the " + fileType + " file ";
+		begin += "'" + getFileName() + "' contains an error: ";
+		Logger.printUserError(begin + msg);
+		System.exit(1);
+	}
 
 	private java.io.BufferedReader innerReader;
 
@@ -115,5 +177,4 @@ public class BufferedReader
 	private String fileName;
 
 	private String fileType;
-
 }

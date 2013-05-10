@@ -13,6 +13,7 @@ import family.plink.PLINKParser;
 import family.popstat.GenotypeMatrix;
 import family.qc.rowqc.SampleFilter;
 import gear.CmdArgs;
+import gear.ConstValues;
 import gear.RegressionModel;
 import gear.util.FileProcessor;
 import gear.util.Logger;
@@ -95,7 +96,7 @@ public class MakePredictor
 			if (a1_1 == a2_1)
 			{// scheme1
 				scheme = 1;
-				if (SNPMatch.Confusion(a1_1, a1_2))
+				if (SNPMatch.isAmbiguous(a1_1, a1_2))
 				{
 					ATGCLocus = true;
 				}
@@ -103,7 +104,7 @@ public class MakePredictor
 			} else if (a1_2 == a2_1)
 			{// scheme2
 				scheme = 2;
-				if (SNPMatch.Confusion(a1_1, a1_2))
+				if (SNPMatch.isAmbiguous(a1_1, a1_2))
 				{
 					ATGCLocus = true;
 				}
@@ -286,12 +287,12 @@ public class MakePredictor
 			}
 			SNP snp = snpList1.get(comSNPIdx[0][i]);
 			Predictor pd = predictorList.get(comSNPIdx[1][i]);
-			if (CmdArgs.INSTANCE.isNA(pd.getField(CmdArgs.INSTANCE
-					.getPredictorIdx())))
+			if (ConstValues.isNA(pd.getField(CmdArgs.INSTANCE.getPredictorIdx())))
 			{
 				NMiss++;
 				continue;
-			} else
+			}
+			else
 			{
 				double s = Double.parseDouble(pd.getField(CmdArgs.INSTANCE
 						.getPredictorIdx()));

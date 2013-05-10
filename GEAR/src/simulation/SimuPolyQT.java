@@ -1,9 +1,9 @@
 package simulation;
 
 import gear.CmdArgs;
+import gear.ConstValues;
 import gear.util.FileProcessor;
 import gear.util.Logger;
-import gear.util.TextHelper;
 
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
@@ -490,7 +490,7 @@ public class SimuPolyQT
 			while ((line = reader.readLine()) != null)
 			{
 				line.trim();
-				String[] l = line.split(TextHelper.WHITESPACE_DELIMITER);
+				String[] l = line.split(ConstValues.WHITESPACE_DELIMITER);
 				if (l.length < 1)
 					continue;
 				if (c < (M - M_null))
