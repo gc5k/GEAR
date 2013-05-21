@@ -22,12 +22,15 @@ import gear.ConstValues;
 import gear.util.FileProcessor;
 import gear.util.Logger;
 import gear.util.NewIt;
+import gear.util.SNPMatch;
+import gear.util.pop.PopStat;
 
 public class RealCheck
 {
 	private GenotypeMatrix G1;
 	private GenotypeMatrix G2;
 
+	private double[][] allelefreq;
 	private int[] markerIdx;
 
 	private int[][] comSNPIdx;
@@ -41,6 +44,7 @@ public class RealCheck
 	private SampleFilter sf1;
 	private SampleFilter sf2;
 
+	private boolean[] snpFlip;
 	public RealCheck()
 	{
 		PLINKParser pp1 = null;
@@ -57,7 +61,8 @@ public class RealCheck
 					.getBed(), CmdArgs.INSTANCE.getBFileArgs(1)
 					.getBim(), CmdArgs.INSTANCE.getBFileArgs(1)
 					.getFam());
-		} else
+		}
+		else
 		{
 			Logger.printUserError("--bfile or --bfile2 is not set.");
 			System.exit(1);
@@ -77,6 +82,8 @@ public class RealCheck
 
 	public void Check()
 	{
+		allelefreq = PopStat.calAlleleFrequency(G1, snpList.size());
+
 		StringBuffer sb = new StringBuffer();
 		sb.append(CmdArgs.INSTANCE.out);
 		sb.append(".real");
@@ -89,38 +96,105 @@ public class RealCheck
 		{
 			Logger.printUserLog("A similarity matrix is generated with real-check SNPs.");
 			getSelectedMarker();
-		} else
+		}
+		else
 		{
 			getRandomMarker();
 		}
 
-		ps.print("file1.famid file1.id file2.famid file2.id score nmiss/loci\n");
+		setSNPFlipFlag();
+
+		double es = 0;
+		double ss = 0;
+		int n = 0;
+
+		ps.print("FID1 ID1 FID2 ID2 Match ExpMatch Score nmiss/loci\n");
 		for (int i = 0; i < G1.getGRow(); i++)
 		{
 			for (int j = 0; j < G2.getGRow(); j++)
 			{
 				double[] s = similarityScore(i, j);
-				if (s[0] > CmdArgs.INSTANCE.getRealCheckParameter()
+				double ES = 0;
+				double OS = 0;
+				if (s[1] > 0)
+				{
+					ES = s[2]/s[1];
+					OS = (s[0] - s[2]) / (s[1] - s[2]);
+				}
+				if (OS > CmdArgs.INSTANCE.getRealCheckParameter()
 						.getThresholdLower()
-						&& s[0] <= CmdArgs.INSTANCE.getRealCheckParameter()
+						&& OS <= CmdArgs.INSTANCE.getRealCheckParameter()
 								.getThresholdUpper())
 				{
 					PersonIndex ps1 = PersonTable1.get(i);
 					PersonIndex ps2 = PersonTable2.get(j);
 					ps.print(ps1.getFamilyID() + " " + ps1.getIndividualID()
-							+ " " + ps2.getFamilyID() + " "
-							+ ps2.getIndividualID() + " " + s[0] + " " + s[1]
-							+ "/" + markerIdx.length + "\n");
+								+ " " + ps2.getFamilyID() + " "
+								+ ps2.getIndividualID() + " " + s[0] + " " + (ES * s[1]) + " " + OS + " " + s[1]
+								+ "/" + markerIdx.length + "\n");
 				}
+
+				es += OS;
+				ss += OS * OS;
+				n++;
+
 			}
 		}
 		ps.close();
 
+		double E = 0;
+		double v = 0;
+		if (n > 0 )
+		{
+			E = es/n;
+			v = Math.sqrt(ss/n - E * E);
+		}
+		else
+		{
+			E = 0;
+			v = 0;
+		}
+
+		long N = G1.getGRow() * G2.getGRow();
+		Logger.printUserLog("In total " + N + " individual pairs were compared.\n");
+		Logger.printUserLog("Mean is: " + E);
+		Logger.printUserLog("Standard deviation is: " + v);
+		Logger.printUserLog("Mean and SD were calculated with the exclusion of the pair of the individual.\n");
+		
+		double[] sChart = similarityScoreChart();
+		Logger.printUserLog("=====Reference similarity score chart=====");
+		Logger.printUserLog("Parent-offsprint: " + (sChart[0] - sChart[3])/(1-sChart[3]));
+		Logger.printUserLog("Full sib: " + (sChart[1] - sChart[3])/(1-sChart[3]) + "\n");
+//		Logger.printUserLog("Half sib: " + sChart[2] + "\n");		
+		Logger.printUserLog("The result has been saved into '" + sb.toString() + "'.");
+	}
+
+	private double[] similarityScoreChart() {
+		double[] sChart = new double[4];
+		//0 for parent-offsprint
+		//1 for full sib
+		//2 for half sib
+		//4 random
+		for (int i = 0; i < markerIdx.length; i++)
+		{
+			int idx = markerIdx[i];
+			double H = allelefreq[idx][1] * (1 - allelefreq[idx][1]);
+			double p = allelefreq[idx][1];
+			sChart[0] += 1-2*H;
+			sChart[1] += (1-H) * (1-H) + 0.5 * H * H;
+			sChart[2] += (1-H) * (1-H) + 0.5 * H * H;
+			sChart[3] += p * p * p * p + 4 * p * p * (1-p) * (1-p) + (1-p) * (1-p) * (1-p) * (1-p);
+		}
+		sChart[0] /= markerIdx.length;
+		sChart[1] /= markerIdx.length;
+		sChart[2] /= markerIdx.length;
+		sChart[3] /= markerIdx.length;
+		return sChart;
 	}
 
 	private double[] similarityScore(int idx1, int idx2)
 	{
-		double[] s = { 0, 0 };
+		double[] s = { 0, 0, 0 };
 
 		for (int i = 0; i < markerIdx.length; i++)
 		{
@@ -132,18 +206,25 @@ public class RealCheck
 			if (g1 == BPerson.MissingGenotypeCode
 					|| g2 == BPerson.MissingGenotypeCode)
 				continue;
-			if (g1 == g2)
+			if ( snpFlip[i] ) 
 			{
-				s[0]++;
+				if (g1 == g2)
+				{
+					s[0]++;
+				}
+			}
+			else 
+			{
+				if (g1 == (2-g2) )
+				{
+					s[0]++;
+				}
 			}
 			s[1]++;
-		}
+			double p = allelefreq[idx][1];
+			s[2] += p * p * p * p + 4 * p * p * (1-p) * (1-p) + (1-p) * (1-p) * (1-p) * (1-p);
 
-		if (s[1] > 0)
-		{
-			s[0] = s[0] / s[1];
 		}
-
 		return s;
 	}
 
@@ -185,15 +266,22 @@ public class RealCheck
 	public void getRandomMarker()
 	{
 		int mn = 0;
-		if (CmdArgs.INSTANCE.getRealCheckParameter().getMarkerNumber() > comSNPIdxMap
+		if (CmdArgs.INSTANCE.getRealCheckParameter().getMarkerNumberFlag()) {
+			if (CmdArgs.INSTANCE.getRealCheckParameter().getMarkerNumber() > comSNPIdxMap
 				.size())
-		{
-			Logger.printUserLog("Realcheck marker number was reduced to "
+			{
+				Logger.printUserLog("Realcheck marker number was reduced to "
 					+ comSNPIdxMap.size() + "\n");
-			mn = comSNPIdxMap.size();
-		} else
+				mn = comSNPIdxMap.size();
+			} 
+			else
+			{
+				mn = CmdArgs.INSTANCE.getRealCheckParameter().getMarkerNumber();
+			}
+		}
+		else 
 		{
-			mn = CmdArgs.INSTANCE.getRealCheckParameter().getMarkerNumber();
+			mn = comSNPIdxMap.size();
 		}
 
 		markerIdx = new int[mn];
@@ -221,13 +309,11 @@ public class RealCheck
 
 	private void getCommonSNP(ArrayList<SNP> snplist1, ArrayList<SNP> snplist2)
 	{
-		HashMap<String, Integer> SNPMap = NewIt.newHashMap();
-		HashMap<String, String> SNPRef = NewIt.newHashMap();
-		for (Iterator<SNP> e = snplist1.iterator(); e.hasNext();)
+		HashMap<String, Boolean> SNPMap = NewIt.newHashMap();
+		for (int i = 0; i < snplist1.size(); i++)
 		{
-			SNP snp = e.next();
-			SNPMap.put(snp.getName(), 0);
-			SNPRef.put(snp.getName(), Character.toString(snp.getFirstAllele()));
+			SNP snp = snplist1.get(i);
+			SNPMap.put(snp.getName(), false);
 		}
 
 		int c = 0;
@@ -238,25 +324,10 @@ public class RealCheck
 			String snp_name = snp.getName();
 			if (SNPMap.containsKey(snp_name))
 			{
-				if (SNPRef.get(snp_name).compareTo(
-						Character.toString(snp.getFirstAllele())) == 0)
+				if (!SNPMatch.isAmbiguous(snp.getFirstAllele(), snp.getSecAllele())) 
 				{
-					SNPMap.put(snp_name, 1);
+					SNPMap.put(snp_name, true);
 					SNPMapList2.put(snp_name, i);
-					c++;
-				}
-			}
-		}
-
-		for (Iterator<SNP> e = snplist2.iterator(); e.hasNext();)
-		{
-			SNP snp = e.next();
-			if (SNPMap.containsKey(snp.getName()))
-			{
-				if (SNPRef.get(snp.getName()).compareTo(
-						Character.toString(snp.getFirstAllele())) == 0)
-				{
-					SNPMap.put(snp.getName(), 1);
 					c++;
 				}
 			}
@@ -266,7 +337,8 @@ public class RealCheck
 		{
 			Logger.printUserError("Common SNPs between the two SNP files: None");
 			System.exit(1);
-		} else
+		} 
+		else
 		{
 			Logger.printUserLog("Common SNP(s) between the two SNP files: " + c);
 		}
@@ -278,14 +350,41 @@ public class RealCheck
 		{
 			SNP snp = snplist1.get(i);
 			String snp_name = snp.getName();
-			if (SNPMap.containsKey(snp_name)
-					&& SNPMap.get(snp_name).intValue() > 0)
+			if (SNPMap.get(snp_name).booleanValue())
 			{
 				comSNPIdxMap.put(snp.getName(), idx1);
 				comSNPIdx[0][idx1] = i;
 				comSNPIdx[1][idx1] = SNPMapList2.get(snp_name).intValue();
 				idx1++;
 			}
+		}
+	}
+
+	private void setSNPFlipFlag() 
+	{
+		snpFlip = new boolean[markerIdx.length];
+		ArrayList<SNP> l1 = sf1.getMapFile().getMarkerList();
+		ArrayList<SNP> l2 = sf2.getMapFile().getMarkerList();
+
+		for (int i = 0; i < markerIdx.length; i++)
+		{
+			int idx = markerIdx[i];
+
+			SNP s1 = l1.get(comSNPIdx[0][idx]);
+			SNP s2 = l2.get(comSNPIdx[0][idx]);
+			if(s1.getSecAllele() == s2.getSecAllele()) 
+			{
+				snpFlip[i] = true;
+			}
+			else if (s1.getSecAllele() == SNPMatch.Flip(s2.getSecAllele())) 
+			{
+				snpFlip[i] = true;
+			}
+			else
+			{
+				snpFlip[i] = false;
+			}
+
 		}
 	}
 
@@ -305,7 +404,8 @@ public class RealCheck
 					selectedSNP.add(l[i]);
 				}
 			}
-		} catch (IOException e)
+		} 
+		catch (IOException e)
 		{
 			Logger.handleException(e,
 					"An exception occurred when reading the real-check SNPs.");

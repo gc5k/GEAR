@@ -135,8 +135,38 @@ public class RealCheckOne
 		Logger.printUserLog("Mean is: " + E);
 		Logger.printUserLog("Standard deviation is: " + v);
 		Logger.printUserLog("Mean and SD were calculated with the exclusion of the pair of the individual.\n");
+		
+		double[] sChart = similarityScoreChart();
+		Logger.printUserLog("=====Reference similarity score chart=====");
+		Logger.printUserLog("Parent-offsprint: " + (sChart[0] - sChart[3])/(1-sChart[3]));
+		Logger.printUserLog("Full sib: " + (sChart[1] - sChart[3])/(1-sChart[3]) + "\n");
+//		Logger.printUserLog("Half sib: " + sChart[2] + "\n");		
+
 		Logger.printUserLog("The result has been saved into '" + sb.toString() + "'.");
 
+	}
+
+	private double[] similarityScoreChart() {
+		double[] sChart = new double[4];
+		//0 for parent-offsprint
+		//1 for full sib
+		//2 for half sib
+		//4 random
+		for (int i = 0; i < markerIdx.length; i++)
+		{
+			int idx = markerIdx[i];
+			double H = allelefreq[idx][1] * (1 - allelefreq[idx][1]);
+			double p = allelefreq[idx][1];
+			sChart[0] += 1-2*H;
+			sChart[1] += (1-H) * (1-H) + 0.5 * H * H;
+			sChart[2] += (1-H) * (1-H) + 0.5 * H * H;
+			sChart[3] += p * p * p * p + 4 * p * p * (1-p) * (1-p) + (1-p) * (1-p) * (1-p) * (1-p);
+		}
+		sChart[0] /= markerIdx.length;
+		sChart[1] /= markerIdx.length;
+		sChart[2] /= markerIdx.length;
+		sChart[3] /= markerIdx.length;
+		return sChart;
 	}
 
 	private double[] similarityScore(int idx1, int idx2)
