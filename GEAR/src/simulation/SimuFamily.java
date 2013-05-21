@@ -1,5 +1,7 @@
 package simulation;
 
+import gear.CmdArgs;
+
 import java.io.BufferedWriter;
 import java.io.FileWriter;
 import java.io.IOException;
@@ -73,13 +75,13 @@ public class SimuFamily
 
 		try
 		{
-			pedout = new PrintWriter(new BufferedWriter(new FileWriter(out
+			pedout = new PrintWriter(new BufferedWriter(new FileWriter(CmdArgs.INSTANCE.out
 					+ ".ped")));
-			map = new PrintWriter(new BufferedWriter(new FileWriter(out
+			map = new PrintWriter(new BufferedWriter(new FileWriter(CmdArgs.INSTANCE.out
 					+ ".map")));
-			phe = new PrintWriter(new BufferedWriter(new FileWriter(out
+			phe = new PrintWriter(new BufferedWriter(new FileWriter(CmdArgs.INSTANCE.out
 					+ ".phe")));
-			cov = new PrintWriter(new BufferedWriter(new FileWriter(out
+			cov = new PrintWriter(new BufferedWriter(new FileWriter(CmdArgs.INSTANCE.out
 					+ ".cov")));
 		} catch (IOException e)
 		{
