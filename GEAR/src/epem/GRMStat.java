@@ -48,10 +48,11 @@ public class GRMStat
 		{
 			BinaryGRM();
 		}
-		if (CmdArgs.INSTANCE.getHEArgs().isGrmTxt())
+		else if (CmdArgs.INSTANCE.getHEArgs().isGrmTxt())
 		{
 			txtGRM();
-		} else
+		}
+		else
 		{
 			gzGRM();
 		}

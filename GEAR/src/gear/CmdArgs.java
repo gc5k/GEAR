@@ -965,7 +965,8 @@ public enum CmdArgs
 				grm_id = sb2.append(".grm.id").toString();
 				isGrmBinary_ = false;
 				isGrmTxt_ = false;
-			} else if (cl.hasOption(cmd_grm_bin))
+			} 
+			else if (cl.hasOption(cmd_grm_bin))
 			{
 				StringBuilder sb1 = new StringBuilder(
 						cl.getOptionValue(cmd_grm_bin));
@@ -975,7 +976,8 @@ public enum CmdArgs
 				grm_id = sb2.append(".grm.id").toString();
 				isGrmBinary_ = true;
 				isGrmTxt_ = false;
-			} else if (cl.hasOption(cmd_grm_txt))
+			} 
+			else if (cl.hasOption(cmd_grm_txt))
 			{
 				StringBuilder sb1 = new StringBuilder(
 						cl.getOptionValue(cmd_grm_txt));
@@ -1022,11 +1024,13 @@ public enum CmdArgs
 			{
 				type = HEType.SD;
 				heFlag = true;
-			} else if (cl.hasOption(cmd_ss))
+			} 
+			else if (cl.hasOption(cmd_ss))
 			{
 				type = HEType.SS;
 				heFlag = true;
-			} else if (cl.hasOption(cmd_cp))
+			} 
+			else if (cl.hasOption(cmd_cp))
 			{
 				type = HEType.CP;
 				heFlag = true;
