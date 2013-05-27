@@ -6,7 +6,6 @@ import java.io.PrintStream;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
-import java.util.Iterator;
 
 import org.apache.commons.math.random.RandomDataImpl;
 
@@ -44,7 +43,7 @@ public class RealCheck
 	private SampleFilter sf1;
 	private SampleFilter sf2;
 
-	private boolean[] snpFlip;
+	private boolean[] snpMatch;
 	public RealCheck()
 	{
 		PLINKParser pp1 = null;
@@ -206,7 +205,7 @@ public class RealCheck
 			if (g1 == BPerson.MissingGenotypeCode
 					|| g2 == BPerson.MissingGenotypeCode)
 				continue;
-			if ( snpFlip[i] ) 
+			if ( snpMatch[i] ) 
 			{
 				if (g1 == g2)
 				{
@@ -317,6 +316,7 @@ public class RealCheck
 		}
 
 		int c = 0;
+		int ATGC = 0;
 		HashMap<String, Integer> SNPMapList2 = NewIt.newHashMap();
 		for (int i = 0; i < snplist2.size(); i++)
 		{
@@ -330,6 +330,10 @@ public class RealCheck
 					SNPMapList2.put(snp_name, i);
 					c++;
 				}
+				else 
+				{
+					ATGC++;
+				}
 			}
 		}
 
@@ -341,6 +345,10 @@ public class RealCheck
 		else
 		{
 			Logger.printUserLog("Common SNP(s) between the two SNP files: " + c);
+			if (ATGC>0) 
+			{
+				Logger.printUserLog("Removed Ambiguous loci (A/T, G/C biallelic): " + ATGC);
+			}
 		}
 
 		comSNPIdx = new int[2][c];
@@ -362,7 +370,7 @@ public class RealCheck
 
 	private void setSNPFlipFlag() 
 	{
-		snpFlip = new boolean[markerIdx.length];
+		snpMatch = new boolean[markerIdx.length];
 		ArrayList<SNP> l1 = sf1.getMapFile().getMarkerList();
 		ArrayList<SNP> l2 = sf2.getMapFile().getMarkerList();
 
@@ -371,18 +379,18 @@ public class RealCheck
 			int idx = markerIdx[i];
 
 			SNP s1 = l1.get(comSNPIdx[0][idx]);
-			SNP s2 = l2.get(comSNPIdx[0][idx]);
+			SNP s2 = l2.get(comSNPIdx[1][idx]);
 			if(s1.getSecAllele() == s2.getSecAllele()) 
 			{
-				snpFlip[i] = true;
+				snpMatch[i] = true;
 			}
 			else if (s1.getSecAllele() == SNPMatch.Flip(s2.getSecAllele())) 
 			{
-				snpFlip[i] = true;
+				snpMatch[i] = true;
 			}
 			else
 			{
-				snpFlip[i] = false;
+				snpMatch[i] = false;
 			}
 
 		}
