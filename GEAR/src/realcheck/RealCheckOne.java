@@ -82,7 +82,7 @@ public class RealCheckOne
 		double es = 0;
 		double ss = 0;
 		int n = 0;
-		ps.print("FID1 ID1 FID2 ID2 Match ExpMatch Score nmiss/loci\n");
+		ps.print("FID1 ID1 FID2 ID2 Match ExpMatch Score nmiss\n");
 		for (int i = 0; i < G1.getGRow(); i++)
 		{
 			for (int j = i; j < G1.getGRow(); j++)
@@ -105,7 +105,7 @@ public class RealCheckOne
 					ps.print(ps1.getFamilyID() + " " + ps1.getIndividualID()
 							+ " " + ps2.getFamilyID() + " "
 							+ ps2.getIndividualID() + " " + s[0] + " " + (ES * s[1]) + " " + OS + " " + s[1]
-							+ "/" + markerIdx.length + "\n");
+							+ "\n");
 				}
 				if(i != j) 
 				{
