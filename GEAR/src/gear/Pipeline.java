@@ -36,6 +36,10 @@ public class Pipeline
 		Logger.printUserLog(AboutInfo.WELCOME_MESSAGE);
 		Logger.printUserLog("Analysis started: " + Calendar.getInstance().getTime() + "\n");
 		
+		if (args.length == 0) 
+		{
+			System.exit(1);
+		}
 		// Print the options set.
 		Logger.printUserLog("Options received: ");
 		StringBuffer sb = null;
