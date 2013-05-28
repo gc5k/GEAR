@@ -105,7 +105,8 @@ public class SimuPolyCC
 		{
 			LOG.append("genetic effect file: "
 					+ CmdArgs.INSTANCE.polyEffectFile + "\n");
-		} else
+		} 
+		else
 		{
 			LOG.append("Uniform Effect: " + U + "\n");
 		}
@@ -138,7 +139,8 @@ public class SimuPolyCC
 		{
 			log = new PrintWriter(new BufferedWriter(new FileWriter(out
 					+ ".plog")));
-		} catch (IOException e)
+		} 
+		catch (IOException e)
 		{
 			e.printStackTrace();
 		}
@@ -155,7 +157,8 @@ public class SimuPolyCC
 		if (CmdArgs.INSTANCE.makebedFlag)
 		{
 			writeBFile();
-		} else
+		} 
+		else
 		{
 			writeFile();
 		}
@@ -172,7 +175,8 @@ public class SimuPolyCC
 		if (CmdArgs.INSTANCE.polyEffectFlag)
 		{
 			effect = readEffects();
-		} else
+		} 
+		else
 		{
 			effect = GenerateEffects();
 		}
@@ -193,7 +197,8 @@ public class SimuPolyCC
 			try
 			{
 				liability = norm.cumulativeProbability(L);
-			} catch (MathException e)
+			} 
+			catch (MathException e)
 			{
 				e.printStackTrace();
 			}
@@ -207,11 +212,13 @@ public class SimuPolyCC
 					genotype[count_case] = chr.getColumn(0);
 					risk[count_case] = liability;
 					count_case++;
-				} else
+				} 
+				else
 				{
 					continue;
 				}
-			} else
+			} 
+			else
 			{
 				if (count_control < N_control)
 				{
@@ -220,7 +227,8 @@ public class SimuPolyCC
 					genotype[N_case + count_control] = chr.getColumn(0);
 					risk[N_case + count_control] = liability;
 					count_control++;
-				} else
+				} 
+				else
 				{
 					continue;
 				}
@@ -253,7 +261,8 @@ public class SimuPolyCC
 			try
 			{
 				liability = norm.cumulativeProbability(L);
-			} catch (MathException e)
+			} 
+			catch (MathException e)
 			{
 				e.printStackTrace();
 			}
@@ -265,7 +274,8 @@ public class SimuPolyCC
 				genotype[count_case] = chr.getColumn(0);
 				risk[count_case] = liability;
 				count_case++;
-			} else
+			} 
+			else
 			{
 				count_control++;
 				BV[sample - count_control] = bv;
@@ -294,7 +304,8 @@ public class SimuPolyCC
 						/ ((M - M_null) * 2 * freq[i] * (1 - freq[i])));
 				effect[i] = sigma_b;
 			}
-		} else
+		} 
+		else
 		{
 			for (int i = 0; i < effect.length - M_null; i++)
 			{
@@ -315,7 +326,8 @@ public class SimuPolyCC
 		{
 			eff = new PrintWriter(new BufferedWriter(new FileWriter(out
 					+ ".rnd")));
-		} catch (IOException e)
+		} 
+		catch (IOException e)
 		{
 			e.printStackTrace();
 		}
@@ -346,7 +358,8 @@ public class SimuPolyCC
 				if (i == 0)
 				{
 					v[i][j] = z;
-				} else
+				} 
+				else
 				{
 					double d = rnd.nextUniform(0, 1);
 					int a = (int) v[i - 1][j];
@@ -407,7 +420,8 @@ public class SimuPolyCC
 					+ ".cov")));
 			geno = new PrintWriter(new BufferedWriter(new FileWriter(out
 					+ ".add")));
-		} catch (IOException e)
+		} 
+		catch (IOException e)
 		{
 			e.printStackTrace();
 		}
@@ -423,7 +437,8 @@ public class SimuPolyCC
 				fam.print(1 + " ");
 
 				fam.println(2 + " ");
-			} else
+			} 
+			else
 			{
 				fam.print("control_" + i + " ");
 				fam.print(1 + " ");
@@ -436,18 +451,17 @@ public class SimuPolyCC
 
 			if (i < N_case)
 			{
-				phe.print("case_" + i + " " + 1 + " " + 2 + " ");
+				phe.println("case_" + i + " " + 1 + " " + 2 + " ");
 				cov.print("case_" + i + " " + 1 + " " + 2 + " ");
-			} else
+			} 
+			else
 			{
-				phe.print("control_" + i + " " + 1 + " " + 1 + " ");
+				phe.println("control_" + i + " " + 1 + " " + 1 + " ");
 				cov.print("control_" + i + " " + 1 + " " + 1 + " ");
 			}
-			phe.println();
 
 			cov.print(risk[i] + " ");
-			cov.print(BV[i] + " ");
-			cov.println(phenotype[i]);
+			cov.println(BV[i] + " ");
 		}
 
 		for (int i = 0; i < genotype.length; i++)
@@ -501,14 +515,16 @@ public class SimuPolyCC
 							gbyte = 0;
 							idx = 0;
 						}
-					} else
+					} 
+					else
 					{
 						bedout.writeByte(gbyte);
 					}
 				}
 			}
 			bedout.close();
-		} catch (IOException e)
+		} 
+		catch (IOException e)
 		{
 			e.printStackTrace();
 		}
@@ -549,7 +565,8 @@ public class SimuPolyCC
 					+ ".cov")));
 			geno = new PrintWriter(new BufferedWriter(new FileWriter(out
 					+ ".add")));
-		} catch (IOException e)
+		} 
+		catch (IOException e)
 		{
 			Logger.handleException(e,
 					"An exception occurred when writing files.");
@@ -566,7 +583,8 @@ public class SimuPolyCC
 				pedout.print(1 + " ");
 
 				pedout.print(2 + " ");
-			} else
+			} 
+			else
 			{
 				pedout.print("control_" + i + " ");
 				pedout.print(1 + " ");
@@ -583,10 +601,12 @@ public class SimuPolyCC
 				if (g == -1)
 				{
 					pedout.print(A1 + " " + A1 + "  ");
-				} else if (g == 0)
+				} 
+				else if (g == 0)
 				{
 					pedout.print(A1 + " " + A2 + "  ");
-				} else
+				} 
+				else
 				{
 					pedout.print(A2 + " " + A2 + "  ");
 				}
@@ -595,18 +615,17 @@ public class SimuPolyCC
 
 			if (i < N_case)
 			{
-				phe.print("case_" + i + " " + 1 + " " + 2 + " ");
+				phe.println("case_" + i + " " + 1 + " " + 2 + " ");
 				cov.print("case_" + i + " " + 1 + " " + 2 + " ");
-			} else
+			} 
+			else
 			{
-				phe.print("control_" + i + " " + 1 + " " + 1 + " ");
+				phe.println("control_" + i + " " + 1 + " " + 1 + " ");
 				cov.print("control_" + i + " " + 1 + " " + 1 + " ");
 			}
-			phe.println();
 
 			cov.print(risk[i] + " ");
-			cov.print(BV[i] + " ");
-			cov.println(phenotype[i]);
+			cov.println(BV[i] + " ");
 		}
 
 		for (int i = 0; i < genotype.length; i++)
@@ -642,7 +661,8 @@ public class SimuPolyCC
 			{
 				D[i] = dprime[i]
 						* Math.min(f[i] * (1 - f[i + 1]), f[i + 1] * (1 - f[i]));
-			} else
+			} 
+			else
 			{
 				D[i] = dprime[i]
 						* Math.min(f[i] * f[i + 1], (1 - f[i]) * (1 - f[i + 1]));
@@ -673,7 +693,8 @@ public class SimuPolyCC
 					effect[c++] = Double.parseDouble(l[0]);
 				}
 			}
-		} catch (IOException e)
+		} 
+		catch (IOException e)
 		{
 			Logger.handleException(e,
 					"An exception occurred when reading the poly-effect file '"
@@ -691,7 +712,8 @@ public class SimuPolyCC
 		{
 			eff = new PrintWriter(new BufferedWriter(new FileWriter(out
 					+ ".rnd")));
-		} catch (IOException e)
+		} 
+		catch (IOException e)
 		{
 			e.printStackTrace();
 		}

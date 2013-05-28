@@ -89,7 +89,8 @@ public class SimuPolyQT
 		{
 			Logger.printUserLog("genetic effect file: "
 					+ CmdArgs.INSTANCE.polyEffectFile);
-		} else
+		} 
+		else
 		{
 			Logger.printUserLog("Uniform Effect: " + U);
 		}
@@ -111,7 +112,8 @@ public class SimuPolyQT
 		if (CmdArgs.INSTANCE.makebedFlag)
 		{
 			writeBFile();
-		} else
+		} 
+		else
 		{
 			writeFile();
 		}
@@ -126,7 +128,8 @@ public class SimuPolyQT
 		if (CmdArgs.INSTANCE.polyEffectFlag)
 		{
 			effect = readEffects();
-		} else
+		} 
+		else
 		{
 			effect = GenerateEffects();
 		}
@@ -170,7 +173,8 @@ public class SimuPolyQT
 						/ ((M - M_null) * 2 * freq[i] * (1 - freq[i])));
 				effect[i] = sigma_b;
 			}
-		} else
+		} 
+		else
 		{
 			for (int i = 0; i < M - M_null; i++)
 			{
@@ -188,7 +192,8 @@ public class SimuPolyQT
 		{
 			eff = new PrintWriter(new BufferedWriter(new FileWriter(out
 					+ ".rnd")));
-		} catch (IOException e)
+		} 
+		catch (IOException e)
 		{
 			e.printStackTrace();
 		}
@@ -219,7 +224,8 @@ public class SimuPolyQT
 				if (i == 0)
 				{
 					v[i][j] = z;
-				} else
+				} 
+				else
 				{
 					double d = rnd.nextUniform(0, 1);
 					int a = (int) v[i - 1][j];
@@ -279,7 +285,8 @@ public class SimuPolyQT
 					+ ".cov")));
 			geno = new PrintWriter(new BufferedWriter(new FileWriter(out
 					+ ".add")));
-		} catch (IOException e)
+		} 
+		catch (IOException e)
 		{
 			e.printStackTrace();
 		}
@@ -292,14 +299,10 @@ public class SimuPolyQT
 			fam.print(0 + " ");
 			fam.print(1 + " ");
 
-			fam.println(2 + " ");
+			fam.println(phenotype[i] + " ");
 
-			phe.print("sample_" + i + " " + 1 + " " + 2 + " ");
-			phe.println();
-			cov.print("sample_" + i + " " + 1 + " " + 2 + " ");
-
-			cov.print(BV[i] + " ");
-			cov.println(phenotype[i]);
+			phe.println("sample_" + i + " " + 1 + " " + phenotype[i]);
+			cov.println("sample_" + i + " " + 1 + " " + BV[i]);
 		}
 
 		for (int i = 0; i < genotype.length; i++)
@@ -353,14 +356,16 @@ public class SimuPolyQT
 							gbyte = 0;
 							idx = 0;
 						}
-					} else
+					} 
+					else
 					{
 						bedout.writeByte(gbyte);
 					}
 				}
 			}
 			bedout.close();
-		} catch (IOException e)
+		} 
+		catch (IOException e)
 		{
 			e.printStackTrace();
 		}
@@ -397,7 +402,8 @@ public class SimuPolyQT
 					+ ".cov")));
 			geno = new PrintWriter(new BufferedWriter(new FileWriter(out
 					+ ".add")));
-		} catch (IOException e)
+		} 
+		catch (IOException e)
 		{
 			Logger.handleException(e,
 					"An exception occurred when writing files.");
@@ -468,7 +474,8 @@ public class SimuPolyQT
 			{
 				D[i] = dprime[i]
 						* Math.min(f[i] * (1 - f[i + 1]), f[i + 1] * (1 - f[i]));
-			} else
+			} 
+			else
 			{
 				D[i] = dprime[i]
 						* Math.min(f[i] * f[i + 1], (1 - f[i]) * (1 - f[i + 1]));
@@ -498,7 +505,8 @@ public class SimuPolyQT
 					effect[c++] = Double.parseDouble(l[0]);
 				}
 			}
-		} catch (IOException e)
+		} 
+		catch (IOException e)
 		{
 			Logger.handleException(e,
 					"An exception occurred when reading the poly-effect file '"
@@ -516,7 +524,8 @@ public class SimuPolyQT
 		{
 			eff = new PrintWriter(new BufferedWriter(new FileWriter(out
 					+ ".rnd")));
-		} catch (IOException e)
+		} 
+		catch (IOException e)
 		{
 			e.printStackTrace();
 		}
