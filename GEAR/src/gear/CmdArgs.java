@@ -84,9 +84,8 @@ public enum CmdArgs
 				.hasArg().create(cmd_simu_fam_marker));
 
 		// simulation real data
-		ops.addOption(OptionBuilder.withLongOpt(cmd_simu_realdata_long)
-				.withDescription("gwas simulations ").hasArg()
-				.create(cmd_simu_realdata));
+		ops.addOption(OptionBuilder.withDescription("gwas data simulations ")
+				.create(cmd_bsimu));
 
 		ops.addOption(OptionBuilder.withLongOpt(cmd_simu_seed_long)
 				.withDescription("gwas simulation seed ").hasArg()
@@ -117,7 +116,7 @@ public enum CmdArgs
 				.create(cmd_simu_order));
 
 		ops.addOption(OptionBuilder.withLongOpt(cmd_simu_cc_long)
-				.withDescription("gwas simulate case-control ").hasArgs(2)
+				.withDescription("gwas simulate case-control ").hasArg()
 				.create(cmd_simu_cc));
 
 		ops.addOption(OptionBuilder.withLongOpt(cmd_simu_k_long)
@@ -704,9 +703,8 @@ public enum CmdArgs
 
 	// /////////////simulation real data
 
-	private final String cmd_simu_realdata = "simu_real_data";
-	private final String cmd_simu_realdata_long = "simu-real-data";
-	public boolean simuRealData = false;
+	private final String cmd_bsimu = "bsimu";
+	public boolean bsimuFlag = false;
 
 	private final String cmd_simu_seed = "simu_seed";
 	private final String cmd_simu_seed_long = "simu-seed";
@@ -747,10 +745,6 @@ public enum CmdArgs
 
 	public final int sm_qt = 0;
 	public final int sm_cc = 1;
-
-	public boolean[] simuType = { true, false }; // first one for case-control,
-													// second one for
-													// quantitative
 
 	// ///////////////simulation polygenic
 	private final String cmd_poly_loci = "poly_loci";
@@ -1559,15 +1553,13 @@ public enum CmdArgs
 
 		// simulation real data
 
-		if (cl.hasOption(cmd_simu_realdata))
+		if (cl.hasOption(cmd_bsimu))
 		{
-			simuRealData = true;
+			bsimuFlag = true;
 		}
 
 		if (cl.hasOption(cmd_simu_qt))
 		{
-			simuType[sm_qt] = false;
-			simuType[sm_cc] = true;
 			simupolyQTFlag = true;
 
 			poly_sample_QT = Integer.parseInt(cl.getOptionValue(cmd_simu_qt));
@@ -1575,10 +1567,8 @@ public enum CmdArgs
 
 		if (cl.hasOption(cmd_simu_cc))
 		{
-			simuType[sm_qt] = true;
-			simuType[sm_cc] = false;
 
-			String[] s = cl.getOptionValues(cmd_simu_cc);
+			String[] s = cl.getOptionValue(cmd_simu_cc).split(",");
 			simuCC[0] = Integer.parseInt(s[0]);
 			simuCC[1] = Integer.parseInt(s[1]);
 			simupolyCCFlag = true;

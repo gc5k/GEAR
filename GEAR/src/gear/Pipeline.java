@@ -16,6 +16,7 @@ import he.h2trans.H2Transformer;
 import realcheck.RealCheck;
 import realcheck.RealCheckOne;
 import simulation.RealDataSimulation;
+import simulation.RealDataSimulationQT;
 import simulation.SimuFamily;
 import simulation.SimuPolyCC;
 import simulation.SimuPolyQT;
@@ -107,10 +108,16 @@ public class Pipeline
 			simuFam.generateSample();
 
 		}
-		else if (CmdArgs.INSTANCE.simuRealData)
+		else if (CmdArgs.INSTANCE.simupolyCCFlag && CmdArgs.INSTANCE.bsimuFlag)
 		{
 			RealDataSimulation rdSimu = new RealDataSimulation();
 			rdSimu.GenerateSample();
+
+		}
+		else if (CmdArgs.INSTANCE.bsimuFlag)
+		{
+			RealDataSimulationQT rdSimuQT = new RealDataSimulationQT();
+			rdSimuQT.GenerateSample();
 
 		}
 		else if (CmdArgs.INSTANCE.simupolyCCFlag)
