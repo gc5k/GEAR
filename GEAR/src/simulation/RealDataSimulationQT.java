@@ -25,24 +25,20 @@ import gear.util.NewIt;
 import simulation.qc.rowqc.*;
 import simulation.gm.RealDataSimulationGenotypeMatrix;
 
-public class RealDataSimulation
+public class RealDataSimulationQT
 {
 	private String casualLociFile = null;
 	private int[] casualLociIdx = null;
 	private double[] b = null;
 	private double[][] bv = null;
 	private double[][] y = null;
-	private int[][] flag = null;
-	private double[] T = null;
 	private Random rnd;
 	private PLINKParser pp = null;
 	private SampleFilter sf = null;
 	RealDataSimulationGenotypeMatrix GM;
 	private int sampleSize = 0;
-	private double accept_cs;
-	private double accept_ctrl;
 
-	public RealDataSimulation()
+	public RealDataSimulationQT()
 	{
 		if (CmdArgs.INSTANCE.getFileArgs().isSet())
 		{
@@ -82,28 +78,10 @@ public class RealDataSimulation
 				pp.getPedigreeData(), pp.getMapData(), sf);
 		GM = new RealDataSimulationGenotypeMatrix(rdSimuQC);
 		sampleSize = GM.getGRow();
-		T = new double[CmdArgs.INSTANCE.simuRep];
-		flag = new int[CmdArgs.INSTANCE.simuRep][];
-
-		accept_cs = (CmdArgs.INSTANCE.simuCC[0] / (1.0 * sampleSize))
-				/ CmdArgs.INSTANCE.simuK;
-		accept_ctrl = (CmdArgs.INSTANCE.simuCC[1] / (1.0 * sampleSize))
-				/ (1 - CmdArgs.INSTANCE.simuK);
-
-		if (accept_cs >= 1 || accept_ctrl >= 1)
-		{
-			Logger.printUserLog("It is impossible to generate the case-control sampel with K = "
-					+ CmdArgs.INSTANCE.simuK
-					+ " with --simu-cc "
-					+ CmdArgs.INSTANCE.simuCC[0]
-					+ " "
-					+ CmdArgs.INSTANCE.simuCC[1]);
-		}
 
 		bv = new double[CmdArgs.INSTANCE.simuRep][sampleSize];
 		b = generateAddEffects(casualLociIdx.length);
 		y = new double[CmdArgs.INSTANCE.simuRep][];
-		int cut_off = (int) (sampleSize * (1 - CmdArgs.INSTANCE.simuK));
 		for (int i = 0; i < CmdArgs.INSTANCE.simuRep; i++)
 		{
 			bv[i] = calculateBV(b);
@@ -114,8 +92,6 @@ public class RealDataSimulation
 			double[] t = new double[sampleSize];
 			System.arraycopy(y[i], 0, t, 0, sampleSize);
 			Arrays.sort(t);
-			T[i] = t[cut_off];
-			flag[i] = sample1(T[i], y[i]);
 		}
 
 		StringBuffer sb1 = new StringBuffer(CmdArgs.INSTANCE.out);
@@ -141,52 +117,11 @@ public class RealDataSimulation
 			ps2.append(pi.getFamilyID() + " " + pi.getIndividualID() + " ");
 			for (int j = 0; j < CmdArgs.INSTANCE.simuRep; j++)
 			{
-				ps2.append(flag[j][i] + " ");
+				ps2.append(y[j][i] + " ");
 			}
 			ps2.append("\n");
 		}
 		ps2.close();
-	}
-
-	private int[] sample1(double T, double[] y)
-	{
-		int[] indicator = new int[y.length];
-
-		int filler = Integer.parseInt(CmdArgs.INSTANCE.missing_phenotype);
-
-		Arrays.fill(indicator, filler);
-		int cs = 0;
-		int ctrl = 0;
-		int i = 0;
-		while (cs < CmdArgs.INSTANCE.simuCC[0]
-				&& ctrl < CmdArgs.INSTANCE.simuCC[1])
-		{
-			if (i == y.length)
-				i = 0;
-
-			if (indicator[i] == filler)
-			{
-				double r = rnd.nextFloat();
-				if (y[i] < T)
-				{
-					if (r < accept_ctrl)
-					{
-						indicator[i] = 1;
-						ctrl++;
-					}
-				} 
-				else
-				{
-					if (r < accept_cs)
-					{
-						indicator[i] = 2;
-						cs++;
-					}
-				}
-			}
-			i++;
-		}
-		return indicator;
 	}
 
 	private double[] generateY(double[] bv, double se)
@@ -230,7 +165,7 @@ public class RealDataSimulation
 
 	private void getRandomCasualLoci(int num)
 	{
-		if (num > 0) 
+		if (num > 0)
 		{
 			ArrayList<SNP> snpList = pp.getMapData().getMarkerList();
 
@@ -281,7 +216,7 @@ public class RealDataSimulation
 			casualLociIdx = new int[snpList.size()];
 			for (int i = 0; i < casualLociIdx.length; i++)
 				casualLociIdx[i] = i;
-		}
+		} 
 		else
 		{
 			ArrayList<Integer> Idx = NewIt.newArrayList();
