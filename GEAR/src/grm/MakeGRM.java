@@ -378,7 +378,6 @@ public class MakeGRM
 
 		if (s[0] > 0)
 		{
-			System.out.println(s[0] + " " + s[1]);
 			s[1] /= s[0];
 		}
 		else 
