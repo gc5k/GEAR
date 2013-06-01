@@ -21,7 +21,7 @@ public enum CmdArgs
 	INSTANCE;
 
 	private CommandLine cl;
-	
+
 	private Options ops = new Options();
 
 	private CommandLineParser parser = new PosixParser();
@@ -33,12 +33,13 @@ public enum CmdArgs
 		fileArgs = new FileArgs();
 		bfileArgs = new BFileArgs[2];
 		bfileArgs[0] = new BFileArgs("PLINK format binary input file", "bfile");
-		bfileArgs[1] = new BFileArgs("The second PLINK format binary input file", "bfile2");
+		bfileArgs[1] = new BFileArgs(
+				"The second PLINK format binary input file", "bfile2");
 		profileArgs = new ProfileArgs();
 
 		// real-check
-		ops.addOption(OptionBuilder.withDescription("realcheck ").create(
-				cmd_realcheck));
+		ops.addOption(OptionBuilder.withDescription("realcheck ")
+				.create(cmd_realcheck));
 		realCheckParameter.commandInitial();
 
 		// merge
@@ -65,8 +66,9 @@ public enum CmdArgs
 
 		ops.addOption(OptionBuilder.withDescription("logit").create(cmd_logit));
 
-		ops.addOption(OptionBuilder.withLongOpt("keep-atgc").withDescription("whether to keep A/T and G/C loci").create());
-		
+		ops.addOption(OptionBuilder.withLongOpt("keep-atgc")
+				.withDescription("whether to keep A/T and G/C loci").create());
+
 		ops.addOption(OptionBuilder.withLongOpt(cmd_remove_Flip_long)
 				.withDescription("remove flipped loci").create(cmd_remove_Flip));
 
@@ -124,8 +126,8 @@ public enum CmdArgs
 				.hasArg().create(cmd_simu_k));
 
 		// nontransmitted
-		ops.addOption(OptionBuilder.withDescription("nontransmitted ").create(
-				cmd_nontrans));
+		ops.addOption(OptionBuilder.withDescription("nontransmitted ")
+				.create(cmd_nontrans));
 
 		ops.addOption(OptionBuilder.withLongOpt(cmd_nontrans_cases_long)
 				.withDescription("nontransmitted filter cases ")
@@ -143,14 +145,12 @@ public enum CmdArgs
 
 		ops.addOption(OptionBuilder
 				.withLongOpt(cmd_poly_loci_long)
-				.withDescription(
-						"number of polygenic loci, defualt= " + polyLoci)
+				.withDescription(	"number of polygenic loci, defualt= " + polyLoci)
 				.hasArg().create(cmd_poly_loci));
 
 		ops.addOption(OptionBuilder
 				.withLongOpt(cmd_poly_loci_null_long)
-				.withDescription(
-						"number of null polygenic loci, defualt= " + polyLoci)
+				.withDescription(	"number of null polygenic loci, defualt= " + polyLoci)
 				.hasArg().create(cmd_poly_loci_null));
 
 		ops.addOption(OptionBuilder.withLongOpt(cmd_poly_LD_long)
@@ -164,14 +164,12 @@ public enum CmdArgs
 
 		ops.addOption(OptionBuilder
 				.withLongOpt(cmd_poly_freq_long)
-				.withDescription(
-						"minor allele frequency for polygenic model? "
-								+ polyFreq).hasArg().create(cmd_poly_freq));
+				.withDescription(	"minor allele frequency for polygenic model? " + polyFreq)
+				.hasArg().create(cmd_poly_freq));
 
 		ops.addOption(OptionBuilder
 				.withLongOpt(cmd_poly_effect_long)
-				.withDescription(
-						"effect for polygenic model? " + polyEffectFile)
+				.withDescription(	"effect for polygenic model? " + polyEffectFile)
 				.hasArg().create(cmd_poly_effect));
 
 		// pop stat
@@ -236,14 +234,12 @@ public enum CmdArgs
 
 		ops.addOption(OptionBuilder
 				.withLongOpt(cmd_maf_range_long)
-				.withDescription(
-						"only maf withwin this range (inclusive) will be used ")
+				.withDescription(	"only maf withwin this range (inclusive) will be used ")
 				.hasArg().create(cmd_maf_range));
 
 		ops.addOption(OptionBuilder
 				.withLongOpt(cmd_grm_range_long)
-				.withDescription(
-						"only grm withwin this range (inclusive) will be calculated ")
+				.withDescription(	"only grm withwin this range (inclusive) will be calculated ")
 				.hasArg().create(cmd_grm_range));
 
 		ops.addOption(OptionBuilder.withLongOpt(cmd_grm_partition_long)
@@ -256,8 +252,7 @@ public enum CmdArgs
 
 		ops.addOption(OptionBuilder
 				.withLongOpt(cmd_make_grm_txt_long)
-				.withDescription(
-						"generate genetic relationship matirx and save in the plain text format")
+				.withDescription(	"generate genetic relationship matirx and save in the plain text format")
 				.create(cmd_make_grm_txt));
 
 		ops.addOption(OptionBuilder.withDescription("covariate file").hasArg()
@@ -275,8 +270,8 @@ public enum CmdArgs
 				.withDescription("quantitative covariate index").hasArg()
 				.create(cmd_qcovar_num));
 
-		ops.addOption(OptionBuilder.withDescription("reverse ").create(
-				cmd_reverse));
+		ops.addOption(OptionBuilder.withDescription("reverse ")
+				.create(cmd_reverse));
 
 		ops.addOption(OptionBuilder
 				.withDescription("standardise the phenotype").create(cmd_scale));
@@ -287,28 +282,27 @@ public enum CmdArgs
 		ops.addOption(OptionBuilder.withDescription("prevalence ").hasArg()
 				.create(cmd_k));
 
-		ops.addOption(OptionBuilder.withDescription("Strings for representing \"Not Available\"").hasArg().create("na"));
+		ops.addOption(OptionBuilder
+				.withDescription("Strings for representing \"Not Available\"")
+				.hasArg().create("na"));
 
 		hpcArgs = new HpcArgs();
 
 		// /////transform heritability
 		ops.addOption(OptionBuilder
 				.withLongOpt(cmd_cal_k_long)
-				.withDescription(
-						"calculate heritability on the liability/observed scale with value K "
-								+ cmd_cal_k).hasArg().create(cmd_cal_k));
+				.withDescription(	"calculate heritability on the liability/observed scale with value K " + cmd_cal_k)
+				.hasArg().create(cmd_cal_k));
 
 		ops.addOption(OptionBuilder
 				.withLongOpt(cmd_cal_hl_long)
-				.withDescription(
-						"calculate heritability on the liability/observed scale "
-								+ cmd_cal_hl_long).hasArg().create(cmd_cal_hl));
+				.withDescription(	"calculate heritability on the liability/observed scale " + cmd_cal_hl_long)
+				.hasArg().create(cmd_cal_hl));
 
 		ops.addOption(OptionBuilder
 				.withLongOpt(cmd_cal_ho_long)
-				.withDescription(
-						"calculate heritability on the liability/observed scale "
-								+ cmd_cal_ho_long).hasArg().create(cmd_cal_ho));
+				.withDescription(	"calculate heritability on the liability/observed scale " + cmd_cal_ho_long)
+				.hasArg().create(cmd_cal_ho));
 
 		ops.addOption(OptionBuilder.withLongOpt(cmd_cal_cc_long)
 				.withDescription("number of case and controls " + cmd_cal_cc)
@@ -316,15 +310,15 @@ public enum CmdArgs
 
 		ops.addOption(OptionBuilder
 				.withLongOpt(cmd_cal_h2_se_long)
-				.withDescription(
-						"se of heritability on the liability/observed scale ")
+				.withDescription(	"se of heritability on the liability/observed scale ")
 				.hasArg().create(cmd_cal_h2_se));
 
 		ops.addOption(OptionBuilder
 				.withDescription("root file, default = " + out).hasArg()
 				.create(cmd_out));
 
-		ops.addOption(OptionBuilder.withDescription("help manual.").create(cmd_help));
+		ops.addOption(OptionBuilder.withDescription("help manual.")
+				.create(cmd_help));
 	}
 
 	public class BFileArgs
@@ -333,7 +327,8 @@ public enum CmdArgs
 		@SuppressWarnings("static-access")
 		private BFileArgs(String desc, String opt)
 		{
-			ops.addOption(OptionBuilder.withDescription(desc).hasArg().create(opt));
+			ops.addOption(OptionBuilder.withDescription(desc).hasArg()
+					.create(opt));
 			cmd_bfile = opt;
 		}
 
@@ -375,7 +370,9 @@ public enum CmdArgs
 		@SuppressWarnings("static-access")
 		private FileArgs()
 		{
-			ops.addOption(OptionBuilder.withDescription("PLINK format text input file").hasArg().create("file"));
+			ops.addOption(OptionBuilder
+					.withDescription("PLINK format text input file").hasArg()
+					.create("file"));
 		}
 
 		public boolean isSet()
@@ -815,82 +812,97 @@ public enum CmdArgs
 		private ProfileArgs()
 		{
 			String desc;
-			
-			ops.addOption(OptionBuilder.withDescription("score file used for profiling").hasArg().create("score"));
-			ops.addOption(OptionBuilder.withLongOpt("mach-dosage").withDescription(".mldose file generated by MaCH").hasArg().create());
-			ops.addOption(OptionBuilder.withLongOpt("mach-infor").withDescription(".mlinfo file generated by MaCH").hasArg().create());
-			ops.addOption(OptionBuilder.withLongOpt("mach-dosage-batch").withDescription("text file in which each line records the name of a .mldose file").hasArg().create());
-			ops.addOption(OptionBuilder.withLongOpt("mach-infor-batch").withDescription("text file in which each line records the name of a .mlinfo file").hasArg().create());
-			ops.addOption(OptionBuilder.withLongOpt("q-score-file").withDescription("q score file").hasArg().create());
-			ops.addOption(OptionBuilder.withLongOpt("q-score-range").withDescription("q score range").hasArg().create());
-			
+
+			ops.addOption(OptionBuilder
+					.withDescription("score file used for profiling").hasArg()
+					.create("score"));
+			ops.addOption(OptionBuilder.withLongOpt("mach-dosage")
+					.withDescription(".mldose file generated by MaCH").hasArg()
+					.create());
+			ops.addOption(OptionBuilder.withLongOpt("mach-infor")
+					.withDescription(".mlinfo file generated by MaCH").hasArg()
+					.create());
+			ops.addOption(OptionBuilder
+					.withLongOpt("mach-dosage-batch")
+					.withDescription(	"text file in which each line records the name of a .mldose file")
+					.hasArg().create());
+			ops.addOption(OptionBuilder
+					.withLongOpt("mach-infor-batch")
+					.withDescription(	"text file in which each line records the name of a .mlinfo file")
+					.hasArg().create());
+			ops.addOption(OptionBuilder.withLongOpt("q-score-file")
+					.withDescription("q score file").hasArg().create());
+			ops.addOption(OptionBuilder.withLongOpt("q-score-range")
+					.withDescription("q score range").hasArg().create());
+
 			// --greedy
 			desc = "Alleles will be flipped if neither allele of a locus matches the score allele.";
 			ops.addOption(OptionBuilder.withDescription(desc).create("greedy"));
-			
+
 			// --model
 			desc = "";
 			desc += "Compute Model, valid values are 'additive', 'dominance' or 'recessive'. ";
 			desc += "If this option is not set, PLINK model is used.";
-			ops.addOption(OptionBuilder.withLongOpt("model").withDescription(desc).hasArg().create());
+			ops.addOption(OptionBuilder.withLongOpt("model")
+					.withDescription(desc).hasArg().create());
 		}
-		
+
 		public boolean isSet()
 		{
 			return getScoreFile() != null;
 		}
-		
+
 		public String getScoreFile()
 		{
 			return cl.getOptionValue("score");
 		}
-		
+
 		public String getMachDosageFile()
 		{
 			return cl.getOptionValue("mach-dosage");
 		}
-		
+
 		public String getMachInfoFile()
 		{
 			return cl.getOptionValue("mach-infor");
 		}
-		
+
 		public String getMachDosageBatchFile()
 		{
 			return cl.getOptionValue("mach-dosage-batch");
 		}
-		
+
 		public String getMachInfoBatchFile()
 		{
 			return cl.getOptionValue("mach-infor-batch");
 		}
-		
+
 		public String getQScoreFile()
 		{
 			return cl.getOptionValue("q-score-file");
 		}
-		
+
 		public String getQRangeFile()
 		{
 			return cl.getOptionValue("q-score-range");
 		}
-		
+
 		public boolean isGreedy()
 		{
 			return cl.hasOption("greedy");
 		}
-		
+
 		public String getModel()
 		{
 			return cl.getOptionValue("model");
 		}
 	}
-	
+
 	public ProfileArgs getProfileArgs()
 	{
 		return profileArgs;
 	}
-	
+
 	private ProfileArgs profileArgs;
 
 	// grm statistics
@@ -925,11 +937,19 @@ public enum CmdArgs
 			ops.addOption(OptionBuilder.withLongOpt(cmd_grm_txt_long)
 					.withDescription("grm text format").hasArg()
 					.create(cmd_grm_txt));
+			ops.addOption(OptionBuilder.withLongOpt(cmd_grm_txt_list_long)
+					.withDescription("grm text list").hasArg()
+					.create(cmd_grm_txt_list));
 			ops.addOption(OptionBuilder.withLongOpt(cmd_grm_bin_long)
 					.withDescription("grm binary format").hasArg()
 					.create(cmd_grm_bin));
+			ops.addOption(OptionBuilder.withLongOpt(cmd_grm_bin_list_long)
+					.withDescription("grm binary list").hasArg()
+					.create(cmd_grm_bin_list));
 			ops.addOption(OptionBuilder.withDescription("grm ").hasArg()
 					.create(cmd_grm));
+			ops.addOption(OptionBuilder.withDescription("grm list").hasArg()
+					.create(cmd_grm_list));
 			ops.addOption(OptionBuilder.withDescription("pheno ").hasArg()
 					.create(cmd_pheno));
 			ops.addOption(OptionBuilder.withLongOpt(cmd_mpheno)
@@ -957,9 +977,24 @@ public enum CmdArgs
 				StringBuilder sb2 = new StringBuilder(
 						cl.getOptionValue(cmd_grm));
 				grm_id = sb2.append(".grm.id").toString();
+				isGrm_ = true;
 				isGrmBinary_ = false;
 				isGrmTxt_ = false;
-			} 
+				isGrmList_ = false;
+				isGrmBinaryList_ = false;
+				isGrmTxtList_ = false;
+			}
+			else if (cl.hasOption(cmd_grm_list))
+			{
+				grmList_ = cl.getOptionValue(cmd_grm_list);
+				exists(grmList_);
+				isGrm_ = false;
+				isGrmBinary_ = false;
+				isGrmTxt_ = false;
+				isGrmList_ = true;
+				isGrmBinaryList_ = false;
+				isGrmTxtList_ = false;
+			}
 			else if (cl.hasOption(cmd_grm_bin))
 			{
 				StringBuilder sb1 = new StringBuilder(
@@ -968,9 +1003,24 @@ public enum CmdArgs
 				StringBuilder sb2 = new StringBuilder(
 						cl.getOptionValue(cmd_grm_bin));
 				grm_id = sb2.append(".grm.id").toString();
+				isGrm_ = false;
 				isGrmBinary_ = true;
 				isGrmTxt_ = false;
-			} 
+				isGrmList_ = false;
+				isGrmBinaryList_ = false;
+				isGrmTxtList_ = false;
+			}
+			else if (cl.hasOption(cmd_grm_bin_list))
+			{
+				grmList_ = cl.getOptionValue(cmd_grm_bin_list);
+				exists(grmList_);
+				isGrm_ = false;
+				isGrmBinary_ = false;
+				isGrmTxt_ = false;
+				isGrmList_ = false;
+				isGrmBinaryList_ = true;
+				isGrmTxtList_ = false;
+			}
 			else if (cl.hasOption(cmd_grm_txt))
 			{
 				StringBuilder sb1 = new StringBuilder(
@@ -979,8 +1029,23 @@ public enum CmdArgs
 				StringBuilder sb2 = new StringBuilder(
 						cl.getOptionValue(cmd_grm_txt));
 				grm_id = sb2.append(".grm.id").toString();
+				isGrm_ = false;
 				isGrmBinary_ = false;
 				isGrmTxt_ = true;
+				isGrmList_ = false;
+				isGrmBinaryList_ = false;
+				isGrmTxtList_ = false;
+			}
+			else if (cl.hasOption(cmd_grm_txt_list))
+			{
+				grmList_ = cl.getOptionValue(cmd_grm_txt_list);
+				exists(grmList_);
+				isGrm_ = false;
+				isGrmBinary_ = false;
+				isGrmTxt_ = false;
+				isGrmList_ = false;
+				isGrmBinaryList_ = false;
+				isGrmTxtList_ = true;
 			}
 
 			if (cl.hasOption(cmd_grm_cutoff))
@@ -1018,12 +1083,12 @@ public enum CmdArgs
 			{
 				type = HEType.SD;
 				heFlag = true;
-			} 
+			}
 			else if (cl.hasOption(cmd_ss))
 			{
 				type = HEType.SS;
 				heFlag = true;
-			} 
+			}
 			else if (cl.hasOption(cmd_cp))
 			{
 				type = HEType.CP;
@@ -1036,14 +1101,34 @@ public enum CmdArgs
 			return type;
 		}
 
+		public boolean isGrm()
+		{
+			return isGrm_;
+		}
+
+		public boolean isGrmList()
+		{
+			return isGrmList_;
+		}
+
 		public boolean isGrmBinary()
 		{
 			return isGrmBinary_;
 		}
 
+		public boolean isGrmBinaryList()
+		{
+			return isGrmBinaryList_;
+		}
+		
 		public boolean isGrmTxt()
 		{
 			return isGrmTxt_;
+		}
+
+		public boolean isGrmTxtList()
+		{
+			return isGrmTxtList_;
 		}
 
 		public boolean isGrmCutoff()
@@ -1106,14 +1191,26 @@ public enum CmdArgs
 
 		private final String cmd_grm_txt = "grm_txt";
 		private final String cmd_grm_txt_long = "grm-txt";
+		private final String cmd_grm_txt_list = "grm_txt_list";
+		private final String cmd_grm_txt_list_long = "grm-txt-list";
+
 		private final String cmd_grm_bin = "grm_bin";
 		private final String cmd_grm_bin_long = "grm-bin";
-		private final String cmd_grm = "grm";
+		private final String cmd_grm_bin_list = "grm_bin_list";
+		private final String cmd_grm_bin_list_long = "grm-bin-list";
 
+		private final String cmd_grm = "grm";
+		private final String cmd_grm_list = "grm_list";
+
+		private boolean isGrm_;
 		private boolean isGrmBinary_;
 		private boolean isGrmTxt_;
+		private boolean isGrmList_;
+		private boolean isGrmTxtList_;
+		private boolean isGrmBinaryList_;
 		private String grm_;
 		private String grm_id = null;
+		private String grmList_;
 
 		private final String cmd_pheno = "pheno";
 		private String pheno = null;
@@ -1229,10 +1326,14 @@ public enum CmdArgs
 		private HpcArgs()
 		{
 			ops.addOption(OptionBuilder.withDescription("qsub").create("qsub"));
-			ops.addOption(OptionBuilder.withDescription("generate shell").create("shell"));
-			ops.addOption(OptionBuilder.withDescription("email").hasArg().create("email"));
-			ops.addOption(OptionBuilder.withDescription("ram").hasArg().create("ram"));
-			ops.addOption(OptionBuilder.withDescription("name").hasArg().create("name"));
+			ops.addOption(OptionBuilder.withDescription("generate shell")
+					.create("shell"));
+			ops.addOption(OptionBuilder.withDescription("email").hasArg()
+					.create("email"));
+			ops.addOption(OptionBuilder.withDescription("ram").hasArg()
+					.create("ram"));
+			ops.addOption(OptionBuilder.withDescription("name").hasArg()
+					.create("name"));
 		}
 
 		public boolean isSet()
@@ -1353,7 +1454,8 @@ public enum CmdArgs
 		}
 		catch (ParseException e)
 		{
-			Logger.handleException(e, "Failed to parse the command-line arguments.");
+			Logger.handleException(	e,
+									"Failed to parse the command-line arguments.");
 		}
 
 		if (cl.hasOption(cmd_help))
@@ -1415,15 +1517,15 @@ public enum CmdArgs
 				if (chr[i].startsWith("-"))
 				{
 					exSet.add(chr[i].substring(1, chr[i].length()));
-				} else
+				}
+				else
 				{
 					chrSet.add(chr[i]);
 				}
 			}
 			if (chr.length != chrSet.size() + exSet.size())
 			{
-				Logger.printUserError("Bad parameter for optin --" + cmd_chr
-						+ ".");
+				Logger.printUserError("Bad parameter for optin --" + cmd_chr + ".");
 				System.exit(1);
 			}
 			if (chrSet.size() > 0)
@@ -1739,8 +1841,7 @@ public enum CmdArgs
 					String[] pp = p[i].split("-");
 					if (pp.length != 2)
 					{
-						Logger.printUserError("Bad parameter for option --"
-								+ cmd_covar_num_long + ": " + p[i] + ".");
+						Logger.printUserError("Bad parameter for option --" + cmd_covar_num_long + ": " + p[i] + ".");
 						System.exit(1);
 					}
 					for (int j = Integer.parseInt(pp[0]); j <= Integer
@@ -1748,7 +1849,8 @@ public enum CmdArgs
 					{
 						idx.add(new Integer(j));
 					}
-				} else
+				}
+				else
 				{
 					idx.add(new Integer(Integer.parseInt(p[i])));
 				}
@@ -1760,8 +1862,7 @@ public enum CmdArgs
 				covar_num[c] = e.next().intValue();
 				if (covar_num[c] < 0)
 				{
-					Logger.printUserError("Bad parameter for option --"
-							+ cmd_covar_num_long + ": " + covar_num[c] + ".");
+					Logger.printUserError("Bad parameter for option --" + cmd_covar_num_long + ": " + covar_num[c] + ".");
 					System.exit(1);
 				}
 				c++;
@@ -1785,8 +1886,7 @@ public enum CmdArgs
 					String[] pp = p[i].split("-");
 					if (pp.length != 2)
 					{
-						Logger.printUserError("Bad parameter for option --"
-								+ cmd_qcovar_num_long + ": " + p[i] + ".");
+						Logger.printUserError("Bad parameter for option --" + cmd_qcovar_num_long + ": " + p[i] + ".");
 						System.exit(1);
 					}
 					for (int j = Integer.parseInt(pp[0]); j <= Integer
@@ -1794,7 +1894,8 @@ public enum CmdArgs
 					{
 						idx.add(new Integer(j));
 					}
-				} else
+				}
+				else
 				{
 					idx.add(new Integer(Integer.parseInt(p[i])));
 				}
@@ -1806,8 +1907,7 @@ public enum CmdArgs
 				qcovar_num[c] = e.next().intValue();
 				if (qcovar_num[c] < 0)
 				{
-					Logger.printUserError("Bad parameter for option --"
-							+ cmd_qcovar_num_long + ": " + qcovar_num[c] + ".");
+					Logger.printUserError("Bad parameter for option --" + cmd_qcovar_num_long + ": " + qcovar_num[c] + ".");
 					System.exit(1);
 				}
 				c++;
@@ -1879,7 +1979,7 @@ public enum CmdArgs
 	{
 		return ops;
 	}
-	
+
 	public String getNA()
 	{
 		return cl.getOptionValue("na");
