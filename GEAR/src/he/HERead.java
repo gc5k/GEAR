@@ -78,7 +78,8 @@ public class HERead
 				ID2Idx.put(sb.toString(), i2++);
 			}
 			reader.close();
-		} catch (IOException e)
+		} 
+		catch (IOException e)
 		{
 			e.printStackTrace();
 		}
@@ -109,7 +110,8 @@ public class HERead
 						{
 							f = false;
 							break;
-						} else
+						} 
+						else
 						{
 							y[ii][j + 1] = Double.parseDouble(s[1 + mpheno[j]]);
 						}
@@ -118,7 +120,8 @@ public class HERead
 				}
 			}
 			reader.close();
-		} catch (IOException e)
+		} 
+		catch (IOException e)
 		{
 			e.printStackTrace();
 		}
@@ -142,7 +145,8 @@ public class HERead
 					}
 				}
 				reader.close();
-			} catch (IOException e)
+			} 
+			catch (IOException e)
 			{
 				e.printStackTrace();
 			}

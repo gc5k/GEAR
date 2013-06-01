@@ -26,7 +26,7 @@ import gear.util.FileProcessor;
 import gear.util.Logger;
 import he.endian.LittleEndianDataInputStream;
 
-public class HECalculate
+public class HEMultiCalculate
 {
 
 	private final String delim = "\\s+";
@@ -35,7 +35,7 @@ public class HECalculate
 	private int Len = 0;
 	private double grmCutoff = 0;
 
-	public HECalculate(HERead h)
+	public HEMultiCalculate(HERead h)
 	{
 		heReader = h;
 		Calculate();
@@ -49,8 +49,7 @@ public class HECalculate
 		if (CmdArgs.INSTANCE.getHEArgs().isAbsGrmCutoff())
 		{
 			grmCutoff = CmdArgs.INSTANCE.getHEArgs().AbsGrmCutoff();
-		} 
-		else if (CmdArgs.INSTANCE.getHEArgs().isGrmCutoff())
+		} else if (CmdArgs.INSTANCE.getHEArgs().isGrmCutoff())
 		{
 			grmCutoff = CmdArgs.INSTANCE.getHEArgs().GrmCutoff();
 		}
@@ -162,8 +161,7 @@ public class HECalculate
 						{
 							if (Math.abs(g) > grmCutoff)
 								continue;
-						} 
-						else if (CmdArgs.INSTANCE.getHEArgs()
+						} else if (CmdArgs.INSTANCE.getHEArgs()
 								.isGrmCutoff())
 						{
 							if (g > grmCutoff)
@@ -194,8 +192,7 @@ public class HECalculate
 							Integer I = (Integer) cat.get(heReader.y[id1][1]);
 							I++;
 							cat.put(heReader.y[id1][1], I);
-						} 
-						else
+						} else
 						{
 							cat.put(heReader.y[id1][1], 1);
 						}
@@ -204,8 +201,7 @@ public class HECalculate
 							Integer I = (Integer) cat.get(heReader.y[id2][1]);
 							I++;
 							cat.put(heReader.y[id2][1], I);
-						} 
-						else
+						} else
 						{
 							cat.put(heReader.y[id2][1], 1);
 						}
@@ -248,13 +244,11 @@ public class HECalculate
 					}
 					grmFile.close();
 
-				} 
-				catch (IOException e)
+				} catch (IOException e)
 				{
 					e.printStackTrace();
 				}
-			} 
-			else if (!CmdArgs.INSTANCE.getHEArgs().isGrmBinary())
+			} else if (!CmdArgs.INSTANCE.getHEArgs().isGrmBinary())
 			{
 				heReader.XtX = new double[2][2];
 				heReader.XtY = new double[2];
@@ -263,8 +257,7 @@ public class HECalculate
 				try
 				{
 					fin = new FileInputStream(heReader.grmFile);
-				} 
-				catch (FileNotFoundException e1)
+				} catch (FileNotFoundException e1)
 				{
 					e1.printStackTrace();
 				}
@@ -272,8 +265,7 @@ public class HECalculate
 				try
 				{
 					gzis = new GZIPInputStream(fin);
-				} 
-				catch (IOException e1)
+				} catch (IOException e1)
 				{
 					e1.printStackTrace();
 				}
@@ -300,8 +292,7 @@ public class HECalculate
 						{
 							if (Math.abs(g) > grmCutoff)
 								continue;
-						} 
-						else if (CmdArgs.INSTANCE.getHEArgs()
+						} else if (CmdArgs.INSTANCE.getHEArgs()
 								.isGrmCutoff())
 						{
 							if (g > grmCutoff)
@@ -333,8 +324,7 @@ public class HECalculate
 							Integer I = (Integer) cat.get(heReader.y[id1][1]);
 							I++;
 							cat.put(heReader.y[id1][1], I);
-						} 
-						else
+						} else
 						{
 							cat.put(heReader.y[id1][1], 1);
 						}
@@ -343,8 +333,7 @@ public class HECalculate
 							Integer I = (Integer) cat.get(heReader.y[id2][1]);
 							I++;
 							cat.put(heReader.y[id2][1], I);
-						} 
-						else
+						} else
 						{
 							cat.put(heReader.y[id2][1], 1);
 						}
@@ -379,8 +368,7 @@ public class HECalculate
 						{
 							heReader.P = c1.doubleValue()
 									/ (c1.doubleValue() + c2.doubleValue());
-						} 
-						else
+						} else
 						{
 							heReader.P = c2.doubleValue()
 									/ (c1.doubleValue() + c2.doubleValue());
@@ -388,13 +376,11 @@ public class HECalculate
 					}
 					grmFile.close();
 
-				} 
-				catch (IOException e)
+				} catch (IOException e)
 				{
 					e.printStackTrace();
 				}
-			} 
-			else
+			} else
 			{// grm.bin
 				HashMap<Double, Integer> cat = new HashMap<Double, Integer>();
 
@@ -403,8 +389,7 @@ public class HECalculate
 				{
 					fileStream = new FileInputStream(CmdArgs.INSTANCE
 							.getHEArgs().getGrm());
-				} 
-				catch (FileNotFoundException e)
+				} catch (FileNotFoundException e)
 				{
 					Logger.handleException(e, "Cannot open the GRM file '"
 							+ CmdArgs.INSTANCE.getHEArgs().getGrm()
@@ -426,8 +411,7 @@ public class HECalculate
 							{
 								g = littleEndianDataStream.readFloat();
 							}
-						} 
-						catch (IOException e)
+						} catch (IOException e)
 						{
 							Logger.handleException(e,
 									"An exception occurred when reading the GRM file '"
@@ -448,8 +432,7 @@ public class HECalculate
 						{
 							if (Math.abs(g) > grmCutoff)
 								continue;
-						} 
-						else if (CmdArgs.INSTANCE.getHEArgs()
+						} else if (CmdArgs.INSTANCE.getHEArgs()
 								.isGrmCutoff())
 						{
 							if (g > grmCutoff)
@@ -481,8 +464,7 @@ public class HECalculate
 							Integer I = (Integer) cat.get(heReader.y[id1][1]);
 							I++;
 							cat.put(heReader.y[id1][1], I);
-						} 
-						else
+						} else
 						{
 							cat.put(heReader.y[id1][1], 1);
 						}
@@ -491,8 +473,7 @@ public class HECalculate
 							Integer I = (Integer) cat.get(heReader.y[id2][1]);
 							I++;
 							cat.put(heReader.y[id2][1], I);
-						} 
-						else
+						} else
 						{
 							cat.put(heReader.y[id2][1], 1);
 						}
@@ -591,8 +572,7 @@ public class HECalculate
 			if (CmdArgs.INSTANCE.qcovar_num == null)
 			{
 				heReader.sb.append("all");
-			} 
-			else
+			} else
 			{
 				for (int i = 0; i < CmdArgs.INSTANCE.qcovar_num.length; i++)
 				{
@@ -610,8 +590,7 @@ public class HECalculate
 			if (CmdArgs.INSTANCE.covar_num == null)
 			{
 				heReader.sb.append("all");
-			} 
-			else
+			} else
 			{
 				for (int i = 0; i < CmdArgs.INSTANCE.covar_num.length; i++)
 				{
@@ -690,8 +669,7 @@ public class HECalculate
 				try
 				{
 					q = Norm.inverseCumulativeProbability(1 - heReader.k);
-				} 
-				catch (MathException e)
+				} catch (MathException e)
 				{
 					e.printStackTrace();
 				}
@@ -747,8 +725,7 @@ public class HECalculate
 			try
 			{
 				pw = new PrintWriter(of);
-			} 
-			catch (FileNotFoundException e)
+			} catch (FileNotFoundException e)
 			{
 				e.printStackTrace();
 			}
