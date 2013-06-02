@@ -12,9 +12,8 @@ import gear.strand.MakePredictor2;
 import gear.strand.Strand;
 import gear.util.Logger;
 import grm.MakeGRM;
-import he.HECalculate;
-import he.HEPermutation;
-import he.HERead;
+import he.HEMCalculate;
+import he.HEMRead;
 import he.h2trans.H2Transformer;
 import realcheck.RealCheck;
 import realcheck.RealCheckOne;
@@ -172,15 +171,21 @@ public class Pipeline
 		}
 		else if (CmdArgs.INSTANCE.hasHEOption())
 		{
-			HERead hr = new HERead();
-			HECalculate HC = new HECalculate(hr);
-			HC.Regression();
-
-			if (CmdArgs.INSTANCE.permFlag)
-			{
-				HEPermutation hp = new HEPermutation(hr);
-				hp.Permutation();
-			}
+			HEMRead mhr = new HEMRead();
+			HEMCalculate mhc = new HEMCalculate(mhr);
+			mhc.Regression();
+//			if (CmdArgs.INSTANCE.getHEArgs().isSingleGrm())
+//			{
+//				HERead hr = new HERead();
+//				HECalculate hc = new HECalculate(hr);
+//				hc.Regression();
+//
+//				if (CmdArgs.INSTANCE.permFlag)
+//				{
+//					HEPermutation hp = new HEPermutation(hr);
+//					hp.Permutation();
+//				}
+//			}
 		}
 		else if (CmdArgs.INSTANCE.grmstatFlag)
 		{
