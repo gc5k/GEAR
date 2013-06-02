@@ -1,6 +1,8 @@
-package strand;
+package gear.strand;
 
-import java.io.BufferedReader;
+import java.io.DataOutputStream;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.PrintStream;
 import java.text.DecimalFormat;
@@ -8,40 +10,49 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
 
+import family.pedigree.PersonIndex;
 import family.pedigree.file.SNP;
+import family.pedigree.genotype.BPerson;
 import family.plink.PLINKBinaryParser;
 import family.plink.PLINKParser;
 import family.popstat.GenotypeMatrix;
 import family.qc.rowqc.SampleFilter;
 import gear.CmdArgs;
-import gear.ConstValues;
+import gear.util.BufferedReader;
 import gear.util.FileProcessor;
 import gear.util.Logger;
 import gear.util.NewIt;
 import gear.util.SNPMatch;
 import gear.util.stat.Z;
-import gear.util.structure.Predictor2;
+import gear.util.structure.MAF;
 
-public class MakePredictor2
+public class Strand
 {
 	private GenotypeMatrix G1;
 
 	private int[][] comSNPIdx;
 	private double[][] allelefreq1;
 	private double[] N1;
-	// private double[] N2;
+	private double[] N2;
 	private ArrayList<Boolean> flag;
 
-	private String[] title;
 	private ArrayList<SNP> snpList1;
-	private ArrayList<Predictor2> predictorList = NewIt.newArrayList();
-	ArrayList<Integer> scoreCoding = NewIt.newArrayList();
+	private ArrayList<MAF> mafList = NewIt.newArrayList();
+
+	private ArrayList<PersonIndex> PersonTable1;
+	ArrayList<Integer> snpCoding = NewIt.newArrayList();
 
 	private SampleFilter sf1;
 
-	public MakePredictor2()
+	private byte byte1 = 108;
+	private byte byte2 = 27;
+	private byte byte3 = 1;
+
+	private DataOutputStream os = null;
+
+	public Strand()
 	{
-		readPredictor();
+		readStrand();
 
 		PLINKParser pp1 = null;
 		if (CmdArgs.INSTANCE.getBFileArgs(0).isSet())
@@ -52,17 +63,18 @@ public class MakePredictor2
 					.getFam());
 		} else
 		{
-			Logger.printUserError("--bfile is not set");
+			Logger.printUserError("--bfile is not set.");
 			System.exit(1);
 		}
 		pp1.Parse();
 
 		sf1 = new SampleFilter(pp1.getPedigreeData(), pp1.getMapData());
 		G1 = new GenotypeMatrix(sf1.getSample());
+		PersonTable1 = sf1.getSample();
 		snpList1 = sf1.getMapFile().getMarkerList();
 	}
 
-	public void BuildPredictor()
+	public void Merge()
 	{
 		DecimalFormat fmt = new DecimalFormat("#.###E0");
 
@@ -71,6 +83,12 @@ public class MakePredictor2
 		sb.append(".mergesnp");
 		PrintStream ps = FileProcessor.CreatePrintStream(sb.toString());
 		ps.append("SNP\tChr\tPos\tA1_1st\tA2_1st\tA1_2nd\tA2_2nd\tMAF_A1_1st\tMAF_A1_2nd\tFlip\tMerged\tP\tScheme\n");
+
+		StringBuffer sb1 = new StringBuffer();
+		sb1.append(CmdArgs.INSTANCE.out);
+		sb1.append(".mergebadsnp");
+		PrintStream ps1 = FileProcessor.CreatePrintStream(sb.toString());
+		ps1.append("SNP\tChr\tPos\tA1_1st\tA2_1st\tA1_2nd\tA2_2nd\tMAF_A1_1st\tMAF_A1_2nd\tFlip\tMerged\tP\tScheme\n");
 
 		allelefreq1 = new double[G1.getNumMarker()][3];
 		N1 = new double[G1.getNumMarker()];
@@ -88,7 +106,7 @@ public class MakePredictor2
 			boolean flip = false;
 
 			SNP snp1 = snpList1.get(comSNPIdx[0][i]);
-			Predictor2 maf2 = predictorList.get(comSNPIdx[1][i]);
+			MAF maf2 = mafList.get(comSNPIdx[1][i]);
 			char a1_1 = snp1.getFirstAllele();
 			char a1_2 = snp1.getSecAllele();
 			char a2_1 = maf2.getA1();
@@ -119,7 +137,7 @@ public class MakePredictor2
 								f = false;
 							}
 							flip = false;
-							scoreCoding.add(0);
+							snpCoding.add(0);
 
 						} else if (ref1 < 0.5 && ref2 > 0.5)
 						{
@@ -135,7 +153,7 @@ public class MakePredictor2
 							}
 							ref2 = 1 - ref1;
 							flip = true;
-							scoreCoding.add(1);
+							snpCoding.add(1);
 
 						} else if (ref1 > 0.5 && ref2 < 0.5)
 						{
@@ -151,7 +169,7 @@ public class MakePredictor2
 							}
 							ref2 = 1 - ref2;
 							flip = true;
-							scoreCoding.add(1);
+							snpCoding.add(1);
 
 						} else
 						{
@@ -166,14 +184,14 @@ public class MakePredictor2
 								f = false;
 							}
 							flip = false;
-							scoreCoding.add(0);
+							snpCoding.add(0);
 						}
 						// debug
 						f = false;
 					} else
 					{
 						flip = false;
-						scoreCoding.add(0);
+						snpCoding.add(0);
 						f = true;
 					}
 
@@ -187,7 +205,7 @@ public class MakePredictor2
 						{
 							if (ref1 < CmdArgs.INSTANCE.getMergeArgs()
 									.getMafCutoff()
-									&& (1 - ref2) < CmdArgs.INSTANCE
+									&& 1 - ref2 < CmdArgs.INSTANCE
 											.getMergeArgs().getMafCutoff())
 							{
 								f = true;
@@ -195,14 +213,14 @@ public class MakePredictor2
 							{
 								f = false;
 							}
-							scoreCoding.add(1);
+							snpCoding.add(1);
 							ref2 = 1 - ref2;
 							flip = true;
 						} else if (ref1 < 0.5 && (1 - ref2) > 0.5)
 						{
 							if (ref1 < CmdArgs.INSTANCE.getMergeArgs()
 									.getMafCutoff()
-									&& (1 - ref2) > 1 - CmdArgs.INSTANCE
+									&& 1 - ref2 > 1 - CmdArgs.INSTANCE
 											.getMergeArgs().getMafCutoff())
 							{
 								f = true;
@@ -211,13 +229,13 @@ public class MakePredictor2
 								f = false;
 							}
 							flip = false;
-							scoreCoding.add(0);
+							snpCoding.add(0);
 
 						} else if (ref1 > 0.5 && (1 - ref2) < 0.5)
 						{
 							if (ref1 > 1 - CmdArgs.INSTANCE
 									.getMergeArgs().getMafCutoff()
-									&& (1 - ref2) < CmdArgs.INSTANCE
+									&& 1 - ref2 < CmdArgs.INSTANCE
 											.getMergeArgs().getMafCutoff())
 							{
 								f = true;
@@ -226,13 +244,13 @@ public class MakePredictor2
 								f = false;
 							}
 							flip = false;
-							scoreCoding.add(0);
+							snpCoding.add(0);
 
 						} else
 						{
 							if (ref1 > 1 - CmdArgs.INSTANCE
 									.getMergeArgs().getMafCutoff()
-									&& (1 - ref2) > 1 - CmdArgs.INSTANCE
+									&& 1 - ref2 > 1 - CmdArgs.INSTANCE
 											.getMergeArgs().getMafCutoff())
 							{
 								f = true;
@@ -241,7 +259,7 @@ public class MakePredictor2
 								f = false;
 							}
 							flip = true;
-							scoreCoding.add(1);
+							snpCoding.add(1);
 							ref2 = 1 - ref2;
 
 						}
@@ -251,21 +269,21 @@ public class MakePredictor2
 					{
 						flip = true;
 						ref2 = 1 - ref2;
-						scoreCoding.add(1);
+						snpCoding.add(1);
 						f = false;
 					}
 				} else if (a1_1 == SNPMatch.Flip(a2_1))
 				{// scheme3
 					scheme = 3;
 					flip = true;
-					scoreCoding.add(0);
+					snpCoding.add(0);
 					f = true;
 				} else if (a1_1 == SNPMatch.Flip(a2_2))
 				{// scheme4
 					scheme = 4;
 					flip = true;
 					ref2 = 1 - ref2;
-					scoreCoding.add(1);
+					snpCoding.add(1);
 					f = true;
 					// debug
 					f = false;
@@ -273,12 +291,12 @@ public class MakePredictor2
 				{// outlier
 					scheme = 5;
 					f = false;
-					scoreCoding.add(0);
+					snpCoding.add(0);
 				}
 
 				double p = Z.OddsRatioTestPvalueTwoTail(ref1, ref2,
-						N1[comSNPIdx[0][i]], maf2.getNInd() * 2);
-				if (p < CmdArgs.INSTANCE.getMergeArgs().getPCutoff())
+						N1[comSNPIdx[0][i]], N2[comSNPIdx[1][i]]);
+				if (p < CmdArgs.INSTANCE.getMergeArgs().getMafCutoff())
 				{
 					f = false;
 				}
@@ -304,24 +322,32 @@ public class MakePredictor2
 			} else
 			{
 				flag.add(false);
-				scoreCoding.add(0);
+				snpCoding.add(0);
+				ps1.println(snpList1.get(comSNPIdx[0][i]).getName() + " "
+						+ snpList1.get(comSNPIdx[0][i]).getChromosome() + " "
+						+ snpList1.get(comSNPIdx[0][i]).getPosition() + " "
+						+ a1_1 + " " + a1_2 + " " + a2_1 + " " + a2_2 + " "
+						+ " " + fmt.format(ref1) + " "
+						+ fmt.format(maf2.getMAF()) + " " + flip + " " + f
+						+ " " + 1 + " scheme" + scheme);
 			}
 		}
 
 		ps.close();
+		ps1.close();
 		if (qualified_snp == 0)
 		{
-			Logger.printUserError("Common SNPs between the two SNP files: None");
+			Logger.printUserError("Number of common SNPs between the two SNP files: None");
 			System.exit(1);
 		} else
 		{
-			Logger.printUserLog("Common SNP(s) between the two SNP files: "
+			Logger.printUserLog("Number of common SNPs between the two SNP files: "
 					+ qualified_snp);
 		}
 
 		Logger.printUserLog("flag " + flag.size() + ": snpCoding "
-				+ scoreCoding.size());
-		WritePredictor();
+				+ snpCoding.size());
+		WriteFile();
 	}
 
 	private void getCommonSNP(ArrayList<SNP> snplist1)
@@ -335,9 +361,9 @@ public class MakePredictor2
 
 		int c = 0;
 		HashMap<String, Integer> SNPMapList2 = NewIt.newHashMap();
-		for (int i = 0; i < predictorList.size(); i++)
+		for (int i = 0; i < mafList.size(); i++)
 		{
-			Predictor2 maf = predictorList.get(i);
+			MAF maf = mafList.get(i);
 			String snp_name = maf.getSNP();
 			if (SNPMap.containsKey(snp_name))
 			{
@@ -352,11 +378,12 @@ public class MakePredictor2
 
 		if (c == 0)
 		{
-			Logger.printUserError("Common SNPs between the two SNP files: None");
+			Logger.printUserError("Number of common SNPs between the two SNP files: None");
 			System.exit(1);
 		} else
 		{
-			Logger.printUserLog("Common SNP(s) between the two SNP files: " + c);
+			Logger.printUserLog("Number of common SNPs between the two SNP files: "
+					+ c);
 		}
 
 		comSNPIdx = new int[2][c];
@@ -374,7 +401,6 @@ public class MakePredictor2
 			}
 		}
 		Logger.printUserLog("idx1 " + idx1);
-
 	}
 
 	public void CalculateAlleleFrequency(GenotypeMatrix G, double[][] frq,
@@ -393,14 +419,14 @@ public class MakePredictor2
 		for (int i = 0; i < G.getNumMarker(); i++)
 		{
 			double w = frq[i][0] + frq[i][1];
-			n[i] = frq[i][0] + frq[i][1] + frq[i][2];
+			n[i] = frq[i][0] + frq[i][1];
 			if (w > 0)
 			{
 				for (int j = 0; j < frq[i].length - 1; j++)
 				{
 					frq[i][j] /= w;
 				}
-				frq[i][2] /= n[i];
+				frq[i][2] /= frq[i][0] + frq[i][1] + frq[i][2];
 			} else
 			{
 				frq[i][2] = 1;
@@ -408,41 +434,26 @@ public class MakePredictor2
 		}
 	}
 
-	public void readPredictor()
+	public void readStrand()
 	{
-
-		BufferedReader reader = FileProcessor.FileOpen(CmdArgs.INSTANCE
-				.getPredictorFile());
-		String line;
-		try
+		BufferedReader reader = BufferedReader.openTextFile(CmdArgs.INSTANCE.getStrandFile(), "strand");
+		String line = reader.readLine();
+		int idx = 1;
+		while ((line = reader.readLine()) != null)
 		{
-			line = reader.readLine();
-			int idx = 1;
 			line = line.trim();
-			title = line.split("\\s+");
-
-			while ((line = reader.readLine()) != null)
-			{
-				line = line.trim();
-				Predictor2 maf = new Predictor2(line, title.length, idx++);
-				predictorList.add(maf);
-			}
-		} catch (IOException e)
-		{
-			Logger.handleException(e,
-					"An exception occurred when parsing the predictor file.");
+			MAF maf = new MAF(line, idx++);
+			mafList.add(maf);
 		}
 	}
 
-	public void WritePredictor()
+	public void WriteFile()
 	{
 		StringBuffer sbim = new StringBuffer();
 		sbim.append(CmdArgs.INSTANCE.out);
-		sbim.append(".predictor");
-		PrintStream predictorFile = FileProcessor.CreatePrintStream(sbim
-				.toString());
+		sbim.append(".bim");
+		PrintStream pbim = FileProcessor.CreatePrintStream(sbim.toString());
 
-		int NMiss = 0;
 		for (int i = 0; i < comSNPIdx[0].length; i++)
 		{
 			if (!flag.get(i))
@@ -450,45 +461,111 @@ public class MakePredictor2
 				continue;
 			}
 			SNP snp = snpList1.get(comSNPIdx[0][i]);
-			Predictor2 pd = predictorList.get(comSNPIdx[1][i]);
-			if (ConstValues.isNA(pd.getField(CmdArgs.INSTANCE.getPredictorIdx())))
+			pbim.append(snp.getChromosome() + "\t" + snp.getName() + "\t"
+					+ snp.getDistance() + "\t" + snp.getPosition() + "\t"
+					+ snp.getFirstAllele() + "\t" + snp.getSecAllele() + "\n");
+		}
+		pbim.close();
+
+		StringBuffer sfam = new StringBuffer();
+		sfam.append(CmdArgs.INSTANCE.out);
+		sfam.append(".fam");
+		PrintStream pfam = FileProcessor.CreatePrintStream(sfam.toString());
+		for (Iterator<PersonIndex> e = PersonTable1.iterator(); e.hasNext();)
+		{
+			PersonIndex per = e.next();
+			BPerson bp = per.getPerson();
+			pfam.append(bp.getFamilyID() + "\t" + bp.getPersonID() + "\t"
+					+ bp.getDadID() + "\t" + bp.getMomID() + "\t"
+					+ bp.getGender() + "\t" + bp.getAffectedStatus() + "\n");
+		}
+
+		pfam.close();
+
+		StringBuffer sbed = new StringBuffer();
+		sbed.append(CmdArgs.INSTANCE.out);
+		sbed.append(".bed");
+		try
+		{
+			os = new DataOutputStream(new FileOutputStream(sbed.toString()));
+		} catch (FileNotFoundException e)
+		{
+			Logger.printUserError("Cannot create file '" + sbed.toString()
+					+ "'.");
+			Logger.printUserError("Exception Message: " + e.getMessage());
+			System.exit(1);
+		}
+
+		try
+		{
+			os.writeByte(byte1);
+			os.writeByte(byte2);
+			os.writeByte(byte3);
+
+			for (int i = 0; i < comSNPIdx[0].length; i++)
 			{
-				NMiss++;
-				continue;
-			} else
-			{
-				double s = Double.parseDouble(pd.getField(CmdArgs.INSTANCE
-						.getPredictorIdx()));
-				if (CmdArgs.INSTANCE.getTranFunction() == gear.RegressionModel.LINEAR)
+				if (!flag.get(i))
 				{
-					if (scoreCoding.get(i).intValue() == 1)
-					{
-						s *= -1;
-					}
-				} else
+					continue;
+				}
+
+				int snpIdx = comSNPIdx[0][i];
+				byte gbyte = 0;
+				int idx = 0;
+
+				int posByte = snpIdx >> BPerson.shift;
+				int posBite = (snpIdx & 0xf) << 1;
+
+				for (int j = 0; j < PersonTable1.size(); j++)
 				{
-					if (s < 0)
+					PersonIndex pi = PersonTable1.get(j);
+					BPerson bp = pi.getPerson();
+					byte g = bp.getOriginalGenotypeScore(posByte, posBite);
+					if (snpCoding.get(i).intValue() == 1)
 					{
-						s = -9;
-					} else
-					{
-						if (scoreCoding.get(i).intValue() == 1)
+						switch (g)
 						{
-							s = Math.log(1 / s);
-						} else
-						{
-							s = Math.log(s);
+						case 0:
+							g = 3;
+							break;
+						case 2:
+							g = 2;
+							break;
+						case 3:
+							g = 0;
+							break;
+						default:
+							g = 1;
+							break; // missing
 						}
 					}
-				}
-				predictorFile.append(snp.getName() + "\t" + snp.getFirstAllele()
-						+ "\t" + s + "\n");
-			}
-		}
-		predictorFile.close();
-		Logger.printUserLog("Write preditor to " + sbim.toString());
-		Logger.printUserLog(NMiss
-				+ " SNP(s) have missing values and were not printed.");
-	}
 
+					gbyte <<= 2 * idx;
+					gbyte |= g;
+					idx++;
+
+					if (j != (PersonTable1.size() - 1))
+					{
+						if (idx == 4)
+						{
+							os.writeByte(gbyte);
+							gbyte = 0;
+							idx = 0;
+						}
+					} else
+					{
+						os.writeByte(gbyte);
+					}
+				}
+			}
+
+			os.close();
+		} catch (IOException e)
+		{
+			Logger.handleException(
+					e,
+					"An exception occurred when writing the bed file '"
+							+ sbed.toString() + "'.");
+		}
+	}
 }

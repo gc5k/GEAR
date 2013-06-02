@@ -213,8 +213,7 @@ public enum CmdArgs
 		ops.addOption(OptionBuilder.withLongOpt(cmd_make_bed_long)
 				.withDescription("make bed ").create(cmd_make_bed));
 
-		ops.addOption(OptionBuilder.withDescription("solve strand ").hasArg()
-				.create(cmd_strand));
+		ops.addOption(OptionBuilder.withDescription("solve strand ").hasArg().create(strandFileOpt));
 
 		// grm-stat
 		ops.addOption(OptionBuilder.withLongOpt(cmd_grm_stat_long)
@@ -607,22 +606,12 @@ public enum CmdArgs
 
 	// Merge options End
 
-	// Strand options Begin
-	public boolean hasStrandOption()
-	{
-		return strandFlag;
-	}
-
 	public String getStrandFile()
 	{
-		return strand_file;
+		return cl.getOptionValue(strandFileOpt);
 	}
-
-	private final String cmd_strand = "strand";
-	private boolean strandFlag = false;
-	private String strand_file = null;
-
-	// Strand options End
+	
+	private static final String strandFileOpt = "strand";
 
 	// Make-predictor-panel options Begin
 	public boolean hasMakePredictorOption()
@@ -1578,13 +1567,6 @@ public enum CmdArgs
 		{
 			reference_allele = cl.getOptionValue(cmd_reference_allele);
 			exists(reference_allele);
-		}
-
-		if (cl.hasOption(cmd_strand))
-		{
-			strand_file = cl.getOptionValue(cmd_strand);
-			exists(strand_file);
-			strandFlag = true;
 		}
 
 		// make bed

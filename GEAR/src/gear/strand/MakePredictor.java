@@ -1,4 +1,4 @@
-package strand;
+package gear.strand;
 
 import java.io.BufferedReader;
 import java.io.IOException;
