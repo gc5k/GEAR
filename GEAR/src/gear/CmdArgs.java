@@ -937,7 +937,7 @@ public enum CmdArgs
 					.create(cmd_grm_bin_list));
 			ops.addOption(OptionBuilder.withDescription("grm ").hasArg()
 					.create(cmd_grm));
-			ops.addOption(OptionBuilder.withDescription("grm list").hasArg()
+			ops.addOption(OptionBuilder.withLongOpt(cmd_grm_list_long).withDescription("grm list").hasArg()
 					.create(cmd_grm_list));
 			ops.addOption(OptionBuilder.withDescription("pheno ").hasArg()
 					.create(cmd_pheno));
@@ -972,6 +972,9 @@ public enum CmdArgs
 				isGrmList_ = false;
 				isGrmBinaryList_ = false;
 				isGrmTxtList_ = false;
+				
+				isSingleGrm = true;
+				isMultiGrm = false;
 			}
 			else if (cl.hasOption(cmd_grm_list))
 			{
@@ -983,6 +986,10 @@ public enum CmdArgs
 				isGrmList_ = true;
 				isGrmBinaryList_ = false;
 				isGrmTxtList_ = false;
+
+				isSingleGrm = false;
+				isMultiGrm = true;
+
 			}
 			else if (cl.hasOption(cmd_grm_bin))
 			{
@@ -998,6 +1005,9 @@ public enum CmdArgs
 				isGrmList_ = false;
 				isGrmBinaryList_ = false;
 				isGrmTxtList_ = false;
+				
+				isSingleGrm = true;
+				isMultiGrm = false;
 			}
 			else if (cl.hasOption(cmd_grm_bin_list))
 			{
@@ -1009,6 +1019,9 @@ public enum CmdArgs
 				isGrmList_ = false;
 				isGrmBinaryList_ = true;
 				isGrmTxtList_ = false;
+				
+				isSingleGrm = false;
+				isMultiGrm = true;
 			}
 			else if (cl.hasOption(cmd_grm_txt))
 			{
@@ -1024,6 +1037,9 @@ public enum CmdArgs
 				isGrmList_ = false;
 				isGrmBinaryList_ = false;
 				isGrmTxtList_ = false;
+				
+				isSingleGrm = true;
+				isMultiGrm = false;
 			}
 			else if (cl.hasOption(cmd_grm_txt_list))
 			{
@@ -1035,6 +1051,9 @@ public enum CmdArgs
 				isGrmList_ = false;
 				isGrmBinaryList_ = false;
 				isGrmTxtList_ = true;
+				
+				isSingleGrm = false;
+				isMultiGrm = true;
 			}
 
 			if (cl.hasOption(cmd_grm_cutoff))
@@ -1088,6 +1107,16 @@ public enum CmdArgs
 		public HEType getType()
 		{
 			return type;
+		}
+
+		public boolean isSingleGrm()
+		{
+			return isSingleGrm;
+		}
+		
+		public boolean isMultiGrm()
+		{
+			return isMultiGrm;
 		}
 
 		public boolean isGrm()
@@ -1150,6 +1179,11 @@ public enum CmdArgs
 			return grm_id;
 		}
 
+		public String getGrmList()
+		{
+			return grmList_;
+		}
+
 		public String getPheno()
 		{
 			return pheno;
@@ -1190,6 +1224,7 @@ public enum CmdArgs
 
 		private final String cmd_grm = "grm";
 		private final String cmd_grm_list = "grm_list";
+		private final String cmd_grm_list_long = "grm-list";
 
 		private boolean isGrm_;
 		private boolean isGrmBinary_;
@@ -1197,9 +1232,11 @@ public enum CmdArgs
 		private boolean isGrmList_;
 		private boolean isGrmTxtList_;
 		private boolean isGrmBinaryList_;
-		private String grm_;
+		private boolean isSingleGrm = false;
+		private boolean isMultiGrm = false;
+		private String grm_ = null;
 		private String grm_id = null;
-		private String grmList_;
+		private String grmList_ = null;
 
 		private final String cmd_pheno = "pheno";
 		private String pheno = null;

@@ -89,4 +89,14 @@ public class FileProcessor
 		return writer;
 	}
 
+	public static void exists(String file)
+	{
+		java.io.File f = new java.io.File(file);
+		if (!f.exists())
+		{
+			Logger.printUserError("File '" + file + "' does not exist.");
+			System.exit(1);
+		}
+	}
+
 }
