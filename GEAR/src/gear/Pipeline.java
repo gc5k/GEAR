@@ -7,6 +7,9 @@ import epem.GRMStat;
 import merge.MergeTwoFile;
 import write.WriteBedSNPMajor;
 import gear.profile.Profiler;
+import gear.strand.MakePredictor;
+import gear.strand.MakePredictor2;
+import gear.strand.Strand;
 import gear.util.Logger;
 import grm.MakeGRM;
 import he.HECalculate;
@@ -20,9 +23,6 @@ import simulation.RealDataSimulationQT;
 import simulation.SimuFamily;
 import simulation.SimuPolyCC;
 import simulation.SimuPolyQT;
-import strand.MakePredictor;
-import strand.MakePredictor2;
-import strand.Strand;
 import sumstat.FrequencyCalculator;
 import sumstat.Inbreeding;
 import pscontrol.NonTransmitted;
@@ -67,7 +67,7 @@ public class Pipeline
 		{
 			Profiler.makeProfile();
 		}
-		else if (CmdArgs.INSTANCE.hasStrandOption())
+		else if (CmdArgs.INSTANCE.getStrandFile() != null)
 		{
 			Strand strand = new Strand();
 			strand.Merge();
