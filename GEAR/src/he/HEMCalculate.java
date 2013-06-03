@@ -164,11 +164,11 @@ public class HEMCalculate
 		}
 		else
 		{
-			heMReader.XtX = new double[heMReader.grmList.size() + 1][heMReader.grmList
+			heMReader.XtX = new double[heMReader.binList.size() + 1][heMReader.binList
 					.size() + 1];
-			heMReader.XtY = new double[heMReader.grmList.size() + 1];
+			heMReader.XtY = new double[heMReader.binList.size() + 1];
 
-			double[] row = new double[heMReader.grmList.size() + 1];
+			double[] row = new double[heMReader.binList.size() + 1];
 			row[0] = 1;
 			for (int i = 0; i < heMReader.flag.length; i++)
 			{
@@ -185,7 +185,7 @@ public class HEMCalculate
 					{
 						pass = true;
 					}
-					for (int k = 0; k <= heMReader.binList.size(); k++)
+					for (int k = 0; k < heMReader.binList.size(); k++)
 					{
 						LittleEndianDataInputStream littleEndianDataStream = heMReader.binList
 								.get(0);
