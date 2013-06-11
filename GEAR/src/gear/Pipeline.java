@@ -30,7 +30,7 @@ public class Pipeline
 {
 	public static void main(String[] args)
 	{
-		CmdArgs.INSTANCE.commandListener(args);
+		CmdArgs.INSTANCE.parse(args);
 
 		Logger.setLogFiles(CmdArgs.INSTANCE.out);
 		Logger.printUserLog(AboutInfo.WELCOME_MESSAGE);
@@ -40,23 +40,8 @@ public class Pipeline
 		{
 			System.exit(1);
 		}
-		// Print the options set.
-		Logger.printUserLog("Options received: ");
-		StringBuffer sb = null;
-		for (int i = 0; i < args.length; i++)
-		{
-			if (args[i].startsWith("--"))
-			{
-				if (i >= 1)
-				{
-					Logger.printUserLog(sb.toString());
-				}
-				sb = new StringBuffer("  ");
-			}
-			sb.append(args[i] + " ");
-		}
-		Logger.printUserLog(sb.toString());
-		Logger.printUserLog("");
+
+		CmdArgs.INSTANCE.printOptionsInEffect();
 
 		if (CmdArgs.INSTANCE.getHpcArgs().isSet())
 		{
@@ -215,5 +200,4 @@ public class Pipeline
 		Logger.printUserLog("Analysis finished: "
 				+ Calendar.getInstance().getTime());
 	}
-
 }
