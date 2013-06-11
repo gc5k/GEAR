@@ -103,7 +103,7 @@ public class SimuPolyQT
 
 	public static void main(String[] args)
 	{
-		CmdArgs.INSTANCE.commandListener(args);
+		CmdArgs.INSTANCE.parse(args);
 	}
 
 	public void generateSample()

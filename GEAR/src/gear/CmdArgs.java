@@ -11,6 +11,7 @@ import java.util.Random;
 import org.apache.commons.cli.CommandLine;
 import org.apache.commons.cli.CommandLineParser;
 import org.apache.commons.cli.HelpFormatter;
+import org.apache.commons.cli.Option;
 import org.apache.commons.cli.OptionBuilder;
 import org.apache.commons.cli.Options;
 import org.apache.commons.cli.ParseException;
@@ -21,7 +22,7 @@ public enum CmdArgs
 {
 	INSTANCE;
 
-	private CommandLine cl;
+	private CommandLine cmdLine;
 
 	private Options ops = new Options();
 
@@ -334,24 +335,24 @@ public enum CmdArgs
 
 		public boolean isSet()
 		{
-			return cl.hasOption(cmd_bfile);
+			return cmdLine.hasOption(cmd_bfile);
 		}
 
 		public String getBed()
 		{
-			String bfile = cl.getOptionValue(cmd_bfile);
+			String bfile = cmdLine.getOptionValue(cmd_bfile);
 			return bfile == null ? null : bfile + ".bed";
 		}
 
 		public String getBim()
 		{
-			String bfile = cl.getOptionValue(cmd_bfile);
+			String bfile = cmdLine.getOptionValue(cmd_bfile);
 			return bfile == null ? null : bfile + ".bim";
 		}
 
 		public String getFam()
 		{
-			String bfile = cl.getOptionValue(cmd_bfile);
+			String bfile = cmdLine.getOptionValue(cmd_bfile);
 			return bfile == null ? null : bfile + ".fam";
 		}
 
@@ -377,18 +378,18 @@ public enum CmdArgs
 
 		public boolean isSet()
 		{
-			return cl.hasOption("file");
+			return cmdLine.hasOption("file");
 		}
 
 		public String getPed()
 		{
-			String file = cl.getOptionValue("file");
+			String file = cmdLine.getOptionValue("file");
 			return file == null ? null : file + ".ped";
 		}
 
 		public String getMap()
 		{
-			String file = cl.getOptionValue("file");
+			String file = cmdLine.getOptionValue("file");
 			return file == null ? null : file + ".map";
 		}
 	}
@@ -609,7 +610,7 @@ public enum CmdArgs
 
 	public String getStrandFile()
 	{
-		return cl.getOptionValue(strandFileOpt);
+		return cmdLine.getOptionValue(strandFileOpt);
 	}
 	
 	private static final String strandFileOpt = "strand";
@@ -664,7 +665,7 @@ public enum CmdArgs
 
 	public boolean keepATGC()
 	{
-		return cl.hasOption("keep-atgc");
+		return cmdLine.hasOption("keep-atgc");
 	}
 
 	public boolean removeFlip()
@@ -844,47 +845,47 @@ public enum CmdArgs
 
 		public String getScoreFile()
 		{
-			return cl.getOptionValue("score");
+			return cmdLine.getOptionValue("score");
 		}
 
 		public String getMachDosageFile()
 		{
-			return cl.getOptionValue("mach-dosage");
+			return cmdLine.getOptionValue("mach-dosage");
 		}
 
 		public String getMachInfoFile()
 		{
-			return cl.getOptionValue("mach-infor");
+			return cmdLine.getOptionValue("mach-infor");
 		}
 
 		public String getMachDosageBatchFile()
 		{
-			return cl.getOptionValue("mach-dosage-batch");
+			return cmdLine.getOptionValue("mach-dosage-batch");
 		}
 
 		public String getMachInfoBatchFile()
 		{
-			return cl.getOptionValue("mach-infor-batch");
+			return cmdLine.getOptionValue("mach-infor-batch");
 		}
 
 		public String getQScoreFile()
 		{
-			return cl.getOptionValue("q-score-file");
+			return cmdLine.getOptionValue("q-score-file");
 		}
 
 		public String getQRangeFile()
 		{
-			return cl.getOptionValue("q-score-range");
+			return cmdLine.getOptionValue("q-score-range");
 		}
 
 		public boolean isGreedy()
 		{
-			return cl.hasOption("greedy");
+			return cmdLine.hasOption("greedy");
 		}
 
 		public String getModel()
 		{
-			return cl.getOptionValue("model");
+			return cmdLine.getOptionValue("model");
 		}
 	}
 
@@ -959,13 +960,13 @@ public enum CmdArgs
 
 		private void commandListener()
 		{
-			if (cl.hasOption(cmd_grm))
+			if (cmdLine.hasOption(cmd_grm))
 			{
 				StringBuilder sb1 = new StringBuilder(
-						cl.getOptionValue(cmd_grm));
+						cmdLine.getOptionValue(cmd_grm));
 				grm_ = sb1.append(".grm.gz").toString();
 				StringBuilder sb2 = new StringBuilder(
-						cl.getOptionValue(cmd_grm));
+						cmdLine.getOptionValue(cmd_grm));
 				grm_id = sb2.append(".grm.id").toString();
 				isGrm_ = true;
 				isGrmBinary_ = false;
@@ -977,9 +978,9 @@ public enum CmdArgs
 				isSingleGrm = true;
 				isMultiGrm = false;
 			}
-			else if (cl.hasOption(cmd_grm_list))
+			else if (cmdLine.hasOption(cmd_grm_list))
 			{
-				grmList_ = cl.getOptionValue(cmd_grm_list);
+				grmList_ = cmdLine.getOptionValue(cmd_grm_list);
 				FileProcessor.exists(grmList_);
 				isGrm_ = false;
 				isGrmBinary_ = false;
@@ -992,13 +993,13 @@ public enum CmdArgs
 				isMultiGrm = true;
 
 			}
-			else if (cl.hasOption(cmd_grm_bin))
+			else if (cmdLine.hasOption(cmd_grm_bin))
 			{
 				StringBuilder sb1 = new StringBuilder(
-						cl.getOptionValue(cmd_grm_bin));
+						cmdLine.getOptionValue(cmd_grm_bin));
 				grm_ = sb1.append(".grm.bin").toString();
 				StringBuilder sb2 = new StringBuilder(
-						cl.getOptionValue(cmd_grm_bin));
+						cmdLine.getOptionValue(cmd_grm_bin));
 				grm_id = sb2.append(".grm.id").toString();
 				isGrm_ = false;
 				isGrmBinary_ = true;
@@ -1010,9 +1011,9 @@ public enum CmdArgs
 				isSingleGrm = true;
 				isMultiGrm = false;
 			}
-			else if (cl.hasOption(cmd_grm_bin_list))
+			else if (cmdLine.hasOption(cmd_grm_bin_list))
 			{
-				grmList_ = cl.getOptionValue(cmd_grm_bin_list);
+				grmList_ = cmdLine.getOptionValue(cmd_grm_bin_list);
 				FileProcessor.exists(grmList_);
 				isGrm_ = false;
 				isGrmBinary_ = false;
@@ -1024,13 +1025,13 @@ public enum CmdArgs
 				isSingleGrm = false;
 				isMultiGrm = true;
 			}
-			else if (cl.hasOption(cmd_grm_txt))
+			else if (cmdLine.hasOption(cmd_grm_txt))
 			{
 				StringBuilder sb1 = new StringBuilder(
-						cl.getOptionValue(cmd_grm_txt));
+						cmdLine.getOptionValue(cmd_grm_txt));
 				grm_ = sb1.append(".grm.txt").toString();
 				StringBuilder sb2 = new StringBuilder(
-						cl.getOptionValue(cmd_grm_txt));
+						cmdLine.getOptionValue(cmd_grm_txt));
 				grm_id = sb2.append(".grm.id").toString();
 				isGrm_ = false;
 				isGrmBinary_ = false;
@@ -1042,9 +1043,9 @@ public enum CmdArgs
 				isSingleGrm = true;
 				isMultiGrm = false;
 			}
-			else if (cl.hasOption(cmd_grm_txt_list))
+			else if (cmdLine.hasOption(cmd_grm_txt_list))
 			{
-				grmList_ = cl.getOptionValue(cmd_grm_txt_list);
+				grmList_ = cmdLine.getOptionValue(cmd_grm_txt_list);
 				FileProcessor.exists(grmList_);
 				isGrm_ = false;
 				isGrmBinary_ = false;
@@ -1057,30 +1058,30 @@ public enum CmdArgs
 				isMultiGrm = true;
 			}
 
-			if (cl.hasOption(cmd_grm_cutoff))
+			if (cmdLine.hasOption(cmd_grm_cutoff))
 			{
-				GrmCutoff_ = Double.parseDouble(cl
+				GrmCutoff_ = Double.parseDouble(cmdLine
 						.getOptionValue(cmd_grm_cutoff));
 				GrmCutoffFlag_ = true;
 				AbsGrmCutoffFlag_ = false;
 			}
 
-			if (cl.hasOption(cmd_abs_grm_cutoff))
+			if (cmdLine.hasOption(cmd_abs_grm_cutoff))
 			{
-				AbsGrmCutoff_ = Double.parseDouble(cl
+				AbsGrmCutoff_ = Double.parseDouble(cmdLine
 						.getOptionValue(cmd_abs_grm_cutoff));
 				AbsGrmCutoffFlag_ = true;
 				GrmCutoffFlag_ = false;
 			}
 
-			if (cl.hasOption(cmd_pheno))
+			if (cmdLine.hasOption(cmd_pheno))
 			{
-				pheno = cl.getOptionValue(cmd_pheno);
+				pheno = cmdLine.getOptionValue(cmd_pheno);
 			}
 
-			if (cl.hasOption(cmd_mpheno))
+			if (cmdLine.hasOption(cmd_mpheno))
 			{
-				String[] s = cl.getOptionValue(cmd_mpheno).split(",");
+				String[] s = cmdLine.getOptionValue(cmd_mpheno).split(",");
 				mpheno = new int[s.length];
 				for (int i = 0; i < s.length; i++)
 				{
@@ -1088,17 +1089,17 @@ public enum CmdArgs
 				}
 			}
 
-			if (cl.hasOption(cmd_sd))
+			if (cmdLine.hasOption(cmd_sd))
 			{
 				type = HEType.SD;
 				heFlag = true;
 			}
-			else if (cl.hasOption(cmd_ss))
+			else if (cmdLine.hasOption(cmd_ss))
 			{
 				type = HEType.SS;
 				heFlag = true;
 			}
-			else if (cl.hasOption(cmd_cp))
+			else if (cmdLine.hasOption(cmd_cp))
 			{
 				type = HEType.CP;
 				heFlag = true;
@@ -1365,27 +1366,27 @@ public enum CmdArgs
 
 		public boolean isSet()
 		{
-			return cl.hasOption("qsub") || cl.hasOption("shell");
+			return cmdLine.hasOption("qsub") || cmdLine.hasOption("shell");
 		}
 
 		public boolean isQsubSet()
 		{
-			return cl.hasOption("qsub");
+			return cmdLine.hasOption("qsub");
 		}
 
 		public String getEmail()
 		{
-			return cl.getOptionValue("email", "guobo.chen@uq.edu.au");
+			return cmdLine.getOptionValue("email", "guobo.chen@uq.edu.au");
 		}
 
 		public String getRam()
 		{
-			return cl.getOptionValue("ram", "10G");
+			return cmdLine.getOptionValue("ram", "10G");
 		}
 
 		public String getName()
 		{
-			return cl.getOptionValue("name", "gear");
+			return cmdLine.getOptionValue("name", "gear");
 		}
 	}
 
@@ -1473,38 +1474,37 @@ public enum CmdArgs
 
 	private final String cmd_help = "help";
 
-	public void commandListener(String[] args)
+	public void parse(String[] args)
 	{
 		try
 		{
-			cl = parser.parse(ops, args);
+			cmdLine = parser.parse(ops, args);
 		}
 		catch (ParseException e)
 		{
-			Logger.handleException(	e,
-									"Failed to parse the command-line arguments.");
+			Logger.handleException(e, "Failed to parse the command-line arguments.");
 		}
 
-		if (cl.hasOption(cmd_help))
+		if (cmdLine.hasOption(cmd_help))
 		{
 			HelpFormatter formatter = new HelpFormatter();
 			formatter.printHelp("HE Regression", ops);
 			System.exit(0);
 		}
 
-		realcheckFlag = cl.hasOption(cmd_realcheck);
-		realCheckParameter.commandListener(cl);
+		realcheckFlag = cmdLine.hasOption(cmd_realcheck);
+		realCheckParameter.commandListener(cmdLine);
 
-		mergeFlag = cl.hasOption(cmd_merge);
-		mergeArgs.commandListener(cl);
+		mergeFlag = cmdLine.hasOption(cmd_merge);
+		mergeArgs.commandListener(cmdLine);
 
 		// make predictor
-		makePredictorFlag = cl.hasOption(cmd_make_predictor);
-		makePredictor2Flag = cl.hasOption(cmd_make_predictor2);
+		makePredictorFlag = cmdLine.hasOption(cmd_make_predictor);
+		makePredictor2Flag = cmdLine.hasOption(cmd_make_predictor2);
 
-		if (cl.hasOption(cmd_predictor_idx))
+		if (cmdLine.hasOption(cmd_predictor_idx))
 		{
-			predictor_idx = Integer.parseInt(cl
+			predictor_idx = Integer.parseInt(cmdLine
 					.getOptionValue(cmd_predictor_idx));
 			predictor_idx--;
 			if (predictor_idx < 0)
@@ -1514,29 +1514,29 @@ public enum CmdArgs
 			}
 		}
 
-		if (cl.hasOption(cmd_predictor_file))
+		if (cmdLine.hasOption(cmd_predictor_file))
 		{
-			predictor_file = cl.getOptionValue(cmd_predictor_file);
+			predictor_file = cmdLine.getOptionValue(cmd_predictor_file);
 			FileProcessor.exists(predictor_file);
 		}
 
-		if (cl.hasOption(cmd_linear))
+		if (cmdLine.hasOption(cmd_linear))
 		{
 			tranFunction = RegressionModel.LINEAR;
 		}
 
-		if (cl.hasOption(cmd_logit))
+		if (cmdLine.hasOption(cmd_logit))
 		{
 			tranFunction = RegressionModel.LOGIT;
 		}
 
-		removeFlipFlag = cl.hasOption(cmd_remove_Flip);
+		removeFlipFlag = cmdLine.hasOption(cmd_remove_Flip);
 
 		// snp selection
-		if (cl.hasOption(cmd_chr))
+		if (cmdLine.hasOption(cmd_chr))
 		{
 
-			String[] chr = cl.getOptionValues(cmd_chr);
+			String[] chr = cmdLine.getOptionValues(cmd_chr);
 			HashSet<String> chrSet = NewIt.newHashSet();
 			HashSet<String> exSet = NewIt.newHashSet();
 			for (int i = 0; i < chr.length; i++)
@@ -1557,158 +1557,158 @@ public enum CmdArgs
 			}
 			if (chrSet.size() > 0)
 			{
-				chr = (String[]) chrSet.toArray(new String[0]);
+				chr = chrSet.toArray(new String[0]);
 				inchrFlag = true;
 			}
 			if (exSet.size() > 0)
 			{
-				exchr = (String[]) exSet.toArray(new String[0]);
+				exchr = exSet.toArray(new String[0]);
 				exchrFlag = true;
 			}
 		}
 
-		if (cl.hasOption(cmd_snps))
+		if (cmdLine.hasOption(cmd_snps))
 		{
-			snpList = cl.getOptionValue(cmd_snps);
+			snpList = cmdLine.getOptionValue(cmd_snps);
 			FileProcessor.exists(snpList);
 		}
 
 		// individual selection 1 keep
-		if (cl.hasOption(cmd_keep))
+		if (cmdLine.hasOption(cmd_keep))
 		{
-			keepFile = cl.getOptionValue(cmd_keep);
+			keepFile = cmdLine.getOptionValue(cmd_keep);
 			FileProcessor.exists(keepFile);
 			keepFlag = true;
 		}
 
-		if (cl.hasOption(cmd_keep_male))
+		if (cmdLine.hasOption(cmd_keep_male))
 		{
 			keep_maleFlag = true;
 		}
-		if (cl.hasOption(cmd_keep_female))
+		if (cmdLine.hasOption(cmd_keep_female))
 		{
 			keep_femaleFlag = true;
 		}
-		if (cl.hasOption(cmd_ex_nosex))
+		if (cmdLine.hasOption(cmd_ex_nosex))
 		{
 			ex_nosexFlag = true;
 		}
-		if (cl.hasOption(cmd_remove))
+		if (cmdLine.hasOption(cmd_remove))
 		{
-			removeFile = cl.getOptionValue(cmd_remove);
+			removeFile = cmdLine.getOptionValue(cmd_remove);
 			FileProcessor.exists(removeFile);
 			removeFlag = true;
 		}
 
 		// ///// set reference
-		if (cl.hasOption(cmd_reference_allele))
+		if (cmdLine.hasOption(cmd_reference_allele))
 		{
-			reference_allele = cl.getOptionValue(cmd_reference_allele);
+			reference_allele = cmdLine.getOptionValue(cmd_reference_allele);
 			FileProcessor.exists(reference_allele);
 		}
 
 		// make bed
-		if (cl.hasOption(cmd_make_bed))
+		if (cmdLine.hasOption(cmd_make_bed))
 		{
 			makebedFlag = true;
 		}
 
 		// nontrans
-		if (cl.hasOption(cmd_nontrans))
+		if (cmdLine.hasOption(cmd_nontrans))
 		{
 			nontransFlag = true;
 		}
 
-		if (cl.hasOption(cmd_nontrans_seed))
+		if (cmdLine.hasOption(cmd_nontrans_seed))
 		{
-			nontransSeed = Long.parseLong(cl.getOptionValue(cmd_nontrans_seed));
+			nontransSeed = Long.parseLong(cmdLine.getOptionValue(cmd_nontrans_seed));
 		}
 
-		if (cl.hasOption(cmd_nontrans_cases))
+		if (cmdLine.hasOption(cmd_nontrans_cases))
 		{
 			nontranscasesFlag = true;
 			nontranscontrolsFlag = false;
 		}
 
-		if (cl.hasOption(cmd_nontrans_controls))
+		if (cmdLine.hasOption(cmd_nontrans_controls))
 		{
 			nontranscontrolsFlag = true;
 			nontranscasesFlag = false;
 		}
 
 		// pop stat
-		if (cl.hasOption(cmd_freq))
+		if (cmdLine.hasOption(cmd_freq))
 		{
 			sumStatFlag = true;
 			freqFlag = true;
 		}
-		if (cl.hasOption(cmd_geno_freq))
+		if (cmdLine.hasOption(cmd_geno_freq))
 		{
 			sumStatFlag = true;
 			genoFreqFlag = true;
 		}
-		if (cl.hasOption(cmd_fst))
+		if (cmdLine.hasOption(cmd_fst))
 		{
 			sumStatFlag = true;
 			fstFlag = true;
-			fst_file = cl.getOptionValue(cmd_fst);
+			fst_file = cmdLine.getOptionValue(cmd_fst);
 			FileProcessor.exists(fst_file);
 		}
 
 		// simulation nuclear family
-		if (cl.hasOption(cmd_simu_fam))
+		if (cmdLine.hasOption(cmd_simu_fam))
 		{
 			simufamFlag = true;
 		}
 
-		if (cl.hasOption(cmd_simu_fam_size))
+		if (cmdLine.hasOption(cmd_simu_fam_size))
 		{
-			simu_fam_size = Integer.parseInt(cl
+			simu_fam_size = Integer.parseInt(cmdLine
 					.getOptionValue(cmd_simu_fam_size));
 		}
 
-		if (cl.hasOption(cmd_simu_fam_marker))
+		if (cmdLine.hasOption(cmd_simu_fam_marker))
 		{
-			simu_fam_marker = Integer.parseInt(cl
+			simu_fam_marker = Integer.parseInt(cmdLine
 					.getOptionValue(cmd_simu_fam_marker));
 		}
 
 		// simulation real data
 
-		if (cl.hasOption(cmd_bsimu))
+		if (cmdLine.hasOption(cmd_bsimu))
 		{
 			bsimuFlag = true;
 		}
 
-		if (cl.hasOption(cmd_simu_qt))
+		if (cmdLine.hasOption(cmd_simu_qt))
 		{
 			simupolyQTFlag = true;
 
-			poly_sample_QT = Integer.parseInt(cl.getOptionValue(cmd_simu_qt));
+			poly_sample_QT = Integer.parseInt(cmdLine.getOptionValue(cmd_simu_qt));
 		}
 
-		if (cl.hasOption(cmd_simu_cc))
+		if (cmdLine.hasOption(cmd_simu_cc))
 		{
 
-			String[] s = cl.getOptionValue(cmd_simu_cc).split(",");
+			String[] s = cmdLine.getOptionValue(cmd_simu_cc).split(",");
 			simuCC[0] = Integer.parseInt(s[0]);
 			simuCC[1] = Integer.parseInt(s[1]);
 			simupolyCCFlag = true;
 		}
 
-		if (cl.hasOption(cmd_simu_order))
+		if (cmdLine.hasOption(cmd_simu_order))
 		{
 			simuOrderFlag = true;
 		}
 
-		if (cl.hasOption(cmd_simu_seed))
+		if (cmdLine.hasOption(cmd_simu_seed))
 		{
-			simuSeed = Long.parseLong(cl.getOptionValue(cmd_simu_seed));
+			simuSeed = Long.parseLong(cmdLine.getOptionValue(cmd_simu_seed));
 		}
 
-		if (cl.hasOption(cmd_simu_hsq))
+		if (cmdLine.hasOption(cmd_simu_hsq))
 		{
-			simuHsq = Double.parseDouble(cl.getOptionValue(cmd_simu_hsq));
+			simuHsq = Double.parseDouble(cmdLine.getOptionValue(cmd_simu_hsq));
 			if (simuHsq < 0 || simuHsq > 1)
 			{
 				Logger.printUserError("Simulation heritability should be between 0 and 1 (inclusively).");
@@ -1716,20 +1716,20 @@ public enum CmdArgs
 			}
 		}
 
-		if (cl.hasOption(cmd_simu_casual_loci))
+		if (cmdLine.hasOption(cmd_simu_casual_loci))
 		{
-			simuCasualLoci = cl.getOptionValue(cmd_simu_casual_loci);
+			simuCasualLoci = cmdLine.getOptionValue(cmd_simu_casual_loci);
 		}
 
-		if (cl.hasOption(cmd_simu_rnd_casual_loci))
+		if (cmdLine.hasOption(cmd_simu_rnd_casual_loci))
 		{
-			simuRndCasualLoci = Integer.parseInt(cl
+			simuRndCasualLoci = Integer.parseInt(cmdLine
 					.getOptionValue(cmd_simu_rnd_casual_loci));
 		}
 
-		if (cl.hasOption(cmd_simu_k))
+		if (cmdLine.hasOption(cmd_simu_k))
 		{
-			simuK = Double.parseDouble(cl.getOptionValue(cmd_simu_k));
+			simuK = Double.parseDouble(cmdLine.getOptionValue(cmd_simu_k));
 			if (simuK < 0 || simuK > 1)
 			{
 				Logger.printUserError("Simulation prevalence should be between 0 and 1 (inclusively)");
@@ -1737,9 +1737,9 @@ public enum CmdArgs
 			}
 		}
 
-		if (cl.hasOption(cmd_simu_rep))
+		if (cmdLine.hasOption(cmd_simu_rep))
 		{
-			simuRep = Integer.parseInt(cl.getOptionValue(cmd_simu_rep));
+			simuRep = Integer.parseInt(cmdLine.getOptionValue(cmd_simu_rep));
 			if (simuRep < 0)
 			{
 				Logger.printUserError("simulation replication should be no smaller than zero");
@@ -1749,41 +1749,41 @@ public enum CmdArgs
 
 		// simulation polygenic
 
-		if (cl.hasOption(cmd_poly_loci))
+		if (cmdLine.hasOption(cmd_poly_loci))
 		{
-			polyLoci = Integer.parseInt(cl.getOptionValue(cmd_poly_loci));
+			polyLoci = Integer.parseInt(cmdLine.getOptionValue(cmd_poly_loci));
 		}
 
-		if (cl.hasOption(cmd_poly_loci_null))
+		if (cmdLine.hasOption(cmd_poly_loci_null))
 		{
-			polyLociNull = Integer.parseInt(cl
+			polyLociNull = Integer.parseInt(cmdLine
 					.getOptionValue(cmd_poly_loci_null));
 		}
 
-		if (cl.hasOption(cmd_poly_LD))
+		if (cmdLine.hasOption(cmd_poly_LD))
 		{
-			polyLD = Double.parseDouble(cl.getOptionValue(cmd_poly_LD));
+			polyLD = Double.parseDouble(cmdLine.getOptionValue(cmd_poly_LD));
 		}
 
-		if (cl.hasOption(cmd_poly_U))
+		if (cmdLine.hasOption(cmd_poly_U))
 		{
 			polyU = true;
 		}
 
-		if (cl.hasOption(cmd_poly_freq))
+		if (cmdLine.hasOption(cmd_poly_freq))
 		{
-			polyFreq = Double.parseDouble(cl.getOptionValue(cmd_poly_freq));
+			polyFreq = Double.parseDouble(cmdLine.getOptionValue(cmd_poly_freq));
 		}
 
-		if (cl.hasOption(cmd_poly_effect))
+		if (cmdLine.hasOption(cmd_poly_effect))
 		{
 			polyEffectFlag = true;
-			polyEffectFile = cl.getOptionValue(cmd_poly_effect);
+			polyEffectFile = cmdLine.getOptionValue(cmd_poly_effect);
 			FileProcessor.exists(polyEffectFile);
 		}
 
 		// grm statistics
-		if (cl.hasOption(cmd_grm_stat))
+		if (cmdLine.hasOption(cmd_grm_stat))
 		{
 			grmstatFlag = true;
 		}
@@ -1794,65 +1794,65 @@ public enum CmdArgs
 
 		// haseman-elston regression
 
-		if (cl.hasOption(cmd_eh2))
+		if (cmdLine.hasOption(cmd_eh2))
 		{
 			eh2Flag = true;
-			eh2 = Double.parseDouble(cl.getOptionValue(cmd_eh2));
+			eh2 = Double.parseDouble(cmdLine.getOptionValue(cmd_eh2));
 		}
 
 		heArgs.commandListener();
 
-		if (cl.hasOption(cmd_ref_freq))
+		if (cmdLine.hasOption(cmd_ref_freq))
 		{
-			ref_freq = cl.getOptionValue(cmd_ref_freq);
+			ref_freq = cmdLine.getOptionValue(cmd_ref_freq);
 			FileProcessor.exists(ref_freq);
 		}
 
-		if (cl.hasOption(cmd_maf_range))
+		if (cmdLine.hasOption(cmd_maf_range))
 		{
-			String s = cl.getOptionValue(cmd_maf_range);
+			String s = cmdLine.getOptionValue(cmd_maf_range);
 			String[] ss = s.split(",");
 			maf_range[0] = Double.parseDouble(ss[0]);
 			maf_range[1] = Double.parseDouble(ss[1]);
 		}
 
-		if (cl.hasOption(cmd_grm_range))
+		if (cmdLine.hasOption(cmd_grm_range))
 		{
-			String s = cl.getOptionValue(cmd_grm_range);
+			String s = cmdLine.getOptionValue(cmd_grm_range);
 			String[] ss = s.split(",");
 			grm_range[0] = Integer.parseInt(ss[0]);
 			grm_range[1] = Integer.parseInt(ss[1]);
 			grmRangeFlag = true;
 		}
 
-		if (cl.hasOption(cmd_grm_partition))
+		if (cmdLine.hasOption(cmd_grm_partition))
 		{
 			grmPartitionFlag = true;
-			grmPartition = Integer.parseInt(cl
+			grmPartition = Integer.parseInt(cmdLine
 					.getOptionValue(cmd_grm_partition));
 		}
 
-		if (cl.hasOption(cmd_make_grm))
+		if (cmdLine.hasOption(cmd_make_grm))
 		{
 			makeGRMFlag = true;
 			GRMFlag = true;
 		}
 
-		if (cl.hasOption(cmd_make_grm_txt))
+		if (cmdLine.hasOption(cmd_make_grm_txt))
 		{
 			makeGRMTXTFlag = true;
 			GRMFlag = true;
 		}
 
-		if (cl.hasOption(cmd_covar))
+		if (cmdLine.hasOption(cmd_covar))
 		{
-			covar_file = cl.getOptionValue(cmd_covar);
+			covar_file = cmdLine.getOptionValue(cmd_covar);
 			FileProcessor.exists(covar_file);
 		}
 
-		if (cl.hasOption(cmd_covar_num))
+		if (cmdLine.hasOption(cmd_covar_num))
 		{
-			String[] p = cl.getOptionValue(cmd_covar_num).split(",");
+			String[] p = cmdLine.getOptionValue(cmd_covar_num).split(",");
 			HashSet<Integer> idx = NewIt.newHashSet();
 			for (int i = 0, len = p.length; i < len; i++)
 			{
@@ -1889,15 +1889,15 @@ public enum CmdArgs
 			}
 		}
 
-		if (cl.hasOption(cmd_qcovar))
+		if (cmdLine.hasOption(cmd_qcovar))
 		{
-			qcovar_file = cl.getOptionValue(cmd_qcovar);
+			qcovar_file = cmdLine.getOptionValue(cmd_qcovar);
 			FileProcessor.exists(qcovar_file);
 		}
 
-		if (cl.hasOption(cmd_qcovar_num))
+		if (cmdLine.hasOption(cmd_qcovar_num))
 		{
-			String[] p = cl.getOptionValue(cmd_qcovar_num).split(",");
+			String[] p = cmdLine.getOptionValue(cmd_qcovar_num).split(",");
 			HashSet<Integer> idx = NewIt.newHashSet();
 			for (int i = 0, len = p.length; i < len; i++)
 			{
@@ -1934,63 +1934,63 @@ public enum CmdArgs
 			}
 		}
 
-		if (cl.hasOption(cmd_reverse))
+		if (cmdLine.hasOption(cmd_reverse))
 		{
 			reverse = true;
 		}
 
-		if (cl.hasOption(cmd_scale))
+		if (cmdLine.hasOption(cmd_scale))
 		{
 			scale = true;
 		}
 
-		if (cl.hasOption(cmd_perm))
+		if (cmdLine.hasOption(cmd_perm))
 		{
 			permFlag = true;
-			perm = Integer.parseInt(cl.getOptionValue(cmd_perm));
+			perm = Integer.parseInt(cmdLine.getOptionValue(cmd_perm));
 		}
 
-		if (cl.hasOption(cmd_k))
+		if (cmdLine.hasOption(cmd_k))
 		{
 			k_button = true;
-			k = Double.parseDouble(cl.getOptionValue(cmd_k));
+			k = Double.parseDouble(cmdLine.getOptionValue(cmd_k));
 		}
 
-		if (cl.hasOption(cmd_out))
+		if (cmdLine.hasOption(cmd_out))
 		{
-			out = cl.getOptionValue(cmd_out);
+			out = cmdLine.getOptionValue(cmd_out);
 		}
 
-		if (cl.hasOption(cmd_cal_k))
+		if (cmdLine.hasOption(cmd_cal_k))
 		{
 			calOption = true;
-			cal_k = Double.parseDouble(cl.getOptionValue(cmd_cal_k));
+			cal_k = Double.parseDouble(cmdLine.getOptionValue(cmd_cal_k));
 		}
 
-		if (cl.hasOption(cmd_cal_ho))
+		if (cmdLine.hasOption(cmd_cal_ho))
 		{
-			cal_ho = Double.parseDouble(cl.getOptionValue(cmd_cal_ho));
+			cal_ho = Double.parseDouble(cmdLine.getOptionValue(cmd_cal_ho));
 			cal_hoFlag = true;
 			cal_hlFlag = false;
 		}
 
-		if (cl.hasOption(cmd_cal_hl))
+		if (cmdLine.hasOption(cmd_cal_hl))
 		{
-			cal_hl = Double.parseDouble(cl.getOptionValue(cmd_cal_hl));
+			cal_hl = Double.parseDouble(cmdLine.getOptionValue(cmd_cal_hl));
 			cal_hoFlag = false;
 			cal_hlFlag = true;
 		}
 
-		if (cl.hasOption(cmd_cal_cc))
+		if (cmdLine.hasOption(cmd_cal_cc))
 		{
-			String[] s = cl.getOptionValue(cmd_cal_cc).split(",");
+			String[] s = cmdLine.getOptionValue(cmd_cal_cc).split(",");
 			cal_cc[0] = Double.parseDouble(s[0]);
 			cal_cc[1] = Double.parseDouble(s[1]);
 		}
 
-		if (cl.hasOption(cmd_cal_h2_se))
+		if (cmdLine.hasOption(cmd_cal_h2_se))
 		{
-			cal_h2_se = Double.parseDouble(cl.getOptionValue(cmd_cal_h2_se));
+			cal_h2_se = Double.parseDouble(cmdLine.getOptionValue(cmd_cal_h2_se));
 			cal_h2seFlag = true;
 		}
 	}
@@ -2002,7 +2002,31 @@ public enum CmdArgs
 
 	public String getNA()
 	{
-		return cl.getOptionValue("na");
+		return cmdLine.getOptionValue("na");
 	}
 
+	public void printOptionsInEffect()
+	{
+		Logger.printUserLog("Options in effect: ");
+		
+		@SuppressWarnings("rawtypes")
+		Iterator optIter = cmdLine.iterator();
+		
+		while (optIter.hasNext())
+		{
+			Option opt = (Option)optIter.next();
+			String line = opt.getOpt() == null ? "\t--" + opt.getLongOpt() : "\t-" + opt.getOpt();
+			String[] argValues = opt.getValues();
+			if (argValues != null)
+			{
+				for (String value : argValues)
+				{
+					line += " " + value; 
+				}
+			}
+			Logger.printUserLog(line);
+		}
+		
+		Logger.printUserLog("");
+	}
 }
