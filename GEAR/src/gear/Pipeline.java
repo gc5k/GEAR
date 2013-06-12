@@ -53,8 +53,7 @@ public class Pipeline
 		}
 		else if (CmdArgs.INSTANCE.getStrandFile() != null)
 		{
-			Strand strand = new Strand();
-			strand.Merge();
+			(new Strand()).merge();
 		}
 		else if (CmdArgs.INSTANCE.hasMergeOption())
 		{

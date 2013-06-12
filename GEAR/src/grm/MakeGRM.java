@@ -1,6 +1,5 @@
 package grm;
 
-import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.FileNotFoundException;
 import java.io.IOException;
@@ -405,29 +404,16 @@ public class MakeGRM
 	private void getRefFreq()
 	{
 		HashMap<String, MAF> refMap = NewIt.newHashMap();
-		BufferedReader reader = FileProcessor
-				.FileOpen(CmdArgs.INSTANCE.ref_freq);
-		String line;
-		try
+		gear.util.BufferedReader reader = gear.util.BufferedReader.openTextFile(CmdArgs.INSTANCE.ref_freq, "reference-frequency");
+		reader.readNonEmptyLine();
+		MAF maf;
+		int numSnpsRead = 0;
+		while ((maf = MAF.next(reader)) != null)
 		{
-			line = reader.readLine();
-			int idx = 0;
-			while ((line = reader.readLine()) != null)
-			{
-				line = line.trim();
-				MAF maf = new MAF(line, ++idx);
-				refMap.put(maf.getSNP(), maf);
-			}
-			Logger.printUserLog("Read " + idx + " SNPs in '"
-					+ CmdArgs.INSTANCE.ref_freq + "'.\n");
-
-		} 
-		catch (IOException e)
-		{
-			Logger.handleException(e,
-					"An exception occurred when reading the maf file '"
-							+ CmdArgs.INSTANCE.ref_freq + "'.");
+			refMap.put(maf.getSNP(), maf);
+			++numSnpsRead;
 		}
+		Logger.printUserLog("Read " + numSnpsRead + " SNPs in '" + CmdArgs.INSTANCE.ref_freq + "'.\n");
 
 		ArrayList<SNP> snpList = snpMap.getMarkerList();
 		int c = 0;

@@ -34,8 +34,7 @@ public class Z
 		return p;
 	}
 
-	public static double OddsRatioTestPvalueTwoTail(double f1, double f2,
-			double n1, double n2)
+	public static double OddsRatioTestPvalueTwoTail(double f1, double f2, double n1, double n2)
 	{
 		double T = OddsRatioTest(f1, f2, n1, n2);
 		NormalDistributionImpl nd = new NormalDistributionImpl();
@@ -43,7 +42,8 @@ public class Z
 		try
 		{
 			p = 1 - nd.cumulativeProbability(T);
-		} catch (MathException e)
+		}
+		catch (MathException e)
 		{
 			e.printStackTrace();
 		}
@@ -51,7 +51,8 @@ public class Z
 		if (2 * p > 1)
 		{
 			p = 2 * (1 - p);
-		} else
+		}
+		else
 		{
 			p = 2 * p;
 		}

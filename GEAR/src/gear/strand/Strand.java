@@ -28,7 +28,7 @@ import gear.util.structure.MAF;
 
 public class Strand
 {
-	private GenotypeMatrix G1;
+	private GenotypeMatrix genoMat;
 
 	private int[][] comSNPIdx;
 	private double[][] allelefreq1;
@@ -36,13 +36,13 @@ public class Strand
 	private double[] N2;
 	private ArrayList<Boolean> flag;
 
-	private ArrayList<SNP> snpList1;
-	private ArrayList<MAF> mafList = NewIt.newArrayList();
+	private ArrayList<SNP> snpList;
+	private ArrayList<MAF> mafList = new ArrayList<MAF>();
 
-	private ArrayList<PersonIndex> PersonTable1;
-	ArrayList<Integer> snpCoding = NewIt.newArrayList();
+	private ArrayList<PersonIndex> personIndexes;
+	ArrayList<Integer> snpCoding = new ArrayList<Integer>();
 
-	private SampleFilter sf1;
+	private SampleFilter sampleFilter;
 
 	private byte byte1 = 108;
 	private byte byte2 = 27;
@@ -54,27 +54,27 @@ public class Strand
 	{
 		readStrand();
 
-		PLINKParser pp1 = null;
+		PLINKParser plinkParser = null;
 		if (CmdArgs.INSTANCE.getBFileArgs(0).isSet())
 		{
-			pp1 = new PLINKBinaryParser(CmdArgs.INSTANCE.getBFileArgs(0)
-					.getBed(), CmdArgs.INSTANCE.getBFileArgs(0)
-					.getBim(), CmdArgs.INSTANCE.getBFileArgs(0)
-					.getFam());
-		} else
+			plinkParser = new PLINKBinaryParser(CmdArgs.INSTANCE.getBFileArgs(0).getBed(),
+			                                    CmdArgs.INSTANCE.getBFileArgs(0).getBim(),
+			                                    CmdArgs.INSTANCE.getBFileArgs(0).getFam());
+		}
+		else
 		{
 			Logger.printUserError("--bfile is not set.");
 			System.exit(1);
 		}
-		pp1.Parse();
+		plinkParser.Parse();
 
-		sf1 = new SampleFilter(pp1.getPedigreeData(), pp1.getMapData());
-		G1 = new GenotypeMatrix(sf1.getSample());
-		PersonTable1 = sf1.getSample();
-		snpList1 = sf1.getMapFile().getMarkerList();
+		sampleFilter = new SampleFilter(plinkParser.getPedigreeData(), plinkParser.getMapData());
+		genoMat = new GenotypeMatrix(sampleFilter.getSample());
+		personIndexes = sampleFilter.getSample();
+		snpList = sampleFilter.getMapFile().getMarkerList();
 	}
 
-	public void Merge()
+	public void merge()
 	{
 		DecimalFormat fmt = new DecimalFormat("#.###E0");
 
@@ -90,13 +90,13 @@ public class Strand
 		PrintStream ps1 = FileProcessor.CreatePrintStream(sb.toString());
 		ps1.append("SNP\tChr\tPos\tA1_1st\tA2_1st\tA1_2nd\tA2_2nd\tMAF_A1_1st\tMAF_A1_2nd\tFlip\tMerged\tP\tScheme\n");
 
-		allelefreq1 = new double[G1.getNumMarker()][3];
-		N1 = new double[G1.getNumMarker()];
+		allelefreq1 = new double[genoMat.getNumMarker()][3];
+		N1 = new double[genoMat.getNumMarker()];
 		flag = NewIt.newArrayList();
 
-		CalculateAlleleFrequency(G1, allelefreq1, N1);
+		calculateAlleleFrequency(genoMat, allelefreq1, N1);
 
-		getCommonSNP(snpList1);
+		getCommonSNP(snpList);
 
 		int qualified_snp = 0;
 		for (int i = 0; i < comSNPIdx[0].length; i++)
@@ -105,12 +105,12 @@ public class Strand
 			boolean ATGCLocus = false;
 			boolean flip = false;
 
-			SNP snp1 = snpList1.get(comSNPIdx[0][i]);
+			SNP snp1 = snpList.get(comSNPIdx[0][i]);
 			MAF maf2 = mafList.get(comSNPIdx[1][i]);
 			char a1_1 = snp1.getFirstAllele();
 			char a1_2 = snp1.getSecAllele();
-			char a2_1 = maf2.getA1();
-			char a2_2 = maf2.getA2();
+			char a2_1 = maf2.getAllele1();
+			char a2_2 = maf2.getAllele2();
 
 			double ref1 = allelefreq1[comSNPIdx[0][i]][0];
 			double ref2 = maf2.getMAF();
@@ -132,14 +132,16 @@ public class Strand
 											.getMergeArgs().getMafCutoff())
 							{
 								f = true;
-							} else
+							}
+							else
 							{
 								f = false;
 							}
 							flip = false;
 							snpCoding.add(0);
 
-						} else if (ref1 < 0.5 && ref2 > 0.5)
+						}
+						else if (ref1 < 0.5 && ref2 > 0.5)
 						{
 							if (ref1 < CmdArgs.INSTANCE.getMergeArgs()
 									.getMafCutoff()
@@ -147,7 +149,8 @@ public class Strand
 											.getMergeArgs().getMafCutoff())
 							{
 								f = true;
-							} else
+							}
+							else
 							{
 								f = false;
 							}
@@ -155,7 +158,8 @@ public class Strand
 							flip = true;
 							snpCoding.add(1);
 
-						} else if (ref1 > 0.5 && ref2 < 0.5)
+						}
+						else if (ref1 > 0.5 && ref2 < 0.5)
 						{
 							if (ref1 > 1 - CmdArgs.INSTANCE
 									.getMergeArgs().getMafCutoff()
@@ -163,7 +167,8 @@ public class Strand
 											.getMergeArgs().getMafCutoff())
 							{
 								f = true;
-							} else
+							}
+							else
 							{
 								f = false;
 							}
@@ -171,7 +176,8 @@ public class Strand
 							flip = true;
 							snpCoding.add(1);
 
-						} else
+						}
+						else
 						{
 							if (ref1 > 1 - CmdArgs.INSTANCE
 									.getMergeArgs().getMafCutoff()
@@ -179,7 +185,8 @@ public class Strand
 											.getMergeArgs().getMafCutoff())
 							{
 								f = true;
-							} else
+							}
+							else
 							{
 								f = false;
 							}
@@ -188,14 +195,16 @@ public class Strand
 						}
 						// debug
 						f = false;
-					} else
+					}
+					else
 					{
 						flip = false;
 						snpCoding.add(0);
 						f = true;
 					}
 
-				} else if (a1_1 == a2_2)
+				}
+				else if (a1_1 == a2_2)
 				{// scheme2
 					scheme = 2;
 					if (SNPMatch.isAmbiguous(a1_1, a1_2))
@@ -216,7 +225,8 @@ public class Strand
 							snpCoding.add(1);
 							ref2 = 1 - ref2;
 							flip = true;
-						} else if (ref1 < 0.5 && (1 - ref2) > 0.5)
+						}
+						else if (ref1 < 0.5 && (1 - ref2) > 0.5)
 						{
 							if (ref1 < CmdArgs.INSTANCE.getMergeArgs()
 									.getMafCutoff()
@@ -231,7 +241,8 @@ public class Strand
 							flip = false;
 							snpCoding.add(0);
 
-						} else if (ref1 > 0.5 && (1 - ref2) < 0.5)
+						}
+						else if (ref1 > 0.5 && (1 - ref2) < 0.5)
 						{
 							if (ref1 > 1 - CmdArgs.INSTANCE
 									.getMergeArgs().getMafCutoff()
@@ -246,7 +257,8 @@ public class Strand
 							flip = false;
 							snpCoding.add(0);
 
-						} else
+						}
+						else
 						{
 							if (ref1 > 1 - CmdArgs.INSTANCE
 									.getMergeArgs().getMafCutoff()
@@ -265,20 +277,23 @@ public class Strand
 						}
 						// debug
 						f = false;
-					} else
+					}
+					else
 					{
 						flip = true;
 						ref2 = 1 - ref2;
 						snpCoding.add(1);
 						f = false;
 					}
-				} else if (a1_1 == SNPMatch.Flip(a2_1))
+				}
+				else if (a1_1 == SNPMatch.Flip(a2_1))
 				{// scheme3
 					scheme = 3;
 					flip = true;
 					snpCoding.add(0);
 					f = true;
-				} else if (a1_1 == SNPMatch.Flip(a2_2))
+				}
+				else if (a1_1 == SNPMatch.Flip(a2_2))
 				{// scheme4
 					scheme = 4;
 					flip = true;
@@ -287,15 +302,15 @@ public class Strand
 					f = true;
 					// debug
 					f = false;
-				} else
+				}
+				else
 				{// outlier
 					scheme = 5;
 					f = false;
 					snpCoding.add(0);
 				}
 
-				double p = Z.OddsRatioTestPvalueTwoTail(ref1, ref2,
-						N1[comSNPIdx[0][i]], N2[comSNPIdx[1][i]]);
+				double p = Z.OddsRatioTestPvalueTwoTail(ref1, ref2, N1[comSNPIdx[0][i]], N2[comSNPIdx[1][i]]);
 				if (p < CmdArgs.INSTANCE.getMergeArgs().getMafCutoff())
 				{
 					f = false;
@@ -312,9 +327,9 @@ public class Strand
 				if (f)
 					qualified_snp++;
 
-				ps.println(snpList1.get(comSNPIdx[0][i]).getName() + " "
-						+ snpList1.get(comSNPIdx[0][i]).getChromosome() + " "
-						+ snpList1.get(comSNPIdx[0][i]).getPosition() + " "
+				ps.println(snpList.get(comSNPIdx[0][i]).getName() + " "
+						+ snpList.get(comSNPIdx[0][i]).getChromosome() + " "
+						+ snpList.get(comSNPIdx[0][i]).getPosition() + " "
 						+ a1_1 + " " + a1_2 + " " + a2_1 + " " + a2_2 + " "
 						+ " " + fmt.format(ref1) + " "
 						+ fmt.format(maf2.getMAF()) + " " + flip + " " + f
@@ -323,9 +338,9 @@ public class Strand
 			{
 				flag.add(false);
 				snpCoding.add(0);
-				ps1.println(snpList1.get(comSNPIdx[0][i]).getName() + " "
-						+ snpList1.get(comSNPIdx[0][i]).getChromosome() + " "
-						+ snpList1.get(comSNPIdx[0][i]).getPosition() + " "
+				ps1.println(snpList.get(comSNPIdx[0][i]).getName() + " "
+						+ snpList.get(comSNPIdx[0][i]).getChromosome() + " "
+						+ snpList.get(comSNPIdx[0][i]).getPosition() + " "
 						+ a1_1 + " " + a1_2 + " " + a2_1 + " " + a2_2 + " "
 						+ " " + fmt.format(ref1) + " "
 						+ fmt.format(maf2.getMAF()) + " " + flip + " " + f
@@ -341,13 +356,11 @@ public class Strand
 			System.exit(1);
 		} else
 		{
-			Logger.printUserLog("Number of common SNPs between the two SNP files: "
-					+ qualified_snp);
+			Logger.printUserLog("Number of common SNPs between the two SNP files: " + qualified_snp);
 		}
 
-		Logger.printUserLog("flag " + flag.size() + ": snpCoding "
-				+ snpCoding.size());
-		WriteFile();
+		Logger.printUserLog("flag " + flag.size() + ": snpCoding " + snpCoding.size());
+		writeFile();
 	}
 
 	private void getCommonSNP(ArrayList<SNP> snplist1)
@@ -403,8 +416,7 @@ public class Strand
 		Logger.printUserLog("idx1 " + idx1);
 	}
 
-	public void CalculateAlleleFrequency(GenotypeMatrix G, double[][] frq,
-			double[] n)
+	public void calculateAlleleFrequency(GenotypeMatrix G, double[][] frq, double[] n)
 	{
 		int[][] g = G.getG();
 		for (int i = 0; i < g.length; i++)
@@ -437,17 +449,15 @@ public class Strand
 	public void readStrand()
 	{
 		BufferedReader reader = BufferedReader.openTextFile(CmdArgs.INSTANCE.getStrandFile(), "strand");
-		String line = reader.readLine();
-		int idx = 1;
-		while ((line = reader.readLine()) != null)
+		reader.readNonEmptyLine();
+		MAF maf;
+		while ((maf = MAF.next(reader)) != null)
 		{
-			line = line.trim();
-			MAF maf = new MAF(line, idx++);
 			mafList.add(maf);
 		}
 	}
 
-	public void WriteFile()
+	public void writeFile()
 	{
 		StringBuffer sbim = new StringBuffer();
 		sbim.append(CmdArgs.INSTANCE.out);
@@ -456,14 +466,13 @@ public class Strand
 
 		for (int i = 0; i < comSNPIdx[0].length; i++)
 		{
-			if (!flag.get(i))
+			if (flag.get(i))
 			{
-				continue;
+				SNP snp = snpList.get(comSNPIdx[0][i]);
+				pbim.append(snp.getChromosome() + "\t" + snp.getName() + "\t" +
+				            snp.getDistance() + "\t" + snp.getPosition() + "\t" +
+				            snp.getFirstAllele() + "\t" + snp.getSecAllele() + "\n");
 			}
-			SNP snp = snpList1.get(comSNPIdx[0][i]);
-			pbim.append(snp.getChromosome() + "\t" + snp.getName() + "\t"
-					+ snp.getDistance() + "\t" + snp.getPosition() + "\t"
-					+ snp.getFirstAllele() + "\t" + snp.getSecAllele() + "\n");
 		}
 		pbim.close();
 
@@ -471,13 +480,13 @@ public class Strand
 		sfam.append(CmdArgs.INSTANCE.out);
 		sfam.append(".fam");
 		PrintStream pfam = FileProcessor.CreatePrintStream(sfam.toString());
-		for (Iterator<PersonIndex> e = PersonTable1.iterator(); e.hasNext();)
+		for (Iterator<PersonIndex> e = personIndexes.iterator(); e.hasNext();)
 		{
 			PersonIndex per = e.next();
 			BPerson bp = per.getPerson();
-			pfam.append(bp.getFamilyID() + "\t" + bp.getPersonID() + "\t"
-					+ bp.getDadID() + "\t" + bp.getMomID() + "\t"
-					+ bp.getGender() + "\t" + bp.getAffectedStatus() + "\n");
+			pfam.append(bp.getFamilyID() + "\t" + bp.getPersonID() + "\t" +
+			            bp.getDadID() + "\t" + bp.getMomID() + "\t" +
+					    bp.getGender() + "\t" + bp.getAffectedStatus() + "\n");
 		}
 
 		pfam.close();
@@ -488,10 +497,10 @@ public class Strand
 		try
 		{
 			os = new DataOutputStream(new FileOutputStream(sbed.toString()));
-		} catch (FileNotFoundException e)
+		}
+		catch (FileNotFoundException e)
 		{
-			Logger.printUserError("Cannot create file '" + sbed.toString()
-					+ "'.");
+			Logger.printUserError("Cannot create file '" + sbed.toString() + "'.");
 			Logger.printUserError("Exception Message: " + e.getMessage());
 			System.exit(1);
 		}
@@ -516,9 +525,9 @@ public class Strand
 				int posByte = snpIdx >> BPerson.shift;
 				int posBite = (snpIdx & 0xf) << 1;
 
-				for (int j = 0; j < PersonTable1.size(); j++)
+				for (int j = 0; j < personIndexes.size(); j++)
 				{
-					PersonIndex pi = PersonTable1.get(j);
+					PersonIndex pi = personIndexes.get(j);
 					BPerson bp = pi.getPerson();
 					byte g = bp.getOriginalGenotypeScore(posByte, posBite);
 					if (snpCoding.get(i).intValue() == 1)
@@ -544,7 +553,7 @@ public class Strand
 					gbyte |= g;
 					idx++;
 
-					if (j != (PersonTable1.size() - 1))
+					if (j != (personIndexes.size() - 1))
 					{
 						if (idx == 4)
 						{
@@ -552,7 +561,8 @@ public class Strand
 							gbyte = 0;
 							idx = 0;
 						}
-					} else
+					}
+					else
 					{
 						os.writeByte(gbyte);
 					}
@@ -560,12 +570,10 @@ public class Strand
 			}
 
 			os.close();
-		} catch (IOException e)
+		}
+		catch (IOException e)
 		{
-			Logger.handleException(
-					e,
-					"An exception occurred when writing the bed file '"
-							+ sbed.toString() + "'.");
+			Logger.handleException(e, "An exception occurred when writing the bed file '" + sbed.toString() + "'.");
 		}
 	}
 }
