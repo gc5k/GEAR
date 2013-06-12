@@ -2002,7 +2002,7 @@ public enum CmdArgs
 
 	public String getNA()
 	{
-		return cmdLine.getOptionValue("na");
+		return cmdLine == null ? null : cmdLine.getOptionValue("na");
 	}
 
 	public void printOptionsInEffect()
