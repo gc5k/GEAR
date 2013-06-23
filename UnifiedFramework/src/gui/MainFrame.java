@@ -124,7 +124,9 @@ public class MainFrame extends JFrame {
 
 	public void dispose() {
 		super.dispose();
+		//System.out.println("1");
 		System.exit(0);
+		//System.out.println("2");
 	}
 
 	private void actionPerformed_dataload() {
