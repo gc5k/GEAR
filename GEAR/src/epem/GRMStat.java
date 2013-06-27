@@ -2,8 +2,8 @@ package epem;
 
 import gear.CmdArgs;
 import gear.util.FileProcessor;
+import gear.util.LittleEndianDataInputStream;
 import gear.util.Logger;
-import he.endian.LittleEndianDataInputStream;
 
 import java.io.BufferedReader;
 import java.io.DataInputStream;

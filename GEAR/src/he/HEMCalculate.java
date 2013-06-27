@@ -16,8 +16,8 @@ import org.apache.commons.math.linear.RealMatrix;
 import org.apache.commons.math.linear.Array2DRowRealMatrix;
 
 import gear.CmdArgs;
+import gear.util.LittleEndianDataInputStream;
 import gear.util.Logger;
-import he.endian.LittleEndianDataInputStream;
 
 public class HEMCalculate
 {
