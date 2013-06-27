@@ -1,4 +1,4 @@
-package he.endian;
+package gear.util;
 
 import java.io.*;
 import java.nio.*;
@@ -9,7 +9,6 @@ import java.nio.*;
 
 public class LittleEndianDataInputStream
 {
-
 	public LittleEndianDataInputStream(DataInputStream inStream, int bufferSize)
 	{
 		inStream_ = inStream;

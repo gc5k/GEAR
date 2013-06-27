@@ -14,9 +14,9 @@ import java.util.zip.GZIPInputStream;
 import gear.CmdArgs;
 import gear.ConstValues;
 import gear.util.FileProcessor;
+import gear.util.LittleEndianDataInputStream;
 import gear.util.Logger;
 import gear.util.NewIt;
-import he.endian.LittleEndianDataInputStream;
 
 public class HEMRead
 {
