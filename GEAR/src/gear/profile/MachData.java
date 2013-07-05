@@ -124,8 +124,10 @@ public class MachData extends Data
 		{
 			BufferedReader reader = BufferedReader.openTextFile(infoFiles[fileIdx], ".mlinfo");
 			String[] tokens;
-			while ((tokens = reader.readTokens(6)) != null)
+			int l = 0;
+			while ((tokens = reader.readTokens(7)) != null)
 			{
+				if (l++<1) continue;
 				String locusName = tokens[0];
 				
 				if (tokens[1].length() != 1)
