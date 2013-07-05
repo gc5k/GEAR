@@ -170,7 +170,7 @@ public class MachData extends Data
 			
 			String[] tokens;
 			
-			while (dosageReader == null || (tokens = dosageReader.readTokens(numLociInFile[dosageFileIdx] + 1)) == null)
+			while (dosageReader == null || (tokens = dosageReader.readTokens(numLociInFile[dosageFileIdx] + 2)) == null)
 			{
 				if (dosageReader != null)
 				{
@@ -230,23 +230,23 @@ public class MachData extends Data
 			indID = id[1];
 			
 			dosages = new float[numLociInFile[dosageFileIdx]];
-			for (int col = 1; col < tokens.length; ++col)
+			for (int col = 2; col < tokens.length; ++col)
 			{
 				boolean failedToParse = false;
 				
 				try
 				{
-					dosages[col - 1] = Float.parseFloat(tokens[col]);
+					dosages[col-2] = Float.parseFloat(tokens[col]);
 				}
 				catch (NumberFormatException e)
 				{
 					failedToParse = true;
 				}
 				
-				if (failedToParse || dosages[col - 1] < 0.0f || dosages[col - 1] > 2.0f)
+				if (failedToParse || dosages[col-2] < 0.0f || dosages[col-2] > 2.0f)
 				{
 					String msg = "";
-					msg += "'" + tokens[col] + "' is not a valid dosage. ";
+					msg += "'" + tokens[col-2] + "' is not a valid dosage. ";
 					msg += "Dosages must be floating point values ranging from 0.0 to 2.0.";
 					dosageReader.reportFormatError(msg);
 				}
