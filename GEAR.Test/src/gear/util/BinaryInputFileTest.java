@@ -19,6 +19,7 @@ public class BinaryInputFileTest
 		assertEquals(4, file.available());
 		assertEquals(2.0f, file.readFloat(), 1e-6);
 		assertEquals(0, file.available());
+		file.close();
 	}
 
 }
