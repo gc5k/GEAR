@@ -2,6 +2,8 @@ package gear;
 
 public class ConstValues
 {
+	public static final int FLOAT_SIZE = Float.SIZE / Byte.SIZE;
+	
 	public static final String WHITESPACE_DELIMITER = "\\s+";
 	
 	public static final int BINARY_HOMOZYGOTE_FIRST = 0x0;
