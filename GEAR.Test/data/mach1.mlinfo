@@ -1,3 +1,4 @@
-M1	A	B	0.5	0.5	0.5
-M2	A	a	0.5	0.5	0.5
-M3	B	b	0.5	0.5	0.5
+SNP    Al1    Al2    Freq1    MAF    Quality    Rsq
+M1	A	B	0.5	0.5	0.5	0.5
+M2	A	a	0.5	0.5	0.5	0.5
+M3	B	b	0.5	0.5	0.5	0.5
