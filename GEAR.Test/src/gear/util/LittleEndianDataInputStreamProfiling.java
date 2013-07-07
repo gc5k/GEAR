@@ -11,7 +11,7 @@ public class LittleEndianDataInputStreamProfiling
 	public static void main(String[] args) throws Exception
 	{
 		long startTime = System.currentTimeMillis();
-		FileInputStream fileStream = new FileInputStream("data/LittleEndian.dat");
+		FileInputStream fileStream = new FileInputStream("data/LittleEndianProfile.dat");
 		DataInputStream bigEndianDataStream = new DataInputStream(fileStream);
 		LittleEndianDataInputStream littleEndianDataStream = new LittleEndianDataInputStream(bigEndianDataStream, Float.SIZE);
 		int cnt = 0;
