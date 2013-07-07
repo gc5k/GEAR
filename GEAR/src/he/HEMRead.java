@@ -1,7 +1,6 @@
 package he;
 
 import java.io.BufferedReader;
-import java.io.DataInputStream;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
@@ -13,8 +12,8 @@ import java.util.zip.GZIPInputStream;
 
 import gear.CmdArgs;
 import gear.ConstValues;
+import gear.util.BinaryInputFile;
 import gear.util.FileProcessor;
-import gear.util.LittleEndianDataInputStream;
 import gear.util.Logger;
 import gear.util.NewIt;
 
@@ -50,7 +49,7 @@ public class HEMRead
 	protected boolean isCC = false;
 
 	protected ArrayList<BufferedReader> grmList;
-	protected ArrayList<LittleEndianDataInputStream> binList;
+	protected ArrayList<BinaryInputFile> binList;
 	protected ArrayList<String> grmFileList;
 	protected ArrayList<String> idFileList;
 	protected HashMap<Double, Integer> cat = new HashMap<Double, Integer>();
@@ -302,21 +301,9 @@ public class HEMRead
 			grmFileList.add(grmFile);
 			idFileList.add(grmID);
 
-			FileInputStream fileStream = null;
-			try
-			{
-				fileStream = new FileInputStream(grmFile);
-			}
-			catch (FileNotFoundException e)
-			{
-				Logger.handleException(	e,
-										"Error in opening GRM bin file '" + grmFile + "'.");
-			}
-			DataInputStream bigEndianDataStream = new DataInputStream(
-					fileStream);
-			LittleEndianDataInputStream littleEndianDataStream = new LittleEndianDataInputStream(
-					bigEndianDataStream, Float.SIZE);
-			binList.add(littleEndianDataStream);
+			BinaryInputFile grmBin = new BinaryInputFile(grmFile, "GRM");
+			grmBin.setLittleEndian(true);
+			binList.add(grmBin);
 		}
 		if (CmdArgs.INSTANCE.getHEArgs().isGrm() || CmdArgs.INSTANCE
 				.getHEArgs().isGrmTxt())
@@ -427,26 +414,9 @@ public class HEMRead
 					tsb = new StringBuilder(root);
 					idFileList.add(tsb.append(".grm.id").toString());
 
-					FileInputStream fileStream = null;
-					try
-					{
-						tsb = new StringBuilder(root);
-						fileStream = new FileInputStream(tsb.append(".grm.bin")
-								.toString());
-					}
-					catch (FileNotFoundException e)
-					{
-						Logger.handleException(	e,
-												"Error in opening GRM bin file '" + line
-														.trim() + "' in " + CmdArgs.INSTANCE
-														.getHEArgs()
-														.getGrmList() + "'.");
-					}
-					DataInputStream bigEndianDataStream = new DataInputStream(
-							fileStream);
-					LittleEndianDataInputStream littleEndianDataStream = new LittleEndianDataInputStream(
-							bigEndianDataStream, Float.SIZE);
-					binList.add(littleEndianDataStream);
+					BinaryInputFile grmBin = new BinaryInputFile(root + ".grm.bin", "GRM");
+					grmBin.setLittleEndian(true);
+					binList.add(grmBin);
 				}
 			}
 		}

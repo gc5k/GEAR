@@ -1,12 +1,12 @@
 package epem;
 
 import gear.CmdArgs;
+import gear.ConstValues;
+import gear.util.BinaryInputFile;
 import gear.util.FileProcessor;
-import gear.util.LittleEndianDataInputStream;
 import gear.util.Logger;
 
 import java.io.BufferedReader;
-import java.io.DataInputStream;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
@@ -109,39 +109,19 @@ public class GRMStat
 							+ "'.");
 		}
 
-		// *************************************read grm file
-		FileInputStream fileStream = null;
-		try
-		{
-			fileStream = new FileInputStream(CmdArgs.INSTANCE
-					.getHEArgs().getGrm());
-		} catch (FileNotFoundException e)
-		{
-			Logger.handleException(e, "Cannot open the GRM file '"
-					+ CmdArgs.INSTANCE.getHEArgs().getGrm() + "'.");
-		}
-		DataInputStream bigEndianDataStream = new DataInputStream(fileStream);
-		LittleEndianDataInputStream littleEndianDataStream = new LittleEndianDataInputStream(
-				bigEndianDataStream, Float.SIZE);
-
+		// *************************************read grm file	
+		BinaryInputFile grmFile = new BinaryInputFile(CmdArgs.INSTANCE.getHEArgs().getGrm(), "GRM");
+		grmFile.setLittleEndian(true);
+		
 		for (int i = 0; i < size; i++)
 		{
 			for (int j = 0; j <= i; j++)
 			{
 				Nt++;
 				double g = 0;
-				try
+				if (grmFile.available() >= ConstValues.FLOAT_SIZE)
 				{
-					if (littleEndianDataStream.available() > 0)
-					{
-						g = littleEndianDataStream.readFloat();
-					}
-				} catch (IOException e)
-				{
-					Logger.handleException(e,
-							"An exception occurred when reading the GRM file '"
-									+ CmdArgs.INSTANCE.getHEArgs()
-											.getGrm() + "'.");
+					g = grmFile.readFloat();
 				}
 
 				int id1 = i;

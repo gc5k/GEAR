@@ -16,7 +16,7 @@ import org.apache.commons.math.linear.RealMatrix;
 import org.apache.commons.math.linear.Array2DRowRealMatrix;
 
 import gear.CmdArgs;
-import gear.util.LittleEndianDataInputStream;
+import gear.util.BinaryInputFile;
 import gear.util.Logger;
 
 public class HEMCalculate
@@ -187,21 +187,13 @@ public class HEMCalculate
 					}
 					for (int k = 0; k < heMReader.binList.size(); k++)
 					{
-						LittleEndianDataInputStream littleEndianDataStream = heMReader.binList
-								.get(0);
-						try
+						BinaryInputFile grmBin = heMReader.binList.get(0);
+
+						if (grmBin.available() > 0)
 						{
-							if (littleEndianDataStream.available() > 0)
-							{
-								row[1 + k] = littleEndianDataStream.readFloat();
-							}
+							row[1 + k] = grmBin.readFloat();
 						}
-						catch (IOException e)
-						{
-							Logger.handleException(	e,
-													"An exception occurred when reading the GRM binary file '" + heMReader.grmFileList
-															.get(k) + "'.");
-						}
+
 						if (heMReader.isSingleGrm)
 						{
 							if (CmdArgs.INSTANCE.getHEArgs().isAbsGrmCutoff())
