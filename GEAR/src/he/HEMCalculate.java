@@ -16,6 +16,7 @@ import org.apache.commons.math.linear.RealMatrix;
 import org.apache.commons.math.linear.Array2DRowRealMatrix;
 
 import gear.CmdArgs;
+import gear.ConstValues;
 import gear.util.BinaryInputFile;
 import gear.util.Logger;
 
@@ -32,6 +33,11 @@ public class HEMCalculate
 	{
 		heMReader = h;
 		Calculate();
+		
+		for (BinaryInputFile grmBin : heMReader.binList)
+		{
+			grmBin.close();
+		}
 	}
 
 	public void Calculate()
@@ -189,7 +195,7 @@ public class HEMCalculate
 					{
 						BinaryInputFile grmBin = heMReader.binList.get(0);
 
-						if (grmBin.available() > 0)
+						if (grmBin.available() >= ConstValues.FLOAT_SIZE)
 						{
 							row[1 + k] = grmBin.readFloat();
 						}
