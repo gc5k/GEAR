@@ -144,6 +144,8 @@ public class GRMStat
 				N++;
 			}
 		}
+		
+		grmFile.close();
 
 		getEffectiveNumber();
 	}
