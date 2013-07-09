@@ -39,6 +39,7 @@ public class Profiler
 		int numLocusGroups = qRanges == null ? 1 : qRanges.length;
 		
 		boolean[][] isInLocusGroup = new boolean[snps.length][numLocusGroups];
+		int[] numInLocusGroup = new int[numLocusGroups];
 		
 		// Check whether each SNP should be used for profiling.
 		for (int snpIdx = 0; snpIdx < snps.length; ++snpIdx)
@@ -105,10 +106,14 @@ public class Profiler
 				{
 					QRange qRange = qRanges[rangeIdx];
 					isInLocusGroup[snpIdx][rangeIdx] = qRange.getLowerBound() <= qScore && qScore <= qRange.getUpperBound();
+					if (isInLocusGroup[snpIdx][rangeIdx])
+					{
+						numInLocusGroup[rangeIdx]++;
+					}
 				}
 			}
 		}  // for each SNP
-		
+
 		Logger.printUserLog("Number of loci having no score (because they do not appear in the score file, or their scores are invalid, etc.): " + numLociNoScore);
 		Logger.printUserLog("Number of monomorphic loci removed: " + numMonoLoci);
 		Logger.printUserLog("Number of A/T or C/G loci " + (CmdArgs.INSTANCE.keepATGC() ? "detected: " : "removed: ") + numAmbiguousLoci);
@@ -126,8 +131,13 @@ public class Profiler
 		if (qScoreMap != null)
 		{
 			Logger.printUserLog("Number of loci having no q-scores: " + numLociNoQScore);
+			for (int i = 0; i < numInLocusGroup.length; i++)
+			{
+				QRange qRange = qRanges[i];
+				Logger.printUserLog("\tNumber of loci within the range: " + qRange.getLowerBound() + ", " + qRange.getUpperBound() + " is " + numInLocusGroup[i]);
+			}
 		}
-		
+
 		ArrayList<String> famIDs = new ArrayList<String>();
 		ArrayList<String> indIDs = new ArrayList<String>();
 		ArrayList<String> phenos = new ArrayList<String>();
