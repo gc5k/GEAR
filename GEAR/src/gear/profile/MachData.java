@@ -29,7 +29,7 @@ public class MachData extends Data
 			infoFiles[0] = CmdArgs.INSTANCE.getProfileArgs().getMachInfoFile();
 			if (infoFiles[0] == null)
 			{
-				Logger.printUserError("--mach-infor is not set.");
+				Logger.printUserError("--mach-info is not set.");
 				System.exit(1);
 			}
 			if (!(new File(infoFiles[0])).exists())
@@ -50,7 +50,7 @@ public class MachData extends Data
 			String infoBatchFile = CmdArgs.INSTANCE.getProfileArgs().getMachInfoBatchFile();
 			if (infoBatchFile == null)
 			{
-				Logger.printUserError("--mach-infor-batch is not set.");
+				Logger.printUserError("--mach-info-batch is not set.");
 				System.exit(1);
 			}
 			

@@ -274,13 +274,13 @@ public class Profiler
 			
 			if (dosage == null && info != null || dosage != null && info == null)
 			{
-				Logger.printUserError("--mach-dosage and --mach-infor must be set together.");
+				Logger.printUserError("--mach-dosage and --mach-info must be set together.");
 				System.exit(1);
 			}
 			
 			if (dosageBatch == null && infoBatch != null || dosageBatch != null && infoBatch == null)
 			{
-				Logger.printUserError("--mach-dosage-batch and --mach-infor-batch must be set together.");
+				Logger.printUserError("--mach-dosage-batch and --mach-info-batch must be set together.");
 				System.exit(1);
 			}
 		}
