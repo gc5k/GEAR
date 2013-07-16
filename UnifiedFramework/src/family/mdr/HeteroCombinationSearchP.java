@@ -224,7 +224,7 @@ public class HeteroCombinationSearchP extends AbstractMergeSearch {
 			}
 		}
 		try {
-			T /= -1 * Tp / Tn;
+			T = -1 * Tp / Tn;
 		} catch (Exception E) {
 			System.err.println("Denominator is zero.");
 		}
