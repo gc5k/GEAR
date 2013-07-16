@@ -54,7 +54,7 @@ public class PLINKParser {
 			System.err.println(mapData.getMarkerNumber() + " selected markers.");
 			pedData.setHeader(false);
 			ParsePedFile();
-			Test.LOG.append("reading " + pedigreeFile + ".");
+			Test.LOG.append("reading " + pedigreeFile + ".\n");
 			Test.LOG.append(pedData.getNumIndividuals() + " individuals.\n");
 			System.err.println("reading " + pedigreeFile + ".");
 			System.err.println(pedData.getNumIndividuals() + " individuals.");
