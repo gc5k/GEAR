@@ -5,6 +5,8 @@ import java.util.Hashtable;
 
 import org.apache.commons.lang3.ArrayUtils;
 
+import admixture.parameter.Parameter;
+
 import test.Test;
 import util.NewIt;
 import util.Sample;
@@ -80,8 +82,16 @@ public final class SII extends ChenBase {
 			CovariateTable.addAll(s_C);
 
 		numSib = ArrayUtils.toPrimitive(SibIdx.toArray(new Integer[0]));
-		System.err.println(s + " siblings from " + numSib.length + " families.");
-		Test.LOG.append(s + " siblings from " + numSib.length + " families.\n");
+		
+		int aff = 0;
+		for (int i = 0; i < status.length; i++) {
+			if ((status[i] - Parameter.status_shift) > 0) {
+				aff++;
+			}
+		}
+
+		System.err.println(s + " siblings " + "(" + aff + " affected "+ (s-aff)+" unaffected) from " + numSib.length + " families.");
+		Test.LOG.append(s + " siblings " + "(" + aff + " affected "+ (s-aff)+" unaffected) from " + numSib.length + " families.\n");
 
 	}
 
