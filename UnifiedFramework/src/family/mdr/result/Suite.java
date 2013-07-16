@@ -146,7 +146,7 @@ public class Suite {
 		DecimalFormat fmt = new DecimalFormat("#.###E0");
 		
 //        sb.append(String.format("%.2f", posScore) + "," + String.format("%d", posSubjects) + "," + String.format("%.2f", negScore) + "," + String.format("%d", -1*negSubjects) + "," + String.format("%.4f", meanScore));
-        sb.append(fmt.format(posScore) + "," + fmt.format(posSubjects) + "," + fmt.format(negScore) + "," + fmt.format(-1*negSubjects));        
+        sb.append(fmt.format(posScore) + "," + fmt.format(posSubjects) + "," + fmt.format(negScore) + "," + fmt.format(negSubjects));        
         return sb.toString();
     }
 }
