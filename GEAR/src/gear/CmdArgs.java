@@ -1,6 +1,6 @@
 package gear;
 
-import gear.util.FileProcessor;
+import gear.util.FileUtil;
 import gear.util.Logger;
 import gear.util.NewIt;
 
@@ -499,7 +499,7 @@ public enum CmdArgs
 			if (cl.hasOption(cmd_snps))
 			{
 				snps = cl.getOptionValue(cmd_snps);
-				FileProcessor.exists(snps);
+				FileUtil.exists(snps);
 			}
 		}
 
@@ -981,7 +981,7 @@ public enum CmdArgs
 			else if (cmdLine.hasOption(cmd_grm_list))
 			{
 				grmList_ = cmdLine.getOptionValue(cmd_grm_list);
-				FileProcessor.exists(grmList_);
+				FileUtil.exists(grmList_);
 				isGrm_ = false;
 				isGrmBinary_ = false;
 				isGrmTxt_ = false;
@@ -1014,7 +1014,7 @@ public enum CmdArgs
 			else if (cmdLine.hasOption(cmd_grm_bin_list))
 			{
 				grmList_ = cmdLine.getOptionValue(cmd_grm_bin_list);
-				FileProcessor.exists(grmList_);
+				FileUtil.exists(grmList_);
 				isGrm_ = false;
 				isGrmBinary_ = false;
 				isGrmTxt_ = false;
@@ -1046,7 +1046,7 @@ public enum CmdArgs
 			else if (cmdLine.hasOption(cmd_grm_txt_list))
 			{
 				grmList_ = cmdLine.getOptionValue(cmd_grm_txt_list);
-				FileProcessor.exists(grmList_);
+				FileUtil.exists(grmList_);
 				isGrm_ = false;
 				isGrmBinary_ = false;
 				isGrmTxt_ = false;
@@ -1517,7 +1517,7 @@ public enum CmdArgs
 		if (cmdLine.hasOption(cmd_predictor_file))
 		{
 			predictor_file = cmdLine.getOptionValue(cmd_predictor_file);
-			FileProcessor.exists(predictor_file);
+			FileUtil.exists(predictor_file);
 		}
 
 		if (cmdLine.hasOption(cmd_linear))
@@ -1570,14 +1570,14 @@ public enum CmdArgs
 		if (cmdLine.hasOption(cmd_snps))
 		{
 			snpList = cmdLine.getOptionValue(cmd_snps);
-			FileProcessor.exists(snpList);
+			FileUtil.exists(snpList);
 		}
 
 		// individual selection 1 keep
 		if (cmdLine.hasOption(cmd_keep))
 		{
 			keepFile = cmdLine.getOptionValue(cmd_keep);
-			FileProcessor.exists(keepFile);
+			FileUtil.exists(keepFile);
 			keepFlag = true;
 		}
 
@@ -1596,7 +1596,7 @@ public enum CmdArgs
 		if (cmdLine.hasOption(cmd_remove))
 		{
 			removeFile = cmdLine.getOptionValue(cmd_remove);
-			FileProcessor.exists(removeFile);
+			FileUtil.exists(removeFile);
 			removeFlag = true;
 		}
 
@@ -1604,7 +1604,7 @@ public enum CmdArgs
 		if (cmdLine.hasOption(cmd_reference_allele))
 		{
 			reference_allele = cmdLine.getOptionValue(cmd_reference_allele);
-			FileProcessor.exists(reference_allele);
+			FileUtil.exists(reference_allele);
 		}
 
 		// make bed
@@ -1652,7 +1652,7 @@ public enum CmdArgs
 			sumStatFlag = true;
 			fstFlag = true;
 			fst_file = cmdLine.getOptionValue(cmd_fst);
-			FileProcessor.exists(fst_file);
+			FileUtil.exists(fst_file);
 		}
 
 		// simulation nuclear family
@@ -1779,7 +1779,7 @@ public enum CmdArgs
 		{
 			polyEffectFlag = true;
 			polyEffectFile = cmdLine.getOptionValue(cmd_poly_effect);
-			FileProcessor.exists(polyEffectFile);
+			FileUtil.exists(polyEffectFile);
 		}
 
 		// grm statistics
@@ -1805,7 +1805,7 @@ public enum CmdArgs
 		if (cmdLine.hasOption(cmd_ref_freq))
 		{
 			ref_freq = cmdLine.getOptionValue(cmd_ref_freq);
-			FileProcessor.exists(ref_freq);
+			FileUtil.exists(ref_freq);
 		}
 
 		if (cmdLine.hasOption(cmd_maf_range))
@@ -1847,7 +1847,7 @@ public enum CmdArgs
 		if (cmdLine.hasOption(cmd_covar))
 		{
 			covar_file = cmdLine.getOptionValue(cmd_covar);
-			FileProcessor.exists(covar_file);
+			FileUtil.exists(covar_file);
 		}
 
 		if (cmdLine.hasOption(cmd_covar_num))
@@ -1892,7 +1892,7 @@ public enum CmdArgs
 		if (cmdLine.hasOption(cmd_qcovar))
 		{
 			qcovar_file = cmdLine.getOptionValue(cmd_qcovar);
-			FileProcessor.exists(qcovar_file);
+			FileUtil.exists(qcovar_file);
 		}
 
 		if (cmdLine.hasOption(cmd_qcovar_num))

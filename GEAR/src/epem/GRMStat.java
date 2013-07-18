@@ -3,7 +3,7 @@ package epem;
 import gear.CmdArgs;
 import gear.ConstValues;
 import gear.util.BinaryInputFile;
-import gear.util.FileProcessor;
+import gear.util.FileUtil;
 import gear.util.Logger;
 
 import java.io.BufferedReader;
@@ -90,7 +90,7 @@ public class GRMStat
 
 	private void BinaryGRM()
 	{
-		BufferedReader reader = FileProcessor.FileOpen(CmdArgs.INSTANCE
+		BufferedReader reader = FileUtil.FileOpen(CmdArgs.INSTANCE
 				.getHEArgs().getGrmId());
 
 		int size = 0;
@@ -217,7 +217,7 @@ public class GRMStat
 
 	private void txtGRM()
 	{
-		BufferedReader grmFile = FileProcessor.FileOpen(CmdArgs.INSTANCE
+		BufferedReader grmFile = FileUtil.FileOpen(CmdArgs.INSTANCE
 				.getHEArgs().getGrm());
 
 		String line;

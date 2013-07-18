@@ -2,7 +2,7 @@ package simulation;
 
 import gear.CmdArgs;
 import gear.ConstValues;
-import gear.util.FileProcessor;
+import gear.util.FileUtil;
 import gear.util.Logger;
 
 import java.io.BufferedReader;
@@ -487,7 +487,7 @@ public class SimuPolyQT
 
 	public RealMatrix readEffects()
 	{
-		BufferedReader reader = FileProcessor
+		BufferedReader reader = FileUtil
 				.FileOpen(CmdArgs.INSTANCE.polyEffectFile);
 		double[] effect = new double[M];
 		int c = 0;

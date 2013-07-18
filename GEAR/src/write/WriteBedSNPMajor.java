@@ -15,7 +15,7 @@ import family.plink.PLINKBinaryParser;
 import family.plink.PLINKParser;
 import family.qc.rowqc.SampleFilter;
 import gear.CmdArgs;
-import gear.util.FileProcessor;
+import gear.util.FileUtil;
 import gear.util.Logger;
 
 public class WriteBedSNPMajor
@@ -71,7 +71,7 @@ public class WriteBedSNPMajor
 		StringBuffer sbim = new StringBuffer();
 		sbim.append(out);
 		sbim.append(".bim");
-		PrintStream pbim = FileProcessor.CreatePrintStream(sbim.toString());
+		PrintStream pbim = FileUtil.CreatePrintStream(sbim.toString());
 		for (Iterator<SNP> e = snpList.iterator(); e.hasNext();)
 		{
 			SNP snp = e.next();
@@ -84,7 +84,7 @@ public class WriteBedSNPMajor
 		StringBuffer sfam = new StringBuffer();
 		sfam.append(out);
 		sfam.append(".fam");
-		PrintStream pfam = FileProcessor.CreatePrintStream(sfam.toString());
+		PrintStream pfam = FileUtil.CreatePrintStream(sfam.toString());
 		for (Iterator<PersonIndex> e = PersonTable.iterator(); e.hasNext();)
 		{
 			PersonIndex per = e.next();

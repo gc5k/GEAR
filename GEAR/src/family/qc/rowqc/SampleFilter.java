@@ -14,7 +14,7 @@ import family.pedigree.genotype.BFamilyStruct;
 import family.pedigree.genotype.BPerson;
 import gear.CmdArgs;
 import gear.ConstValues;
-import gear.util.FileProcessor;
+import gear.util.FileUtil;
 import gear.util.Logger;
 import gear.util.NewIt;
 
@@ -215,7 +215,7 @@ public class SampleFilter
 
 	private void readKeepFile()
 	{
-		BufferedReader reader = FileProcessor
+		BufferedReader reader = FileUtil
 				.FileOpen(CmdArgs.INSTANCE.keepFile);
 		String line = null;
 		ArrayList<String> famList = NewIt.newArrayList();
@@ -244,7 +244,7 @@ public class SampleFilter
 
 	private void readRemoveFile()
 	{
-		BufferedReader reader = FileProcessor
+		BufferedReader reader = FileUtil
 				.FileOpen(CmdArgs.INSTANCE.removeFile);
 		ArrayList<String> famList = NewIt.newArrayList();
 		ArrayList<String> indList = NewIt.newArrayList();

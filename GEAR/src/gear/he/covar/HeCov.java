@@ -1,7 +1,7 @@
-package he.covar;
+package gear.he.covar;
 
 import gear.ConstValues;
-import gear.util.FileProcessor;
+import gear.util.FileUtil;
 import gear.util.Logger;
 import gear.util.NewIt;
 
@@ -59,7 +59,7 @@ public class HeCov
 		if (qcov_file != null)
 		{
 
-			BufferedReader reader = FileProcessor.FileOpen(qcov_file);
+			BufferedReader reader = FileUtil.FileOpen(qcov_file);
 			String line;
 			ArrayList<String> c = null;
 			int _c = 0;
@@ -122,7 +122,7 @@ public class HeCov
 		if (cov_file != null)
 		{
 
-			BufferedReader reader = FileProcessor.FileOpen(cov_file);
+			BufferedReader reader = FileUtil.FileOpen(cov_file);
 			String line;
 			ArrayList<String> c = null;
 			int _c = 0;

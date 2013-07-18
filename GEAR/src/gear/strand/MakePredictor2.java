@@ -15,7 +15,7 @@ import family.popstat.GenotypeMatrix;
 import family.qc.rowqc.SampleFilter;
 import gear.CmdArgs;
 import gear.ConstValues;
-import gear.util.FileProcessor;
+import gear.util.FileUtil;
 import gear.util.Logger;
 import gear.util.NewIt;
 import gear.util.SNPMatch;
@@ -69,7 +69,7 @@ public class MakePredictor2
 		StringBuffer sb = new StringBuffer();
 		sb.append(CmdArgs.INSTANCE.out);
 		sb.append(".mergesnp");
-		PrintStream ps = FileProcessor.CreatePrintStream(sb.toString());
+		PrintStream ps = FileUtil.CreatePrintStream(sb.toString());
 		ps.append("SNP\tChr\tPos\tA1_1st\tA2_1st\tA1_2nd\tA2_2nd\tMAF_A1_1st\tMAF_A1_2nd\tFlip\tMerged\tP\tScheme\n");
 
 		allelefreq1 = new double[G1.getNumMarker()][3];
@@ -411,7 +411,7 @@ public class MakePredictor2
 	public void readPredictor()
 	{
 
-		BufferedReader reader = FileProcessor.FileOpen(CmdArgs.INSTANCE
+		BufferedReader reader = FileUtil.FileOpen(CmdArgs.INSTANCE
 				.getPredictorFile());
 		String line;
 		try
@@ -439,7 +439,7 @@ public class MakePredictor2
 		StringBuffer sbim = new StringBuffer();
 		sbim.append(CmdArgs.INSTANCE.out);
 		sbim.append(".predictor");
-		PrintStream predictorFile = FileProcessor.CreatePrintStream(sbim
+		PrintStream predictorFile = FileUtil.CreatePrintStream(sbim
 				.toString());
 
 		int NMiss = 0;

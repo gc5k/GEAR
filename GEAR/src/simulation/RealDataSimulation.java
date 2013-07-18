@@ -19,7 +19,7 @@ import family.plink.PLINKBinaryParser;
 import family.plink.PLINKParser;
 import family.qc.rowqc.SampleFilter;
 import gear.CmdArgs;
-import gear.util.FileProcessor;
+import gear.util.FileUtil;
 import gear.util.Logger;
 import gear.util.NewIt;
 import simulation.qc.rowqc.*;
@@ -120,7 +120,7 @@ public class RealDataSimulation
 
 		StringBuffer sb1 = new StringBuffer(CmdArgs.INSTANCE.out);
 		sb1.append(".eff");
-		PrintStream ps1 = FileProcessor.CreatePrintStream(sb1.toString());
+		PrintStream ps1 = FileUtil.CreatePrintStream(sb1.toString());
 		ArrayList<SNP> snpList = pp.getMapData().getMarkerList();
 		for (int i = 0; i < casualLociIdx.length; i++)
 		{
@@ -132,7 +132,7 @@ public class RealDataSimulation
 
 		StringBuffer sb2 = new StringBuffer(CmdArgs.INSTANCE.out);
 		sb2.append(".phen");
-		PrintStream ps2 = FileProcessor.CreatePrintStream(sb2.toString());
+		PrintStream ps2 = FileUtil.CreatePrintStream(sb2.toString());
 		ArrayList<PersonIndex> personTable = rdSimuQC.getSample();
 
 		for (int i = 0; i < sampleSize; i++)
@@ -256,7 +256,7 @@ public class RealDataSimulation
 		if (CmdArgs.INSTANCE.simuCasualLoci != null)
 		{
 			casualLociFile = CmdArgs.INSTANCE.simuCasualLoci;
-			BufferedReader reader = FileProcessor.FileOpen(casualLociFile);
+			BufferedReader reader = FileUtil.FileOpen(casualLociFile);
 			String line = null;
 			try
 			{

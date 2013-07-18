@@ -18,7 +18,7 @@ import family.plink.PLINKParser;
 import family.popstat.GenotypeMatrix;
 import family.qc.rowqc.SampleFilter;
 import gear.CmdArgs;
-import gear.util.FileProcessor;
+import gear.util.FileUtil;
 import gear.util.Logger;
 import gear.util.NewIt;
 import gear.util.SNPMatch;
@@ -94,14 +94,14 @@ public class MergeTwoFile
 		StringBuffer sb = new StringBuffer();
 		sb.append(CmdArgs.INSTANCE.out);
 		sb.append(".mergesnp");
-		PrintStream ps = FileProcessor.CreatePrintStream(sb.toString());
+		PrintStream ps = FileUtil.CreatePrintStream(sb.toString());
 		ps.append("SNP\tChr\tPos\tA1_1st\tA2_1st\tA1_2nd\tA2_2nd\tMAF_A1_1st\tMAF_A1_2nd\tFlip\tMerged\tP\tScheme\n");
 
 		StringBuffer sb1 = new StringBuffer();
 		sb1.append(CmdArgs.INSTANCE.out);
 		sb1.append(".mergebadsnp");
 
-		PrintStream ps1 = FileProcessor.CreatePrintStream(sb.toString());
+		PrintStream ps1 = FileUtil.CreatePrintStream(sb.toString());
 		ps1.append("SNP\tChr\tPos\tA1_1st\tA2_1st\tA1_2nd\tA2_2nd\tMAF_A1_1st\tMAF_A1_2nd\tFlip\tMerged\tP\tScheme\n");
 
 		allelefreq1 = new double[G1.getNumMarker()][3];
@@ -451,7 +451,7 @@ public class MergeTwoFile
 		StringBuffer sbim = new StringBuffer();
 		sbim.append(CmdArgs.INSTANCE.out);
 		sbim.append(".bim");
-		PrintStream pbim = FileProcessor.CreatePrintStream(sbim.toString());
+		PrintStream pbim = FileUtil.CreatePrintStream(sbim.toString());
 
 		for (int i = 0; i < comSNPIdx[0].length; i++)
 		{
@@ -469,7 +469,7 @@ public class MergeTwoFile
 		StringBuffer sfam = new StringBuffer();
 		sfam.append(CmdArgs.INSTANCE.out);
 		sfam.append(".fam");
-		PrintStream pfam = FileProcessor.CreatePrintStream(sfam.toString());
+		PrintStream pfam = FileUtil.CreatePrintStream(sfam.toString());
 		for (Iterator<PersonIndex> e = PersonTable1.iterator(); e.hasNext();)
 		{
 			PersonIndex per = e.next();

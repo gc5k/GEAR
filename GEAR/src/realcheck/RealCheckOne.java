@@ -14,7 +14,7 @@ import family.plink.PLINKParser;
 import family.popstat.GenotypeMatrix;
 import family.qc.rowqc.SampleFilter;
 import gear.CmdArgs;
-import gear.util.FileProcessor;
+import gear.util.FileUtil;
 import gear.util.Logger;
 import gear.util.pop.PopStat;
 
@@ -63,7 +63,7 @@ public class RealCheckOne
 		StringBuffer sb = new StringBuffer();
 		sb.append(CmdArgs.INSTANCE.out);
 		sb.append(".real");
-		PrintStream ps = FileProcessor.CreatePrintStream(sb.toString());
+		PrintStream ps = FileUtil.CreatePrintStream(sb.toString());
 
 		if (CmdArgs.INSTANCE.getRealCheckParameter().getSnps() != null)
 		{
@@ -207,7 +207,7 @@ public class RealCheckOne
 		sb.append(CmdArgs.INSTANCE.out);
 		sb.append(".realsnp");
 
-		PrintStream ps = FileProcessor.CreatePrintStream(sb.toString());
+		PrintStream ps = FileUtil.CreatePrintStream(sb.toString());
 		for (int i = 0; i < markerIdx.length; i++)
 		{
 			int idx = markerIdx[i];
@@ -256,7 +256,7 @@ public class RealCheckOne
 		sb.append(CmdArgs.INSTANCE.out);
 		sb.append(".realsnp");
 
-		PrintStream ps = FileProcessor.CreatePrintStream(sb.toString());
+		PrintStream ps = FileUtil.CreatePrintStream(sb.toString());
 		for (int i = 0; i < markerIdx.length; i++)
 		{
 			int idx = markerIdx[i];

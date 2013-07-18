@@ -6,15 +6,15 @@ import epem.GRMStat;
 
 import merge.MergeTwoFile;
 import write.WriteBedSNPMajor;
+import gear.he.HEMCalculate;
+import gear.he.HEMRead;
+import gear.he.h2trans.H2Transformer;
 import gear.profile.Profiler;
 import gear.strand.MakePredictor;
 import gear.strand.MakePredictor2;
 import gear.strand.Strand;
 import gear.util.Logger;
 import grm.MakeGRM;
-import he.HEMCalculate;
-import he.HEMRead;
-import he.h2trans.H2Transformer;
 import realcheck.RealCheck;
 import realcheck.RealCheckOne;
 import simulation.RealDataSimulation;

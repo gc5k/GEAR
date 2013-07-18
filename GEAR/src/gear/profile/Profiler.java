@@ -4,7 +4,7 @@ import family.pedigree.file.SNP;
 import gear.CmdArgs;
 import gear.ConstValues;
 import gear.util.BufferedReader;
-import gear.util.FileProcessor;
+import gear.util.FileUtil;
 import gear.util.Logger;
 import gear.util.SNPMatch;
 
@@ -222,7 +222,7 @@ public class Profiler
 			}
 		}
 		
-		PrintStream predictorFile = FileProcessor.CreatePrintStream(resultFile);
+		PrintStream predictorFile = FileUtil.CreatePrintStream(resultFile);
 		
 		// Title Line
 		predictorFile.print("FID\tIID\tPHENO");
