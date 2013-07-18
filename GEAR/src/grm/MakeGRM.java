@@ -19,7 +19,7 @@ import family.popstat.GenotypeMatrix;
 import family.qc.rowqc.SampleFilter;
 import gear.HPC;
 import gear.CmdArgs;
-import gear.util.FileProcessor;
+import gear.util.FileUtil;
 import gear.util.Logger;
 import gear.util.NewIt;
 import gear.util.pop.PopStat;
@@ -78,11 +78,11 @@ public class MakeGRM
 		if (CmdArgs.INSTANCE.makeGRMTXTFlag)
 		{
 			sb.append(".grm.txt");
-			grm = FileProcessor.CreatePrintStream(sb.toString());
+			grm = FileUtil.CreatePrintStream(sb.toString());
 		} else if (CmdArgs.INSTANCE.makeGRMFlag)
 		{
 			sb.append(".grm.gz");
-			grmGZ = FileProcessor.ZipFielWriter(sb.toString());
+			grmGZ = FileUtil.ZipFielWriter(sb.toString());
 		}
 
 		for (int i = 0; i < G.getGRow(); i++)
@@ -132,7 +132,7 @@ public class MakeGRM
 		sb_id.append(CmdArgs.INSTANCE.out);
 		PrintStream grm_id = null;
 		sb_id.append(".grm.id");
-		grm_id = FileProcessor.CreatePrintStream(sb_id.toString());
+		grm_id = FileUtil.CreatePrintStream(sb_id.toString());
 
 		ArrayList<Hukou> H = pf.getHukouBook();
 		for (int i = 0; i < H.size(); i++)
@@ -257,12 +257,12 @@ public class MakeGRM
 		if (CmdArgs.INSTANCE.makeGRMTXTFlag)
 		{
 			sb.append(".grm.txt");
-			grm = FileProcessor.CreatePrintStream(sb.toString());
+			grm = FileUtil.CreatePrintStream(sb.toString());
 		} 
 		else if (CmdArgs.INSTANCE.makeGRMFlag)
 		{
 			sb.append(".grm.gz");
-			grmGZ = FileProcessor.ZipFielWriter(sb.toString());
+			grmGZ = FileUtil.ZipFielWriter(sb.toString());
 		}
 
 		int i = 0, j = 0;
@@ -329,7 +329,7 @@ public class MakeGRM
 		sb_id.append(CmdArgs.INSTANCE.out);
 		PrintStream grm_id = null;
 		sb_id.append(".grm.id");
-		grm_id = FileProcessor.CreatePrintStream(sb_id.toString());
+		grm_id = FileUtil.CreatePrintStream(sb_id.toString());
 
 		ArrayList<Hukou> H = pf.getHukouBook();
 		for (int k = 0; k < H.size(); k++)

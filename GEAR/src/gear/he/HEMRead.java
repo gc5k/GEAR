@@ -1,4 +1,4 @@
-package he;
+package gear.he;
 
 import java.io.BufferedReader;
 import java.io.FileInputStream;
@@ -13,7 +13,7 @@ import java.util.zip.GZIPInputStream;
 import gear.CmdArgs;
 import gear.ConstValues;
 import gear.util.BinaryInputFile;
-import gear.util.FileProcessor;
+import gear.util.FileUtil;
 import gear.util.Logger;
 import gear.util.NewIt;
 
@@ -36,8 +36,6 @@ public class HEMRead
 	protected boolean k_button;
 	protected double k;
 	protected gear.HEType heType;
-
-	protected HashMap<String, Integer> ID2Idx;
 
 	protected double yyProd;
 
@@ -91,36 +89,17 @@ public class HEMRead
 		XtX = new double[mpheno.length + 1][mpheno.length + 1];
 		XtY = new double[mpheno.length + 1];
 
-		String line;
+		HashMap<String, Integer> id2Idx = readGrmIds();
 
-		// *********************************** read grm id
-		BufferedReader reader = FileProcessor.FileOpen(grmID);
-
-		int i2 = 0;
-		ID2Idx = new HashMap<String, Integer>();
-		try
-		{
-			while ((line = reader.readLine()) != null)
-			{
-				String[] s = line.split(delim);
-				StringBuilder sb = new StringBuilder();
-				sb.append(s[0] + "." + s[1]);
-				ID2Idx.put(sb.toString(), i2++);
-			}
-			reader.close();
-		}
-		catch (IOException e)
-		{
-			e.printStackTrace();
-		}
-
-		flag = new boolean[ID2Idx.size()];
+		flag = new boolean[id2Idx.size()];
 		Arrays.fill(flag, false);
 
 		nRec = flag.length * (flag.length + 1) / 2;
 
 		// *********************************** read pheno file
-		reader = FileProcessor.FileOpen(phenoFile);
+		BufferedReader reader = FileUtil.FileOpen(phenoFile);
+		
+		String line;
 
 		y = new double[flag.length][mpheno.length + 1];
 		HashMap<Double, Integer> cat = new HashMap<Double, Integer>();
@@ -132,9 +111,9 @@ public class HEMRead
 				String[] s = line.split(delim);
 				StringBuilder sb = new StringBuilder();
 				sb.append(s[0] + "." + s[1]);
-				if (ID2Idx.containsKey(sb.toString()))
+				if (id2Idx.containsKey(sb.toString()))
 				{
-					int ii = ID2Idx.get(sb.toString());
+					int ii = id2Idx.get(sb.toString());
 					boolean f = true;
 					y[ii][0] = 1;
 					for (int j = 0; j < mpheno.length; j++)
@@ -173,7 +152,7 @@ public class HEMRead
 		// ************************keep
 		if (keepFile != null)
 		{
-			reader = FileProcessor.FileOpen(keepFile);
+			reader = FileUtil.FileOpen(keepFile);
 			boolean[] ff = new boolean[flag.length];
 			Arrays.fill(ff, false);
 			try
@@ -182,9 +161,9 @@ public class HEMRead
 				{
 					String[] s = line.split(delim);
 					StringBuilder sb = new StringBuilder(s[0] + "." + s[1]);
-					if (ID2Idx.containsKey(sb.toString()))
+					if (id2Idx.containsKey(sb.toString()))
 					{
-						int ii = ID2Idx.get(sb.toString());
+						int ii = id2Idx.get(sb.toString());
 						ff[ii] = true;
 					}
 				}
@@ -251,19 +230,19 @@ public class HEMRead
 
 		if (CmdArgs.INSTANCE.getHEArgs().isGrmTxt())
 		{
-			FileProcessor.exists(grmFile);
-			FileProcessor.exists(grmID);
+			FileUtil.exists(grmFile);
+			FileUtil.exists(grmID);
 
 			grmFileList.add(grmFile);
 			idFileList.add(grmID);
 
-			grmList.add(FileProcessor.FileOpen(grmFile
+			grmList.add(FileUtil.FileOpen(grmFile
 					.toString()));
 		}
 		else if (CmdArgs.INSTANCE.getHEArgs().isGrm())
 		{
-			FileProcessor.exists(grmFile);
-			FileProcessor.exists(grmID);
+			FileUtil.exists(grmFile);
+			FileUtil.exists(grmID);
 
 			grmFileList.add(grmFile);
 			idFileList.add(grmID);
@@ -295,8 +274,8 @@ public class HEMRead
 		}
 		else
 		{
-			FileProcessor.exists(grmFile);
-			FileProcessor.exists(grmID);
+			FileUtil.exists(grmFile);
+			FileUtil.exists(grmID);
 
 			grmFileList.add(grmFile);
 			idFileList.add(grmID);
@@ -334,7 +313,7 @@ public class HEMRead
 		idFileList = NewIt.newArrayList();
 		binList = NewIt.newArrayList();
 
-		BufferedReader listReader = FileProcessor.FileOpen(grmListFile);
+		BufferedReader listReader = FileUtil.FileOpen(grmListFile);
 		String line = null;
 		try
 		{
@@ -345,9 +324,9 @@ public class HEMRead
 
 				if (CmdArgs.INSTANCE.getHEArgs().isGrmTxtList())
 				{
-					FileProcessor.exists(tsb.append(".grm.txt").toString());
+					FileUtil.exists(tsb.append(".grm.txt").toString());
 					tsb = new StringBuilder(root);
-					FileProcessor.exists(tsb.append(".grm.id").toString());
+					FileUtil.exists(tsb.append(".grm.id").toString());
 
 					tsb = new StringBuilder(root);
 					grmFileList.add(tsb.append(".grm.txt").toString());
@@ -355,14 +334,14 @@ public class HEMRead
 					idFileList.add(tsb.append(".grm.id").toString());
 
 					tsb = new StringBuilder(root);
-					grmList.add(FileProcessor.FileOpen(tsb.append(".grm.txt")
+					grmList.add(FileUtil.FileOpen(tsb.append(".grm.txt")
 							.toString()));
 				}
 				else if (CmdArgs.INSTANCE.getHEArgs().isGrmList())
 				{
-					FileProcessor.exists(tsb.append(".grm.gz").toString());
+					FileUtil.exists(tsb.append(".grm.gz").toString());
 					tsb = new StringBuilder(root);
-					FileProcessor.exists(tsb.append(".grm.id").toString());
+					FileUtil.exists(tsb.append(".grm.id").toString());
 
 					tsb = new StringBuilder(root);
 					grmFileList.add(tsb.append(".grm.gz").toString());
@@ -405,9 +384,9 @@ public class HEMRead
 				else
 				{
 					tsb = new StringBuilder(root);
-					FileProcessor.exists(tsb.append(".grm.bin").toString());
+					FileUtil.exists(tsb.append(".grm.bin").toString());
 					tsb = new StringBuilder(root);
-					FileProcessor.exists(tsb.append(".grm.id").toString());
+					FileUtil.exists(tsb.append(".grm.id").toString());
 
 					tsb = new StringBuilder(root);
 					grmFileList.add(tsb.append(".grm.bin").toString());
@@ -447,5 +426,19 @@ public class HEMRead
 			isBinGrm = true;
 		}
 		grmID = idFileList.get(0);
+	}
+	
+	private HashMap<String, Integer> readGrmIds()
+	{
+		HashMap<String, Integer> id2Idx = new HashMap<String, Integer>();
+		gear.util.BufferedReader reader = gear.util.BufferedReader.openTextFile(grmID, "GRM-ID");
+		int idx = 0;
+		String[] tokens;
+		while ((tokens = reader.readTokens(2)) != null)
+		{
+			id2Idx.put(tokens[0] + "." + tokens[1], idx++);
+		}
+		reader.close();
+		return id2Idx;
 	}
 }

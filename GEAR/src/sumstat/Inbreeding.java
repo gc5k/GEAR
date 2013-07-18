@@ -20,7 +20,7 @@ import family.popstat.GenotypeMatrix;
 import family.qc.rowqc.SampleFilter;
 import gear.CmdArgs;
 import gear.ConstValues;
-import gear.util.FileProcessor;
+import gear.util.FileUtil;
 import gear.util.Logger;
 import gear.util.NewIt;
 
@@ -193,7 +193,7 @@ public class Inbreeding
 
 	private void readKeepFile()
 	{
-		BufferedReader reader = FileProcessor
+		BufferedReader reader = FileUtil
 				.FileOpen(CmdArgs.INSTANCE.fst_file);
 		String line = null;
 		ArrayList<String> famList = NewIt.newArrayList();

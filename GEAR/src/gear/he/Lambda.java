@@ -1,4 +1,4 @@
-package he;
+package gear.he;
 
 import gear.CmdArgs;
 

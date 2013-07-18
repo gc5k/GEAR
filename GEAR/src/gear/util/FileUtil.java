@@ -14,7 +14,7 @@ import java.io.PrintStream;
 import java.util.zip.GZIPInputStream;
 import java.util.zip.GZIPOutputStream;
 
-public class FileProcessor
+public class FileUtil
 {
 	public static BufferedReader FileOpen(String file)
 	{

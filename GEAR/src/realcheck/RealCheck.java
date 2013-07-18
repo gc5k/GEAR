@@ -18,7 +18,7 @@ import family.popstat.GenotypeMatrix;
 import family.qc.rowqc.SampleFilter;
 import gear.CmdArgs;
 import gear.ConstValues;
-import gear.util.FileProcessor;
+import gear.util.FileUtil;
 import gear.util.Logger;
 import gear.util.NewIt;
 import gear.util.SNPMatch;
@@ -86,7 +86,7 @@ public class RealCheck
 		StringBuffer sb = new StringBuffer();
 		sb.append(CmdArgs.INSTANCE.out);
 		sb.append(".real");
-		PrintStream ps = FileProcessor.CreatePrintStream(sb.toString());
+		PrintStream ps = FileUtil.CreatePrintStream(sb.toString());
 
 		getCommonSNP(sf1.getMapFile().getMarkerList(), sf2.getMapFile()
 				.getMarkerList());
@@ -250,7 +250,7 @@ public class RealCheck
 		sb.append(CmdArgs.INSTANCE.out);
 		sb.append(".realsnp");
 
-		PrintStream ps = FileProcessor.CreatePrintStream(sb.toString());
+		PrintStream ps = FileUtil.CreatePrintStream(sb.toString());
 		for (int i = 0; i < markerIdx.length; i++)
 		{
 			int idx = markerIdx[i];
@@ -294,7 +294,7 @@ public class RealCheck
 		sb.append(CmdArgs.INSTANCE.out);
 		sb.append(".realsnp");
 
-		PrintStream ps = FileProcessor.CreatePrintStream(sb.toString());
+		PrintStream ps = FileUtil.CreatePrintStream(sb.toString());
 		for (int i = 0; i < markerIdx.length; i++)
 		{
 			int idx = markerIdx[i];
@@ -398,7 +398,7 @@ public class RealCheck
 
 	private ArrayList<String> readRealcheckSNPs()
 	{
-		BufferedReader reader = FileProcessor.FileOpen(CmdArgs.INSTANCE
+		BufferedReader reader = FileUtil.FileOpen(CmdArgs.INSTANCE
 				.getRealCheckParameter().getSnps());
 		String line = null;
 		ArrayList<String> selectedSNP = NewIt.newArrayList();

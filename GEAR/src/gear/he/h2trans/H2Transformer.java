@@ -1,4 +1,4 @@
-package he.h2trans;
+package gear.he.h2trans;
 
 import gear.CmdArgs;
 import gear.util.Logger;
