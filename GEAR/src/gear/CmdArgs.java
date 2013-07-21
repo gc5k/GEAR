@@ -915,47 +915,22 @@ public enum CmdArgs
 
 	public class HEArgs
 	{
-
 		@SuppressWarnings("static-access")
 		private HEArgs()
 		{
-			ops.addOption(OptionBuilder.withLongOpt(cmd_grm_cutoff_long)
-					.withDescription("grm cut-off").hasArg()
-					.create(cmd_grm_cutoff));
-			ops.addOption(OptionBuilder.withLongOpt(cmd_abs_grm_cutoff_long)
-					.withDescription("grm absolute cut-off").hasArg()
-					.create(cmd_abs_grm_cutoff));
-			ops.addOption(OptionBuilder.withLongOpt(cmd_grm_txt_long)
-					.withDescription("grm text format").hasArg()
-					.create(cmd_grm_txt));
-			ops.addOption(OptionBuilder.withLongOpt(cmd_grm_txt_list_long)
-					.withDescription("grm text list").hasArg()
-					.create(cmd_grm_txt_list));
-			ops.addOption(OptionBuilder.withLongOpt(cmd_grm_bin_long)
-					.withDescription("grm binary format").hasArg()
-					.create(cmd_grm_bin));
-			ops.addOption(OptionBuilder.withLongOpt(cmd_grm_bin_list_long)
-					.withDescription("grm binary list").hasArg()
-					.create(cmd_grm_bin_list));
-			ops.addOption(OptionBuilder.withDescription("grm ").hasArg()
-					.create(cmd_grm));
-			ops.addOption(OptionBuilder.withLongOpt(cmd_grm_list_long).withDescription("grm list").hasArg()
-					.create(cmd_grm_list));
-			ops.addOption(OptionBuilder.withDescription("pheno ").hasArg()
-					.create(cmd_pheno));
-			ops.addOption(OptionBuilder.withLongOpt(cmd_mpheno)
-					.withDescription("pheno number " + cmd_mpheno).hasArg()
-					.withArgName("index").create(cmd_mpheno));
-			ops.addOption(OptionBuilder
-					.withLongOpt(cmd_sd_long)
-					.withDescription("phenotype is coded as squared difference")
-					.create(cmd_sd));
-			ops.addOption(OptionBuilder.withLongOpt(cmd_ss_long)
-					.withDescription("phenotype is coded as squared sum")
-					.create(cmd_ss));
-			ops.addOption(OptionBuilder.withLongOpt(cmd_cp_long)
-					.withDescription("phenotype is coded as cross product")
-					.create(cmd_cp));
+			ops.addOption(OptionBuilder.withLongOpt(cmd_grm_cutoff_long).withDescription("grm cut-off").hasArg().create(cmd_grm_cutoff));
+			ops.addOption(OptionBuilder.withLongOpt(cmd_abs_grm_cutoff_long).withDescription("grm absolute cut-off").hasArg().create(cmd_abs_grm_cutoff));
+			ops.addOption(OptionBuilder.withLongOpt(cmd_grm_txt_long).withDescription("grm text format").hasArg().create(cmd_grm_txt));
+			ops.addOption(OptionBuilder.withLongOpt(cmd_grm_txt_list_long).withDescription("grm text list").hasArg().create(cmd_grm_txt_list));
+			ops.addOption(OptionBuilder.withLongOpt(cmd_grm_bin_long).withDescription("grm binary format").hasArg().create(cmd_grm_bin));
+			ops.addOption(OptionBuilder.withLongOpt(cmd_grm_bin_list_long).withDescription("grm binary list").hasArg().create(cmd_grm_bin_list));
+			ops.addOption(OptionBuilder.withDescription("grm ").hasArg().create(cmd_grm));
+			ops.addOption(OptionBuilder.withLongOpt(cmd_grm_list_long).withDescription("grm list").hasArg().create(cmd_grm_list));
+			ops.addOption(OptionBuilder.withDescription("phenotype file").hasArg().create(cmd_pheno));
+			ops.addOption(OptionBuilder.withLongOpt(targetTraitLongOpt).withDescription("a positive integer indicating the target trait, i.e. the phenotype column, used for analysis; starting from 1, meaning the first trait").hasArg().withArgName("index").create(targetTraitOpt));
+			ops.addOption(OptionBuilder.withLongOpt(cmd_sd_long).withDescription("phenotype is coded as squared difference").create(cmd_sd));
+			ops.addOption(OptionBuilder.withLongOpt(cmd_ss_long).withDescription("phenotype is coded as squared sum").create(cmd_ss));
+			ops.addOption(OptionBuilder.withLongOpt(cmd_cp_long).withDescription("phenotype is coded as cross product").create(cmd_cp));
 		}
 
 		private void commandListener()
@@ -1079,13 +1054,28 @@ public enum CmdArgs
 				pheno = cmdLine.getOptionValue(cmd_pheno);
 			}
 
-			if (cmdLine.hasOption(cmd_mpheno))
+			if (cmdLine.hasOption(targetTraitOpt))
 			{
-				String[] s = cmdLine.getOptionValue(cmd_mpheno).split(",");
-				mpheno = new int[s.length];
-				for (int i = 0; i < s.length; i++)
+				boolean valid = true;
+				
+				String mphenoOptValStr = cmdLine.getOptionValue(targetTraitOpt);
+				
+				try
 				{
-					mpheno[i] = Integer.parseInt(s[i]);
+					targetTraitOptVal = Integer.parseInt(mphenoOptValStr);
+				}
+				catch (NumberFormatException e)
+				{
+					valid = false;
+				}
+				
+				if (!valid || targetTraitOptVal <= 0)
+				{
+					String msg = "";
+					msg += mphenoOptValStr + " is not a valid value of --" + getTargetTraitLongOption() + "/-" + getTargetTraitOption() + " option. ";
+					msg += "It should be a positive integer indicating the phenotype column for analysis.";
+					Logger.printUserError(msg);
+					System.exit(1);
 				}
 			}
 
@@ -1190,10 +1180,20 @@ public enum CmdArgs
 		{
 			return pheno;
 		}
-
-		public int[] getMPheno()
+		
+		public String getTargetTraitLongOption()
 		{
-			return mpheno;
+			return targetTraitLongOpt;
+		}
+
+		public String getTargetTraitOption()
+		{
+			return targetTraitOpt;
+		}
+		
+		public int getTargetTraitOptionValue()
+		{
+			return targetTraitOptVal;
 		}
 
 		private final String cmd_sd = "he_sd"; // (y1-y2)^2
@@ -1243,8 +1243,9 @@ public enum CmdArgs
 		private final String cmd_pheno = "pheno";
 		private String pheno = null;
 
-		private final String cmd_mpheno = "mpheno";
-		private int[] mpheno = { 1 };
+		private static final String targetTraitLongOpt = "target-trait";
+		private static final String targetTraitOpt = "tt";
+		private int targetTraitOptVal = 1;
 
 	}
 

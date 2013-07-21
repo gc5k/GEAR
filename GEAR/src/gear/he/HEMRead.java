@@ -8,6 +8,7 @@ import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.zip.GZIPInputStream;
 
 import gear.CmdArgs;
@@ -28,7 +29,6 @@ public class HEMRead
 	protected String keepFile;
 	protected String phenoFile;
 	protected String output;
-	protected int[] mpheno;
 	protected int perm;
 	protected boolean permFlag = false;
 
@@ -41,16 +41,13 @@ public class HEMRead
 
 	protected double[][] XtX;
 	protected double[] XtY;
-	protected double[][] y;
+	protected double[] y;
 	protected int dim;
-	protected double P;
-	protected boolean isCC = false;
 
 	protected ArrayList<BufferedReader> grmList;
 	protected ArrayList<BinaryInputFile> binList;
 	protected ArrayList<String> grmFileList;
 	protected ArrayList<String> idFileList;
-	protected HashMap<Double, Integer> cat = new HashMap<Double, Integer>();
 
 	protected boolean isSingleGrm;
 	protected boolean isBinGrm = false;
@@ -77,7 +74,6 @@ public class HEMRead
 
 		keepFile = CmdArgs.INSTANCE.keepFile;
 		phenoFile = CmdArgs.INSTANCE.getHEArgs().getPheno();
-		mpheno = CmdArgs.INSTANCE.getHEArgs().getMPheno();
 		reverse = CmdArgs.INSTANCE.reverse;
 		k_button = CmdArgs.INSTANCE.k_button;
 		k = CmdArgs.INSTANCE.k;
@@ -86,68 +82,14 @@ public class HEMRead
 		permFlag = CmdArgs.INSTANCE.permFlag;
 		perm = CmdArgs.INSTANCE.perm;
 
-		XtX = new double[mpheno.length + 1][mpheno.length + 1];
-		XtY = new double[mpheno.length + 1];
-
-		HashMap<String, Integer> id2Idx = readGrmIds();
-
-		flag = new boolean[id2Idx.size()];
-		Arrays.fill(flag, false);
+		HashMap<SubjectID, Integer> id2Idx = readGrmIds();
+		
+		readPhenotypes(id2Idx);
 
 		nRec = flag.length * (flag.length + 1) / 2;
 
-		// *********************************** read pheno file
-		BufferedReader reader = FileUtil.FileOpen(phenoFile);
-		
+		BufferedReader reader;
 		String line;
-
-		y = new double[flag.length][mpheno.length + 1];
-		HashMap<Double, Integer> cat = new HashMap<Double, Integer>();
-
-		try
-		{
-			while ((line = reader.readLine()) != null)
-			{
-				String[] s = line.split(delim);
-				StringBuilder sb = new StringBuilder();
-				sb.append(s[0] + "." + s[1]);
-				if (id2Idx.containsKey(sb.toString()))
-				{
-					int ii = id2Idx.get(sb.toString());
-					boolean f = true;
-					y[ii][0] = 1;
-					for (int j = 0; j < mpheno.length; j++)
-					{
-						if (ConstValues.isNA(s[1 + mpheno[j]]))
-						{
-							f = false;
-							break;
-						}
-						else
-						{
-							y[ii][j + 1] = Double.parseDouble(s[1 + mpheno[j]]);
-						}
-					}
-					flag[ii] = f;
-					
-					if (cat.containsKey(y[ii][1]))
-					{
-						Integer I = (Integer) cat.get(y[ii][1]);
-						I++;
-						cat.put(y[ii][1], I);
-					}
-					else
-					{
-						cat.put(y[ii][1], 1);
-					}
-				}
-			}
-			reader.close();
-		}
-		catch (IOException e)
-		{
-			Logger.handleException(e, "Error in reading phenotype file '" + phenoFile + "'.");
-		}
 
 		// ************************keep
 		if (keepFile != null)
@@ -180,45 +122,17 @@ public class HEMRead
 			}
 		}
 
-		int Len = 0;
+		int numAvailSubjects = 0;
 		for (int i = 0; i < flag.length; i++)
+		{
 			if (flag[i])
-				Len++;
-		dim = Len * (Len - 1) / 2;
-
-		// ************************************standardising
-		double[] ss = new double[y[0].length - 1];
-		double[] ssx = new double[y[0].length - 1];
-		for (int i = 0; i < flag.length; i++)
-		{
-			if (!flag[i])
-				continue;
-			for (int j = 0; j < ss.length; j++)
 			{
-				ss[j] += y[i][j + 1];
-				ssx[j] += y[i][j + 1] * y[i][j + 1];
+				++numAvailSubjects;
 			}
 		}
-		double[] sd = new double[ssx.length];
-		for (int i = 0; i < sd.length; i++)
-		{
-			ss[i] /= Len;
-			sd[i] = Math.sqrt((ssx[i] - Len * ss[i] * ss[i]) / (Len - 1));
-		}
-
-		if (CmdArgs.INSTANCE.scale)
-		{
-			Logger.printUserLog("Standardising phentoype.");
-			for (int i = 0; i < flag.length; i++)
-			{
-				if (!flag[i])
-					continue;
-				for (int j = 1; j < y[i].length; j++)
-				{
-					y[i][j] = (y[i][j] - ss[j - 1]) / sd[j - 1];
-				}
-			}
-		}
+		dim = numAvailSubjects * (numAvailSubjects - 1) / 2;
+		
+		standardisePhenotypes(numAvailSubjects);
 	}
 
 	private void existGrm()
@@ -304,6 +218,31 @@ public class HEMRead
 			}
 			isBinGrm = true;
 		}
+	}
+	
+	public boolean isCaseControl()
+	{
+		return isCaseCtrl;
+	}
+	
+	public double getCaseValue()
+	{
+		return caseVal;
+	}
+	
+	public double getControlValue()
+	{
+		return ctrlVal;
+	}
+	
+	public int getNumberOfCases()
+	{
+		return numCases;
+	}
+	
+	public int getNumberOfControls()
+	{
+		return numCtrls;
 	}
 
 	private void existGrmList()
@@ -428,17 +367,177 @@ public class HEMRead
 		grmID = idFileList.get(0);
 	}
 	
-	private HashMap<String, Integer> readGrmIds()
+	private HashMap<SubjectID, Integer> readGrmIds()
 	{
-		HashMap<String, Integer> id2Idx = new HashMap<String, Integer>();
+		HashMap<SubjectID, Integer> id2Idx = new HashMap<SubjectID, Integer>();
 		gear.util.BufferedReader reader = gear.util.BufferedReader.openTextFile(grmID, "GRM-ID");
 		int idx = 0;
 		String[] tokens;
 		while ((tokens = reader.readTokens(2)) != null)
 		{
-			id2Idx.put(tokens[0] + "." + tokens[1], idx++);
+			id2Idx.put(new SubjectID(tokens[0], tokens[1]), idx++);
 		}
 		reader.close();
 		return id2Idx;
 	}
+	
+	private void readPhenotypes(HashMap<SubjectID, Integer> id2Idx)
+	{
+		gear.util.BufferedReader reader = gear.util.BufferedReader.openTextFile(phenoFile, "phenotype");
+		
+		flag = new boolean[id2Idx.size()];
+		Arrays.fill(flag, false);
+		y = new double[id2Idx.size()];
+		
+		@SuppressWarnings("unchecked")
+		HashMap<SubjectID, Integer> subjectsUnread = (HashMap<SubjectID, Integer>)id2Idx.clone();
+		HashSet<SubjectID> subjectsRead = new HashSet<SubjectID>();
+		
+		int tarTraitIdx = CmdArgs.INSTANCE.getHEArgs().getTargetTraitOptionValue() - 1;
+		int minNumCols = 2 + tarTraitIdx + 1;
+
+		String[] tokens = null;
+
+		while ((tokens = reader.readTokens()) != null)
+		{
+			if (tokens.length < minNumCols)
+			{
+				reader.reportFormatError("There should be at least " + minNumCols + " columns.");
+			}
+			
+			SubjectID subID = new SubjectID(/*famID*/tokens[0], /*indID*/tokens[1]);
+			
+			if (subjectsUnread.containsKey(subID))
+			{
+				int ii = subjectsUnread.get(subID);
+				boolean f = true;
+				String pheValStr = tokens[tarTraitIdx];
+				if (ConstValues.isNA(pheValStr))
+				{
+					f = false;
+					break;
+				}
+				else
+				{
+					try
+					{
+						y[ii] = Double.parseDouble(pheValStr);
+					}
+					catch (NumberFormatException e)
+					{
+						reader.reportFormatError("'" + pheValStr + "' is not a valid phenotype value. It should be a floating point number.");
+					}
+				}
+				flag[ii] = f;
+				
+				subjectsUnread.remove(subID);
+				subjectsRead.add(subID);
+			}
+			else if (subjectsRead.contains(subID))
+			{
+				reader.reportFormatError("Individual " + subID + " is repeated.");
+			}
+			else
+			{
+				reader.reportFormatError("Individual " + subID + " appears in the phenotype file but not in the grm id file(s).");
+			}
+		}
+		reader.close();
+		
+		if (!subjectsUnread.isEmpty())
+		{
+			String msg = "";
+			msg += subjectsUnread.size() + " individual(s) (e.g. " + subjectsUnread.keySet().iterator().next();
+			msg += ") appear in the grm id file(s) but not in the phenotype file";
+			Logger.printUserError(msg);
+		}
+		
+		checkCaseControl();
+	}
+	
+	private void checkCaseControl()
+	{
+		double val1 = 0.0, val2 = 0.0;
+		int numVal1 = 0, numVal2 = 0;
+		
+		for (int ii = 0; ii < y.length; ++ii)
+		{
+			if (flag[ii])
+			{
+				if (numVal1 == 0)
+				{
+					val1 = y[ii];
+					++numVal1;
+				}
+				else if (Math.abs(val1 - y[ii]) <= ConstValues.EPSILON)
+				{
+					++numVal1;
+				}
+				else if (numVal2 == 0)
+				{
+					val2 = y[ii];
+					++numVal2;
+				}
+				else if (Math.abs(val2 - y[ii]) <= ConstValues.EPSILON)
+				{
+					++numVal2;
+				}
+				else
+				{
+					isCaseCtrl = false;
+					return;
+				}
+			}
+		}
+		
+		isCaseCtrl = true;
+		
+		if (val1 > val2)
+		{
+			caseVal = val1;
+			ctrlVal = val2;
+			numCases = numVal1;
+			numCtrls = numVal2;
+		}
+		else
+		{
+			caseVal = val2;
+			ctrlVal = val1;
+			numCases = numVal2;
+			numCtrls = numVal1;
+		}
+	}
+	
+	private void standardisePhenotypes(int numAvailSubjects)
+	{
+		double ss = 0.0, ssx = 0.0;
+		for (int i = 0; i < flag.length; i++)
+		{
+			if (flag[i])
+			{
+				ss += y[i];
+				ssx += y[i] * y[i];
+			}
+		}
+		ss /= numAvailSubjects;
+		
+		double sd = Math.sqrt((ssx - numAvailSubjects * ss * ss) / (numAvailSubjects - 1));
+
+		if (CmdArgs.INSTANCE.scale)
+		{
+			Logger.printUserLog("Standardising phentoypes.");
+			for (int i = 0; i < flag.length; i++)
+			{
+				if (flag[i])
+				{
+					y[i] = (y[i] - ss) / sd;
+				}
+			}
+		}
+	}
+	
+	// Case-Control Cached Data
+	private boolean isCaseCtrl;
+	private double caseVal, ctrlVal;
+	private int numCases, numCtrls;
 }

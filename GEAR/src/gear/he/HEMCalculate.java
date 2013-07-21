@@ -6,8 +6,6 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.text.DecimalFormat;
-import java.util.Iterator;
-import java.util.Set;
 
 import org.apache.commons.math.MathException;
 import org.apache.commons.math.distribution.NormalDistributionImpl;
@@ -62,8 +60,7 @@ public class HEMCalculate
 
 		if (!heMReader.isBinGrm)
 		{
-			heMReader.XtX = new double[heMReader.grmList.size() + 1][heMReader.grmList
-					.size() + 1];
+			heMReader.XtX = new double[heMReader.grmList.size() + 1][heMReader.grmList.size() + 1];
 			heMReader.XtY = new double[heMReader.grmList.size() + 1];
 
 			try
@@ -125,13 +122,13 @@ public class HEMCalculate
 					switch (heMReader.heType)
 					{
 					case SD:
-						ds = (heMReader.y[id1][1] - heMReader.y[id2][1]) * (heMReader.y[id1][1] - heMReader.y[id2][1]);
+						ds = (heMReader.y[id1] - heMReader.y[id2]) * (heMReader.y[id1] - heMReader.y[id2]);
 						break;
 					case SS:
-						ds = (heMReader.y[id1][1] + heMReader.y[id2][1]) * (heMReader.y[id1][1] + heMReader.y[id2][1]);
+						ds = (heMReader.y[id1] + heMReader.y[id2]) * (heMReader.y[id1] + heMReader.y[id2]);
 						break;
 					case CP:
-						ds = heMReader.y[id1][1] * heMReader.y[id2][1];
+						ds = heMReader.y[id1] * heMReader.y[id2];
 						break;
 					default:
 						break;
@@ -229,13 +226,13 @@ public class HEMCalculate
 					switch (heMReader.heType)
 					{
 					case SD:
-						ds = (heMReader.y[id1][1] - heMReader.y[id2][1]) * (heMReader.y[id1][1] - heMReader.y[id2][1]);
+						ds = (heMReader.y[id1] - heMReader.y[id2]) * (heMReader.y[id1] - heMReader.y[id2]);
 						break;
 					case SS:
-						ds = (heMReader.y[id1][1] + heMReader.y[id2][1]) * (heMReader.y[id1][1] + heMReader.y[id2][1]);
+						ds = (heMReader.y[id1] + heMReader.y[id2]) * (heMReader.y[id1] + heMReader.y[id2]);
 						break;
 					case CP:
-						ds = heMReader.y[id1][1] * heMReader.y[id2][1];
+						ds = heMReader.y[id1] * heMReader.y[id2];
 						break;
 					default:
 						// TODO: assert false or throw exception
@@ -253,28 +250,6 @@ public class HEMCalculate
 					heMReader.yyProd += ds * ds;
 					heMReader.lambda.N++;
 				}
-			}
-		}
-
-		if (heMReader.cat.size() == 2)
-		{
-			heMReader.isCC = true;
-			Set<Double> set = heMReader.cat.keySet();
-			Iterator<Double> it = set.iterator();
-			Double k1 = it.next();
-			Double k2 = it.next();
-			Integer c1 = heMReader.cat.get(k1);
-			Integer c2 = heMReader.cat.get(k2);
-
-			if (k1 > k2)
-			{
-				heMReader.P = c1.doubleValue() / (c1.doubleValue() + c2
-						.doubleValue());
-			}
-			else
-			{
-				heMReader.P = c2.doubleValue() / (c1.doubleValue() + c2
-						.doubleValue());
 			}
 		}
 
@@ -337,13 +312,7 @@ public class HEMCalculate
 
 		heMReader.sb.append("keep list: " + heMReader.keepFile + "\n");
 		heMReader.sb.append("pheno: " + heMReader.phenoFile + "\n");
-		heMReader.sb.append("mpheno: ");
-
-		for (int i = 0; i < heMReader.mpheno.length; i++)
-		{
-			heMReader.sb.append(heMReader.mpheno[i] + " ");
-		}
-		heMReader.sb.append("\n");
+		heMReader.sb.append("target trait: " + CmdArgs.INSTANCE.getHEArgs().getTargetTraitOptionValue() + "\n");
 
 		if (CmdArgs.INSTANCE.qcovar_file != null)
 		{
@@ -443,7 +412,7 @@ public class HEMCalculate
 				heMReader.sb.append("h2(o) for b" + i + ": " + fmt
 						.format(h_o[i - 1]) + "\t" + fmt.format(v_ho) + "\n");
 
-				if (heMReader.k_button && heMReader.isCC)
+				if (heMReader.k_button && heMReader.isCaseControl())
 				{
 					NormalDistributionImpl Norm = new NormalDistributionImpl();
 					double q = 0;
@@ -455,11 +424,11 @@ public class HEMCalculate
 					{
 						e.printStackTrace();
 					}
-					double z = 1 / (Math.sqrt(2 * 3.1416926)) * Math
-							.exp(-q * q / 2);
-					h_l[i - 1] = h_o[i - 1] * heMReader.k * (1 - heMReader.k) * heMReader.k * (1 - heMReader.k) / (z * z * heMReader.P * (1 - heMReader.P));
+					double z = 1 / (Math.sqrt(2 * 3.1416926)) * Math.exp(-q * q / 2);
+					double ratioCaseCtrl = ((double)heMReader.getNumberOfCases()) / ((double)(heMReader.getNumberOfCases() + heMReader.getNumberOfControls()));
+					h_l[i - 1] = h_o[i - 1] * heMReader.k * (1 - heMReader.k) * heMReader.k * (1 - heMReader.k) / (z * z * ratioCaseCtrl * (1 - ratioCaseCtrl));
 
-					double f = (heMReader.k * (1 - heMReader.k) * heMReader.k * (1 - heMReader.k)) / (z * z * heMReader.P * (1 - heMReader.P));
+					double f = (heMReader.k * (1 - heMReader.k) * heMReader.k * (1 - heMReader.k)) / (z * z * ratioCaseCtrl * (1 - ratioCaseCtrl));
 					double v_hl = v_ho * f * f;
 					heMReader.sb
 							.append("h2(l) for b" + i + ": " + fmt
