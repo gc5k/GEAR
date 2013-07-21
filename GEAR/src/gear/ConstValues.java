@@ -36,4 +36,6 @@ public class ConstValues
 		}
 		return CmdArgs.INSTANCE.getNA().trim().split(",");
 	}
+	
+	public static final double EPSILON = 1e-6;
 }

@@ -98,6 +98,6 @@ public class Logger
 		}
 	}
 
-	private static String logFileNamePrefix;
+	private static String logFileNamePrefix = "gear";
 	private static boolean isDevLoggerInited = false;
 }
