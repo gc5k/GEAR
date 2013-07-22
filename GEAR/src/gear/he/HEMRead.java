@@ -82,10 +82,10 @@ public class HEMRead
 		perm = CmdArgs.INSTANCE.perm;
 
 		HashMap<SubjectID, Integer> id2Idx = readGrmIds();
+		flag = new boolean[id2Idx.size()];
+		nRec = flag.length * (flag.length + 1) / 2;
 		
 		readPhenotypes(id2Idx);
-
-		nRec = flag.length * (flag.length + 1) / 2;
 
 		BufferedReader reader;
 		String line;
@@ -132,6 +132,7 @@ public class HEMRead
 		
 		standardisePhenotypes(numAvailSubjects);
 	}
+
 
 	private void existGrm()
 	{
@@ -376,6 +377,7 @@ public class HEMRead
 			id2Idx.put(new SubjectID(tokens[0], tokens[1]), idx++);
 		}
 		reader.close();
+
 		return id2Idx;
 	}
 	
@@ -383,7 +385,6 @@ public class HEMRead
 	{
 		gear.util.BufferedReader reader = gear.util.BufferedReader.openTextFile(phenoFile, "phenotype");
 		
-		flag = new boolean[id2Idx.size()];
 		Arrays.fill(flag, false);
 		y = new double[id2Idx.size()];
 		
@@ -451,6 +452,12 @@ public class HEMRead
 		}
 		
 		checkCaseControl();
+	}
+	
+	private void readCov(HashMap<SubjectID, Integer> id2Idx)
+	{
+		// TODO Auto-generated method stub
+		
 	}
 	
 	private void checkCaseControl()
