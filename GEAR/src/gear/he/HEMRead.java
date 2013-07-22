@@ -42,7 +42,6 @@ public class HEMRead
 	protected double[][] XtX;
 	protected double[] XtY;
 	protected double[] y;
-	protected int dim;
 
 	protected ArrayList<BufferedReader> grmList;
 	protected ArrayList<BinaryInputFile> binList;
@@ -130,7 +129,6 @@ public class HEMRead
 				++numAvailSubjects;
 			}
 		}
-		dim = numAvailSubjects * (numAvailSubjects - 1) / 2;
 		
 		standardisePhenotypes(numAvailSubjects);
 	}
