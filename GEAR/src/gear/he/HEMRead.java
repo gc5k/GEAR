@@ -426,7 +426,7 @@ public class HEMRead
 			{
 				int ii = subjectsUnread.get(subID);
 				boolean f = true;
-				String pheValStr = tokens[tarTraitIdx];
+				String pheValStr = tokens[2 + tarTraitIdx];
 				if (ConstValues.isNA(pheValStr))
 				{
 					f = false;

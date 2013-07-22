@@ -26,6 +26,11 @@ public class SubjectID
 			   ((SubjectID)obj).getIndividualID().equals(indID);
 	}
 	
+	public int hashCode()
+	{
+		return toString().hashCode();
+	}
+	
 	public String toString()
 	{
 		return "[Family ID: " + famID + ", Individual ID: " + indID + "]";
