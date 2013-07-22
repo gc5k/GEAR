@@ -18,7 +18,7 @@ import org.apache.commons.math.linear.RealMatrix;
 public class HeCov
 {
 	private final String delim = "\\s+";
-	private double[][] y;
+	private double[] y;
 	private boolean[] cov_flag;
 
 	private boolean[] flag;
@@ -34,7 +34,7 @@ public class HeCov
 
 	private HashMap<String, Integer> ID2Idx;
 
-	public HeCov(double[][] p, boolean[] f, HashMap<String, Integer> I,
+	public HeCov(double[] p, boolean[] f, HashMap<String, Integer> I,
 			String qf, int[] q_i, String cf, int[] c_i)
 	{
 
@@ -225,7 +225,7 @@ public class HeCov
 		{
 			if (cov_flag[i])
 			{
-				phe[cn++][0] = y[i][1];
+				phe[cn++][0] = y[i];
 			}
 		}
 
@@ -315,7 +315,7 @@ public class HeCov
 			flag[i] &= cov_flag[i];
 			if (cov_flag[i])
 			{
-				y[i][1] -= Pre.getEntry(cc++, 0);
+				y[i] -= Pre.getEntry(cc++, 0);
 			}
 		}
 	}
