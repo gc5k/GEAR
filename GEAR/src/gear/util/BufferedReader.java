@@ -161,13 +161,23 @@ public class BufferedReader
 		return curLineNum;
 	}
 	
-	public void reportFormatError(String msg)
+	public void error(int lineNo, String msg)
 	{
 		String begin = "";
-		begin += "Line " + getCurLineNum() + " of the " + fileType + " file ";
+		begin += "Line " + lineNo + " of the " + fileType + " file ";
 		begin += "'" + getFileName() + "' contains an error: ";
 		Logger.printUserError(begin + msg);
 		System.exit(1);
+	}
+	
+	public void error(String msg)
+	{
+		error(getCurLineNum(), msg);
+	}
+	
+	public void errorPreviousLine(String msg)
+	{
+		error(getCurLineNum() - 1, msg);
 	}
 
 	private java.io.BufferedReader innerReader;

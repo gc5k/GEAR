@@ -136,7 +136,7 @@ public class MachData extends Data
 					String msg = "";
 					msg += "'" + tokens[1] + "' is not a valid allele. ";
 					msg += "Notice that every allele must be labled by a character.";
-					reader.reportFormatError(msg);
+					reader.errorPreviousLine(msg);
 				}
 				char allele1 = tokens[1].charAt(0);
 				
@@ -145,7 +145,7 @@ public class MachData extends Data
 					String msg = "";
 					msg += "'" + tokens[2] + "' is not a valid allele. ";
 					msg += "Notice that every allele must be labled by a character.";
-					reader.reportFormatError(msg);
+					reader.errorPreviousLine(msg);
 				}
 				char allele2 = tokens[2].charAt(0);
 				
@@ -225,7 +225,7 @@ public class MachData extends Data
 			String[] id = tokens[0].split("->", 2);
 			if (id.length != 2)
 			{
-				dosageReader.reportFormatError("The first column must be in the form of 'FamilyID->IndividualID'");
+				dosageReader.errorPreviousLine("The first column must be in the form of 'FamilyID->IndividualID'");
 			}
 			famID = id[0];
 			indID = id[1];
@@ -249,7 +249,7 @@ public class MachData extends Data
 					String msg = "";
 					msg += "'" + tokens[col-2] + "' is not a valid dosage. ";
 					msg += "Dosages must be floating point values ranging from 0.0 to 2.0.";
-					dosageReader.reportFormatError(msg);
+					dosageReader.errorPreviousLine(msg);
 				}
 			}
 			

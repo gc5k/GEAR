@@ -417,7 +417,7 @@ public class HEMRead
 		{
 			if (tokens.length < minNumCols)
 			{
-				reader.reportFormatError("There should be at least " + minNumCols + " columns.");
+				reader.errorPreviousLine("There should be at least " + minNumCols + " columns.");
 			}
 			
 			SubjectID subID = new SubjectID(/*famID*/tokens[0], /*indID*/tokens[1]);
@@ -440,7 +440,7 @@ public class HEMRead
 					}
 					catch (NumberFormatException e)
 					{
-						reader.reportFormatError("'" + pheValStr + "' is not a valid phenotype value. It should be a floating point number.");
+						reader.errorPreviousLine("'" + pheValStr + "' is not a valid phenotype value. It should be a floating point number.");
 					}
 				}
 				flag[ii] = f;
@@ -450,11 +450,11 @@ public class HEMRead
 			}
 			else if (subjectsRead.contains(subID))
 			{
-				reader.reportFormatError("Individual " + subID + " is repeated.");
+				reader.errorPreviousLine("Individual " + subID + " is repeated.");
 			}
 			else
 			{
-				reader.reportFormatError("Individual " + subID + " appears in the phenotype file but not in the grm id file(s).");
+				reader.errorPreviousLine("Individual " + subID + " appears in the phenotype file but not in the grm id file(s).");
 			}
 		}
 		reader.close();
