@@ -357,7 +357,7 @@ public class HEMCalculate
 			heMReader.sb.append("Empirical h2: " + CmdArgs.INSTANCE.eh2 + "\n");
 		}
 
-		heMReader.sb.append("reverse: " + heMReader.reverse + "\n");
+		heMReader.sb.append("Reverse: " + heMReader.reverse + "\n");
 		heMReader.sb.append("Scale : " + CmdArgs.INSTANCE.scale + "\n");
 		if (heMReader.k_button)
 		{
@@ -481,7 +481,7 @@ public class HEMCalculate
 			{
 				e.printStackTrace();
 			}
-			pw.append(heMReader.sb);
+			pw.append(heMReader.sb.toString());
 			pw.close();
 		}
 	}

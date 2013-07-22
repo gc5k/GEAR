@@ -48,7 +48,8 @@ public class HEMRead
 	protected ArrayList<BinaryInputFile> binList;
 	protected ArrayList<String> grmFileList;
 	protected ArrayList<String> idFileList;
-
+	HashMap<SubjectID, Integer> id2Idx = new HashMap<SubjectID, Integer>();
+	
 	protected boolean isSingleGrm;
 	protected boolean isBinGrm = false;
 
@@ -82,7 +83,7 @@ public class HEMRead
 		permFlag = CmdArgs.INSTANCE.permFlag;
 		perm = CmdArgs.INSTANCE.perm;
 
-		HashMap<SubjectID, Integer> id2Idx = readGrmIds();
+		readGrmIds();
 		flag = new boolean[id2Idx.size()];
 		Arrays.fill(flag, false);
 		nRec = flag.length * (flag.length + 1) / 2;
@@ -140,7 +141,12 @@ public class HEMRead
 			}
 		}
 		
-		standardisePhenotypes(numAvailSubjects);
+		Logger.printUserLog("Individuals matched phenotype and grm:" + numAvailSubjects);
+		if (CmdArgs.INSTANCE.scale) 
+		{
+			Logger.printUserLog("standardizing the phenotype...");
+			standardisePhenotypes(numAvailSubjects);
+		}
 	}
 
 
@@ -376,9 +382,9 @@ public class HEMRead
 		grmID = idFileList.get(0);
 	}
 	
-	private HashMap<SubjectID, Integer> readGrmIds()
+	private void readGrmIds()
 	{
-		HashMap<SubjectID, Integer> id2Idx = new HashMap<SubjectID, Integer>();
+
 		gear.util.BufferedReader reader = gear.util.BufferedReader.openTextFile(grmID, "GRM-ID");
 		int idx = 0;
 		String[] tokens;
@@ -386,9 +392,9 @@ public class HEMRead
 		{
 			id2Idx.put(new SubjectID(tokens[0], tokens[1]), idx++);
 		}
+		Logger.printUserLog("individuals in grm id file: " + id2Idx.size());
 		reader.close();
 
-		return id2Idx;
 	}
 	
 	private void readPhenotypes(HashMap<SubjectID, Integer> id2Idx)
@@ -399,6 +405,7 @@ public class HEMRead
 		
 		@SuppressWarnings("unchecked")
 		HashMap<SubjectID, Integer> subjectsUnread = (HashMap<SubjectID, Integer>)id2Idx.clone();
+
 		HashSet<SubjectID> subjectsRead = new HashSet<SubjectID>();
 		
 		int tarTraitIdx = CmdArgs.INSTANCE.getHEArgs().getTargetTraitOptionValue() - 1;
@@ -414,7 +421,7 @@ public class HEMRead
 			}
 			
 			SubjectID subID = new SubjectID(/*famID*/tokens[0], /*indID*/tokens[1]);
-			
+
 			if (subjectsUnread.containsKey(subID))
 			{
 				int ii = subjectsUnread.get(subID);
@@ -454,6 +461,7 @@ public class HEMRead
 		
 		if (!subjectsUnread.isEmpty())
 		{
+			System.out.println(subjectsUnread.size());
 			String msg = "";
 			msg += subjectsUnread.size() + " individual(s) (e.g. " + subjectsUnread.keySet().iterator().next();
 			msg += ") appear in the grm id file(s) but not in the phenotype file";
@@ -518,6 +526,8 @@ public class HEMRead
 	
 	private void standardisePhenotypes(int numAvailSubjects)
 	{
+		Logger.printUserLog("Standardising phentoypes.");
+
 		double ss = 0.0, ssx = 0.0;
 		for (int i = 0; i < flag.length; i++)
 		{
@@ -531,15 +541,12 @@ public class HEMRead
 		
 		double sd = Math.sqrt((ssx - numAvailSubjects * ss * ss) / (numAvailSubjects - 1));
 
-		if (CmdArgs.INSTANCE.scale)
+
+		for (int i = 0; i < flag.length; i++)
 		{
-			Logger.printUserLog("Standardising phentoypes.");
-			for (int i = 0; i < flag.length; i++)
+			if (flag[i])
 			{
-				if (flag[i])
-				{
-					y[i] = (y[i] - ss) / sd;
-				}
+				y[i] = (y[i] - ss) / sd;
 			}
 		}
 	}
