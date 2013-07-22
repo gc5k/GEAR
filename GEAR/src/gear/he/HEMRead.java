@@ -461,7 +461,6 @@ public class HEMRead
 		
 		if (!subjectsUnread.isEmpty())
 		{
-			System.out.println(subjectsUnread.size());
 			String msg = "";
 			msg += subjectsUnread.size() + " individual(s) (e.g. " + subjectsUnread.keySet().iterator().next();
 			msg += ") appear in the grm id file(s) but not in the phenotype file";
