@@ -347,7 +347,7 @@ public class Profiler
 		{
 			if (tokens[1].length() != 1)
 			{
-				reader.reportFormatError("The allele is not a character.");
+				reader.errorPreviousLine("The allele is not a character.");
 			}
 			
 			if (!ConstValues.isNA(tokens[2]))
@@ -358,7 +358,7 @@ public class Profiler
 				}
 				catch (NumberFormatException e)
 				{
-					reader.reportFormatError("'" + tokens[2] + "' is not a valid score.");
+					reader.errorPreviousLine("'" + tokens[2] + "' is not a valid score.");
 				}
 			}
 		}
@@ -392,7 +392,7 @@ public class Profiler
 				}
 				catch (NumberFormatException e)
 				{
-					reader.reportFormatError("'" + tokens[1] + "' is not a valid q-score.");
+					reader.errorPreviousLine("'" + tokens[1] + "' is not a valid q-score.");
 				}
 			}
 		}
@@ -427,7 +427,7 @@ public class Profiler
 			}
 			catch (NumberFormatException e)
 			{
-				reader.reportFormatError("An invalid q-score value is detected.");
+				reader.errorPreviousLine("An invalid q-score value is detected.");
 			}
 		}
 		reader.close();

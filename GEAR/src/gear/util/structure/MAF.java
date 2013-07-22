@@ -65,13 +65,13 @@ public class MAF
 		
 		if (tokens[2].length() != 1)
 		{
-			reader.reportFormatError("'" + tokens[2] + "' is not a valid allele. Alleles must be single characters.");
+			reader.errorPreviousLine("'" + tokens[2] + "' is not a valid allele. Alleles must be single characters.");
 		}
 		char allele1 = tokens[2].charAt(0);
 		
 		if (tokens[3].length() != 1)
 		{
-			reader.reportFormatError("'" + tokens[3] + "' is not a valid allele. Alleles must be single characters.");
+			reader.errorPreviousLine("'" + tokens[3] + "' is not a valid allele. Alleles must be single characters.");
 		}
 		char allele2 = tokens[3].charAt(0);
 
@@ -82,12 +82,12 @@ public class MAF
 		}
 		catch (NumberFormatException e)
 		{
-			reader.reportFormatError("'" + tokens[4] + "' is not a valid MAF value. An MAF value must be a floating point number.");
+			reader.errorPreviousLine("'" + tokens[4] + "' is not a valid MAF value. An MAF value must be a floating point number.");
 		}
 		
 		if (maf != Double.NaN && (maf < 0.0f || 1.0f < maf))
 		{
-			reader.reportFormatError("'" + tokens[4] + "' is not a valid MAF value. MAF must between 0 and 1 inclusively.");
+			reader.errorPreviousLine("'" + tokens[4] + "' is not a valid MAF value. MAF must between 0 and 1 inclusively.");
 		}
 		
 		double nchr = Double.NaN;
@@ -97,7 +97,7 @@ public class MAF
 		}
 		catch (NumberFormatException e)
 		{
-			reader.reportFormatError("'" + tokens[5] + "' is not a valid NCHR value. An NCHR value must be a floating point number.");
+			reader.errorPreviousLine("'" + tokens[5] + "' is not a valid NCHR value. An NCHR value must be a floating point number.");
 		}
 		
 		return new MAF(chr, snp, allele1, allele2, maf, nchr);
