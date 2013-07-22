@@ -13,6 +13,7 @@ import java.util.zip.GZIPInputStream;
 
 import gear.CmdArgs;
 import gear.ConstValues;
+import gear.he.covar.HeCov;
 import gear.util.BinaryInputFile;
 import gear.util.FileUtil;
 import gear.util.Logger;
@@ -83,9 +84,18 @@ public class HEMRead
 
 		HashMap<SubjectID, Integer> id2Idx = readGrmIds();
 		flag = new boolean[id2Idx.size()];
+		Arrays.fill(flag, false);
 		nRec = flag.length * (flag.length + 1) / 2;
-		
+
 		readPhenotypes(id2Idx);
+
+		if (CmdArgs.INSTANCE.covar_file != null & CmdArgs.INSTANCE.qcovar_file != null) 
+		{
+			HeCov hecov = new HeCov(y, flag, id2Idx, CmdArgs.INSTANCE.qcovar_file, CmdArgs.INSTANCE.qcovar_num, CmdArgs.INSTANCE.covar_file, CmdArgs.INSTANCE.covar_num);
+			hecov.generate_Res();
+			y = hecov.getAdjustedPhe();
+			flag = hecov.getFlag();
+		}
 
 		BufferedReader reader;
 		String line;
@@ -385,7 +395,6 @@ public class HEMRead
 	{
 		gear.util.BufferedReader reader = gear.util.BufferedReader.openTextFile(phenoFile, "phenotype");
 		
-		Arrays.fill(flag, false);
 		y = new double[id2Idx.size()];
 		
 		@SuppressWarnings("unchecked")
@@ -452,12 +461,6 @@ public class HEMRead
 		}
 		
 		checkCaseControl();
-	}
-	
-	private void readCov(HashMap<SubjectID, Integer> id2Idx)
-	{
-		// TODO Auto-generated method stub
-		
 	}
 	
 	private void checkCaseControl()

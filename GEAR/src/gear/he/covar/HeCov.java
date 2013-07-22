@@ -1,6 +1,7 @@
 package gear.he.covar;
 
 import gear.ConstValues;
+import gear.he.SubjectID;
 import gear.util.FileUtil;
 import gear.util.Logger;
 import gear.util.NewIt;
@@ -19,6 +20,7 @@ public class HeCov
 {
 	private final String delim = "\\s+";
 	private double[] y;
+	private double[] res;
 	private boolean[] cov_flag;
 
 	private boolean[] flag;
@@ -32,14 +34,14 @@ public class HeCov
 	private ArrayList<ArrayList<String>> cov;
 	private ArrayList<HashMap<String, Integer>> cov_class;
 
-	private HashMap<String, Integer> ID2Idx;
+	private HashMap<SubjectID, Integer> ID2Idx;
 
-	public HeCov(double[] p, boolean[] f, HashMap<String, Integer> I,
+	public HeCov(double[] p, final boolean[] f, HashMap<SubjectID, Integer> I,
 			String qf, int[] q_i, String cf, int[] c_i)
 	{
 
 		y = p;
-
+		res = new double[p.length];
 		flag = f;
 		ID2Idx = I;
 		qcov_file = qf;
@@ -50,10 +52,9 @@ public class HeCov
 
 		cov_flag = new boolean[flag.length];
 		Arrays.fill(cov_flag, false);
-		generate_Res();
 	}
 
-	private void generate_Res()
+	public void generate_Res()
 	{
 
 		if (qcov_file != null)
@@ -65,6 +66,8 @@ public class HeCov
 			int _c = 0;
 			try
 			{
+				Logger.printUserLog("reading quantitative covariate from '" + qcov_file +"'.");
+
 				while ((line = reader.readLine()) != null)
 				{
 
@@ -128,6 +131,8 @@ public class HeCov
 			int _c = 0;
 			try
 			{
+				Logger.printUserLog("reading class covariate from '" + cov_file +"'.");
+
 				while ((line = reader.readLine()) != null)
 				{
 					String[] s = line.split(delim);
@@ -179,7 +184,8 @@ public class HeCov
 						if (qcov_file != null)
 						{// should be existed in both
 							cov_flag[idx] &= f;
-						} else
+						} 
+						else
 						{// if exists this file only, it should be lined up with
 							// the phenotype
 							cov_flag[idx] = f & flag[idx];
@@ -279,7 +285,8 @@ public class HeCov
 				System.arraycopy(x2[i], 0, x3[i], 1 + qcov_idx.length,
 						cov_idx.length);
 			}
-		} else if (qcov_file != null)
+		} 
+		else if (qcov_file != null)
 		{
 			x3 = new double[cn][qcov_idx.length + 1];
 			for (int i = 0; i < dim; i++)
@@ -287,7 +294,8 @@ public class HeCov
 				x3[i][0] = 1;
 				System.arraycopy(x1[i], 0, x3[i], 1, qcov_idx.length);
 			}
-		} else if (cov_file != null)
+		} 
+		else if (cov_file != null)
 		{
 			x3 = new double[cn][cov_idx.length + 1];
 			for (int i = 0; i < dim; i++)
@@ -312,11 +320,21 @@ public class HeCov
 		int cc = 0;
 		for (int i = 0; i < cov_flag.length; i++)
 		{
-			flag[i] &= cov_flag[i];
 			if (cov_flag[i])
 			{
-				y[i] -= Pre.getEntry(cc++, 0);
+				res[i] -= Pre.getEntry(cc++, 0);
 			}
 		}
+	}
+	
+	public double[] getAdjustedPhe() 
+	{
+		return res;
+	}
+
+	
+	public boolean[] getFlag() 
+	{
+		return cov_flag;
 	}
 }
