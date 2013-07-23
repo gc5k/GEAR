@@ -1483,7 +1483,8 @@ public enum CmdArgs
 		}
 		catch (ParseException e)
 		{
-			Logger.handleException(e, "Failed to parse the command-line arguments.");
+			Logger.printUserError(e.getMessage());
+			System.exit(1);
 		}
 
 		if (cmdLine.hasOption(cmd_help))
