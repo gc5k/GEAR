@@ -3,18 +3,22 @@ package simulation;
 import gear.CmdArgs;
 
 import java.io.BufferedWriter;
+import java.io.DataOutputStream;
+import java.io.FileOutputStream;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.util.Arrays;
 
 import org.apache.commons.math.MathException;
-import org.apache.commons.math.linear.Array2DRowRealMatrix;
-import org.apache.commons.math.linear.RealMatrix;
 import org.apache.commons.math.random.RandomDataImpl;
 
 public class SimuFamily
 {
+	private byte byte1 = 108;
+	private byte byte2 = 27;
+	private byte byte3 = 1;
+	
 	private RandomDataImpl rnd;
 	private long seed = 2011;
 
@@ -27,12 +31,9 @@ public class SimuFamily
 	private double[] rec = null;
 	private double[] maf = null;
 
-	private PrintWriter pedout = null;
-	private PrintWriter map = null;
-	private PrintWriter phe = null;
-	private PrintWriter cov = null;
+	private int[][] gm = null;
+	private int famSize = 4;
 
-	private String out = "simuFam";
 
 	public SimuFamily(int NFam, int NMarker, long seed)
 	{
@@ -42,16 +43,8 @@ public class SimuFamily
 		initial();
 	}
 
-	public SimuFamily()
-	{
-
-		initial();
-
-	}
-
 	private void initial()
 	{
-
 		rnd = new RandomDataImpl();
 		rnd.reSeed(seed);
 
@@ -68,61 +61,42 @@ public class SimuFamily
 		Arrays.fill(rec, 0.5);
 		rec[0] = maf[0];
 
+		gm = new int[NFam * famSize][NMarker];
 	}
 
 	public void generateSample()
 	{
 
-		try
-		{
-			pedout = new PrintWriter(new BufferedWriter(new FileWriter(CmdArgs.INSTANCE.out
-					+ ".ped")));
-			map = new PrintWriter(new BufferedWriter(new FileWriter(CmdArgs.INSTANCE.out
-					+ ".map")));
-			phe = new PrintWriter(new BufferedWriter(new FileWriter(CmdArgs.INSTANCE.out
-					+ ".phe")));
-			cov = new PrintWriter(new BufferedWriter(new FileWriter(CmdArgs.INSTANCE.out
-					+ ".cov")));
-		} catch (IOException e)
-		{
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-
 		for (int i = 0; i < NFam; i++)
 		{
-			generateNuclearFamily(NKid[i], NAffKid[i], i + 1);
+			generateNuclearFamily(NKid[i], NAffKid[i], i);
 		}
-
-		writeMap();
-
-		pedout.close();
-		map.close();
-		phe.close();
-		cov.close();
 
 	}
 
 	private void generateNuclearFamily(int nkid, int affKid, int famIdx)
 	{
 
-		RealMatrix pchr = sampleChromosome();
-		RealMatrix mchr = sampleChromosome();
-		RealMatrix[] kchr = new RealMatrix[nkid];
+		int[][] p = sampleChromosome(famIdx, 0);
+		int[][] m = sampleChromosome(famIdx, 1);
 		for (int i = 0; i < nkid; i++)
 		{
-			kchr[i] = generateBaby(pchr, mchr);
+			generateBaby(p, m, famIdx, i + 2);
 		}
 
-		writeFile(pchr, mchr, kchr, famIdx);
-
+		if (CmdArgs.INSTANCE.makebedFlag)
+		{
+			writeBFile();
+		}
+		else
+		{
+			writeFile();
+		}
 	}
 
-	private RealMatrix sampleChromosome()
+	private int[][] sampleChromosome(int famIdx, int shift)
 	{
-
-		double[] g = new double[maf.length];
-		double[][] v = new double[maf.length][2];
+		int[][] v = new int[maf.length][2];
 		for (int i = 0; i < maf.length; i++)
 		{
 			for (int j = 0; j < 2; j++)
@@ -131,7 +105,8 @@ public class SimuFamily
 				if (i == 0)
 				{
 					v[i][j] = r < maf[i] ? 0 : 1;
-				} else
+				}
+				else
 				{
 					double d = rnd.nextUniform(0, 1);
 					int a = (int) v[i - 1][j];
@@ -141,97 +116,155 @@ public class SimuFamily
 							: (1 - v[i - 1][j]);
 				}
 			}
-			g[i] = v[i][0] + v[i][1];
+			gm[famIdx * famSize + shift][i] = v[i][0] + v[i][1];
 		}
 
-		RealMatrix chr = new Array2DRowRealMatrix(v);
-		return chr;
+		return v;
 	}
 
-	private RealMatrix generateBaby(RealMatrix pchr, RealMatrix mchr)
+	private void generateBaby(int[][] p, int[][] m, int famIdx, int shift)
 	{
-		double[][] v = new double[maf.length][2];
+		int[][] v = new int[maf.length][2];
 
 		for (int i = 0; i < 2; i++)
 		{
-			RealMatrix chr = i == 0 ? pchr : mchr;
+			int[][] chr = i == 0 ? p : m;
 			int idx = 1;
 			for (int j = 0; j < maf.length; j++)
 			{
 				double r = rnd.nextUniform(0, 1);
 				idx = r < rec[j] ? 1 - idx : idx;
-				v[j][i] = chr.getEntry(j, idx);
+				v[j][i] = chr[j][idx];
 			}
 		}
 
-		RealMatrix chr = new Array2DRowRealMatrix(v);
-		return chr;
+		for (int i = 0; i < maf.length; i++)
+		{
+			gm[famIdx * famSize + shift][i] = v[i][0] + v[i][1];
+		}
 	}
 
-	public void writeFile(RealMatrix pchr, RealMatrix mchr, RealMatrix[] kchr,
-			int famIdx)
+	public void writeFile()
 	{
+		PrintWriter pedout = null;
+		PrintWriter map = null;
 
-		int fid = famIdx * 10000;
-		int pid = fid + 1;
-		int mid = fid + 2;
-
-		pedout.print(fid + " ");
-		pedout.print(pid + " ");
-		pedout.print(0 + " ");
-		pedout.print(0 + " ");
-		pedout.print(1 + " ");
-		pedout.print(1 + " ");
-
-		for (int i = 0; i < pchr.getRowDimension(); i++)
+		try
 		{
-			pedout.print(A[(int) (pchr.getEntry(i, 0))] + " "
-					+ A[(int) pchr.getEntry(i, 1)] + " ");
+			pedout = new PrintWriter(new BufferedWriter(new FileWriter(
+					CmdArgs.INSTANCE.out + ".ped")));
+			map = new PrintWriter(new BufferedWriter(new FileWriter(
+					CmdArgs.INSTANCE.out + ".map")));
 		}
-		pedout.print("\n");
-
-		pedout.print(fid + " ");
-		pedout.print(mid + " ");
-		pedout.print(0 + " ");
-		pedout.print(0 + " ");
-		pedout.print(2 + " ");
-		pedout.print(1 + " ");
-
-		for (int i = 0; i < mchr.getRowDimension(); i++)
+		catch (IOException e)
 		{
-			pedout.print(A[(int) (mchr.getEntry(i, 0))] + " "
-					+ A[(int) mchr.getEntry(i, 1)] + " ");
+			// TODO Auto-generated catch block
+			e.printStackTrace();
 		}
-		pedout.print("\n");
 
-		for (int i = 0; i < kchr.length; i++)
+		for (int h = 0; h < famSize; h++)
 		{
+			int fid = (h + 1) * 10000;
+			int pid = fid + 1;
+			int mid = fid + 2;
+
 			pedout.print(fid + " ");
-			pedout.print((fid + 3 + i) + " ");
 			pedout.print(pid + " ");
-			pedout.print(mid + " ");
-			pedout.print(2 + " ");
-			try
-			{
-				pedout.print((rnd.nextBinomial(1, 0.5) + 1) + " ");
-			} catch (MathException e)
-			{
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			}
+			pedout.print(0 + " ");
+			pedout.print(0 + " ");
+			pedout.print(1 + " ");
+			pedout.print(1 + " ");
 
-			for (int j = 0; j < kchr[i].getRowDimension(); j++)
+			for (int i = 0; i < maf.length; i++)
 			{
-				pedout.print(A[(int) (kchr[i].getEntry(j, 0))] + " "
-						+ A[(int) kchr[i].getEntry(j, 1)] + " ");
+				StringBuilder sb = new StringBuilder();
+				switch (gm[h * famSize][0])
+				{
+				case 0:
+					sb.append(A[0] + " " + A[0]);
+					break;
+				case 1:
+					sb.append(A[0] + " " + A[0]);
+					break;
+				case 2:
+					sb.append(A[0] + " " + A[0]);
+					break;
+				default:
+					break;
+				}
+				pedout.print(sb.toString());
 			}
 			pedout.print("\n");
+
+			pedout.print(fid + " ");
+			pedout.print(mid + " ");
+			pedout.print(0 + " ");
+			pedout.print(0 + " ");
+			pedout.print(2 + " ");
+			pedout.print(1 + " ");
+
+			for (int i = 0; i < maf.length; i++)
+			{
+				StringBuilder sb = new StringBuilder();
+				switch (gm[h * famSize + 1][0])
+				{
+				case 0:
+					sb.append(A[0] + " " + A[0]);
+					break;
+				case 1:
+					sb.append(A[0] + " " + A[0]);
+					break;
+				case 2:
+					sb.append(A[0] + " " + A[0]);
+					break;
+				default:
+					break;
+				}
+				pedout.print(sb.toString());
+			}
+			pedout.print("\n");
+
+			for (int j = 0; j < 2; j++)
+			{
+				pedout.print(fid + " ");
+				pedout.print((fid + 3 + j) + " ");
+				pedout.print(pid + " ");
+				pedout.print(mid + " ");
+
+				try
+				{
+					pedout.print((rnd.nextBinomial(1, 0.5) + 1) + " ");
+					pedout.print((rnd.nextBinomial(1, 0.5) + 1) + " ");
+				}
+				catch (MathException e)
+				{
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
+
+				for (int i = 0; i < maf.length; i++)
+				{
+					StringBuilder sb = new StringBuilder();
+					switch (gm[h * famSize + 2 + j][0])
+					{
+					case 0:
+						sb.append(A[0] + " " + A[0]);
+						break;
+					case 1:
+						sb.append(A[0] + " " + A[0]);
+						break;
+					case 2:
+						sb.append(A[0] + " " + A[0]);
+						break;
+					default:
+						break;
+					}
+					pedout.print(sb.toString());
+				}
+				pedout.print("\n");
+			}
 		}
-	}
-
-	private void writeMap()
-	{
-
+		
 		for (int i = 0; i < maf.length; i++)
 		{
 			map.print(1 + " ");
@@ -240,11 +273,113 @@ public class SimuFamily
 			map.println(i * 100);
 		}
 
+		pedout.close();
+		map.close();
 	}
 
-	public static void main(String[] args)
+	public void writeBFile()
 	{
-		SimuFamily sf = new SimuFamily();
-		sf.generateSample();
+		DataOutputStream bedout = null;
+		PrintWriter fam = null;
+		PrintWriter bim = null;
+		try
+		{
+			bedout = new DataOutputStream(new FileOutputStream(CmdArgs.INSTANCE.out + ".bed"));
+
+			fam = new PrintWriter(new BufferedWriter(new FileWriter(CmdArgs.INSTANCE.out
+					+ ".fam")));
+			bim = new PrintWriter(new BufferedWriter(new FileWriter(CmdArgs.INSTANCE.out
+					+ ".bim")));
+
+		} 
+		catch (IOException e)
+		{
+			e.printStackTrace();
+		}
+
+		for (int i = 0; i < gm.length; i++)
+		{
+			fam.print("sample_" + i + " ");
+			fam.print(1 + " ");
+			fam.print(0 + " ");
+			fam.print(0 + " ");
+			try
+			{
+				fam.print((rnd.nextBinomial(1, 0.5) + 1) + " ");
+				fam.print((rnd.nextBinomial(1, 0.5) + 1) + " ");
+			}
+			catch (MathException e)
+			{
+				e.printStackTrace();
+			}
+		}
+
+		try
+		{
+			bedout.writeByte(byte1);
+			bedout.writeByte(byte2);
+			bedout.writeByte(byte3);
+			for (int i = 0; i < NMarker; i++)
+			{
+				byte gbyte = 0;
+				int idx = 0;
+				for (int j = 0; j < gm.length; j++)
+				{
+					int g = gm[j][i] + 1;
+					switch (g)
+					{
+					case 0:
+						g = 0;
+						break;
+					case 1:
+						g = 2;
+						break;
+					case 2:
+						g = 3;
+						break;
+					default:
+						g = 1;
+						break; // missing
+					}
+
+					g <<= 2 * idx;
+					gbyte |= g;
+					idx++;
+
+					if (j != (gm.length - 1))
+					{
+						if (idx == 4)
+						{
+							bedout.writeByte(gbyte);
+							gbyte = 0;
+							idx = 0;
+						}
+					} 
+					else
+					{
+						bedout.writeByte(gbyte);
+					}
+				}
+			}
+			bedout.close();
+		} 
+		catch (IOException e)
+		{
+			e.printStackTrace();
+		}
+
+		for (int i = 0; i < NMarker; i++)
+		{
+			bim.print(1 + " ");
+			bim.print("rs" + i + " ");
+			bim.print(i / (NMarker * 1.0) + " ");
+			bim.print(i * 100 + " ");
+			bim.println(A[0] + " " + A[1]);
+		}
+
+		bim.close();
+		fam.close();
+
 	}
+
 }
