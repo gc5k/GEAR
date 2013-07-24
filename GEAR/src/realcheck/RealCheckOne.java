@@ -238,7 +238,7 @@ public class RealCheckOne
 			}
 			markerIdx = new int[mn];
 			RandomDataImpl rd = new RandomDataImpl();
-			rd.reSeed(CmdArgs.INSTANCE.seed);
+			rd.reSeed(CmdArgs.INSTANCE.simuSeed);
 
 			markerIdx = rd.nextPermutation(markerIdx.length, mn);
 			Arrays.sort(markerIdx);

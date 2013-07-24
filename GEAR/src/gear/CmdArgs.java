@@ -1458,8 +1458,6 @@ public enum CmdArgs
 
 	public boolean covar_header_flag = false;
 
-	public long seed = 2012;
-
 	public boolean genoFlag = false;
 
 	public double geno = 0;
