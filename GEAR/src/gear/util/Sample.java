@@ -11,7 +11,7 @@ import java.util.Random;
 
 public class Sample
 {
-	public static Random U = new Random(CmdArgs.INSTANCE.seed);
+	public static Random U = new Random(CmdArgs.INSTANCE.simuSeed);
 
 	public static void setSeed(long s)
 	{

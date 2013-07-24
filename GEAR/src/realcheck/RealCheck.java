@@ -285,7 +285,7 @@ public class RealCheck
 
 		markerIdx = new int[mn];
 		RandomDataImpl rd = new RandomDataImpl();
-		rd.reSeed(CmdArgs.INSTANCE.seed);
+		rd.reSeed(CmdArgs.INSTANCE.simuSeed);
 
 		markerIdx = rd.nextPermutation(comSNPIdxMap.size(), mn);
 
