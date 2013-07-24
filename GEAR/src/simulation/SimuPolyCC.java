@@ -55,7 +55,6 @@ public class SimuPolyCC
 	private double h2 = 0.5;
 	private double E = 0.5;
 	private double K = 0.05;
-	private String out = "Poly";
 
 	private String A1 = "A";
 	private String A2 = "C";
@@ -74,7 +73,6 @@ public class SimuPolyCC
 		N_control = CmdArgs.INSTANCE.simuCC[1];
 		h2 = CmdArgs.INSTANCE.simuHsq;
 		K = CmdArgs.INSTANCE.simuK;
-		out = CmdArgs.INSTANCE.out;
 
 		E = Math.sqrt(1 - h2);
 
@@ -115,7 +113,7 @@ public class SimuPolyCC
 		LOG.append("Control: " + N_control + "\n");
 		LOG.append("K: " + K + "\n");
 		LOG.append("h2: " + h2 + "\n");
-		LOG.append("out: " + out + "\n");
+		LOG.append("out: " + CmdArgs.INSTANCE.out + "\n");
 		if (CmdArgs.INSTANCE.makebedFlag)
 		{
 			LOG.append("make bed");
@@ -137,7 +135,7 @@ public class SimuPolyCC
 		PrintWriter log = null;
 		try
 		{
-			log = new PrintWriter(new BufferedWriter(new FileWriter(out
+			log = new PrintWriter(new BufferedWriter(new FileWriter(CmdArgs.INSTANCE.out
 					+ ".plog")));
 		} 
 		catch (IOException e)
@@ -324,7 +322,7 @@ public class SimuPolyCC
 		PrintWriter eff = null;
 		try
 		{
-			eff = new PrintWriter(new BufferedWriter(new FileWriter(out
+			eff = new PrintWriter(new BufferedWriter(new FileWriter(CmdArgs.INSTANCE.out
 					+ ".rnd")));
 		} 
 		catch (IOException e)
@@ -408,17 +406,17 @@ public class SimuPolyCC
 		PrintWriter geno = null;
 		try
 		{
-			bedout = new DataOutputStream(new FileOutputStream(out + ".bed"));
-			fam = new PrintWriter(new BufferedWriter(new FileWriter(out
+			bedout = new DataOutputStream(new FileOutputStream(CmdArgs.INSTANCE.out + ".bed"));
+			fam = new PrintWriter(new BufferedWriter(new FileWriter(CmdArgs.INSTANCE.out
 					+ ".fam")));
-			bim = new PrintWriter(new BufferedWriter(new FileWriter(out
+			bim = new PrintWriter(new BufferedWriter(new FileWriter(CmdArgs.INSTANCE.out
 					+ ".bim")));
 
-			phe = new PrintWriter(new BufferedWriter(new FileWriter(out
+			phe = new PrintWriter(new BufferedWriter(new FileWriter(CmdArgs.INSTANCE.out
 					+ ".phe")));
-			cov = new PrintWriter(new BufferedWriter(new FileWriter(out
+			cov = new PrintWriter(new BufferedWriter(new FileWriter(CmdArgs.INSTANCE.out
 					+ ".cov")));
-			geno = new PrintWriter(new BufferedWriter(new FileWriter(out
+			geno = new PrintWriter(new BufferedWriter(new FileWriter(CmdArgs.INSTANCE.out
 					+ ".add")));
 		} 
 		catch (IOException e)
@@ -555,15 +553,15 @@ public class SimuPolyCC
 
 		try
 		{
-			pedout = new PrintWriter(new BufferedWriter(new FileWriter(out
+			pedout = new PrintWriter(new BufferedWriter(new FileWriter(CmdArgs.INSTANCE.out
 					+ ".ped")));
-			map = new PrintWriter(new BufferedWriter(new FileWriter(out
+			map = new PrintWriter(new BufferedWriter(new FileWriter(CmdArgs.INSTANCE.out
 					+ ".map")));
-			phe = new PrintWriter(new BufferedWriter(new FileWriter(out
+			phe = new PrintWriter(new BufferedWriter(new FileWriter(CmdArgs.INSTANCE.out
 					+ ".phe")));
-			cov = new PrintWriter(new BufferedWriter(new FileWriter(out
+			cov = new PrintWriter(new BufferedWriter(new FileWriter(CmdArgs.INSTANCE.out
 					+ ".cov")));
-			geno = new PrintWriter(new BufferedWriter(new FileWriter(out
+			geno = new PrintWriter(new BufferedWriter(new FileWriter(CmdArgs.INSTANCE.out
 					+ ".add")));
 		} 
 		catch (IOException e)
@@ -710,7 +708,7 @@ public class SimuPolyCC
 		PrintWriter eff = null;
 		try
 		{
-			eff = new PrintWriter(new BufferedWriter(new FileWriter(out
+			eff = new PrintWriter(new BufferedWriter(new FileWriter(CmdArgs.INSTANCE.out
 					+ ".rnd")));
 		} 
 		catch (IOException e)
