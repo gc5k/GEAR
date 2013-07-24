@@ -85,9 +85,7 @@ public class Pipeline
 		}
 		else if (CmdArgs.INSTANCE.simufamFlag)
 		{
-			SimuFamily simuFam = new SimuFamily(
-					CmdArgs.INSTANCE.simu_fam_size,
-					CmdArgs.INSTANCE.simu_fam_marker, CmdArgs.INSTANCE.seed);
+			SimuFamily simuFam = new SimuFamily();
 			simuFam.generateSample();
 
 		}

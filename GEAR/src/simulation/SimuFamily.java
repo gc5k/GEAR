@@ -35,11 +35,11 @@ public class SimuFamily
 	private int famSize = 4;
 
 
-	public SimuFamily(int NFam, int NMarker, long seed)
+	public SimuFamily()
 	{
-		this.NFam = NFam;
-		this.NMarker = NMarker;
-		this.seed = seed;
+		this.NFam = CmdArgs.INSTANCE.simu_fam_size;
+		this.NMarker = CmdArgs.INSTANCE.simu_fam_marker;
+		this.seed = CmdArgs.INSTANCE.simuSeed;
 		initial();
 	}
 

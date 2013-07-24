@@ -6,7 +6,6 @@ import gear.util.NewIt;
 
 import java.util.HashSet;
 import java.util.Iterator;
-import java.util.Random;
 
 import org.apache.commons.cli.CommandLine;
 import org.apache.commons.cli.CommandLineParser;
@@ -696,7 +695,7 @@ public enum CmdArgs
 
 	private final String cmd_simu_seed = "simu_seed";
 	private final String cmd_simu_seed_long = "simu-seed";
-	public long simuSeed = (new Random()).nextLong();
+	public long simuSeed = 2012;
 
 	private final String cmd_simu_rep = "simu_rep";
 	private final String cmd_simu_rep_long = "simu-rep";
