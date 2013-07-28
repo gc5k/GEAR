@@ -1484,7 +1484,7 @@ public enum CmdArgs
 			System.exit(1);
 		}
 
-		if (cmdLine.hasOption(cmd_help))
+		if (args.length == 0 || cmdLine.hasOption(cmd_help))
 		{
 			HelpFormatter formatter = new HelpFormatter();
 			formatter.printHelp("HE Regression", ops);
