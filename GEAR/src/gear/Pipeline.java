@@ -37,11 +37,6 @@ public class Pipeline
 		Logger.printUserLog(AboutInfo.WELCOME_MESSAGE);
 		Logger.printUserLog("Analysis started: " + Calendar.getInstance().getTime() + "\n");
 		
-		if (args.length == 0) 
-		{
-			System.exit(1);
-		}
-		
 		MonitorThread monitor = new MonitorThread();
 		monitor.start();
 
