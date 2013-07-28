@@ -14,6 +14,7 @@ import gear.strand.MakePredictor;
 import gear.strand.MakePredictor2;
 import gear.strand.Strand;
 import gear.util.Logger;
+import gear.util.MonitorThread;
 import grm.MakeGRM;
 import realcheck.RealCheck;
 import realcheck.RealCheckOne;
@@ -31,7 +32,7 @@ public class Pipeline
 	public static void main(String[] args)
 	{
 		CmdArgs.INSTANCE.parse(args);
-
+		
 		Logger.setLogFiles(CmdArgs.INSTANCE.out);
 		Logger.printUserLog(AboutInfo.WELCOME_MESSAGE);
 		Logger.printUserLog("Analysis started: " + Calendar.getInstance().getTime() + "\n");
@@ -40,6 +41,9 @@ public class Pipeline
 		{
 			System.exit(1);
 		}
+		
+		MonitorThread monitor = new MonitorThread();
+		monitor.start();
 
 		CmdArgs.INSTANCE.printOptionsInEffect();
 
@@ -193,8 +197,11 @@ public class Pipeline
 				mg.makeGeneticRelationshipScore();
 			}
 		}
+		
+		monitor.stopMonitoring();
+		
 		Logger.printUserLog("");
-		Logger.printUserLog("Analysis finished: "
-				+ Calendar.getInstance().getTime());
+		Logger.printUserLog("Analysis finished: " + Calendar.getInstance().getTime());
+		Logger.printUserLog("Peak memory consumption: " + monitor.getPeakMemoryFormatString());
 	}
 }

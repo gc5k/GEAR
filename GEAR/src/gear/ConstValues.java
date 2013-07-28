@@ -38,4 +38,8 @@ public class ConstValues
 	}
 	
 	public static final double EPSILON = 1e-6;
+	
+	public static final long KILOBYTE = 1024;
+	public static final long MEGABYTE = 1024 * 1024;
+	public static final long GIGABYTE = 1024 * 1024 * 1024;
 }
