@@ -19,13 +19,16 @@ public class MonitorThread extends Thread
 			if (totalMem > peakMem)
 			{
 				peakMem = totalMem;
-				try
+				synchronized (this)
 				{
-					wait(1000);  // Don't use 'sleep' method.
-				}
-				catch (InterruptedException e)
-				{
-					// Do nothing
+					try
+					{
+						wait(1000);  // Don't use 'sleep' method.
+					}
+					catch (InterruptedException e)
+					{
+						// Do nothing
+					}
 				}
 			}
 		} while (isRun);
