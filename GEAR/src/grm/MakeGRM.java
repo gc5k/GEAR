@@ -44,13 +44,15 @@ public class MakeGRM
 			pp = new PLINKParser(CmdArgs.INSTANCE.getFileArgs()
 					.getPed(), CmdArgs.INSTANCE.getFileArgs()
 					.getMap());
-		} else if (CmdArgs.INSTANCE.getBFileArgs(0).isSet())
+		} 
+		else if (CmdArgs.INSTANCE.getBFileArgs(0).isSet())
 		{
 			pp = new PLINKBinaryParser(CmdArgs.INSTANCE.getBFileArgs(0)
 					.getBed(), CmdArgs.INSTANCE.getBFileArgs(0)
 					.getBim(), CmdArgs.INSTANCE.getBFileArgs(0)
 					.getFam());
-		} else
+		} 
+		else
 		{
 			Logger.printUserError("No input files.");
 			System.exit(1);
@@ -79,7 +81,8 @@ public class MakeGRM
 		{
 			sb.append(".grm.txt");
 			grm = FileUtil.CreatePrintStream(sb.toString());
-		} else if (CmdArgs.INSTANCE.makeGRMFlag)
+		} 
+		else if (CmdArgs.INSTANCE.makeGRMFlag)
 		{
 			sb.append(".grm.gz");
 			grmGZ = FileUtil.ZipFielWriter(sb.toString());
