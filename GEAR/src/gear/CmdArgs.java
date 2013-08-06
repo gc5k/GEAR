@@ -917,6 +917,7 @@ public enum CmdArgs
 		@SuppressWarnings("static-access")
 		private HEArgs()
 		{
+			ops.addOption(OptionBuilder.withDescription("grm markers").hasArg().create(cmd_grm_M));			
 			ops.addOption(OptionBuilder.withLongOpt(cmd_grm_cutoff_long).withDescription("grm cut-off").hasArg().create(cmd_grm_cutoff));
 			ops.addOption(OptionBuilder.withLongOpt(cmd_abs_grm_cutoff_long).withDescription("grm absolute cut-off").hasArg().create(cmd_abs_grm_cutoff));
 			ops.addOption(OptionBuilder.withLongOpt(cmd_grm_txt_long).withDescription("grm text format").hasArg().create(cmd_grm_txt));
@@ -1030,6 +1031,11 @@ public enum CmdArgs
 				
 				isSingleGrm = false;
 				isMultiGrm = true;
+			}
+
+			if (cmdLine.hasOption(cmd_grm_M))
+			{
+				grm_M_ = Integer.parseInt(cmdLine.getOptionValue(cmd_grm_M));
 			}
 
 			if (cmdLine.hasOption(cmd_grm_cutoff))
@@ -1160,6 +1166,11 @@ public enum CmdArgs
 			return AbsGrmCutoff_;
 		}
 
+		public int getGrmM() 
+		{
+			return grm_M_;
+		}
+
 		public String getGrm()
 		{
 			return grm_;
@@ -1212,6 +1223,7 @@ public enum CmdArgs
 		private final String cmd_abs_grm_cutoff_long = "grm-abs-cutoff";
 		private double AbsGrmCutoff_ = 0;
 		private boolean AbsGrmCutoffFlag_ = false;
+		private final String cmd_grm_M = "marker";
 
 		private final String cmd_grm_txt = "grm_txt";
 		private final String cmd_grm_txt_long = "grm-txt";
@@ -1222,7 +1234,7 @@ public enum CmdArgs
 		private final String cmd_grm_bin_long = "grm-bin";
 		private final String cmd_grm_bin_list = "grm_bin_list";
 		private final String cmd_grm_bin_list_long = "grm-bin-list";
-
+		
 		private final String cmd_grm = "grm";
 		private final String cmd_grm_list = "grm_list";
 		private final String cmd_grm_list_long = "grm-list";
@@ -1239,6 +1251,7 @@ public enum CmdArgs
 		private String grm_id = null;
 		private String grmList_ = null;
 
+		private int grm_M_ = -1;
 		private final String cmd_pheno = "pheno";
 		private String pheno = null;
 
@@ -1397,7 +1410,7 @@ public enum CmdArgs
 
 	private HpcArgs hpcArgs;
 
-	// /////////////////level 1 snp selection
+	///////////////////level 1 snp selection
 	private final String cmd_chr = "chr";
 	public String[] inchr = null;
 	public String[] exchr = null;
@@ -1673,7 +1686,6 @@ public enum CmdArgs
 		}
 
 		// simulation real data
-
 		if (cmdLine.hasOption(cmd_bsimu))
 		{
 			bsimuFlag = true;

@@ -19,6 +19,7 @@ public class GRMStat
 
 	private final String delim = "\\s+";
 
+	private int M = -1;
 	private double Nt = 0;
 	private double N = 0;
 	private double mean = 0;
@@ -32,6 +33,7 @@ public class GRMStat
 
 	public GRMStat()
 	{
+		M = CmdArgs.INSTANCE.getHEArgs().getGrmM();
 		if (CmdArgs.INSTANCE.getHEArgs().isAbsGrmCutoff())
 		{
 			grmCutoff = CmdArgs.INSTANCE.getHEArgs().AbsGrmCutoff();
@@ -58,7 +60,7 @@ public class GRMStat
 		}
 
 		double s = Nt - N;
-
+		double r_sq = 0;
 		sb.append("grm file: " + CmdArgs.INSTANCE.getHEArgs().getGrm()
 				+ "\n");
 
@@ -70,6 +72,12 @@ public class GRMStat
 		sb.append("The effective sample size is " + Ne + "\n");
 		sb.append("Effective number of markers is " + Me + "\n");
 
+		if (M > 0) 
+		{
+			r_sq = (M - Me) / (Me*(M-1));
+			sb.append("Average r^2 LD between markers is " + r_sq + "\n");
+		}
+
 		Logger.printUserLog(sb.toString());
 
 		StringBuilder fsb = new StringBuilder();
@@ -79,7 +87,8 @@ public class GRMStat
 		try
 		{
 			pw = new PrintWriter(fsb.toString());
-		} catch (FileNotFoundException e)
+		} 
+		catch (FileNotFoundException e)
 		{
 			e.printStackTrace();
 		}
@@ -101,7 +110,8 @@ public class GRMStat
 				size++;
 			}
 			reader.close();
-		} catch (IOException e)
+		} 
+		catch (IOException e)
 		{
 			Logger.handleException(e,
 					"An exception occurred when reading the ID file '"
@@ -133,7 +143,8 @@ public class GRMStat
 				{
 					if (Math.abs(g) > grmCutoff)
 						continue;
-				} else if (CmdArgs.INSTANCE.getHEArgs().isGrmCutoff())
+				} 
+				else if (CmdArgs.INSTANCE.getHEArgs().isGrmCutoff())
 				{
 					if (g > grmCutoff)
 						continue;
@@ -157,7 +168,8 @@ public class GRMStat
 		{
 			fin = new FileInputStream(CmdArgs.INSTANCE.getHEArgs()
 					.getGrm());
-		} catch (FileNotFoundException e)
+		} 
+		catch (FileNotFoundException e)
 		{
 			Logger.handleException(e, "Cannot open the GRM file '"
 					+ CmdArgs.INSTANCE.getHEArgs().getGrm() + "'.");
@@ -167,7 +179,8 @@ public class GRMStat
 		try
 		{
 			gzis = new GZIPInputStream(fin);
-		} catch (IOException e)
+		} 
+		catch (IOException e)
 		{
 			Logger.handleException(e, "Cannot open the GRM archive '"
 					+ CmdArgs.INSTANCE.getHEArgs().getGrm() + "'.");
@@ -194,7 +207,8 @@ public class GRMStat
 				{
 					if (Math.abs(g) > grmCutoff)
 						continue;
-				} else if (CmdArgs.INSTANCE.getHEArgs().isGrmCutoff())
+				} 
+				else if (CmdArgs.INSTANCE.getHEArgs().isGrmCutoff())
 				{
 					if (g > grmCutoff)
 						continue;
@@ -204,7 +218,8 @@ public class GRMStat
 				prod += g * g;
 				N++;
 			}
-		} catch (IOException e)
+		} 
+		catch (IOException e)
 		{
 			Logger.handleException(e,
 					"An exception occurred when reading the GRM archive '"
@@ -238,7 +253,8 @@ public class GRMStat
 				{
 					if (Math.abs(g) > grmCutoff)
 						continue;
-				} else if (CmdArgs.INSTANCE.getHEArgs().isGrmCutoff())
+				} 
+				else if (CmdArgs.INSTANCE.getHEArgs().isGrmCutoff())
 				{
 					if (g > grmCutoff)
 						continue;
@@ -248,7 +264,8 @@ public class GRMStat
 				prod += g * g;
 				N++;
 			}
-		} catch (IOException e)
+		} 
+		catch (IOException e)
 		{
 			Logger.handleException(e,
 					"An exception occurred when reading the GRM file '"
