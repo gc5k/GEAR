@@ -112,10 +112,10 @@ public class HEMRead
 				while ((line = reader.readLine()) != null)
 				{
 					String[] s = line.split(delim);
-					StringBuilder sb = new StringBuilder(s[0] + "." + s[1]);
-					if (id2Idx.containsKey(sb.toString()))
+					SubjectID subID = new SubjectID(/*famID*/s[0], /*indID*/s[1]);
+					if (id2Idx.containsKey(subID))
 					{
-						int ii = id2Idx.get(sb.toString());
+						int ii = id2Idx.get(subID);
 						ff[ii] = true;
 					}
 				}
