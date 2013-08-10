@@ -21,7 +21,6 @@ import gear.util.NewIt;
 
 public class HEMRead
 {
-	private final String delim = "\\s+";
 	protected boolean[] flag;
 	HashMap<String, Integer> ID;
 	protected String grmListFile;
@@ -48,7 +47,6 @@ public class HEMRead
 	protected ArrayList<BinaryInputFile> binList;
 	protected ArrayList<String> grmFileList;
 	protected ArrayList<String> idFileList;
-	HashMap<SubjectID, Integer> id2Idx = new HashMap<SubjectID, Integer>();
 	
 	protected boolean isSingleGrm;
 	protected boolean isBinGrm = false;
@@ -83,7 +81,9 @@ public class HEMRead
 		permFlag = CmdArgs.INSTANCE.permFlag;
 		perm = CmdArgs.INSTANCE.perm;
 
-		readGrmIds();
+		HashMap<SubjectID, Integer> id2Idx = new HashMap<SubjectID, Integer>();
+		
+		readGrmIds(id2Idx);
 		flag = new boolean[id2Idx.size()];
 		Arrays.fill(flag, false);
 		nRec = flag.length * (flag.length + 1) / 2;
@@ -98,39 +98,7 @@ public class HEMRead
 			flag = hecov.getFlag();
 		}
 
-		BufferedReader reader;
-		String line;
-
-		// ************************keep
-		if (keepFile != null)
-		{
-			reader = FileUtil.FileOpen(keepFile);
-			boolean[] ff = new boolean[flag.length];
-			Arrays.fill(ff, false);
-			try
-			{
-				while ((line = reader.readLine()) != null)
-				{
-					String[] s = line.split(delim);
-					SubjectID subID = new SubjectID(/*famID*/s[0], /*indID*/s[1]);
-					if (id2Idx.containsKey(subID))
-					{
-						int ii = id2Idx.get(subID);
-						ff[ii] = true;
-					}
-				}
-				reader.close();
-			}
-			catch (IOException e)
-			{
-				e.printStackTrace();
-			}
-
-			for (int i = 0; i < ff.length; i++)
-			{
-				flag[i] &= ff[i];
-			}
-		}
+		keepSpecifiedSubjects(id2Idx);
 
 		int numAvailSubjects = 0;
 		for (int i = 0; i < flag.length; i++)
@@ -382,7 +350,7 @@ public class HEMRead
 		grmID = idFileList.get(0);
 	}
 	
-	private void readGrmIds()
+	private void readGrmIds(HashMap<SubjectID, Integer> id2Idx)
 	{
 
 		gear.util.BufferedReader reader = gear.util.BufferedReader.openTextFile(grmID, "GRM-ID");
@@ -546,6 +514,32 @@ public class HEMRead
 			if (flag[i])
 			{
 				y[i] = (y[i] - ss) / sd;
+			}
+		}
+	}
+	
+	private void keepSpecifiedSubjects(HashMap<SubjectID, Integer> id2Idx)
+	{
+		if (keepFile != null)
+		{
+			gear.util.BufferedReader reader = gear.util.BufferedReader.openTextFile(keepFile, "keep-individual");
+			boolean[] ff = new boolean[flag.length];
+			Arrays.fill(ff, false);
+
+			String[] tokens = null;
+			while ((tokens = reader.readTokens(2)) != null)
+			{
+				Integer idx = id2Idx.get(new SubjectID(/*famID*/tokens[0], /*indID*/tokens[1]));
+				if (idx != null)
+				{
+					ff[idx] = true;
+				}
+			}
+			reader.close();
+
+			for (int i = 0; i < ff.length; i++)
+			{
+				flag[i] &= ff[i];
 			}
 		}
 	}
