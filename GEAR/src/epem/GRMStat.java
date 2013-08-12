@@ -74,7 +74,7 @@ public class GRMStat
 
 		if (M > 0) 
 		{
-			r_sq = (M - Me) / (Me*(M-1));
+			r_sq = (M - Me) / (Me * (M-1));
 			sb.append("Average r^2 LD between markers is " + r_sq + "\n");
 		}
 

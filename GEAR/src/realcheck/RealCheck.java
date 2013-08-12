@@ -173,7 +173,7 @@ public class RealCheck
 		//0 for parent-offsprint
 		//1 for full sib
 		//2 for half sib
-		//4 random
+		//3 random
 		for (int i = 0; i < markerIdx.length; i++)
 		{
 			int idx = markerIdx[i];
@@ -182,7 +182,7 @@ public class RealCheck
 			sChart[0] += 1-2*H;
 			sChart[1] += (1-H) * (1-H) + 0.5 * H * H;
 			sChart[2] += (1-H) * (1-H) + 0.5 * H * H;
-			sChart[3] += p * p * p * p + 4 * p * p * (1-p) * (1-p) + (1-p) * (1-p) * (1-p) * (1-p);
+			sChart[3] += 1 - 4 * H + 6 * H * H;
 		}
 		sChart[0] /= markerIdx.length;
 		sChart[1] /= markerIdx.length;
