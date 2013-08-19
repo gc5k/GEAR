@@ -162,7 +162,7 @@ public class RealCheck
 		
 		double[] sChart = similarityScoreChart();
 		Logger.printUserLog("=====Reference similarity score chart=====");
-		Logger.printUserLog("Parent-offsprint: " + (sChart[0] - sChart[3])/(1-sChart[3]));
+		Logger.printUserLog("Parent-offspring: " + (sChart[0] - sChart[3])/(1-sChart[3]));
 		Logger.printUserLog("Full sib: " + (sChart[1] - sChart[3])/(1-sChart[3]) + "\n");
 //		Logger.printUserLog("Half sib: " + sChart[2] + "\n");		
 		Logger.printUserLog("The result has been saved into '" + sb.toString() + "'.");
