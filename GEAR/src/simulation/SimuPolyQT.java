@@ -61,6 +61,11 @@ public class SimuPolyQT
 		seed = CmdArgs.INSTANCE.simuSeed;
 		sample = CmdArgs.INSTANCE.poly_sample_QT;
 		h2 = CmdArgs.INSTANCE.simuHsq;
+		if (Math.abs(h2-1) < 0.001) 
+		{
+			Logger.printUserLog("'h2 = " + h2 +"' is too big.  Now it has been reset to " + (h2 * 0.99));
+			h2 *= 0.99;
+		}
 
 		E = Math.sqrt(1 - h2);
 

@@ -74,6 +74,12 @@ public class SimuPolyCC
 		h2 = CmdArgs.INSTANCE.simuHsq;
 		K = CmdArgs.INSTANCE.simuK;
 
+		if (Math.abs(h2-1) < 0.001) 
+		{
+			Logger.printUserLog("'h2 = " + h2 +"' is too big.  Now it has been reset to " + (h2 * 0.99));
+			h2 *= 0.99;
+		}
+
 		E = Math.sqrt(1 - h2);
 
 		rnd = new RandomDataImpl();
