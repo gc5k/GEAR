@@ -85,7 +85,7 @@ public class RealCheckOne
 		ps.print("FID1 ID1 FID2 ID2 Match ExpMatch Score nmiss\n");
 		for (int i = 0; i < G1.getGRow(); i++)
 		{
-			for (int j = i; j < G1.getGRow(); j++)
+			for (int j = 0; j <= i; j++)
 			{
 				double[] s = similarityScore(i, j);
 				double ES = 0;
@@ -119,7 +119,7 @@ public class RealCheckOne
 
 		double E = 0;
 		double v = 0;
-		if (n > 0 ) 
+		if (n > 0 )
 		{
 			E = es/n;
 			v = Math.sqrt(ss/n - E * E);
