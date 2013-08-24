@@ -88,17 +88,18 @@ public class Pipeline
 			simuFam.generateSample();
 
 		}
-		else if (CmdArgs.INSTANCE.simupolyCCFlag && CmdArgs.INSTANCE.bsimuFlag)
-		{
-			RealDataSimulation rdSimu = new RealDataSimulation();
-			rdSimu.GenerateSample();
-
-		}
 		else if (CmdArgs.INSTANCE.bsimuFlag)
 		{
-			RealDataSimulationQT rdSimuQT = new RealDataSimulationQT();
-			rdSimuQT.GenerateSample();
-
+			if (CmdArgs.INSTANCE.simupolyCCFlag) 
+			{
+				RealDataSimulation rdSimu = new RealDataSimulation();
+				rdSimu.GenerateSample();				
+			}
+			else 
+			{
+				RealDataSimulationQT rdSimuQT = new RealDataSimulationQT();
+				rdSimuQT.GenerateSample();
+			}
 		}
 		else if (CmdArgs.INSTANCE.simupolyCCFlag)
 		{
