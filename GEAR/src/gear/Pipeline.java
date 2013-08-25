@@ -6,6 +6,8 @@ import epem.GRMStat;
 
 import merge.MergeTwoFile;
 import write.WriteBedSNPMajor;
+import gear.ancestry.GenPCA;
+import gear.ancestry.HapMapPCA;
 import gear.he.HEMCalculate;
 import gear.he.HEMRead;
 import gear.he.h2trans.H2Transformer;
@@ -192,6 +194,14 @@ public class Pipeline
 			{
 				mg.makeGeneticRelationshipScore();
 			}
+		}
+		else if (CmdArgs.INSTANCE.pcaFlag)
+		{
+			GenPCA gpca = new GenPCA();
+		}
+		else if (CmdArgs.INSTANCE.hppcaFlag)
+		{
+			HapMapPCA hppca = new HapMapPCA();
 		}
 		
 		monitor.stopMonitoring();
