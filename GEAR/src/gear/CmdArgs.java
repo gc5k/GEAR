@@ -173,6 +173,13 @@ public enum CmdArgs
 				.withDescription(	"effect for polygenic model? " + polyEffectFile)
 				.hasArg().create(cmd_poly_effect));
 
+		//pca
+		ops.addOption(OptionBuilder.withDescription("calculate principal components")
+						.create(cmd_pca));
+
+		ops.addOption(OptionBuilder.withDescription("calculate hapmap based principal components")
+						.create(cmd_hppca));
+		
 		// pop stat
 		ops.addOption(OptionBuilder.withDescription("calculate MAF frequency ")
 				.create(cmd_freq));
@@ -777,6 +784,15 @@ public enum CmdArgs
 	private final String cmd_nontrans_controls = "nontrans_controls";
 	private final String cmd_nontrans_controls_long = "nontrans-controls";
 	public boolean nontranscontrolsFlag = false;
+
+	////////////////PCA
+	private final String cmd_pca = "pca";
+	public boolean pcaFlag = false;
+	public int pca = 10;
+	
+	private final String cmd_hppca = "hppca";
+	public boolean hppcaFlag = false;
+	public int hppca = 10;
 
 	// /////////////////pop stat
 	private final String cmd_freq = "freq";
@@ -1648,6 +1664,29 @@ public enum CmdArgs
 			nontranscasesFlag = false;
 		}
 
+		//pca
+		if (cmdLine.hasOption(cmd_pca))
+		{
+			pcaFlag = true;
+			pca = Integer.parseInt(cmdLine.getOptionValue(cmd_pca));
+			if (pca < 1)
+			{
+				Logger.printUserError("pca number should be greater than 0.");
+				System.exit(1);				
+			}
+		}
+
+		if (cmdLine.hasOption(cmd_hppca))
+		{
+			hppcaFlag = true;
+			hppca = Integer.parseInt(cmdLine.getOptionValue(cmd_hppca));
+			if (hppca < 1)
+			{
+				Logger.printUserError("hppca number should be greater than 0.");
+				System.exit(1);				
+			}
+		}
+
 		// pop stat
 		if (cmdLine.hasOption(cmd_freq))
 		{
@@ -1722,7 +1761,7 @@ public enum CmdArgs
 			simuHsq = Double.parseDouble(cmdLine.getOptionValue(cmd_simu_hsq));
 			if (simuHsq < 0 || simuHsq > 1)
 			{
-				Logger.printUserError("Simulation heritability should be between 0 and 1 (inclusively).");
+				Logger.printUserError("Simulation heritability should be between 0 and 1 (exclusively).");
 				System.exit(1);
 			}
 		}
