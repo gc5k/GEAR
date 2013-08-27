@@ -51,10 +51,8 @@ public class GenotypeMatrix
 	{
 		int posByte = i >> shift;
 		int posBite = (i & 0xf) << 1;
-
-		int g = (v << (posBite));
-		
-		// To: Zhixiang, I don't know how to do this...
+		genotypeMat[idx][posByte] &= ~(3 << posBite);
+		genotypeMat[idx][posByte] |= (v & 3) << posBite;
 	}
 
 	public int getAdditiveScore(int idx, int i)
