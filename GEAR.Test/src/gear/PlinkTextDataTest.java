@@ -6,12 +6,12 @@ import java.util.Hashtable;
 
 import org.junit.Test;
 
-import family.pedigree.file.MapFile;
-import family.pedigree.file.PedigreeFile;
-import family.pedigree.file.SNP;
-import family.pedigree.genotype.BFamilyStruct;
-import family.pedigree.genotype.BPerson;
-import family.plink.PLINKParser;
+import gear.family.pedigree.file.MapFile;
+import gear.family.pedigree.file.PedigreeFile;
+import gear.family.pedigree.file.SNP;
+import gear.family.pedigree.genotype.BFamilyStruct;
+import gear.family.pedigree.genotype.BPerson;
+import gear.family.plink.PLINKParser;
 
 public class PlinkTextDataTest
 {

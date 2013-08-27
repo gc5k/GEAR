@@ -2,12 +2,12 @@ package gear;
 
 import java.util.*;
 
-import family.pedigree.genotype.BFamilyStruct;
-import family.pedigree.genotype.BPerson;
-import family.pedigree.file.SNP;
-import family.pedigree.file.MapFile;
-import family.pedigree.file.PedigreeFile;
-import family.plink.PLINKBinaryParser;
+import gear.family.pedigree.file.MapFile;
+import gear.family.pedigree.file.PedigreeFile;
+import gear.family.pedigree.file.SNP;
+import gear.family.pedigree.genotype.BFamilyStruct;
+import gear.family.pedigree.genotype.BPerson;
+import gear.family.plink.PLINKBinaryParser;
 
 import static org.junit.Assert.*;
 

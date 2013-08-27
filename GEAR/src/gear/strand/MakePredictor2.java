@@ -8,13 +8,13 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
 
-import family.pedigree.file.SNP;
-import family.plink.PLINKBinaryParser;
-import family.plink.PLINKParser;
-import family.popstat.GenotypeMatrix;
-import family.qc.rowqc.SampleFilter;
 import gear.CmdArgs;
 import gear.ConstValues;
+import gear.family.pedigree.file.SNP;
+import gear.family.plink.PLINKBinaryParser;
+import gear.family.plink.PLINKParser;
+import gear.family.popstat.GenotypeMatrix;
+import gear.family.qc.rowqc.SampleFilter;
 import gear.util.FileUtil;
 import gear.util.Logger;
 import gear.util.NewIt;

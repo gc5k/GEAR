@@ -2,33 +2,33 @@ package gear;
 
 import java.util.Calendar;
 
-import epem.GRMStat;
 
-import merge.MergeTwoFile;
-import write.WriteBedSNPMajor;
 import gear.ancestry.GenPCA;
 import gear.ancestry.HapMapPCA;
+import gear.epem.GRMStat;
+import gear.grm.MakeGRM;
 import gear.he.HEMCalculate;
 import gear.he.HEMRead;
 import gear.he.h2trans.H2Transformer;
 import gear.manager.NaiveImputation;
+import gear.merge.MergeTwoFile;
 import gear.profile.Profiler;
+import gear.pscontrol.NonTransmitted;
+import gear.realcheck.RealCheck;
+import gear.realcheck.RealCheckOne;
+import gear.simulation.RealDataSimulation;
+import gear.simulation.RealDataSimulationQT;
+import gear.simulation.SimuFamily;
+import gear.simulation.SimuPolyCC;
+import gear.simulation.SimuPolyQT;
 import gear.strand.MakePredictor;
 import gear.strand.MakePredictor2;
 import gear.strand.Strand;
+import gear.sumstat.FrequencyCalculator;
+import gear.sumstat.Inbreeding;
 import gear.util.Logger;
 import gear.util.MonitorThread;
-import grm.MakeGRM;
-import realcheck.RealCheck;
-import realcheck.RealCheckOne;
-import simulation.RealDataSimulation;
-import simulation.RealDataSimulationQT;
-import simulation.SimuFamily;
-import simulation.SimuPolyCC;
-import simulation.SimuPolyQT;
-import sumstat.FrequencyCalculator;
-import sumstat.Inbreeding;
-import pscontrol.NonTransmitted;
+import gear.write.WriteBedSNPMajor;
 
 public class Pipeline
 {

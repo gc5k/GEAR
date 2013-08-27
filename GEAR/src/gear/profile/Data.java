@@ -1,6 +1,6 @@
 package gear.profile;
 
-import family.pedigree.file.SNP;
+import gear.family.pedigree.file.SNP;
 
 public abstract class Data
 {

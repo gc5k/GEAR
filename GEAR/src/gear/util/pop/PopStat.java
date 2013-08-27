@@ -3,9 +3,9 @@ package gear.util.pop;
 import org.apache.commons.math.distribution.BinomialDistribution;
 import org.apache.commons.math.distribution.BinomialDistributionImpl;
 
-import family.popstat.GenotypeMatrix;
 import gear.CmdArgs;
 import gear.ConstValues;
+import gear.family.popstat.GenotypeMatrix;
 
 public class PopStat
 {

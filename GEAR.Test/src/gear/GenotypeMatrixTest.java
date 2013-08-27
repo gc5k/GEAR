@@ -6,9 +6,9 @@ import java.util.ArrayList;
 
 import org.junit.Test;
 
-import family.pedigree.PersonIndex;
-import family.pedigree.genotype.BPerson;
-import family.popstat.GenotypeMatrix;
+import gear.family.pedigree.PersonIndex;
+import gear.family.pedigree.genotype.BPerson;
+import gear.family.popstat.GenotypeMatrix;
 
 public class GenotypeMatrixTest
 {

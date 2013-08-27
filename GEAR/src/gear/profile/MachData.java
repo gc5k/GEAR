@@ -1,7 +1,7 @@
 package gear.profile;
 
-import family.pedigree.file.SNP;
 import gear.CmdArgs;
+import gear.family.pedigree.file.SNP;
 import gear.util.BufferedReader;
 import gear.util.Logger;
 
