@@ -191,6 +191,10 @@ public enum CmdArgs
 		ops.addOption(OptionBuilder.withDescription("calculate fst ").hasArg()
 				.create(cmd_fst));
 
+		// snp
+		ops.addOption(OptionBuilder.withLongOpt(cmd_naive_imputation_long).withDescription("naive imputation ")
+						.create(cmd_naive_imputation));
+
 		// snp selection
 		ops.addOption(OptionBuilder.withDescription("select chromosomes")
 				.hasArgs().create(cmd_chr));
@@ -1426,6 +1430,11 @@ public enum CmdArgs
 
 	private HpcArgs hpcArgs;
 
+	///naive imputation
+	private final String cmd_naive_imputation = "naive_imputation";
+	private final String cmd_naive_imputation_long = "naive-imputation";
+	public boolean naiveImputFlag = false;
+
 	///////////////////level 1 snp selection
 	private final String cmd_chr = "chr";
 	public String[] inchr = null;
@@ -1558,9 +1567,18 @@ public enum CmdArgs
 			tranFunction = RegressionModel.LOGIT;
 		}
 
-		removeFlipFlag = cmdLine.hasOption(cmd_remove_Flip);
+		if (cmdLine.hasOption(cmd_remove_Flip))
+		{
+			removeFlipFlag = true;
+		}
 
-		// snp selection
+		//naive imputation
+		if (cmdLine.hasOption(cmd_naive_imputation))
+		{
+			naiveImputFlag = true;
+		}
+
+		//snp selection
 		if (cmdLine.hasOption(cmd_chr))
 		{
 

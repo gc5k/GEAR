@@ -37,9 +37,24 @@ public class GenotypeMatrix
 
 	}
 
+	public int getNumIndivdial() 
+	{
+		return getGRow();
+	}
+
 	public int getNumMarker()
 	{
 		return numMarker;
+	}
+
+	public void setAdditiveScore(int idx, int i, int v)
+	{
+		int posByte = i >> shift;
+		int posBite = (i & 0xf) << 1;
+
+		int g = (v << (posBite));
+		
+		// To: Zhixiang, I don't know how to do this...
 	}
 
 	public int getAdditiveScore(int idx, int i)

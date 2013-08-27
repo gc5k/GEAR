@@ -1,12 +1,17 @@
 package gear.util.pop;
 
+import org.apache.commons.math.distribution.BinomialDistribution;
+import org.apache.commons.math.distribution.BinomialDistributionImpl;
+
 import family.popstat.GenotypeMatrix;
 import gear.CmdArgs;
+import gear.ConstValues;
 
 public class PopStat
 {
 	public static double[][] calAlleleFrequency(GenotypeMatrix G, int numMarker)
 	{
+		//[][0]allele freq; [][1]geno freq; [][2] missing rate
 		double[][] allelefreq = new double[numMarker][3];
 		for (int i = 0; i < G.getGRow(); i++)
 		{
@@ -36,6 +41,7 @@ public class PopStat
 				allelefreq[i][0] = Double.NaN;
 				allelefreq[i][2] = 1;
 			}
+/*			
 			if (allelefreq[i][1] <= 0.5)
 			{
 				if (allelefreq[i][1] < CmdArgs.INSTANCE.maf_range[0]
@@ -52,8 +58,28 @@ public class PopStat
 					allelefreq[i][1] = 0;
 				}
 			}
+*/
 		}
+
 		return allelefreq;
 	}
 
+	public static void NaiveImputation (GenotypeMatrix G, int numMarker)
+	{
+		double[][] f = calAlleleFrequency(G, numMarker);
+		for (int i = 0; i < G.getNumMarker(); i++)
+		{
+			BinomialDistribution db = new BinomialDistributionImpl(2, f[i][0]);
+
+			for (int j = 0; j < G.getNumIndivdial(); j++)
+			{
+				int genoValue = G.getAdditiveScore(j, i);
+				if (genoValue != ConstValues.BINARY_MISSING_GENOTYPE)
+				{
+					int v = db.getNumberOfTrials();
+					G.setAdditiveScore(j, i, v);
+				}
+			}
+		}
+	}
 }
