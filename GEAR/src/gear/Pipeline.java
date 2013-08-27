@@ -11,6 +11,7 @@ import gear.ancestry.HapMapPCA;
 import gear.he.HEMCalculate;
 import gear.he.HEMRead;
 import gear.he.h2trans.H2Transformer;
+import gear.manager.NaiveImputation;
 import gear.profile.Profiler;
 import gear.strand.MakePredictor;
 import gear.strand.MakePredictor2;
@@ -202,6 +203,10 @@ public class Pipeline
 		else if (CmdArgs.INSTANCE.hppcaFlag)
 		{
 			HapMapPCA hppca = new HapMapPCA();
+		}
+		else if (CmdArgs.INSTANCE.naiveImputFlag)
+		{
+			NaiveImputation ni = new NaiveImputation();
 		}
 		
 		monitor.stopMonitoring();
