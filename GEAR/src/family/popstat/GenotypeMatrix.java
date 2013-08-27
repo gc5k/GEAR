@@ -50,9 +50,9 @@ public class GenotypeMatrix
 	public void setAdditiveScore(int idx, int i, int v)
 	{
 		int posByte = i >> shift;
-		int posBite = (i & 0xf) << 1;
-		genotypeMat[idx][posByte] &= ~(3 << posBite);
-		genotypeMat[idx][posByte] |= (v & 3) << posBite;
+		int posBit = (i & 0xf) << 1;
+		genotypeMat[idx][posByte] &= ~(3 << posBit);
+		genotypeMat[idx][posByte] |= (v & 3) << posBit;
 	}
 
 	public int getAdditiveScore(int idx, int i)
@@ -62,8 +62,8 @@ public class GenotypeMatrix
 		// 2 homozygote 2/2
 		// 3 missing
 		int posByte = i >> shift;
-		int posBite = (i & 0xf) << 1;
-		int g = (genotypeMat[idx][posByte] >> (posBite)) & 3;
+		int posBit = (i & 0xf) << 1;
+		int g = (genotypeMat[idx][posByte] >> (posBit)) & 3;
 		return g;
 		// if (g == 1) {// 01
 		// return 3;
@@ -79,8 +79,8 @@ public class GenotypeMatrix
 	public int[] getBiAlleleGenotype(int idx, int i)
 	{
 		int posByte = i >> shift;
-		int posBite = (i & 0xf) << 1;
-		int g = (genotypeMat[idx][posByte] >> posBite) & 3;
+		int posBit = (i & 0xf) << 1;
+		int g = (genotypeMat[idx][posByte] >> posBit) & 3;
 		int[] b = { 0, 0 };
 		switch (g)
 		{
@@ -107,8 +107,8 @@ public class GenotypeMatrix
 	public String getGenotypeScoreString(int idx, int i)
 	{
 		int posByte = i >> shift;
-		int posBite = (i & 0xf) << 1;
-		int g = (genotypeMat[idx][posByte] >> (posBite)) & 3;
+		int posBit = (i & 0xf) << 1;
+		int g = (genotypeMat[idx][posByte] >> (posBit)) & 3;
 		if (g == 3)
 		{// 01
 			return CmdArgs.INSTANCE.missingGenotype;

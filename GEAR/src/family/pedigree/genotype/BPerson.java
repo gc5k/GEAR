@@ -192,27 +192,27 @@ public class BPerson
 	public void addMarker(boolean flag, int a1, int a2, int i)
 	{
 		int posByte = i >> shift;
-		int posBite = (i & 0xf) << 1;
+		int posBit = (i & 0xf) << 1;
 		if (flag)
 		{
 			if (a2 == a1)
 			{// add 00 or 11
-				int c = (a1 + a2) << posBite;
+				int c = (a1 + a2) << posBit;
 				alleles[posByte] |= c;
 			} else
 			{// add 10
-				int c = 1 << posBite;
+				int c = 1 << posBit;
 				alleles[posByte] |= c;
 			}
 		} else
 		{// add 01
-			alleles[posByte] |= (3 << posBite);
+			alleles[posByte] |= (3 << posBit);
 		}
 	}
 
-	public void addByteGenotype(int g, int posByte, int posBite)
+	public void addByteGenotype(int g, int posByte, int posBit)
 	{
-		alleles[posByte] |= g << posBite;
+		alleles[posByte] |= g << posBit;
 	}
 
 	public void addAllMarker(byte[] genoBytes)
@@ -236,8 +236,8 @@ public class BPerson
 	public String getGenotypeScoreString(int i)
 	{
 		int posByte = i >> shift;
-		int posBite = (i & 0xf) << 1;
-		int g = (alleles[posByte] >> (posBite)) & 3;
+		int posBit = (i & 0xf) << 1;
+		int g = (alleles[posByte] >> (posBit)) & 3;
 		if (g == 1)
 		{// 01
 			return CmdArgs.INSTANCE.missingGenotype;
@@ -266,16 +266,16 @@ public class BPerson
 	public String getBiAlleleGenotypeString(int i)
 	{
 		int posByte = i >> shift;
-		int posBite = (i & 0xf) << 1;
-		int g = (alleles[posByte] >> posBite) & 3;
+		int posBit = (i & 0xf) << 1;
+		int g = (alleles[posByte] >> posBit) & 3;
 		if (g == 3)
 		{
 			return CmdArgs.INSTANCE.missingGenotype;
 		} else
 		{
 			StringBuffer sb = new StringBuffer();
-			sb.append((alleles[posByte] >> (posBite + 1)) & 1);
-			sb.append(alleles[posByte] >> posBite & 1);
+			sb.append((alleles[posByte] >> (posBit + 1)) & 1);
+			sb.append(alleles[posByte] >> posBit & 1);
 			return sb.toString();
 		}
 	}
@@ -283,8 +283,8 @@ public class BPerson
 	public int getGenotypeScore(int i)
 	{
 		int posByte = i >> shift;
-		int posBite = (i & 0xf) << 1;
-		int g = (alleles[posByte] >> (posBite)) & 3;
+		int posBit = (i & 0xf) << 1;
+		int g = (alleles[posByte] >> (posBit)) & 3;
 		return g;
 		// if (g == 1) {// 01
 		// return 2;
@@ -300,8 +300,8 @@ public class BPerson
 	public byte getOriginalGenotypeScore(int i)
 	{// this only for write back to bed file purpose
 		int posByte = i >> shift;
-		int posBite = (i & 0xf) << 1;
-		int g = (alleles[posByte] >> (posBite)) & 3;
+		int posBit = (i & 0xf) << 1;
+		int g = (alleles[posByte] >> (posBit)) & 3;
 		switch (g)
 		{
 		case 0:
@@ -320,9 +320,9 @@ public class BPerson
 		return (byte) g;
 	}
 
-	public byte getOriginalGenotypeScore(int posByte, int posBite)
+	public byte getOriginalGenotypeScore(int posByte, int posBit)
 	{// this only for write back to bed file purpose
-		int g = (alleles[posByte] >> (posBite)) & 3;
+		int g = (alleles[posByte] >> (posBit)) & 3;
 		switch (g)
 		{
 		case 0:
