@@ -169,12 +169,12 @@ public class BEDReader extends PedigreeFile
 			if (idx < 0)
 				continue;
 			int posByte = i >> 2;
-			int posBite = (i & 0x3) << 1;
-			int g1 = (g[posByte] >> posBite) & 3;
+			int posBit = (i & 0x3) << 1;
+			int g1 = (g[posByte] >> posBit) & 3;
 
 			int ExposByte = c >> 2;
-			int ExposBite = (c & 0x3) << 1;
-			Exg[ExposByte] |= g1 << ExposBite;
+			int ExposBit = (c & 0x3) << 1;
+			Exg[ExposByte] |= g1 << ExposBit;
 			if (g1 == 0)
 			{
 				AlleleFreq[c][0] += 2;
@@ -218,7 +218,7 @@ public class BEDReader extends PedigreeFile
 			{
 				int indIdx = 0;
 				int posByte = snpIdx >> BPerson.shift;
-				int posBite = (i & 0xf) << 1;
+				int posBit = (i & 0xf) << 1;
 				for (int byteIdx = 0; byteIdx < g.length; ++byteIdx)
 				{
 					int[] genoValues = genoByteCvtTable[g[byteIdx] & 0xff]; // 0xff
@@ -235,7 +235,7 @@ public class BEDReader extends PedigreeFile
 					for (int j = 0; j < 4 && indIdx < n_individual; ++j, ++indIdx)
 					{
 						persons.get(indIdx).addByteGenotype(genoValues[j],
-								posByte, posBite);
+								posByte, posBit);
 					}
 				}
 				snpIdx++;

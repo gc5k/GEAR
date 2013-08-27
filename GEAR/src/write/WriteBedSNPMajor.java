@@ -121,13 +121,13 @@ public class WriteBedSNPMajor
 				int idx = 0;
 
 				int posByte = i >> BPerson.shift;
-				int posBite = (i & 0xf) << 1;
+				int posBit = (i & 0xf) << 1;
 
 				for (int j = 0; j < PersonTable.size(); j++)
 				{
 					PersonIndex pi = PersonTable.get(j);
 					BPerson bp = pi.getPerson();
-					byte g = bp.getOriginalGenotypeScore(posByte, posBite);
+					byte g = bp.getOriginalGenotypeScore(posByte, posBit);
 
 					g <<= 2 * idx;
 					gbyte |= g;

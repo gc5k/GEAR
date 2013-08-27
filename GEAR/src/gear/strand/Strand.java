@@ -523,13 +523,13 @@ public class Strand
 				int idx = 0;
 
 				int posByte = snpIdx >> BPerson.shift;
-				int posBite = (snpIdx & 0xf) << 1;
+				int posBit = (snpIdx & 0xf) << 1;
 
 				for (int j = 0; j < personIndexes.size(); j++)
 				{
 					PersonIndex pi = personIndexes.get(j);
 					BPerson bp = pi.getPerson();
-					byte g = bp.getOriginalGenotypeScore(posByte, posBite);
+					byte g = bp.getOriginalGenotypeScore(posByte, posBit);
 					if (snpCoding.get(i).intValue() == 1)
 					{
 						switch (g)

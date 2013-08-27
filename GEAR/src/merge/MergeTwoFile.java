@@ -519,13 +519,13 @@ public class MergeTwoFile
 				int idx = 0;
 
 				int posByte = snpIdx >> BPerson.shift;
-				int posBite = (snpIdx & 0xf) << 1;
+				int posBit = (snpIdx & 0xf) << 1;
 
 				for (int j = 0; j < PersonTable1.size(); j++)
 				{
 					PersonIndex pi = PersonTable1.get(j);
 					BPerson bp = pi.getPerson();
-					byte g = bp.getOriginalGenotypeScore(posByte, posBite);
+					byte g = bp.getOriginalGenotypeScore(posByte, posBit);
 
 					g <<= 2 * idx;
 					gbyte |= g;
@@ -542,13 +542,13 @@ public class MergeTwoFile
 				int snpIdx2 = comSNPIdx[1][i];
 
 				int posByte2 = snpIdx2 >> BPerson.shift;
-				int posBite2 = (snpIdx2 & 0xf) << 1;
+				int posBit2 = (snpIdx2 & 0xf) << 1;
 
 				for (int j = 0; j < PersonTable2.size(); j++)
 				{
 					PersonIndex pi = PersonTable2.get(j);
 					BPerson bp = pi.getPerson();
-					byte g = bp.getOriginalGenotypeScore(posByte2, posBite2);
+					byte g = bp.getOriginalGenotypeScore(posByte2, posBit2);
 
 					if (snpCoding.get(i).intValue() == 1)
 					{
