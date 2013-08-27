@@ -4,8 +4,8 @@ import static org.junit.Assert.*;
 
 import org.junit.Test;
 
-import family.pedigree.file.SNP;
-import family.plink.PLINKBinaryParser;
+import gear.family.pedigree.file.SNP;
+import gear.family.plink.PLINKBinaryParser;
 
 public class DataTest
 {
