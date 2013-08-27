@@ -390,9 +390,10 @@ public class HEMRead
 			
 			SubjectID subID = new SubjectID(/*famID*/tokens[0], /*indID*/tokens[1]);
 
+			int ii = 0;
 			if (subjectsUnread.containsKey(subID))
 			{
-				int ii = subjectsUnread.get(subID);
+				ii = subjectsUnread.get(subID);
 				boolean f = true;
 				String pheValStr = tokens[2 + tarTraitIdx];
 				if (ConstValues.isNA(pheValStr))
@@ -422,11 +423,12 @@ public class HEMRead
 			}
 			else
 			{
-				reader.errorPreviousLine("Individual " + subID + " appears in the phenotype file but not in the grm id file(s).");
+				flag[ii] = false;
+//				reader.errorPreviousLine("Individual " + subID + " appears in the phenotype file but not in the grm id file(s).");
 			}
 		}
 		reader.close();
-		
+
 		if (!subjectsUnread.isEmpty())
 		{
 			String msg = "";
