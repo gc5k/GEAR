@@ -847,7 +847,7 @@ public enum CmdArgs
 
 			// --greedy
 			desc = "Alleles will be flipped if neither allele of a locus matches the score allele.";
-			ops.addOption(OptionBuilder.withDescription(desc).create("greedy"));
+			ops.addOption(OptionBuilder.withDescription(desc).create("auto-flip"));
 
 			// --model
 			desc = "";
@@ -897,9 +897,9 @@ public enum CmdArgs
 			return cmdLine.getOptionValue("q-score-range");
 		}
 
-		public boolean isGreedy()
+		public boolean isAutoFlip()
 		{
-			return cmdLine.hasOption("greedy");
+			return cmdLine.hasOption("auto-flip");
 		}
 
 		public String getModel()
