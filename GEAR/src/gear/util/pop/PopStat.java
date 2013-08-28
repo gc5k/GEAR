@@ -3,9 +3,9 @@ package gear.util.pop;
 import org.apache.commons.math.distribution.BinomialDistribution;
 import org.apache.commons.math.distribution.BinomialDistributionImpl;
 
-import gear.CmdArgs;
 import gear.ConstValues;
 import gear.family.popstat.GenotypeMatrix;
+import gear.util.Logger;
 
 public class PopStat
 {
@@ -64,9 +64,13 @@ public class PopStat
 		return allelefreq;
 	}
 
-	public static void NaiveImputation (GenotypeMatrix G, int numMarker)
+	public static void Imputation (GenotypeMatrix G)
 	{
-		double[][] f = calAlleleFrequency(G, numMarker);
+		Logger.printUserLog("Implementing naive imputatation......");
+		double[][] f = calAlleleFrequency(G, G.getNumMarker());
+		Logger.printUserLog("Missing genotypes will be imputed according to Hardy-Weinberg proportion for each locus with its estimated allele frequency.");
+
+		int cn = 0;
 		for (int i = 0; i < G.getNumMarker(); i++)
 		{
 			BinomialDistribution db = new BinomialDistributionImpl(2, f[i][0]);
@@ -74,12 +78,14 @@ public class PopStat
 			for (int j = 0; j < G.getNumIndivdial(); j++)
 			{
 				int genoValue = G.getAdditiveScore(j, i);
-				if (genoValue != ConstValues.BINARY_MISSING_GENOTYPE)
+				if (genoValue == ConstValues.BINARY_MISSING_GENOTYPE)
 				{
+					cn++;
 					int v = db.getNumberOfTrials();
 					G.setAdditiveScore(j, i, v);
 				}
 			}
 		}
+		Logger.printUserLog("In total " + cn + " genotypes have been imputed.");
 	}
 }

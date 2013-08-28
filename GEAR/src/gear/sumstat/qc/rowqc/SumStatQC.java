@@ -2,6 +2,7 @@ package gear.sumstat.qc.rowqc;
 
 import java.util.ArrayList;
 
+import gear.family.pedigree.Hukou;
 import gear.family.pedigree.PersonIndex;
 import gear.family.pedigree.file.MapFile;
 import gear.family.pedigree.file.PedigreeFile;
@@ -36,9 +37,18 @@ public class SumStatQC
 
 	}
 
+	public MapFile getMapFile()
+	{
+		return MapData;
+	}
+
 	public ArrayList<PersonIndex> getSample()
 	{
 		return PersonTable;
 	}
 
+	public ArrayList<Hukou> getHukouBook()
+	{
+		return samFilter.getHukouBook();
+	}
 }

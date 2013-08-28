@@ -4,7 +4,6 @@ import gear.family.pedigree.genotype.BPerson;
 
 public class PersonIndex
 {
-
 	private String FamilyID;
 	private String IndividualID;
 	private BPerson person;
