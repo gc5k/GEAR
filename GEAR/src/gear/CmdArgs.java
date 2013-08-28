@@ -846,8 +846,9 @@ public enum CmdArgs
 					.withDescription("q score range").hasArg().create());
 
 			// --greedy
-			desc = "Alleles will be flipped if neither allele of a locus matches the score allele.";
-			ops.addOption(OptionBuilder.withDescription(desc).create("auto-flip"));
+			desc = "Alleles will not be flipped if neither allele of a locus matches the score allele.";
+			ops.addOption(OptionBuilder.withLongOpt("auto-flip-off")
+			              .withDescription(desc).create());
 
 			// --model
 			desc = "";
@@ -897,9 +898,9 @@ public enum CmdArgs
 			return cmdLine.getOptionValue("q-score-range");
 		}
 
-		public boolean isAutoFlip()
+		public boolean isAutoFlipOff()
 		{
-			return cmdLine.hasOption("auto-flip");
+			return cmdLine.hasOption("auto-flip-off");
 		}
 
 		public String getModel()
