@@ -99,9 +99,9 @@ public class Profiler
 					++numLociNoQScore;
 					continue;
 				}
-				
+
 				assert qRanges != null;
-				
+
 				for (int rangeIdx = 0; rangeIdx < qRanges.length; ++rangeIdx)
 				{
 					QRange qRange = qRanges[rangeIdx];
@@ -115,16 +115,16 @@ public class Profiler
 		}  // for each SNP
 
 		Logger.printUserLog("Number of loci having no score (because they do not appear in the score file, or their scores are invalid, etc.): " + numLociNoScore);
-		Logger.printUserLog("Number of monomorphic loci removed: " + numMonoLoci);
-		Logger.printUserLog("Number of A/T or C/G loci " + (CmdArgs.INSTANCE.keepATGC() ? "detected: " : "removed: ") + numAmbiguousLoci);
+		Logger.printUserLog("Number of monomorphic loci (removed): " + numMonoLoci);
+		Logger.printUserLog("Number of ambiguous loci (A/T or C/G) " + (CmdArgs.INSTANCE.keepATGC() ? "detected: " : "removed: ") + numAmbiguousLoci);
 
 		// Allele Matching Schemes
-		Logger.printUserLog("Number of score alleles matching the first allele in the data file: " + matchNums[AlleleMatchScheme.MATCH_ALLELE1.ordinal()]);
-		Logger.printUserLog("Number of score alleles matching the second allele in the data file: " + matchNums[AlleleMatchScheme.MATCH_ALLELE2.ordinal()]);
-		if (CmdArgs.INSTANCE.getProfileArgs().isGreedy())
+		Logger.printUserLog("Number of Scheme I predictors: predictor alleles were A1: " + matchNums[AlleleMatchScheme.MATCH_ALLELE1.ordinal()]);
+		Logger.printUserLog("Number of Scheme II predictors: predictor alleles were A2: " + matchNums[AlleleMatchScheme.MATCH_ALLELE2.ordinal()]);
+		if (CmdArgs.INSTANCE.getProfileArgs().isAutoFlip())
 		{
-			Logger.printUserLog("Number of score alleles matching the flipped first allele in the data file: " + matchNums[AlleleMatchScheme.MATCH_ALLELE1_FLIPPED.ordinal()]);
-			Logger.printUserLog("Number of score alleles matching the flipped second allele in the data file: " + matchNums[AlleleMatchScheme.MATCH_ALLELE2_FLIPPED.ordinal()]);
+			Logger.printUserLog("Number of Scheme III predictors: predictor alleles were flipped A1: " + matchNums[AlleleMatchScheme.MATCH_ALLELE1_FLIPPED.ordinal()]);
+			Logger.printUserLog("Number of Scheme IV predictors: predictor alleles were flipped A2: " + matchNums[AlleleMatchScheme.MATCH_ALLELE2_FLIPPED.ordinal()]);
 		}
 		Logger.printUserLog("Number of score alleles matching none in the data file: " + matchNums[AlleleMatchScheme.MATCH_NONE.ordinal()]);
 
@@ -456,7 +456,7 @@ public class Profiler
 		{
 			return AlleleMatchScheme.MATCH_ALLELE2;
 		}
-		else if (CmdArgs.INSTANCE.getProfileArgs().isGreedy())
+		else if (CmdArgs.INSTANCE.getProfileArgs().isAutoFlip())
 		{
 			if (scoreAllele == SNPMatch.Flip(allele1))
 			{
@@ -469,7 +469,7 @@ public class Profiler
 		}
 		return AlleleMatchScheme.MATCH_NONE;
 	}
-	
+
 	private static CoeffModel coeffModel;
 	private static boolean sameAsPlink;
 	private static String resultFile;
