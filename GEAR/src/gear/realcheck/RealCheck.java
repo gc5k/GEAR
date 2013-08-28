@@ -178,7 +178,6 @@ public class RealCheck
 		{
 			int idx = markerIdx[i];
 			double H = allelefreq[idx][1] * (1 - allelefreq[idx][1]);
-			double p = allelefreq[idx][1];
 			sChart[0] += 1-2*H;
 			sChart[1] += (1-H) * (1-H) + 0.5 * H * H;
 			sChart[2] += (1-H) * (1-H) + 0.5 * H * H;
