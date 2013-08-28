@@ -121,7 +121,7 @@ public class Profiler
 		// Allele Matching Schemes
 		Logger.printUserLog("Number of Scheme I predictors: predictor alleles were A1: " + matchNums[AlleleMatchScheme.MATCH_ALLELE1.ordinal()]);
 		Logger.printUserLog("Number of Scheme II predictors: predictor alleles were A2: " + matchNums[AlleleMatchScheme.MATCH_ALLELE2.ordinal()]);
-		if (CmdArgs.INSTANCE.getProfileArgs().isAutoFlip())
+		if (!CmdArgs.INSTANCE.getProfileArgs().isAutoFlipOff())
 		{
 			Logger.printUserLog("Number of Scheme III predictors: predictor alleles were flipped A1: " + matchNums[AlleleMatchScheme.MATCH_ALLELE1_FLIPPED.ordinal()]);
 			Logger.printUserLog("Number of Scheme IV predictors: predictor alleles were flipped A2: " + matchNums[AlleleMatchScheme.MATCH_ALLELE2_FLIPPED.ordinal()]);
@@ -456,7 +456,7 @@ public class Profiler
 		{
 			return AlleleMatchScheme.MATCH_ALLELE2;
 		}
-		else if (CmdArgs.INSTANCE.getProfileArgs().isAutoFlip())
+		else if (!CmdArgs.INSTANCE.getProfileArgs().isAutoFlipOff())
 		{
 			if (scoreAllele == SNPMatch.Flip(allele1))
 			{
