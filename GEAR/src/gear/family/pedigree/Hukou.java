@@ -49,7 +49,7 @@ public class Hukou
 		return MotherID;
 	}
 
-	public String getSet()
+	public String getSex()
 	{
 		return Sex;
 	}
