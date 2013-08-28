@@ -10,7 +10,7 @@ import gear.grm.MakeGRM;
 import gear.he.HEMCalculate;
 import gear.he.HEMRead;
 import gear.he.h2trans.H2Transformer;
-import gear.manager.NaiveImputation;
+import gear.imputation.NaiveImputation;
 import gear.merge.MergeTwoFile;
 import gear.profile.Profiler;
 import gear.pscontrol.NonTransmitted;
@@ -136,12 +136,6 @@ public class Pipeline
 				inb.CalculateFst();
 			}
 		}
-		else if (CmdArgs.INSTANCE.makebedFlag)
-		{
-			WriteBedSNPMajor bedWriter = new WriteBedSNPMajor();
-			bedWriter.WriteFile();
-
-		}
 		else if (CmdArgs.INSTANCE.calOption)
 		{
 			H2Transformer H2 = new H2Transformer();
@@ -207,6 +201,13 @@ public class Pipeline
 		else if (CmdArgs.INSTANCE.naiveImputFlag)
 		{
 			NaiveImputation ni = new NaiveImputation();
+			ni.Imputation();
+		}
+		else if (CmdArgs.INSTANCE.makebedFlag)
+		{
+			WriteBedSNPMajor bedWriter = new WriteBedSNPMajor();
+			bedWriter.WriteFile();
+
 		}
 		
 		monitor.stopMonitoring();

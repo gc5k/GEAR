@@ -76,6 +76,29 @@ public class GenotypeMatrix
 		// }
 	}
 
+	public byte getOriginalGenotypeScore(int ind, int i)
+	{// this only for write back to bed file purpose
+		int posByte = i >> shift;
+		int posBit = (i & 0xf) << 1;
+		int g = (genotypeMat[ind][posByte] >> (posBit)) & 3;
+		switch (g)
+		{
+		case 0:
+			g = 0;
+			break;
+		case 1:
+			g = 2;
+			break;
+		case 2:
+			g = 3;
+			break;
+		default:
+			g = 1;
+			break; // missing
+		}
+		return (byte) g;
+	}
+
 	public int[] getBiAlleleGenotype(int idx, int i)
 	{
 		int posByte = i >> shift;
@@ -132,5 +155,4 @@ public class GenotypeMatrix
 	{
 		return genotypeMat;
 	}
-
 }
