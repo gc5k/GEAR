@@ -11,7 +11,6 @@ import gear.he.HEMCalculate;
 import gear.he.HEMRead;
 import gear.he.h2trans.H2Transformer;
 import gear.imputation.NaiveImputation;
-import gear.merge.MergeTwoFile;
 import gear.profile.Profiler;
 import gear.pscontrol.NonTransmitted;
 import gear.realcheck.RealCheck;
@@ -21,9 +20,6 @@ import gear.simulation.RealDataSimulationQT;
 import gear.simulation.SimuFamily;
 import gear.simulation.SimuPolyCC;
 import gear.simulation.SimuPolyQT;
-import gear.strand.MakePredictor;
-import gear.strand.MakePredictor2;
-import gear.strand.Strand;
 import gear.sumstat.FrequencyCalculator;
 import gear.sumstat.Inbreeding;
 import gear.util.Logger;
@@ -58,25 +54,6 @@ public class Pipeline
 		else if (CmdArgs.INSTANCE.getProfileArgs().isSet())
 		{
 			Profiler.makeProfile();
-		}
-		else if (CmdArgs.INSTANCE.getStrandFile() != null)
-		{
-			(new Strand()).merge();
-		}
-		else if (CmdArgs.INSTANCE.hasMergeOption())
-		{
-			MergeTwoFile mtf = new MergeTwoFile();
-			mtf.Merge();
-		}
-		else if (CmdArgs.INSTANCE.hasMakePredictorOption())
-		{
-			MakePredictor mp = new MakePredictor();
-			mp.BuildPredictor();
-		}
-		else if (CmdArgs.INSTANCE.hasMakePredictor2Option())
-		{
-			MakePredictor2 mp2 = new MakePredictor2();
-			mp2.BuildPredictor();
 		}
 		else if (CmdArgs.INSTANCE.hasRealCheckOption())
 		{
