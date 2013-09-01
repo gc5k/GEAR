@@ -34,6 +34,12 @@ public class Pipeline
 {
 	public static void main(String[] args)
 	{
+		if (args.length == 0)
+		{
+			System.out.println("Type 'gear help' or 'java -jar gear.jar help' for usage.");
+			System.exit(1);
+		}
+		
 		CmdArgs.INSTANCE.parse(args);
 		
 		Logger.setLogFiles(CmdArgs.INSTANCE.out);
