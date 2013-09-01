@@ -43,25 +43,6 @@ public enum CmdArgs
 				.create(cmd_realcheck));
 		realCheckParameter.commandInitial();
 
-		// merge
-		ops.addOption(OptionBuilder.withDescription("merge ").create(cmd_merge));
-		mergeArgs.commandInitial();
-
-		// make predictor
-		ops.addOption(OptionBuilder.withLongOpt(cmd_make_predictor_long)
-				.withDescription("make predictor").create(cmd_make_predictor));
-
-		ops.addOption(OptionBuilder.withLongOpt(cmd_make_predictor2_long)
-				.withDescription("make predictor2").create(cmd_make_predictor2));
-
-		ops.addOption(OptionBuilder.withLongOpt(cmd_predictor_idx_long)
-				.withDescription("predictor index").hasArg()
-				.create(cmd_predictor_idx));
-
-		ops.addOption(OptionBuilder.withLongOpt(cmd_predictor_file_long)
-				.withDescription("predictor file").hasArg()
-				.create(cmd_predictor_file));
-
 		ops.addOption(OptionBuilder.withDescription("linear")
 				.create(cmd_linear));
 
@@ -224,8 +205,6 @@ public enum CmdArgs
 
 		ops.addOption(OptionBuilder.withLongOpt(cmd_make_bed_long)
 				.withDescription("make bed ").create(cmd_make_bed));
-
-		ops.addOption(OptionBuilder.withDescription("solve strand ").hasArg().create(strandFileOpt));
 
 		// grm-stat
 		ops.addOption(OptionBuilder.withLongOpt(cmd_grm_stat_long)
@@ -539,128 +518,6 @@ public enum CmdArgs
 	}
 
 	// Real-check options End
-
-	// Merge options Begin
-	public boolean hasMergeOption()
-	{
-		return mergeFlag;
-	}
-
-	private final String cmd_merge = "merge";
-	private boolean mergeFlag = false;
-
-	public class MergeArgs
-	{
-		private MergeArgs()
-		{
-		}
-
-		public double getMafCutoff()
-		{
-			return maf_cutoff;
-		}
-
-		public double getPCutoff()
-		{
-			return p_cutoff;
-		}
-
-		@SuppressWarnings("static-access")
-		private void commandInitial()
-		{
-			ops.addOption(OptionBuilder.withLongOpt(cmd_maf_cutoff_long)
-					.withDescription("merge maf cutoff").hasArg()
-					.create(cmd_maf_cutoff));
-			ops.addOption(OptionBuilder.withLongOpt(cmd_p_cutoff_long)
-					.withDescription("merge p cutoff").hasArg()
-					.create(cmd_p_cutoff));
-		}
-
-		private void commandListener(CommandLine cl)
-		{
-			if (cl.hasOption(cmd_maf_cutoff))
-			{
-				maf_cutoff = Double.parseDouble(cl
-						.getOptionValue(cmd_maf_cutoff));
-				if (maf_cutoff > 0.5 || maf_cutoff < 0)
-				{
-					Logger.printUserError("merger maf cutoff should be between 0 and 0.5");
-					System.exit(1);
-				}
-			}
-
-			if (cl.hasOption(cmd_p_cutoff))
-			{
-				p_cutoff = Double.parseDouble(cl.getOptionValue(cmd_p_cutoff));
-				if (p_cutoff < 0)
-				{
-					Logger.printUserError("merger p cutoff should be between 0 and 1.");
-					System.exit(1);
-				}
-			}
-		}
-
-		private final String cmd_maf_cutoff = "merge_maf_cutoff";
-		private final String cmd_maf_cutoff_long = "merge-maf-cutoff";
-		private double maf_cutoff = 0.4;
-
-		private final String cmd_p_cutoff = "merge_p_cutoff";
-		private final String cmd_p_cutoff_long = "merge-p-cutoff";
-		private double p_cutoff = 0.05;
-	}
-
-	private MergeArgs mergeArgs = new MergeArgs();
-
-	public MergeArgs getMergeArgs()
-	{
-		return mergeArgs;
-	}
-
-	// Merge options End
-
-	public String getStrandFile()
-	{
-		return cmdLine.getOptionValue(strandFileOpt);
-	}
-	
-	private static final String strandFileOpt = "strand";
-
-	// Make-predictor-panel options Begin
-	public boolean hasMakePredictorOption()
-	{
-		return makePredictorFlag;
-	}
-
-	private final String cmd_make_predictor = "build_predictor";
-	private final String cmd_make_predictor_long = "build-predictor";
-	private boolean makePredictorFlag = false;
-
-	public boolean hasMakePredictor2Option()
-	{
-		return makePredictor2Flag;
-	}
-
-	private final String cmd_make_predictor2 = "build_predictor2";
-	private final String cmd_make_predictor2_long = "build-predictor2";
-	private boolean makePredictor2Flag = false;
-
-	public int getPredictorIdx()
-	{
-		return predictor_idx;
-	}
-
-	private final String cmd_predictor_idx = "predictor_idx";
-	private final String cmd_predictor_idx_long = "predictor-idx";
-	private int predictor_idx = 0;
-
-	public String getPredictorFile()
-	{
-		return predictor_file;
-	}
-
-	private final String cmd_predictor_file = "predictor_file";
-	private final String cmd_predictor_file_long = "predictor-file";
-	private String predictor_file = null;
 
 	public RegressionModel getTranFunction()
 	{
@@ -1532,31 +1389,6 @@ public enum CmdArgs
 
 		realcheckFlag = cmdLine.hasOption(cmd_realcheck);
 		realCheckParameter.commandListener(cmdLine);
-
-		mergeFlag = cmdLine.hasOption(cmd_merge);
-		mergeArgs.commandListener(cmdLine);
-
-		// make predictor
-		makePredictorFlag = cmdLine.hasOption(cmd_make_predictor);
-		makePredictor2Flag = cmdLine.hasOption(cmd_make_predictor2);
-
-		if (cmdLine.hasOption(cmd_predictor_idx))
-		{
-			predictor_idx = Integer.parseInt(cmdLine
-					.getOptionValue(cmd_predictor_idx));
-			predictor_idx--;
-			if (predictor_idx < 0)
-			{
-				Logger.printUserError("--predictor-idx should be bigger than 0.");
-				System.exit(1);
-			}
-		}
-
-		if (cmdLine.hasOption(cmd_predictor_file))
-		{
-			predictor_file = cmdLine.getOptionValue(cmd_predictor_file);
-			FileUtil.exists(predictor_file);
-		}
 
 		if (cmdLine.hasOption(cmd_linear))
 		{
