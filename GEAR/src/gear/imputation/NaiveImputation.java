@@ -9,6 +9,7 @@ import java.io.PrintWriter;
 import java.util.ArrayList;
 
 import gear.CmdArgs;
+import gear.ConstValues;
 import gear.family.pedigree.PersonIndex;
 import gear.family.pedigree.file.MapFile;
 import gear.family.pedigree.file.SNP;
@@ -23,9 +24,6 @@ import gear.util.pop.PopStat;
 
 public class NaiveImputation
 {
-	private byte byte1 = 108;
-	private byte byte2 = 27;
-	private byte byte3 = 1;
 
 	private MapFile mapFile;
 	private SampleFilter sf;
@@ -117,9 +115,9 @@ public class NaiveImputation
 
 		try
 		{
-			bedout.writeByte(byte1);
-			bedout.writeByte(byte2);
-			bedout.writeByte(byte3);
+			bedout.writeByte(ConstValues.byte1);
+			bedout.writeByte(ConstValues.byte2);
+			bedout.writeByte(ConstValues.byte3);
 
 			for (int i = 0; i < gm.getNumMarker(); i++)
 			{
