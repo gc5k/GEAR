@@ -2,6 +2,11 @@ package gear;
 
 public class ConstValues
 {
+	
+	public static byte byte1 = 108;
+	public static byte byte2 = 27;
+	public static byte byte3 = 1;
+
 	public static final int FLOAT_SIZE = Float.SIZE / Byte.SIZE;
 	
 	public static final String WHITESPACE_DELIMITER = "\\s+";
