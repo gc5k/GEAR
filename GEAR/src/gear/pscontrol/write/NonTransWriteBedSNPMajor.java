@@ -9,6 +9,7 @@ import java.util.ArrayList;
 import java.util.Iterator;
 
 import gear.CmdArgs;
+import gear.ConstValues;
 import gear.family.pedigree.PersonIndex;
 import gear.family.pedigree.file.SNP;
 import gear.family.pedigree.genotype.BPerson;
@@ -20,9 +21,6 @@ import gear.util.Logger;
 
 public class NonTransWriteBedSNPMajor
 {
-	private byte byte1 = 108;
-	private byte byte2 = 27;
-	private byte byte3 = 1;
 
 	private ArrayList<PersonIndex> PersonTable;
 	private DataOutputStream os = null;
@@ -105,9 +103,9 @@ public class NonTransWriteBedSNPMajor
 
 		try
 		{
-			os.writeByte(byte1);
-			os.writeByte(byte2);
-			os.writeByte(byte3);
+			os.writeByte(ConstValues.byte1);
+			os.writeByte(ConstValues.byte2);
+			os.writeByte(ConstValues.byte3);
 
 			for (int i = 0; i < snpList.size(); i++)
 			{
