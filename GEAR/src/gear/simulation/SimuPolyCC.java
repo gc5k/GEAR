@@ -25,10 +25,6 @@ import org.apache.commons.math.stat.StatUtils;
 public class SimuPolyCC
 {
 
-	private byte byte1 = 108;
-	private byte byte2 = 27;
-	private byte byte3 = 1;
-
 	private NormalDistributionImpl norm;
 	private RandomDataImpl rnd;
 	private long seed = 2011;
@@ -481,9 +477,9 @@ public class SimuPolyCC
 
 		try
 		{
-			bedout.writeByte(byte1);
-			bedout.writeByte(byte2);
-			bedout.writeByte(byte3);
+			bedout.writeByte(ConstValues.byte1);
+			bedout.writeByte(ConstValues.byte2);
+			bedout.writeByte(ConstValues.byte3);
 			for (int i = 0; i < M; i++)
 			{
 				byte gbyte = 0;
