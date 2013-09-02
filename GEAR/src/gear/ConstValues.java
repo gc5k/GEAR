@@ -3,9 +3,9 @@ package gear;
 public class ConstValues
 {
 	
-	public static byte byte1 = 108;
-	public static byte byte2 = 27;
-	public static byte byte3 = 1;
+	public static byte PLINK_BED_BYTE1 = 0x6c;
+	public static byte PLINK_BED_BYTE2 = 0x1b;
+	public static byte PLINK_BED_BYTE3 = 0x1;
 
 	public static final int FLOAT_SIZE = Float.SIZE / Byte.SIZE;
 	

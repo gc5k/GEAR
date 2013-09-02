@@ -109,9 +109,9 @@ public class WriteBedSNPMajor
 
 		try
 		{
-			os.writeByte(ConstValues.byte1);
-			os.writeByte(ConstValues.byte2);
-			os.writeByte(ConstValues.byte3);
+			os.writeByte(ConstValues.PLINK_BED_BYTE1);
+			os.writeByte(ConstValues.PLINK_BED_BYTE2);
+			os.writeByte(ConstValues.PLINK_BED_BYTE3);
 
 			for (int i = 0; i < snpList.size(); i++)
 			{
