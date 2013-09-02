@@ -318,9 +318,9 @@ public class SimuPolyQT
 
 		try
 		{
-			bedout.writeByte(ConstValues.byte1);
-			bedout.writeByte(ConstValues.byte2);
-			bedout.writeByte(ConstValues.byte3);
+			bedout.writeByte(ConstValues.PLINK_BED_BYTE1);
+			bedout.writeByte(ConstValues.PLINK_BED_BYTE2);
+			bedout.writeByte(ConstValues.PLINK_BED_BYTE3);
 			for (int i = 0; i < M; i++)
 			{
 				byte gbyte = 0;
