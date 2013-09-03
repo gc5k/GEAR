@@ -344,14 +344,13 @@ public class Profiler
 		
 		BufferedReader reader = BufferedReader.openTextFile(CmdArgs.INSTANCE.getProfileArgs().getScoreFile(), "score");
 		String[] tokens;
-		
-		int cn=0;
+
 		while ((tokens = reader.readTokens(3)) != null)
 		{
-			cn++;
 			if (tokens[1].length() != 1)
 			{
-				Logger.printUserLog("[Warning] line " + cn + " the allele is not a character, and will be ignored.");
+				reader.warningPreviousLine("'" + tokens[1] + "' is not a character, so it is not a valid allele, and this line will be ignored.");
+				continue;
 			}
 			
 			if (!ConstValues.isNA(tokens[2]))
@@ -362,7 +361,7 @@ public class Profiler
 				}
 				catch (NumberFormatException e)
 				{
-					Logger.printUserLog("[Warning] line " + cn + " is not a valid score, and will be ingored.");
+					reader.warningPreviousLine("'" + tokens[2] + "' is not a floating point number, so it it not a valid score, and this line will be ingored.");
 				}
 			}
 		}

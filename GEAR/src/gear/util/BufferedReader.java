@@ -163,10 +163,7 @@ public class BufferedReader
 	
 	public void error(int lineNo, String msg)
 	{
-		String begin = "";
-		begin += "Line " + lineNo + " of the " + fileType + " file ";
-		begin += "'" + getFileName() + "' contains an error: ";
-		Logger.printUserError(begin + msg);
+		Logger.printUserError(fileType + " file '" + getFileName() + "', line " + lineNo + ": " + msg);
 		System.exit(1);
 	}
 	
@@ -178,6 +175,21 @@ public class BufferedReader
 	public void errorPreviousLine(String msg)
 	{
 		error(getCurLineNum() - 1, msg);
+	}
+	
+	public void warning(int lineNo, String msg)
+	{
+		Logger.printUserWarning(fileType + " file '" + getFileName() + "', line " + lineNo + ": " + msg);
+	}
+	
+	public void warning(String msg)
+	{
+		warning(getCurLineNum(), msg);
+	}
+	
+	public void warningPreviousLine(String msg)
+	{
+		warning(getCurLineNum() - 1, msg);
 	}
 
 	private java.io.BufferedReader innerReader;
