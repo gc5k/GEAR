@@ -158,8 +158,8 @@ public enum CmdArgs
 		ops.addOption(OptionBuilder.withDescription("calculate principal components")
 						.create(cmd_pca));
 
-		ops.addOption(OptionBuilder.withDescription("calculate hapmap based principal components")
-						.create(cmd_hppca));
+		ops.addOption(OptionBuilder.withDescription("calculate blup PCA.")
+						.create(cmd_bluppca));
 		
 		// pop stat
 		ops.addOption(OptionBuilder.withDescription("calculate MAF frequency ")
@@ -651,9 +651,8 @@ public enum CmdArgs
 	public boolean pcaFlag = false;
 	public int pca = 10;
 	
-	private final String cmd_hppca = "hppca";
-	public boolean hppcaFlag = false;
-	public int hppca = 10;
+	private final String cmd_bluppca = "bluppca";
+	public boolean bluppcaFlag = false;
 
 	// /////////////////pop stat
 	private final String cmd_freq = "freq";
@@ -1178,7 +1177,7 @@ public enum CmdArgs
 	public boolean grmPartitionFlag = false;
 
 	// make grm options end
-
+	
 	// quantitative covariates
 	private final String cmd_qcovar = "qcovar";
 	public String qcovar_file = null;
@@ -1527,15 +1526,9 @@ public enum CmdArgs
 			}
 		}
 
-		if (cmdLine.hasOption(cmd_hppca))
+		if (cmdLine.hasOption(cmd_bluppca))
 		{
-			hppcaFlag = true;
-			hppca = Integer.parseInt(cmdLine.getOptionValue(cmd_hppca));
-			if (hppca < 1)
-			{
-				Logger.printUserError("hppca number should be greater than 0.");
-				System.exit(1);				
-			}
+			bluppcaFlag = true;
 		}
 
 		// pop stat
