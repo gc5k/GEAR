@@ -38,7 +38,9 @@ public class Gear
 		CmdArgs.INSTANCE.parse(args);
 		
 		Logger.setLogFiles(CmdArgs.INSTANCE.out);
+		Logger.setHasUserLogTagPrefix(false);
 		Logger.printUserLog(AboutInfo.WELCOME_MESSAGE);
+		Logger.setHasUserLogTagPrefix(true);
 		Logger.printUserLog("Analysis started: " + Calendar.getInstance().getTime() + "\n");
 		
 		MonitorThread monitor = new MonitorThread();

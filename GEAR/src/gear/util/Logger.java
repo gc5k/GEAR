@@ -2,12 +2,14 @@ package gear.util;
 
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.io.PrintStream;
 import java.io.PrintWriter;
 import java.util.logging.Level;
 
 public class Logger
 {
-
+	public enum LogLevel { INFO, WARNING, ERROR }
+	
 	private static PrintWriter userLogWriter;
 	private static java.util.logging.Logger devLogger;
 
@@ -44,23 +46,61 @@ public class Logger
 			handleException(e, "Unable to create the log file '" + userLogFileName + "'");
 		}
 	}
+	
+	public static void printUserLog(LogLevel level, String msg)
+	{
+		String tag = "";
+		PrintStream printStrm = System.out;
+		
+		switch (level)
+		{
+		case INFO:
+			tag = "[INFO] ";
+			break;
+			
+		case WARNING:
+			tag = "[WARNING] ";
+			printStrm = System.err;
+			break;
+			
+		case ERROR:
+			tag = "[ERROR] ";
+			printStrm = System.err;
+			break;
+		}
+		
+		if (!hasUserLogTagPrefix)
+		{
+			tag = "";
+		}
+		
+		String finalMsg = tag + msg;
+		printStrm.println(finalMsg);
+		
+		if (userLogWriter != null)
+		{
+			userLogWriter.println(finalMsg);
+		}
+	}
 
 	public static void printUserLog(String msg)
 	{
-		System.out.println(msg);
-		if (userLogWriter != null)
-		{
-			userLogWriter.println(msg);
-		}
+		printUserLog(LogLevel.INFO, msg);
+	}
+	
+	public static void printUserWarning(String msg)
+	{
+		printUserLog(LogLevel.WARNING, msg);
 	}
 
 	public static void printUserError(String msg)
 	{
-		System.err.println(msg);
-		if (userLogWriter != null)
-		{
-			userLogWriter.println(msg);
-		}
+		printUserLog(LogLevel.ERROR, msg);
+	}
+	
+	public static void setHasUserLogTagPrefix(boolean hasUserLogTagPrefix)
+	{
+		Logger.hasUserLogTagPrefix = hasUserLogTagPrefix;
 	}
 
 	public static java.util.logging.Logger getDevLogger()
@@ -100,4 +140,5 @@ public class Logger
 
 	private static String logFileNamePrefix = "gear";
 	private static boolean isDevLoggerInited = false;
+	private static boolean hasUserLogTagPrefix = true;
 }
