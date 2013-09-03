@@ -3,6 +3,7 @@ package gear.util.stat.PCA;
 /*
  * Exception thrown by the PCA class
  */
+@SuppressWarnings("serial")
 public class PCAException extends Exception 
 {
 	// constructor signatures all match constructors of the Exception class

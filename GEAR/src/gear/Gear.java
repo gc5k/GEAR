@@ -2,9 +2,8 @@ package gear;
 
 import java.util.Calendar;
 
-
+import gear.ancestry.BLUPPCA;
 import gear.ancestry.GenPCA;
-import gear.ancestry.HapMapPCA;
 import gear.epem.GRMStat;
 import gear.grm.MakeGRM;
 import gear.he.HEMCalculate;
@@ -177,9 +176,10 @@ public class Gear
 		{
 			GenPCA gpca = new GenPCA();
 		}
-		else if (CmdArgs.INSTANCE.hppcaFlag)
+		else if (CmdArgs.INSTANCE.bluppcaFlag)
 		{
-			HapMapPCA hppca = new HapMapPCA();
+			BLUPPCA bluppca = new BLUPPCA();
+			bluppca.BLUPit();
 		}
 		else if (CmdArgs.INSTANCE.naiveImputFlag)
 		{
