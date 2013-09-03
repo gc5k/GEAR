@@ -352,7 +352,6 @@ public class Profiler
 			if (tokens[1].length() != 1)
 			{
 				Logger.printUserLog("[Warning] line " + cn + " the allele is not a character, and will be ignored.");
-//				reader.errorPreviousLine("The allele is not a character.");
 			}
 			
 			if (!ConstValues.isNA(tokens[2]))
@@ -364,7 +363,6 @@ public class Profiler
 				catch (NumberFormatException e)
 				{
 					Logger.printUserLog("[Warning] line " + cn + " is not a valid score, and will be ingored.");
-//					reader.errorPreviousLine("'" + tokens[2] + "' is not a valid score.");
 				}
 			}
 		}
