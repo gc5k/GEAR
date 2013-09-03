@@ -210,18 +210,20 @@ public class Profiler
 			}
 		}
 
-		for (int indIdx = 0; indIdx < riskProfiles.size(); ++indIdx)
+		if (!CmdArgs.INSTANCE.getProfileArgs().isNoWeight())
 		{
-			for (int locGrpIdx = 0; locGrpIdx < numLocusGroups; ++locGrpIdx)
+			for (int indIdx = 0; indIdx < riskProfiles.size(); ++indIdx)
 			{
-				int denom = numLociUsed.get(indIdx)[locGrpIdx];
-				if (denom != 0)
+				for (int locGrpIdx = 0; locGrpIdx < numLocusGroups; ++locGrpIdx)
 				{
-					riskProfiles.get(indIdx)[locGrpIdx] /= sameAsPlink ? (denom << 1) : denom;
+					int denom = numLociUsed.get(indIdx)[locGrpIdx];
+					if (denom != 0)
+					{
+						riskProfiles.get(indIdx)[locGrpIdx] /= sameAsPlink ? (denom << 1) : denom;
+					}
 				}
 			}
 		}
-		
 		PrintStream predictorFile = FileUtil.CreatePrintStream(resultFile);
 		
 		// Title Line
@@ -343,11 +345,14 @@ public class Profiler
 		BufferedReader reader = BufferedReader.openTextFile(CmdArgs.INSTANCE.getProfileArgs().getScoreFile(), "score");
 		String[] tokens;
 		
+		int cn=0;
 		while ((tokens = reader.readTokens(3)) != null)
 		{
+			cn++;
 			if (tokens[1].length() != 1)
 			{
-				reader.errorPreviousLine("The allele is not a character.");
+				Logger.printUserLog("[Warning] line " + cn + " the allele is not a character, and will be ignored.");
+//				reader.errorPreviousLine("The allele is not a character.");
 			}
 			
 			if (!ConstValues.isNA(tokens[2]))
@@ -358,14 +363,14 @@ public class Profiler
 				}
 				catch (NumberFormatException e)
 				{
-					reader.errorPreviousLine("'" + tokens[2] + "' is not a valid score.");
+					Logger.printUserLog("[Warning] line " + cn + " is not a valid score, and will be ingored.");
+//					reader.errorPreviousLine("'" + tokens[2] + "' is not a valid score.");
 				}
 			}
 		}
 		reader.close();
 		
 		Logger.printUserLog("Number of valid scores: " + scores.size());
-		
 		return scores;
 	}
 
