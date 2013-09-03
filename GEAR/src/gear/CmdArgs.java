@@ -701,6 +701,7 @@ public enum CmdArgs
 			ops.addOption(OptionBuilder.withLongOpt("q-score-range")
 					.withDescription("q score range").hasArg().create());
 
+			ops.addOption(OptionBuilder.withLongOpt("no-weight").withDescription("not divided by the number of the loci").create());
 			// --greedy
 			desc = "Alleles will not be flipped if neither allele of a locus matches the score allele.";
 			ops.addOption(OptionBuilder.withLongOpt("auto-flip-off")
@@ -752,6 +753,11 @@ public enum CmdArgs
 		public String getQRangeFile()
 		{
 			return cmdLine.getOptionValue("q-score-range");
+		}
+
+		public boolean isNoWeight()
+		{
+			return cmdLine.hasOption("no-weight");
 		}
 
 		public boolean isAutoFlipOff()
