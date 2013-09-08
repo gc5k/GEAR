@@ -98,7 +98,7 @@ public class Logger
 		printUserLog(LogLevel.ERROR, msg);
 	}
 	
-	public static void setHasUserLogTagPrefix(boolean hasUserLogTagPrefix)
+	public static void hasUserLogTag(boolean hasUserLogTagPrefix)
 	{
 		Logger.hasUserLogTagPrefix = hasUserLogTagPrefix;
 	}
