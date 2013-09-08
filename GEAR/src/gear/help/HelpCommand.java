@@ -46,9 +46,11 @@ public final class HelpCommand extends Command
 	}
 	
 	@Override
-	protected CommandArguments createCommandArguments(CommandLine cmdLine) throws CommandArgumentException
+	protected CommandArguments parse(CommandLine cmdLine)
 	{
-		return new HelpCommandArguments(cmdLine);
+		HelpCommandArguments cmdArgs = new HelpCommandArguments();
+		cmdArgs.setSubcommands(cmdLine.getArgs());
+		return cmdArgs;
 	}
 	
 	@Override
