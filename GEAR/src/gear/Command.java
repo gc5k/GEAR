@@ -82,7 +82,7 @@ public abstract class Command implements Comparable<Command>
 		return options;
 	}
 	
-	protected abstract CommandArguments createCommandArguments(CommandLine cmdLine) throws CommandArgumentException;
+	protected abstract CommandArguments parse(CommandLine cmdLine) throws CommandArgumentException;
 	protected abstract CommandImpl createCommandImpl();
 	
 	protected void printOptionsInEffect(CommandLine cmdLine)
@@ -118,7 +118,7 @@ public abstract class Command implements Comparable<Command>
 		try
 		{
 			CommandLine cmdLine = cmdLineParser.parse(options, args);
-			CommandArguments cmdArgs = createCommandArguments(cmdLine);
+			CommandArguments cmdArgs = parse(cmdLine);
 			
 			Logger.hasUserLogTag(false);
 			Logger.printUserLog(AboutInfo.WELCOME_MESSAGE);
