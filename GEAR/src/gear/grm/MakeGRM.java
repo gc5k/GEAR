@@ -8,7 +8,6 @@ import java.io.PrintWriter;
 import java.util.ArrayList;
 import java.util.HashMap;
 
-import gear.HPC;
 import gear.CmdArgs;
 import gear.family.pedigree.Hukou;
 import gear.family.pedigree.file.MapFile;
@@ -188,7 +187,7 @@ public class MakeGRM
 
 			pw.print("java -jar -Xmx"
 					+ CmdArgs.INSTANCE.getHpcArgs().getRam() + " ");
-			pw.print(HPC.class.getProtectionDomain().getCodeSource()
+			pw.print(gear.Gear.class.getProtectionDomain().getCodeSource()
 					.getLocation().getPath()
 					+ " ");
 			for (int i = 0; i < args.length; i++)
