@@ -117,7 +117,7 @@ public abstract class Command implements Comparable<Command>
 		CommandLineParser cmdLineParser = new PosixParser();
 		try
 		{
-			CommandLine cmdLine = cmdLineParser.parse(options, args);
+			CommandLine cmdLine = cmdLineParser.parse(options, args, stopAtNonOption);
 			CommandArguments cmdArgs = parse(cmdLine);
 			
 			Logger.hasUserLogTag(false);
@@ -142,4 +142,11 @@ public abstract class Command implements Comparable<Command>
 			System.exit(1);
 		}
 	}
+	
+	protected void setStopAtNonOption(boolean stopAtNonOption)
+	{
+		this.stopAtNonOption = stopAtNonOption;
+	}
+	
+	private boolean stopAtNonOption;
 }

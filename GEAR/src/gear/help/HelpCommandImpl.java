@@ -115,13 +115,14 @@ public class HelpCommandImpl extends CommandImpl
 			{
 				Logger.printUserLog("Available Options:");
 				HelpFormatter helpFormatter = new HelpFormatter();
-				PrintWriter writer = new PrintWriter(new StringWriter());
-				helpFormatter.printOptions(writer,
+				StringWriter stringWriter = new StringWriter();
+				PrintWriter printWriter = new PrintWriter(stringWriter);
+				helpFormatter.printOptions(printWriter,
 				                           helpFormatter.getWidth(),
 				                           options,
 				                           helpFormatter.getLeftPadding(),
 				                           helpFormatter.getDescPadding());
-				Logger.printUserLog(writer.toString());
+				Logger.printUserLog(stringWriter.toString());
 				Logger.printUserLog("");
 			}
 		}

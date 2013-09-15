@@ -36,6 +36,7 @@ public enum Gear
 	private Gear()
 	{
 		addCommand(new gear.help.HelpCommand());
+		addCommand(new gear.hpc.HpcCommand());
 	}
 	
 	private void addCommand(Command cmd)
@@ -95,11 +96,7 @@ public enum Gear
 	
 			CmdArgs.INSTANCE.printOptionsInEffect();
 	
-			if (CmdArgs.INSTANCE.getHpcArgs().isSet())
-			{
-				HPC.genScript(args);
-			}
-			else if (CmdArgs.INSTANCE.getProfileArgs().isSet())
+			if (CmdArgs.INSTANCE.getProfileArgs().isSet())
 			{
 				Profiler.makeProfile();
 			}

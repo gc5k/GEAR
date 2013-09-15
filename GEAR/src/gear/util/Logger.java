@@ -15,6 +15,8 @@ public class Logger
 
 	static
 	{
+		setLogFiles("gear");
+		
 		Runtime.getRuntime().addShutdownHook(new Thread(new Runnable()
 		{
 			public void run()

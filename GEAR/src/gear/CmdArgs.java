@@ -1249,25 +1249,12 @@ public enum CmdArgs
 		@SuppressWarnings("static-access")
 		private HpcArgs()
 		{
-			ops.addOption(OptionBuilder.withDescription("qsub").create("qsub"));
-			ops.addOption(OptionBuilder.withDescription("generate shell")
-					.create("shell"));
 			ops.addOption(OptionBuilder.withDescription("email").hasArg()
 					.create("email"));
 			ops.addOption(OptionBuilder.withDescription("ram").hasArg()
 					.create("ram"));
 			ops.addOption(OptionBuilder.withDescription("name").hasArg()
 					.create("name"));
-		}
-
-		public boolean isSet()
-		{
-			return cmdLine.hasOption("qsub") || cmdLine.hasOption("shell");
-		}
-
-		public boolean isQsubSet()
-		{
-			return cmdLine.hasOption("qsub");
 		}
 
 		public String getEmail()
