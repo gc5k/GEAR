@@ -4,7 +4,6 @@ import org.apache.commons.cli.CommandLine;
 import org.apache.commons.cli.Options;
 
 import gear.Command;
-import gear.CommandArgumentException;
 import gear.CommandArguments;
 import gear.CommandImpl;
 
