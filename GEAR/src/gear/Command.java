@@ -120,6 +120,8 @@ public abstract class Command implements Comparable<Command>
 			CommandLine cmdLine = cmdLineParser.parse(options, args, stopAtNonOption);
 			CommandArguments cmdArgs = parse(cmdLine);
 			
+			Logger.setLogFiles(cmdLine.getOptionValue(OPT_OUT, OPT_OUT_DEFAULT));
+			
 			Logger.hasUserLogTag(false);
 			Logger.printUserLog(AboutInfo.WELCOME_MESSAGE);
 			Logger.hasUserLogTag(true);
@@ -149,4 +151,15 @@ public abstract class Command implements Comparable<Command>
 	}
 	
 	private boolean stopAtNonOption;
+	
+	protected static final String OPT_FILE_LONG = "file";
+	protected static final String OPT_FILE_DESC = "Specify PLINK format .ped and .map files";
+	
+	protected static final String OPT_BFILE_LONG = "bfile";
+	protected static final String OPT_BFILE_DESC = "Specify PLINK format .bed, .bim and .fam files";
+	
+	protected static final char OPT_OUT = 'o';
+	protected static final String OPT_OUT_LONG = "out";
+	protected static final String OPT_OUT_DESC = "Specify output root filename";
+	protected static final String OPT_OUT_DEFAULT = "gear";
 }

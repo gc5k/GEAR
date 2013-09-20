@@ -1,6 +1,5 @@
 package gear.profile;
 
-import gear.CmdArgs;
 import gear.family.pedigree.file.SNP;
 import gear.util.BufferedReader;
 import gear.util.Logger;
@@ -10,13 +9,14 @@ import java.util.ArrayList;
 
 public class MachData extends Data
 {
-	public static MachData create()
+	public static MachData create(String dosageFile, String infoFile, String dosageBatch, String infoBatch)
 	{
 		String[] dosageFiles, infoFiles;
 		
-		String dosageFile = CmdArgs.INSTANCE.getProfileArgs().getMachDosageFile();
 		if (dosageFile != null)
 		{
+			assert(infoFile != null);
+			
 			if (!(new File(dosageFile)).exists())
 			{
 				Logger.printUserError("The dosage file '" + dosageFile + "' does not exist");
@@ -25,39 +25,22 @@ public class MachData extends Data
 			dosageFiles = new String[1];
 			dosageFiles[0] = dosageFile;
 			
-			infoFiles = new String[1];
-			infoFiles[0] = CmdArgs.INSTANCE.getProfileArgs().getMachInfoFile();
-			if (infoFiles[0] == null)
-			{
-				Logger.printUserError("--mach-info is not set.");
-				System.exit(1);
-			}
+			infoFiles = new String[1];			
+			infoFiles[0] = infoFile;
 			if (!(new File(infoFiles[0])).exists())
 			{
-				Logger.printUserError("The information file " + infoFiles[0] + "' does not exist");
+				Logger.printUserError("The .mlinfo file " + infoFiles[0] + "' does not exist");
 				System.exit(1);
 			}
 		}
 		else
 		{
-			String dosageBatchFile = CmdArgs.INSTANCE.getProfileArgs().getMachDosageBatchFile();
-			if (dosageBatchFile == null)
-			{
-				Logger.printUserError("--mach-dosage-batch is not set.");
-				System.exit(1);
-			}
-			
-			String infoBatchFile = CmdArgs.INSTANCE.getProfileArgs().getMachInfoBatchFile();
-			if (infoBatchFile == null)
-			{
-				Logger.printUserError("--mach-info-batch is not set.");
-				System.exit(1);
-			}
+			assert(dosageBatch != null && infoBatch != null);
 			
 			String fileName = null;
 			ArrayList<String> fileNameList = new ArrayList<String>();
 			
-			BufferedReader dosageBatchReader = BufferedReader.openTextFile(dosageBatchFile, "MaCH dosage batch");
+			BufferedReader dosageBatchReader = BufferedReader.openTextFile(dosageBatch, "MaCH dosage batch");
 			while ((fileName = dosageBatchReader.readNonEmptyLine()) != null)
 			{
 				if (!(new File(fileName)).exists())
@@ -71,7 +54,7 @@ public class MachData extends Data
 			
 			fileNameList.clear();
 			
-			gear.util.BufferedReader infoBatchReader = BufferedReader.openTextFile(infoBatchFile, "MaCH information batch");
+			gear.util.BufferedReader infoBatchReader = BufferedReader.openTextFile(infoBatch, "MaCH information batch");
 			while ((fileName = infoBatchReader.readNonEmptyLine()) != null)
 			{
 				if (!(new File(fileName)).exists())

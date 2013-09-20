@@ -1,6 +1,5 @@
 package gear.profile;
 
-import gear.CmdArgs;
 import gear.ConstValues;
 import gear.family.pedigree.file.SNP;
 import gear.family.plink.PLINKBinaryParser;
@@ -12,24 +11,15 @@ import java.util.ArrayList;
 
 public class PlinkData extends Data
 {
-	public static PlinkData create()
+	public static PlinkData createByFile(String file)
 	{
-		PLINKParser parser = null;
-		if (CmdArgs.INSTANCE.getFileArgs().isSet())
-		{
-			parser = new PLINKParser(CmdArgs.INSTANCE.getFileArgs().getPed(),
-					                 CmdArgs.INSTANCE.getFileArgs().getMap());
-		}
-		else if (CmdArgs.INSTANCE.getBFileArgs(0).isSet())
-		{
-			parser = new PLINKBinaryParser(CmdArgs.INSTANCE.getBFileArgs(0).getBed(),
-					                       CmdArgs.INSTANCE.getBFileArgs(0).getBim(),
-					                       CmdArgs.INSTANCE.getBFileArgs(0).getFam());
-		}
-		else
-		{
-			assert false;
-		}
+		PLINKParser parser = new PLINKParser(file + ".ped", file + ".map");
+		return new PlinkData(parser);
+	}
+	
+	public static PlinkData createByBFile(String bfile)
+	{
+		PLINKParser parser = new PLINKBinaryParser(bfile + ".bed", bfile + ".bim", bfile + ".fam");
 		return new PlinkData(parser);
 	}
 	

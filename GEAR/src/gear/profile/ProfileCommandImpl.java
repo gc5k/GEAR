@@ -1,6 +1,7 @@
 package gear.profile;
 
-import gear.CmdArgs;
+import gear.CommandArguments;
+import gear.CommandImpl;
 import gear.ConstValues;
 import gear.family.pedigree.file.SNP;
 import gear.util.BufferedReader;
@@ -12,11 +13,14 @@ import java.io.PrintStream;
 import java.util.ArrayList;
 import java.util.HashMap;
 
-public class Profiler
-{	
-	public static void makeProfile()
+public final class ProfileCommandImpl extends CommandImpl
+{
+	@Override
+	public void execute(CommandArguments cmdArgs)
 	{
-		checkCmdArgs();
+		profCmdArgs = (ProfileCommandArguments)cmdArgs;
+		
+		printWhichCoeffModelIsUsed();
 		
 		HashMap<String, Score> scoreMap = readScores();  // LocusName-to-Score map
 		HashMap<String, Float> qScoreMap = readQScores();  // LocusName-to-QScore map
@@ -55,7 +59,7 @@ public class Profiler
 				continue;
 			}
 			
-			if (CmdArgs.INSTANCE.getTranFunction() == gear.RegressionModel.LOGIT)
+			if (profCmdArgs.getIsLogit())
 			{
 				scores[snpIdx].setValue((float)Math.log(score.getValue()));
 			}
@@ -72,7 +76,7 @@ public class Profiler
 			if (SNPMatch.isAmbiguous(allele1, allele2))  // A/T or C/G
 			{
 				++numAmbiguousLoci;
-				if (!CmdArgs.INSTANCE.keepATGC())
+				if (!profCmdArgs.getIsKeepATGC())
 				{
 					continue;
 				}
@@ -116,12 +120,12 @@ public class Profiler
 
 		Logger.printUserLog("Number of loci having no score (because they do not appear in the score file, or their scores are invalid, etc.): " + numLociNoScore);
 		Logger.printUserLog("Number of monomorphic loci (removed): " + numMonoLoci);
-		Logger.printUserLog("Number of ambiguous loci (A/T or C/G) " + (CmdArgs.INSTANCE.keepATGC() ? "detected: " : "removed: ") + numAmbiguousLoci);
+		Logger.printUserLog("Number of ambiguous loci (A/T or C/G) " + (profCmdArgs.getIsKeepATGC() ? "detected: " : "removed: ") + numAmbiguousLoci);
 
 		// Allele Matching Schemes
 		Logger.printUserLog("Number of Scheme I predictors: predictor alleles were A1: " + matchNums[AlleleMatchScheme.MATCH_ALLELE1.ordinal()]);
 		Logger.printUserLog("Number of Scheme II predictors: predictor alleles were A2: " + matchNums[AlleleMatchScheme.MATCH_ALLELE2.ordinal()]);
-		if (!CmdArgs.INSTANCE.getProfileArgs().isAutoFlipOff())
+		if (profCmdArgs.getIsAutoFlip())
 		{
 			Logger.printUserLog("Number of Scheme III predictors: predictor alleles were flipped A1: " + matchNums[AlleleMatchScheme.MATCH_ALLELE1_FLIPPED.ordinal()]);
 			Logger.printUserLog("Number of Scheme IV predictors: predictor alleles were flipped A2: " + matchNums[AlleleMatchScheme.MATCH_ALLELE2_FLIPPED.ordinal()]);
@@ -198,7 +202,7 @@ public class Profiler
 				continue;
 			}
 			
-			float riskValue = coeffModel.compute(scoreAlleleFrac) * scores[locIdx].getValue();
+			float riskValue = profCmdArgs.getCoeffModel().compute(scoreAlleleFrac) * scores[locIdx].getValue();
 			
 			for (int locGrpIdx = 0; locGrpIdx < isInLocusGroup[locIdx].length; ++locGrpIdx)
 			{
@@ -210,7 +214,7 @@ public class Profiler
 			}
 		}
 
-		if (!CmdArgs.INSTANCE.getProfileArgs().isNoWeight())
+		if (profCmdArgs.getIsWeighted())
 		{
 			for (int indIdx = 0; indIdx < riskProfiles.size(); ++indIdx)
 			{
@@ -219,12 +223,12 @@ public class Profiler
 					int denom = numLociUsed.get(indIdx)[locGrpIdx];
 					if (denom != 0)
 					{
-						riskProfiles.get(indIdx)[locGrpIdx] /= sameAsPlink ? (denom << 1) : denom;
+						riskProfiles.get(indIdx)[locGrpIdx] /= profCmdArgs.getIsSameAsPlink() ? (denom << 1) : denom;
 					}
 				}
 			}
 		}
-		PrintStream predictorFile = FileUtil.CreatePrintStream(resultFile);
+		PrintStream predictorFile = FileUtil.CreatePrintStream(profCmdArgs.getResultFile());
 		
 		// Title Line
 		predictorFile.print("FID\tIID\tPHENO");
@@ -252,97 +256,32 @@ public class Profiler
 		}
 		predictorFile.close();
 	}
-
-	private static void checkCmdArgs()
+	
+	private void printWhichCoeffModelIsUsed()
 	{
-		String scoreFile = CmdArgs.INSTANCE.getProfileArgs().getScoreFile();
-		if (scoreFile == null)
+		if (profCmdArgs.getIsSameAsPlink())
 		{
-			Logger.printUserError("Score file is not provided.");
-			System.exit(1);
+			Logger.printUserLog("PLINK allelic model is used.");
 		}
-		
-		String qScoreFile = CmdArgs.INSTANCE.getProfileArgs().getQScoreFile();
-		String qRangeFile = CmdArgs.INSTANCE.getProfileArgs().getQRangeFile();
-		if (qScoreFile == null && qRangeFile != null || 
-			qScoreFile != null && qRangeFile == null)
+		else if (profCmdArgs.getCoeffModel() instanceof AdditiveCoeffModel)
 		{
-			Logger.printUserError("--q-score-file and --q-score-range must be set together.");
-			System.exit(1);
+			Logger.printUserLog("Additive model is used.");
 		}
-		
-		if (!CmdArgs.INSTANCE.getFileArgs().isSet() && !CmdArgs.INSTANCE.getBFileArgs(0).isSet())
+		else if (profCmdArgs.getCoeffModel() instanceof DominanceCoeffModel)
 		{
-			String dosage = CmdArgs.INSTANCE.getProfileArgs().getMachDosageFile();
-			String info = CmdArgs.INSTANCE.getProfileArgs().getMachInfoFile();
-			String dosageBatch = CmdArgs.INSTANCE.getProfileArgs().getMachDosageBatchFile();
-			String infoBatch = CmdArgs.INSTANCE.getProfileArgs().getMachInfoBatchFile();
-			
-			if (dosage == null && info == null && dosageBatch == null && infoBatch == null)
-			{
-				Logger.printUserError("No input data files.");
-				System.exit(1);
-			}
-			
-			if (dosage == null && info != null || dosage != null && info == null)
-			{
-				Logger.printUserError("--mach-dosage and --mach-info must be set together.");
-				System.exit(1);
-			}
-			
-			if (dosageBatch == null && infoBatch != null || dosageBatch != null && infoBatch == null)
-			{
-				Logger.printUserError("--mach-dosage-batch and --mach-info-batch must be set together.");
-				System.exit(1);
-			}
-		}
-		
-		resultFile = CmdArgs.INSTANCE.out;
-		
-		// Compute Model
-		String sCoeffModel = CmdArgs.INSTANCE.getProfileArgs().getModel();
-		if (sCoeffModel == null)
-		{
-			Logger.printUserLog("Allelic model is used.");
-			coeffModel = new AdditiveCoeffModel();
-			sameAsPlink = true;
+			Logger.printUserLog("Dominance model is used.");
 		}
 		else
 		{
-			resultFile += "." + sCoeffModel;
-			if (sCoeffModel.equals("additive"))
-			{
-				Logger.printUserLog("Additive model is used.");
-				coeffModel = new AdditiveCoeffModel();
-			}
-			else if (sCoeffModel.equals("dominance"))
-			{
-				Logger.printUserLog("Dominance model is used.");
-				coeffModel = new DominanceCoeffModel();
-			}
-			else if (sCoeffModel.equals("recessive"))
-			{
-				Logger.printUserLog("Recessive model is used.");
-				coeffModel = new RecessiveCoeffModel();
-			}
-			else
-			{
-				String msg = "";
-				msg += "'" + sCoeffModel + "' is an invalid coefficient model. ";
-				msg += "Valid models are 'additive', 'dominance' or 'recessive'.";
-				Logger.printUserError(msg);
-				System.exit(1);
-			}
+			Logger.printUserLog("Recessive model is used.");
 		}
-		
-		resultFile += ".profile";
 	}
 	
-	private static HashMap<String, Score> readScores()
+	private HashMap<String, Score> readScores()
 	{
 		HashMap<String, Score> scores = new HashMap<String, Score>();
 		
-		BufferedReader reader = BufferedReader.openTextFile(CmdArgs.INSTANCE.getProfileArgs().getScoreFile(), "score");
+		BufferedReader reader = BufferedReader.openTextFile(profCmdArgs.getScoreFile(), "score");
 		String[] tokens;
 
 		while ((tokens = reader.readTokens(3)) != null)
@@ -371,9 +310,9 @@ public class Profiler
 		return scores;
 	}
 
-	private static HashMap<String, Float> readQScores()
+	private HashMap<String, Float> readQScores()
 	{
-		String qScoreFile = CmdArgs.INSTANCE.getProfileArgs().getQScoreFile();
+		String qScoreFile = profCmdArgs.getQScoreFile();
 		if (qScoreFile == null)
 		{
 			return null;
@@ -405,9 +344,9 @@ public class Profiler
 		return qScores;
 	}
 
-	private static QRange[] readQRanges()
+	private QRange[] readQRanges()
 	{
-		String qRangeFile = CmdArgs.INSTANCE.getProfileArgs().getQRangeFile();
+		String qRangeFile = profCmdArgs.getQRangeFile();
 		if (qRangeFile == null)
 		{
 			return null;
@@ -439,16 +378,23 @@ public class Profiler
 		return qRanges.toArray(new QRange[0]);
 	}
 	
-	private static Data initData()
+	private Data initData()
 	{
-		if (CmdArgs.INSTANCE.getFileArgs().isSet() || CmdArgs.INSTANCE.getBFileArgs(0).isSet())
+		if (profCmdArgs.getFile() != null)
 		{
-			return PlinkData.create();
+			return PlinkData.createByFile(profCmdArgs.getFile());
 		}
-		return MachData.create();
+		else if (profCmdArgs.getBFile() != null)
+		{
+			return PlinkData.createByBFile(profCmdArgs.getBFile());
+		}
+		return MachData.create(profCmdArgs.getMachDosageFile(),
+		                       profCmdArgs.getMachInfoFile(),
+		                       profCmdArgs.getMachDosageBatch(),
+		                       profCmdArgs.getMachInfoBatch());
 	}
 	
-	private static AlleleMatchScheme getMatchScheme(char scoreAllele, char allele1, char allele2)
+	private AlleleMatchScheme getMatchScheme(char scoreAllele, char allele1, char allele2)
 	{
 		if (scoreAllele == allele1)
 		{
@@ -458,7 +404,7 @@ public class Profiler
 		{
 			return AlleleMatchScheme.MATCH_ALLELE2;
 		}
-		else if (!CmdArgs.INSTANCE.getProfileArgs().isAutoFlipOff())
+		else if (profCmdArgs.getIsAutoFlip())
 		{
 			if (scoreAllele == SNPMatch.Flip(allele1))
 			{
@@ -472,7 +418,5 @@ public class Profiler
 		return AlleleMatchScheme.MATCH_NONE;
 	}
 
-	private static CoeffModel coeffModel;
-	private static boolean sameAsPlink;
-	private static String resultFile;
+	private ProfileCommandArguments profCmdArgs;
 }

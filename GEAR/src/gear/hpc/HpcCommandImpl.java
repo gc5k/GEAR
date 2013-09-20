@@ -5,7 +5,6 @@ import java.io.IOException;
 import java.io.PrintWriter;
 import java.net.URL;
 
-import gear.CmdArgs;
 import gear.CommandArguments;
 import gear.CommandImpl;
 import gear.util.Logger;

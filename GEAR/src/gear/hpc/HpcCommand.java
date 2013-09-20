@@ -72,16 +72,16 @@ public final class HpcCommand extends Command
 	
 	private static final String OPT_NAME_LONG = "name";
 	private static final String OPT_NAME_DEFAULT = "gear";
-	private static final String OPT_NAME_DESC = "job name, default to '" + OPT_NAME_DEFAULT + "'";
+	private static final String OPT_NAME_DESC = "Job name, default to '" + OPT_NAME_DEFAULT + "'";
 	
 	private static final String OPT_RAM_LONG = "ram";
 	private static final String OPT_RAM_DEFAULT = "10";
-	private static final String OPT_RAM_DESC = "memory required for the job, default to " + OPT_RAM_DEFAULT + " (GB), must be an integer";
+	private static final String OPT_RAM_DESC = "Memory required for the job, default to " + OPT_RAM_DEFAULT + " (GB), must be an integer";
 	
 	private static final String OPT_EMAIL_LONG = "email";
-	private static final String OPT_EMAIL_DESC = "some cluster requires the user to specify the email for a submitted job. This option can specify the email address";
+	private static final String OPT_EMAIL_DESC = "Some cluster requires the user to specify the email for a submitted job. This option can specify the email address";
 	
 	private static final String OPT_SUBMIT_LONG = "submit";
-	private static final String OPT_SUBMIT_DESC = "if this option is set, the generated script will be submitted to cluster";
+	private static final String OPT_SUBMIT_DESC = "If this option is set, the generated script will be submitted to cluster";
 
 }
