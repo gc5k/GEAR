@@ -14,7 +14,6 @@ import gear.he.HEMCalculate;
 import gear.he.HEMRead;
 import gear.he.h2trans.H2Transformer;
 import gear.imputation.NaiveImputation;
-import gear.profile.Profiler;
 import gear.pscontrol.NonTransmitted;
 import gear.realcheck.RealCheck;
 import gear.realcheck.RealCheckOne;
@@ -37,6 +36,7 @@ public enum Gear
 	{
 		addCommand(new gear.help.HelpCommand());
 		addCommand(new gear.hpc.HpcCommand());
+		addCommand(new gear.profile.ProfileCommand());
 	}
 	
 	private void addCommand(Command cmd)
@@ -96,11 +96,7 @@ public enum Gear
 	
 			CmdArgs.INSTANCE.printOptionsInEffect();
 	
-			if (CmdArgs.INSTANCE.getProfileArgs().isSet())
-			{
-				Profiler.makeProfile();
-			}
-			else if (CmdArgs.INSTANCE.hasRealCheckOption())
+			if (CmdArgs.INSTANCE.hasRealCheckOption())
 			{
 				if (CmdArgs.INSTANCE.getBFileArgs(1).isSet())
 				{
