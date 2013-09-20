@@ -15,7 +15,7 @@ public final class ProfileCommand extends Command
 	@Override
 	public String getName()
 	{
-		return "prof";
+		return "profile";
 	}
 
 	@Override
