@@ -19,7 +19,6 @@ import gear.realcheck.RealCheck;
 import gear.realcheck.RealCheckOne;
 import gear.simulation.RealDataSimulation;
 import gear.simulation.RealDataSimulationQT;
-import gear.simulation.SimuFamily;
 import gear.simulation.SimuPolyCC;
 import gear.simulation.SimuPolyQT;
 import gear.sumstat.FrequencyCalculator;
@@ -37,6 +36,7 @@ public enum Gear
 		addCommand(new gear.help.HelpCommand());
 		addCommand(new gear.hpc.HpcCommand());
 		addCommand(new gear.profile.ProfileCommand());
+		addCommand(new gear.simulation.SimuFamilyCommand());
 	}
 	
 	private void addCommand(Command cmd)
@@ -108,12 +108,6 @@ public enum Gear
 					RealCheckOne realcheckone = new RealCheckOne();
 					realcheckone.Check();
 				}
-			}
-			else if (CmdArgs.INSTANCE.simufamFlag)
-			{
-				SimuFamily simuFam = new SimuFamily();
-				simuFam.generateSample();
-	
 			}
 			else if (CmdArgs.INSTANCE.bsimuFlag)
 			{

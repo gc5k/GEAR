@@ -1,7 +1,9 @@
 package gear.simulation;
 
-import gear.CmdArgs;
+import gear.CommandArguments;
+import gear.CommandImpl;
 import gear.ConstValues;
+import gear.util.Logger;
 
 import java.io.BufferedWriter;
 import java.io.DataOutputStream;
@@ -14,75 +16,61 @@ import java.util.Arrays;
 import org.apache.commons.math.MathException;
 import org.apache.commons.math.random.RandomDataImpl;
 
-public class SimuFamily
+public final class SimuFamilyCommandImpl extends CommandImpl
 {
-	
-	private RandomDataImpl rnd;
-	private long seed = 2011;
-
-	private final String[] A = { "A", "C" };
-	private int NFam = 100;
-	private int NMarker = 10;
-	private int[] NKid = null;
-	private int[] NAffKid = null;
-	private double[] LD = null;
-	private double[] rec = null;
-	private double[] maf = null;
-
-	private int[][] gm = null;
-	private int famSize = 4;
-
-
-	public SimuFamily()
+	@Override
+	public void execute(CommandArguments cmdArgs)
 	{
-		this.NFam = CmdArgs.INSTANCE.simu_fam_size;
-		this.NMarker = CmdArgs.INSTANCE.simu_fam_marker;
-		this.seed = CmdArgs.INSTANCE.simuSeed;
-		initial();
-	}
+		this.cmdArgs = (SimuFamilyCommandArguments)cmdArgs;
+		
+		init();
 
-	private void initial()
-	{
-		rnd = new RandomDataImpl();
-		rnd.reSeed(seed);
-
-		NKid = new int[NFam];
-		Arrays.fill(NKid, 2);
-		NAffKid = new int[NFam];
-		Arrays.fill(NAffKid, 1);
-
-		maf = new double[NMarker];
-		Arrays.fill(maf, 0.5);
-		LD = new double[NMarker];
-		Arrays.fill(LD, 0);
-		rec = new double[NMarker];
-		Arrays.fill(rec, 0.5);
-		rec[0] = maf[0];
-
-		gm = new int[NFam * famSize][NMarker];
-	}
-
-	public void generateSample()
-	{
-
-		for (int i = 0; i < NFam; i++)
+		for (int i = 0; i < this.cmdArgs.getNumberOfFamilies(); i++)
 		{
 			generateNuclearFamily(NKid[i], NAffKid[i], i);
 		}
+	}
+	
+	private void init()
+	{
+		rnd = new RandomDataImpl();
+		
+		if (cmdArgs.getSeed() == null)
+		{
+			rnd.reSeed();
+		}
+		else
+		{
+			rnd.reSeed(cmdArgs.getSeed());
+		}
 
+		NKid = new int[cmdArgs.getNumberOfFamilies()];
+		Arrays.fill(NKid, 2);
+		NAffKid = new int[cmdArgs.getNumberOfFamilies()];
+		Arrays.fill(NAffKid, 1);
+
+		maf = new double[cmdArgs.getNumberOfMarkers()];
+		Arrays.fill(maf, 0.5);
+		LD = new double[cmdArgs.getNumberOfMarkers()];
+		Arrays.fill(LD, 0);
+		rec = new double[cmdArgs.getNumberOfMarkers()];
+		Arrays.fill(rec, 0.5);
+		rec[0] = maf[0];
+
+		gm = new int[cmdArgs.getNumberOfFamilies() * famSize][cmdArgs.getNumberOfMarkers()];
 	}
 
 	private void generateNuclearFamily(int nkid, int affKid, int famIdx)
 	{
-
 		int[][] p = sampleChromosome(famIdx, 0);
 		int[][] m = sampleChromosome(famIdx, 1);
+		
 		for (int i = 0; i < nkid; i++)
 		{
 			generateBaby(p, m, famIdx, i + 2);
 		}
 
-		if (CmdArgs.INSTANCE.makebedFlag)
+		if (cmdArgs.getMakeBed())
 		{
 			writeBFile();
 		}
@@ -144,34 +132,31 @@ public class SimuFamily
 
 	public void writeFile()
 	{
-		PrintWriter pedout = null;
+		PrintWriter ped = null;
 		PrintWriter map = null;
 
 		try
 		{
-			pedout = new PrintWriter(new BufferedWriter(new FileWriter(
-					CmdArgs.INSTANCE.out + ".ped")));
-			map = new PrintWriter(new BufferedWriter(new FileWriter(
-					CmdArgs.INSTANCE.out + ".map")));
+			ped = new PrintWriter(new BufferedWriter(new FileWriter(cmdArgs.getOutRoot() + ".ped")));
+			map = new PrintWriter(new BufferedWriter(new FileWriter(cmdArgs.getOutRoot() + ".map")));
 		}
 		catch (IOException e)
 		{
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+			Logger.handleException(e, "An I/O exception occurred when creating the .ped and .map files.");
 		}
 
-		for (int h = 0; h < famSize; h++)
+		for (int h = 0; h < cmdArgs.getNumberOfFamilies(); h++)
 		{
 			int fid = (h + 1) * 10000;
 			int pid = fid + 1;
 			int mid = fid + 2;
 
-			pedout.print(fid + " ");
-			pedout.print(pid + " ");
-			pedout.print(0 + " ");
-			pedout.print(0 + " ");
-			pedout.print(1 + " ");
-			pedout.print(1 + " ");
+			ped.print(fid + " ");
+			ped.print(pid + " ");
+			ped.print(0 + " ");
+			ped.print(0 + " ");
+			ped.print(1 + " ");
+			ped.print(1 + " ");
 
 			for (int i = 0; i < maf.length; i++)
 			{
@@ -190,16 +175,16 @@ public class SimuFamily
 				default:
 					break;
 				}
-				pedout.print(sb.toString());
+				ped.print(sb.toString());
 			}
-			pedout.print("\n");
+			ped.print("\n");
 
-			pedout.print(fid + " ");
-			pedout.print(mid + " ");
-			pedout.print(0 + " ");
-			pedout.print(0 + " ");
-			pedout.print(2 + " ");
-			pedout.print(1 + " ");
+			ped.print(fid + " ");
+			ped.print(mid + " ");
+			ped.print(0 + " ");
+			ped.print(0 + " ");
+			ped.print(2 + " ");
+			ped.print(1 + " ");
 
 			for (int i = 0; i < maf.length; i++)
 			{
@@ -218,26 +203,25 @@ public class SimuFamily
 				default:
 					break;
 				}
-				pedout.print(sb.toString());
+				ped.print(sb.toString());
 			}
-			pedout.print("\n");
+			ped.print("\n");
 
 			for (int j = 0; j < 2; j++)
 			{
-				pedout.print(fid + " ");
-				pedout.print((fid + 3 + j) + " ");
-				pedout.print(pid + " ");
-				pedout.print(mid + " ");
+				ped.print(fid + " ");
+				ped.print((fid + 3 + j) + " ");
+				ped.print(pid + " ");
+				ped.print(mid + " ");
 
 				try
 				{
-					pedout.print((rnd.nextBinomial(1, 0.5) + 1) + " ");
-					pedout.print((rnd.nextBinomial(1, 0.5) + 1) + " ");
+					ped.print((rnd.nextBinomial(1, 0.5) + 1) + " ");
+					ped.print((rnd.nextBinomial(1, 0.5) + 1) + " ");
 				}
 				catch (MathException e)
 				{
-					// TODO Auto-generated catch block
-					e.printStackTrace();
+					Logger.handleException(e, "Failed to generate the random values.");
 				}
 
 				for (int i = 0; i < maf.length; i++)
@@ -257,9 +241,9 @@ public class SimuFamily
 					default:
 						break;
 					}
-					pedout.print(sb.toString());
+					ped.print(sb.toString());
 				}
-				pedout.print("\n");
+				ped.print("\n");
 			}
 		}
 		
@@ -271,28 +255,26 @@ public class SimuFamily
 			map.println(i * 100);
 		}
 
-		pedout.close();
+		ped.close();
 		map.close();
 	}
 
 	public void writeBFile()
 	{
-		DataOutputStream bedout = null;
+		DataOutputStream bed = null;
 		PrintWriter fam = null;
 		PrintWriter bim = null;
+		
 		try
 		{
-			bedout = new DataOutputStream(new FileOutputStream(CmdArgs.INSTANCE.out + ".bed"));
-
-			fam = new PrintWriter(new BufferedWriter(new FileWriter(CmdArgs.INSTANCE.out
-					+ ".fam")));
-			bim = new PrintWriter(new BufferedWriter(new FileWriter(CmdArgs.INSTANCE.out
-					+ ".bim")));
+			bed = new DataOutputStream(new FileOutputStream(cmdArgs.getOutRoot() + ".bed"));
+			fam = new PrintWriter(new BufferedWriter(new FileWriter(cmdArgs.getOutRoot() + ".fam")));
+			bim = new PrintWriter(new BufferedWriter(new FileWriter(cmdArgs.getOutRoot() + ".bim")));
 
 		} 
 		catch (IOException e)
 		{
-			e.printStackTrace();
+			Logger.handleException(e, "An I/O exception occurred when creating the .bed, .fam and .bim files.");
 		}
 
 		for (int i = 0; i < gm.length; i++)
@@ -308,16 +290,16 @@ public class SimuFamily
 			}
 			catch (MathException e)
 			{
-				e.printStackTrace();
+				Logger.handleException(e, "Failed to generate the random values.");
 			}
 		}
 
 		try
 		{
-			bedout.writeByte(ConstValues.PLINK_BED_BYTE1);
-			bedout.writeByte(ConstValues.PLINK_BED_BYTE2);
-			bedout.writeByte(ConstValues.PLINK_BED_BYTE3);
-			for (int i = 0; i < NMarker; i++)
+			bed.writeByte(ConstValues.PLINK_BED_BYTE1);
+			bed.writeByte(ConstValues.PLINK_BED_BYTE2);
+			bed.writeByte(ConstValues.PLINK_BED_BYTE3);
+			for (int i = 0; i < cmdArgs.getNumberOfMarkers(); i++)
 			{
 				byte gbyte = 0;
 				int idx = 0;
@@ -348,29 +330,29 @@ public class SimuFamily
 					{
 						if (idx == 4)
 						{
-							bedout.writeByte(gbyte);
+							bed.writeByte(gbyte);
 							gbyte = 0;
 							idx = 0;
 						}
 					} 
 					else
 					{
-						bedout.writeByte(gbyte);
+						bed.writeByte(gbyte);
 					}
 				}
 			}
-			bedout.close();
+			bed.close();
 		} 
 		catch (IOException e)
 		{
-			e.printStackTrace();
+			Logger.handleException(e, "An I/O exception occurred when writing the .bed file.");
 		}
 
-		for (int i = 0; i < NMarker; i++)
+		for (int i = 0; i < cmdArgs.getNumberOfMarkers(); i++)
 		{
 			bim.print(1 + " ");
 			bim.print("rs" + i + " ");
-			bim.print(i / (NMarker * 1.0) + " ");
+			bim.print(i / (cmdArgs.getNumberOfMarkers() * 1.0) + " ");
 			bim.print(i * 100 + " ");
 			bim.println(A[0] + " " + A[1]);
 		}
@@ -380,4 +362,17 @@ public class SimuFamily
 
 	}
 
+	private SimuFamilyCommandArguments cmdArgs;
+	
+	private RandomDataImpl rnd;
+
+	private final String[] A = { "A", "C" };
+	private int[] NKid = null;
+	private int[] NAffKid = null;
+	private double[] LD = null;
+	private double[] rec = null;
+	private double[] maf = null;
+
+	private int[][] gm = null;
+	private final int famSize = 4; 
 }
