@@ -47,19 +47,6 @@ public enum CmdArgs
 
 		ops.addOption(OptionBuilder.withDescription("logit").create(cmd_logit));
 
-		// simulation nuclear fam
-		ops.addOption(OptionBuilder.withLongOpt(cmd_simu_fam_long)
-				.withDescription("simulation nuclear family ")
-				.create(cmd_simu_fam));
-
-		ops.addOption(OptionBuilder.withLongOpt(cmd_simu_fam_size_long)
-				.withDescription("simulation nuclear family size ").hasArg()
-				.create(cmd_simu_fam_size));
-
-		ops.addOption(OptionBuilder.withLongOpt(cmd_simu_fam_marker_long)
-				.withDescription("simulation number for nuclear family ")
-				.hasArg().create(cmd_simu_fam_marker));
-
 		// simulation real data
 		ops.addOption(OptionBuilder.withDescription("gwas data simulations ")
 				.create(cmd_bsimu));
@@ -522,18 +509,6 @@ public enum CmdArgs
 	private final String cmd_linear = "linear";
 	private final String cmd_logit = "logit";
 	private RegressionModel tranFunction = RegressionModel.LINEAR;
-
-	// /////////////simulation nuclear family
-	private final String cmd_simu_fam = "simu_fam";
-	private final String cmd_simu_fam_long = "simu-fam";
-	public boolean simufamFlag = false;
-
-	private final String cmd_simu_fam_size = "simu_fam_size";
-	private final String cmd_simu_fam_size_long = "simu-fam-size";
-	public int simu_fam_size = 100;
-	private final String cmd_simu_fam_marker = "simu_fam_marker";
-	private final String cmd_simu_fam_marker_long = "simu-fam-marker";
-	public int simu_fam_marker = 10;
 
 	// /////////////simulation real data
 
@@ -1436,24 +1411,6 @@ public enum CmdArgs
 			fstFlag = true;
 			fst_file = cmdLine.getOptionValue(cmd_fst);
 			FileUtil.exists(fst_file);
-		}
-
-		// simulation nuclear family
-		if (cmdLine.hasOption(cmd_simu_fam))
-		{
-			simufamFlag = true;
-		}
-
-		if (cmdLine.hasOption(cmd_simu_fam_size))
-		{
-			simu_fam_size = Integer.parseInt(cmdLine
-					.getOptionValue(cmd_simu_fam_size));
-		}
-
-		if (cmdLine.hasOption(cmd_simu_fam_marker))
-		{
-			simu_fam_marker = Integer.parseInt(cmdLine
-					.getOptionValue(cmd_simu_fam_marker));
 		}
 
 		// simulation real data
