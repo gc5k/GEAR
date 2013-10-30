@@ -360,22 +360,24 @@ public class AJHG2008 extends ChenBase {
 		double[][] Y = new double[T.size()][1];
 		for (int i = 0; i < T.size(); i++) {
 			Y[i][0] = ((Double) T.get(i)).doubleValue();
+			score[i * 2] = Y[i][0];
+			score[i * 2 + 1] = -1 * Y[i][0];
 		}
 
-		double[] r = null;
-		if (method == 0) {
-			LinearRegression LReg = new LinearRegression(Y, X, true);
-			LReg.MLE();
-			r = LReg.getResiduals1();
-		} else {
-			LogisticRegression LogReg1 = new LogisticRegression(Y, X, true);
-			LogReg1.MLE();
-			r = LogReg1.getResiduals1();
-		}
-
-		for (int i = 0; i < r.length; i++) {
-			score[i * 2] = r[i];
-			score[i * 2 + 1] = -1 * r[i];
-		}
+//		double[] r = null;
+//		if (method == 0) {
+//			LinearRegression LReg = new LinearRegression(Y, X, true);
+//			LReg.MLE();
+//			r = LReg.getResiduals1();
+//		} else {
+//			LogisticRegression LogReg1 = new LogisticRegression(Y, X, true);
+//			LogReg1.MLE();
+//			r = LogReg1.getResiduals1();
+//		}
+//
+//		for (int i = 0; i < r.length; i++) {
+//			score[i * 2] = r[i];
+//			score[i * 2 + 1] = -1 * r[i];
+//		}
 	}
 }
