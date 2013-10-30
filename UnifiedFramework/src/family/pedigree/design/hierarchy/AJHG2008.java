@@ -2,6 +2,7 @@ package family.pedigree.design.hierarchy;
 
 import java.util.ArrayList;
 import java.util.Enumeration;
+import java.util.HashMap;
 import java.util.Hashtable;
 import java.util.Random;
 import java.util.TreeMap;
@@ -285,10 +286,12 @@ public class AJHG2008 extends ChenBase {
 	protected void buildScore(int pheIdx, int[] covIdx, int method) {
 		score = new double[PersonTable.size()];
 		ArrayList<Double> T = NewIt.newArrayList();
+		HashMap<String, Integer> PheCat = NewIt.newHashMap();
 		ArrayList<ArrayList<Double>> C = NewIt.newArrayList();
 
 		for (int i = 0; i < PersonTable.size(); i += 2) {
 			double t = 0;
+			String phe;
 			ArrayList<Double> c = NewIt.newArrayList();
 			ArrayList<String> tempc = CovariateTable.get(i / 2);
 			if (pheIdx == -1) {// using affecting status as phenotype
@@ -296,6 +299,13 @@ public class AJHG2008 extends ChenBase {
 			} else {
 				t = Double.parseDouble((String) tempc.get(pheIdx));
 			}
+			phe = Double.toString(t);
+			if(PheCat.containsKey(phe)) {
+				PheCat.put(phe, 1);
+			} else {
+				PheCat.put(phe, 1);
+			}
+			
 			if (covIdx != null) {
 				for (int j = 0; j < covIdx.length; j++) {
 					c.add((Double.parseDouble((String) tempc.get(covIdx[j]))));
@@ -322,13 +332,20 @@ public class AJHG2008 extends ChenBase {
 		}
 
 		double[] r = null;
-		LinearRegression LReg = new LinearRegression(Y, X, true);
-		LReg.MLE();
-		r = LReg.getResiduals1();
+		if (PheCat.size() > 1) {
+			LinearRegression LReg = new LinearRegression(Y, X, true);
+			LReg.MLE();
+			r = LReg.getResiduals1();			
+			for (int i = 0; i < r.length; i++) {
+				score[i * 2] = r[i];
+				score[i * 2 + 1] = -1 * r[i];
+			}
 
-		for (int i = 0; i < r.length; i++) {
-			score[i * 2] = r[i];
-			score[i * 2 + 1] = -1 * r[i];
+		} else {
+			for (int i = 0; i < r.length; i++) {
+				score[i * 2] = Y[i][0];
+				score[i * 2 + 1] = -1 * Y[i][0];
+			}
 		}
 	}
 
