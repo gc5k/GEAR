@@ -30,7 +30,7 @@ public final class ProfileCommandImpl extends CommandImpl
 
 		FilteredSNPs filteredSNPs = FilteredSNPs.filter(snps, scoreMap, qScoreMap, qRanges, profCmdArgs);
 
-		printSNPFilterResult(qScoreMap, qRanges, filteredSNPs);
+		printSNPFilterResult(qRanges, filteredSNPs);
 
 		ArrayList<String> famIDs = new ArrayList<String>();
 		ArrayList<String> indIDs = new ArrayList<String>();
@@ -147,7 +147,7 @@ public final class ProfileCommandImpl extends CommandImpl
 		predictorFile.close();
 	}
 
-	private void printSNPFilterResult(HashMap<String, Float> qScoreMap,	QRange[] qRanges, FilteredSNPs filteredSNPs)
+	private void printSNPFilterResult(QRange[] qRanges, FilteredSNPs filteredSNPs)
 	{
 		Logger.printUserLog("Number of loci having no score (because they do not appear in the score file, or their scores are invalid, etc.): " + filteredSNPs.getNumLociNoScore());
 		Logger.printUserLog("Number of monomorphic loci (removed): " + filteredSNPs.getNumMonoLoci());
@@ -163,13 +163,12 @@ public final class ProfileCommandImpl extends CommandImpl
 		}
 		Logger.printUserLog("Number of score alleles matching none in the data file: " + filteredSNPs.getMatchNum(AlleleMatchScheme.MATCH_NONE));
 
-		if (qScoreMap != null)
+		if (profCmdArgs.getQScoreFile() != null)
 		{
 			Logger.printUserLog("Number of loci having no q-scores: " + filteredSNPs.getNumLociNoQScore());
 			for (int i = 0; i < filteredSNPs.getNumLocusGroups(); i++)
 			{
-				QRange qRange = qRanges[i];
-				Logger.printUserLog("\tNumber of loci within the range: " + qRange.getLowerBound() + ", " + qRange.getUpperBound() + " is " + filteredSNPs.getNumInLocusGroup(i));
+				Logger.printUserLog("\tNumber of loci within the range: " + qRanges[i].getLowerBound() + ", " + qRanges[i].getUpperBound() + " is " + filteredSNPs.getNumInLocusGroup(i));
 			}
 		}
 	}
