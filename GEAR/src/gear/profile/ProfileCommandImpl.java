@@ -30,29 +30,7 @@ public final class ProfileCommandImpl extends CommandImpl
 
 		FilteredSNPs filteredSNPs = FilteredSNPs.filter(snps, scoreMap, qScoreMap, qRanges, profCmdArgs);
 
-		Logger.printUserLog("Number of loci having no score (because they do not appear in the score file, or their scores are invalid, etc.): " + filteredSNPs.getNumLociNoScore());
-		Logger.printUserLog("Number of monomorphic loci (removed): " + filteredSNPs.getNumMonoLoci());
-		Logger.printUserLog("Number of ambiguous loci (A/T or C/G) " + (profCmdArgs.getIsKeepATGC() ? "detected: " : "removed: ") + filteredSNPs.getNumAmbiguousLoci());
-
-		// Allele Matching Schemes
-		Logger.printUserLog("Number of Scheme I predictors: predictor alleles were A1: " + filteredSNPs.getMatchNum(AlleleMatchScheme.MATCH_ALLELE1));
-		Logger.printUserLog("Number of Scheme II predictors: predictor alleles were A2: " + filteredSNPs.getMatchNum(AlleleMatchScheme.MATCH_ALLELE2));
-		if (profCmdArgs.getIsAutoFlip())
-		{
-			Logger.printUserLog("Number of Scheme III predictors: predictor alleles were flipped A1: " + filteredSNPs.getMatchNum(AlleleMatchScheme.MATCH_ALLELE1_FLIPPED));
-			Logger.printUserLog("Number of Scheme IV predictors: predictor alleles were flipped A2: " + filteredSNPs.getMatchNum(AlleleMatchScheme.MATCH_ALLELE2_FLIPPED));
-		}
-		Logger.printUserLog("Number of score alleles matching none in the data file: " + filteredSNPs.getMatchNum(AlleleMatchScheme.MATCH_NONE));
-
-		if (qScoreMap != null)
-		{
-			Logger.printUserLog("Number of loci having no q-scores: " + filteredSNPs.getNumLociNoQScore());
-			for (int i = 0; i < filteredSNPs.getNumLocusGroups(); i++)
-			{
-				QRange qRange = qRanges[i];
-				Logger.printUserLog("\tNumber of loci within the range: " + qRange.getLowerBound() + ", " + qRange.getUpperBound() + " is " + filteredSNPs.getNumInLocusGroup(i));
-			}
-		}
+		printSNPFilterResult(qScoreMap, qRanges, filteredSNPs);
 
 		ArrayList<String> famIDs = new ArrayList<String>();
 		ArrayList<String> indIDs = new ArrayList<String>();
@@ -167,6 +145,33 @@ public final class ProfileCommandImpl extends CommandImpl
 			predictorFile.println();
 		}
 		predictorFile.close();
+	}
+
+	private void printSNPFilterResult(HashMap<String, Float> qScoreMap,	QRange[] qRanges, FilteredSNPs filteredSNPs)
+	{
+		Logger.printUserLog("Number of loci having no score (because they do not appear in the score file, or their scores are invalid, etc.): " + filteredSNPs.getNumLociNoScore());
+		Logger.printUserLog("Number of monomorphic loci (removed): " + filteredSNPs.getNumMonoLoci());
+		Logger.printUserLog("Number of ambiguous loci (A/T or C/G) " + (profCmdArgs.getIsKeepATGC() ? "detected: " : "removed: ") + filteredSNPs.getNumAmbiguousLoci());
+
+		// Allele Matching Schemes
+		Logger.printUserLog("Number of Scheme I predictors: predictor alleles were A1: " + filteredSNPs.getMatchNum(AlleleMatchScheme.MATCH_ALLELE1));
+		Logger.printUserLog("Number of Scheme II predictors: predictor alleles were A2: " + filteredSNPs.getMatchNum(AlleleMatchScheme.MATCH_ALLELE2));
+		if (profCmdArgs.getIsAutoFlip())
+		{
+			Logger.printUserLog("Number of Scheme III predictors: predictor alleles were flipped A1: " + filteredSNPs.getMatchNum(AlleleMatchScheme.MATCH_ALLELE1_FLIPPED));
+			Logger.printUserLog("Number of Scheme IV predictors: predictor alleles were flipped A2: " + filteredSNPs.getMatchNum(AlleleMatchScheme.MATCH_ALLELE2_FLIPPED));
+		}
+		Logger.printUserLog("Number of score alleles matching none in the data file: " + filteredSNPs.getMatchNum(AlleleMatchScheme.MATCH_NONE));
+
+		if (qScoreMap != null)
+		{
+			Logger.printUserLog("Number of loci having no q-scores: " + filteredSNPs.getNumLociNoQScore());
+			for (int i = 0; i < filteredSNPs.getNumLocusGroups(); i++)
+			{
+				QRange qRange = qRanges[i];
+				Logger.printUserLog("\tNumber of loci within the range: " + qRange.getLowerBound() + ", " + qRange.getUpperBound() + " is " + filteredSNPs.getNumInLocusGroup(i));
+			}
+		}
 	}
 	
 	private void printWhichCoeffModelIsUsed()
