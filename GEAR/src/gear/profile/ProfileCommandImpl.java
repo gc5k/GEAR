@@ -7,7 +7,6 @@ import gear.family.pedigree.file.SNP;
 import gear.util.BufferedReader;
 import gear.util.FileUtil;
 import gear.util.Logger;
-import gear.util.SNPMatch;
 
 import java.io.PrintStream;
 import java.util.ArrayList;
@@ -26,119 +25,32 @@ public final class ProfileCommandImpl extends CommandImpl
 		HashMap<String, Float> qScoreMap = readQScores();  // LocusName-to-QScore map
 		QRange[] qRanges = readQRanges();
 		
-		int[] matchNums = new int[AlleleMatchScheme.values().length];
-		
 		Data genoData = initData();
 		SNP[] snps = genoData.getSNPs();
-		
-		int numLociNoScore = 0, numMonoLoci = 0, numAmbiguousLoci = 0, numLociNoQScore = 0;
-		Score[] scores = new Score[snps.length]; 
-		
-		AlleleMatchScheme[] alleleMatchSchemes = new AlleleMatchScheme[snps.length];
-		for (int i = 0; i < alleleMatchSchemes.length; ++i)
-		{
-			alleleMatchSchemes[i] = AlleleMatchScheme.MATCH_NONE;
-		}
-		
-		int numLocusGroups = qRanges == null ? 1 : qRanges.length;
-		
-		boolean[][] isInLocusGroup = new boolean[snps.length][numLocusGroups];
-		int[] numInLocusGroup = new int[numLocusGroups];
-		
-		// Check whether each SNP should be used for profiling.
-		for (int snpIdx = 0; snpIdx < snps.length; ++snpIdx)
-		{
-			SNP snp = snps[snpIdx];
-			
-			Score score = scoreMap.remove(snp.getName());
-			scores[snpIdx] = score;
-			
-			if (score == null)
-			{
-				++numLociNoScore;
-				continue;
-			}
-			
-			if (profCmdArgs.getIsLogit())
-			{
-				scores[snpIdx].setValue((float)Math.log(score.getValue()));
-			}
-			
-			char allele1 = snp.getFirstAllele();
-			char allele2 = snp.getSecAllele();
-			
-			if (!SNPMatch.isBiallelic(allele1, allele2))
-			{
-				++numMonoLoci;
-				continue;
-			}
-			
-			if (SNPMatch.isAmbiguous(allele1, allele2))  // A/T or C/G
-			{
-				++numAmbiguousLoci;
-				if (!profCmdArgs.getIsKeepATGC())
-				{
-					continue;
-				}
-			}
-			
-			AlleleMatchScheme matchScheme = getMatchScheme(score.getAllele(), allele1, allele2);
-			++matchNums[matchScheme.ordinal()];
-			if (matchScheme == AlleleMatchScheme.MATCH_NONE)
-			{
-				continue;
-			}
-			alleleMatchSchemes[snpIdx] = matchScheme;
-			
-			if (qScoreMap == null)
-			{
-				isInLocusGroup[snpIdx][0] = true;
-			}
-			else
-			{
-				Float qScore = qScoreMap.remove(snp.getName());
-				
-				if (qScore == null)
-				{
-					++numLociNoQScore;
-					continue;
-				}
 
-				assert qRanges != null;
+		FilteredSNPs filteredSNPs = FilteredSNPs.filter(snps, scoreMap, qScoreMap, qRanges, profCmdArgs);
 
-				for (int rangeIdx = 0; rangeIdx < qRanges.length; ++rangeIdx)
-				{
-					QRange qRange = qRanges[rangeIdx];
-					isInLocusGroup[snpIdx][rangeIdx] = qRange.getLowerBound() <= qScore && qScore <= qRange.getUpperBound();
-					if (isInLocusGroup[snpIdx][rangeIdx])
-					{
-						numInLocusGroup[rangeIdx]++;
-					}
-				}
-			}
-		}  // for each SNP
-
-		Logger.printUserLog("Number of loci having no score (because they do not appear in the score file, or their scores are invalid, etc.): " + numLociNoScore);
-		Logger.printUserLog("Number of monomorphic loci (removed): " + numMonoLoci);
-		Logger.printUserLog("Number of ambiguous loci (A/T or C/G) " + (profCmdArgs.getIsKeepATGC() ? "detected: " : "removed: ") + numAmbiguousLoci);
+		Logger.printUserLog("Number of loci having no score (because they do not appear in the score file, or their scores are invalid, etc.): " + filteredSNPs.getNumLociNoScore());
+		Logger.printUserLog("Number of monomorphic loci (removed): " + filteredSNPs.getNumMonoLoci());
+		Logger.printUserLog("Number of ambiguous loci (A/T or C/G) " + (profCmdArgs.getIsKeepATGC() ? "detected: " : "removed: ") + filteredSNPs.getNumAmbiguousLoci());
 
 		// Allele Matching Schemes
-		Logger.printUserLog("Number of Scheme I predictors: predictor alleles were A1: " + matchNums[AlleleMatchScheme.MATCH_ALLELE1.ordinal()]);
-		Logger.printUserLog("Number of Scheme II predictors: predictor alleles were A2: " + matchNums[AlleleMatchScheme.MATCH_ALLELE2.ordinal()]);
+		Logger.printUserLog("Number of Scheme I predictors: predictor alleles were A1: " + filteredSNPs.getMatchNum(AlleleMatchScheme.MATCH_ALLELE1));
+		Logger.printUserLog("Number of Scheme II predictors: predictor alleles were A2: " + filteredSNPs.getMatchNum(AlleleMatchScheme.MATCH_ALLELE2));
 		if (profCmdArgs.getIsAutoFlip())
 		{
-			Logger.printUserLog("Number of Scheme III predictors: predictor alleles were flipped A1: " + matchNums[AlleleMatchScheme.MATCH_ALLELE1_FLIPPED.ordinal()]);
-			Logger.printUserLog("Number of Scheme IV predictors: predictor alleles were flipped A2: " + matchNums[AlleleMatchScheme.MATCH_ALLELE2_FLIPPED.ordinal()]);
+			Logger.printUserLog("Number of Scheme III predictors: predictor alleles were flipped A1: " + filteredSNPs.getMatchNum(AlleleMatchScheme.MATCH_ALLELE1_FLIPPED));
+			Logger.printUserLog("Number of Scheme IV predictors: predictor alleles were flipped A2: " + filteredSNPs.getMatchNum(AlleleMatchScheme.MATCH_ALLELE2_FLIPPED));
 		}
-		Logger.printUserLog("Number of score alleles matching none in the data file: " + matchNums[AlleleMatchScheme.MATCH_NONE.ordinal()]);
+		Logger.printUserLog("Number of score alleles matching none in the data file: " + filteredSNPs.getMatchNum(AlleleMatchScheme.MATCH_NONE));
 
 		if (qScoreMap != null)
 		{
-			Logger.printUserLog("Number of loci having no q-scores: " + numLociNoQScore);
-			for (int i = 0; i < numInLocusGroup.length; i++)
+			Logger.printUserLog("Number of loci having no q-scores: " + filteredSNPs.getNumLociNoQScore());
+			for (int i = 0; i < filteredSNPs.getNumLocusGroups(); i++)
 			{
 				QRange qRange = qRanges[i];
-				Logger.printUserLog("\tNumber of loci within the range: " + qRange.getLowerBound() + ", " + qRange.getUpperBound() + " is " + numInLocusGroup[i]);
+				Logger.printUserLog("\tNumber of loci within the range: " + qRange.getLowerBound() + ", " + qRange.getUpperBound() + " is " + filteredSNPs.getNumInLocusGroup(i));
 			}
 		}
 
@@ -174,21 +86,21 @@ public final class ProfileCommandImpl extends CommandImpl
 			
 			while (indIdx >= riskProfiles.size())
 			{
-				riskProfiles.add(new float [numLocusGroups]);
+				riskProfiles.add(new float [filteredSNPs.getNumLocusGroups()]);
 			}
 			
 			while (indIdx >= numLociUsed.size())
 			{
-				numLociUsed.add(new int [numLocusGroups]);
+				numLociUsed.add(new int [filteredSNPs.getNumLocusGroups()]);
 			}
 			
-			if (scores[locIdx] == null)
+			if (filteredSNPs.getScore(locIdx) == null)
 			{
 				continue;
 			}
 			
 			float scoreAlleleFrac = 0.0f;
-			switch (alleleMatchSchemes[locIdx])
+			switch (filteredSNPs.getAlleleMatchScheme(locIdx))
 			{
 			case MATCH_ALLELE1:
 			case MATCH_ALLELE1_FLIPPED:
@@ -202,11 +114,11 @@ public final class ProfileCommandImpl extends CommandImpl
 				continue;
 			}
 			
-			float riskValue = profCmdArgs.getCoeffModel().compute(scoreAlleleFrac) * scores[locIdx].getValue();
+			float riskValue = profCmdArgs.getCoeffModel().compute(scoreAlleleFrac) * filteredSNPs.getScore(locIdx).getValue();
 			
-			for (int locGrpIdx = 0; locGrpIdx < isInLocusGroup[locIdx].length; ++locGrpIdx)
+			for (int locGrpIdx = 0; locGrpIdx < filteredSNPs.getNumLocusGroups(); ++locGrpIdx)
 			{
-				if (isInLocusGroup[locIdx][locGrpIdx])
+				if (filteredSNPs.isInLocusGroup(locIdx, locGrpIdx))
 				{
 					riskProfiles.get(indIdx)[locGrpIdx] += riskValue;
 					++numLociUsed.get(indIdx)[locGrpIdx];
@@ -218,7 +130,7 @@ public final class ProfileCommandImpl extends CommandImpl
 		{
 			for (int indIdx = 0; indIdx < riskProfiles.size(); ++indIdx)
 			{
-				for (int locGrpIdx = 0; locGrpIdx < numLocusGroups; ++locGrpIdx)
+				for (int locGrpIdx = 0; locGrpIdx < filteredSNPs.getNumLocusGroups(); ++locGrpIdx)
 				{
 					int denom = numLociUsed.get(indIdx)[locGrpIdx];
 					if (denom != 0)
@@ -248,7 +160,7 @@ public final class ProfileCommandImpl extends CommandImpl
 		for (int indIdx = 0; indIdx < riskProfiles.size(); indIdx++)
 		{
 			predictorFile.print(famIDs.get(indIdx) + "\t" + indIDs.get(indIdx) + "\t" + phenos.get(indIdx));
-			for (int locGrpIdx = 0; locGrpIdx < numLocusGroups; ++locGrpIdx)
+			for (int locGrpIdx = 0; locGrpIdx < filteredSNPs.getNumLocusGroups(); ++locGrpIdx)
 			{
 				predictorFile.print("\t" + riskProfiles.get(indIdx)[locGrpIdx]);
 			}
@@ -392,30 +304,6 @@ public final class ProfileCommandImpl extends CommandImpl
 		                       profCmdArgs.getMachInfoFile(),
 		                       profCmdArgs.getMachDosageBatch(),
 		                       profCmdArgs.getMachInfoBatch());
-	}
-	
-	private AlleleMatchScheme getMatchScheme(char scoreAllele, char allele1, char allele2)
-	{
-		if (scoreAllele == allele1)
-		{
-			return AlleleMatchScheme.MATCH_ALLELE1;
-		}
-		else if (scoreAllele == allele2)
-		{
-			return AlleleMatchScheme.MATCH_ALLELE2;
-		}
-		else if (profCmdArgs.getIsAutoFlip())
-		{
-			if (scoreAllele == SNPMatch.Flip(allele1))
-			{
-				return AlleleMatchScheme.MATCH_ALLELE1_FLIPPED;
-			}
-			else if (scoreAllele == SNPMatch.Flip(allele2))
-			{
-				return AlleleMatchScheme.MATCH_ALLELE2_FLIPPED;
-			}
-		}
-		return AlleleMatchScheme.MATCH_NONE;
 	}
 
 	private ProfileCommandArguments profCmdArgs;
