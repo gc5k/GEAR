@@ -29,6 +29,7 @@ public final class ProfileCommand extends Command
 	protected void prepareOptions(Options options)
 	{
 		options.addOption(OptionBuilder.withDescription(OPT_SCORE_DESC).withLongOpt(OPT_SCORE_LONG).isRequired().hasArg().create(OPT_SCORE));
+		options.addOption(OptionBuilder.withDescription(OPT_NO_SCORE_HEADER_DESC).withLongOpt(OPT_NO_SCORE_HEADER_LONG).create());
 		options.addOption(OptionBuilder.withDescription(OPT_QSCORE_DESC).withLongOpt(OPT_QSCORE_LONG).hasArg().create());
 		options.addOption(OptionBuilder.withDescription(OPT_QRANGE_DESC).withLongOpt(OPT_QRANGE_LONG).hasArg().create());
 		options.addOption(OptionBuilder.withDescription(OPT_FILE_DESC).withLongOpt(OPT_FILE_LONG).hasArg().create());
@@ -50,6 +51,7 @@ public final class ProfileCommand extends Command
 	{
 		ProfileCommandArguments profCmdArgs = new ProfileCommandArguments();
 		profCmdArgs.setScoreFile(cmdLine.getOptionValue(OPT_SCORE_LONG));
+		profCmdArgs.setHasScoreHeader(!cmdLine.hasOption(OPT_NO_SCORE_HEADER_LONG));
 		parseQScoreQRangeArgs(profCmdArgs, cmdLine);
 		parseDataFileArgs(profCmdArgs, cmdLine);
 		parseCoeffModelArgs(profCmdArgs, cmdLine);
@@ -213,6 +215,9 @@ public final class ProfileCommand extends Command
 	private static final char OPT_SCORE = 's';
 	private static final String OPT_SCORE_LONG = "score";
 	private static final String OPT_SCORE_DESC = "Specify score file";
+	
+	private static final String OPT_NO_SCORE_HEADER_LONG = "no-score-header";
+	private static final String OPT_NO_SCORE_HEADER_DESC = "Indicate that the score file has no header (title) line";
 	
 	private static final String OPT_QSCORE_LONG = "qscore";
 	private static final String OPT_QSCORE_DESC = "Specify q-score file";
