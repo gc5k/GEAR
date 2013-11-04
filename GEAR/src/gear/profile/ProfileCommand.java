@@ -202,7 +202,6 @@ public final class ProfileCommand extends Command
 			}
 		}
 		
-		resultFile += ".profile";
 		profCmdArgs.setResultFile(resultFile);
 	}
 	

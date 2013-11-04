@@ -120,42 +120,35 @@ public final class ProfileCommandImpl extends CommandImpl
 		}
 		
 		// Write result to file
-		PrintStream predictorFile = FileUtil.CreatePrintStream(profCmdArgs.getResultFile());
-		
-		// Title Line
-		predictorFile.print("FID\tIID");
-		if (qRanges == null)
+		for (int locGrpIdx = 0; locGrpIdx < filteredSNPs.getNumLocusGroups(); ++locGrpIdx)
 		{
+			String fileName = profCmdArgs.getResultFile();
+			if (qRanges != null)
+			{
+				fileName += "." + qRanges[locGrpIdx].getName();
+			}
+			fileName += ".profile";
+			PrintStream predictorFile = FileUtil.CreatePrintStream(fileName);
+			
+			// Title Line
+			predictorFile.print("FID\tIID");
 			for (int traitIdx = 0; traitIdx < scoreFile.getNumberOfTraits(); ++traitIdx)
 			{
 				predictorFile.print("\tSCORE." + scoreFile.getTrait(traitIdx));
 			}
-		}
-		else
-		{
-			for (int traitIdx = 0; traitIdx < scoreFile.getNumberOfTraits(); ++traitIdx)
+			predictorFile.println();
+			
+			for (int indIdx = 0; indIdx < riskProfiles.size(); indIdx++)
 			{
-				for (int rangeIdx = 0; rangeIdx < qRanges.length; ++rangeIdx)
-				{
-					predictorFile.print("\tSCORE." + scoreFile.getTrait(traitIdx) + "." + qRanges[rangeIdx].getName());
-				}
-			}
-		}
-		predictorFile.println();
-		
-		for (int indIdx = 0; indIdx < riskProfiles.size(); indIdx++)
-		{
-			predictorFile.print(famIDs.get(indIdx) + "\t" + indIDs.get(indIdx));
-			for (int traitIdx = 0; traitIdx < scoreFile.getNumberOfTraits(); ++traitIdx)
-			{
-				for (int locGrpIdx = 0; locGrpIdx < filteredSNPs.getNumLocusGroups(); ++locGrpIdx)
+				predictorFile.print(famIDs.get(indIdx) + "\t" + indIDs.get(indIdx));
+				for (int traitIdx = 0; traitIdx < scoreFile.getNumberOfTraits(); ++traitIdx)
 				{
 					predictorFile.print("\t" + riskProfiles.get(indIdx)[traitIdx][locGrpIdx]);
 				}
+				predictorFile.println();
 			}
-			predictorFile.println();
+			predictorFile.close();
 		}
-		predictorFile.close();
 	}
 
 	private void printSNPFilterResult(ScoreFile scoreFile, QRange[] qRanges, FilteredSNPs filteredSNPs)
@@ -262,6 +255,16 @@ public final class ProfileCommandImpl extends CommandImpl
 				float lowerBound, upperBound;
 				lowerBound = ConstValues.isNA(tokens[1]) ? Float.MIN_VALUE : Float.parseFloat(tokens[1]);
 				upperBound = ConstValues.isNA(tokens[2]) ? Float.MAX_VALUE : Float.parseFloat(tokens[2]);
+				
+				for (QRange qRange : qRanges)
+				{
+					if (qRange.getName().equals(tokens[0]))
+					{
+						Logger.printUserError("QRange '" + qRange.getName() + "' appears more than once in the qrange file '" + profCmdArgs.getQRangeFile() + "'.");
+						System.exit(1);
+					}
+				}
+				
 				qRanges.add(new QRange(/* name = */tokens[0], lowerBound, upperBound));
 			}
 			catch (NumberFormatException e)
