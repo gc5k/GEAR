@@ -14,6 +14,16 @@ public final class ProfileCommandArguments extends CommandArguments
 		this.scoreFile = scoreFile;
 	}
 	
+	public boolean getHasScoreHeader()
+	{
+		return hasScoreHeader;
+	}
+
+	public void setHasScoreHeader(boolean hasScoreHeader)
+	{
+		this.hasScoreHeader = hasScoreHeader;
+	}
+	
 	public String getQScoreFile()
 	{
 		return qScoreFile;
@@ -165,6 +175,7 @@ public final class ProfileCommandArguments extends CommandArguments
 	}
 	
 	private String scoreFile;
+	private boolean hasScoreHeader;
 	private String qScoreFile;
 	private String qRangeFile;
 	private String file;

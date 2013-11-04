@@ -199,12 +199,17 @@ public final class ProfileCommandImpl extends CommandImpl
 		
 		BufferedReader reader = BufferedReader.openTextFile(profCmdArgs.getScoreFile(), "score");
 		String[] tokens;
+		
+		if (profCmdArgs.getHasScoreHeader())
+		{
+			reader.readTokens(3);
+		}
 
 		while ((tokens = reader.readTokens(3)) != null)
 		{
 			if (tokens[1].length() != 1)
 			{
-				reader.warningPreviousLine("'" + tokens[1] + "' is not a character, so it is not a valid allele, and this line will be ignored.");
+				reader.errorPreviousLine("'" + tokens[1] + "' is not a character, so it is not a valid allele.");
 				continue;
 			}
 			
@@ -216,7 +221,7 @@ public final class ProfileCommandImpl extends CommandImpl
 				}
 				catch (NumberFormatException e)
 				{
-					reader.warningPreviousLine("'" + tokens[2] + "' is not a floating point number, so it it not a valid score, and this line will be ingored.");
+					reader.errorPreviousLine("'" + tokens[2] + "' is not a floating point number, so it it not a valid score.");
 				}
 			}
 		}
