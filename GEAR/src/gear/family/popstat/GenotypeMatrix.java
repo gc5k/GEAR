@@ -76,6 +76,27 @@ public class GenotypeMatrix
 		// }
 	}
 
+	public int getAdditiveScoreOnFirstAllele(int idx, int i)
+	{
+		// 0 homozygote 1/1
+		// 1 heterozygosity 1/2
+		// 2 homozygote 2/2
+		// 3 missing
+		int posByte = i >> shift;
+		int posBit = (i & 0xf) << 1;
+		int g = (genotypeMat[idx][posByte] >> (posBit)) & 3;
+		return g == 3 ? g : (2-g);
+		// if (g == 1) {// 01
+		// return 3;
+		// } else if (g == 0) {
+		// return 0;
+		// } else if (g == 2) {
+		// return 1;
+		// } else {
+		// return 2;
+		// }
+	}
+
 	public byte getOriginalGenotypeScore(int ind, int i)
 	{// this only for write back to bed file purpose
 		int posByte = i >> shift;
