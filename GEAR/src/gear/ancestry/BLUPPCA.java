@@ -14,13 +14,18 @@ import gear.util.BinaryInputFile;
 import gear.util.FileUtil;
 import gear.util.Logger;
 import gear.util.pop.PopStat;
-import gear.util.stat.PCA.NCGStatUtils;
 
+import java.io.BufferedReader;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.io.InputStreamReader;
 import java.io.PrintStream;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.zip.GZIPInputStream;
 
 import org.apache.commons.math.linear.Array2DRowRealMatrix;
 import org.apache.commons.math.linear.LUDecompositionImpl;
@@ -29,6 +34,8 @@ import org.apache.commons.math.linear.RealMatrix;
 public class BLUPPCA
 {
 	
+	private final String delim = "\\s+";
+
 	private boolean[] flag;
 	private String phenoFile;
 	private double[][] phe;
@@ -40,8 +47,6 @@ public class BLUPPCA
 	private SampleFilter sf;
 	private SumStatQC ssQC;
 	private GenotypeMatrix gm;
-
-	private double[][] freq;
 	
 	public BLUPPCA()
 	{
@@ -49,7 +54,15 @@ public class BLUPPCA
 		//read grm
 		id2Idx = new HashMap<SubjectID, Integer>();
 		readGrmIds(id2Idx);
-		readGRM();
+
+		if (CmdArgs.INSTANCE.getHEArgs().isGrmBinary())
+		{
+			readGRMbin();
+		}
+		else if (CmdArgs.INSTANCE.getHEArgs().isGrm())
+		{
+			readGRMgz();
+		}
 
 		flag = new boolean[id2Idx.size()];
 		Arrays.fill(flag, false);
@@ -96,8 +109,6 @@ public class BLUPPCA
 
 		//impute
 		PopStat.Imputation(gm);
-		//calculate freq
-		freq = PopStat.calAlleleFrequency(gm, gm.getNumMarker());
 	}
 
 	public void BLUPit()
@@ -121,7 +132,7 @@ public class BLUPPCA
 			}
 			Logger.printUserLog("\n");
 		}
-		
+
 		double[][] blupPC = new double[gm.getNumMarker()][phe[0].length];
 
 		RealMatrix grm = new Array2DRowRealMatrix(A);
@@ -223,7 +234,7 @@ public class BLUPPCA
 		reader.close();
 	}
 
-	private void readGRM()
+	private void readGRMbin()
 	{
 		BinaryInputFile grmBin = new BinaryInputFile(CmdArgs.INSTANCE.getHEArgs().getGrm(), "GRM");
 		grmBin.setLittleEndian(true);
@@ -239,6 +250,60 @@ public class BLUPPCA
 				}
 			}
 		}
+	}
+
+	private void readGRMgz()
+	{
+		A = new double[id2Idx.size()][id2Idx.size()];
+		FileInputStream fin = null;
+		try
+		{
+			fin = new FileInputStream(CmdArgs.INSTANCE.getHEArgs()
+					.getGrm());
+		}
+		catch (FileNotFoundException e)
+		{
+			Logger.handleException(e, "Cannot open the GRM file '"
+					+ CmdArgs.INSTANCE.getHEArgs().getGrm() + "'.");
+		}
+
+		GZIPInputStream gzis = null;
+		try
+		{
+			gzis = new GZIPInputStream(fin);
+		} 
+		catch (IOException e)
+		{
+			Logger.handleException(e, "Cannot open the GRM archive '"
+					+ CmdArgs.INSTANCE.getHEArgs().getGrm() + "'.");
+		}
+		InputStreamReader xover = new InputStreamReader(gzis);
+
+		BufferedReader grmFile = new BufferedReader(xover);
+
+		String line;
+		try
+		{
+			for (int i = 0; i < A.length; i++)
+			{
+				for (int j = 0; j <= i; j++)
+				{
+					if ((line = grmFile.readLine()) != null) 
+					{
+						String[] s = line.split(delim);
+						A[i][j] = A[j][i] = Double.parseDouble(s[3]);
+					}
+				}
+			}
+		} 
+		catch (IOException e)
+		{
+			Logger.handleException(e,
+					"An exception occurred when reading the GRM archive '"
+							+ CmdArgs.INSTANCE.getHEArgs().getGrm()
+							+ "'.");
+		}
+
 	}
 
 	private void readPhenotypes(HashMap<SubjectID, Integer> id2Idx)
