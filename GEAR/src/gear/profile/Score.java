@@ -1,28 +1,34 @@
 package gear.profile;
 
-public class Score
+/**
+ * Score values for a specific allele of a SNP 
+ * 
+ * @author Zhixiang
+ *
+ */
+class Score
 {
-	private char allele;
-	private float value;
-
-	public Score(char allele, float value)
+	protected Score(char allele, int numValues)
 	{
 		this.allele = allele;
-		this.value = value;
+		this.values = new Float[numValues];
 	}
 
-	public char getAllele()
+	protected char getAllele()
 	{
 		return allele;
 	}
 
-	public float getValue()
+	protected Float getValue(int i)
 	{
-		return value;
+		return values[i];
 	}
 	
-	public void setValue(float value)
+	protected void setValue(int i, Float value)
 	{
-		this.value = value;
+		values[i] = value;
 	}
+	
+	private char allele;
+	private Float[] values;
 }

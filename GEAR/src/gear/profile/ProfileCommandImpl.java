@@ -21,135 +21,145 @@ public final class ProfileCommandImpl extends CommandImpl
 		
 		printWhichCoeffModelIsUsed();
 		
-		HashMap<String, Score> scoreMap = readScores();  // LocusName-to-Score map
+		ScoreFile scoreFile = new ScoreFile(profCmdArgs.getScoreFile(), profCmdArgs.getHasScoreHeader());
+
 		HashMap<String, Float> qScoreMap = readQScores();  // LocusName-to-QScore map
 		QRange[] qRanges = readQRanges();
 		
 		Data genoData = initData();
 		SNP[] snps = genoData.getSNPs();
 
-		FilteredSNPs filteredSNPs = FilteredSNPs.filter(snps, scoreMap, qScoreMap, qRanges, profCmdArgs);
+		FilteredSNPs filteredSNPs = new FilteredSNPs(snps, scoreFile, qScoreMap, qRanges, profCmdArgs);
 
-		printSNPFilterResult(qRanges, filteredSNPs);
+		printSNPFilterResult(scoreFile, qRanges, filteredSNPs);
 
 		ArrayList<String> famIDs = new ArrayList<String>();
 		ArrayList<String> indIDs = new ArrayList<String>();
-		ArrayList<String> phenos = new ArrayList<String>();
-		ArrayList<float[]> riskProfiles = new ArrayList<float[]>();
-		ArrayList<int[]> numLociUsed = new ArrayList<int[]>();
+		ArrayList<float[][]> riskProfiles = new ArrayList<float[][]>();
+		ArrayList<int[][]> numLociUsed = new ArrayList<int[][]>();
 		
-		Data.Iterator iter = genoData.iterator();
-		while (iter.next())
+		for (int traitIdx = 0; traitIdx < scoreFile.getNumberOfTraits(); ++traitIdx)
 		{
-			int indIdx = iter.getIndividualIndex();
-			int locIdx = iter.getLocusIndex();
-			
-			while (indIdx >= famIDs.size())
+			Data.Iterator iter = genoData.iterator();
+			while (iter.next())
 			{
-				famIDs.add(null);
-			}
-			famIDs.set(indIdx, iter.getFamilyID());
-			
-			while (indIdx >= indIDs.size())
-			{
-				indIDs.add(null);
-			}
-			indIDs.set(indIdx, iter.getIndividualID());
-			
-			while (indIdx >= phenos.size())
-			{
-				phenos.add(null);
-			}
-			phenos.set(indIdx, iter.getPhenotype());
-			
-			while (indIdx >= riskProfiles.size())
-			{
-				riskProfiles.add(new float [filteredSNPs.getNumLocusGroups()]);
-			}
-			
-			while (indIdx >= numLociUsed.size())
-			{
-				numLociUsed.add(new int [filteredSNPs.getNumLocusGroups()]);
-			}
-			
-			if (filteredSNPs.getScore(locIdx) == null)
-			{
-				continue;
-			}
-			
-			float scoreAlleleFrac = 0.0f;
-			switch (filteredSNPs.getAlleleMatchScheme(locIdx))
-			{
-			case MATCH_ALLELE1:
-			case MATCH_ALLELE1_FLIPPED:
-				scoreAlleleFrac = iter.getAllele1Fraction();
-				break;
-			case MATCH_ALLELE2:
-			case MATCH_ALLELE2_FLIPPED:
-				scoreAlleleFrac = 2.0f - iter.getAllele1Fraction();
-				break;
-			default:
-				continue;
-			}
-			
-			float riskValue = profCmdArgs.getCoeffModel().compute(scoreAlleleFrac) * filteredSNPs.getScore(locIdx).getValue();
-			
-			for (int locGrpIdx = 0; locGrpIdx < filteredSNPs.getNumLocusGroups(); ++locGrpIdx)
-			{
-				if (filteredSNPs.isInLocusGroup(locIdx, locGrpIdx))
+				int indIdx = iter.getIndividualIndex();
+				int locIdx = iter.getLocusIndex();
+				
+				while (indIdx >= famIDs.size())
 				{
-					riskProfiles.get(indIdx)[locGrpIdx] += riskValue;
-					++numLociUsed.get(indIdx)[locGrpIdx];
+					famIDs.add(null);
 				}
-			}
-		}
+				famIDs.set(indIdx, iter.getFamilyID());
+				
+				while (indIdx >= indIDs.size())
+				{
+					indIDs.add(null);
+				}
+				indIDs.set(indIdx, iter.getIndividualID());
+				
+				while (indIdx >= riskProfiles.size())
+				{
+					riskProfiles.add(new float [scoreFile.getNumberOfTraits()][filteredSNPs.getNumLocusGroups()]);
+				}
+				
+				while (indIdx >= numLociUsed.size())
+				{
+					numLociUsed.add(new int [scoreFile.getNumberOfTraits()][filteredSNPs.getNumLocusGroups()]);
+				}
+				
+				if (filteredSNPs.getScore(traitIdx, locIdx) == null)
+				{
+					continue;
+				}
+				
+				float scoreAlleleFrac = 0.0f;
+				switch (filteredSNPs.getAlleleMatchScheme(locIdx))
+				{
+				case MATCH_ALLELE1:
+				case MATCH_ALLELE1_FLIPPED:
+					scoreAlleleFrac = iter.getAllele1Fraction();
+					break;
+				case MATCH_ALLELE2:
+				case MATCH_ALLELE2_FLIPPED:
+					scoreAlleleFrac = 2.0f - iter.getAllele1Fraction();
+					break;
+				default:
+					continue;
+				}
+				
+				float riskValue = profCmdArgs.getCoeffModel().compute(scoreAlleleFrac) * filteredSNPs.getScore(traitIdx, locIdx);
+				
+				for (int locGrpIdx = 0; locGrpIdx < filteredSNPs.getNumLocusGroups(); ++locGrpIdx)
+				{
+					if (filteredSNPs.isInLocusGroup(locIdx, locGrpIdx))
+					{
+						riskProfiles.get(indIdx)[traitIdx][locGrpIdx] += riskValue;
+						++numLociUsed.get(indIdx)[traitIdx][locGrpIdx];
+					}
+				}
+			}  // while data
+		}  // for each trait
 
 		if (profCmdArgs.getIsWeighted())
 		{
 			for (int indIdx = 0; indIdx < riskProfiles.size(); ++indIdx)
 			{
-				for (int locGrpIdx = 0; locGrpIdx < filteredSNPs.getNumLocusGroups(); ++locGrpIdx)
+				for (int traitIdx = 0; traitIdx < scoreFile.getNumberOfTraits(); ++traitIdx)
 				{
-					int denom = numLociUsed.get(indIdx)[locGrpIdx];
-					if (denom != 0)
+					for (int locGrpIdx = 0; locGrpIdx < filteredSNPs.getNumLocusGroups(); ++locGrpIdx)
 					{
-						riskProfiles.get(indIdx)[locGrpIdx] /= profCmdArgs.getIsSameAsPlink() ? (denom << 1) : denom;
+						int denom = numLociUsed.get(indIdx)[traitIdx][locGrpIdx];
+						if (denom != 0)
+						{
+							riskProfiles.get(indIdx)[traitIdx][locGrpIdx] /= profCmdArgs.getIsSameAsPlink() ? (denom << 1) : denom;
+						}
 					}
 				}
 			}
 		}
+		
+		// Write result to file
 		PrintStream predictorFile = FileUtil.CreatePrintStream(profCmdArgs.getResultFile());
 		
 		// Title Line
-		predictorFile.print("FID\tIID\tPHENO");
+		predictorFile.print("FID\tIID");
 		if (qRanges == null)
 		{
-			predictorFile.print("\tSCORE");
+			for (int traitIdx = 0; traitIdx < scoreFile.getNumberOfTraits(); ++traitIdx)
+			{
+				predictorFile.print("\tSCORE." + scoreFile.getTrait(traitIdx));
+			}
 		}
 		else
 		{
-			for (int rangeIdx = 0; rangeIdx < qRanges.length; ++rangeIdx)
+			for (int traitIdx = 0; traitIdx < scoreFile.getNumberOfTraits(); ++traitIdx)
 			{
-				predictorFile.print("\tSCORE." + qRanges[rangeIdx].getName());
+				for (int rangeIdx = 0; rangeIdx < qRanges.length; ++rangeIdx)
+				{
+					predictorFile.print("\tSCORE." + scoreFile.getTrait(traitIdx) + "." + qRanges[rangeIdx].getName());
+				}
 			}
 		}
 		predictorFile.println();
 		
 		for (int indIdx = 0; indIdx < riskProfiles.size(); indIdx++)
 		{
-			predictorFile.print(famIDs.get(indIdx) + "\t" + indIDs.get(indIdx) + "\t" + phenos.get(indIdx));
-			for (int locGrpIdx = 0; locGrpIdx < filteredSNPs.getNumLocusGroups(); ++locGrpIdx)
+			predictorFile.print(famIDs.get(indIdx) + "\t" + indIDs.get(indIdx));
+			for (int traitIdx = 0; traitIdx < scoreFile.getNumberOfTraits(); ++traitIdx)
 			{
-				predictorFile.print("\t" + riskProfiles.get(indIdx)[locGrpIdx]);
+				for (int locGrpIdx = 0; locGrpIdx < filteredSNPs.getNumLocusGroups(); ++locGrpIdx)
+				{
+					predictorFile.print("\t" + riskProfiles.get(indIdx)[traitIdx][locGrpIdx]);
+				}
 			}
 			predictorFile.println();
 		}
 		predictorFile.close();
 	}
 
-	private void printSNPFilterResult(QRange[] qRanges, FilteredSNPs filteredSNPs)
+	private void printSNPFilterResult(ScoreFile scoreFile, QRange[] qRanges, FilteredSNPs filteredSNPs)
 	{
-		Logger.printUserLog("Number of loci having no score (because they do not appear in the score file, or their scores are invalid, etc.): " + filteredSNPs.getNumLociNoScore());
 		Logger.printUserLog("Number of monomorphic loci (removed): " + filteredSNPs.getNumMonoLoci());
 		Logger.printUserLog("Number of ambiguous loci (A/T or C/G) " + (profCmdArgs.getIsKeepATGC() ? "detected: " : "removed: ") + filteredSNPs.getNumAmbiguousLoci());
 
@@ -168,8 +178,13 @@ public final class ProfileCommandImpl extends CommandImpl
 			Logger.printUserLog("Number of loci having no q-scores: " + filteredSNPs.getNumLociNoQScore());
 			for (int i = 0; i < filteredSNPs.getNumLocusGroups(); i++)
 			{
-				Logger.printUserLog("\tNumber of loci within the range: " + qRanges[i].getLowerBound() + ", " + qRanges[i].getUpperBound() + " is " + filteredSNPs.getNumInLocusGroup(i));
+				Logger.printUserLog("Number of loci within the range: " + qRanges[i].getLowerBound() + ", " + qRanges[i].getUpperBound() + " is " + filteredSNPs.getNumInLocusGroup(i));
 			}
+		}
+		
+		for (int traitIdx = 0; traitIdx < scoreFile.getNumberOfTraits(); ++traitIdx)
+		{
+			Logger.printUserLog("Number of loci having no score for trait " + scoreFile.getTrait(traitIdx) + ": " + filteredSNPs.getNumLociNoScore(traitIdx));
 		}
 	}
 	
@@ -191,44 +206,6 @@ public final class ProfileCommandImpl extends CommandImpl
 		{
 			Logger.printUserLog("Recessive model is used.");
 		}
-	}
-	
-	private HashMap<String, Score> readScores()
-	{
-		HashMap<String, Score> scores = new HashMap<String, Score>();
-		
-		BufferedReader reader = BufferedReader.openTextFile(profCmdArgs.getScoreFile(), "score");
-		String[] tokens;
-		
-		if (profCmdArgs.getHasScoreHeader())
-		{
-			reader.readTokens(3);
-		}
-
-		while ((tokens = reader.readTokens(3)) != null)
-		{
-			if (tokens[1].length() != 1)
-			{
-				reader.errorPreviousLine("'" + tokens[1] + "' is not a character, so it is not a valid allele.");
-				continue;
-			}
-			
-			if (!ConstValues.isNA(tokens[2]))
-			{
-				try
-				{
-					scores.put(/* locusName = */ tokens[0], new Score(/* scoreAllele = */ tokens[1].charAt(0), /* score = */ Float.parseFloat(tokens[2])));
-				}
-				catch (NumberFormatException e)
-				{
-					reader.errorPreviousLine("'" + tokens[2] + "' is not a floating point number, so it it not a valid score.");
-				}
-			}
-		}
-		reader.close();
-		
-		Logger.printUserLog("Number of valid scores: " + scores.size());
-		return scores;
 	}
 
 	private HashMap<String, Float> readQScores()

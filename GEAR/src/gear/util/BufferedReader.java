@@ -150,6 +150,21 @@ public class BufferedReader
 		}
 		return tokens;
 	}
+	
+	public String[] readTokensAtLeast(int minNumCols)
+	{
+		String[] tokens = readTokens();
+		if (tokens != null && tokens.length < minNumCols)
+		{
+			String msg = "";
+			msg += "The format of the " + fileType + " file '" + fileName + "' is incorrect: ";
+			msg += "The file should consists of at least " + minNumCols + " column(s) at line ";
+			msg += + curLineNum + ", but this line actually contains only " + tokens.length + " column(s).";
+			Logger.printUserError(msg);
+			System.exit(1);
+		}
+		return tokens;
+	}
 
 	public String getFileName()
 	{
