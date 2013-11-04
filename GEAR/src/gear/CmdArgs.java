@@ -607,7 +607,7 @@ public enum CmdArgs
 
 	private final String cmd_bluppca = "bluppca";
 	public boolean bluppcaFlag = false;
-
+	
 	// /////////////////pop stat
 	private final String cmd_freq = "freq";
 	public boolean freqFlag = false;
