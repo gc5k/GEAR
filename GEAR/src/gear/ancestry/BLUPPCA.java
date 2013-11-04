@@ -31,7 +31,7 @@ public class BLUPPCA
 	
 	private boolean[] flag;
 	private String phenoFile;
-	private double[] y;
+	private double[][] phe;
 	private double[][] A;
 
 	private HashMap<SubjectID, Integer> id2Idx;
@@ -85,6 +85,15 @@ public class BLUPPCA
 				sf);
 		mapFile = ssQC.getMapFile();
 		gm = new GenotypeMatrix(ssQC.getSample());
+		
+		System.out.println("geno test:" + gm.getBiAlleleGenotype(0, 0)[0] + gm.getBiAlleleGenotype(0, 0)[1]);
+		System.out.println("geno test:" + gm.getBiAlleleGenotype(0, 1)[0] + gm.getBiAlleleGenotype(0, 1)[1]);
+		System.out.println("geno test:" + gm.getBiAlleleGenotype(0, 2)[0] + gm.getBiAlleleGenotype(0, 2)[1]);
+
+		System.out.println("geno test:" + gm.getBiAlleleGenotype(1, 0)[0] + gm.getBiAlleleGenotype(1, 0)[1]);
+		System.out.println("geno test:" + gm.getBiAlleleGenotype(1, 1)[0] + gm.getBiAlleleGenotype(1, 1)[1]);
+		System.out.println("geno test:" + gm.getBiAlleleGenotype(1, 2)[0] + gm.getBiAlleleGenotype(1, 2)[1]);
+
 		//impute
 		PopStat.Imputation(gm);
 		//calculate freq
@@ -93,32 +102,71 @@ public class BLUPPCA
 
 	public void BLUPit()
 	{
-		RealMatrix grm = new Array2DRowRealMatrix(A);
-		RealMatrix grm_Inv = (new LUDecompositionImpl(grm)).getSolver().getInverse();
 
 		double[][] genoMat = new double[gm.getNumIndivdial()][gm.getNumMarker()];
 		for(int i = 0; i < genoMat.length; i++)
 		{
 			for(int j = 0; j < genoMat[i].length; j++)
 			{
-				genoMat[i][j] = gm.getAdditiveScore(i, j);
+				genoMat[i][j] = gm.getAdditiveScoreOnFirstAllele(i, j);
 			}
 		}
 
-		Logger.printUserLog("Standardizing genotypes...");
-		NCGStatUtils.standardize(genoMat, false);
-
-		Logger.printUserLog("Calculating blup pca...");
-		RealMatrix tmp = (new Array2DRowRealMatrix(genoMat)).transpose().multiply(grm_Inv);
-		RealMatrix B = tmp.multiply(new Array2DRowRealMatrix(y));
-
-		Logger.printUserLog("Rescaling the snp effects...");
-		for(int i = 0; i < B.getRowDimension(); i++)
+		Logger.printUserLog("Geno");
+		for(int i = 0; i < 2; i++)
 		{
-			double b = B.getEntry(i, 0);
-			double sd = Math.sqrt(freq[i][0] * (1-freq[i][0]) * 2);
-			double s = b / sd / B.getRowDimension();
-			B.setEntry(i, 0, s);
+			for(int j = 0; j < 2; j++)
+			{
+				Logger.printUserLog(genoMat[i][j] + "\t");				
+			}
+			Logger.printUserLog("\n");
+		}
+		
+		double[][] blupPC = new double[gm.getNumMarker()][phe[0].length];
+
+		RealMatrix grm = new Array2DRowRealMatrix(A);
+		for(int i = 0; i < 2; i++)
+		{
+			for(int j = 0; j < 2; j++)
+			{
+				Logger.printUserLog(grm.getEntry(i, j) + "\t");				
+			}
+			Logger.printUserLog("\n");
+		}
+		RealMatrix grm_Inv = (new LUDecompositionImpl(grm)).getSolver().getInverse();
+
+		Logger.printUserLog("Invers");
+		for(int i = 0; i < 2; i++)
+		{
+			for(int j = 0; j < 2; j++)
+			{
+				Logger.printUserLog(grm_Inv.getEntry(i, j) + "\t");				
+			}
+			Logger.printUserLog("\n");
+		}
+
+		
+		Logger.printUserLog("Revving up the BLUP machine...");
+		RealMatrix tmp = (new Array2DRowRealMatrix(genoMat)).transpose().multiply(grm_Inv);
+
+		for(int i = 0; i < phe[0].length; i++)
+		{
+			Logger.printUserLog("Calculating blup vector[" + (i+1) + "].");
+
+			double[] Y = new double[phe.length];
+			for(int j = 0; j < phe.length; j++)
+			{
+				Y[j] = phe[j][i];
+			}
+			RealMatrix B = tmp.multiply(new Array2DRowRealMatrix(Y));
+
+			Logger.printUserLog("Rescaling the snp effects...");
+			for(int j = 0; j < B.getRowDimension(); j++)
+			{
+				blupPC[j][i] = B.getEntry(j, 0);
+//				double sd = Math.sqrt(freq[j][0] * (1-freq[j][0]) * 2);
+//				blupPC[j][i] = b; // * sd / B.getRowDimension();
+			}
 		}
 
 		StringBuilder fsb = new StringBuilder();
@@ -129,14 +177,36 @@ public class BLUPPCA
 		// Title Line
 		ArrayList<SNP> snpList = mapFile.getMarkerList();
 
-		predictorFile.println("SNP\tA1\tBLUP");
-		for(int i = 0; i < B.getRowDimension(); i++)
+		predictorFile.print("SNP\tRefAllele");
+		for(int i = 0; i < phe[0].length; i++)
+		{
+			if (i == (phe[0].length - 1)) 
+			{
+				predictorFile.println("\tBLUP" + (i+1));				
+			}
+			else
+			{
+				predictorFile.print("\tBLUP" + (i+1));
+			}
+		}
+
+		for(int i = 0; i < gm.getNumMarker(); i++)
 		{
 			SNP snp = snpList.get(i);
-			predictorFile.println(snp.getName() + "\t" + snp.getFirstAllele() + "\t" + B.getEntry(i, 0));
+			predictorFile.print(snp.getName() + "\t" + snp.getFirstAllele() + "\t");
+			for(int j = 0; j < blupPC[i].length; j++)
+			{
+				if (j == (blupPC[i].length - 1))
+				{
+					predictorFile.println(blupPC[i][j]);
+				}
+				else
+				{
+					predictorFile.print(blupPC[i][j]+"\t");
+				}
+			}
 		}
 		predictorFile.close();
-
 	}
 
 	private void readGrmIds(HashMap<SubjectID, Integer> id2Idx)
@@ -158,7 +228,7 @@ public class BLUPPCA
 		BinaryInputFile grmBin = new BinaryInputFile(CmdArgs.INSTANCE.getHEArgs().getGrm(), "GRM");
 		grmBin.setLittleEndian(true);
 		A = new double[id2Idx.size()][id2Idx.size()];
-		Logger.printUserLog("making A matrix");
+		Logger.printUserLog("Constructing A matrix: a " + id2Idx.size() + " X " + id2Idx.size() + " matrix.");
 		for (int i = 0; i < A.length; i++) 
 		{
 			for (int j = 0; j <= i; j++)
@@ -175,27 +245,32 @@ public class BLUPPCA
 	{
 		Logger.printUserLog("reading phentoypes from '" + phenoFile + "'");
 		gear.util.BufferedReader reader = gear.util.BufferedReader.openTextFile(phenoFile, "phenotype");
-		
-		y = new double[id2Idx.size()];
-		Arrays.fill(y, -9);
-		
+				
 		@SuppressWarnings("unchecked")
 		HashMap<SubjectID, Integer> subjectsUnread = (HashMap<SubjectID, Integer>)id2Idx.clone();
 
 		HashSet<SubjectID> subjectsRead = new HashSet<SubjectID>();
 
-		int tarTraitIdx = CmdArgs.INSTANCE.getHEArgs().getTargetTraitOptionValue() - 1;
-		int minNumCols = 2 + tarTraitIdx + 1;
-
 		String[] tokens = null;
 
+		int c = 0;
 		while ((tokens = reader.readTokens()) != null)
 		{
-			if (tokens.length < minNumCols)
+
+			if (tokens.length < 3)
 			{
-				reader.errorPreviousLine("There should be at least " + minNumCols + " columns.");
+				reader.errorPreviousLine("There should be at least " + 3 + " columns.");
 			}
-			
+			if (c == 0) 
+			{
+				phe = new double[id2Idx.size()][tokens.length - 2];
+				c++;
+				for( int i = 0; i < id2Idx.size(); i++)
+				{
+					Arrays.fill(phe[i], -9);
+				}
+			}
+
 			SubjectID subID = new SubjectID(/*famID*/tokens[0], /*indID*/tokens[1]);
 
 			int ii = 0;
@@ -203,25 +278,26 @@ public class BLUPPCA
 			{
 				ii = subjectsUnread.get(subID);
 				boolean f = true;
-				String pheValStr = tokens[2 + tarTraitIdx];
-				if (ConstValues.isNA(pheValStr))
+				String pheValStr = null;
+				try
 				{
-					f = false;
-					break;
+					for( int i = 0; i < phe[ii].length; i++)
+					{
+						pheValStr = tokens[2 + i];
+						if (ConstValues.isNA(pheValStr))
+						{
+							f = false;
+							break;
+						}
+						phe[ii][i] = Double.parseDouble(pheValStr);							
+					}
 				}
-				else
+				catch (NumberFormatException e)
 				{
-					try
-					{
-						y[ii] = Double.parseDouble(pheValStr);
-					}
-					catch (NumberFormatException e)
-					{
-						reader.errorPreviousLine("'" + pheValStr + "' is not a valid phenotype value. It should be a floating point number.");
-					}
+					reader.errorPreviousLine("'" + pheValStr + "' is not a valid phenotype value. It should be a floating point number.");
 				}
 				flag[ii] = f;
-				
+
 				subjectsUnread.remove(subID);
 				subjectsRead.add(subID);
 			}
