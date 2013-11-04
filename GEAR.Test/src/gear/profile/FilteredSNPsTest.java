@@ -27,15 +27,7 @@ public class FilteredSNPsTest
 		snps[8] = new SNP("SNP9", 'T', 'C');
 		snps[9] = new SNP("SNP10", 'T', 'G');
 		
-		HashMap<String, Score> scoreMap = new HashMap<String, Score>();
-		scoreMap.put("SNP1", new Score('A', 1.0f));
-		scoreMap.put("SNP2", new Score('A', 1.1f));
-		scoreMap.put("SNP3", new Score('G', 2.4f));
-		scoreMap.put("SNP5", new Score('C', 2.1f));
-		scoreMap.put("SNP6", new Score('A', 1.5f));
-		scoreMap.put("SNP7", new Score('G', 3.0f));
-		scoreMap.put("SNP8", new Score('C', 4.1f));
-		scoreMap.put("SNP10", new Score('C', 0.7f));
+		ScoreFile scoreFile = new ScoreFile("data/ScoresWithHeaders.txt", /*hasHeaders*/true);
 		
 		HashMap<String, Float> qScoreMap = new HashMap<String, Float>();
 		qScoreMap.put("SNP1", 2.0f);
@@ -56,39 +48,13 @@ public class FilteredSNPsTest
 		cmdArgs.setIsKeepATGC(true);
 		cmdArgs.setIsAutoFlip(true);
 		
-		FilteredSNPs filteredSNPs = FilteredSNPs.filter(snps, scoreMap, qScoreMap, qRanges, cmdArgs);
+		FilteredSNPs filteredSNPs = new FilteredSNPs(snps, scoreFile, qScoreMap, qRanges, cmdArgs);
 		
-		assertNotNull(filteredSNPs.getScore(0));
-		assertEquals('A', filteredSNPs.getScore(0).getAllele());
-		assertEquals(1.0f, filteredSNPs.getScore(0).getValue(), 1e-3);
-		assertNotNull(filteredSNPs.getScore(1));
-		assertEquals('A', filteredSNPs.getScore(1).getAllele());
-		assertEquals(1.1f, filteredSNPs.getScore(1).getValue(), 1e-3);
-		assertNotNull(filteredSNPs.getScore(2));
-		assertEquals('G', filteredSNPs.getScore(2).getAllele());
-		assertEquals(2.4f, filteredSNPs.getScore(2).getValue(), 1e-3);
-		assertNull(filteredSNPs.getScore(3));
-		assertNotNull(filteredSNPs.getScore(4));
-		assertEquals('C', filteredSNPs.getScore(4).getAllele());
-		assertEquals(2.1f, filteredSNPs.getScore(4).getValue(), 1e-3);
-		assertNotNull(filteredSNPs.getScore(5));
-		assertEquals('A', filteredSNPs.getScore(5).getAllele());
-		assertEquals(1.5f, filteredSNPs.getScore(5).getValue(), 1e-3);
-		assertNotNull(filteredSNPs.getScore(6));
-		assertEquals('G', filteredSNPs.getScore(6).getAllele());
-		assertEquals(3.0f, filteredSNPs.getScore(6).getValue(), 1e-3);
-		assertNotNull(filteredSNPs.getScore(7));
-		assertEquals('C', filteredSNPs.getScore(7).getAllele());
-		assertEquals(4.1f, filteredSNPs.getScore(7).getValue(), 1e-3);
-		assertNull(filteredSNPs.getScore(8));
-		assertNotNull(filteredSNPs.getScore(9));
-		assertEquals('C', filteredSNPs.getScore(9).getAllele());
-		assertEquals(0.7f, filteredSNPs.getScore(9).getValue(), 1e-3);
-		
-		assertEquals(2, filteredSNPs.getNumLociNoScore());
-		assertEquals(1, filteredSNPs.getNumLociNoQScore());  // SNP9 has no score, so its q-score is not checked.
-		assertEquals(1, filteredSNPs.getNumMonoLoci());  // SNP4 has no score, so its mono is not checked.
+		assertEquals(1, filteredSNPs.getNumLociNoQScore());  // SNP9 doesn't appear in the score file, so its q-score is not checked.
+		assertEquals(2, filteredSNPs.getNumMonoLoci());  // SNP4 and SNP8
 		assertEquals(2, filteredSNPs.getNumAmbiguousLoci());  // SNP2 and SNP7
+		assertEquals(2, filteredSNPs.getNumLociNoScore(0));
+		assertEquals(1, filteredSNPs.getNumLociNoScore(1));
 		
 		assertEquals(0, filteredSNPs.getMatchNum(AlleleMatchScheme.MATCH_NONE));
 		assertEquals(3, filteredSNPs.getMatchNum(AlleleMatchScheme.MATCH_ALLELE1));  // SNP1, SNP2, SNP5
@@ -121,7 +87,7 @@ public class FilteredSNPsTest
 		assertTrue(!filteredSNPs.isInLocusGroup(2, 1));
 		assertTrue(filteredSNPs.isInLocusGroup(2, 2));
 		assertTrue(!filteredSNPs.isInLocusGroup(2, 3));
-		assertTrue(!filteredSNPs.isInLocusGroup(3, 0));  // SNP4 has no score
+		assertTrue(!filteredSNPs.isInLocusGroup(3, 0));  // SNP4 is monolithic
 		assertTrue(!filteredSNPs.isInLocusGroup(3, 1));
 		assertTrue(!filteredSNPs.isInLocusGroup(3, 2));
 		assertTrue(!filteredSNPs.isInLocusGroup(3, 3));
