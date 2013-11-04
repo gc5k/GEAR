@@ -123,39 +123,10 @@ public class BLUPPCA
 			}
 		}
 
-		Logger.printUserLog("Geno");
-		for(int i = 0; i < 2; i++)
-		{
-			for(int j = 0; j < 2; j++)
-			{
-				Logger.printUserLog(genoMat[i][j] + "\t");				
-			}
-			Logger.printUserLog("\n");
-		}
-
 		double[][] blupPC = new double[gm.getNumMarker()][phe[0].length];
 
 		RealMatrix grm = new Array2DRowRealMatrix(A);
-		for(int i = 0; i < 2; i++)
-		{
-			for(int j = 0; j < 2; j++)
-			{
-				Logger.printUserLog(grm.getEntry(i, j) + "\t");				
-			}
-			Logger.printUserLog("\n");
-		}
 		RealMatrix grm_Inv = (new LUDecompositionImpl(grm)).getSolver().getInverse();
-
-		Logger.printUserLog("Invers");
-		for(int i = 0; i < 2; i++)
-		{
-			for(int j = 0; j < 2; j++)
-			{
-				Logger.printUserLog(grm_Inv.getEntry(i, j) + "\t");				
-			}
-			Logger.printUserLog("\n");
-		}
-
 		
 		Logger.printUserLog("Revving up the BLUP machine...");
 		RealMatrix tmp = (new Array2DRowRealMatrix(genoMat)).transpose().multiply(grm_Inv);
@@ -175,8 +146,6 @@ public class BLUPPCA
 			for(int j = 0; j < B.getRowDimension(); j++)
 			{
 				blupPC[j][i] = B.getEntry(j, 0);
-//				double sd = Math.sqrt(freq[j][0] * (1-freq[j][0]) * 2);
-//				blupPC[j][i] = b; // * sd / B.getRowDimension();
 			}
 		}
 
