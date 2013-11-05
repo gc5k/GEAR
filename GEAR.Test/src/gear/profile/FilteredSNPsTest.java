@@ -50,6 +50,27 @@ public class FilteredSNPsTest
 		
 		FilteredSNPs filteredSNPs = new FilteredSNPs(snps, scoreFile, qScoreMap, qRanges, cmdArgs);
 		
+		assertEquals(1.0f, filteredSNPs.getScore(/*traitIdx*/0, /*snpIdx*/0), 1e-3);
+		assertEquals(1.1f, filteredSNPs.getScore(/*traitIdx*/0, /*snpIdx*/1), 1e-3);
+		assertEquals(2.4f, filteredSNPs.getScore(/*traitIdx*/0, /*snpIdx*/2), 1e-3);
+		assertNull(filteredSNPs.getScore(/*traitIdx*/0, /*snpIdx*/3));
+		assertEquals(2.1f, filteredSNPs.getScore(/*traitIdx*/0, /*snpIdx*/4), 1e-3);
+		assertEquals(1.5f, filteredSNPs.getScore(/*traitIdx*/0, /*snpIdx*/5), 1e-3);
+		assertEquals(3.0f, filteredSNPs.getScore(/*traitIdx*/0, /*snpIdx*/6), 1e-3);
+		assertEquals(4.1f, filteredSNPs.getScore(/*traitIdx*/0, /*snpIdx*/7), 1e-3);
+		assertNull(filteredSNPs.getScore(/*traitIdx*/0, /*snpIdx*/8));
+		assertEquals(0.7f, filteredSNPs.getScore(/*traitIdx*/0, /*snpIdx*/9), 1e-3);
+		assertEquals(3.4f, filteredSNPs.getScore(/*traitIdx*/1, /*snpIdx*/0), 1e-3);
+		assertEquals(5.8f, filteredSNPs.getScore(/*traitIdx*/1, /*snpIdx*/1), 1e-3);
+		assertEquals(1.9f, filteredSNPs.getScore(/*traitIdx*/1, /*snpIdx*/2), 1e-3);
+		assertEquals(4.3f, filteredSNPs.getScore(/*traitIdx*/1, /*snpIdx*/3), 1e-3);
+		assertEquals(1.2f, filteredSNPs.getScore(/*traitIdx*/1, /*snpIdx*/4), 1e-3);
+		assertEquals(7.2f, filteredSNPs.getScore(/*traitIdx*/1, /*snpIdx*/5), 1e-3);
+		assertEquals(2.2f, filteredSNPs.getScore(/*traitIdx*/1, /*snpIdx*/6), 1e-3);
+		assertEquals(3.3f, filteredSNPs.getScore(/*traitIdx*/1, /*snpIdx*/7), 1e-3);
+		assertNull(filteredSNPs.getScore(/*traitIdx*/1, /*snpIdx*/8));
+		assertEquals(6.4f, filteredSNPs.getScore(/*traitIdx*/1, /*snpIdx*/9), 1e-3);
+		
 		assertEquals(1, filteredSNPs.getNumLociNoQScore());  // SNP9 doesn't appear in the score file, so its q-score is not checked.
 		assertEquals(2, filteredSNPs.getNumMonoLoci());  // SNP4 and SNP8
 		assertEquals(2, filteredSNPs.getNumAmbiguousLoci());  // SNP2 and SNP7
