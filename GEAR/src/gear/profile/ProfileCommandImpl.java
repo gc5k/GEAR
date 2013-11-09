@@ -125,7 +125,7 @@ public final class ProfileCommandImpl extends CommandImpl
 			String fileName = profCmdArgs.getResultFile();
 			if (qRanges != null)
 			{
-				fileName += "." + qRanges[locGrpIdx].getName();
+				fileName += ".q." + qRanges[locGrpIdx].getName();
 			}
 			fileName += ".profile";
 			PrintStream predictorFile = FileUtil.CreatePrintStream(fileName);
