@@ -13,6 +13,7 @@ public class DataTest
 	public void testPlinkData()
 	{
 		PLINKBinaryParser parser = new PLINKBinaryParser("data/sim.bed", "data/sim.bim", "data/sim.fam");
+		parser.Parse();
 		gear.profile.Data data = new gear.profile.PlinkData(parser);
 		
 		SNP[] snps = data.getSNPs();
