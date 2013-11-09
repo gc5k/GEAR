@@ -13,6 +13,12 @@ public class BinaryInputFile
 {
 	public BinaryInputFile(String fileName, String fileType)
 	{
+		// Little-Endian is default to false because Java itself uses big-endian
+		this(fileName, fileType, /*littleEndian*/false);
+	}
+	
+	public BinaryInputFile(String fileName, String fileType, boolean littleEndian)
+	{
 		try
 		{
 			stream = new FileInputStream(fileName);
@@ -27,6 +33,7 @@ public class BinaryInputFile
 		
 		this.fileName = fileName;
 		this.fileType = fileType;
+		setLittleEndian(littleEndian);
 	}
 	
 	public void close()

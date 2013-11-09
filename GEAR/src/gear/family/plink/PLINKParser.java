@@ -12,6 +12,24 @@ import gear.util.Logger;
 
 public class PLINKParser
 {
+	public static PLINKParser parse(gear.CommandArguments cmdArgs)
+	{
+		PLINKParser pp = null;
+		if (cmdArgs.getBFile() != null)
+		{
+			pp = new PLINKBinaryParser(cmdArgs.getBed(), cmdArgs.getBim(), cmdArgs.getFam());
+		}
+		else if (cmdArgs.getFile() != null)
+		{
+			pp = new PLINKParser(cmdArgs.getPed(), cmdArgs.getMap());
+		}
+		else
+		{
+			return null;
+		}
+		pp.Parse();
+		return pp;
+	}
 
 	protected MapFile mapData = null;
 	protected PedigreeFile pedData = null;

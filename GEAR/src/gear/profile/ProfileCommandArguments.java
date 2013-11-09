@@ -44,26 +44,6 @@ public final class ProfileCommandArguments extends CommandArguments
 		this.qRangeFile = qRangeFile;
 	}
 	
-	public String getFile()
-	{
-		return file;
-	}
-	
-	public void setFile(String file)
-	{
-		this.file = file;
-	}
-	
-	public String getBFile()
-	{
-		return bfile;
-	}
-	
-	public void setBFile(String bfile)
-	{
-		this.bfile = bfile;
-	}
-	
 	public String getMachDosageFile()
 	{
 		return machDosageFile;
@@ -178,8 +158,6 @@ public final class ProfileCommandArguments extends CommandArguments
 	private boolean hasScoreHeader;
 	private String qScoreFile;
 	private String qRangeFile;
-	private String file;
-	private String bfile;
 	private String machDosageFile;
 	private String machInfoFile;
 	private String machDosageBatch;
