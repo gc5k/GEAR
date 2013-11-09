@@ -21,7 +21,7 @@ public class BufferedReader
 		return new BufferedReader(reader, fileName, fileType);
 	}
 	
-	public static BufferedReader openZipFile(String fileName, String fileType)
+	public static BufferedReader openGZipFile(String fileName, String fileType)
 	{
 		java.io.FileInputStream fileInStrm = null;
 		try

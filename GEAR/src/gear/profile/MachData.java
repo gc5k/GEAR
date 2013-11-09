@@ -174,7 +174,7 @@ public class MachData extends Data
 					return false;
 				}
 				
-				dosageReader = BufferedReader.openZipFile(dosageFiles[dosageFileIdx], "dosage");
+				dosageReader = BufferedReader.openGZipFile(dosageFiles[dosageFileIdx], "dosage");
 				indIdx = -1;
 			}
 			
