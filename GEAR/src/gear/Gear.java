@@ -6,8 +6,6 @@ import java.util.SortedSet;
 import java.util.TreeMap;
 import java.util.TreeSet;
 
-import gear.ancestry.BLUPPCA;
-import gear.ancestry.GenPCA;
 import gear.epem.GRMStat;
 import gear.grm.MakeGRM;
 import gear.he.HEMCalculate;
@@ -33,6 +31,7 @@ public enum Gear
 	
 	private Gear()
 	{
+		addCommand(new gear.bluppca.BlupPCACommand());
 		addCommand(new gear.help.HelpCommand());
 		addCommand(new gear.hpc.HpcCommand());
 		addCommand(new gear.profile.ProfileCommand());
@@ -207,15 +206,6 @@ public enum Gear
 				{
 					mg.makeGeneticRelationshipScore();
 				}
-			}
-			else if (CmdArgs.INSTANCE.pcaFlag)
-			{
-				GenPCA gpca = new GenPCA();
-			}
-			else if (CmdArgs.INSTANCE.bluppcaFlag)
-			{
-				BLUPPCA bluppca = new BLUPPCA();
-				bluppca.BLUPit();
 			}
 			else if (CmdArgs.INSTANCE.naiveImputFlag)
 			{

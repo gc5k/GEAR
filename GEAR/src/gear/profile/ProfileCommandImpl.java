@@ -4,6 +4,7 @@ import gear.CommandArguments;
 import gear.CommandImpl;
 import gear.ConstValues;
 import gear.family.pedigree.file.SNP;
+import gear.family.plink.PLINKParser;
 import gear.util.BufferedReader;
 import gear.util.FileUtil;
 import gear.util.Logger;
@@ -281,18 +282,15 @@ public final class ProfileCommandImpl extends CommandImpl
 	
 	private Data initData()
 	{
-		if (profCmdArgs.getFile() != null)
+		PLINKParser plinkParser = PLINKParser.parse(profCmdArgs);
+		if (plinkParser == null)
 		{
-			return PlinkData.createByFile(profCmdArgs.getFile());
+			return MachData.create(profCmdArgs.getMachDosageFile(),
+			                       profCmdArgs.getMachInfoFile(),
+			                       profCmdArgs.getMachDosageBatch(),
+			                       profCmdArgs.getMachInfoBatch());
 		}
-		else if (profCmdArgs.getBFile() != null)
-		{
-			return PlinkData.createByBFile(profCmdArgs.getBFile());
-		}
-		return MachData.create(profCmdArgs.getMachDosageFile(),
-		                       profCmdArgs.getMachInfoFile(),
-		                       profCmdArgs.getMachDosageBatch(),
-		                       profCmdArgs.getMachInfoBatch());
+		return new PlinkData(plinkParser);
 	}
 
 	private ProfileCommandArguments profCmdArgs;

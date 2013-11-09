@@ -134,14 +134,6 @@ public enum CmdArgs
 				.withDescription(	"effect for polygenic model? " + polyEffectFile)
 				.hasArg().create(cmd_poly_effect));
 
-		// pca
-		ops.addOption(OptionBuilder
-				.withDescription("calculate principal components")
-				.create(cmd_pca));
-
-		ops.addOption(OptionBuilder.withDescription("calculate blup PCA.")
-				.create(cmd_bluppca));
-
 		// pop stat
 		ops.addOption(OptionBuilder.withDescription("calculate MAF frequency ")
 				.create(cmd_freq));
@@ -599,14 +591,6 @@ public enum CmdArgs
 	private final String cmd_nontrans_controls = "nontrans_controls";
 	private final String cmd_nontrans_controls_long = "nontrans-controls";
 	public boolean nontranscontrolsFlag = false;
-
-	// //////////////PCA
-	private final String cmd_pca = "pca";
-	public boolean pcaFlag = false;
-	public int pca = 10;
-
-	private final String cmd_bluppca = "bluppca";
-	public boolean bluppcaFlag = false;
 	
 	// /////////////////pop stat
 	private final String cmd_freq = "freq";
@@ -1375,23 +1359,6 @@ public enum CmdArgs
 		{
 			nontranscontrolsFlag = true;
 			nontranscasesFlag = false;
-		}
-
-		// pca
-		if (cmdLine.hasOption(cmd_pca))
-		{
-			pcaFlag = true;
-			pca = Integer.parseInt(cmdLine.getOptionValue(cmd_pca));
-			if (pca < 1)
-			{
-				Logger.printUserError("pca number should be greater than 0.");
-				System.exit(1);
-			}
-		}
-
-		if (cmdLine.hasOption(cmd_bluppca))
-		{
-			bluppcaFlag = true;
 		}
 
 		// pop stat

@@ -2,7 +2,6 @@ package gear.profile;
 
 import gear.ConstValues;
 import gear.family.pedigree.file.SNP;
-import gear.family.plink.PLINKBinaryParser;
 import gear.family.plink.PLINKParser;
 import gear.family.popstat.GenotypeMatrix;
 import gear.family.qc.rowqc.SampleFilter;
@@ -10,22 +9,9 @@ import gear.family.qc.rowqc.SampleFilter;
 import java.util.ArrayList;
 
 public class PlinkData extends Data
-{
-	public static PlinkData createByFile(String file)
-	{
-		PLINKParser parser = new PLINKParser(file + ".ped", file + ".map");
-		return new PlinkData(parser);
-	}
-	
-	public static PlinkData createByBFile(String bfile)
-	{
-		PLINKParser parser = new PLINKBinaryParser(bfile + ".bed", bfile + ".bim", bfile + ".fam");
-		return new PlinkData(parser);
-	}
-	
+{	
 	public PlinkData(PLINKParser parser)
 	{
-		parser.Parse();
 		sampleFilter = new SampleFilter(parser.getPedigreeData(), parser.getMapData());
 		genoMatrix = new GenotypeMatrix(sampleFilter.getSample());
 		snpList = sampleFilter.getMapFile().getMarkerList();
