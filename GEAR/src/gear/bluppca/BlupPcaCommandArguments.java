@@ -2,50 +2,50 @@ package gear.bluppca;
 
 import gear.CommandArguments;
 
-public class BlupPCACommandArguments extends CommandArguments
+public class BlupPcaCommandArguments extends CommandArguments
 {
-	public String getGRMBin()
+	public String getGrmBin()
 	{
 		return grmBin;
 	}
 	
-	public void setGRMBin(String grmBin)
+	public void setGrmBin(String grmBin)
 	{
 		this.grmBin = grmBin;
 	}
 	
 	private String grmBin;
 	
-	public String getGRMText()
+	public String getGrmText()
 	{
 		return grmText;
 	}
 	
-	public void setGRMText(String grmText)
+	public void setGrmText(String grmText)
 	{
 		this.grmText = grmText;
 	}
 	
 	private String grmText;  // root name of the GRM files
 	
-	public String getGRM_GZ()
+	public String getGrmGZ()
 	{
 		return grmGZ;
 	}
 	
-	public void setGRM_GZ(String grmGZ)
+	public void setGrmGZ(String grmGZ)
 	{
 		this.grmGZ = grmGZ;
 	}
 	
 	private String grmGZ;  // root name of the GRM files
 	
-	public String getGRM_ID()
+	public String getGrmID()
 	{
 		return grmID;
 	}
 	
-	public void setGRM_ID(String grmID)
+	public void setGrmID(String grmID)
 	{
 		this.grmID = grmID;
 	}

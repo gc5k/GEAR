@@ -31,7 +31,7 @@ public enum Gear
 	
 	private Gear()
 	{
-		addCommand(new gear.bluppca.BlupPCACommand());
+		addCommand(new gear.bluppca.BlupPcaCommand());
 		addCommand(new gear.help.HelpCommand());
 		addCommand(new gear.hpc.HpcCommand());
 		addCommand(new gear.profile.ProfileCommand());

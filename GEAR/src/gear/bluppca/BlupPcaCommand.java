@@ -9,7 +9,7 @@ import gear.CommandArgumentException;
 import gear.CommandArguments;
 import gear.CommandImpl;
 
-public class BlupPCACommand extends Command
+public class BlupPcaCommand extends Command
 {
 	@Override
 	public String getName()
@@ -39,7 +39,7 @@ public class BlupPCACommand extends Command
 	@Override
 	protected CommandArguments parse(CommandLine cmdLine) throws CommandArgumentException
 	{
-		BlupPCACommandArguments blupArgs = new BlupPCACommandArguments();
+		BlupPcaCommandArguments blupArgs = new BlupPcaCommandArguments();
 		parseGRMArguments(blupArgs, cmdLine);
 		parseFileArguments(blupArgs, cmdLine);
 		blupArgs.setPhenotypeFile(cmdLine.getOptionValue(OPT_PHE_LONG));
@@ -47,7 +47,7 @@ public class BlupPCACommand extends Command
 		return blupArgs;
 	}
 	
-	private void parseGRMArguments(BlupPCACommandArguments blupArgs, CommandLine cmdLine) throws CommandArgumentException
+	private void parseGRMArguments(BlupPcaCommandArguments blupArgs, CommandLine cmdLine) throws CommandArgumentException
 	{
 		String grmBin = cmdLine.getOptionValue(OPT_GRM_BIN_LONG);
 		String grmText = cmdLine.getOptionValue(OPT_GRM_TEXT_LONG);
@@ -57,22 +57,22 @@ public class BlupPCACommand extends Command
 		
 		if (grmBin != null)
 		{
-			blupArgs.setGRMBin(grmBin + ".grm.bin");
-			blupArgs.setGRM_ID(grmBin + ".grm.id");
+			blupArgs.setGrmBin(grmBin + ".grm.bin");
+			blupArgs.setGrmID(grmBin + ".grm.id");
 			++numFiles;
 		}
 		
 		if (grmText != null)
 		{
-			blupArgs.setGRMText(grmText + ".grm");
-			blupArgs.setGRM_ID(grmText + ".grm.id");
+			blupArgs.setGrmText(grmText + ".grm");
+			blupArgs.setGrmID(grmText + ".grm.id");
 			++numFiles;
 		}
 		
 		if (grmGZ != null)
 		{
-			blupArgs.setGRM_GZ(grmGZ + ".grm.gz");
-			blupArgs.setGRM_ID(grmGZ + ".grm.id");
+			blupArgs.setGrmGZ(grmGZ + ".grm.gz");
+			blupArgs.setGrmID(grmGZ + ".grm.id");
 			++numFiles;
 		}
 		
@@ -87,7 +87,7 @@ public class BlupPCACommand extends Command
 		}
 	}
 	
-	private void parseFileArguments(BlupPCACommandArguments blupArgs, CommandLine cmdLine) throws CommandArgumentException
+	private void parseFileArguments(BlupPcaCommandArguments blupArgs, CommandLine cmdLine) throws CommandArgumentException
 	{
 		String bfile = cmdLine.getOptionValue(OPT_BFILE_LONG);
 		String file = cmdLine.getOptionValue(OPT_FILE_LONG);
@@ -109,7 +109,7 @@ public class BlupPCACommand extends Command
 	@Override
 	protected CommandImpl createCommandImpl()
 	{
-		return new BlupPCACommandImpl();
+		return new BlupPcaCommandImpl();
 	}
 	
 	private final static String OPT_GRM_BIN_LONG = "grm-bin";
