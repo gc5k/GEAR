@@ -143,8 +143,8 @@ public class BufferedReader
 		{
 			String msg = "";
 			msg += "The format of the " + fileType + " file '" + fileName + "' is incorrect: ";
-			msg += "A " + fileType + " file should consists of " + expectedNumCols + " columns, ";
-			msg += "but line " + curLineNum + " contains " + tokens.length + " column(s).";
+			msg += "The file should consists of " + expectedNumCols + " column(s) at line " + (curLineNum - 1);
+			msg += ", but this line actually contains " + tokens.length + " column(s).";
 			Logger.printUserError(msg);
 			System.exit(1);
 		}
@@ -158,8 +158,8 @@ public class BufferedReader
 		{
 			String msg = "";
 			msg += "The format of the " + fileType + " file '" + fileName + "' is incorrect: ";
-			msg += "The file should consists of at least " + minNumCols + " column(s) at line ";
-			msg += + curLineNum + ", but this line actually contains only " + tokens.length + " column(s).";
+			msg += "The file should consists of at least " + minNumCols + " column(s) at line " + (curLineNum - 1);
+			msg += ", but this line actually contains only " + tokens.length + " column(s).";
 			Logger.printUserError(msg);
 			System.exit(1);
 		}
