@@ -26,17 +26,17 @@ import org.apache.commons.math.linear.Array2DRowRealMatrix;
 import org.apache.commons.math.linear.LUDecompositionImpl;
 import org.apache.commons.math.linear.RealMatrix;
 
-public class BlupPCACommandImpl extends CommandImpl
+public class BlupPcaCommandImpl extends CommandImpl
 {
 	@Override
 	public void execute(CommandArguments cmdArgs)
 	{
-		BlupPCACommandArguments blupArgs = (BlupPCACommandArguments)cmdArgs;
+		BlupPcaCommandArguments blupArgs = (BlupPcaCommandArguments)cmdArgs;
 
 		//read grm
 		id2Idx = new HashMap<SubjectID, Integer>();
-		readGRM_IDs(blupArgs.getGRM_ID(), id2Idx);
-		readGRM(blupArgs);
+		readGrmID(blupArgs.getGrmID(), id2Idx);
+		readGrm(blupArgs);
 
 		flag = new boolean[id2Idx.size()];
 		Arrays.fill(flag, false);
@@ -123,7 +123,7 @@ public class BlupPCACommandImpl extends CommandImpl
 		predictorFile.close();
 	}
 
-	private void readGRM_IDs(String fileName, HashMap<SubjectID, Integer> id2Idx)
+	private void readGrmID(String fileName, HashMap<SubjectID, Integer> id2Idx)
 	{
 		BufferedReader reader = BufferedReader.openTextFile(fileName, "GRM-ID");
 		int idx = 0;
@@ -136,24 +136,24 @@ public class BlupPCACommandImpl extends CommandImpl
 		reader.close();
 	}
 	
-	private void readGRM(BlupPCACommandArguments blupArgs)
+	private void readGrm(BlupPcaCommandArguments blupArgs)
 	{
-		if (blupArgs.getGRMBin() != null)
+		if (blupArgs.getGrmBin() != null)
 		{
-			readGRMBin(blupArgs.getGRMBin());
+			readGrmBin(blupArgs.getGrmBin());
 		}
 		else
 		{
-			BufferedReader reader = blupArgs.getGRMText() == null ?
-					BufferedReader.openGZipFile(blupArgs.getGRM_GZ(), "GRM (GZip)") :
-					BufferedReader.openTextFile(blupArgs.getGRMText(), "GRM");
-			readGRM(reader);
+			BufferedReader reader = blupArgs.getGrmText() == null ?
+					BufferedReader.openGZipFile(blupArgs.getGrmGZ(), "GRM (gzip)") :
+					BufferedReader.openTextFile(blupArgs.getGrmText(), "GRM");
+			readGrm(reader);
 		}
 	}	
 
-	private void readGRMBin(String fileName)
+	private void readGrmBin(String fileName)
 	{
-		BinaryInputFile grmBin = new BinaryInputFile(fileName, "GRM (Binary)", /*littleEndian*/true);
+		BinaryInputFile grmBin = new BinaryInputFile(fileName, "GRM (binary)", /*littleEndian*/true);
 		A = new double[id2Idx.size()][id2Idx.size()];
 		Logger.printUserLog("Constructing A matrix: a " + id2Idx.size() + " X " + id2Idx.size() + " matrix.");
 		for (int i = 0; i < A.length; i++) 
@@ -168,7 +168,7 @@ public class BlupPCACommandImpl extends CommandImpl
 		}
 	}
 
-	private void readGRM(BufferedReader reader)
+	private void readGrm(BufferedReader reader)
 	{
 		A = new double[id2Idx.size()][id2Idx.size()];
 		String[] tokens = null;
