@@ -194,52 +194,50 @@ public class BlupPcaCommandImpl extends CommandImpl
 
 		HashSet<SubjectID> subjectsRead = new HashSet<SubjectID>();
 
-		String[] tokens = null;
-
-		int c = 0;
-		while ((tokens = reader.readTokens()) != null)
+		String[] tokens = reader.readTokensAtLeast(3);
+		
+		if (tokens == null)
 		{
+			Logger.printUserError("The phenotype file '" + fileName + "' is empty.");
+			System.exit(1);
+		}
+		
+		int numCols = tokens.length;
+		
+		phe = new double[id2Idx.size()][tokens.length - 2];
+		for (double[] indPhe : phe)
+		{
+			Arrays.fill(indPhe, -9);
+		}
 
-			if (tokens.length < 3)
-			{
-				reader.errorPreviousLine("There should be at least " + 3 + " columns.");
-			}
-			if (c == 0) 
-			{
-				phe = new double[id2Idx.size()][tokens.length - 2];
-				c++;
-				for( int i = 0; i < id2Idx.size(); i++)
-				{
-					Arrays.fill(phe[i], -9);
-				}
-			}
-
+		do
+		{
 			SubjectID subID = new SubjectID(/*famID*/tokens[0], /*indID*/tokens[1]);
 
-			int ii = 0;
+			int indIdx = 0;
 			if (subjectsUnread.containsKey(subID))
 			{
-				ii = subjectsUnread.get(subID);
+				indIdx = subjectsUnread.get(subID);
 				boolean f = true;
 				String pheValStr = null;
 				try
 				{
-					for( int i = 0; i < phe[ii].length; i++)
+					for( int traitIdx = 0; traitIdx < phe[indIdx].length; traitIdx++)
 					{
-						pheValStr = tokens[2 + i];
+						pheValStr = tokens[2 + traitIdx];
 						if (ConstValues.isNA(pheValStr))
 						{
 							f = false;
-							break;
+							break;  // Question: All the following phenotypes are ignored?
 						}
-						phe[ii][i] = Double.parseDouble(pheValStr);							
+						phe[indIdx][traitIdx] = Double.parseDouble(pheValStr);							
 					}
 				}
 				catch (NumberFormatException e)
 				{
 					reader.errorPreviousLine("'" + pheValStr + "' is not a valid phenotype value. It should be a floating point number.");
 				}
-				flag[ii] = f;
+				flag[indIdx] = f;
 
 				subjectsUnread.remove(subID);
 				subjectsRead.add(subID);
@@ -250,10 +248,10 @@ public class BlupPcaCommandImpl extends CommandImpl
 			}
 			else
 			{
-				flag[ii] = false;
-//				reader.errorPreviousLine("Individual " + subID + " appears in the phenotype file but not in the grm id file(s).");
+				flag[indIdx] = false;
 			}
-		}
+		} while ((tokens = reader.readTokens(numCols)) != null);
+		
 		reader.close();
 
 		if (!subjectsUnread.isEmpty())
@@ -261,11 +259,11 @@ public class BlupPcaCommandImpl extends CommandImpl
 			String msg = "";
 			msg += subjectsUnread.size() + " individual(s) (e.g. " + subjectsUnread.keySet().iterator().next();
 			msg += ") appear in the grm id file(s) but not in the phenotype file";
-			Logger.printUserError(msg);
+			Logger.printUserWarning(msg);
 		}
 	}
 
-	private boolean[] flag;
+	private boolean[] flag;  // BUG: The 'flag' seems to have no use. Those individuals whose flags are false (i.e. who have missing phenotypes) still participate in the calculation.
 	private double[][] phe;
 	private double[][] A;
 
