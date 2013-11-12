@@ -145,15 +145,6 @@ public enum CmdArgs
 		ops.addOption(OptionBuilder.withDescription("calculate fst ").hasArg()
 				.create(cmd_fst));
 
-		// Enigma
-		ops.addOption(OptionBuilder.withDescription("Enigma")
-						.create(cmd_Enigma));
-		ops.addOption(OptionBuilder.withDescription("Enigma code").hasArg()
-						.create(cmd_Ecode));
-		ops.addOption(OptionBuilder.withDescription("Enigma code length").hasArg()
-						.create(cmd_Ecol));
-		ops.addOption(OptionBuilder.withDescription("Referece allele file").hasArg()
-				.create(cmd_refAllele));
 		// snp
 		ops.addOption(OptionBuilder.withLongOpt(cmd_naive_imputation_long)
 				.withDescription("naive imputation ")
@@ -372,19 +363,6 @@ public enum CmdArgs
 	}
 
 	private FileArgs fileArgs;
-
-	//Enigma
-	private final String cmd_Enigma = "enigma";
-	public boolean EnigmaFlag = false;
-
-	private final String cmd_Ecode = "ecode";
-	public long Ecode = 2013;
-
-	private final String cmd_Ecol = "ecol";
-	public int Ecol = 5;
-
-	private final String cmd_refAllele = "refallele";
-	public String refAllele = null;
 
 	// Real-check options Begin
 	public boolean hasRealCheckOption()
@@ -1276,40 +1254,6 @@ public enum CmdArgs
 		if (cmdLine.hasOption(cmd_naive_imputation))
 		{
 			naiveImputFlag = true;
-		}
-
-		//Enigma
-		if (cmdLine.hasOption(cmd_Enigma)) 
-		{
-			EnigmaFlag = true;
-		}
-
-		if (cmdLine.hasOption(cmd_Ecol)) 
-		{
-			Ecol = Integer.parseInt(cmdLine.getOptionValue(cmd_Ecol));
-			if(Ecol < 1)
-			{
-				Logger.printUserError("Ecol should be >= 1");
-				Logger.printUserLog("Ecol should be >= 1");
-				System.exit(0);
-			}
-		}
-
-		if (cmdLine.hasOption(cmd_Ecode))
-		{
-			Ecode = Long.parseLong(cmdLine.getOptionValue(cmd_Ecode));
-			if (Ecode < 0) 
-			{
-				Logger.printUserError("Ecode should be > 0.");
-				Logger.printUserLog("Ecode should be > 0.");
-				System.exit(0);
-			}
-		}
-		
-		if (cmdLine.hasOption(cmd_refAllele))
-		{
-			refAllele = cmdLine.getOptionValue(cmd_refAllele);
-			FileUtil.exists(refAllele);	
 		}
 
 		// snp selection
