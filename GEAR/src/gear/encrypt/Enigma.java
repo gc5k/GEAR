@@ -82,6 +82,7 @@ public class Enigma
 			}
 		}
 		ec.close();
+		Logger.printUserLog(ref.size() + " SNPs were used for generating Enigma scores.");
 	}
 
 	private void readRefAllele() 
@@ -99,6 +100,8 @@ public class Enigma
 		}
 
 		String line = null;
+		int fc = 0;
+
 		try
 		{
 			int c = 0;
@@ -109,6 +112,7 @@ public class Enigma
 				if (tokens.length < 2)
 				{
 					Logger.printUserLog("line " + c + " was ignored.");
+					fc++;
 				}
 				// Skip genetic distance field at tokens[2].
 				StringBuffer sb = new StringBuffer();
@@ -122,6 +126,10 @@ public class Enigma
 			Logger.handleException(e,
 					"An exception occured when reading the map file '" + refFile
 							+ "'.");
+		}
+		if(fc>0)
+		{
+			Logger.printUserLog(fc + " SNPs were failed for generating their Enigma codes.");
 		}
 	}
 }
