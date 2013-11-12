@@ -6,6 +6,7 @@ import java.util.SortedSet;
 import java.util.TreeMap;
 import java.util.TreeSet;
 
+import gear.encrypt.Enigma;
 import gear.epem.GRMStat;
 import gear.grm.MakeGRM;
 import gear.he.HEMCalculate;
@@ -217,6 +218,11 @@ public enum Gear
 				WriteBedSNPMajor bedWriter = new WriteBedSNPMajor();
 				bedWriter.WriteFile();
 	
+			}
+			else if (CmdArgs.INSTANCE.EnigmaFlag)
+			{
+				Enigma eni = new Enigma();
+				eni.Revup();
 			}
 			
 			monitor.stopMonitoring();

@@ -77,7 +77,8 @@ public class MapFile
 				addSNP(chr, name, dis, pos);
 			}
 			reader.close();
-		} catch (IOException e)
+		} 
+		catch (IOException e)
 		{
 			Logger.handleException(e,
 					"An exception occured when reading the map file '" + mf
