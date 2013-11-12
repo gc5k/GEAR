@@ -62,10 +62,11 @@ public class BlupPcaCommandImpl extends CommandImpl
 
 		double[][] blupPC = new double[gm.getNumMarker()][phe[0].length];
 
+		Logger.printUserLog("Revving up the BLUP machine...");
+
 		RealMatrix grm = new Array2DRowRealMatrix(A);
 		RealMatrix grm_Inv = (new LUDecompositionImpl(grm)).getSolver().getInverse();
-		
-		Logger.printUserLog("Revving up the BLUP machine...");
+
 		RealMatrix tmp = (new Array2DRowRealMatrix(genoMat)).transpose().multiply(grm_Inv);
 
 		for(int i = 0; i < phe[0].length; i++)
@@ -78,8 +79,8 @@ public class BlupPcaCommandImpl extends CommandImpl
 				Y[j] = phe[j][i];
 			}
 			RealMatrix B = tmp.multiply(new Array2DRowRealMatrix(Y));
-
-			Logger.printUserLog("Rescaling the snp effects...");
+			B.scalarMultiply(1/gm.getNumMarker());
+//			Logger.printUserLog("Rescaling the snp effects...");
 			for(int j = 0; j < B.getRowDimension(); j++)
 			{
 				blupPC[j][i] = B.getEntry(j, 0);
