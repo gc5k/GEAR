@@ -121,6 +121,6 @@ public class BlupPcaCommand extends Command
 	private final static String OPT_GRM_GZ_LONG = "grm-gz";
 	private final static String OPT_GRM_GZ_DESC = "Specify the .grm.gz and .grm.id files";
 	
-	private final static String OPT_PHE_LONG = "phe";
+	private final static String OPT_PHE_LONG = "pheno";
 	private final static String OPT_PHE_DESC = "Specify the phenotype file (individual eigenvector)";
 }
