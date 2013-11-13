@@ -145,6 +145,15 @@ public enum CmdArgs
 		ops.addOption(OptionBuilder.withDescription("calculate fst ").hasArg()
 				.create(cmd_fst));
 
+		//watchdog
+		ops.addOption(OptionBuilder.withDescription("meta-analysis watchdog ").create(cmd_watchdog));
+		
+		ops.addOption(OptionBuilder.withDescription("meta-analysis set1 ").hasArg().create(cmd_set1));
+
+		ops.addOption(OptionBuilder.withDescription("meta-analysis set2 ").hasArg().create(cmd_set2));
+
+		ops.addOption(OptionBuilder.withDescription("meta-analysis alpha ").hasArg().create(cmd_alpha));
+
 		// snp
 		ops.addOption(OptionBuilder.withLongOpt(cmd_naive_imputation_long)
 				.withDescription("naive imputation ")
@@ -604,6 +613,19 @@ public enum CmdArgs
 	public final int freq = 0;
 	public final int geno_freq = 1;
 	public boolean sumStatFlag = false;
+
+	/////////meta watchdog
+	private final String cmd_watchdog = "watchdog";
+	public boolean watchdogFlag = false;
+	
+	private final String cmd_set1 = "set1";
+	public String set1_file = null;
+
+	private final String cmd_set2 = "set2";
+	public String set2_file = null;
+
+	private final String cmd_alpha = "alpha";
+	public double alpha = 0.05;
 
 	// fst
 	private final String cmd_fst = "fst";
@@ -1378,6 +1400,34 @@ public enum CmdArgs
 			fstFlag = true;
 			fst_file = cmdLine.getOptionValue(cmd_fst);
 			FileUtil.exists(fst_file);
+		}
+
+		///////meta-analysis watchdog
+		if (cmdLine.hasOption(cmd_watchdog))
+		{
+			watchdogFlag = true;
+		}
+		
+		if (cmdLine.hasOption(cmd_set1))
+		{
+			set1_file = cmdLine.getOptionValue(cmd_set1);
+			FileUtil.exists(set1_file);
+		}
+
+		if (cmdLine.hasOption(cmd_set2))
+		{
+			set1_file = cmdLine.getOptionValue(cmd_set2);
+			FileUtil.exists(set2_file);
+		}
+
+		if (cmdLine.hasOption(cmd_alpha))
+		{
+			alpha = Double.parseDouble(cmdLine.getOptionValue(cmd_alpha));
+			if(alpha < 0 || alpha >= 1.0)
+			{
+				Logger.printUserLog("alpha should be between 0 and 1.");
+				System.exit(0);
+			}
 		}
 
 		// simulation real data

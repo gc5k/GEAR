@@ -12,6 +12,7 @@ import gear.he.HEMCalculate;
 import gear.he.HEMRead;
 import gear.he.h2trans.H2Transformer;
 import gear.imputation.NaiveImputation;
+import gear.metawatchdog.MetaWatchdog;
 import gear.pscontrol.NonTransmitted;
 import gear.realcheck.RealCheck;
 import gear.realcheck.RealCheckOne;
@@ -218,6 +219,11 @@ public enum Gear
 				WriteBedSNPMajor bedWriter = new WriteBedSNPMajor();
 				bedWriter.WriteFile();
 	
+			}
+			else if (CmdArgs.INSTANCE.watchdogFlag)
+			{
+				MetaWatchdog wd = new MetaWatchdog();
+				wd.Bark();
 			}
 			
 			monitor.stopMonitoring();
