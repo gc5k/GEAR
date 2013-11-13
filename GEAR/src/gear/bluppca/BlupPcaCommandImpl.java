@@ -79,11 +79,11 @@ public class BlupPcaCommandImpl extends CommandImpl
 				Y[j] = phe[j][i];
 			}
 			RealMatrix B = tmp.multiply(new Array2DRowRealMatrix(Y));
-			B = B.scalarMultiply(1.0 / gm.getNumIndivdial());
+
 //			Logger.printUserLog("Rescaling the snp effects...");
 			for(int j = 0; j < B.getRowDimension(); j++)
 			{
-				blupPC[j][i] = B.getEntry(j, 0);
+				blupPC[j][i] = B.getEntry(j, 0) / gm.getNumMarker();
 			}
 		}
 
