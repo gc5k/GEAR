@@ -20,13 +20,13 @@ public class MetaWatchdog
 	private final String delim = "\\s+";
 
 	private double[][] phe1;
-	private ArrayList<String> ID1;
+	private ArrayList<String> ID1 = NewIt.newArrayList();
 	private String f1 = null;
 	
 	private double[][] phe2;
-	private ArrayList<String> ID2;
+	private ArrayList<String> ID2 = NewIt.newArrayList();
 	private String f2 = null;
-	
+
 	private double alpha = 0.05;
 	private NormalDistribution nd = new NormalDistributionImpl();
 	private double T = 0;
