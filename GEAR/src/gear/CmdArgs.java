@@ -1416,7 +1416,7 @@ public enum CmdArgs
 
 		if (cmdLine.hasOption(cmd_set2))
 		{
-			set1_file = cmdLine.getOptionValue(cmd_set2);
+			set2_file = cmdLine.getOptionValue(cmd_set2);
 			FileUtil.exists(set2_file);
 		}
 

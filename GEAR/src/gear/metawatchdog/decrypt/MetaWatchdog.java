@@ -28,16 +28,15 @@ public class MetaWatchdog
 	private String f2 = null;
 	
 	private double alpha = 0.05;
-	private NormalDistribution nd = null;
+	private NormalDistribution nd = new NormalDistributionImpl();
 	private double T = 0;
-	
-	private double[][] s = null;
+
 	public MetaWatchdog ()
 	{
+
 		f1 = CmdArgs.INSTANCE.set1_file;
 		f2 = CmdArgs.INSTANCE.set2_file;
 		alpha = CmdArgs.INSTANCE.alpha;
-		nd = new NormalDistributionImpl();
 		try
 		{
 			T = nd.inverseCumulativeProbability(alpha/2 + 0.5) * Math.sqrt(2);
@@ -47,8 +46,9 @@ public class MetaWatchdog
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
+
 	}
-	
+
 	public void Bark()
 	{
 		readPhenotypes1(f1);
@@ -64,13 +64,26 @@ public class MetaWatchdog
 			for (int j = 0; j < phe2.length; j++)
 			{
 				flag = true;
+				double[] s = new double[test];
 				for (int k = 0; k < test; k++)
 				{
-					flag &= Math.abs(phe1[i][k] - phe2[j][k]) < T; 
+					s[k] = Math.abs(phe1[i][k] - phe2[j][k]);
+					flag &= Math.abs(s[k]) < T; 
 				}
 				if (flag)
 				{
-					predictorFile.println(ID1.get(i) + "\t" +ID2.get(j));
+					predictorFile.print(ID1.get(i) + "\t" +ID2.get(j) + "\t");
+					for (int l = 0; l < test; l++)
+					{
+						if (l < (test - 1) ) 
+						{
+							predictorFile.print(s[l] + "\t");
+						}
+						else
+						{
+							predictorFile.println(s[l]);							
+						}
+					}
 				}
 			}
 		}
