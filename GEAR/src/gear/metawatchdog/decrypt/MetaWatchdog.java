@@ -1,4 +1,4 @@
-package gear.metawatchdog;
+package gear.metawatchdog.decrypt;
 
 import gear.CmdArgs;
 import gear.he.SubjectID;

@@ -1,4 +1,4 @@
-package gear.encrypt;
+package gear.metawatchdog.ecode;
 
 import org.apache.commons.cli.CommandLine;
 import org.apache.commons.cli.OptionBuilder;

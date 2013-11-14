@@ -1,4 +1,4 @@
-package gear.encrypt;
+package gear.metawatchdog.ecode;
 
 import java.io.BufferedWriter;
 import java.io.FileWriter;
