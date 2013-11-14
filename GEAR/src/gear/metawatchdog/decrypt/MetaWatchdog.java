@@ -123,7 +123,6 @@ public class MetaWatchdog
 			{
 				StringBuffer id = new StringBuffer();
 				id.append(subID.getFamilyID() + "\t" + subID.getIndividualID() + "\t");
-				ID1.add(id.toString());
 
 				StringBuffer sb = new StringBuffer();
 				sb.append(id.toString());
@@ -148,9 +147,13 @@ public class MetaWatchdog
 		for(int i = 0; i < tmp.size(); i++) 
 		{
 			String[] tk = tmp.get(i).split(delim);
-			for(int j = 0; j < tk.length; j++)
+			StringBuffer id = new StringBuffer();
+			id.append(tk[0] + "\t" + tk[1] + "\t");
+			ID1.add(id.toString());
+
+			for(int j = 0; j < tk.length - 2; j++)
 			{
-				phe1[i][j] = Double.parseDouble(tk[j]);
+				phe1[i][j] = Double.parseDouble(tk[j]+2);
 			}
 		}
 		Logger.printUserLog("Read " + tmp.size() + " individuals," + (numCols-2) + " scores. in " + fileName);
@@ -190,7 +193,6 @@ public class MetaWatchdog
 			{
 				StringBuffer id = new StringBuffer();
 				id.append(subID.getFamilyID() + "\t" + subID.getIndividualID() + "\t");
-				ID2.add(id.toString());
 
 				StringBuffer sb = new StringBuffer();
 				sb.append(id.toString());
@@ -216,9 +218,13 @@ public class MetaWatchdog
 		for(int i = 0; i < tmp.size(); i++) 
 		{
 			String[] tk = tmp.get(i).split(delim);
-			for(int j = 0; j < tk.length; j++)
+			StringBuffer id = new StringBuffer();
+			id.append(tk[0] + "\t" + tk[1] + "\t");
+			ID2.add(id.toString());
+
+			for(int j = 0; j < tk.length - 2; j++)
 			{
-				phe2[i][j] = Double.parseDouble(tk[j]);
+				phe2[i][j] = Double.parseDouble(tk[j+2]);
 			}
 		}
 		
