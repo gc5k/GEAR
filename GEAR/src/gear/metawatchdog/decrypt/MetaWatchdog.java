@@ -154,7 +154,7 @@ public class MetaWatchdog
 			}
 		}
 		Logger.printUserLog("Read " + tmp.size() + " individuals," + (numCols-2) + " scores. in " + fileName);
-		NCGStatUtils.standardize(phe1, false);		
+		NCGStatUtils.standardize(phe1, true);		
 	}
 
 	private void readPhenotypes2(String fileName)
@@ -223,7 +223,7 @@ public class MetaWatchdog
 		}
 		
 		Logger.printUserLog("Read " + tmp.size() + " individuals," + (numCols-2) + " scores. in " + fileName);
-		NCGStatUtils.standardize(phe1, false);
+		NCGStatUtils.standardize(phe2, true);
 	}
 
 }
