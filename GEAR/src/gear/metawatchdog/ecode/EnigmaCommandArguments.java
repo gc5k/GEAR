@@ -1,4 +1,4 @@
-package gear.encrypt;
+package gear.metawatchdog.ecode;
 
 import gear.CommandArguments;
 

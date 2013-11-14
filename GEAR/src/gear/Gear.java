@@ -12,7 +12,7 @@ import gear.he.HEMCalculate;
 import gear.he.HEMRead;
 import gear.he.h2trans.H2Transformer;
 import gear.imputation.NaiveImputation;
-import gear.metawatchdog.MetaWatchdog;
+import gear.metawatchdog.decrypt.MetaWatchdog;
 import gear.pscontrol.NonTransmitted;
 import gear.realcheck.RealCheck;
 import gear.realcheck.RealCheckOne;
@@ -33,7 +33,7 @@ public enum Gear
 	private Gear()
 	{
 		addCommand(new gear.bluppca.BlupPcaCommand());
-		addCommand(new gear.encrypt.EnigmaCommand());
+		addCommand(new gear.metawatchdog.ecode.EnigmaCommand());
 		addCommand(new gear.help.HelpCommand());
 		addCommand(new gear.hpc.HpcCommand());
 		addCommand(new gear.profile.ProfileCommand());
