@@ -13,6 +13,7 @@ import gear.he.HEMRead;
 import gear.he.h2trans.H2Transformer;
 import gear.imputation.NaiveImputation;
 import gear.metawatchdog.decrypt.MetaWatchdog;
+import gear.metawatchdog.decrypt.MetaWatchdog2;
 import gear.pscontrol.NonTransmitted;
 import gear.realcheck.RealCheck;
 import gear.realcheck.RealCheckOne;
@@ -225,7 +226,12 @@ public enum Gear
 				MetaWatchdog wd = new MetaWatchdog();
 				wd.Bark();
 			}
-			
+			else if (CmdArgs.INSTANCE.watchdog2Flag)
+			{
+				MetaWatchdog2 wd = new MetaWatchdog2();
+				wd.Bark();
+			}
+
 			monitor.stopMonitoring();
 			
 			Logger.printUserLog("");

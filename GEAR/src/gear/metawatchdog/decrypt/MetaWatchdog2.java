@@ -5,17 +5,16 @@ import gear.he.SubjectID;
 import gear.util.FileUtil;
 import gear.util.Logger;
 import gear.util.NewIt;
-import gear.util.stat.PCA.NCGStatUtils;
 
 import java.io.PrintStream;
 import java.util.ArrayList;
 import java.util.HashSet;
 
-import org.apache.commons.math.MathException;
+import org.apache.commons.math.stat.regression.*;
 import org.apache.commons.math.distribution.NormalDistribution;
 import org.apache.commons.math.distribution.NormalDistributionImpl;
 
-public class MetaWatchdog
+public class MetaWatchdog2
 {
 	private final String delim = "\\s+";
 
@@ -27,30 +26,18 @@ public class MetaWatchdog
 	private ArrayList<String> ID2 = NewIt.newArrayList();
 	private String f2 = null;
 
-	private double alpha = 0.05;
-	private NormalDistribution nd = new NormalDistributionImpl();
-	private double T = 0;
+	private double alpha = 0.95;
 
-	public MetaWatchdog ()
+	public MetaWatchdog2 ()
 	{
 
 		f1 = CmdArgs.INSTANCE.set1_file;
 		f2 = CmdArgs.INSTANCE.set2_file;
 		alpha = CmdArgs.INSTANCE.alpha;
-		try
-		{
-			T = nd.inverseCumulativeProbability(alpha/2 + 0.5) * Math.sqrt(2);
-		}
-		catch (MathException e)
-		{
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
 
 		Logger.printUserLog("set1: " + f1);
 		Logger.printUserLog("Set2: " + f2);
 		Logger.printUserLog("alpha: " + alpha);
-		Logger.printUserLog("cutoff: " + T);
 	}
 
 	public void Bark()
@@ -58,46 +45,35 @@ public class MetaWatchdog
 		readPhenotypes1(f1);
 		readPhenotypes2(f2);
 
-		PrintStream predictorFile = FileUtil.CreatePrintStream(CmdArgs.INSTANCE.out + ".watchdog");
+		PrintStream predictorFile = FileUtil.CreatePrintStream(CmdArgs.INSTANCE.out + ".watchdog2");
 
 		int test = phe1[0].length <= phe2[0].length ? phe1[0].length : phe2[0].length; 
 
-		boolean flag = true;
-		
 		int cnt = 0;
 		for (int i = 0; i < phe1.length; i++)
 		{
 			for (int j = 0; j < phe2.length; j++)
 			{
-				flag = true;
-				double[] s = new double[test];
+				double[][] dat = new double[test][2];
 				for (int k = 0; k < test; k++)
 				{
-					s[k] = Math.abs(phe1[i][k] - phe2[j][k]);
-					if (s[k] > T)
-					{
-						flag = false;
-					}
+					dat[k][0] = phe1[i][k];
+					dat[k][1] = phe2[j][k];
 				}
-				if (flag)
+				SimpleRegression sr = new SimpleRegression();
+				sr.addData(dat);
+				double b = sr.getSlope();
+
+				if(b > alpha)
 				{
+					predictorFile.println(ID1.get(i) + "\t" +ID2.get(j) + "\t" + b + "\t" + sr.getSlopeStdErr() + "\t" + sr.getN());
 					cnt++;
-					predictorFile.print(ID1.get(i) + "\t" +ID2.get(j) + "\t");
-					for (int l = 0; l < test; l++)
-					{
-						if (l < (test - 1) ) 
-						{
-							predictorFile.print(s[l] + "\t");
-						}
-						else
-						{
-							predictorFile.println(s[l]);							
-						}
-					}
 				}
 			}
 		}
 		predictorFile.close();
+		Logger.printUserLog("In total " + phe1.length * phe2.length + " pairs were compared.");
+		
 		Logger.printUserLog("In total " + cnt + " similar pairs were detected.");
 	}
 
@@ -160,8 +136,7 @@ public class MetaWatchdog
 				phe1[i][j] = Double.parseDouble(tk[j+2]);
 			}
 		}
-		Logger.printUserLog("Read " + tmp.size() + " individuals, " + (numCols-2) + " scores. in " + fileName);
-		phe1 = NCGStatUtils.standardize(phe1, true);		
+		Logger.printUserLog("Read " + tmp.size() + " individuals, " + (numCols-2) + " scores in " + fileName);		
 	}
 
 	private void readPhenotypes2(String fileName)
@@ -225,8 +200,8 @@ public class MetaWatchdog
 			}
 		}
 
-		Logger.printUserLog("Read " + tmp.size() + " individuals, " + (numCols-2) + " scores. in " + fileName);
-		phe2 = NCGStatUtils.standardize(phe2, true);
+		Logger.printUserLog("Read " + tmp.size() + " individuals, " + (numCols-2) + " scores in " + fileName);
+				
 	}
 
 }
