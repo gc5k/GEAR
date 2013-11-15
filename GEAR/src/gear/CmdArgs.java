@@ -147,7 +147,9 @@ public enum CmdArgs
 
 		//watchdog
 		ops.addOption(OptionBuilder.withDescription("meta-analysis watchdog ").create(cmd_watchdog));
-		
+
+		ops.addOption(OptionBuilder.withDescription("meta-analysis watchdog2 ").create(cmd_watchdog2));
+
 		ops.addOption(OptionBuilder.withDescription("meta-analysis set1 ").hasArg().create(cmd_set1));
 
 		ops.addOption(OptionBuilder.withDescription("meta-analysis set2 ").hasArg().create(cmd_set2));
@@ -617,7 +619,10 @@ public enum CmdArgs
 	/////////meta watchdog
 	private final String cmd_watchdog = "watchdog";
 	public boolean watchdogFlag = false;
-	
+
+	private final String cmd_watchdog2 = "watchdog2";
+	public boolean watchdog2Flag = false;
+
 	private final String cmd_set1 = "set1";
 	public String set1_file = null;
 
@@ -1407,7 +1412,12 @@ public enum CmdArgs
 		{
 			watchdogFlag = true;
 		}
-		
+
+		if (cmdLine.hasOption(cmd_watchdog2))
+		{
+			watchdog2Flag = true;
+		}
+
 		if (cmdLine.hasOption(cmd_set1))
 		{
 			set1_file = cmdLine.getOptionValue(cmd_set1);
