@@ -11,8 +11,6 @@ import java.util.ArrayList;
 import java.util.HashSet;
 
 import org.apache.commons.math.stat.regression.*;
-import org.apache.commons.math.distribution.NormalDistribution;
-import org.apache.commons.math.distribution.NormalDistributionImpl;
 
 public class MetaWatchdog2
 {
