@@ -117,7 +117,7 @@ public class BufferedReader
 
 		while (true)
 		{
-			String line = readLine();
+			String line = readNonEmptyLine();
 
 			if (line == null)
 			{
