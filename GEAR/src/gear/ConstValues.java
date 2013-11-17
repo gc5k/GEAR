@@ -10,6 +10,7 @@ public class ConstValues
 	public static final int FLOAT_SIZE = Float.SIZE / Byte.SIZE;
 	
 	public static final String WHITESPACE_DELIMITER = "\\s+";
+	public static final String LINE_SEPARATOR = System.getProperty("line.separator");
 	
 	public static final int BINARY_HOMOZYGOTE_FIRST = 0x0;
 	public static final int BINARY_HETEROZYGOTE = 0x1;

@@ -1,7 +1,7 @@
 package gear.he.covar;
 
 import gear.ConstValues;
-import gear.he.SubjectID;
+import gear.data.SubjectID;
 import gear.util.FileUtil;
 import gear.util.Logger;
 import gear.util.NewIt;

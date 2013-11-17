@@ -3,12 +3,12 @@ package gear.bluppca;
 import gear.CommandArguments;
 import gear.CommandImpl;
 import gear.ConstValues;
+import gear.data.InputDataSet;
 import gear.family.pedigree.file.MapFile;
 import gear.family.pedigree.file.SNP;
 import gear.family.plink.PLINKParser;
 import gear.family.popstat.GenotypeMatrix;
 import gear.family.qc.rowqc.SampleFilter;
-import gear.he.SubjectID;
 import gear.sumstat.qc.rowqc.SumStatQC;
 import gear.util.BinaryInputFile;
 import gear.util.BufferedReader;
@@ -18,9 +18,6 @@ import gear.util.pop.PopStat;
 
 import java.io.PrintStream;
 import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.HashSet;
 
 import org.apache.commons.math.linear.Array2DRowRealMatrix;
 import org.apache.commons.math.linear.LUDecompositionImpl;
@@ -33,15 +30,11 @@ public class BlupPcaCommandImpl extends CommandImpl
 	{
 		BlupPcaCommandArguments blupArgs = (BlupPcaCommandArguments)cmdArgs;
 
-		//read grm
-		id2Idx = new HashMap<SubjectID, Integer>();
-		readGrmID(blupArgs.getGrmID(), id2Idx);
-		readGrm(blupArgs);
-
-		flag = new boolean[id2Idx.size()];
-		Arrays.fill(flag, false);
-
-		readPhenotypes(blupArgs.getPhenotypeFile(), id2Idx);
+		InputDataSet data = new InputDataSet();
+		data.readSubjectIDFile(blupArgs.getGrmID());
+		data.readPhenotypeFile(blupArgs.getPhenotypeFile());
+		
+		readGrm(blupArgs, data.getNumberOfSubjects());
 
 		PLINKParser pp = PLINKParser.parse(blupArgs);
 		sf = new SampleFilter(pp.getPedigreeData(), pp.getMapData());
@@ -60,7 +53,7 @@ public class BlupPcaCommandImpl extends CommandImpl
 			}
 		}
 
-		double[][] blupPC = new double[gm.getNumMarker()][phe[0].length];
+		double[][] blupPC = new double[gm.getNumMarker()][data.getNumberOfTraits()];
 
 		Logger.printUserLog("Revving up the BLUP machine...");
 
@@ -69,21 +62,21 @@ public class BlupPcaCommandImpl extends CommandImpl
 
 		RealMatrix tmp = (new Array2DRowRealMatrix(genoMat)).transpose().multiply(grm_Inv);
 
-		for(int i = 0; i < phe[0].length; i++)
+		for(int traitIdx = 0; traitIdx < data.getNumberOfTraits(); traitIdx++)
 		{
-			Logger.printUserLog("Calculating blup vector[" + (i+1) + "].");
+			Logger.printUserLog("Calculating blup vector[" + (traitIdx+1) + "].");
 
-			double[] Y = new double[phe.length];
-			for(int j = 0; j < phe.length; j++)
+			double[] Y = new double[data.getNumberOfSubjects()];
+			for(int subjectIdx = 0; subjectIdx < Y.length; subjectIdx++)
 			{
-				Y[j] = phe[j][i];
+				Y[subjectIdx] = data.getPhenotype(subjectIdx, traitIdx);
 			}
 			RealMatrix B = tmp.multiply(new Array2DRowRealMatrix(Y));
 
 //			Logger.printUserLog("Rescaling the snp effects...");
 			for(int j = 0; j < B.getRowDimension(); j++)
 			{
-				blupPC[j][i] = B.getEntry(j, 0) / gm.getNumMarker();
+				blupPC[j][traitIdx] = B.getEntry(j, 0) / gm.getNumMarker();
 			}
 		}
 
@@ -93,15 +86,15 @@ public class BlupPcaCommandImpl extends CommandImpl
 		ArrayList<SNP> snpList = mapFile.getMarkerList();
 
 		predictorFile.print("SNP\tRefAllele");
-		for(int i = 0; i < phe[0].length; i++)
+		for(int traitIdx = 0; traitIdx < data.getNumberOfTraits(); traitIdx++)
 		{
-			if (i == (phe[0].length - 1)) 
+			if (traitIdx == (data.getNumberOfTraits() - 1)) 
 			{
-				predictorFile.println("\tBLUP" + (i+1));				
+				predictorFile.println("\tBLUP" + (traitIdx+1));				
 			}
 			else
 			{
-				predictorFile.print("\tBLUP" + (i+1));
+				predictorFile.print("\tBLUP" + (traitIdx+1));
 			}
 		}
 
@@ -123,40 +116,27 @@ public class BlupPcaCommandImpl extends CommandImpl
 		}
 		predictorFile.close();
 	}
-
-	private void readGrmID(String fileName, HashMap<SubjectID, Integer> id2Idx)
-	{
-		BufferedReader reader = BufferedReader.openTextFile(fileName, "GRM-ID");
-		int idx = 0;
-		String[] tokens;
-		while ((tokens = reader.readTokens(2)) != null)
-		{
-			id2Idx.put(new SubjectID(/*famID*/tokens[0], /*indID*/tokens[1]), idx++);
-		}
-		Logger.printUserLog("individuals in grm id file: " + id2Idx.size());
-		reader.close();
-	}
 	
-	private void readGrm(BlupPcaCommandArguments blupArgs)
+	private void readGrm(BlupPcaCommandArguments blupArgs, int numSubjects)
 	{
 		if (blupArgs.getGrmBin() != null)
 		{
-			readGrmBin(blupArgs.getGrmBin());
+			readGrmBin(blupArgs.getGrmBin(), numSubjects);
 		}
 		else
 		{
 			BufferedReader reader = blupArgs.getGrmText() == null ?
 					BufferedReader.openGZipFile(blupArgs.getGrmGZ(), "GRM (gzip)") :
 					BufferedReader.openTextFile(blupArgs.getGrmText(), "GRM");
-			readGrm(reader);
+			readGrm(reader, numSubjects);
 		}
 	}	
 
-	private void readGrmBin(String fileName)
+	private void readGrmBin(String fileName, int numSubjects)
 	{
 		BinaryInputFile grmBin = new BinaryInputFile(fileName, "GRM (binary)", /*littleEndian*/true);
-		A = new double[id2Idx.size()][id2Idx.size()];
-		Logger.printUserLog("Constructing A matrix: a " + id2Idx.size() + " X " + id2Idx.size() + " matrix.");
+		A = new double[numSubjects][numSubjects];
+		Logger.printUserLog("Constructing A matrix: a " + numSubjects + " X " + numSubjects + " matrix.");
 		for (int i = 0; i < A.length; i++) 
 		{
 			for (int j = 0; j <= i; j++)
@@ -169,9 +149,9 @@ public class BlupPcaCommandImpl extends CommandImpl
 		}
 	}
 
-	private void readGrm(BufferedReader reader)
+	private void readGrm(BufferedReader reader, int numSubjects)
 	{
-		A = new double[id2Idx.size()][id2Idx.size()];
+		A = new double[numSubjects][numSubjects];
 		String[] tokens = null;
 		for (int i = 0; i < A.length; i++)
 		{
@@ -186,89 +166,7 @@ public class BlupPcaCommandImpl extends CommandImpl
 		reader.close();
 	}
 
-	private void readPhenotypes(String fileName, HashMap<SubjectID, Integer> id2Idx)
-	{
-		gear.util.BufferedReader reader = gear.util.BufferedReader.openTextFile(fileName, "phenotype");
-				
-		@SuppressWarnings("unchecked")
-		HashMap<SubjectID, Integer> subjectsUnread = (HashMap<SubjectID, Integer>)id2Idx.clone();
-
-		HashSet<SubjectID> subjectsRead = new HashSet<SubjectID>();
-
-		String[] tokens = reader.readTokensAtLeast(3);
-		
-		if (tokens == null)
-		{
-			Logger.printUserError("The phenotype file '" + fileName + "' is empty.");
-			System.exit(1);
-		}
-		
-		int numCols = tokens.length;
-		
-		phe = new double[id2Idx.size()][tokens.length - 2];
-		for (double[] indPhe : phe)
-		{
-			Arrays.fill(indPhe, -9);
-		}
-
-		do
-		{
-			SubjectID subID = new SubjectID(/*famID*/tokens[0], /*indID*/tokens[1]);
-
-			int indIdx = 0;
-			if (subjectsUnread.containsKey(subID))
-			{
-				indIdx = subjectsUnread.get(subID);
-				boolean f = true;
-				String pheValStr = null;
-				try
-				{
-					for( int traitIdx = 0; traitIdx < phe[indIdx].length; traitIdx++)
-					{
-						pheValStr = tokens[2 + traitIdx];
-						if (ConstValues.isNA(pheValStr))
-						{
-							f = false;
-							break;  // Question: All the following phenotypes are ignored?
-						}
-						phe[indIdx][traitIdx] = Double.parseDouble(pheValStr);							
-					}
-				}
-				catch (NumberFormatException e)
-				{
-					reader.errorPreviousLine("'" + pheValStr + "' is not a valid phenotype value. It should be a floating point number.");
-				}
-				flag[indIdx] = f;
-
-				subjectsUnread.remove(subID);
-				subjectsRead.add(subID);
-			}
-			else if (subjectsRead.contains(subID))
-			{
-				reader.errorPreviousLine("Individual " + subID + " is repeated.");
-			}
-			else
-			{
-				flag[indIdx] = false;
-			}
-		} while ((tokens = reader.readTokens(numCols)) != null);
-		
-		reader.close();
-
-		if (!subjectsUnread.isEmpty())
-		{
-			String msg = "";
-			msg += subjectsUnread.size() + " individual(s) (e.g. " + subjectsUnread.keySet().iterator().next();
-			msg += ") appear in the grm id file(s) but not in the phenotype file";
-			Logger.printUserWarning(msg);
-		}
-	}
-
-	private boolean[] flag;  // BUG: The 'flag' seems to have no use. Those individuals whose flags are false (i.e. who have missing phenotypes) still participate in the calculation.
-	private double[][] phe;
 	private double[][] A;
-
-	private HashMap<SubjectID, Integer> id2Idx;
 
 	private MapFile mapFile;
 	private SampleFilter sf;

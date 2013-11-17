@@ -1,5 +1,7 @@
 package gear.util;
 
+import gear.ConstValues;
+
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.PrintStream;
@@ -124,20 +126,62 @@ public class Logger
 	{
 		if (!isDevLoggerInited)
 		{
-			String devLogFileName = logFileNamePrefix + "_dev.log";
 			try
 			{
 				java.util.logging.FileHandler devLogHandler =
-						new java.util.logging.FileHandler(devLogFileName);
+						new java.util.logging.FileHandler(getDevLogFileName());
 				devLogHandler.setFormatter(new java.util.logging.SimpleFormatter());
 				devLogger.addHandler(devLogHandler);
 			}
 			catch (IOException e)
 			{
-				handleException(e, "Unable to create the log file '" + devLogFileName + "'");
+				handleException(e, "Unable to create the log file '" + getDevLogFileName() + "'");
 			}
 			isDevLoggerInited = true;	
 		}
+	}
+	
+	public static void warnInternalBug(String msg)
+	{
+		getDevLogger().warning(printInternalBug(msg, /*fatal*/false));
+	}
+	
+	public static void fatalInternalBug(String msg)
+	{
+		getDevLogger().severe(printInternalBug(msg, /*fatal*/true));
+		System.exit(1);
+	}
+	
+	private static String printInternalBug(String msg, boolean fatal)
+	{
+		String userMsg = "";
+		userMsg += "There's " + (fatal ? "a fatal" : "an") + " internal bug in the program: ";
+		userMsg += msg;
+		userMsg += " Please contact us (GEAR's authors) and send '" + getDevLogFileName();
+		userMsg += "' to us to help improve the software.";
+		
+		if (fatal)
+		{
+			printUserError(userMsg);
+		}
+		else
+		{
+			printUserWarning(userMsg);
+		}
+		
+		String devMsg = msg;
+		devMsg += ConstValues.LINE_SEPARATOR;
+		devMsg += "Stack trace:" + ConstValues.LINE_SEPARATOR;
+		for (StackTraceElement stElem : Thread.currentThread().getStackTrace())
+		{
+			devMsg += stElem + ConstValues.LINE_SEPARATOR;
+		}
+		return devMsg;
+	}
+	
+	public static String getDevLogFileName()
+	{
+		return logFileNamePrefix + "_dev.log";
 	}
 
 	private static String logFileNamePrefix = "gear";
