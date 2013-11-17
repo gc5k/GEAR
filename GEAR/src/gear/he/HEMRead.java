@@ -13,6 +13,7 @@ import java.util.zip.GZIPInputStream;
 
 import gear.CmdArgs;
 import gear.ConstValues;
+import gear.data.SubjectID;
 import gear.he.covar.HeCov;
 import gear.util.BinaryInputFile;
 import gear.util.FileUtil;

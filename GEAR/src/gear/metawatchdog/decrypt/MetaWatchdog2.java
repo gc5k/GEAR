@@ -1,7 +1,7 @@
 package gear.metawatchdog.decrypt;
 
 import gear.CmdArgs;
-import gear.he.SubjectID;
+import gear.data.SubjectID;
 import gear.util.FileUtil;
 import gear.util.Logger;
 import gear.util.NewIt;
