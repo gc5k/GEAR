@@ -82,6 +82,8 @@ public class Inbreeding
 
 	public void CalculateFst()
 	{
+		//The definition for FST is as defined in Population Genetics page 98 by John Gillespie.
+		//It ranges between 0~1.
 		int[][] g = G.getG();
 		maf = new double[numMarker];
 		mafGroup = new double[numMarker][groupID.size()];
