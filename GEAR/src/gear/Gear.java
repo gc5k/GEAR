@@ -12,7 +12,6 @@ import gear.he.HEMCalculate;
 import gear.he.HEMRead;
 import gear.he.h2trans.H2Transformer;
 import gear.imputation.NaiveImputation;
-import gear.metawatchdog.decrypt.MetaWatchdog;
 import gear.metawatchdog.decrypt.MetaWatchdog2;
 import gear.metawatchdog.powercalculator.MetaWatchdogPowerCalculator;
 import gear.pscontrol.NonTransmitted;
@@ -221,11 +220,6 @@ public enum Gear
 				WriteBedSNPMajor bedWriter = new WriteBedSNPMajor();
 				bedWriter.WriteFile();
 	
-			}
-			else if (CmdArgs.INSTANCE.watchdogFlag)
-			{
-				MetaWatchdog wd = new MetaWatchdog();
-				wd.Bark();
 			}
 			else if (CmdArgs.INSTANCE.watchdog2Flag)
 			{
