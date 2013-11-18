@@ -162,7 +162,7 @@ public enum CmdArgs
 
 		ops.addOption(OptionBuilder.withDescription("meta-analysis set2 ").hasArg().create(cmd_set2));
 
-		ops.addOption(OptionBuilder.withDescription("meta-analysis alpha ").hasArg().create(cmd_alpha));
+		ops.addOption(OptionBuilder.withDescription("meta-analysis alpha ").hasArg().create(cmd_dog_cutoff));
 
 		// snp
 		ops.addOption(OptionBuilder.withLongOpt(cmd_naive_imputation_long)
@@ -650,8 +650,8 @@ public enum CmdArgs
 	private final String cmd_set2 = "set2";
 	public String set2_file = null;
 
-	private final String cmd_alpha = "alpha";
-	public double alpha = 0.05;
+	private final String cmd_dog_cutoff = "dogcutoff";
+	public double dog_cutoff = 0.05;
 
 	// fst
 	private final String cmd_fst = "fst";
@@ -1487,10 +1487,10 @@ public enum CmdArgs
 			FileUtil.exists(set2_file);
 		}
 
-		if (cmdLine.hasOption(cmd_alpha))
+		if (cmdLine.hasOption(cmd_dog_cutoff))
 		{
-			alpha = Double.parseDouble(cmdLine.getOptionValue(cmd_alpha));
-			if(alpha < 0 || alpha >= 1.0)
+			dog_cutoff = Double.parseDouble(cmdLine.getOptionValue(cmd_dog_cutoff));
+			if(dog_cutoff < 0 || dog_cutoff >= 1.0)
 			{
 				Logger.printUserLog("alpha should be between 0 and 1.");
 				System.exit(0);

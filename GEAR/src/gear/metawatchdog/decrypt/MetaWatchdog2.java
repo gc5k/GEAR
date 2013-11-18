@@ -24,18 +24,18 @@ public class MetaWatchdog2
 	private ArrayList<String> ID2 = NewIt.newArrayList();
 	private String f2 = null;
 
-	private double alpha = 0.95;
+	private double cutoff = 0.95;
 
 	public MetaWatchdog2 ()
 	{
 
 		f1 = CmdArgs.INSTANCE.set1_file;
 		f2 = CmdArgs.INSTANCE.set2_file;
-		alpha = CmdArgs.INSTANCE.alpha;
+		cutoff = CmdArgs.INSTANCE.dog_cutoff;
 
 		Logger.printUserLog("set1: " + f1);
 		Logger.printUserLog("Set2: " + f2);
-		Logger.printUserLog("alpha: " + alpha);
+		Logger.printUserLog("alpha: " + cutoff);
 	}
 
 	public void Bark()
@@ -62,7 +62,7 @@ public class MetaWatchdog2
 				sr.addData(dat);
 				double b = sr.getSlope();
 
-				if(b > alpha)
+				if(b > cutoff)
 				{
 					predictorFile.println(ID1.get(i) + "\t" +ID2.get(j) + "\t" + b + "\t" + sr.getSlopeStdErr() + "\t" + sr.getN());
 					cnt++;
@@ -122,7 +122,7 @@ public class MetaWatchdog2
 		reader.close();
 
 		phe1 = new double[tmp.size()][numCols-2];
-		for(int i = 0; i < tmp.size(); i++) 
+		for(int i = 0; i < tmp.size(); i++)
 		{
 			String[] tk = tmp.get(i).split(delim);
 			StringBuffer id = new StringBuffer();
