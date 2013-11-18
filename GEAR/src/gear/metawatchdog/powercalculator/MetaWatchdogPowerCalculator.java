@@ -20,7 +20,7 @@ public class MetaWatchdogPowerCalculator
 		beta = CmdArgs.INSTANCE.dog_beta;
 		tests = CmdArgs.INSTANCE.dog_tests;
 		h2 = CmdArgs.INSTANCE.dog_h2;
-		
+
 		double za = 0;
 		double zb = 0;
 		try
