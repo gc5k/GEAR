@@ -11,6 +11,7 @@ import java.util.ArrayList;
 import java.util.HashSet;
 
 import org.apache.commons.math.stat.regression.*;
+import org.apache.commons.math.stat.StatUtils;
 
 public class MetaWatchdog2
 {
@@ -33,9 +34,9 @@ public class MetaWatchdog2
 		f2 = CmdArgs.INSTANCE.set2_file;
 		cutoff = CmdArgs.INSTANCE.dog_cutoff;
 
-		Logger.printUserLog("set1: " + f1);
+		Logger.printUserLog("Set1: " + f1);
 		Logger.printUserLog("Set2: " + f2);
-		Logger.printUserLog("alpha: " + cutoff);
+		Logger.printUserLog("Cutoff: " + cutoff);
 	}
 
 	public void Bark()
@@ -134,7 +135,14 @@ public class MetaWatchdog2
 				phe1[i][j] = Double.parseDouble(tk[j+2]);
 			}
 		}
-		Logger.printUserLog("Read " + tmp.size() + " individuals, " + (numCols-2) + " scores in " + fileName);		
+
+		Logger.printUserLog("Read " + tmp.size() + " individuals, " + (numCols-2) + " scores in " + fileName);
+		Logger.printUserLog("Standardization the scores for each individual in set 1");
+		for (int i = 0; i < phe1.length; i++)
+		{
+			phe1[i] = StatUtils.normalize(phe1[i]);
+		}
+
 	}
 
 	private void readPhenotypes2(String fileName)
@@ -199,7 +207,11 @@ public class MetaWatchdog2
 		}
 
 		Logger.printUserLog("Read " + tmp.size() + " individuals, " + (numCols-2) + " scores in " + fileName);
-				
+		Logger.printUserLog("Standardization the scores for each individual in set 2");
+		for (int i = 0; i < phe2.length; i++)
+		{
+			phe2[i] = StatUtils.normalize(phe2[i]);
+		}				
 	}
 
 }
