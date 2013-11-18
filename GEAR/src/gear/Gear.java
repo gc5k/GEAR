@@ -14,6 +14,7 @@ import gear.he.h2trans.H2Transformer;
 import gear.imputation.NaiveImputation;
 import gear.metawatchdog.decrypt.MetaWatchdog;
 import gear.metawatchdog.decrypt.MetaWatchdog2;
+import gear.metawatchdog.powercalculator.MetaWatchdogPowerCalculator;
 import gear.pscontrol.NonTransmitted;
 import gear.realcheck.RealCheck;
 import gear.realcheck.RealCheckOne;
@@ -230,6 +231,10 @@ public enum Gear
 			{
 				MetaWatchdog2 wd = new MetaWatchdog2();
 				wd.Bark();
+			}
+			else if (CmdArgs.INSTANCE.dogpowerFlag)
+			{
+				MetaWatchdogPowerCalculator p = new MetaWatchdogPowerCalculator();
 			}
 
 			monitor.stopMonitoring();
