@@ -146,6 +146,16 @@ public enum CmdArgs
 				.create(cmd_fst));
 
 		//watchdog
+		ops.addOption(OptionBuilder.withDescription("meta-watchdog power calculator").create(cmd_dog_power));
+
+		ops.addOption(OptionBuilder.withDescription("meta-watchdog power calculator alpha").hasArg().create(cmd_dog_alpha));
+
+		ops.addOption(OptionBuilder.withDescription("meta-watchdog power calculator beta").hasArg().create(cmd_dog_beta));
+		
+		ops.addOption(OptionBuilder.withDescription("meta-watchdog power calculator tests").hasArg().create(cmd_dog_test));
+
+		ops.addOption(OptionBuilder.withDescription("meta-watchdog power calculator h2").hasArg().create(cmd_dog_h2));
+
 		ops.addOption(OptionBuilder.withDescription("meta-analysis watchdog ").create(cmd_watchdog));
 
 		ops.addOption(OptionBuilder.withDescription("meta-analysis watchdog2 ").create(cmd_watchdog2));
@@ -617,6 +627,22 @@ public enum CmdArgs
 	public boolean sumStatFlag = false;
 
 	/////////meta watchdog
+	
+	private final String cmd_dog_power = "dogpower";
+	public boolean dogpowerFlag = false;
+
+	private final String cmd_dog_alpha = "dogalpha";
+	public double dog_alpha = 0.05;
+
+	private final String cmd_dog_beta = "dogbeta";
+	public double dog_beta = 0.95;
+
+	private final String cmd_dog_test = "dogtest";
+	public int dog_tests = 100;
+
+	private final String cmd_dog_h2 = "dogh2";
+	public double dog_h2 = 100;
+
 	private final String cmd_watchdog = "watchdog";
 	public boolean watchdogFlag = false;
 
@@ -1408,6 +1434,47 @@ public enum CmdArgs
 		}
 
 		///////meta-analysis watchdog
+		if (cmdLine.hasOption(cmd_dog_power))
+		{
+			dogpowerFlag = true;
+		}
+
+		if (cmdLine.hasOption(cmd_dog_alpha))
+		{
+			dog_alpha = Double.parseDouble(cmdLine.getOptionValue(cmd_dog_alpha));
+			if(dog_alpha < 0 || dog_alpha >= 1.0)
+			{
+				Logger.printUserLog("dog alpha should be between 0 and 1.");
+			}
+		}
+
+		if (cmdLine.hasOption(cmd_dog_beta))
+		{
+			dog_beta = Double.parseDouble(cmdLine.getOptionValue(cmd_dog_beta));
+			if(dog_beta < 0 || dog_beta >= 1.0)
+			{
+				Logger.printUserLog("dog beta should be between 0 and 1.");
+			}
+		}
+		
+		if (cmdLine.hasOption(cmd_dog_test))
+		{
+			dog_tests = Integer.parseInt(cmdLine.getOptionValue(cmd_dog_test));
+			if (dog_tests < 1)
+			{
+				Logger.printUserLog("dog tests should not be less than 1.");
+			}
+		}
+
+		if (cmdLine.hasOption(cmd_dog_h2))
+		{
+			dog_h2 = Double.parseDouble(cmdLine.getOptionValue(cmd_dog_h2));
+			if (dog_h2 < 0 || dog_h2 > 1)
+			{
+				Logger.printUserLog("dog h2 should be between 0 and 1.");
+			}
+		}
+
 		if (cmdLine.hasOption(cmd_watchdog))
 		{
 			watchdogFlag = true;
