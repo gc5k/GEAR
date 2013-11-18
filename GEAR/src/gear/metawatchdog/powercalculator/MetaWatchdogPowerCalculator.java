@@ -10,7 +10,7 @@ public class MetaWatchdogPowerCalculator
 {
 	private int tests = 100;
 	private double alpha = 0.05;
-	private double beta = 0.9;
+	private double beta = 0.5;
 	private double h2 = 0.95;
 	private NormalDistribution nd = new NormalDistributionImpl();
 	
@@ -25,15 +25,15 @@ public class MetaWatchdogPowerCalculator
 		double zb = 0;
 		try
 		{
-			za = nd.inverseCumulativeProbability(alpha/tests);
-			zb = nd.inverseCumulativeProbability(beta);
+			za = nd.inverseCumulativeProbability(1-alpha/tests);
+			zb = nd.inverseCumulativeProbability(1-beta);
 		}
 		catch (MathException e)
 		{
 			e.printStackTrace();
 		}
 
-		double k = (zb - za/Math.sqrt(1-h2 * h2)) * (zb - za /Math.sqrt(1-h2 * h2)) * (1-h2 * h2) / (h2 * h2);
+		double k = (zb + za/Math.sqrt(1-h2 * h2)) * (zb + za /Math.sqrt(1-h2 * h2)) * (1-h2 * h2) / (h2 * h2);
 		Logger.printUserLog("alpha: " + alpha + "(" + za + ")");
 		Logger.printUserLog("bete: " + beta + "(" + zb + ")");
 		Logger.printUserLog("h2: " + h2);
