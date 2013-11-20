@@ -221,7 +221,7 @@ public enum Gear
 				bedWriter.WriteFile();
 	
 			}
-			else if (CmdArgs.INSTANCE.watchdog2Flag)
+			else if (CmdArgs.INSTANCE.watchdogFlag)
 			{
 				MetaWatchdog2 wd = new MetaWatchdog2();
 				wd.Bark();
