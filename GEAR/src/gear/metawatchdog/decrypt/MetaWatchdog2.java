@@ -44,7 +44,7 @@ public class MetaWatchdog2
 		readPhenotypes1(f1);
 		readPhenotypes2(f2);
 
-		PrintStream predictorFile = FileUtil.CreatePrintStream(CmdArgs.INSTANCE.out + ".watchdog2");
+		PrintStream predictorFile = FileUtil.CreatePrintStream(CmdArgs.INSTANCE.out + ".watchdog");
 
 		int test = phe1[0].length <= phe2[0].length ? phe1[0].length : phe2[0].length; 
 
