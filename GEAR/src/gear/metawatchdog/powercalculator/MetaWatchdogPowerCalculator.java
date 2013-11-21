@@ -1,6 +1,9 @@
 package gear.metawatchdog.powercalculator;
 
+import java.io.PrintStream;
+
 import gear.CmdArgs;
+import gear.util.FileUtil;
 import gear.util.Logger;
 
 import org.apache.commons.math.MathException;
@@ -34,10 +37,18 @@ public class MetaWatchdogPowerCalculator
 		}
 
 		double k = (zb + za/Math.sqrt(1-h2 * h2)) * (zb + za /Math.sqrt(1-h2 * h2)) * (1-h2 * h2) / (h2 * h2);
-		Logger.printUserLog("alpha: " + alpha + "(" + za + ")");
-		Logger.printUserLog("bete: " + beta + "(" + zb + ")");
+		Logger.printUserLog("alpha: " + alpha + " (z score=" + za + ")");
+		Logger.printUserLog("beta: " + beta + " (z score=" + zb + ")");
 		Logger.printUserLog("h2: " + h2);
 		Logger.printUserLog("tests: " + tests);
 		Logger.printUserLog("sample size to archive type I error rate at alphe = " + alpha + " and power = " + beta + " is " + k);
+
+		PrintStream predictorFile = FileUtil.CreatePrintStream(CmdArgs.INSTANCE.out + ".dogpower");
+		predictorFile.println("alpha (type I error rate): " + alpha + "( z score =" + za + ")");
+		predictorFile.println("beta (type II error rate): " + beta + "( z score =" + zb + ")");
+		predictorFile.println("h2: " + h2);
+		predictorFile.println("tests: " + tests);
+		predictorFile.println("sample size to archive type I error rate at alphe = " + alpha + " and power = " + beta + " is " + k);
+
 	}
 }
