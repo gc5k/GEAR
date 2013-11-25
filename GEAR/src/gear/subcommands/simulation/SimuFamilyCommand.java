@@ -1,4 +1,4 @@
-package gear.simulation;
+package gear.subcommands.simulation;
 
 import org.apache.commons.cli.CommandLine;
 import org.apache.commons.cli.OptionBuilder;

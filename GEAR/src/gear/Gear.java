@@ -39,7 +39,7 @@ public enum Gear
 		addCommand(new gear.subcommands.help.HelpCommand());
 		addCommand(new gear.subcommands.hpc.HpcCommand());
 		addCommand(new gear.subcommands.profile.ProfileCommand());
-		addCommand(new gear.simulation.SimuFamilyCommand());
+		addCommand(new gear.subcommands.simulation.SimuFamilyCommand());
 	}
 	
 	private void addCommand(Command cmd)
