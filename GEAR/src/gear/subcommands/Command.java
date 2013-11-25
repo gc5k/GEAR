@@ -116,8 +116,7 @@ public abstract class Command implements Comparable<Command>
 	
 	public void execute(String[] args)
 	{
-		Options options = new Options();
-		prepareOptions(options);
+		Options options = getOptions();
 		CommandLineParser cmdLineParser = new PosixParser();
 		
 		try
