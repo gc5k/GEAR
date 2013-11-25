@@ -21,6 +21,7 @@ import gear.simulation.RealDataSimulation;
 import gear.simulation.RealDataSimulationQT;
 import gear.simulation.SimuPolyCC;
 import gear.simulation.SimuPolyQT;
+import gear.subcommands.Command;
 import gear.sumstat.FrequencyCalculator;
 import gear.sumstat.Inbreeding;
 import gear.util.Logger;
@@ -33,11 +34,11 @@ public enum Gear
 	
 	private Gear()
 	{
-		addCommand(new gear.bluppca.BlupPcaCommand());
-		addCommand(new gear.metawatchdog.ecode.EnigmaCommand());
-		addCommand(new gear.help.HelpCommand());
-		addCommand(new gear.hpc.HpcCommand());
-		addCommand(new gear.profile.ProfileCommand());
+		addCommand(new gear.subcommands.bluppca.BlupPcaCommand());
+		addCommand(new gear.subcommands.metawatchdog.encrypt.EnigmaCommand());
+		addCommand(new gear.subcommands.help.HelpCommand());
+		addCommand(new gear.subcommands.hpc.HpcCommand());
+		addCommand(new gear.subcommands.profile.ProfileCommand());
 		addCommand(new gear.simulation.SimuFamilyCommand());
 	}
 	
