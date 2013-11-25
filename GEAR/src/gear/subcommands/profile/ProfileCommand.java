@@ -43,7 +43,6 @@ public final class ProfileCommand extends Command
 		options.addOption(OptionBuilder.withDescription(OPT_AUTO_FLIP_OFF_DESC).withLongOpt(OPT_AUTO_FLIP_OFF_LONG).hasArg(false).create());
 		options.addOption(OptionBuilder.withDescription(OPT_NO_WEIGHT_DESC).withLongOpt(OPT_NO_WEIGHT_LONG).hasArg(false).create());
 		options.addOption(OptionBuilder.withDescription(OPT_KEEP_ATGC_DESC).withLongOpt(OPT_KEEP_ATGC_LONG).hasArg(false).create());
-		options.addOption(OptionBuilder.withDescription(OPT_OUT_DESC).withLongOpt(OPT_OUT_LONG).hasArg().create(OPT_OUT));
 	}
 
 	@Override
@@ -59,7 +58,6 @@ public final class ProfileCommand extends Command
 		profCmdArgs.setIsAutoFlip(!cmdLine.hasOption(OPT_AUTO_FLIP_OFF_LONG));
 		profCmdArgs.setIsWeighted(!cmdLine.hasOption(OPT_NO_WEIGHT_LONG));
 		profCmdArgs.setIsKeepATGC(cmdLine.hasOption(OPT_KEEP_ATGC_LONG));
-		profCmdArgs.setOutRoot(cmdLine.getOptionValue(OPT_OUT, OPT_OUT_DEFAULT));
 		return profCmdArgs;
 	}
 	

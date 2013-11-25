@@ -33,7 +33,6 @@ public class BlupPcaCommand extends Command
 		options.addOption(OptionBuilder.withDescription(OPT_FILE_DESC).withLongOpt(OPT_FILE_LONG).hasArg().create());
 		options.addOption(OptionBuilder.withDescription(OPT_BFILE_DESC).withLongOpt(OPT_BFILE_LONG).hasArg().create());
 		options.addOption(OptionBuilder.withDescription(OPT_PHE_DESC).withLongOpt(OPT_PHE_LONG).hasArg().isRequired().create());
-		options.addOption(OptionBuilder.withDescription(OPT_OUT_DESC).withLongOpt(OPT_OUT_LONG).hasArg().create(OPT_OUT));
 	}
 
 	@Override
@@ -43,7 +42,6 @@ public class BlupPcaCommand extends Command
 		parseGRMArguments(blupArgs, cmdLine);
 		parseFileArguments(blupArgs, cmdLine);
 		blupArgs.setPhenotypeFile(cmdLine.getOptionValue(OPT_PHE_LONG));
-		blupArgs.setOutRoot(cmdLine.getOptionValue(OPT_OUT_LONG, OPT_OUT_DEFAULT));
 		return blupArgs;
 	}
 	

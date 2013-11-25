@@ -32,7 +32,6 @@ public final class SimuFamilyCommand extends Command
 		options.addOption(OptionBuilder.withDescription(OPT_NUM_MARKERS_DESC).withLongOpt(OPT_NUM_MARKERS_LONG).hasArg().isRequired().create(OPT_NUM_MARKERS));
 		options.addOption(OptionBuilder.withDescription(OPT_SEED_DESC).withLongOpt(OPT_SEED_LONG).hasArg().create(OPT_SEED));
 		options.addOption(OptionBuilder.withDescription(OPT_MAKE_BED_DESC).withLongOpt(OPT_MAKE_BED_LONG).create(OPT_MAKE_BED));
-		options.addOption(OptionBuilder.withDescription(OPT_OUT_DESC).withLongOpt(OPT_OUT_LONG).hasArg().create(OPT_OUT));
 	}
 
 	@Override
@@ -43,7 +42,6 @@ public final class SimuFamilyCommand extends Command
 		parseNumberOfMarkers(cmdArgs, cmdLine);
 		parseSeed(cmdArgs, cmdLine);
 		cmdArgs.setMakeBed(cmdLine.hasOption(OPT_MAKE_BED));
-		cmdArgs.setOutRoot(cmdLine.getOptionValue(OPT_OUT, OPT_OUT_DEFAULT));
 		return cmdArgs;
 	}
 	

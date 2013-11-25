@@ -30,7 +30,6 @@ public class EnigmaCommand extends Command
 		options.addOption(OptionBuilder.withDescription(OPT_SEED_DESC).withLongOpt(OPT_SEED_LONG).hasArg().create());
 		options.addOption(OptionBuilder.withDescription(OPT_NUM_COLS_DESC).withLongOpt(OPT_NUM_COLS_LONG).hasArg().create());
 		options.addOption(OptionBuilder.withDescription(OPT_MAP_DESC).withLongOpt(OPT_MAP_LONG).hasArg().isRequired().create());
-		options.addOption(OptionBuilder.withDescription(OPT_OUT_DESC).withLongOpt(OPT_OUT_LONG).hasArg().create(OPT_OUT));
 	}
 
 	@Override
@@ -40,7 +39,6 @@ public class EnigmaCommand extends Command
 		parseSeed(cmdArgs, cmdLine);
 		parseNumberOfColumns(cmdArgs, cmdLine);
 		cmdArgs.setMapFile(cmdLine.getOptionValue(OPT_MAP_LONG));
-		cmdArgs.setOutRoot(cmdLine.getOptionValue(OPT_OUT_LONG, OPT_OUT_DEFAULT));
 		return cmdArgs;
 	}
 	

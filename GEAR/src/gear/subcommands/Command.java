@@ -11,6 +11,7 @@ import java.util.TreeSet;
 import org.apache.commons.cli.CommandLine;
 import org.apache.commons.cli.CommandLineParser;
 import org.apache.commons.cli.Option;
+import org.apache.commons.cli.OptionBuilder;
 import org.apache.commons.cli.Options;
 import org.apache.commons.cli.ParseException;
 import org.apache.commons.cli.PosixParser;
@@ -76,9 +77,11 @@ public abstract class Command implements Comparable<Command>
 	
 	protected abstract void prepareOptions(Options options);
 	
+	@SuppressWarnings("static-access")
 	public Options getOptions()
 	{
 		Options options = new Options();
+		options.addOption(OptionBuilder.withDescription(OPT_OUT_DESC).withLongOpt(OPT_OUT_LONG).hasArg().create(OPT_OUT));
 		prepareOptions(options);
 		return options;
 	}
@@ -116,13 +119,14 @@ public abstract class Command implements Comparable<Command>
 		Options options = new Options();
 		prepareOptions(options);
 		CommandLineParser cmdLineParser = new PosixParser();
+		
 		try
 		{
 			CommandLine cmdLine = cmdLineParser.parse(options, args, stopAtNonOption);
 			CommandArguments cmdArgs = parse(cmdLine);
+			cmdArgs.setOutRoot(cmdLine.getOptionValue(OPT_OUT, OPT_OUT_DEFAULT));
 			
-			Logger.setLogFiles(cmdLine.getOptionValue(OPT_OUT, OPT_OUT_DEFAULT));
-			
+			Logger.setLogFiles(cmdArgs.getOutRoot());
 			Logger.hasUserLogTag(false);
 			Logger.printUserLog(AboutInfo.WELCOME_MESSAGE);
 			Logger.hasUserLogTag(true);

@@ -36,6 +36,7 @@ public enum Gear
 	{
 		addCommand(new gear.subcommands.bluppca.BlupPcaCommand());
 		addCommand(new gear.subcommands.metawatchdog.encrypt.EnigmaCommand());
+		addCommand(new gear.subcommands.he.assocpower.HEAssocPowerCommand());
 		addCommand(new gear.subcommands.help.HelpCommand());
 		addCommand(new gear.subcommands.hpc.HpcCommand());
 		addCommand(new gear.subcommands.profile.ProfileCommand());
