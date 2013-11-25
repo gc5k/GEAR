@@ -1,8 +1,8 @@
 package gear.simulation;
 
-import gear.CommandArguments;
-import gear.CommandImpl;
 import gear.ConstValues;
+import gear.subcommands.CommandArguments;
+import gear.subcommands.CommandImpl;
 import gear.util.Logger;
 
 import java.io.BufferedWriter;

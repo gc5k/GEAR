@@ -12,7 +12,7 @@ import gear.util.Logger;
 
 public class PLINKParser
 {
-	public static PLINKParser parse(gear.CommandArguments cmdArgs)
+	public static PLINKParser parse(gear.subcommands.CommandArguments cmdArgs)
 	{
 		PLINKParser pp = null;
 		if (cmdArgs.getBFile() != null)

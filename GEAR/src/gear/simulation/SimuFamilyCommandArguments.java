@@ -1,6 +1,6 @@
 package gear.simulation;
 
-import gear.CommandArguments;
+import gear.subcommands.CommandArguments;
 
 public final class SimuFamilyCommandArguments extends CommandArguments
 {
