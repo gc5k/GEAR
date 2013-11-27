@@ -9,7 +9,8 @@ public abstract class CommandImpl
 {
 	public void preExecute()
 	{
-		Logger.printUserLog("Analysis started: " + Calendar.getInstance().getTime() + "\n");
+		Logger.printUserLog("Analysis started: " + Calendar.getInstance().getTime());
+		Logger.printUserLog("");
 		monitor = new MonitorThread();
 		monitor.start();
 	}
