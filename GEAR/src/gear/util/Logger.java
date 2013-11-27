@@ -39,20 +39,15 @@ public class Logger
 	public static void setLogFiles(String namePrefix)
 	{
 		logFileNamePrefix = namePrefix;
-		
-		String userLogFileName = namePrefix + ".log";
-		try
-		{
-			userLogWriter = new PrintWriter(userLogFileName);
-		}
-		catch (FileNotFoundException e)
-		{
-			handleException(e, "Unable to create the log file '" + userLogFileName + "'");
-		}
 	}
 	
 	public static void printUserLog(LogLevel level, String msg)
 	{
+		if (userLogWriter == null)
+		{
+			initUserLogWriter();
+		}
+		
 		String tag = "";
 		PrintStream printStrm = System.out;
 		
@@ -120,6 +115,19 @@ public class Logger
 		printUserError("Exception Message: " + e.getMessage());
 		devLogger.log(Level.SEVERE, msg, e);
 		System.exit(1);
+	}
+	
+	public static void initUserLogWriter()
+	{
+		String userLogFileName = logFileNamePrefix + ".log";
+		try
+		{
+			userLogWriter = new PrintWriter(userLogFileName);
+		}
+		catch (FileNotFoundException e)
+		{
+			handleException(e, "Unable to create the log file '" + userLogFileName + "'");
+		}
 	}
 	
 	public static void initDevLogger()
