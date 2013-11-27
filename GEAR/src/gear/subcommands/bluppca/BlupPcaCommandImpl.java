@@ -69,7 +69,7 @@ public class BlupPcaCommandImpl extends CommandImpl
 			double[] Y = new double[data.getNumberOfSubjects()];
 			for(int subjectIdx = 0; subjectIdx < Y.length; subjectIdx++)
 			{
-				Y[subjectIdx] = data.getPhenotype(subjectIdx, traitIdx);
+				Y[subjectIdx] = data.isPhenotypeMissing(subjectIdx, traitIdx) ? 0 : data.getPhenotype(subjectIdx, traitIdx);
 			}
 			RealMatrix B = tmp.multiply(new Array2DRowRealMatrix(Y));
 
