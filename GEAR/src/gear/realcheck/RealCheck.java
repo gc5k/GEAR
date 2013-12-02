@@ -343,7 +343,7 @@ public class RealCheck
 		} 
 		else
 		{
-			Logger.printUserLog("Common SNP(s) between the two SNP files: " + c);
+			Logger.printUserLog("Common SNP(s) between the two SNP files: " + (c+ATGC));
 			if (ATGC>0) 
 			{
 				Logger.printUserLog("Removed Ambiguous loci (A/T, G/C biallelic): " + ATGC);
