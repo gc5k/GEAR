@@ -156,7 +156,9 @@ public enum CmdArgs
 
 		ops.addOption(OptionBuilder.withDescription("meta-watchdog power calculator h2").hasArg().create(cmd_dog_h2));
 
-		ops.addOption(OptionBuilder.withDescription("meta-analysis watchdog2 ").create(cmd_watchdog));
+		ops.addOption(OptionBuilder.withDescription("meta-analysis watchdog ").create(cmd_watchdog));
+
+		ops.addOption(OptionBuilder.withDescription("meta-analysis watchdog sequential test").create(cmd_sequential));
 
 		ops.addOption(OptionBuilder.withDescription("meta-analysis set1 ").hasArg().create(cmd_set1));
 
@@ -641,6 +643,9 @@ public enum CmdArgs
 	private final String cmd_dog_h2 = "dogh2";
 	public double dog_h2 = 100;
 
+	private final String cmd_sequential = "sequential";
+	public boolean sequentialFlag = false;
+	
 	private final String cmd_watchdog = "watchdog";
 	public boolean watchdogFlag = false;
 
@@ -1468,6 +1473,11 @@ public enum CmdArgs
 			{
 				Logger.printUserLog("dog h2 should be between 0 and 1.");
 			}
+		}
+
+		if (cmdLine.hasOption(cmd_sequential))
+		{
+			sequentialFlag = true;
 		}
 
 		if (cmdLine.hasOption(cmd_watchdog))

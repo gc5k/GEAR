@@ -12,6 +12,7 @@ import gear.he.HEMCalculate;
 import gear.he.HEMRead;
 import gear.he.h2trans.H2Transformer;
 import gear.imputation.NaiveImputation;
+import gear.metawatchdog.decrypt.MetaWatchdog;
 import gear.metawatchdog.decrypt.MetaWatchdog2;
 import gear.metawatchdog.powercalculator.MetaWatchdogPowerCalculator;
 import gear.pscontrol.NonTransmitted;
@@ -225,8 +226,16 @@ public enum Gear
 			}
 			else if (CmdArgs.INSTANCE.watchdogFlag)
 			{
-				MetaWatchdog2 wd = new MetaWatchdog2();
-				wd.Bark();
+				if (CmdArgs.INSTANCE.sequentialFlag)
+				{
+					MetaWatchdog mw = new MetaWatchdog();
+					mw.Bark();
+				}
+				else
+				{
+					MetaWatchdog2 wd = new MetaWatchdog2();
+					wd.Bark();
+				}
 			}
 			else if (CmdArgs.INSTANCE.dogpowerFlag)
 			{
@@ -234,7 +243,7 @@ public enum Gear
 			}
 
 			monitor.stopMonitoring();
-			
+
 			Logger.printUserLog("");
 			Logger.printUserLog("Analysis finished: " + Calendar.getInstance().getTime());
 			Logger.printUserLog("Peak memory consumption: " + monitor.getPeakMemoryFormatString());
