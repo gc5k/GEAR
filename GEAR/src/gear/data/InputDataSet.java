@@ -115,7 +115,10 @@ public class InputDataSet implements SubjectOrder
 				System.exit(1);
 			}
 			
-			order2.swapSubjects(subjectIdx1, subjectIdx2);
+			if (subjectIdx1 != subjectIdx2)
+			{
+				order2.swapSubjects(subjectIdx1, subjectIdx2);
+			}
 		}
 	}
 	
