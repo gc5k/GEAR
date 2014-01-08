@@ -94,7 +94,7 @@ public class SimuPolyQT
 		{
 			Logger.printUserLog("Uniform Effect: " + U);
 		}
-		Logger.printUserLog("LD: " + ld);
+		Logger.printUserLog("LD (Lewontin's Dprime): " + ld);
 		Logger.printUserLog("Sample size: " + sample);
 		Logger.printUserLog("h2: " + h2);
 		Logger.printUserLog("out: " + CmdArgs.INSTANCE.out);
