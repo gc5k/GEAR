@@ -376,7 +376,7 @@ public class HEMCalculate
 					.getEntry(i, 0)) + "\t" + fmt.format(Math.sqrt(v
 					.getEntry(i, i))) + "\n");
 		}
-
+		
 		if (!heMReader.reverse)
 		{
 			double[] h_o = new double[Mat_B.getRowDimension() - 1];
@@ -409,8 +409,8 @@ public class HEMCalculate
 				{
 					v_ho = Math.sqrt(v_b1);
 				}
-				heMReader.sb.append("h2(o) for b" + i + ": " + fmt
-						.format(h_o[i - 1]) + "\t" + fmt.format(v_ho) + "\n");
+//				heMReader.sb.append("h2(o) for b" + i + ": " + fmt
+//						.format(h_o[i - 1]) + "\t" + fmt.format(v_ho) + "\n");
 
 				if (heMReader.k_button && heMReader.isCaseControl())
 				{
@@ -430,10 +430,10 @@ public class HEMCalculate
 
 					double f = (heMReader.k * (1 - heMReader.k) * heMReader.k * (1 - heMReader.k)) / (z * z * ratioCaseCtrl * (1 - ratioCaseCtrl));
 					double v_hl = v_ho * f * f;
-					heMReader.sb
-							.append("h2(l) for b" + i + ": " + fmt
-									.format(h_l[i - 1]) + "\t" + fmt
-									.format(v_hl) + "\n");
+//					heMReader.sb
+//							.append("h2(l) for b" + i + ": " + fmt
+//									.format(h_l[i - 1]) + "\t" + fmt
+//									.format(v_hl) + "\n");
 				}
 			}
 		}
@@ -450,12 +450,12 @@ public class HEMCalculate
 		}
 
 		heMReader.lambda.calLambda();
-		heMReader.sb
-				.append("Decomposite b1 into the covariance and the variance:\n");
-		heMReader.sb.append("\ncov(Y, X): " + fmt.format(heMReader.lambda
-				.getCov()) + "\n");
-		heMReader.sb
-				.append("var(X): " + fmt.format(heMReader.lambda.getVar()) + "\n");
+//		heMReader.sb
+//				.append("Decomposite b1 into the covariance and the variance:\n");
+//		heMReader.sb.append("\ncov(Y, X): " + fmt.format(heMReader.lambda
+//				.getCov()) + "\n");
+//		heMReader.sb
+//				.append("var(X): " + fmt.format(heMReader.lambda.getVar()) + "\n");
 
 		if (CmdArgs.INSTANCE.eh2Flag)
 		{
