@@ -277,16 +277,47 @@ public final class SimuFamilyCommandImpl extends CommandImpl
 			Logger.handleException(e, "An I/O exception occurred when creating the .bed, .fam and .bim files.");
 		}
 
+		int fid = 0;
+		int fc = 0;
+		int cn = 0;
+		int pid = 0;
+		int mid = 0;
 		for (int i = 0; i < gm.length; i++)
 		{
-			fam.print("sample_" + i + " ");
-			fam.print(1 + " ");
-			fam.print(0 + " ");
-			fam.print(0 + " ");
+			if (i % 4 == 0)
+			{
+				fc++;
+				fid = fc * 10000;
+				pid = fid + 1;
+				mid = fid + 2;
+				cn = 0;
+			}
+			cn++;
+			fam.print(fid + " ");
+			if (cn <= 2) 
+			{
+				fam.print((fid+cn) + " ");
+				fam.print(0 + " ");
+				fam.print(0 + " ");
+			}
+			else
+			{
+				fam.print((fid+cn) + " ");
+				fam.print(pid + " ");
+				fam.print(mid + " ");				
+			}
 			try
 			{
-				fam.print((rnd.nextBinomial(1, 0.5) + 1) + " ");
-				fam.print((rnd.nextBinomial(1, 0.5) + 1) + " ");
+				if (cn <= 2)
+				{
+					fam.print(cn + " ");
+				}
+				else 
+				{
+					fam.print((rnd.nextBinomial(1, 0.5) + 1) + " ");
+				}
+				fam.print((rnd.nextBinomial(1, 0.5) + 1) + "\n");
+
 			}
 			catch (MathException e)
 			{
