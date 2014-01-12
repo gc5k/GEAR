@@ -29,6 +29,25 @@ public final class SimuFamilyCommandImpl extends CommandImpl
 		{
 			generateNuclearFamily(NKid[i], NAffKid[i], i);
 		}
+		System.out.println(gm.length + " " + gm[1].length);
+		for(int i = 0; i < gm.length; i++)
+		{
+			for(int j = 0; j < gm[0].length; j++)
+			{
+				System.out.print(gm[i][j] + " ");
+			}
+			System.out.println();
+		}
+
+		if (this.cmdArgs.getMakeBed())
+		{
+			writeBFile();
+		}
+		else
+		{
+			writeFile();
+		}
+
 	}
 	
 	private void init()
@@ -37,7 +56,7 @@ public final class SimuFamilyCommandImpl extends CommandImpl
 		
 		if (cmdArgs.getSeed() == null)
 		{
-			rnd.reSeed();
+			rnd.reSeed(2013);
 		}
 		else
 		{
@@ -70,14 +89,6 @@ public final class SimuFamilyCommandImpl extends CommandImpl
 			generateBaby(p, m, famIdx, i + 2);
 		}
 
-		if (cmdArgs.getMakeBed())
-		{
-			writeBFile();
-		}
-		else
-		{
-			writeFile();
-		}
 	}
 
 	private int[][] sampleChromosome(int famIdx, int shift)
@@ -161,21 +172,28 @@ public final class SimuFamilyCommandImpl extends CommandImpl
 			for (int i = 0; i < maf.length; i++)
 			{
 				StringBuilder sb = new StringBuilder();
-				switch (gm[h * famSize][0])
+				switch (gm[h * famSize][i])
 				{
 				case 0:
 					sb.append(A[0] + " " + A[0]);
 					break;
 				case 1:
-					sb.append(A[0] + " " + A[0]);
+					sb.append(A[0] + " " + A[1]);
 					break;
 				case 2:
-					sb.append(A[0] + " " + A[0]);
+					sb.append(A[1] + " " + A[1]);
 					break;
 				default:
 					break;
 				}
-				ped.print(sb.toString());
+				if (i == (maf.length - 1))
+				{
+					ped.print(sb.toString());			
+				}
+				else
+				{
+					ped.print(sb.toString() + " ");
+				}
 			}
 			ped.print("\n");
 
@@ -189,21 +207,28 @@ public final class SimuFamilyCommandImpl extends CommandImpl
 			for (int i = 0; i < maf.length; i++)
 			{
 				StringBuilder sb = new StringBuilder();
-				switch (gm[h * famSize + 1][0])
+				switch (gm[h * famSize + 1][i])
 				{
 				case 0:
 					sb.append(A[0] + " " + A[0]);
 					break;
 				case 1:
-					sb.append(A[0] + " " + A[0]);
+					sb.append(A[0] + " " + A[1]);
 					break;
 				case 2:
-					sb.append(A[0] + " " + A[0]);
+					sb.append(A[1] + " " + A[1]);
 					break;
 				default:
 					break;
 				}
-				ped.print(sb.toString());
+				if (i == (maf.length - 1))
+				{
+					ped.print(sb.toString());						
+				}
+				else
+				{
+					ped.print(sb.toString() + " ");
+				}
 			}
 			ped.print("\n");
 
@@ -227,26 +252,33 @@ public final class SimuFamilyCommandImpl extends CommandImpl
 				for (int i = 0; i < maf.length; i++)
 				{
 					StringBuilder sb = new StringBuilder();
-					switch (gm[h * famSize + 2 + j][0])
+					switch (gm[h * famSize + 2 + j][i])
 					{
 					case 0:
 						sb.append(A[0] + " " + A[0]);
 						break;
 					case 1:
-						sb.append(A[0] + " " + A[0]);
+						sb.append(A[0] + " " + A[1]);
 						break;
 					case 2:
-						sb.append(A[0] + " " + A[0]);
+						sb.append(A[1] + " " + A[1]);
 						break;
 					default:
 						break;
 					}
-					ped.print(sb.toString());
+					if (i == (maf.length - 1))
+					{
+						ped.print(sb.toString());						
+					}
+					else
+					{
+						ped.print(sb.toString() + " ");
+					}
 				}
 				ped.print("\n");
 			}
 		}
-		
+
 		for (int i = 0; i < maf.length; i++)
 		{
 			map.print(1 + " ");
@@ -261,13 +293,13 @@ public final class SimuFamilyCommandImpl extends CommandImpl
 
 	public void writeBFile()
 	{
-		DataOutputStream bed = null;
+		DataOutputStream bedout = null;
 		PrintWriter fam = null;
 		PrintWriter bim = null;
 		
 		try
 		{
-			bed = new DataOutputStream(new FileOutputStream(cmdArgs.getOutRoot() + ".bed"));
+			bedout = new DataOutputStream(new FileOutputStream(cmdArgs.getOutRoot() + ".bed"));
 			fam = new PrintWriter(new BufferedWriter(new FileWriter(cmdArgs.getOutRoot() + ".fam")));
 			bim = new PrintWriter(new BufferedWriter(new FileWriter(cmdArgs.getOutRoot() + ".bim")));
 
@@ -327,16 +359,16 @@ public final class SimuFamilyCommandImpl extends CommandImpl
 
 		try
 		{
-			bed.writeByte(ConstValues.PLINK_BED_BYTE1);
-			bed.writeByte(ConstValues.PLINK_BED_BYTE2);
-			bed.writeByte(ConstValues.PLINK_BED_BYTE3);
+			bedout.writeByte(ConstValues.PLINK_BED_BYTE1);
+			bedout.writeByte(ConstValues.PLINK_BED_BYTE2);
+			bedout.writeByte(ConstValues.PLINK_BED_BYTE3);
 			for (int i = 0; i < cmdArgs.getNumberOfMarkers(); i++)
 			{
 				byte gbyte = 0;
 				int idx = 0;
 				for (int j = 0; j < gm.length; j++)
 				{
-					int g = gm[j][i] + 1;
+					int g = (int) gm[j][i];
 					switch (g)
 					{
 					case 0:
@@ -361,19 +393,19 @@ public final class SimuFamilyCommandImpl extends CommandImpl
 					{
 						if (idx == 4)
 						{
-							bed.writeByte(gbyte);
+							bedout.writeByte(gbyte);
 							gbyte = 0;
 							idx = 0;
 						}
-					} 
+					}
 					else
 					{
-						bed.writeByte(gbyte);
+						bedout.writeByte(gbyte);
 					}
 				}
 			}
-			bed.close();
-		} 
+			bedout.close();
+		}
 		catch (IOException e)
 		{
 			Logger.handleException(e, "An I/O exception occurred when writing the .bed file.");
