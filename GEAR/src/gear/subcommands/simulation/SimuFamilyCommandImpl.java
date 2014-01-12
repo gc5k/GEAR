@@ -29,16 +29,6 @@ public final class SimuFamilyCommandImpl extends CommandImpl
 		{
 			generateNuclearFamily(NKid[i], NAffKid[i], i);
 		}
-		System.out.println(gm.length + " " + gm[1].length);
-		for(int i = 0; i < gm.length; i++)
-		{
-			for(int j = 0; j < gm[0].length; j++)
-			{
-				System.out.print(gm[i][j] + " ");
-			}
-			System.out.println();
-		}
-
 		if (this.cmdArgs.getMakeBed())
 		{
 			writeBFile();
