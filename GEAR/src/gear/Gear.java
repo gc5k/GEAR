@@ -11,6 +11,7 @@ import gear.grm.MakeGRM;
 import gear.he.HEMCalculate;
 import gear.he.HEMRead;
 import gear.he.h2trans.H2Transformer;
+import gear.ibd.ParentIBD;
 import gear.imputation.NaiveImputation;
 import gear.metawatchdog.decrypt.MetaWatchdog;
 import gear.metawatchdog.decrypt.MetaWatchdog2;
@@ -240,6 +241,11 @@ public enum Gear
 			else if (CmdArgs.INSTANCE.dogpowerFlag)
 			{
 				MetaWatchdogPowerCalculator p = new MetaWatchdogPowerCalculator();
+			}
+			else if (CmdArgs.INSTANCE.ibdFlag)
+			{
+				ParentIBD ibd = new ParentIBD();
+				ibd.getIBD();
 			}
 
 			monitor.stopMonitoring();

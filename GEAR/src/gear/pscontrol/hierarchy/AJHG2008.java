@@ -121,7 +121,8 @@ public class AJHG2008 extends ChenBase
 					fam.countAllele(genoset.getparentsGenoMap(), aSet);
 					gDis = new ObservedParents(genoset.getchildrenGenoMap(),
 							genoset.getparentsGenoMap());
-				} else
+				} 
+				else
 				{
 					fam.countAllele(genoset.getchildrenGenoMap(), aSet);
 					fam.countAllele(genoset.getparentsGenoMap(), aSet);
@@ -134,13 +135,15 @@ public class AJHG2008 extends ChenBase
 							gDis = new HomozygousParent(
 									genoset.getchildrenGenoMap(),
 									genoset.getparentsGenoMap());
-						} else
+						} 
+						else
 						{// table 2
 							gDis = new HeterozygousParent(
 									genoset.getchildrenGenoMap(),
 									genoset.getparentsGenoMap());
 						}
-					} else
+					} 
+					else
 					{// table 3
 						gDis = new UnobservedParents(
 								genoset.getchildrenGenoMap());
@@ -169,7 +172,8 @@ public class AJHG2008 extends ChenBase
 						int a2 = Integer.parseInt(nontran_tran[0].substring(1,
 								2));
 						pseudoper.addMarker(f, a1, a2, i);
-					} else
+					} 
+					else
 					{
 						pseudoper.addMarker(f, 0, 0, i);
 					}
@@ -197,18 +201,21 @@ public class AJHG2008 extends ChenBase
 				{
 					Integer c = ((Integer) Ks.get(genotype));
 					Ks.put(genotype, ++c);
-				} else
+				} 
+				else
 				{
 					Integer c = new Integer(1);
 					Ks.put(new String(genotype), c);
 				}
-			} else
+			} 
+			else
 			{
 				if (Ps.containsKey(genotype))
 				{
 					Integer c = ((Integer) Ps.get(genotype));
 					Ps.put(genotype, ++c);
-				} else
+				} 
+				else
 				{
 					Integer c = new Integer(1);
 					Ps.put(new String(genotype), c);

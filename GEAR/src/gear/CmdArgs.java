@@ -87,6 +87,9 @@ public enum CmdArgs
 				.withDescription("gwas prevalence of the binary trait ")
 				.hasArg().create(cmd_simu_k));
 
+		// ibd
+		ops.addOption(OptionBuilder.withDescription("ibd" ).create(cmd_ibd));
+
 		// nontransmitted
 		ops.addOption(OptionBuilder.withDescription("nontransmitted ")
 				.create(cmd_nontrans));
@@ -597,6 +600,10 @@ public enum CmdArgs
 	public boolean polyEffectFlag = false;
 	public String polyEffectFile = null;
 
+	// /////////////////ibd
+	private final String cmd_ibd = "ibd";
+	public boolean ibdFlag = false;
+	
 	// /////////////////nontrans
 	private final String cmd_nontrans = "nontrans";
 	public boolean nontransFlag = false;
@@ -1390,6 +1397,11 @@ public enum CmdArgs
 			makebedFlag = true;
 		}
 
+		// ibd
+		if (cmdLine.hasOption(cmd_ibd))
+		{
+			ibdFlag = true;
+		}
 		// nontrans
 		if (cmdLine.hasOption(cmd_nontrans))
 		{
