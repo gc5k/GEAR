@@ -1,5 +1,6 @@
 package gear.ibd;
 
+import java.io.PrintStream;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Enumeration;
@@ -20,6 +21,7 @@ import gear.family.pedigree.genotype.BPerson;
 import gear.family.pedigree.genotype.GenoSet;
 import gear.family.plink.PLINKBinaryParser;
 import gear.family.plink.PLINKParser;
+import gear.util.FileUtil;
 import gear.util.Logger;
 import gear.util.NewIt;
 
@@ -53,6 +55,8 @@ public class ParentIBD
 
 	public void getIBD()
 	{
+		PrintStream ibdFile = FileUtil.CreatePrintStream(CmdArgs.INSTANCE.out + ".ibd");
+		
 		Enumeration<String> perList1;
 		BFamilyStruct fam;
 
@@ -109,24 +113,19 @@ public class ParentIBD
 											per2.getGenotypeScore(k));
 					}
 
-					System.out
-							.println(per1.getFamilyID() + "-" + per1
-									.getPersonID() + ", " + per2.getFamilyID() + "-" + per2
-									.getPersonID());
+					ibdFile
+							.print(per1.getFamilyID() + " " + per1
+									.getPersonID() + " " + per2.getFamilyID() + " " + per2
+									.getPersonID() + " ");
 					for (int k = 0; k < F.getNumMarkers(); k++)
 					{
-						System.out.print(ibd[k][0] + " ");
+						ibdFile.print(ibd[k][0] + " " + ibd[k][1] + " ");
 					}
-					System.out.println();
-					for (int k = 0; k < F.getNumMarkers(); k++)
-					{
-						System.out.print(ibd[k][1] + " ");
-					}
-					System.out.println();
-
+					ibdFile.println();
 				}
 			}
 		}
+		ibdFile.close();
 	}
 
 	private int[] quickIBD(int fg, int mg, int kg1, int kg2) 
