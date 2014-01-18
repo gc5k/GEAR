@@ -1,6 +1,5 @@
 package gear.subcommands.simulation;
 
-import gear.CmdArgs;
 import gear.ConstValues;
 import gear.subcommands.CommandArguments;
 import gear.subcommands.CommandImpl;
