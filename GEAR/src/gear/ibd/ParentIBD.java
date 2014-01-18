@@ -5,20 +5,12 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Enumeration;
 import java.util.Hashtable;
-import java.util.TreeSet;
 import java.util.Map.Entry;
 
 import gear.CmdArgs;
-import gear.family.RabinowitzLairdAlgorithm.AbstractGenoDistribution;
-import gear.family.RabinowitzLairdAlgorithm.lou.HeterozygousParent;
-import gear.family.RabinowitzLairdAlgorithm.lou.HomozygousParent;
-import gear.family.RabinowitzLairdAlgorithm.lou.ObservedParents;
-import gear.family.RabinowitzLairdAlgorithm.lou.UnobservedParents;
-import gear.family.pedigree.file.MapFile;
 import gear.family.pedigree.file.PedigreeFile;
 import gear.family.pedigree.genotype.BFamilyStruct;
 import gear.family.pedigree.genotype.BPerson;
-import gear.family.pedigree.genotype.GenoSet;
 import gear.family.plink.PLINKBinaryParser;
 import gear.family.plink.PLINKParser;
 import gear.util.FileUtil;
@@ -27,7 +19,6 @@ import gear.util.NewIt;
 
 public class ParentIBD
 {
-	private MapFile MapData;
 	private PedigreeFile PedData;
 	
 	private int[][] ibd;
@@ -35,7 +26,13 @@ public class ParentIBD
 	public ParentIBD() 
 	{
 		PLINKParser pp = null;
-		if (CmdArgs.INSTANCE.getBFileArgs(0).isSet())
+		if (CmdArgs.INSTANCE.getFileArgs().isSet())
+		{
+			pp = new PLINKParser(CmdArgs.INSTANCE.getFileArgs()
+					.getPed(), CmdArgs.INSTANCE.getFileArgs()
+					.getMap());
+		}
+		else if (CmdArgs.INSTANCE.getBFileArgs(0).isSet())
 		{
 			pp = new PLINKBinaryParser(CmdArgs.INSTANCE.getBFileArgs(0)
 					.getBed(), CmdArgs.INSTANCE.getBFileArgs(0)
@@ -49,7 +46,6 @@ public class ParentIBD
 		}
 		pp.Parse();
 		PedData = pp.getPedigreeData();
-		Hashtable<String, BFamilyStruct> Fam = PedData.getFamilyStruct();
 
 	}
 
@@ -99,11 +95,9 @@ public class ParentIBD
 					}
 
 					ibd = new int[per2.getNumMarkers()][2];
-					Arrays.fill(ibd[0], 0);
-					Arrays.fill(ibd[1], 0);
 
-					BPerson F = fam.getPerson(per2.getDadID());
-					BPerson M = fam.getPerson(per2.getMomID());
+					BPerson F = fam.getPerson(fid2);
+					BPerson M = fam.getPerson(mid2);
 
 					for (int k = 0; k < F.getNumMarkers(); k++)
 					{
@@ -119,7 +113,17 @@ public class ParentIBD
 									.getPersonID() + " ");
 					for (int k = 0; k < F.getNumMarkers(); k++)
 					{
-						ibdFile.print(ibd[k][0] + " " + ibd[k][1] + " ");
+						ibdFile.print(ibd[k][0] + " ");
+					}
+					ibdFile.println();
+					
+					ibdFile
+					.print(per1.getFamilyID() + " " + per1
+							.getPersonID() + " " + per2.getFamilyID() + " " + per2
+							.getPersonID() + " ");
+					for (int k = 0; k < F.getNumMarkers(); k++)
+					{
+						ibdFile.print(ibd[k][1] + " ");
 					}
 					ibdFile.println();
 				}
@@ -131,7 +135,7 @@ public class ParentIBD
 	private int[] quickIBD(int fg, int mg, int kg1, int kg2) 
 	{
 		int[] ibd = {0, 0};
-		if (fg == 3 || mg == 3 || kg1 == 3 || kg2 ==2)
+		if (fg == 3 || mg == 3 || kg1 == 3 || kg2 ==3)
 		{
 			return ibd;
 		}
@@ -153,11 +157,11 @@ public class ParentIBD
 				}
 				else if (kg1 != 1 && kg2 != 1)
 				{
-					if (fg != 1)
+					if (fg == 1)
 					{
 						ibd[0] = 1;
 					}
-					else if (mg != 1)
+					else if (mg == 1)
 					{
 						ibd[1] = 1;
 					}
@@ -169,13 +173,13 @@ public class ParentIBD
 				{
 					ibd[0] = -1; 
 				}
-				else if (mg == 1) 
+				else if (mg == 1)
 				{
 					ibd[1] = -1;
 				}
 			}
 		}
-		
+
 		if(fg == 1 && mg == 1)
 		{
 			if (kg1 == 0 && kg2 == 0)

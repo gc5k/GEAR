@@ -43,9 +43,43 @@ public final class SimuFamilyCommandArguments extends CommandArguments
 	{
 		this.makeBed = makeBed;
 	}
+
+	public boolean getRecRand()
+	{
+		return recRandFlag;
+	}
+
+	public void setRecRand(boolean f)
+	{
+		this.recRandFlag = f;
+	}
+
+
+	public double getLD()
+	{
+		return ld;
+	}
+
+	public void setLD(double l)
+	{
+		this.ld = l;
+	}
+
+	public double getRec()
+	{
+		return rec;
+	}
+
+	public void setRec(double r)
+	{
+		this.rec = r;
+	}
 	
 	private int numFams;
 	private int numMarkers;
 	private Long seed = null;
 	private boolean makeBed;
+	private double ld = 0;
+	private double rec = 0.5;
+	private boolean recRandFlag = false;
 }
