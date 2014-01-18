@@ -1,5 +1,6 @@
 package gear.subcommands.simulation;
 
+import gear.CmdArgs;
 import gear.ConstValues;
 import gear.subcommands.CommandArguments;
 import gear.subcommands.CommandImpl;
@@ -58,12 +59,27 @@ public final class SimuFamilyCommandImpl extends CommandImpl
 		NAffKid = new int[cmdArgs.getNumberOfFamilies()];
 		Arrays.fill(NAffKid, 1);
 
+		
 		maf = new double[cmdArgs.getNumberOfMarkers()];
 		Arrays.fill(maf, 0.5);
-		LD = new double[cmdArgs.getNumberOfMarkers()];
-		Arrays.fill(LD, 0);
+		
+		DPrime = new double[cmdArgs.getNumberOfMarkers() - 1];
+		Arrays.fill(DPrime, cmdArgs.getLD());
+
+		LD = CalculateDprime(maf, DPrime);
+
 		rec = new double[cmdArgs.getNumberOfMarkers()];
-		Arrays.fill(rec, 0.5);
+		if (cmdArgs.getRecRand())
+		{
+			for (int i = 0; i < rec.length; i++)
+			{
+				rec[i] = rnd.nextUniform(0.01, 0.5);
+			}
+		}
+		else
+		{
+			Arrays.fill(rec, cmdArgs.getRec());			
+		}
 		rec[0] = maf[0];
 
 		gm = new int[cmdArgs.getNumberOfFamilies() * famSize][cmdArgs.getNumberOfMarkers()];
@@ -73,12 +89,11 @@ public final class SimuFamilyCommandImpl extends CommandImpl
 	{
 		int[][] p = sampleChromosome(famIdx, 0);
 		int[][] m = sampleChromosome(famIdx, 1);
-		
+
 		for (int i = 0; i < nkid; i++)
 		{
 			generateBaby(p, m, famIdx, i + 2);
 		}
-
 	}
 
 	private int[][] sampleChromosome(int famIdx, int shift)
@@ -112,7 +127,6 @@ public final class SimuFamilyCommandImpl extends CommandImpl
 	private void generateBaby(int[][] p, int[][] m, int famIdx, int shift)
 	{
 		int[][] v = new int[maf.length][2];
-
 		for (int i = 0; i < 2; i++)
 		{
 			int[][] chr = i == 0 ? p : m;
@@ -129,6 +143,7 @@ public final class SimuFamilyCommandImpl extends CommandImpl
 		{
 			gm[famIdx * famSize + shift][i] = v[i][0] + v[i][1];
 		}
+
 	}
 
 	public void writeFile()
@@ -281,6 +296,29 @@ public final class SimuFamilyCommandImpl extends CommandImpl
 		map.close();
 	}
 
+	public double[] CalculateDprime(double[] f, double[] dprime)
+	{
+
+		double[] D = new double[dprime.length];
+
+		for (int i = 0; i < D.length; i++)
+		{
+			if (dprime[i] > 0)
+			{
+				D[i] = dprime[i]
+						* Math.min(f[i] * (1 - f[i + 1]), f[i + 1] * (1 - f[i]));
+			} 
+			else
+			{
+				D[i] = dprime[i]
+						* Math.min(f[i] * f[i + 1], (1 - f[i]) * (1 - f[i + 1]));
+			}
+		}
+
+		return D;
+	}
+
+	
 	public void writeBFile()
 	{
 		DataOutputStream bedout = null;
@@ -425,6 +463,7 @@ public final class SimuFamilyCommandImpl extends CommandImpl
 	private double[] LD = null;
 	private double[] rec = null;
 	private double[] maf = null;
+	private double[] DPrime = null;
 
 	private int[][] gm = null;
 	private final int famSize = 4; 

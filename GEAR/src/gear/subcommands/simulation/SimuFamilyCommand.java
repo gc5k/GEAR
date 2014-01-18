@@ -32,6 +32,10 @@ public final class SimuFamilyCommand extends Command
 		options.addOption(OptionBuilder.withDescription(OPT_NUM_MARKERS_DESC).withLongOpt(OPT_NUM_MARKERS_LONG).hasArg().isRequired().create(OPT_NUM_MARKERS));
 		options.addOption(OptionBuilder.withDescription(OPT_SEED_DESC).withLongOpt(OPT_SEED_LONG).hasArg().create(OPT_SEED));
 		options.addOption(OptionBuilder.withDescription(OPT_MAKE_BED_DESC).withLongOpt(OPT_MAKE_BED_LONG).create(OPT_MAKE_BED));
+
+		options.addOption(OptionBuilder.withDescription(OPT_LD_DESC).withLongOpt(OPT_LD_LONG).hasArg().create(OPT_LD));
+		options.addOption(OptionBuilder.withDescription(OPT_REC_DESC).withLongOpt(OPT_REC_LONG).hasArg().create(OPT_REC));
+		options.addOption(OptionBuilder.withDescription(OPT_REC_RAND_DESC).withLongOpt(OPT_REC_RAND_LONG).create(OPT_REC_RAND));
 	}
 
 	@Override
@@ -41,14 +45,16 @@ public final class SimuFamilyCommand extends Command
 		parseNumberOfFamilies(cmdArgs, cmdLine);
 		parseNumberOfMarkers(cmdArgs, cmdLine);
 		parseSeed(cmdArgs, cmdLine);
+		parseLD(cmdArgs, cmdLine);
+		parseRec(cmdArgs, cmdLine);
+		parseRecRand(cmdArgs, cmdLine);
 		cmdArgs.setMakeBed(cmdLine.hasOption(OPT_MAKE_BED));
 		return cmdArgs;
 	}
-	
+
 	private void parseNumberOfFamilies(SimuFamilyCommandArguments cmdArgs, CommandLine cmdLine) throws CommandArgumentException
 	{
 		int numFams = 0;
-		
 		try
 		{
 			numFams = Integer.parseInt(cmdLine.getOptionValue(OPT_NUM_FAMS));
@@ -109,6 +115,65 @@ public final class SimuFamilyCommand extends Command
 		}
 	}
 
+	private void parseRec(SimuFamilyCommandArguments cmdArgs, CommandLine cmdLine) throws CommandArgumentException
+	{
+		double r = 0.5;
+		if(cmdLine.hasOption(OPT_REC))
+		{
+			try
+			{
+				r = Double.parseDouble(cmdLine.getOptionValue(OPT_REC));
+			}
+			catch (NumberFormatException e)
+			{
+			}
+
+			if (r < 0 || r > 0.5)
+			{
+				String msg = "";
+				msg += "The value of --" + OPT_REC_LONG + "is invalid: '";
+				msg += cmdLine.getOptionValue(OPT_REC) + "' is not a valid number between 0 and 0.5.";
+				throw new CommandArgumentException(msg);
+			}			
+		}
+
+		cmdArgs.setRec(r);
+	}
+
+	private void parseRecRand(SimuFamilyCommandArguments cmdArgs, CommandLine cmdLine) throws CommandArgumentException
+	{
+		if (cmdLine.hasOption(OPT_REC_RAND))
+		{
+			cmdArgs.setRecRand(true);
+		}
+	}
+
+	private void parseLD(SimuFamilyCommandArguments cmdArgs, CommandLine cmdLine) throws CommandArgumentException
+	{
+		double l = 0;
+		
+		if (cmdLine.hasOption(OPT_LD))
+		{
+			try
+			{
+				l = Double.parseDouble(cmdLine.getOptionValue(OPT_LD));
+			}
+			catch (NumberFormatException e)
+			{
+			}
+
+			if (l < 0 || l > 1)
+			{
+				String msg = "";
+				msg += "The value of --" + OPT_LD + "is invalid: '";
+				msg += cmdLine.getOptionValue(OPT_LD) + "' is not a valid between 0 and 1.";
+				throw new CommandArgumentException(msg);
+			}			
+		}
+
+		cmdArgs.setLD(l);
+	}
+
 	@Override
 	protected CommandImpl createCommandImpl()
 	{
@@ -131,4 +196,15 @@ public final class SimuFamilyCommand extends Command
 	private static final String OPT_MAKE_BED_LONG = "make-bed";
 	private static final String OPT_MAKE_BED_DESC = "Make .bed, .bim and .fam files";
 
+	private static final char OPT_LD = 'l';
+	private static final String OPT_LD_LONG = "ld";
+	private static final String OPT_LD_DESC = "Specify the ld (DPrime)";
+
+	private static final char OPT_REC = 'r';
+	private static final String OPT_REC_LONG = "rec";
+	private static final String OPT_REC_DESC = "Specify the recombination fraction";
+	
+	private static final String OPT_REC_RAND = "rr";
+	private static final String OPT_REC_RAND_LONG = "rec-rand";
+	private static final String OPT_REC_RAND_DESC = "Use uniformly distributed recombination fractions beween (0~0.5)";
 }
