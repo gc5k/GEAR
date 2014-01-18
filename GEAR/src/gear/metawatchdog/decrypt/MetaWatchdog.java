@@ -2,14 +2,12 @@ package gear.metawatchdog.decrypt;
 
 import gear.CmdArgs;
 import gear.data.InputDataSet;
-import gear.data.SubjectID;
 import gear.util.FileUtil;
 import gear.util.Logger;
 import gear.util.NewIt;
 import gear.util.stat.PCA.NCGStatUtils;
 import java.io.PrintStream;
 import java.util.ArrayList;
-import java.util.HashSet;
 import org.apache.commons.math.MathException;
 import org.apache.commons.math.distribution.NormalDistribution;
 import org.apache.commons.math.distribution.NormalDistributionImpl;
