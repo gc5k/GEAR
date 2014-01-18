@@ -142,10 +142,7 @@ public final class SimuFamilyCommand extends Command
 
 	private void parseRecRand(SimuFamilyCommandArguments cmdArgs, CommandLine cmdLine) throws CommandArgumentException
 	{
-		if (cmdLine.hasOption(OPT_REC_RAND))
-		{
-			cmdArgs.setRecRand(true);
-		}
+		cmdArgs.setRecRand(cmdLine.hasOption(OPT_REC_RAND));
 	}
 
 	private void parseLD(SimuFamilyCommandArguments cmdArgs, CommandLine cmdLine) throws CommandArgumentException
