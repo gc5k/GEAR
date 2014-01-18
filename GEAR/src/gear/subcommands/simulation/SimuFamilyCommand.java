@@ -47,7 +47,7 @@ public final class SimuFamilyCommand extends Command
 		parseSeed(cmdArgs, cmdLine);
 		parseLD(cmdArgs, cmdLine);
 		parseRec(cmdArgs, cmdLine);
-		parseRecRand(cmdArgs, cmdLine);
+		cmdArgs.setRecRand(cmdLine.hasOption(OPT_REC_RAND));
 		cmdArgs.setMakeBed(cmdLine.hasOption(OPT_MAKE_BED));
 		return cmdArgs;
 	}
@@ -138,11 +138,6 @@ public final class SimuFamilyCommand extends Command
 		}
 
 		cmdArgs.setRec(r);
-	}
-
-	private void parseRecRand(SimuFamilyCommandArguments cmdArgs, CommandLine cmdLine) throws CommandArgumentException
-	{
-		cmdArgs.setRecRand(cmdLine.hasOption(OPT_REC_RAND));
 	}
 
 	private void parseLD(SimuFamilyCommandArguments cmdArgs, CommandLine cmdLine) throws CommandArgumentException
