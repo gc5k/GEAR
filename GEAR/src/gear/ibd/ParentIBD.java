@@ -7,6 +7,7 @@ import java.util.Hashtable;
 import java.util.Map.Entry;
 
 import gear.CmdArgs;
+import gear.family.pedigree.file.MapFile;
 import gear.family.pedigree.file.PedigreeFile;
 import gear.family.pedigree.genotype.BFamilyStruct;
 import gear.family.pedigree.genotype.BPerson;
@@ -19,8 +20,8 @@ import gear.util.NewIt;
 public class ParentIBD
 {
 	private PedigreeFile PedData;
-	
-	private int[][] ibd;
+	private MapFile snpMap;
+	private double[][] ibd;
 
 	public ParentIBD() 
 	{
@@ -45,12 +46,13 @@ public class ParentIBD
 		}
 		pp.Parse();
 		PedData = pp.getPedigreeData();
-
+		snpMap = pp.getMapData();
 	}
 
 	public void getIBD()
 	{
 		PrintStream ibdFile = FileUtil.CreatePrintStream(CmdArgs.INSTANCE.out + ".ibd");
+		PrintStream ibd2File = FileUtil.CreatePrintStream(CmdArgs.INSTANCE.out + ".ibd2");
 		
 		Enumeration<String> perList1;
 		BFamilyStruct fam;
@@ -93,7 +95,7 @@ public class ParentIBD
 						continue;
 					}
 
-					ibd = new int[per2.getNumMarkers()][2];
+					ibd = new double[per2.getNumMarkers()][2];
 
 					BPerson F = fam.getPerson(fid2);
 					BPerson M = fam.getPerson(mid2);
@@ -105,7 +107,8 @@ public class ParentIBD
 											per1.getGenotypeScore(k),
 											per2.getGenotypeScore(k));
 					}
-
+					
+					
 					ibdFile
 							.print(per1.getFamilyID() + " " + per1
 									.getPersonID() + " " + per2.getFamilyID() + " " + per2
@@ -125,15 +128,139 @@ public class ParentIBD
 						ibdFile.print(ibd[k][1] + " ");
 					}
 					ibdFile.println();
+					
+					guessIBD(ibd, 0);
+					guessIBD(ibd, 1);
+					ibd2File
+					.print(per1.getFamilyID() + " " + per1
+							.getPersonID() + " " + per2.getFamilyID() + " " + per2
+							.getPersonID() + " ");
+					for (int k = 0; k < F.getNumMarkers(); k++)
+					{
+						ibd2File.print(ibd[k][0] + " ");
+					}
+					ibd2File.println();
+			
+					ibd2File
+					.print(per1.getFamilyID() + " " + per1
+					.getPersonID() + " " + per2.getFamilyID() + " " + per2
+					.getPersonID() + " ");
+					for (int k = 0; k < F.getNumMarkers(); k++)
+					{
+						ibd2File.print(ibd[k][1] + " ");
+					}
+					ibd2File.println();
+
 				}
 			}
 		}
 		ibdFile.close();
+		ibd2File.close();
 	}
 
-	private int[] quickIBD(int fg, int mg, int kg1, int kg2) 
+	private void guessIBD(double[][]ibd, int pidx)
 	{
-		int[] ibd = {0, 0};
+		int idx0 = 0;
+		int idx1 = 0;
+		boolean end = false;
+		if (ibd[0][pidx]==0)
+		{
+			//find the first nonzero
+			while (ibd[idx0][pidx] == 0)
+			{
+				idx0++;
+				if (idx0 == ibd.length)
+				{
+					end = true;
+					break;
+				}
+			}
+			if (!end)
+			{
+				for (int i = 0; i < idx0; i++)
+				{
+					ibd[i][pidx]= ibd[idx0][pidx];
+				}
+			}
+		}
+
+		//find the first zero
+		if (!end)
+		{
+			while (ibd[idx0][pidx] != 0)
+			{
+				idx0++;
+				if (idx0 == ibd.length)
+				{
+					end = true;
+					break;
+				}
+			}
+			idx1 = idx0;
+			idx0--;
+		}
+
+		while (!end)
+		{
+			//right boundary first nonzero
+			while (ibd[idx1][pidx]==0)
+			{
+				idx1++;
+				if (idx1 == ibd.length)
+				{
+					end = true;
+					break;
+				}
+			}
+
+			if(end)
+			{
+				break;
+			}
+
+			double pos1 = snpMap.getSNP(idx0).getPosition();
+			double pos2 = snpMap.getSNP(idx1).getPosition();
+			double w = pos2 - pos1;
+			for(int i = idx0+1; i < idx1; i++)
+			{
+				double pos = snpMap.getSNP(i).getPosition();
+				double w1 = pos - pos1;
+				double w2 = pos2 - pos;
+				ibd[i][pidx] = ibd[idx0][pidx] * w2/w + ibd[idx1][pidx] * w1/w;
+			}
+
+			//left boundary first zero
+			while(ibd[idx1][pidx]!=0)
+			{
+				idx1++;
+				if(idx1 == ibd.length)
+				{
+					end = true;
+					break;
+				}
+			}
+			idx0 = idx1;
+			idx0--;
+		}
+
+		if(ibd[ibd.length-1][pidx] == 0)
+		{
+			idx0 = ibd.length-1;
+			while(ibd[idx0][pidx]==0)
+			{
+				idx0--;
+				break;
+			}
+			for(int i = idx0+1; i< ibd.length; i++)
+			{
+				ibd[i][pidx] = ibd[idx0][pidx];
+			}
+		}
+	}
+
+	private double[] quickIBD(int fg, int mg, int kg1, int kg2) 
+	{
+		double[] ibd = {0, 0};
 		if (fg == 3 || mg == 3 || kg1 == 3 || kg2 ==3)
 		{
 			return ibd;
