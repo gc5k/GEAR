@@ -53,11 +53,20 @@ public class MetaWatchdog2
 		{
 			for (int j = 0; j < phe2.length; j++)
 			{
-				double[][] dat = new double[test][2];
-				for (int k = 0; k < test; k++)
+				double[][] normPhes = new double[2][test];
+				for (int k = 0; k < test; ++k)
 				{
-					dat[k][0] = phe1[i][k];
-					dat[k][1] = phe2[j][k];
+					normPhes[0][k] = phe1[i][k];
+					normPhes[1][k] = phe2[j][k];
+				}
+				normPhes[0] = StatUtils.normalize(normPhes[0]);
+				normPhes[1] = StatUtils.normalize(normPhes[1]);
+				
+				double[][] dat = new double[test][2];
+				for (int k = 0; k < test; ++k)
+				{
+					dat[k][0] = normPhes[0][k];
+					dat[k][1] = normPhes[1][k];
 				}
 				SimpleRegression sr = new SimpleRegression();
 				sr.addData(dat);
@@ -137,12 +146,6 @@ public class MetaWatchdog2
 		}
 
 		Logger.printUserLog("Read " + tmp.size() + " individuals, " + (numCols-2) + " scores in " + fileName);
-		Logger.printUserLog("Standardization the scores for each individual in set 1");
-		for (int i = 0; i < phe1.length; i++)
-		{
-			phe1[i] = StatUtils.normalize(phe1[i]);
-		}
-
 	}
 
 	private void readPhenotypes2(String fileName)
@@ -207,11 +210,6 @@ public class MetaWatchdog2
 		}
 
 		Logger.printUserLog("Read " + tmp.size() + " individuals, " + (numCols-2) + " scores in " + fileName);
-		Logger.printUserLog("Standardization the scores for each individual in set 2");
-		for (int i = 0; i < phe2.length; i++)
-		{
-			phe2[i] = StatUtils.normalize(phe2[i]);
-		}				
 	}
 
 }
