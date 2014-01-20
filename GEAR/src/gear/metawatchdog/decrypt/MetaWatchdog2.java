@@ -53,6 +53,7 @@ public class MetaWatchdog2
 		{
 			for (int j = 0; j < phe2.length; j++)
 			{
+				// TODO: Move the normalization out of the for-loops to speed-up.
 				double[][] normPhes = new double[2][test];
 				for (int k = 0; k < test; ++k)
 				{
