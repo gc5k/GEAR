@@ -6,6 +6,7 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.PrintStream;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashSet;
 import java.util.Iterator;
 
@@ -26,10 +27,10 @@ public class WriteBedSNPMajor
 {
 
 	private ArrayList<PersonIndex> PersonTable;
+	private ArrayList<PersonIndex> PrintPerson = NewIt.newArrayList();
 	private DataOutputStream os = null;
 	private ArrayList<SNP> snpList;
 
-	private ArrayList<Integer> indOrder = NewIt.newArrayList();
 	public WriteBedSNPMajor()
 	{
 		PLINKParser pp = null;
@@ -71,10 +72,7 @@ public class WriteBedSNPMajor
 		}
 		else
 		{
-			for(int i = 0; i < PersonTable.size(); i++)
-			{
-				indOrder.add(i);
-			}
+			PrintPerson = PersonTable;
 		}
 		WriteFile(CmdArgs.INSTANCE.out);
 	}
@@ -120,23 +118,38 @@ public class WriteBedSNPMajor
 
 		Logger.printUserLog("Read " + subjectIDs.size() + " individuals in " + CmdArgs.INSTANCE.orderindFile);
 
-		int cn = 0;
-		for (int i = 0; i < subjectIDs.size(); i++)
+		int cn = 0;		
+		int[] index = new int[PersonTable.size()];
+		Arrays.fill(index, -1);
+		for (int i = 0; i < PersonTable.size(); i++)
 		{
-			SubjectID subID = subjectIDs.get(i);
-
-			for (int j = 0; j < PersonTable.size(); j++)
+			PersonIndex pi = PersonTable.get(i);
+			for (int j = 0; j < subjectIDs.size(); j++)
 			{
-				PersonIndex pi = PersonTable.get(j);
+				SubjectID subID = subjectIDs.get(j);
 				if (subID.getFamilyID().compareTo(pi.getFamilyID()) == 0 && subID.getIndividualID().compareTo(pi.getIndividualID()) == 0)
 				{
 					cn++;
-					indOrder.add(j);
+					index[i] = j;
 					break;
 				}
 			}
 		}
-		Logger.printUserLog("Matched " + cn + " individuals in fam");
+
+		if(cn == 0)
+		{
+			Logger.printUserLog("no individuals were matched between fam and " + CmdArgs.INSTANCE.orderindFile + ".");
+			System.exit(1);
+		}
+		
+		for(int i = 0; i < PersonTable.size(); i++)
+		{
+			if (index[i]!= -1)
+			{
+				PrintPerson.add(PersonTable.get(index[i]));
+			}
+		}
+		Logger.printUserLog("Matched " + PrintPerson.size() + " individuals in fam");		
 	}
 
 	public void WriteFile(String out)
@@ -159,14 +172,9 @@ public class WriteBedSNPMajor
 		sfam.append(".fam");
 		PrintStream pfam = FileUtil.CreatePrintStream(sfam.toString());
 		
-		for (int i = 0; i < indOrder.size(); i++)
+		for (int i = 0; i < PrintPerson.size(); i++)
 		{
-			int idx = indOrder.get(i).intValue();
-			if(idx == -1)
-			{
-				continue;
-			}
-			PersonIndex per = PersonTable.get(idx);
+			PersonIndex per = PrintPerson.get(i);
 			BPerson bp = per.getPerson();
 			pfam.append(bp.getFamilyID() + "\t" + bp.getPersonID() + "\t"
 					+ bp.getDadID() + "\t" + bp.getMomID() + "\t"
@@ -202,66 +210,31 @@ public class WriteBedSNPMajor
 				int posByte = i >> BPerson.shift;
 				int posBit = (i & 0xf) << 1;
 
-				for (int j = 0; j < indOrder.size(); j++)
+
+				for (int j = 0; j < PrintPerson.size(); j++)
 				{
-					int pidx = indOrder.get(j).intValue();
-					if (pidx == -1)
+					PersonIndex pi = PrintPerson.get(j);
+					BPerson bp = pi.getPerson();
+					byte g = bp.getOriginalGenotypeScore(posByte, posBit);
+
+					g <<= 2 * idx;
+					gbyte |= g;
+					idx++;
+
+					if (j != (PrintPerson.size() - 1))
 					{
-						if (j == (indOrder.size() -1) && idx != 0) //last one and there is something in gbyte.
+						if (idx == 4)
 						{
 							os.writeByte(gbyte);
+							gbyte = 0;
+							idx = 0;
 						}
 					}
 					else
 					{
-						PersonIndex pi = PersonTable.get(pidx);
-						BPerson bp = pi.getPerson();
-						byte g = bp.getOriginalGenotypeScore(posByte, posBit);
-
-						g <<= 2 * idx;
-						gbyte |= g;
-						idx++;
-
-						if (j != (indOrder.size() - 1))
-						{
-							if (idx == 4)
-							{
-								os.writeByte(gbyte);
-								gbyte = 0;
-								idx = 0;
-							}
-						} 
-						else
-						{
-							os.writeByte(gbyte);
-						}
+						os.writeByte(gbyte);
 					}
 				}
-
-//				for (int j = 0; j < PersonTable.size(); j++)
-//				{
-//					PersonIndex pi = PersonTable.get(j);
-//					BPerson bp = pi.getPerson();
-//					byte g = bp.getOriginalGenotypeScore(posByte, posBit);
-//
-//					g <<= 2 * idx;
-//					gbyte |= g;
-//					idx++;
-//
-//					if (j != (PersonTable.size() - 1))
-//					{
-//						if (idx == 4)
-//						{
-//							os.writeByte(gbyte);
-//							gbyte = 0;
-//							idx = 0;
-//						}
-//					} 
-//					else
-//					{
-//						os.writeByte(gbyte);
-//					}
-//				}
 			}
 			os.close();
 		} catch (IOException e)
