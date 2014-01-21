@@ -204,6 +204,9 @@ public enum CmdArgs
 		ops.addOption(OptionBuilder.withLongOpt(cmd_make_bed_long)
 				.withDescription("make bed ").create(cmd_make_bed));
 
+		ops.addOption(OptionBuilder.withLongOpt(cmd_order_ind_long)
+						.withDescription("order individuals ").hasArg().create(cmd_order_ind));
+
 		// grm-stat
 		ops.addOption(OptionBuilder.withLongOpt(cmd_grm_stat_long)
 				.withDescription("grm statistics").create(cmd_grm_stat));
@@ -1234,6 +1237,11 @@ public enum CmdArgs
 	private final String cmd_make_bed_long = "make-bed";
 	public boolean makebedFlag = false;
 
+	private final String cmd_order_ind = "order_ind";
+	private final String cmd_order_ind_long = "order-ind";
+	public String orderindFile = null;
+	public boolean orderindFlag = false;
+	
 	/*
 	 * private final String cmd_ex_ind = "exind"; public String[][] ex_ind =
 	 * null; private final String cmd_ex_ind_file = "exindfile"; public boolean
@@ -1395,6 +1403,13 @@ public enum CmdArgs
 		if (cmdLine.hasOption(cmd_make_bed))
 		{
 			makebedFlag = true;
+		}
+
+		if (cmdLine.hasOption(cmd_order_ind))
+		{
+			orderindFile = cmdLine.getOptionValue(cmd_order_ind);
+			FileUtil.exists(orderindFile);
+			orderindFlag = true;
 		}
 
 		// ibd
