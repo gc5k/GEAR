@@ -191,6 +191,7 @@ public class MetaWatchdog2
 					sb.append("\t" + tokens[i]);
 				}
 				tmp.add(sb.toString());
+				subjectsRead.add(subID);
 			}
 			indIdx++;
 		}
