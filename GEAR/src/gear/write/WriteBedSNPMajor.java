@@ -116,17 +116,17 @@ public class WriteBedSNPMajor
 		}
 		reader.close();
 
-		Logger.printUserLog("Read " + subjectIDs.size() + " individuals in " + CmdArgs.INSTANCE.orderindFile);
+		Logger.printUserLog("Read " + subjectIDs.size() + " unique individuals in " + CmdArgs.INSTANCE.orderindFile);
 
-		int cn = 0;		
-		int[] index = new int[PersonTable.size()];
+		int cn = 0;
+		int[] index = new int[subjectIDs.size()];
 		Arrays.fill(index, -1);
-		for (int i = 0; i < PersonTable.size(); i++)
+		for (int i = 0; i < subjectIDs.size(); i++)
 		{
-			PersonIndex pi = PersonTable.get(i);
-			for (int j = 0; j < subjectIDs.size(); j++)
+			SubjectID subID = subjectIDs.get(i);
+			for (int j = 0; j < PersonTable.size(); j++)
 			{
-				SubjectID subID = subjectIDs.get(j);
+				PersonIndex pi = PersonTable.get(j);
 				if (subID.getFamilyID().compareTo(pi.getFamilyID()) == 0 && subID.getIndividualID().compareTo(pi.getIndividualID()) == 0)
 				{
 					cn++;
@@ -141,8 +141,8 @@ public class WriteBedSNPMajor
 			Logger.printUserLog("no individuals were matched between fam and " + CmdArgs.INSTANCE.orderindFile + ".");
 			System.exit(1);
 		}
-		
-		for(int i = 0; i < PersonTable.size(); i++)
+
+		for(int i = 0; i < index.length; i++)
 		{
 			if (index[i]!= -1)
 			{
