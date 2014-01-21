@@ -207,7 +207,7 @@ public class WriteBedSNPMajor
 					int pidx = indOrder.get(j).intValue();
 					if (pidx == -1)
 					{
-						if (j == (indOrder.size() -1))
+						if (j == (indOrder.size() -1) && idx != 0) //last one and there is something in gbyte.
 						{
 							os.writeByte(gbyte);
 						}
