@@ -37,7 +37,6 @@ public final class SimuFamilyCommandImpl extends CommandImpl
 		{
 			writeFile();
 		}
-
 	}
 	
 	private void init()
@@ -82,6 +81,7 @@ public final class SimuFamilyCommandImpl extends CommandImpl
 		rec[0] = maf[0];
 
 		gm = new int[cmdArgs.getNumberOfFamilies() * famSize][cmdArgs.getNumberOfMarkers()];
+		phe = new double[cmdArgs.getNumberOfFamilies()][famSize];
 	}
 
 	private void generateNuclearFamily(int nkid, int affKid, int famIdx)
@@ -93,6 +93,7 @@ public final class SimuFamilyCommandImpl extends CommandImpl
 		{
 			generateBaby(p, m, famIdx, i + 2);
 		}
+
 	}
 
 	private int[][] sampleChromosome(int famIdx, int shift)
@@ -142,7 +143,6 @@ public final class SimuFamilyCommandImpl extends CommandImpl
 		{
 			gm[famIdx * famSize + shift][i] = v[i][0] + v[i][1];
 		}
-
 	}
 
 	public void writeFile()
@@ -465,5 +465,8 @@ public final class SimuFamilyCommandImpl extends CommandImpl
 	private double[] DPrime = null;
 
 	private int[][] gm = null;
-	private final int famSize = 4; 
+	private final int famSize = 4;
+	private double[][] phe = null;
+	private int[] qtlIdx = {5, 5};
+	private double[] h2 = {0.5, 0.5};
 }
