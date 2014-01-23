@@ -22,6 +22,7 @@ import gear.family.qc.rowqc.SampleFilter;
 import gear.util.FileUtil;
 import gear.util.Logger;
 import gear.util.NewIt;
+import gear.util.SNPMatch;
 
 public class WriteBedSNPMajor
 {
@@ -30,6 +31,7 @@ public class WriteBedSNPMajor
 	private ArrayList<PersonIndex> PrintPerson = NewIt.newArrayList();
 	private DataOutputStream os = null;
 	private ArrayList<SNP> snpList;
+	private ArrayList<Boolean> keepLoci = NewIt.newArrayList();
 
 	public WriteBedSNPMajor()
 	{
@@ -39,13 +41,15 @@ public class WriteBedSNPMajor
 			pp = new PLINKParser(CmdArgs.INSTANCE.getFileArgs()
 					.getPed(), CmdArgs.INSTANCE.getFileArgs()
 					.getMap());
-		} else if (CmdArgs.INSTANCE.getBFileArgs(0).isSet())
+		}
+		else if (CmdArgs.INSTANCE.getBFileArgs(0).isSet())
 		{
 			pp = new PLINKBinaryParser(CmdArgs.INSTANCE.getBFileArgs(0)
 					.getBed(), CmdArgs.INSTANCE.getBFileArgs(0)
 					.getBim(), CmdArgs.INSTANCE.getBFileArgs(0)
 					.getFam());
-		} else
+		}
+		else
 		{
 			Logger.printUserError("No input files.");
 			System.exit(1);
@@ -74,7 +78,41 @@ public class WriteBedSNPMajor
 		{
 			PrintPerson = PersonTable;
 		}
+		if(CmdArgs.INSTANCE.removeatgcFlag)
+		{
+			tagATGC();
+		}
+		else
+		{
+			for (int i = 0; i < snpList.size(); i++)
+			{
+				keepLoci.add(true);
+			}
+		}
 		WriteFile(CmdArgs.INSTANCE.out);
+	}
+
+	private void tagATGC()
+	{
+		int cn = 0;
+		for(int i = 0; i < snpList.size(); i++)
+		{
+			SNP snp = snpList.get(i);
+			boolean flag = true;
+			if (SNPMatch.isAmbiguous(snp.getFirstAllele(), snp.getSecAllele()))
+			{
+				cn++;
+				flag = false;
+			}
+			keepLoci.add(flag);
+		}
+		Logger.printUserLog("removed " + cn + " atgc loci.");
+		if(cn == snpList.size())
+		{
+			Logger.printUserLog("All snps have been removed.");
+			Logger.printUserLog("GEAR quited.");
+			System.exit(1);
+		}
 	}
 
 	private void OrderInd()
@@ -149,7 +187,12 @@ public class WriteBedSNPMajor
 				PrintPerson.add(PersonTable.get(index[i]));
 			}
 		}
-		Logger.printUserLog("Matched " + PrintPerson.size() + " individuals in fam");		
+		Logger.printUserLog("Matched " + PrintPerson.size() + " individuals in fam");
+		if(PrintPerson.size() == 0)
+		{
+			Logger.printUserLog("GEAR quited.");
+			System.exit(1);
+		}
 	}
 
 	public void WriteFile(String out)
@@ -158,9 +201,14 @@ public class WriteBedSNPMajor
 		sbim.append(out);
 		sbim.append(".bim");
 		PrintStream pbim = FileUtil.CreatePrintStream(sbim.toString());
+		int cn = 0;
 		for (Iterator<SNP> e = snpList.iterator(); e.hasNext();)
 		{
 			SNP snp = e.next();
+			if(!keepLoci.get(cn++))
+			{
+				continue;
+			}
 			pbim.append(snp.getChromosome() + "\t" + snp.getName() + "\t"
 					+ snp.getDistance() + "\t" + snp.getPosition() + "\t"
 					+ snp.getFirstAllele() + "\t" + snp.getSecAllele() + "\n");
@@ -188,7 +236,8 @@ public class WriteBedSNPMajor
 		try
 		{
 			os = new DataOutputStream(new FileOutputStream(sbed.toString()));
-		} catch (FileNotFoundException e)
+		} 
+		catch (FileNotFoundException e)
 		{
 			Logger.printUserError("Cannot create file '" + sbed.toString()
 					+ "'.");
@@ -204,6 +253,11 @@ public class WriteBedSNPMajor
 
 			for (int i = 0; i < snpList.size(); i++)
 			{
+				if (!keepLoci.get(i).booleanValue())
+				{
+					continue;
+				}
+
 				byte gbyte = 0;
 				int idx = 0;
 
@@ -237,7 +291,8 @@ public class WriteBedSNPMajor
 				}
 			}
 			os.close();
-		} catch (IOException e)
+		} 
+		catch (IOException e)
 		{
 			Logger.handleException(
 					e,
