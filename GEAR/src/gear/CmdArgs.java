@@ -206,6 +206,8 @@ public enum CmdArgs
 
 		ops.addOption(OptionBuilder.withLongOpt(cmd_order_ind_long)
 						.withDescription("order individuals ").hasArg().create(cmd_order_ind));
+		ops.addOption(OptionBuilder.withLongOpt(cmd_remove_atgc_long)
+						.withDescription("remove atgc loci ").create(cmd_remove_atgc));
 
 		// grm-stat
 		ops.addOption(OptionBuilder.withLongOpt(cmd_grm_stat_long)
@@ -1241,7 +1243,11 @@ public enum CmdArgs
 	private final String cmd_order_ind_long = "order-ind";
 	public String orderindFile = null;
 	public boolean orderindFlag = false;
-	
+
+	private final String cmd_remove_atgc = "remove_atgc";
+	private final String cmd_remove_atgc_long = "remove-atgc";
+	public boolean removeatgcFlag = false;
+
 	/*
 	 * private final String cmd_ex_ind = "exind"; public String[][] ex_ind =
 	 * null; private final String cmd_ex_ind_file = "exindfile"; public boolean
@@ -1412,6 +1418,10 @@ public enum CmdArgs
 			orderindFlag = true;
 		}
 
+		if (cmdLine.hasOption(cmd_remove_atgc))
+		{
+			removeatgcFlag = true;
+		}
 		// ibd
 		if (cmdLine.hasOption(cmd_ibd))
 		{
