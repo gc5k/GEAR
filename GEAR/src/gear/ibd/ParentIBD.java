@@ -243,17 +243,26 @@ public class ParentIBD
 			idx0--;
 		}
 
+		
 		if(ibd[ibd.length-1][pidx] == 0)
 		{
+			boolean head = false;
 			idx0 = ibd.length-1;
 			while(ibd[idx0][pidx]==0)
 			{
 				idx0--;
-				break;
+				if (idx0 == 0)
+				{
+					head = true;
+					break;
+				}
 			}
-			for(int i = idx0+1; i< ibd.length; i++)
+			if (!head)
 			{
-				ibd[i][pidx] = ibd[idx0][pidx];
+				for(int i = idx0+1; i< ibd.length; i++)
+				{
+					ibd[i][pidx] = ibd[idx0][pidx];
+				}
 			}
 		}
 	}

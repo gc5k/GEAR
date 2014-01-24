@@ -127,6 +127,7 @@ public final class SimuFamilyCommandImpl extends CommandImpl
 	private void generateBaby(int[][] p, int[][] m, int famIdx, int shift)
 	{
 		int[][] v = new int[maf.length][2];
+		int[][] rc = new int[maf.length][2];
 		for (int i = 0; i < 2; i++)
 		{
 			int[][] chr = i == 0 ? p : m;
@@ -135,6 +136,7 @@ public final class SimuFamilyCommandImpl extends CommandImpl
 			{
 				double r = rnd.nextUniform(0, 1);
 				idx = r < rec[j] ? 1 - idx : idx;
+				rc[j][i] = idx;
 				v[j][i] = chr[j][idx];
 			}
 		}
@@ -143,6 +145,16 @@ public final class SimuFamilyCommandImpl extends CommandImpl
 		{
 			gm[famIdx * famSize + shift][i] = v[i][0] + v[i][1];
 		}
+		
+		//print ibd
+//		for (int i = 0; i < 2; i++)
+//		{
+//			for (int j = 0; j < maf.length; j++)
+//			{
+//				System.out.print(rc[j][i] + " ");
+//			}
+//			System.out.println();
+//		}
 	}
 
 	public void writeFile()
