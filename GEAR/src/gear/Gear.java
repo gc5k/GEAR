@@ -242,7 +242,7 @@ public enum Gear
 			{
 				MetaWatchdogPowerCalculator p = new MetaWatchdogPowerCalculator();
 			}
-			else if (CmdArgs.INSTANCE.ibdFlag)
+			else if (CmdArgs.INSTANCE.quickibdFlag)
 			{
 				ParentIBD ibd = new ParentIBD();
 				ibd.getIBD();

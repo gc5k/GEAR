@@ -51,9 +51,9 @@ public class ParentIBD
 
 	public void getIBD()
 	{
-		PrintStream ibdFile = FileUtil.CreatePrintStream(CmdArgs.INSTANCE.out + ".ibd");
-		PrintStream ibd2File = FileUtil.CreatePrintStream(CmdArgs.INSTANCE.out + ".ibd2");
-		
+		PrintStream ibdFile = FileUtil.CreatePrintStream(CmdArgs.INSTANCE.out + ".ibd.raw");
+		PrintStream ibd2File = FileUtil.CreatePrintStream(CmdArgs.INSTANCE.out + ".ibd");
+
 		Enumeration<String> perList1;
 		BFamilyStruct fam;
 
