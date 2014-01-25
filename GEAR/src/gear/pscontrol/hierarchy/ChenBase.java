@@ -17,7 +17,6 @@ import gear.util.NewIt;
 public abstract class ChenBase implements ChenInterface
 {
 
-	protected long seed = 2011;
 	public static Random rnd = new Random();
 	protected MapFile MapData;
 	protected PedigreeFile PedData;
@@ -33,7 +32,7 @@ public abstract class ChenBase implements ChenInterface
 
 	public ChenBase(PedigreeFile ped, MapFile map)
 	{
-		rnd.setSeed(CmdArgs.INSTANCE.nontransSeed);
+		rnd.setSeed(CmdArgs.INSTANCE.simuSeed);
 		PedData = ped;
 		MapData = map;
 
