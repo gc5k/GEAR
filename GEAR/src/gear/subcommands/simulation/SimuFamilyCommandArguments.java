@@ -49,11 +49,10 @@ public final class SimuFamilyCommandArguments extends CommandArguments
 		return recRandFlag;
 	}
 
-	public void setRecRand(boolean f)
+	public void setRecRandFlag(boolean f)
 	{
 		this.recRandFlag = f;
 	}
-
 
 	public double getLD()
 	{
@@ -74,12 +73,35 @@ public final class SimuFamilyCommandArguments extends CommandArguments
 	{
 		this.rec = r;
 	}
+
+	public double[] getRecSex()
+	{
+		return recSex;
+	}
+
+	public void setRecSex(double[] rs)
+	{
+		recSex[0] = rs[0];
+		recSex[1] = rs[1];
+	}
 	
+	public void setRecSexFlag(boolean f)
+	{
+		this.recSexFlag = f ;
+	}
+
+	public boolean isRecSex()
+	{
+		return recSexFlag;
+	}
+
 	private int numFams;
 	private int numMarkers;
-	private Long seed = null;
+	private Long seed = Long.valueOf(2013);
 	private boolean makeBed;
 	private double ld = 0;
 	private double rec = 0.5;
+	private boolean recSexFlag = false;
+	private double[] recSex = {0.5, 0.5};
 	private boolean recRandFlag = false;
 }

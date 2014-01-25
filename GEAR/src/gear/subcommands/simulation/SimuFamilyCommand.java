@@ -35,6 +35,8 @@ public final class SimuFamilyCommand extends Command
 
 		options.addOption(OptionBuilder.withDescription(OPT_LD_DESC).withLongOpt(OPT_LD_LONG).hasArg().create(OPT_LD));
 		options.addOption(OptionBuilder.withDescription(OPT_REC_DESC).withLongOpt(OPT_REC_LONG).hasArg().create(OPT_REC));
+		options.addOption(OptionBuilder.withDescription(OPT_REC_SEX_DESC).withLongOpt(OPT_REC_SEX_LONG).hasArg().create(OPT_REC_SEX));
+
 		options.addOption(OptionBuilder.withDescription(OPT_REC_RAND_DESC).withLongOpt(OPT_REC_RAND_LONG).create(OPT_REC_RAND));
 	}
 
@@ -47,7 +49,9 @@ public final class SimuFamilyCommand extends Command
 		parseSeed(cmdArgs, cmdLine);
 		parseLD(cmdArgs, cmdLine);
 		parseRec(cmdArgs, cmdLine);
-		cmdArgs.setRecRand(cmdLine.hasOption(OPT_REC_RAND));
+		parseRecSex(cmdArgs, cmdLine);
+		cmdArgs.setRecRandFlag(cmdLine.hasOption(OPT_REC_RAND));
+		cmdArgs.setRecSexFlag(cmdLine.hasOption(OPT_REC_SEX));
 		cmdArgs.setMakeBed(cmdLine.hasOption(OPT_MAKE_BED));
 		return cmdArgs;
 	}
@@ -136,8 +140,41 @@ public final class SimuFamilyCommand extends Command
 				throw new CommandArgumentException(msg);
 			}			
 		}
-
 		cmdArgs.setRec(r);
+	}
+
+	private void parseRecSex(SimuFamilyCommandArguments cmdArgs, CommandLine cmdLine) throws CommandArgumentException
+	{
+		double[] rs = {0.5, 0.5};
+		if(cmdLine.hasOption(OPT_REC_SEX))
+		{
+			try
+			{
+				String[] s = cmdLine.getOptionValue(OPT_REC_SEX).split(",");
+				rs[0] = Double.parseDouble(s[0]);
+				rs[1] = Double.parseDouble(s[1]);
+			}
+			catch (NumberFormatException e)
+			{
+			}
+
+			if (rs[0] < 0 || rs[0] > 0.5)
+			{
+				String msg = "";
+				msg += "The value of --" + OPT_REC_SEX_LONG + "is invalid: '";
+				msg += cmdLine.getOptionValue(OPT_REC_SEX) + "' is not a valid number between 0 and 0.5.";
+				throw new CommandArgumentException(msg);
+			}
+			
+			if (rs[1] < 0 || rs[1] > 0.5)
+			{
+				String msg = "";
+				msg += "The value of --" + OPT_REC_SEX_LONG + "is invalid: '";
+				msg += cmdLine.getOptionValue(OPT_REC_SEX) + "' is not a valid number between 0 and 0.5.";
+				throw new CommandArgumentException(msg);
+			}
+		}
+		cmdArgs.setRecSex(rs);
 	}
 
 	private void parseLD(SimuFamilyCommandArguments cmdArgs, CommandLine cmdLine) throws CommandArgumentException
@@ -162,7 +199,6 @@ public final class SimuFamilyCommand extends Command
 				throw new CommandArgumentException(msg);
 			}			
 		}
-
 		cmdArgs.setLD(l);
 	}
 
@@ -173,11 +209,11 @@ public final class SimuFamilyCommand extends Command
 	}
 	
 	private static final char OPT_NUM_FAMS = 'f';
-	private static final String OPT_NUM_FAMS_LONG = "num-fams";
+	private static final String OPT_NUM_FAMS_LONG = "num-fam";
 	private static final String OPT_NUM_FAMS_DESC = "Specify the number of families";
 	
 	private static final char OPT_NUM_MARKERS = 'm';
-	private static final String OPT_NUM_MARKERS_LONG = "num-markers";
+	private static final String OPT_NUM_MARKERS_LONG = "num-marker";
 	private static final String OPT_NUM_MARKERS_DESC = "Specify the number of markers";
 	
 	private static final char OPT_SEED = 's';
@@ -190,12 +226,16 @@ public final class SimuFamilyCommand extends Command
 
 	private static final char OPT_LD = 'l';
 	private static final String OPT_LD_LONG = "ld";
-	private static final String OPT_LD_DESC = "Specify the ld (DPrime)";
+	private static final String OPT_LD_DESC = "Specify the ld (Lewontin's DPrime)";
 
 	private static final char OPT_REC = 'r';
 	private static final String OPT_REC_LONG = "rec";
 	private static final String OPT_REC_DESC = "Specify the recombination fraction";
-	
+
+	private static final String OPT_REC_SEX = "rs";
+	private static final String OPT_REC_SEX_LONG = "rec-sex";
+	private static final String OPT_REC_SEX_DESC = "Specify the sex-specific recombination fraction";
+
 	private static final String OPT_REC_RAND = "rr";
 	private static final String OPT_REC_RAND_LONG = "rec-rand";
 	private static final String OPT_REC_RAND_DESC = "Use uniformly distributed recombination fractions beween (0~0.5)";

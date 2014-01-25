@@ -43,14 +43,7 @@ public final class SimuFamilyCommandImpl extends CommandImpl
 	{
 		rnd = new RandomDataImpl();
 		
-		if (cmdArgs.getSeed() == null)
-		{
-			rnd.reSeed(2013);
-		}
-		else
-		{
-			rnd.reSeed(cmdArgs.getSeed());
-		}
+		rnd.reSeed(cmdArgs.getSeed());
 
 		NKid = new int[cmdArgs.getNumberOfFamilies()];
 		Arrays.fill(NKid, 2);
@@ -67,19 +60,34 @@ public final class SimuFamilyCommandImpl extends CommandImpl
 		LD = CalculateDprime(maf, DPrime);
 
 		rec = new double[cmdArgs.getNumberOfMarkers()];
-		if (cmdArgs.getRecRand())
+		recSex = new double[cmdArgs.getNumberOfMarkers()][2];
+
+		if (cmdArgs.isRecSex())
 		{
-			for (int i = 0; i < rec.length; i++)
+			double[] rs = cmdArgs.getRecSex();
+			for (int i = 0; i < recSex.length; i++)
 			{
-				rec[i] = rnd.nextUniform(0.01, 0.5);
+				recSex[i][0] = rs[0];
+				recSex[i][1] = rs[1];
 			}
+			recSex[0][0] = maf[0];
+			recSex[0][1] = maf[0];			
 		}
 		else
 		{
-			Arrays.fill(rec, cmdArgs.getRec());			
+			if (cmdArgs.getRecRand())
+			{
+				for (int i = 0; i < rec.length; i++)
+				{
+					rec[i] = rnd.nextUniform(0.01, 0.5);
+				}
+			}
+			else
+			{
+				Arrays.fill(rec, cmdArgs.getRec());
+			}
+			rec[0] = maf[0];
 		}
-		rec[0] = maf[0];
-
 		gm = new int[cmdArgs.getNumberOfFamilies() * famSize][cmdArgs.getNumberOfMarkers()];
 		phe = new double[cmdArgs.getNumberOfFamilies()][famSize];
 	}
@@ -128,16 +136,52 @@ public final class SimuFamilyCommandImpl extends CommandImpl
 	{
 		int[][] v = new int[maf.length][2];
 		int[][] rc = new int[maf.length][2];
-		for (int i = 0; i < 2; i++)
+		if(cmdArgs.isRecSex())
 		{
-			int[][] chr = i == 0 ? p : m;
-			int idx = 1;
-			for (int j = 0; j < maf.length; j++)
+			for (int i = 0; i < 2; i++)
 			{
-				double r = rnd.nextUniform(0, 1);
-				idx = r < rec[j] ? 1 - idx : idx;
-				rc[j][i] = idx;
-				v[j][i] = chr[j][idx];
+				int[][] chr = i == 0 ? p : m;
+				int idx = 1;
+				try
+				{
+					idx = rnd.nextBinomial(1, recSex[0][i]);
+				}
+				catch (MathException e)
+				{
+					e.printStackTrace();
+				}
+
+				for (int j = 0; j < maf.length; j++)
+				{
+					double r = rnd.nextUniform(0, 1);
+					idx = r < recSex[j][i] ? 1 - idx : idx;
+					rc[j][i] = idx;
+					v[j][i] = chr[j][idx];
+				}
+			}
+		}
+		else
+		{
+
+			for (int i = 0; i < 2; i++)
+			{
+				int[][] chr = i == 0 ? p : m;
+				int idx = 1;
+				try
+				{
+					idx = rnd.nextBinomial(1, rec[0]);
+				}
+				catch (MathException e)
+				{
+					e.printStackTrace();
+				}
+				for (int j = 0; j < maf.length; j++)
+				{
+					double r = rnd.nextUniform(0, 1);
+					idx = r < rec[j] ? 1 - idx : idx;
+					rc[j][i] = idx;
+					v[j][i] = chr[j][idx];
+				}
 			}
 		}
 
@@ -147,14 +191,15 @@ public final class SimuFamilyCommandImpl extends CommandImpl
 		}
 		
 		//print ibd
-//		for (int i = 0; i < 2; i++)
-//		{
-//			for (int j = 0; j < maf.length; j++)
-//			{
-//				System.out.print(rc[j][i] + " ");
-//			}
-//			System.out.println();
-//		}
+
+		for (int i = 0; i < 2; i++)
+		{
+			for (int j = 0; j < maf.length; j++)
+			{
+				System.out.print(rc[j][i] + " ");
+			}
+			System.out.println();
+		}
 	}
 
 	public void writeFile()
@@ -473,6 +518,7 @@ public final class SimuFamilyCommandImpl extends CommandImpl
 	private int[] NAffKid = null;
 	private double[] LD = null;
 	private double[] rec = null;
+	private double[][] recSex = null;
 	private double[] maf = null;
 	private double[] DPrime = null;
 
