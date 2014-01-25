@@ -51,9 +51,8 @@ public enum CmdArgs
 		ops.addOption(OptionBuilder.withDescription("gwas data simulations ")
 				.create(cmd_bsimu));
 
-		ops.addOption(OptionBuilder.withLongOpt(cmd_simu_seed_long)
-				.withDescription("gwas simulation seed ").hasArg()
-				.create(cmd_simu_seed));
+		ops.addOption(OptionBuilder.withDescription("gwas simulation seed ").hasArg()
+				.create(cmd_seed));
 
 		ops.addOption(OptionBuilder.withLongOpt(cmd_simu_rep_long)
 				.withDescription("gwas simulation replication ").hasArg()
@@ -101,10 +100,6 @@ public enum CmdArgs
 		ops.addOption(OptionBuilder.withLongOpt(cmd_nontrans_controls_long)
 				.withDescription("nontransmitted filter controls ")
 				.create(cmd_nontrans_controls));
-
-		ops.addOption(OptionBuilder.withLongOpt(cmd_nontrans_seed_long)
-				.withDescription("gwas prevalence of the binary trait ")
-				.hasArg().create(cmd_nontrans_seed));
 
 		// simulation polygenic model
 
@@ -536,8 +531,7 @@ public enum CmdArgs
 	private final String cmd_bsimu = "bsimu";
 	public boolean bsimuFlag = false;
 
-	private final String cmd_simu_seed = "simu_seed";
-	private final String cmd_simu_seed_long = "simu-seed";
+	private final String cmd_seed = "seed";
 	public long simuSeed = 2012;
 
 	private final String cmd_simu_rep = "simu_rep";
@@ -614,10 +608,6 @@ public enum CmdArgs
 	// /////////////////nontrans
 	private final String cmd_nontrans = "nontrans";
 	public boolean nontransFlag = false;
-
-	private final String cmd_nontrans_seed = "nontrans_seed";
-	private final String cmd_nontrans_seed_long = "nontrans-seed";
-	public long nontransSeed = 2010;
 
 	private final String cmd_nontrans_cases = "nontrans_cases";
 	private final String cmd_nontrans_cases_long = "nontrans-cases";
@@ -1435,12 +1425,6 @@ public enum CmdArgs
 			nontransFlag = true;
 		}
 
-		if (cmdLine.hasOption(cmd_nontrans_seed))
-		{
-			nontransSeed = Long.parseLong(cmdLine
-					.getOptionValue(cmd_nontrans_seed));
-		}
-
 		if (cmdLine.hasOption(cmd_nontrans_cases))
 		{
 			nontranscasesFlag = true;
@@ -1574,9 +1558,9 @@ public enum CmdArgs
 			simuOrderFlag = true;
 		}
 
-		if (cmdLine.hasOption(cmd_simu_seed))
+		if (cmdLine.hasOption(cmd_seed))
 		{
-			simuSeed = Long.parseLong(cmdLine.getOptionValue(cmd_simu_seed));
+			simuSeed = Long.parseLong(cmdLine.getOptionValue(cmd_seed));
 		}
 
 		if (cmdLine.hasOption(cmd_simu_hsq))

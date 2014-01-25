@@ -41,7 +41,7 @@ public class NonTransmitted
 	public void GenerateNonTransmitted()
 	{
 		AJHG2008 ajhg2008 = new AJHG2008(pp.getPedigreeData(), pp.getMapData());
-		ajhg2008.setSeed(CmdArgs.INSTANCE.nontransSeed);
+		ajhg2008.setSeed(CmdArgs.INSTANCE.simuSeed);
 		ajhg2008.RevvingUp(sf.getSample());
 
 		ArrayList<PersonIndex> sample = ajhg2008.getSample();
