@@ -1,64 +1,41 @@
 package gear.metawatchdog.decrypt;
 
 import gear.CmdArgs;
-import gear.data.SubjectID;
+import gear.data.PhenotypeFile;
 import gear.util.FileUtil;
 import gear.util.Logger;
-import gear.util.NewIt;
 
 import java.io.PrintStream;
-import java.util.ArrayList;
-import java.util.HashSet;
 
 import org.apache.commons.math.stat.regression.*;
 import org.apache.commons.math.stat.StatUtils;
 
 public class MetaWatchdog2
 {
-	private final String delim = "\\s+";
-
-	private double[][] phe1;
-	private ArrayList<String> ID1 = NewIt.newArrayList();
-	private String f1 = null;
-	
-	private double[][] phe2;
-	private ArrayList<String> ID2 = NewIt.newArrayList();
-	private String f2 = null;
-
-	private double cutoff = 0.95;
-
-	public MetaWatchdog2 ()
-	{
-
-		f1 = CmdArgs.INSTANCE.set1_file;
-		f2 = CmdArgs.INSTANCE.set2_file;
-		cutoff = CmdArgs.INSTANCE.dog_cutoff;
-
-		Logger.printUserLog("Set1: " + f1);
-		Logger.printUserLog("Set2: " + f2);
-		Logger.printUserLog("Cutoff: " + cutoff);
-	}
-
 	public void Bark()
 	{
-		readPhenotypes1(f1);
-		readPhenotypes2(f2);
-
+		Logger.printUserLog("Set1: " + CmdArgs.INSTANCE.set1_file);
+		Logger.printUserLog("Set2: " + CmdArgs.INSTANCE.set2_file);
+		Logger.printUserLog("Cutoff: " + CmdArgs.INSTANCE.dog_cutoff);
+		
+		PhenotypeFile phe1 = new PhenotypeFile(CmdArgs.INSTANCE.set1_file, /*hasHeaders*/true);
+		PhenotypeFile phe2 = new PhenotypeFile(CmdArgs.INSTANCE.set2_file, /*hasHeaders*/true);
+		
 		PrintStream predictorFile = FileUtil.CreatePrintStream(CmdArgs.INSTANCE.out + ".watchdog");
 
-		int test = phe1[0].length <= phe2[0].length ? phe1[0].length : phe2[0].length; 
+		int test = Math.min(phe1.getNumberOfTraits(), phe2.getNumberOfTraits()); 
 
 		int cnt = 0;
-		for (int i = 0; i < phe1.length; i++)
+		for (int i = 0; i < phe1.getNumberOfSubjects(); i++)
 		{
-			for (int j = 0; j < phe2.length; j++)
+			for (int j = 0; j < phe2.getNumberOfSubjects(); j++)
 			{
 				// TODO: Move the normalization out of the for-loops to speed-up.
 				double[][] normPhes = new double[2][test];
 				for (int k = 0; k < test; ++k)
 				{
-					normPhes[0][k] = phe1[i][k];
-					normPhes[1][k] = phe2[j][k];
+					normPhes[0][k] = phe1.getPhenotype(i, k);
+					normPhes[1][k] = phe2.getPhenotype(j, k);
 				}
 				normPhes[0] = StatUtils.normalize(normPhes[0]);
 				normPhes[1] = StatUtils.normalize(normPhes[1]);
@@ -73,146 +50,20 @@ public class MetaWatchdog2
 				sr.addData(dat);
 				double b = sr.getSlope();
 
-				if(b > cutoff)
+				if (b > CmdArgs.INSTANCE.dog_cutoff)
 				{
-					predictorFile.println(ID1.get(i) + "\t" +ID2.get(j) + "\t" + b + "\t" + sr.getSlopeStdErr() + "\t" + sr.getN());
+					String entry = "";
+					entry += phe1.getSubjectID(i).getFamilyID() + "\t" + phe1.getSubjectID(i).getIndividualID() + "\t";
+					entry += phe2.getSubjectID(j).getFamilyID() + "\t" + phe2.getSubjectID(j).getIndividualID() + "\t";
+					entry += b + "\t" + sr.getSlopeStdErr() + "\t" + sr.getN();
+					predictorFile.println(entry);
 					cnt++;
 				}
 			}
 		}
 		predictorFile.close();
-		Logger.printUserLog("In total " + phe1.length * phe2.length + " pairs were compared.");
+		Logger.printUserLog("In total " + phe1.getNumberOfSubjects() * phe2.getNumberOfSubjects() + " pairs were compared.");
 		
 		Logger.printUserLog("In total " + cnt + " similar pairs were detected.");
 	}
-
-	private void readPhenotypes1(String fileName)
-	{
-		Logger.printUserLog("Reading " + fileName);
-		gear.util.BufferedReader reader = gear.util.BufferedReader.openTextFile(fileName, "phenotype");
-
-		HashSet<SubjectID> subjectsRead = new HashSet<SubjectID>();
-
-		String[] tokens = reader.readTokensAtLeast(3);
-
-		if (tokens == null)
-		{
-			Logger.printUserError("The phenotype file '" + fileName + "' is empty.");
-			System.exit(1);
-		}
-
-		int numCols = tokens.length;
-
-		ArrayList<String> tmp = NewIt.newArrayList();
-
-		int indIdx = 0;
-
-		while ((tokens = reader.readTokens(numCols)) != null)
-		{
-			SubjectID subID = new SubjectID(/*famID*/tokens[0], /*indID*/tokens[1]);
-
-			if (subjectsRead.contains(subID))
-			{
-				Logger.printUserLog("Individual:" + subID.getFamilyID() + " " + subID.getIndividualID() + " at line " + (indIdx+1) + " excluded due to double entry.");
-			}
-			else
-			{
-				StringBuffer id = new StringBuffer();
-				id.append(subID.getFamilyID() + "\t" + subID.getIndividualID());
-
-				StringBuffer sb = new StringBuffer();
-				sb.append(id.toString());
-				for (int i = 2; i < numCols; i++)
-				{
-					sb.append("\t" + tokens[i]);
-				}
-				tmp.add(sb.toString());
-				subjectsRead.add(subID);
-			}
-			indIdx++;
-		}
-		reader.close();
-
-		phe1 = new double[tmp.size()][numCols-2];
-		for(int i = 0; i < tmp.size(); i++)
-		{
-			String[] tk = tmp.get(i).split(delim);
-			StringBuffer id = new StringBuffer();
-			id.append(tk[0] + "\t" + tk[1] + "\t");
-			ID1.add(id.toString());
-
-			for(int j = 0; j < tk.length - 2; j++)
-			{
-				phe1[i][j] = Double.parseDouble(tk[j+2]);
-			}
-		}
-
-		Logger.printUserLog("Read " + tmp.size() + " individuals, " + (numCols-2) + " scores in " + fileName);
-	}
-
-	private void readPhenotypes2(String fileName)
-	{
-		Logger.printUserLog("Reading " + fileName);
-		gear.util.BufferedReader reader = gear.util.BufferedReader.openTextFile(fileName, "phenotype");
-
-		HashSet<SubjectID> subjectsRead = new HashSet<SubjectID>();
-
-		String[] tokens = reader.readTokensAtLeast(3);
-
-		if (tokens == null)
-		{
-			Logger.printUserError("The phenotype file '" + fileName + "' is empty.");
-			System.exit(1);
-		}
-
-		int numCols = tokens.length;
-
-		ArrayList<String> tmp = NewIt.newArrayList();
-
-		int indIdx = 0;
-
-		while ((tokens = reader.readTokens(numCols)) != null)
-		{
-			SubjectID subID = new SubjectID(/*famID*/tokens[0], /*indID*/tokens[1]);
-
-			if (subjectsRead.contains(subID))
-			{
-				Logger.printUserLog("Individual:" + subID.getFamilyID() + " " + subID.getIndividualID() + " at line " + (indIdx+1) + " excluded due to double entry.");
-			}
-			else
-			{
-				StringBuffer id = new StringBuffer();
-				id.append(subID.getFamilyID() + "\t" + subID.getIndividualID());
-
-				StringBuffer sb = new StringBuffer();
-				sb.append(id.toString());
-				for (int i = 2; i < numCols; i++)
-				{
-					sb.append("\t" + tokens[i]);
-				}
-				tmp.add(sb.toString());
-				subjectsRead.add(subID);
-			}
-			indIdx++;
-		}
-
-		reader.close();
-
-		phe2 = new double[tmp.size()][numCols-2];
-		for(int i = 0; i < tmp.size(); i++) 
-		{
-			String[] tk = tmp.get(i).split(delim);
-			StringBuffer id = new StringBuffer();
-			id.append(tk[0] + "\t" + tk[1] + "\t");
-			ID2.add(id.toString());
-
-			for(int j = 0; j < tk.length - 2; j++)
-			{
-				phe2[i][j] = Double.parseDouble(tk[j+2]);
-			}
-		}
-
-		Logger.printUserLog("Read " + tmp.size() + " individuals, " + (numCols-2) + " scores in " + fileName);
-	}
-
 }
