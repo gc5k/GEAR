@@ -3,8 +3,10 @@ package gear.subcommands.simulation;
 import gear.ConstValues;
 import gear.subcommands.CommandArguments;
 import gear.subcommands.CommandImpl;
+import gear.util.FileUtil;
 import gear.util.Logger;
 
+import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.DataOutputStream;
 import java.io.FileOutputStream;
@@ -22,13 +24,16 @@ public final class SimuFamilyCommandImpl extends CommandImpl
 	public void execute(CommandArguments cmdArgs)
 	{
 		this.cmdArgs = (SimuFamilyCommandArguments)cmdArgs;
-		
+
 		init();
 
 		for (int i = 0; i < this.cmdArgs.getNumberOfFamilies(); i++)
 		{
 			generateNuclearFamily(NKid[i], NAffKid[i], i);
 		}
+
+		writePheno();
+		
 		if (this.cmdArgs.getMakeBed())
 		{
 			writeBFile();
@@ -41,6 +46,45 @@ public final class SimuFamilyCommandImpl extends CommandImpl
 	
 	private void init()
 	{
+		if (cmdArgs.getQTLFile() != null)
+		{
+			FileUtil.exists(cmdArgs.getQTLFile());
+			BufferedReader qtlFile = FileUtil.FileOpen(cmdArgs.getQTLFile());
+			String line = null;
+			try
+			{
+				int cn = 0;
+				while( (line = qtlFile.readLine()) != null)
+				{
+					String[] s = line.split(",");
+					if (cn == 0)
+					{
+						qtlIdx[0] = Integer.parseInt(s[0]);
+						qtlIdx[1] = Integer.parseInt(s[1]);
+					}
+					if (cn == 1)
+					{
+						qtlEff[0][0] = Double.parseDouble(s[0]);
+						qtlEff[0][1] = Double.parseDouble(s[1]);
+						qtlEff[1][0] = Double.parseDouble(s[2]);
+						qtlEff[1][1] = Double.parseDouble(s[3]);
+					}
+					if (cn == 2)
+					{
+						h2[0] = Double.parseDouble(s[0]);
+						h2[1] = Double.parseDouble(s[1]);
+					}
+					cn++;
+				}
+			}
+			catch (IOException e)
+			{
+				e.printStackTrace();
+			}
+		}
+		
+		
+		
 		rnd = new RandomDataImpl();
 		
 		rnd.reSeed(cmdArgs.getSeed());
@@ -89,7 +133,7 @@ public final class SimuFamilyCommandImpl extends CommandImpl
 			rec[0] = maf[0];
 		}
 		gm = new int[cmdArgs.getNumberOfFamilies() * famSize][cmdArgs.getNumberOfMarkers()];
-		phe = new double[cmdArgs.getNumberOfFamilies()][famSize];
+		phe = new double[cmdArgs.getNumberOfFamilies() * famSize];
 	}
 
 	private void generateNuclearFamily(int nkid, int affKid, int famIdx)
@@ -128,7 +172,8 @@ public final class SimuFamilyCommandImpl extends CommandImpl
 			}
 			gm[famIdx * famSize + shift][i] = v[i][0] + v[i][1];
 		}
-
+		phe[famIdx * famSize + shift] += v[qtlIdx[0]][0] * qtlEff[0][0] + v[qtlIdx[0]][1] * qtlEff[0][1];
+		phe[famIdx * famSize + shift] += v[qtlIdx[1]][0] * qtlEff[1][0] + v[qtlIdx[1]][1] * qtlEff[1][1];
 		return v;
 	}
 
@@ -189,17 +234,48 @@ public final class SimuFamilyCommandImpl extends CommandImpl
 		{
 			gm[famIdx * famSize + shift][i] = v[i][0] + v[i][1];
 		}
+
+		phe[famIdx * famSize +shift] += v[qtlIdx[0]][0] * qtlEff[0][0] + v[qtlIdx[0]][1] * qtlEff[0][1];
+		phe[famIdx * famSize +shift] += v[qtlIdx[1]][0] * qtlEff[1][0] + v[qtlIdx[1]][1] * qtlEff[1][1];
 		
 		//print ibd
 
-		for (int i = 0; i < 2; i++)
+//		for (int i = 0; i < 2; i++)
+//		{
+//			for (int j = 0; j < maf.length; j++)
+//			{
+//				System.out.print(rc[j][i] + " ");
+//			}
+//			System.out.println();
+//		}
+	}
+
+	public void writePheno()
+	{
+		PrintWriter pheno = null;
+		try
 		{
-			for (int j = 0; j < maf.length; j++)
-			{
-				System.out.print(rc[j][i] + " ");
-			}
-			System.out.println();
+			pheno = new PrintWriter(new BufferedWriter(new FileWriter(cmdArgs.getOutRoot() + ".phe")));
 		}
+		catch (IOException e)
+		{
+			Logger.handleException(e, "An I/O exception occurred when creating the .phe file.");
+		}
+		
+		for (int h = 0; h < cmdArgs.getNumberOfFamilies(); h++)
+		{
+			int fid = (h + 1) * 10000;
+			
+			for (int j = 0; j < famSize; j++)
+			{
+				int pid = fid + 1 + j;
+
+				pheno.print(fid + " ");
+				pheno.print(pid + " ");
+				pheno.println(phe[h*famSize + j]);
+			}
+		}
+		pheno.close();
 	}
 
 	public void writeFile()
@@ -380,7 +456,7 @@ public final class SimuFamilyCommandImpl extends CommandImpl
 		DataOutputStream bedout = null;
 		PrintWriter fam = null;
 		PrintWriter bim = null;
-		
+
 		try
 		{
 			bedout = new DataOutputStream(new FileOutputStream(cmdArgs.getOutRoot() + ".bed"));
@@ -510,9 +586,8 @@ public final class SimuFamilyCommandImpl extends CommandImpl
 	}
 
 	private SimuFamilyCommandArguments cmdArgs;
-	
-	private RandomDataImpl rnd;
 
+	private RandomDataImpl rnd;
 	private final String[] A = { "A", "C" };
 	private int[] NKid = null;
 	private int[] NAffKid = null;
@@ -524,7 +599,8 @@ public final class SimuFamilyCommandImpl extends CommandImpl
 
 	private int[][] gm = null;
 	private final int famSize = 4;
-	private double[][] phe = null;
+	private double[] phe = null;
 	private int[] qtlIdx = {5, 5};
+	private double[][] qtlEff = {{1, 1}, {1,1}};
 	private double[] h2 = {0.5, 0.5};
 }
