@@ -95,6 +95,16 @@ public final class SimuFamilyCommandArguments extends CommandArguments
 		return recSexFlag;
 	}
 
+	public void setQTLFile(String f)
+	{
+		qtlFile = f;
+	}
+
+	public String getQTLFile()
+	{
+		return qtlFile;
+	}
+
 	private int numFams;
 	private int numMarkers;
 	private Long seed = Long.valueOf(2013);
@@ -104,4 +114,5 @@ public final class SimuFamilyCommandArguments extends CommandArguments
 	private boolean recSexFlag = false;
 	private double[] recSex = {0.5, 0.5};
 	private boolean recRandFlag = false;
+	private String qtlFile = null;
 }

@@ -36,8 +36,9 @@ public final class SimuFamilyCommand extends Command
 		options.addOption(OptionBuilder.withDescription(OPT_LD_DESC).withLongOpt(OPT_LD_LONG).hasArg().create(OPT_LD));
 		options.addOption(OptionBuilder.withDescription(OPT_REC_DESC).withLongOpt(OPT_REC_LONG).hasArg().create(OPT_REC));
 		options.addOption(OptionBuilder.withDescription(OPT_REC_SEX_DESC).withLongOpt(OPT_REC_SEX_LONG).hasArg().create(OPT_REC_SEX));
-
 		options.addOption(OptionBuilder.withDescription(OPT_REC_RAND_DESC).withLongOpt(OPT_REC_RAND_LONG).create(OPT_REC_RAND));
+
+		options.addOption(OptionBuilder.withDescription(OPT_QTL_DESC).withLongOpt(OPT_QTL_LONG).hasArg().create(OPT_QTL));
 	}
 
 	@Override
@@ -50,6 +51,7 @@ public final class SimuFamilyCommand extends Command
 		parseLD(cmdArgs, cmdLine);
 		parseRec(cmdArgs, cmdLine);
 		parseRecSex(cmdArgs, cmdLine);
+		parseQTL(cmdArgs, cmdLine);
 		cmdArgs.setRecRandFlag(cmdLine.hasOption(OPT_REC_RAND));
 		cmdArgs.setRecSexFlag(cmdLine.hasOption(OPT_REC_SEX));
 		cmdArgs.setMakeBed(cmdLine.hasOption(OPT_MAKE_BED));
@@ -177,6 +179,17 @@ public final class SimuFamilyCommand extends Command
 		cmdArgs.setRecSex(rs);
 	}
 
+	private void parseQTL(SimuFamilyCommandArguments cmdArgs, CommandLine cmdLine) throws CommandArgumentException
+	{
+		String f = null;
+		
+		if (cmdLine.hasOption(OPT_QTL))
+		{
+			f = cmdLine.getOptionValue(OPT_QTL);
+		}
+		cmdArgs.setQTLFile(f);
+	}
+
 	private void parseLD(SimuFamilyCommandArguments cmdArgs, CommandLine cmdLine) throws CommandArgumentException
 	{
 		double l = 0;
@@ -239,4 +252,8 @@ public final class SimuFamilyCommand extends Command
 	private static final String OPT_REC_RAND = "rr";
 	private static final String OPT_REC_RAND_LONG = "rec-rand";
 	private static final String OPT_REC_RAND_DESC = "Use uniformly distributed recombination fractions beween (0~0.5)";
+
+	private static final String OPT_QTL = "q";
+	private static final String OPT_QTL_LONG = "qtl";
+	private static final String OPT_QTL_DESC = "qtl parameters (locp, locm, effm, effp, h2)";
 }
