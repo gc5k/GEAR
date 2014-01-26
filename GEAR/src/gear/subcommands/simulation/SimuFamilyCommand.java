@@ -51,7 +51,7 @@ public final class SimuFamilyCommand extends Command
 		parseLD(cmdArgs, cmdLine);
 		parseRec(cmdArgs, cmdLine);
 		parseRecSex(cmdArgs, cmdLine);
-		parseQTL(cmdArgs, cmdLine);
+		cmdArgs.setQTLFile(cmdLine.getOptionValue(OPT_QTL));
 		cmdArgs.setRecRandFlag(cmdLine.hasOption(OPT_REC_RAND));
 		cmdArgs.setRecSexFlag(cmdLine.hasOption(OPT_REC_SEX));
 		cmdArgs.setMakeBed(cmdLine.hasOption(OPT_MAKE_BED));
@@ -177,17 +177,6 @@ public final class SimuFamilyCommand extends Command
 			}
 		}
 		cmdArgs.setRecSex(rs);
-	}
-
-	private void parseQTL(SimuFamilyCommandArguments cmdArgs, CommandLine cmdLine) throws CommandArgumentException
-	{
-		String f = null;
-		
-		if (cmdLine.hasOption(OPT_QTL))
-		{
-			f = cmdLine.getOptionValue(OPT_QTL);
-		}
-		cmdArgs.setQTLFile(f);
 	}
 
 	private void parseLD(SimuFamilyCommandArguments cmdArgs, CommandLine cmdLine) throws CommandArgumentException
