@@ -14,7 +14,6 @@ import gear.he.h2trans.H2Transformer;
 import gear.ibd.ParentIBD;
 import gear.imputation.NaiveImputation;
 import gear.metawatchdog.decrypt.MetaWatchdog;
-import gear.metawatchdog.decrypt.MetaWatchdog2;
 import gear.metawatchdog.powercalculator.MetaWatchdogPowerCalculator;
 import gear.pscontrol.NonTransmitted;
 import gear.realcheck.RealCheck;
@@ -37,10 +36,11 @@ public enum Gear
 	private Gear()
 	{
 		addCommand(new gear.subcommands.bluppca.BlupPcaCommand());
-		addCommand(new gear.subcommands.metawatchdog.encrypt.EnigmaCommand());
 		addCommand(new gear.subcommands.he.assocpower.HEAssocPowerCommand());
 		addCommand(new gear.subcommands.help.HelpCommand());
 		addCommand(new gear.subcommands.hpc.HpcCommand());
+		addCommand(new gear.subcommands.metawatchdog.decrypt.MetaWatchdog2Command());
+		addCommand(new gear.subcommands.metawatchdog.encrypt.EnigmaCommand());
 		addCommand(new gear.subcommands.profile.ProfileCommand());
 		addCommand(new gear.subcommands.simulation.SimuFamilyCommand());
 	}
@@ -227,16 +227,8 @@ public enum Gear
 			}
 			else if (CmdArgs.INSTANCE.watchdogFlag)
 			{
-				if (CmdArgs.INSTANCE.sequentialFlag)
-				{
-					MetaWatchdog mw = new MetaWatchdog();
-					mw.Bark();
-				}
-				else
-				{
-					MetaWatchdog2 wd = new MetaWatchdog2();
-					wd.Bark();
-				}
+				MetaWatchdog mw = new MetaWatchdog();
+				mw.Bark();
 			}
 			else if (CmdArgs.INSTANCE.dogpowerFlag)
 			{
