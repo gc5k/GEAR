@@ -11,7 +11,7 @@ public class InputDataSetTest
 	{
 		InputDataSet data = new InputDataSet();
 		data.readSubjectIDFile("data/SubjectID.txt");
-		data.readPhenotypeFile("data/Phenotype.txt");
+		data.readPhenotypeFile("data/PhenotypeWithoutHeaders.txt");
 		
 		assertEquals(3, data.getNumberOfSubjects());
 		assertEquals(2, data.getNumberOfTraits());

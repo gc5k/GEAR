@@ -7,12 +7,32 @@ import org.junit.Test;
 public class PhenotypeFileTest
 {
 	@Test
-	public void test()
+	public void testWithoutHeaders()
 	{
-		PhenotypeFile file = new PhenotypeFile("data/Phenotype.txt");
+		PhenotypeFile file = new PhenotypeFile("data/PhenotypeWithoutHeaders.txt");
 		
-		assertEquals("data/Phenotype.txt", file.getFileName());
-		assertEquals("file 'data/Phenotype.txt'", file.getSubjectOrderName());
+		assertEquals("data/PhenotypeWithoutHeaders.txt", file.getFileName());
+		assertEquals("file 'data/PhenotypeWithoutHeaders.txt'", file.getSubjectOrderName());
+		
+		testCommon(file);
+	}
+	
+	@Test
+	public void testWithHeaders()
+	{
+		PhenotypeFile file = new PhenotypeFile("data/PhenotypeWithHeaders.txt", /*hasHeaders*/true);
+		
+		assertEquals("data/PhenotypeWithHeaders.txt", file.getFileName());
+		assertEquals("file 'data/PhenotypeWithHeaders.txt'", file.getSubjectOrderName());
+		
+		testCommon(file);
+		
+		assertEquals("Trait1", file.getTraitName(0));
+		assertEquals("Trait2", file.getTraitName(1));
+	}
+	
+	private void testCommon(PhenotypeFile file)
+	{
 		assertEquals(3, file.getNumberOfSubjects());
 		assertEquals(2, file.getNumberOfTraits());
 		

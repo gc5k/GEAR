@@ -11,6 +11,11 @@ public class PhenotypeFile implements SubjectOrder
 {
 	public PhenotypeFile(String fileName)
 	{
+		this(fileName, /*hasHeaders*/false);
+	}
+	
+	public PhenotypeFile(String fileName, boolean hasHeaders)
+	{
 		this.fileName = fileName;
 		
 		BufferedReader reader = BufferedReader.openTextFile(fileName, "phenotype");
@@ -24,6 +29,14 @@ public class PhenotypeFile implements SubjectOrder
 		}
 		
 		int numCols = tokens.length;
+		
+		if (hasHeaders)
+		{
+			traitNames = new String[numCols - 2];
+			System.arraycopy(tokens, 2, traitNames, 0, traitNames.length);
+			tokens = reader.readTokens(numCols);
+		}
+		
 		ArrayList<float[]> phenotypes = new ArrayList<float[]>();
 		ArrayList<boolean[]> isMissing = new ArrayList<boolean[]>();
 
@@ -112,6 +125,16 @@ public class PhenotypeFile implements SubjectOrder
 		isMissing[subjectIdx2] = tmpIsMissing;
 	}
 	
+	public boolean hasTraitNames()
+	{
+		return traitNames != null;
+	}
+	
+	public String getTraitName(int traitIndex)
+	{
+		return traitNames[traitIndex];
+	}
+	
 	public int getNumberOfTraits()
 	{
 		return phenotypes[0].length;
@@ -132,6 +155,7 @@ public class PhenotypeFile implements SubjectOrder
 	}
 	
 	private String fileName;
+	private String[] traitNames;
 	private IDIndexMap<SubjectID> subjectMap = new IDIndexMap<SubjectID>();
 	private float[][] phenotypes;
 	private boolean[][] isMissing;
