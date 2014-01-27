@@ -34,7 +34,7 @@ public final class SimuFamilyCommand extends Command
 		options.addOption(OptionBuilder.withDescription(OPT_MAKE_BED_DESC).withLongOpt(OPT_MAKE_BED_LONG).create(OPT_MAKE_BED));
 
 		options.addOption(OptionBuilder.withDescription(OPT_LD_DESC).withLongOpt(OPT_LD_LONG).hasArg().create(OPT_LD));
-		options.addOption(OptionBuilder.withDescription(OPT_MAF_DESC).hasArg().create(OPT_MAF));
+		options.addOption(OptionBuilder.withDescription(OPT_MAF_DESC).hasArg().create(OPT_MAF_LONG));
 		options.addOption(OptionBuilder.withDescription(OPT_MAF_RAND_DESC).withLongOpt(OPT_MAF_RAND_LONG).create(OPT_MAF_RAND));
 		options.addOption(OptionBuilder.withDescription(OPT_REC_DESC).withLongOpt(OPT_REC_LONG).hasArg().create(OPT_REC));
 		options.addOption(OptionBuilder.withDescription(OPT_REC_SEX_DESC).withLongOpt(OPT_REC_SEX_LONG).hasArg().create(OPT_REC_SEX));
@@ -212,11 +212,11 @@ public final class SimuFamilyCommand extends Command
 	{
 		double maf = 0;
 		
-		if (cmdLine.hasOption(OPT_MAF))
+		if (cmdLine.hasOption(OPT_MAF_LONG))
 		{
 			try
 			{
-				maf = Double.parseDouble(cmdLine.getOptionValue(OPT_MAF));
+				maf = Double.parseDouble(cmdLine.getOptionValue(OPT_MAF_LONG));
 			}
 			catch (NumberFormatException e)
 			{
@@ -225,8 +225,8 @@ public final class SimuFamilyCommand extends Command
 			if (maf < 0 || maf > 1)
 			{
 				String msg = "";
-				msg += "The value of --" + OPT_MAF + "is invalid: '";
-				msg += cmdLine.getOptionValue(OPT_MAF) + "' is not a valid between 0 and 1.";
+				msg += "The value of --" + OPT_MAF_LONG + "is invalid: '";
+				msg += cmdLine.getOptionValue(OPT_MAF_LONG) + "' is not a valid between 0 and 1.";
 				throw new CommandArgumentException(msg);
 			}			
 		}
@@ -259,7 +259,7 @@ public final class SimuFamilyCommand extends Command
 	private static final String OPT_LD_LONG = "ld";
 	private static final String OPT_LD_DESC = "Specify the ld (Lewontin's DPrime)";
 
-	private static final String OPT_MAF = "maf";
+	private static final String OPT_MAF_LONG = "maf";
 	private static final String OPT_MAF_DESC = "Specify the minor allele frequency";
 	
 	private static final String OPT_MAF_RAND = "mr";
