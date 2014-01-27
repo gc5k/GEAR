@@ -27,10 +27,20 @@ public final class SimuFamilyCommandImpl extends CommandImpl
 
 		init();
 
+		try
+		{
+			ibdF = new PrintWriter(new BufferedWriter(new FileWriter(cmdArgs.getOutRoot() + ".ibdo")));
+		}
+		catch (IOException e)
+		{
+			Logger.handleException(e, "An I/O exception occurred when creating the .ibdo file.");
+		}
+
 		for (int i = 0; i < this.cmdArgs.getNumberOfFamilies(); i++)
 		{
 			generateNuclearFamily(NKid[i], NAffKid[i], i);
 		}
+		ibdF.close();
 
 		writePheno();
 		
@@ -152,9 +162,16 @@ public final class SimuFamilyCommandImpl extends CommandImpl
 
 		for (int i = 0; i < nkid; i++)
 		{
-			generateBaby(p, m, famIdx, i + 2);
+			int[][] rc = generateBaby(p, m, famIdx, i + 2);
+			for (int j = 0; j < 2; j++)
+			{
+				for (int k = 0; k < rc.length; k++)
+				{
+					ibdF.print(rc[k][j] + " ");
+				}
+				ibdF.println();
+			}
 		}
-
 	}
 
 	private int[][] sampleChromosome(int famIdx, int shift)
@@ -186,7 +203,7 @@ public final class SimuFamilyCommandImpl extends CommandImpl
 		return v;
 	}
 
-	private void generateBaby(int[][] p, int[][] m, int famIdx, int shift)
+	private int[][] generateBaby(int[][] p, int[][] m, int famIdx, int shift)
 	{
 		int[][] v = new int[maf.length][2];
 		int[][] rc = new int[maf.length][2];
@@ -246,17 +263,8 @@ public final class SimuFamilyCommandImpl extends CommandImpl
 
 		phe[famIdx * famSize +shift] += v[qtlIdx[0]][0] * qtlEff[0][0] + v[qtlIdx[0]][1] * qtlEff[0][1];
 		phe[famIdx * famSize +shift] += v[qtlIdx[1]][0] * qtlEff[1][0] + v[qtlIdx[1]][1] * qtlEff[1][1];
-		
-		//print ibd
 
-//		for (int i = 0; i < 2; i++)
-//		{
-//			for (int j = 0; j < maf.length; j++)
-//			{
-//				System.out.print(rc[j][i] + " ");
-//			}
-//			System.out.println();
-//		}
+		return rc;
 	}
 
 	public void writePheno()
@@ -612,4 +620,6 @@ public final class SimuFamilyCommandImpl extends CommandImpl
 	private int[] qtlIdx = {5, 5};
 	private double[][] qtlEff = {{1, 1}, {1,1}};
 	private double[] h2 = {0.5, 0.5};
+	
+	PrintWriter ibdF = null;
 }
