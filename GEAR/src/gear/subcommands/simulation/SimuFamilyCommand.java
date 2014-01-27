@@ -34,6 +34,8 @@ public final class SimuFamilyCommand extends Command
 		options.addOption(OptionBuilder.withDescription(OPT_MAKE_BED_DESC).withLongOpt(OPT_MAKE_BED_LONG).create(OPT_MAKE_BED));
 
 		options.addOption(OptionBuilder.withDescription(OPT_LD_DESC).withLongOpt(OPT_LD_LONG).hasArg().create(OPT_LD));
+		options.addOption(OptionBuilder.withDescription(OPT_MAF_DESC).hasArg().create(OPT_MAF));
+		options.addOption(OptionBuilder.withDescription(OPT_MAF_RAND_DESC).withLongOpt(OPT_MAF_RAND_LONG).create(OPT_MAF_RAND));
 		options.addOption(OptionBuilder.withDescription(OPT_REC_DESC).withLongOpt(OPT_REC_LONG).hasArg().create(OPT_REC));
 		options.addOption(OptionBuilder.withDescription(OPT_REC_SEX_DESC).withLongOpt(OPT_REC_SEX_LONG).hasArg().create(OPT_REC_SEX));
 		options.addOption(OptionBuilder.withDescription(OPT_REC_RAND_DESC).withLongOpt(OPT_REC_RAND_LONG).create(OPT_REC_RAND));
@@ -49,10 +51,12 @@ public final class SimuFamilyCommand extends Command
 		parseNumberOfMarkers(cmdArgs, cmdLine);
 		parseSeed(cmdArgs, cmdLine);
 		parseLD(cmdArgs, cmdLine);
+		parseMAF(cmdArgs, cmdLine);
 		parseRec(cmdArgs, cmdLine);
 		parseRecSex(cmdArgs, cmdLine);
 		cmdArgs.setQTLFile(cmdLine.getOptionValue(OPT_QTL));
 		cmdArgs.setRecRandFlag(cmdLine.hasOption(OPT_REC_RAND));
+		cmdArgs.setMAFRandFlag(cmdLine.hasOption(OPT_MAF_RAND));
 		cmdArgs.setRecSexFlag(cmdLine.hasOption(OPT_REC_SEX));
 		cmdArgs.setMakeBed(cmdLine.hasOption(OPT_MAKE_BED));
 		return cmdArgs;
@@ -204,6 +208,31 @@ public final class SimuFamilyCommand extends Command
 		cmdArgs.setLD(l);
 	}
 
+	private void parseMAF(SimuFamilyCommandArguments cmdArgs, CommandLine cmdLine) throws CommandArgumentException
+	{
+		double maf = 0;
+		
+		if (cmdLine.hasOption(OPT_MAF))
+		{
+			try
+			{
+				maf = Double.parseDouble(cmdLine.getOptionValue(OPT_MAF));
+			}
+			catch (NumberFormatException e)
+			{
+			}
+
+			if (maf < 0 || maf > 1)
+			{
+				String msg = "";
+				msg += "The value of --" + OPT_LD + "is invalid: '";
+				msg += cmdLine.getOptionValue(OPT_LD) + "' is not a valid between 0 and 1.";
+				throw new CommandArgumentException(msg);
+			}			
+		}
+		cmdArgs.setMAF(maf);
+	}
+
 	@Override
 	protected CommandImpl createCommandImpl()
 	{
@@ -230,6 +259,13 @@ public final class SimuFamilyCommand extends Command
 	private static final String OPT_LD_LONG = "ld";
 	private static final String OPT_LD_DESC = "Specify the ld (Lewontin's DPrime)";
 
+	private static final String OPT_MAF = "maf";
+	private static final String OPT_MAF_DESC = "Specify the minor allele frequency";
+	
+	private static final String OPT_MAF_RAND = "mr";
+	private static final String OPT_MAF_RAND_LONG = "maf-rand";
+	private static final String OPT_MAF_RAND_DESC = "Use uniform distribution for MAF";
+
 	private static final char OPT_REC = 'r';
 	private static final String OPT_REC_LONG = "rec";
 	private static final String OPT_REC_DESC = "Specify the recombination fraction";
@@ -240,7 +276,7 @@ public final class SimuFamilyCommand extends Command
 
 	private static final String OPT_REC_RAND = "rr";
 	private static final String OPT_REC_RAND_LONG = "rec-rand";
-	private static final String OPT_REC_RAND_DESC = "Use uniformly distributed recombination fractions beween (0~0.5)";
+	private static final String OPT_REC_RAND_DESC = "Use uniform distribution recombination fractions beween (0~0.5)";
 
 	private static final String OPT_QTL = "q";
 	private static final String OPT_QTL_LONG = "qtl";

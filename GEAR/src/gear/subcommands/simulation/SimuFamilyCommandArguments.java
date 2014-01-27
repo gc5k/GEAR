@@ -49,6 +49,16 @@ public final class SimuFamilyCommandArguments extends CommandArguments
 		return recRandFlag;
 	}
 
+	public void setMAFRandFlag(boolean f)
+	{
+		this.mafFlag = f;
+	}
+
+	public boolean isMAFRand()
+	{
+		return mafFlag;
+	}
+	
 	public void setRecRandFlag(boolean f)
 	{
 		this.recRandFlag = f;
@@ -62,6 +72,16 @@ public final class SimuFamilyCommandArguments extends CommandArguments
 	public void setLD(double l)
 	{
 		this.ld = l;
+	}
+
+	public double getMAF()
+	{
+		return maf;
+	}
+
+	public void setMAF(double m)
+	{
+		this.maf = m;
 	}
 
 	public double getRec()
@@ -109,6 +129,8 @@ public final class SimuFamilyCommandArguments extends CommandArguments
 	private int numMarkers;
 	private Long seed = Long.valueOf(2013);
 	private boolean makeBed;
+	private double maf = 0.5;
+	private boolean mafFlag = false;
 	private double ld = 0;
 	private double rec = 0.5;
 	private boolean recSexFlag = false;

@@ -93,11 +93,20 @@ public final class SimuFamilyCommandImpl extends CommandImpl
 		Arrays.fill(NKid, 2);
 		NAffKid = new int[cmdArgs.getNumberOfFamilies()];
 		Arrays.fill(NAffKid, 1);
-
-		
+	
 		maf = new double[cmdArgs.getNumberOfMarkers()];
-		Arrays.fill(maf, 0.5);
-		
+		if (cmdArgs.isMAFRand())
+		{
+			for (int i = 0; i < maf.length; i++)
+			{
+				maf[i] = rnd.nextUniform(0.01, 0.5);
+			}
+		}
+		else
+		{
+			Arrays.fill(maf, cmdArgs.getMAF());			
+		}
+
 		DPrime = new double[cmdArgs.getNumberOfMarkers() - 1];
 		Arrays.fill(DPrime, cmdArgs.getLD());
 
