@@ -6,6 +6,7 @@ import java.io.PrintStream;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
+import java.util.TreeSet;
 
 import org.apache.commons.math.random.RandomDataImpl;
 
@@ -307,26 +308,74 @@ public class RealCheck
 
 	private void getCommonSNP(ArrayList<SNP> snplist1, ArrayList<SNP> snplist2)
 	{
-		HashMap<String, Boolean> SNPMap = NewIt.newHashMap();
+		HashMap<String, Boolean> SNPMap1 = NewIt.newHashMap();
+		TreeSet<String> DupSNP1 = NewIt.newTreeSet();
 		for (int i = 0; i < snplist1.size(); i++)
 		{
 			SNP snp = snplist1.get(i);
-			SNPMap.put(snp.getName(), false);
+			if(SNPMap1.containsKey(snp.getName())) // removed duplicated snps
+			{
+				SNPMap1.remove(snp.getName());
+				DupSNP1.add(snp.getName());
+			}
+			else
+			{
+				SNPMap1.put(snp.getName(), false);
+			}
+		}
+
+		if (DupSNP1.size() > 0)
+		{
+			Logger.printUserLog(DupSNP1.size() + " SNPs with duplicated ID in bfile will not be used in real-check.");
+		}
+		if (SNPMap1.size() == 0)
+		{
+			Logger.printUserLog("No SNPs left for real-check.");
+			Logger.printUserLog("GEAR quited.");
+			System.exit(1);
+		}
+
+		HashMap<String, Integer> SNPMap2 = NewIt.newHashMap();
+		TreeSet<String> DupSNP2 = NewIt.newTreeSet();
+		for (int i = 0; i < snplist2.size(); i++)
+		{
+			SNP snp = snplist2.get(i);
+			if(SNPMap2.containsKey(snp.getName())) //removed duplicated snps
+			{
+				SNPMap2.remove(snp.getName());
+				DupSNP2.add(snp.getName());
+			}
+			else
+			{
+				SNPMap2.put(snp.getName(), i);
+			}
+		}
+
+		if (DupSNP2.size() > 0)
+		{
+			Logger.printUserLog(DupSNP2.size() + " SNPs with duplicated ID in bfile2 will not be used in real-check.");
+		}
+		if (SNPMap2.size() == 0)
+		{
+			Logger.printUserLog("No SNPs left for real-check.");
+			Logger.printUserLog("GEAR quited.");
+			System.exit(1);
 		}
 
 		int c = 0;
 		int ATGC = 0;
 		HashMap<String, Integer> SNPMapList2 = NewIt.newHashMap();
-		for (int i = 0; i < snplist2.size(); i++)
+		for (String key : SNPMap2.keySet())
 		{
-			SNP snp = snplist2.get(i);
-			String snp_name = snp.getName();
-			if (SNPMap.containsKey(snp_name))
+			String snp_name = key;
+			int snpIdx = SNPMap2.get(key).intValue();
+			SNP snp = snplist2.get(snpIdx);
+			if (SNPMap1.containsKey(snp_name))
 			{
 				if (!SNPMatch.isAmbiguous(snp.getFirstAllele(), snp.getSecAllele())) 
 				{
-					SNPMap.put(snp_name, true);
-					SNPMapList2.put(snp_name, i);
+					SNPMap1.put(snp_name, true);
+					SNPMapList2.put(snp_name, snpIdx);
 					c++;
 				}
 				else 
@@ -357,12 +406,15 @@ public class RealCheck
 		{
 			SNP snp = snplist1.get(i);
 			String snp_name = snp.getName();
-			if (SNPMap.get(snp_name).booleanValue())
+			if (SNPMap1.containsKey(snp_name))
 			{
-				comSNPIdxMap.put(snp.getName(), idx1);
-				comSNPIdx[0][idx1] = i;
-				comSNPIdx[1][idx1] = SNPMapList2.get(snp_name).intValue();
-				idx1++;
+				if (SNPMap1.get(snp_name).booleanValue())
+				{
+					comSNPIdxMap.put(snp.getName(), idx1);
+					comSNPIdx[0][idx1] = i;
+					comSNPIdx[1][idx1] = SNPMapList2.get(snp_name).intValue();
+					idx1++;
+				}
 			}
 		}
 	}
