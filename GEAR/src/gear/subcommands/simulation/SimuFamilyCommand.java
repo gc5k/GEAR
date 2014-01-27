@@ -65,15 +65,23 @@ public final class SimuFamilyCommand extends Command
 	private void parseNumberOfFamilies(SimuFamilyCommandArguments cmdArgs, CommandLine cmdLine) throws CommandArgumentException
 	{
 		int numFams = 0;
+		boolean throwException = false;
+		
 		try
 		{
 			numFams = Integer.parseInt(cmdLine.getOptionValue(OPT_NUM_FAMS));
 		}
 		catch (NumberFormatException e)
 		{
+			throwException = true;
 		}
 		
 		if (numFams <= 0)
+		{
+			throwException = true;
+		}
+		
+		if (throwException)
 		{
 			String msg = "";
 			msg += "The value of --" + OPT_NUM_FAMS_LONG + "is invalid: '";
@@ -87,6 +95,7 @@ public final class SimuFamilyCommand extends Command
 	private void parseNumberOfMarkers(SimuFamilyCommandArguments cmdArgs, CommandLine cmdLine) throws CommandArgumentException
 	{
 		int numMarkers = 0;
+		boolean throwException = false;
 		
 		try
 		{
@@ -94,12 +103,18 @@ public final class SimuFamilyCommand extends Command
 		}
 		catch (NumberFormatException e)
 		{
+			throwException = true;
 		}
 		
 		if (numMarkers <= 0)
 		{
+			throwException = true;
+		}
+		
+		if (throwException)
+		{
 			String msg = "";
-			msg += "The value of --" + OPT_NUM_MARKERS_LONG + "is invalid: '";
+			msg += "The value of --" + OPT_NUM_MARKERS_LONG + " is invalid: '";
 			msg += cmdLine.getOptionValue(OPT_NUM_MARKERS) + "' is not a valid positive integer.";
 			throw new CommandArgumentException(msg);
 		}
@@ -128,7 +143,9 @@ public final class SimuFamilyCommand extends Command
 	private void parseRec(SimuFamilyCommandArguments cmdArgs, CommandLine cmdLine) throws CommandArgumentException
 	{
 		double r = 0.5;
-		if(cmdLine.hasOption(OPT_REC))
+		boolean throwException = false;
+		
+		if (cmdLine.hasOption(OPT_REC))
 		{
 			try
 			{
@@ -136,15 +153,21 @@ public final class SimuFamilyCommand extends Command
 			}
 			catch (NumberFormatException e)
 			{
+				throwException = true;
 			}
 
 			if (r < 0 || r > 0.5)
 			{
+				throwException = true;
+			}
+			
+			if (throwException)
+			{
 				String msg = "";
-				msg += "The value of --" + OPT_REC_LONG + "is invalid: '";
-				msg += cmdLine.getOptionValue(OPT_REC) + "' is not a valid number between 0 and 0.5.";
+				msg += "The value of --" + OPT_REC_LONG + " is invalid: '";
+				msg += cmdLine.getOptionValue(OPT_REC) + "' is not a valid real number between 0 and 0.5.";
 				throw new CommandArgumentException(msg);
-			}			
+			}
 		}
 		cmdArgs.setRec(r);
 	}
@@ -152,10 +175,12 @@ public final class SimuFamilyCommand extends Command
 	private void parseRecSex(SimuFamilyCommandArguments cmdArgs, CommandLine cmdLine) throws CommandArgumentException
 	{
 		double[] rs = {0.5, 0.5};
+		
 		if(cmdLine.hasOption(OPT_REC_SEX))
 		{
 			try
 			{
+				// TODO: Apache CLI should have its own routine to receive multiple arguments instead of split(",")
 				String[] s = cmdLine.getOptionValue(OPT_REC_SEX).split(",");
 				rs[0] = Double.parseDouble(s[0]);
 				rs[1] = Double.parseDouble(s[1]);
@@ -186,6 +211,7 @@ public final class SimuFamilyCommand extends Command
 	private void parseLD(SimuFamilyCommandArguments cmdArgs, CommandLine cmdLine) throws CommandArgumentException
 	{
 		double l = 0;
+		boolean throwException = false;
 		
 		if (cmdLine.hasOption(OPT_LD))
 		{
@@ -195,15 +221,21 @@ public final class SimuFamilyCommand extends Command
 			}
 			catch (NumberFormatException e)
 			{
+				throwException = true;
 			}
 
 			if (l < 0 || l > 1)
 			{
+				throwException = true;
+			}
+			
+			if (throwException)
+			{
 				String msg = "";
-				msg += "The value of --" + OPT_LD + "is invalid: '";
-				msg += cmdLine.getOptionValue(OPT_LD) + "' is not a valid between 0 and 1.";
+				msg += "The value of --" + OPT_LD + " is invalid: '";
+				msg += cmdLine.getOptionValue(OPT_LD) + "' is not a valid real number between 0 and 1.";
 				throw new CommandArgumentException(msg);
-			}			
+			}
 		}
 		cmdArgs.setLD(l);
 	}
@@ -211,6 +243,7 @@ public final class SimuFamilyCommand extends Command
 	private void parseMAF(SimuFamilyCommandArguments cmdArgs, CommandLine cmdLine) throws CommandArgumentException
 	{
 		double maf = 0;
+		boolean throwException = false;
 		
 		if (cmdLine.hasOption(OPT_MAF_LONG))
 		{
@@ -220,15 +253,21 @@ public final class SimuFamilyCommand extends Command
 			}
 			catch (NumberFormatException e)
 			{
+				throwException = true;
 			}
 
 			if (maf < 0 || maf > 1)
 			{
+				throwException = true;
+			}
+			
+			if (throwException)
+			{
 				String msg = "";
-				msg += "The value of --" + OPT_MAF_LONG + "is invalid: '";
-				msg += cmdLine.getOptionValue(OPT_MAF_LONG) + "' is not a valid between 0 and 1.";
+				msg += "The value of --" + OPT_MAF_LONG + " is invalid: '";
+				msg += cmdLine.getOptionValue(OPT_MAF_LONG) + "' is not a valid real number between 0 and 1.";
 				throw new CommandArgumentException(msg);
-			}			
+			}
 		}
 		cmdArgs.setMAF(maf);
 	}
