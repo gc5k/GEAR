@@ -225,8 +225,8 @@ public final class SimuFamilyCommand extends Command
 			if (maf < 0 || maf > 1)
 			{
 				String msg = "";
-				msg += "The value of --" + OPT_LD + "is invalid: '";
-				msg += cmdLine.getOptionValue(OPT_LD) + "' is not a valid between 0 and 1.";
+				msg += "The value of --" + OPT_MAF + "is invalid: '";
+				msg += cmdLine.getOptionValue(OPT_MAF) + "' is not a valid between 0 and 1.";
 				throw new CommandArgumentException(msg);
 			}			
 		}
