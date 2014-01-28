@@ -10,6 +10,9 @@ import java.util.Arrays;
 import java.util.HashSet;
 import java.util.Iterator;
 
+import org.apache.commons.math.MathException;
+import org.apache.commons.math.random.RandomDataImpl;
+
 import gear.CmdArgs;
 import gear.ConstValues;
 import gear.data.SubjectID;
@@ -32,6 +35,7 @@ public class WriteBedSNPMajor
 	private DataOutputStream os = null;
 	private ArrayList<SNP> snpList;
 	private ArrayList<Boolean> keepLoci = NewIt.newArrayList();
+	private RandomDataImpl rd = new RandomDataImpl();
 
 	public WriteBedSNPMajor()
 	{
@@ -60,6 +64,8 @@ public class WriteBedSNPMajor
 
 		snpList = pp.getMapData().getMarkerList();
 		PersonTable = sf.getSample();
+		rd.reSeed(CmdArgs.INSTANCE.simuSeed);
+
 	}
 
 	public WriteBedSNPMajor(ArrayList<PersonIndex> pt, ArrayList<SNP> sl)
@@ -271,6 +277,18 @@ public class WriteBedSNPMajor
 					BPerson bp = pi.getPerson();
 					byte g = bp.getOriginalGenotypeScore(posByte, posBit);
 
+					if (CmdArgs.INSTANCE.zerogenoFlag)
+					{
+						try
+						{
+							g = rd.nextBinomial(1, CmdArgs.INSTANCE.zerogeno) == 1 ? ConstValues.PLINK_MISSING_GENOTYPE:g;
+						}
+						catch (MathException e)
+						{
+							// TODO Auto-generated catch block
+							e.printStackTrace();
+						}
+					}
 					g <<= 2 * idx;
 					gbyte |= g;
 					idx++;

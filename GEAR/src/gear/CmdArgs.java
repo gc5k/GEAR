@@ -201,6 +201,8 @@ public enum CmdArgs
 						.withDescription("order individuals ").hasArg().create(cmd_order_ind));
 		ops.addOption(OptionBuilder.withLongOpt(cmd_remove_atgc_long)
 						.withDescription("remove atgc loci ").create(cmd_remove_atgc));
+		ops.addOption(OptionBuilder.withLongOpt(cmd_zero_geno_long)
+						.withDescription("set missing genotypes ").hasArg().create(cmd_zero_geno));
 
 		// grm-stat
 		ops.addOption(OptionBuilder.withLongOpt(cmd_grm_stat_long)
@@ -1235,6 +1237,11 @@ public enum CmdArgs
 	private final String cmd_remove_atgc_long = "remove-atgc";
 	public boolean removeatgcFlag = false;
 
+	private final String cmd_zero_geno = "zero_geno";
+	private final String cmd_zero_geno_long = "zero-geno";
+	public double zerogeno = -1;
+	public boolean zerogenoFlag = false;
+
 	/*
 	 * private final String cmd_ex_ind = "exind"; public String[][] ex_ind =
 	 * null; private final String cmd_ex_ind_file = "exindfile"; public boolean
@@ -1409,6 +1416,18 @@ public enum CmdArgs
 		{
 			removeatgcFlag = true;
 		}
+		
+		if (cmdLine.hasOption(cmd_zero_geno))
+		{
+			zerogeno = Double.parseDouble(cmdLine.getOptionValue(cmd_zero_geno));
+			zerogenoFlag = true;
+			if (zerogeno < 0 || zerogeno >1)
+			{
+				Logger.printUserLog("missing rate for genotype should be between 0 and 1.");
+				System.exit(1);
+			}
+		}
+
 		// ibd
 		if (cmdLine.hasOption(cmd_quickibd))
 		{
@@ -1463,6 +1482,7 @@ public enum CmdArgs
 			if(dog_alpha < 0 || dog_alpha >= 1.0)
 			{
 				Logger.printUserLog("dog alpha should be between 0 and 1.");
+				System.exit(1);
 			}
 		}
 
@@ -1472,6 +1492,7 @@ public enum CmdArgs
 			if(dog_beta < 0 || dog_beta >= 1.0)
 			{
 				Logger.printUserLog("dog beta should be between 0 and 1.");
+				System.exit(1);
 			}
 		}
 		
@@ -1481,6 +1502,7 @@ public enum CmdArgs
 			if (dog_tests < 1)
 			{
 				Logger.printUserLog("dog tests should not be less than 1.");
+				System.exit(1);
 			}
 		}
 
@@ -1490,6 +1512,7 @@ public enum CmdArgs
 			if (dog_h2 < 0 || dog_h2 > 1)
 			{
 				Logger.printUserLog("dog h2 should be between 0 and 1.");
+				System.exit(1);
 			}
 		}
 
