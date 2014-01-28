@@ -8,6 +8,7 @@ import gear.subcommands.Command;
 import gear.subcommands.CommandArgumentException;
 import gear.subcommands.CommandArguments;
 import gear.subcommands.CommandImpl;
+import gear.util.Logger;
 
 public final class SimuFamilyCommand extends Command
 {
@@ -182,6 +183,11 @@ public final class SimuFamilyCommand extends Command
 			{
 				// TODO: Apache CLI should have its own routine to receive multiple arguments instead of split(",")
 				String[] s = cmdLine.getOptionValue(OPT_REC_SEX).split(",");
+				if (s.length < 2)
+				{
+					Logger.printUserLog("The value of --" + OPT_REC_SEX_LONG + " should take two values.");
+					System.exit(0);
+				}
 				rs[0] = Double.parseDouble(s[0]);
 				rs[1] = Double.parseDouble(s[1]);
 			}
