@@ -17,6 +17,8 @@ public class ConstValues
 	public static final int BINARY_HOMOZYGOTYE_SECOND = 0x2;
 	public static final int BINARY_MISSING_GENOTYPE = 0x3;
 	
+	public static final byte PLINK_MISSING_GENOTYPE = 1;
+
 	public static final char MISSING_ALLELE_CHAR = '0';
 	public static final String MISSING_ALLELE_STRING = "0";
 	
