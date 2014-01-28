@@ -185,7 +185,7 @@ public final class SimuFamilyCommand extends Command
 				String[] s = cmdLine.getOptionValue(OPT_REC_SEX).split(",");
 				if (s.length < 2)
 				{
-					Logger.printUserLog("The value of --" + OPT_REC_SEX_LONG + " should take two values.");
+					Logger.printUserError("The value of --" + OPT_REC_SEX_LONG + " should take two values.");
 					System.exit(0);
 				}
 				rs[0] = Double.parseDouble(s[0]);
