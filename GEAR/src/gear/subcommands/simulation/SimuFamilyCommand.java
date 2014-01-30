@@ -122,7 +122,7 @@ public final class SimuFamilyCommand extends Command
 		
 		cmdArgs.setNumberOfMarkers(numMarkers);
 	}
-	
+
 	private void parseSeed(SimuFamilyCommandArguments cmdArgs, CommandLine cmdLine) throws CommandArgumentException
 	{
 		if (cmdLine.hasOption(OPT_SEED))
@@ -145,7 +145,7 @@ public final class SimuFamilyCommand extends Command
 	{
 		double r = 0.5;
 		boolean throwException = false;
-		
+
 		if (cmdLine.hasOption(OPT_REC))
 		{
 			try
@@ -248,7 +248,7 @@ public final class SimuFamilyCommand extends Command
 
 	private void parseMAF(SimuFamilyCommandArguments cmdArgs, CommandLine cmdLine) throws CommandArgumentException
 	{
-		double maf = 0;
+		double maf = 0.5;
 		boolean throwException = false;
 		
 		if (cmdLine.hasOption(OPT_MAF_LONG))
