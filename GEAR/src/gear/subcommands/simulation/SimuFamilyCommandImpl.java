@@ -17,6 +17,7 @@ import java.util.Arrays;
 
 import org.apache.commons.math.MathException;
 import org.apache.commons.math.random.RandomDataImpl;
+import org.apache.commons.math.stat.StatUtils;
 
 public final class SimuFamilyCommandImpl extends CommandImpl
 {
@@ -177,27 +178,32 @@ public final class SimuFamilyCommandImpl extends CommandImpl
 	private int[][] sampleChromosome(int famIdx, int shift)
 	{
 		int[][] v = new int[maf.length][2];
-		for (int i = 0; i < maf.length; i++)
+		for (int i = 0; i < 2; i++)
 		{
-			for (int j = 0; j < 2; j++)
+			for (int j = 0; j < maf.length; j++)
 			{
 				double r = rnd.nextUniform(0, 1);
-				if (i == 0)
+				if (j == 0)
 				{
-					v[i][j] = r < maf[i] ? 0 : 1;
+					v[j][i] = r < maf[j] ? 0 : 1;
 				}
 				else
 				{
 					double d = rnd.nextUniform(0, 1);
-					int a = (int) v[i - 1][j];
-					double f1 = a == 0 ? maf[i - 1] : (1 - maf[i - 1]);
-					double f2 = a == 0 ? maf[i] : (1 - maf[i]);
-					v[i][j] = d < (f1 * f2 + LD[i - 1]) / f1 ? v[i - 1][j]
-							: (1 - v[i - 1][j]);
+					int a = (int) v[j - 1][i];
+					double f1 = a == 0 ? maf[j - 1] : (1 - maf[j - 1]);
+					double f2 = a == 0 ? maf[j] : (1 - maf[j]);
+					v[j][i] = d < (f1 * f2 + LD[j - 1]) / f1 ? v[j - 1][i]
+							: (1 - v[j - 1][i]);
 				}
 			}
+		}
+		
+		for (int i = 0; i < maf.length; i++)
+		{
 			gm[famIdx * famSize + shift][i] = v[i][0] + v[i][1];
 		}
+
 		phe[famIdx * famSize + shift] += v[qtlIdx[0]][0] * qtlEff[0][0] + v[qtlIdx[0]][1] * qtlEff[0][1];
 		phe[famIdx * famSize + shift] += v[qtlIdx[1]][0] * qtlEff[1][0] + v[qtlIdx[1]][1] * qtlEff[1][1];
 		return v;
@@ -278,20 +284,34 @@ public final class SimuFamilyCommandImpl extends CommandImpl
 		{
 			Logger.handleException(e, "An I/O exception occurred when creating the .phe file.");
 		}
+
+		double [] p = new double[cmdArgs.getNumberOfFamilies() * famSize];
+		int cn=0;
 		
+		for (int h = 0; h < cmdArgs.getNumberOfFamilies(); h++)
+		{
+			for (int j = 0; j < famSize; j++)
+			{
+				p[cn++] = phe[h*famSize+j];
+			}
+		}
+		double vb = StatUtils.variance(p);
+		double ve = vb * (1-h2[0]) / h2[0];
 		for (int h = 0; h < cmdArgs.getNumberOfFamilies(); h++)
 		{
 			int fid = (h + 1) * 10000;
 			
 			for (int j = 0; j < famSize; j++)
 			{
+				double pv = phe[h*famSize+j] + rnd.nextGaussian(0, Math.sqrt(ve));
 				int pid = fid + 1 + j;
 
 				pheno.print(fid + " ");
 				pheno.print(pid + " ");
-				pheno.println(phe[h*famSize + j]);
+				pheno.println(pv);
 			}
 		}
+
 		pheno.close();
 	}
 
