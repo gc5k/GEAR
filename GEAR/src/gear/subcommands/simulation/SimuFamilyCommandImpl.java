@@ -285,14 +285,17 @@ public final class SimuFamilyCommandImpl extends CommandImpl
 			Logger.handleException(e, "An I/O exception occurred when creating the .phe file.");
 		}
 
-		double [] p = new double[cmdArgs.getNumberOfFamilies() * famSize];
+		double [] p = new double[cmdArgs.getNumberOfFamilies() * 2];
 		int cn=0;
 		
 		for (int h = 0; h < cmdArgs.getNumberOfFamilies(); h++)
 		{
 			for (int j = 0; j < famSize; j++)
 			{
-				p[cn++] = phe[h*famSize+j];
+				if(j < 2)
+				{
+					p[cn++] = phe[h*famSize+j];
+				}
 			}
 		}
 		double vb = StatUtils.variance(p);
