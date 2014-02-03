@@ -303,7 +303,7 @@ public final class SimuFamilyCommandImpl extends CommandImpl
 		for (int h = 0; h < cmdArgs.getNumberOfFamilies(); h++)
 		{
 			int fid = (h + 1) * 10000;
-			
+
 			for (int j = 0; j < famSize; j++)
 			{
 				double pv = phe[h*famSize+j] + rnd.nextGaussian(0, Math.sqrt(ve));

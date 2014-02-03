@@ -280,7 +280,7 @@ public class ParentIBD
 	 */
 	private double[] quickIBD(int fg, int mg, int kg1, int kg2) 
 	{
-		double[] ibd = {0, 0};
+		double[] ibd = {0.5, 0.5};
 		if (fg == 3 || mg == 3 || kg1 == 3 || kg2 ==3)
 		{
 			return ibd;
@@ -317,11 +317,11 @@ public class ParentIBD
 			{
 				if (fg == 1)
 				{
-					ibd[0] = -1; 
+					ibd[0] = 0; 
 				}
 				else if (mg == 1)
 				{
-					ibd[1] = -1;
+					ibd[1] = 0;
 				}
 			}
 		}
@@ -340,8 +340,8 @@ public class ParentIBD
 			}
 			else if ( Math.abs(kg1 - kg2 ) == 2)
 			{
-				ibd[0] = -1;
-				ibd[1] = -1;
+				ibd[0] = 0;
+				ibd[1] = 0;
 			}
 		}
 		return ibd;
