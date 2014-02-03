@@ -164,10 +164,10 @@ public class ParentIBD
 		int idx0 = 0;
 		int idx1 = 0;
 		boolean end = false;
-		if (ibd[0][pidx]==0)
+		if (ibd[0][pidx]==0.5)
 		{
 			//find the first nonzero
-			while (ibd[idx0][pidx] == 0)
+			while (ibd[idx0][pidx] == 0.5)
 			{
 				idx0++;
 				if (idx0 == ibd.length)
@@ -188,7 +188,7 @@ public class ParentIBD
 		//find the first zero
 		if (!end)
 		{
-			while (ibd[idx0][pidx] != 0)
+			while (ibd[idx0][pidx] != 0.5)
 			{
 				idx0++;
 				if (idx0 == ibd.length)
@@ -204,7 +204,7 @@ public class ParentIBD
 		while (!end)
 		{
 			//right boundary first nonzero
-			while (ibd[idx1][pidx]==0)
+			while (ibd[idx1][pidx]==0.5)
 			{
 				idx1++;
 				if (idx1 == ibd.length)
@@ -231,7 +231,7 @@ public class ParentIBD
 			}
 
 			//left boundary first zero
-			while(ibd[idx1][pidx]!=0)
+			while(ibd[idx1][pidx]!=0.5)
 			{
 				idx1++;
 				if(idx1 == ibd.length)
@@ -245,11 +245,11 @@ public class ParentIBD
 		}
 
 		
-		if(ibd[ibd.length-1][pidx] == 0)
+		if(ibd[ibd.length-1][pidx] == 0.5)
 		{
 			boolean head = false;
 			idx0 = ibd.length-1;
-			while(ibd[idx0][pidx]==0)
+			while(ibd[idx0][pidx]==0.5)
 			{
 				idx0--;
 				if (idx0 == 0)
