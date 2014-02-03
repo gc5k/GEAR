@@ -275,7 +275,7 @@ public class ParentIBD
 	 * @param kg1 kid1's genotype
 	 * @param kg2 kid2's genotype
 	 * @return a two-element array indicating whether the two allele
-	 * pairs are IBD, where -1 stands for non-IBD, 0 stands for unknown,
+	 * pairs are IBD, where 0 stands for non-IBD, 0.5 stands for unknown,
 	 * and 1 stands for IBD. 
 	 */
 	private double[] quickIBD(int fg, int mg, int kg1, int kg2) 
