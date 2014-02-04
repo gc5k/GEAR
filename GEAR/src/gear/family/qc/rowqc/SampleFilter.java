@@ -7,13 +7,13 @@ import java.util.Iterator;
 
 import gear.CmdArgs;
 import gear.ConstValues;
-import gear.data.FamilySet;
+import gear.data.Person;
+import gear.data.Family;
+import gear.data.UniqueRecordSet;
 import gear.family.pedigree.Hukou;
 import gear.family.pedigree.PersonIndex;
 import gear.family.pedigree.file.MapFile;
 import gear.family.pedigree.file.PedigreeFile;
-import gear.family.pedigree.genotype.BFamilyStruct;
-import gear.family.pedigree.genotype.BPerson;
 import gear.util.FileUtil;
 import gear.util.Logger;
 import gear.util.NewIt;
@@ -70,42 +70,41 @@ public class SampleFilter
 	{
 		ArrayList<Hukou> hukoubook = PedData.getHukouBook();
 		HukouBook = NewIt.newArrayList();
-		FamilySet familySet = PedData.getFamilySet();
-		num_qualified = new int[familySet.size()][2];
-		filter = new boolean[familySet.size()][];
+		UniqueRecordSet<Family> families = PedData.getFamilies();
+		num_qualified = new int[families.size()][2];
+		filter = new boolean[families.size()][];
 
 		for (Iterator<Hukou> e = hukoubook.iterator(); e.hasNext();)
 		{
 			Hukou hukou = e.next();
-			BFamilyStruct fs = familySet.getFamily(hukou.getFamilyID());
-			BPerson per = fs.getPerson(hukou.getIndividualID());
+			Family family = families.get(hukou.getFamilyID());
+			Person per = family.getPerson(hukou.getIndividualID());
 			boolean hf = hardFilter(per);
 			hukou.setAvailable(hf);
 			if (!hf)
 			{
 				continue;
 			}
-			boolean isFounder = fs.hasAncestor(per);
+			boolean isFounder = family.hasAncestor(per);
 			HukouBook.add(hukou);
 			PersonTable.add(new PersonIndex(per.getFamilyID(), per
 					.getPersonID(), per, false, isFounder));
 		}
 
-		num_qualified = new int[familySet.size()][2];
-		filter = new boolean[familySet.size()][];
+		num_qualified = new int[families.size()][2];
+		filter = new boolean[families.size()][];
 		int c = 0;
-		for (String fi : PedData.getFamListSorted())
+		for (int familyIdx = 0; familyIdx < families.size(); ++familyIdx)
 		{
-			BFamilyStruct fs = familySet.getFamily(fi);
-			String[] pi = fs.getPersonListSorted();
-			filter[c] = new boolean[pi.length];
+			Family family = families.get(familyIdx);
+			filter[c] = new boolean[family.size()];
 
 			// filter_family
 
 			int cc = 0;
-			for (int i = 0; i < pi.length; i++)
+			for (int personIdx = 0; personIdx < family.size(); ++personIdx)
 			{
-				BPerson per = fs.getPerson(pi[i]);
+				Person per = family.getPerson(personIdx);
 				boolean hf = hardFilter(per);
 				if (!hf)
 				{
@@ -114,7 +113,7 @@ public class SampleFilter
 				}
 
 				filter[c][cc++] = hf;
-				boolean isFounder = fs.hasAncestor(per);
+				boolean isFounder = family.hasAncestor(per);
 				if (isFounder)
 				{
 					num_qualified[c][1]++;
@@ -133,7 +132,7 @@ public class SampleFilter
 		}
 	}
 
-	protected boolean hardFilter(BPerson p)
+	protected boolean hardFilter(Person p)
 	{
 		boolean flag = true;
 

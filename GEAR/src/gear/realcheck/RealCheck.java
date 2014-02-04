@@ -12,9 +12,9 @@ import org.apache.commons.math.random.RandomDataImpl;
 
 import gear.CmdArgs;
 import gear.ConstValues;
+import gear.data.Person;
 import gear.family.pedigree.PersonIndex;
 import gear.family.pedigree.file.SNP;
-import gear.family.pedigree.genotype.BPerson;
 import gear.family.plink.PLINKBinaryParser;
 import gear.family.plink.PLINKParser;
 import gear.family.popstat.GenotypeMatrix;
@@ -202,8 +202,8 @@ public class RealCheck
 
 			int g1 = G1.getAdditiveScore(idx1, comSNPIdx[0][idx]);
 			int g2 = G2.getAdditiveScore(idx2, comSNPIdx[1][idx]);
-			if (g1 == BPerson.MissingGenotypeCode
-					|| g2 == BPerson.MissingGenotypeCode)
+			if (g1 == Person.MissingGenotypeCode
+					|| g2 == Person.MissingGenotypeCode)
 				continue;
 			if ( snpMatch[i] ) 
 			{

@@ -3,8 +3,8 @@ package gear.family.popstat;
 import java.util.ArrayList;
 
 import gear.CmdArgs;
+import gear.data.Person;
 import gear.family.pedigree.PersonIndex;
-import gear.family.pedigree.genotype.BPerson;
 
 public class GenotypeMatrix
 {
@@ -141,8 +141,8 @@ public class GenotypeMatrix
 			b[1] = 1;
 			break;
 		default:
-			b[0] = BPerson.MissingAlleleCode;
-			b[1] = BPerson.MissingAlleleCode;
+			b[0] = Person.MissingAlleleCode;
+			b[1] = Person.MissingAlleleCode;
 			break;
 		}
 		return b;

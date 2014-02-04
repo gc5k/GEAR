@@ -12,9 +12,9 @@ import java.util.Set;
 
 import gear.CmdArgs;
 import gear.ConstValues;
+import gear.data.Person;
 import gear.family.pedigree.PersonIndex;
 import gear.family.pedigree.file.MapFile;
-import gear.family.pedigree.genotype.BPerson;
 import gear.family.plink.PLINKBinaryParser;
 import gear.family.plink.PLINKParser;
 import gear.family.popstat.GenotypeMatrix;
@@ -109,7 +109,7 @@ public class Inbreeding
 					maf[j]++;
 					mafGroup[j][idx]++;
 				}
-				if (c[1] != BPerson.MissingAlleleCode)
+				if (c[1] != Person.MissingAlleleCode)
 				{
 					w[j][idx]++;
 					N[j]++;

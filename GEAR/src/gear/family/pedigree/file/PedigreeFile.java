@@ -1,9 +1,5 @@
 package gear.family.pedigree.file;
 
-import java.io.BufferedReader;
-import java.io.File;
-import java.io.FileReader;
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashSet;
 
@@ -11,10 +7,11 @@ import org.apache.commons.lang3.ArrayUtils;
 
 import gear.ConstValues;
 import gear.CmdArgs;
-import gear.data.FamilySet;
+import gear.data.Person;
+import gear.data.Family;
+import gear.data.UniqueRecordSet;
 import gear.family.pedigree.Hukou;
-import gear.family.pedigree.genotype.BFamilyStruct;
-import gear.family.pedigree.genotype.BPerson;
+import gear.util.BufferedReader;
 import gear.util.Logger;
 import gear.util.NewIt;
 
@@ -27,7 +24,7 @@ public class PedigreeFile
 	protected char[][] AlleleSet;
 	protected short[][] AlleleFreq;
 	protected ArrayList<Hukou> HukouBook;
-	protected FamilySet familySet = new FamilySet();
+	protected UniqueRecordSet<Family> families = new UniqueRecordSet<Family>();
 	protected HashSet<String> SixthCol = NewIt.newHashSet();
 	protected boolean IsSixthColBinary = true;
 	protected int num_marker;
@@ -35,33 +32,9 @@ public class PedigreeFile
 	protected String pedfile;
 	protected boolean header = true;
 
-	public String[] getFamListSorted()
+	public Family getFamily(String familystrID)
 	{
-		ArrayList<String> f = NewIt.newArrayList();
-		HashSet<String> fam = NewIt.newHashSet();
-		for (int i = 0; i < HukouBook.size(); i++)
-		{
-			Hukou hukou = HukouBook.get(i);
-			if (f.size() == 0)
-			{
-				f.add(hukou.getFamilyID());
-				fam.add(hukou.getFamilyID());
-			} else
-			{
-				if (fam.contains(hukou.getFamilyID()))
-				{
-					continue;
-				}
-				f.add(hukou.getFamilyID());
-				fam.add(hukou.getFamilyID());
-			}
-		}
-		return (String[]) f.toArray(new String[0]);
-	}
-
-	public BFamilyStruct getFamilyStruct(String familystrID)
-	{
-		return this.familySet.getFamily(familystrID);
+		return this.families.get(familystrID);
 	}
 
 	/**
@@ -74,20 +47,20 @@ public class PedigreeFile
 	public int getNumIndividuals()
 	{
 		int total = 0;
-		for (int ii = 0; ii < familySet.size(); ++ii)
+		for (int ii = 0; ii < families.size(); ++ii)
 		{
-			BFamilyStruct fam = familySet.getFamily(ii);
-			total += fam.getNumPersons();
+			Family fam = families.get(ii);
+			total += fam.size();
 		}
 		return total;
 	}
 
-	public FamilySet getFamilySet()
+	public UniqueRecordSet<Family> getFamilies()
 	{
-		return familySet;
+		return families;
 	}
 
-	public void initial() throws IOException
+	public void initial()
 	{
 
 	}
@@ -99,7 +72,6 @@ public class PedigreeFile
 	 * relatives in a pedigree, but is not that term of genetics.
 	 */
 	public void parseLinkage(String infile, int numMarkerInFile, int[] WSNP)
-			throws IOException
 	{
 		initial();
 		num_marker = WSNP.length;
@@ -109,98 +81,102 @@ public class PedigreeFile
 		{
 			AlleleSet[i][0] = AlleleSet[i][1] = ConstValues.MISSING_ALLELE_CHAR;
 		}
-		int numMarkers = 0;
-		BufferedReader reader = new BufferedReader(new FileReader(new File(
-				infile)));
+		BufferedReader reader = BufferedReader.openTextFile(infile, "ped");
 		pedfile = infile;
-		String line;
-		BPerson per;
+		Person per;
 		int k = 0;
 		Hukou hukou;
 		HukouBook = NewIt.newArrayList();
-		while ((line = reader.readLine()) != null)
+		String[] tokens = reader.readTokensAtLeast(6);
+		
+		if (tokens.length % 2 != 0)
 		{
-
-			String[] tokenizer = line.split("\\s+");
-			int numTokens = tokenizer.length;
-			numMarkers = (numTokens - 6) / 2;
-			if (numMarkers != numMarkerInFile)
-			{
-				Logger.printUserError("Mismatched column in ped file at line "
-						+ (k + 1) + ".");
-				System.exit(1);
-			}
-
-			per = new BPerson(num_marker);
-
-			if (tokenizer.length > 6)
-			{
-
-				per.setFamilyID(tokenizer[0]);
-				per.setPersonID(tokenizer[1]);
-				per.setDadID(tokenizer[2]);
-				per.setMomID(tokenizer[3]);
-
-				int Gender = Integer.parseInt(tokenizer[4]);
-				SixthCol.add(tokenizer[5]);
-
-				per.setGender(Gender);
-				per.setAffectedStatus(tokenizer[5]);
-
-				hukou = new Hukou(tokenizer[0], tokenizer[1], tokenizer[2],
-						tokenizer[3], tokenizer[4], tokenizer[5]);
-
-				int c = 0;
-				for (int j = 0; j < (tokenizer.length - 6) / 2; j++)
-				{
-					int idx = ArrayUtils.indexOf(WSNP, j);
-					if (idx < 0)
-						continue;
-					try
-					{
-						String[] allele = { tokenizer[6 + j * 2],
-								tokenizer[6 + j * 2 + 1] };
-						boolean flag = !allele[0].equals(ConstValues.MISSING_ALLELE_STRING) &&
-								       !allele[1].equals(ConstValues.MISSING_ALLELE_STRING);
-						if (flag)
-						{
-							int[] code = recode(c, allele);
-							per.addMarker(flag, code[0], code[1], c);
-							AlleleFreq[c][code[0]]++;
-							AlleleFreq[c][code[1]]++;
-						} else
-						{
-							per.addMarker(flag, 0, 0, c);
-						}
-					} catch (NumberFormatException e)
-					{
-						Logger.handleException(e,
-								"An invalid genotype is found in the ped file at line "
-										+ (k + 1) + " for marker " + (c + 1)
-										+ ".");
-					}
-					c++;
-				}
-				// check if the family exists already in the Hashtable
-				BFamilyStruct famstr = familySet.getFamily(per.getFamilyID());
-				if (famstr == null)
-				{
-					// it doesn't exist, so create a new FamilyStruct object
-					famstr = new BFamilyStruct(per.getFamilyID());
-					familySet.putFamily(famstr);
-				}
-
-				if (famstr.getPersons().containsKey(per.getPersonID()))
-				{
-					throw new IOException("Person " + per.getPersonID()
-							+ " in family " + per.getFamilyID()
-							+ " appears more than once.");
-				}
-				HukouBook.add(hukou);
-				famstr.addPerson(per);
-			}
-			k++;
+			reader.errorPreviousLine("The number of columns is not an even number.");
 		}
+		
+		int numCols = tokens.length;
+		int numMarkers = (numCols - 6) / 2;
+		
+		do
+		{
+			if (numCols != tokens.length)
+			{
+				String msg = "";
+				msg += "The first row has " + numCols + " columns, ";
+				msg += "but this row has " + tokens.length + " columns.";
+				reader.errorPreviousLine(msg);
+			}
+
+			per = new Person(num_marker);
+			per.setFamilyID(tokens[0]);
+			per.setPersonID(tokens[1]);
+			per.setDadID(tokens[2]);
+			per.setMomID(tokens[3]);
+
+			int Gender = Integer.parseInt(tokens[4]);
+			SixthCol.add(tokens[5]);
+
+			per.setGender(Gender);
+			per.setAffectedStatus(tokens[5]);
+
+			hukou = new Hukou(tokens[0], tokens[1], tokens[2], tokens[3], tokens[4], tokens[5]);
+
+			int c = 0;
+			for (int j = 0; j < numMarkers; j++)
+			{
+				int idx = ArrayUtils.indexOf(WSNP, j);
+				if (idx < 0)
+				{
+					continue;
+				}
+				
+				try
+				{
+					String[] allele = { tokens[6 + j * 2],
+							tokens[6 + j * 2 + 1] };
+					boolean flag = !allele[0].equals(ConstValues.MISSING_ALLELE_STRING) &&
+							       !allele[1].equals(ConstValues.MISSING_ALLELE_STRING);
+					if (flag)
+					{
+						int[] code = recode(c, allele);
+						per.addMarker(flag, code[0], code[1], c);
+						AlleleFreq[c][code[0]]++;
+						AlleleFreq[c][code[1]]++;
+					}
+					else
+					{
+						per.addMarker(flag, 0, 0, c);
+					}
+				}
+				catch (NumberFormatException e)
+				{
+					Logger.handleException(e,
+							"An invalid genotype is found in the ped file at line "
+									+ (k + 1) + " for marker " + (c + 1)
+									+ ".");
+				}
+				c++;
+			}
+			// check if the family exists already in the Hashtable
+			Family family = families.get(per.getFamilyID());
+			if (family == null)
+			{
+				// it doesn't exist, so create a new FamilyStruct object
+				family = new Family(per.getFamilyID());
+				families.put(family);
+			}
+
+			if (family.hasPerson(per.getPersonID()))
+			{
+				String msg = "";
+				msg += "Person " + per.getPersonID() + " in family ";
+				msg += per.getFamilyID() + " appears more than once.";
+				reader.errorPreviousLine(msg);
+			}
+			HukouBook.add(hukou);
+			family.addPerson(per);
+			k++;
+		} while ((tokens = reader.readTokens(numCols)) != null);
 		Is6ColBinary();
 	}
 
@@ -270,7 +246,8 @@ public class PedigreeFile
 					// zero detected alleles
 					ref[0] = allele[0].charAt(0);
 					code[0] = code[1] = 0;
-				} else
+				}
+				else
 				{
 					// one detected alleles
 					if (allele[0].charAt(0) == ref[0])

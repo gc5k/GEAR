@@ -1,21 +1,18 @@
 package gear.ibd;
 
 import java.io.PrintStream;
-import java.util.ArrayList;
-import java.util.Enumeration;
 
 import gear.CmdArgs;
 import gear.ConstValues;
-import gear.data.FamilySet;
+import gear.data.Person;
+import gear.data.Family;
+import gear.data.UniqueRecordSet;
 import gear.family.pedigree.file.MapFile;
 import gear.family.pedigree.file.PedigreeFile;
-import gear.family.pedigree.genotype.BFamilyStruct;
-import gear.family.pedigree.genotype.BPerson;
 import gear.family.plink.PLINKBinaryParser;
 import gear.family.plink.PLINKParser;
 import gear.util.FileUtil;
 import gear.util.Logger;
-import gear.util.NewIt;
 
 public class ParentIBD
 {
@@ -23,7 +20,7 @@ public class ParentIBD
 	private MapFile snpMap;
 	private double[][] ibd;
 
-	public ParentIBD() 
+	public ParentIBD()
 	{
 		PLINKParser pp = null;
 		if (CmdArgs.INSTANCE.getFileArgs().isSet())
@@ -52,79 +49,60 @@ public class ParentIBD
 	public void getIBD()
 	{
 		PrintStream ibdFile = FileUtil.CreatePrintStream(CmdArgs.INSTANCE.out + ".ibd.raw");
-
 		PrintStream ibd2File = FileUtil.CreatePrintStream(CmdArgs.INSTANCE.out + ".ibd");
+		Family family;
 
-		Enumeration<String> perList1;
-		BFamilyStruct fam;
-
-		FamilySet familySet = PedData.getFamilySet();
-		for (int famIdx = 0; famIdx < familySet.size(); ++famIdx)
+		UniqueRecordSet<Family> families = PedData.getFamilies();
+		for (int famIdx = 0; famIdx < families.size(); ++famIdx)
 		{
-			fam = familySet.getFamily(famIdx);
-			perList1 = fam.getPersonList();
+			family = families.get(famIdx);
 
-			ArrayList<String> perID = NewIt.newArrayList();
-			while (perList1.hasMoreElements())
+			for (int personIdx1 = 0; personIdx1 < family.size() - 1; ++personIdx1)
 			{
-				String iid1 = perList1.nextElement();
-				if (!fam.hasAncestor(iid1))
+				Person person1 = family.getPerson(personIdx1);
+				Person dad = family.getPerson(person1.getDadID());
+				Person mom = family.getPerson(person1.getMomID());
+				
+				if (dad == null || mom == null)
 				{
 					continue;
 				}
-				perID.add(iid1);
-			}
 
-			for (int i = 0; i < perID.size(); i++)
-			{
-				String iid1 = perID.get(i);
-				BPerson per1 = fam.getPerson(iid1);
-
-				String fid1 = per1.getDadID();
-				String mid1 = per1.getMomID();
-
-				for (int j = i + 1; j < perID.size(); j++)
+				for (int personIdx2 = personIdx1 + 1; personIdx2 < family.size(); ++personIdx2)
 				{
-					String iid2 = perID.get(j);
-					BPerson per2 = fam.getPerson(iid2);
+					Person person2 = family.getPerson(personIdx2);
 
-					String fid2 = per2.getDadID();
-					String mid2 = per2.getMomID();
-
-					if (fid1.compareTo(fid2) != 0 || mid1.compareTo(mid2) != 0)
+					if (!dad.getID().equals(person2.getDadID()) ||
+						!mom.getID().equals(person2.getMomID()))
 					{
 						continue;
 					}
 
-					ibd = new double[per2.getNumMarkers()][2];
-
-					BPerson F = fam.getPerson(fid2);
-					BPerson M = fam.getPerson(mid2);
-
-					for (int k = 0; k < F.getNumMarkers(); k++)
+					ibd = new double[person2.getNumMarkers()][2];
+					
+					for (int k = 0; k < dad.getNumMarkers(); k++)
 					{
-						ibd[k] = quickIBD(	F.getGenotypeScore(k),
-											M.getGenotypeScore(k),
-											per1.getGenotypeScore(k),
-											per2.getGenotypeScore(k));
+						ibd[k] = quickIBD(dad.getGenotypeScore(k),
+										  mom.getGenotypeScore(k),
+										  person1.getGenotypeScore(k),
+										  person2.getGenotypeScore(k));
 					}
 					
 					
-					ibdFile
-							.print(per1.getFamilyID() + " " + per1
-									.getPersonID() + " " + per2.getFamilyID() + " " + per2
+					ibdFile.print(person1.getFamilyID() + " " + person1
+									.getPersonID() + " " + person2.getFamilyID() + " " + person2
 									.getPersonID() + " ");
-					for (int k = 0; k < F.getNumMarkers(); k++)
+					for (int k = 0; k < dad.getNumMarkers(); k++)
 					{
 						ibdFile.print(ibd[k][0] + " ");
 					}
 					ibdFile.println();
 					
 					ibdFile
-					.print(per1.getFamilyID() + " " + per1
-							.getPersonID() + " " + per2.getFamilyID() + " " + per2
+					.print(person1.getFamilyID() + " " + person1
+							.getPersonID() + " " + person2.getFamilyID() + " " + person2
 							.getPersonID() + " ");
-					for (int k = 0; k < F.getNumMarkers(); k++)
+					for (int k = 0; k < dad.getNumMarkers(); k++)
 					{
 						ibdFile.print(ibd[k][1] + " ");
 					}
@@ -133,20 +111,20 @@ public class ParentIBD
 					guessIBD(ibd, 0);
 					guessIBD(ibd, 1);
 					ibd2File
-					.print(per1.getFamilyID() + " " + per1
-							.getPersonID() + " " + per2.getFamilyID() + " " + per2
+					.print(person1.getFamilyID() + " " + person1
+							.getPersonID() + " " + person2.getFamilyID() + " " + person2
 							.getPersonID() + " ");
-					for (int k = 0; k < F.getNumMarkers(); k++)
+					for (int k = 0; k < dad.getNumMarkers(); k++)
 					{
 						ibd2File.print(ibd[k][0] + " ");
 					}
 					ibd2File.println();
 			
 					ibd2File
-					.print(per1.getFamilyID() + " " + per1
-					.getPersonID() + " " + per2.getFamilyID() + " " + per2
+					.print(person1.getFamilyID() + " " + person1
+					.getPersonID() + " " + person2.getFamilyID() + " " + person2
 					.getPersonID() + " ");
-					for (int k = 0; k < F.getNumMarkers(); k++)
+					for (int k = 0; k < dad.getNumMarkers(); k++)
 					{
 						ibd2File.print(ibd[k][1] + " ");
 					}

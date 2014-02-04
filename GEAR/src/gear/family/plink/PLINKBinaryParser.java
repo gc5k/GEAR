@@ -1,7 +1,5 @@
 package gear.family.plink;
 
-import java.io.IOException;
-
 import gear.family.pedigree.file.BEDReader;
 import gear.family.pedigree.file.BIMReader;
 import gear.util.Logger;
@@ -64,15 +62,6 @@ public class PLINKBinaryParser extends PLINKParser
 	@Override
 	public void ParsePedFile()
 	{
-		try
-		{
-			pedData.parseLinkage(pedigreeFile,
-					mapData.getMarkerNumberOriginal(),
-					snpFilter.getWorkingSNP());
-		} catch (IOException e)
-		{
-			Logger.handleException(e,
-					"An exception occurred when parsing the pedigree files.");
-		}
+		pedData.parseLinkage(pedigreeFile, mapData.getMarkerNumberOriginal(), snpFilter.getWorkingSNP());
 	}
 }

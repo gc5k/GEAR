@@ -1,7 +1,5 @@
 package gear.family.plink;
 
-import java.io.IOException;
-
 import gear.CmdArgs;
 import gear.family.pedigree.file.MapFile;
 import gear.family.pedigree.file.PedigreeFile;
@@ -102,16 +100,7 @@ public class PLINKParser
 	 */
 	public void ParsePedFile()
 	{
-		try
-		{
-			pedData.parseLinkage(pedigreeFile,
-					mapData.getMarkerNumberOriginal(),
-					snpFilter.getWorkingSNP());
-		} catch (IOException e)
-		{
-			Logger.handleException(e,
-					"An exception occurred when parsing the pedigree files.");
-		}
+		pedData.parseLinkage(pedigreeFile, mapData.getMarkerNumberOriginal(), snpFilter.getWorkingSNP());
 	}
 
 	public PedigreeFile getPedigreeData()

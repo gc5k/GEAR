@@ -5,7 +5,7 @@ import java.text.DecimalFormat;
 import org.apache.commons.math.MathException;
 import org.apache.commons.math.stat.inference.ChiSquareTestImpl;
 
-import gear.family.pedigree.genotype.BPerson;
+import gear.data.Person;
 
 public class AlleleFrequency
 {
@@ -36,7 +36,7 @@ public class AlleleFrequency
 				int[] c = G.getBiAlleleGenotype(i, j);
 				allelefreq[j][c[0]]++;
 				allelefreq[j][c[1]]++;
-				int idx = c[0] == BPerson.MissingAlleleCode ? 3 : (c[0] + c[1]);
+				int idx = c[0] == Person.MissingAlleleCode ? 3 : (c[0] + c[1]);
 				genotypefreq[j][idx]++;
 			}
 		}

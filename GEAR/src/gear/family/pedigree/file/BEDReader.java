@@ -1,46 +1,45 @@
 package gear.family.pedigree.file;
 
 import java.io.BufferedInputStream;
-import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
-import java.io.FileReader;
 import java.io.IOException;
 import java.util.ArrayList;
 
 import org.apache.commons.lang3.ArrayUtils;
 
+import gear.data.Person;
+import gear.data.Family;
 import gear.family.pedigree.Hukou;
-import gear.family.pedigree.genotype.BFamilyStruct;
-import gear.family.pedigree.genotype.BPerson;
 import gear.family.plink.PLINKBinaryParser;
+import gear.util.BufferedReader;
 import gear.util.Logger;
 import gear.util.NewIt;
 
 public class BEDReader extends PedigreeFile
 {
-	public String FamFile;
+	public String famFile;
 	private int n_individual = 0;
-	private ArrayList<String> Famid;
-	private ArrayList<BPerson> persons;
+	private ArrayList<String> famIDs;
+	private ArrayList<Person> persons;
 	private MapFile mapData;
 
 	public BEDReader(String famF, int numMark, MapFile mapdata)
 	{
 		super();
-		FamFile = famF;
-		this.num_marker = numMark;
-		this.mapData = mapdata;
+		famFile = famF;
+		num_marker = numMark;
+		mapData = mapdata;
 	}
 
 	@Override
-	public void initial() throws IOException
+	public void initial()
 	{
-		Famid = NewIt.newArrayList();
+		famIDs = NewIt.newArrayList();
 		persons = NewIt.newArrayList();
 
-		BufferedReader reader = new BufferedReader(new FileReader(FamFile));
+		BufferedReader reader = BufferedReader.openTextFile(famFile, "fam");
 		AlleleSet = new char[num_marker][];
 		AlleleFreq = new short[num_marker][2];
 		for (int i = 0; i < mapData.snpList.size(); i++)
@@ -48,16 +47,14 @@ public class BEDReader extends PedigreeFile
 			SNP snp = mapData.snpList.get(i);
 			AlleleSet[i] = snp.getSNP();
 		}
-		String line;
 
 		HukouBook = NewIt.newArrayList();
 		Hukou hukou;
-		while ((line = reader.readLine()) != null)
+		String[] tokens;
+		while ((tokens = reader.readTokens(6)) != null)
 		{
-			String[] tokens = line.split("\\s+");
-
-			BPerson person = new BPerson(num_marker);
-			Famid.add(tokens[0]);
+			Person person = new Person(num_marker);
+			famIDs.add(tokens[0]);
 
 			person.setFamilyID(tokens[0]);
 			person.setPersonID(tokens[1]);
@@ -67,22 +64,22 @@ public class BEDReader extends PedigreeFile
 			person.setAffectedStatus(tokens[5]);
 			SixthCol.add(tokens[5]);
 
-			hukou = new Hukou(tokens[0], tokens[1], tokens[2], tokens[3],
-					tokens[4], tokens[5]);
-			BFamilyStruct famstr = familySet.getFamily(tokens[0]);
-			if (famstr == null)
+			hukou = new Hukou(tokens[0], tokens[1], tokens[2], tokens[3], tokens[4], tokens[5]);
+			Family family = families.get(tokens[0]);
+			if (family == null)
 			{
-				famstr = new BFamilyStruct(tokens[0]);
-				familySet.putFamily(famstr);
+				family = new Family(tokens[0]);
+				families.put(family);
 			}
-			if (famstr.getPersons().containsKey(person.getPersonID()))
+			if (family.hasPerson(person.getPersonID()))
 			{
-				throw new IOException("Person " + person.getPersonID()
-						+ " in family " + person.getFamilyID()
-						+ " appears more than once.");
+				String msg = "";
+				msg += "Person " + person.getPersonID() + " in family ";
+				msg += person.getFamilyID() + " appears more than once.";
+				reader.errorPreviousLine(msg);
 			}
 			HukouBook.add(hukou);
-			famstr.addPerson(person);
+			family.addPerson(person);
 			persons.add(person);
 			n_individual++;
 		}
@@ -91,7 +88,6 @@ public class BEDReader extends PedigreeFile
 
 	@Override
 	public void parseLinkage(String infile, int numMarkerInFile, int[] WSNP)
-			throws IOException
 	{
 		initial();
 		pedfile = infile;
@@ -100,23 +96,32 @@ public class BEDReader extends PedigreeFile
 		try
 		{
 			in = new BufferedInputStream(new FileInputStream(new File(pedfile)));
-		} catch (FileNotFoundException e)
-		{
-			Logger.handleException(e, "Cannot open the pedigree file '"
-					+ pedfile + "'.");
 		}
-		byte[] magic = new byte[3];
-		in.read(magic, 0, 3);
-		if (magic[2] == 1)
+		catch (FileNotFoundException e)
 		{
-			Logger.printUserLog("Reading data in PLINK SNP-major mode.");
-			snp_major(in, numMarkerInFile, WSNP);
-		} else
-		{
-			Logger.printUserLog("Reading data in PLINK individual-major mode.");
-			individual_major(in, numMarkerInFile, WSNP);
+			Logger.handleException(e, "Cannot open the pedigree file '" + pedfile + "'.");
 		}
-		in.close();
+		
+		try
+		{
+			byte[] magic = new byte[3];
+			in.read(magic, 0, 3);
+			if (magic[2] == 1)
+			{
+				Logger.printUserLog("Reading data in PLINK SNP-major mode.");
+				snp_major(in, numMarkerInFile, WSNP);
+			}
+			else
+			{
+				Logger.printUserLog("Reading data in PLINK individual-major mode.");
+				individual_major(in, numMarkerInFile, WSNP);
+			}
+			in.close();
+		}
+		catch (IOException e)
+		{
+			Logger.handleException(e, "An I/O exception occurred when reading the bed file.");
+		}
 	}
 
 	private void individual_major(BufferedInputStream in, int numMarkerInFile,
@@ -146,7 +151,7 @@ public class BEDReader extends PedigreeFile
 			extract_geno = extractGenotype(geno, numMarkerInFile, WSNP);
 			persons.get(i).addAllMarker(extract_geno);
 		}
-		Famid = null;
+		famIDs = null;
 		persons = null;
 	}
 
@@ -217,7 +222,7 @@ public class BEDReader extends PedigreeFile
 			if (ArrayUtils.indexOf(WSNP, i) >= 0)
 			{
 				int indIdx = 0;
-				int posByte = snpIdx >> BPerson.shift;
+				int posByte = snpIdx >> Person.shift;
 				int posBit = (i & 0xf) << 1;
 				for (int byteIdx = 0; byteIdx < g.length; ++byteIdx)
 				{

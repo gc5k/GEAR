@@ -10,10 +10,10 @@ import java.util.ArrayList;
 
 import gear.CmdArgs;
 import gear.ConstValues;
+import gear.data.Person;
 import gear.family.pedigree.PersonIndex;
 import gear.family.pedigree.file.MapFile;
 import gear.family.pedigree.file.SNP;
-import gear.family.pedigree.genotype.BPerson;
 import gear.family.plink.PLINKBinaryParser;
 import gear.family.plink.PLINKParser;
 import gear.family.popstat.GenotypeMatrix;
@@ -100,7 +100,7 @@ public class NaiveImputation
 		for (int i = 0; i < pi.size(); i++)
 		{
 			PersonIndex p = pi.get(i);
-			BPerson bp = p.getPerson();
+			Person bp = p.getPerson();
 			fam.println(bp.getFamilyID() + "\t" + bp.getPersonID() + "\t" + bp.getDadID() + "\t" + bp.getMomID() + "\t" + bp.getGender() + "\t" + bp.getAffectedStatus());
 		}
 		fam.close();
