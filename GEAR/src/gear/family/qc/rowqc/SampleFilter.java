@@ -3,11 +3,11 @@ package gear.family.qc.rowqc;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Hashtable;
 import java.util.Iterator;
 
 import gear.CmdArgs;
 import gear.ConstValues;
+import gear.data.FamilySet;
 import gear.family.pedigree.Hukou;
 import gear.family.pedigree.PersonIndex;
 import gear.family.pedigree.file.MapFile;
@@ -70,14 +70,14 @@ public class SampleFilter
 	{
 		ArrayList<Hukou> hukoubook = PedData.getHukouBook();
 		HukouBook = NewIt.newArrayList();
-		Hashtable<String, BFamilyStruct> Fam = PedData.getFamilyStruct();
-		num_qualified = new int[Fam.size()][2];
-		filter = new boolean[Fam.size()][];
+		FamilySet familySet = PedData.getFamilySet();
+		num_qualified = new int[familySet.size()][2];
+		filter = new boolean[familySet.size()][];
 
 		for (Iterator<Hukou> e = hukoubook.iterator(); e.hasNext();)
 		{
 			Hukou hukou = e.next();
-			BFamilyStruct fs = Fam.get(hukou.getFamilyID());
+			BFamilyStruct fs = familySet.getFamily(hukou.getFamilyID());
 			BPerson per = fs.getPerson(hukou.getIndividualID());
 			boolean hf = hardFilter(per);
 			hukou.setAvailable(hf);
@@ -91,12 +91,12 @@ public class SampleFilter
 					.getPersonID(), per, false, isFounder));
 		}
 
-		num_qualified = new int[Fam.size()][2];
-		filter = new boolean[Fam.size()][];
+		num_qualified = new int[familySet.size()][2];
+		filter = new boolean[familySet.size()][];
 		int c = 0;
 		for (String fi : PedData.getFamListSorted())
 		{
-			BFamilyStruct fs = Fam.get(fi);
+			BFamilyStruct fs = familySet.getFamily(fi);
 			String[] pi = fs.getPersonListSorted();
 			filter[c] = new boolean[pi.length];
 

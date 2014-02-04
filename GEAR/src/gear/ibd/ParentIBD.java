@@ -3,11 +3,10 @@ package gear.ibd;
 import java.io.PrintStream;
 import java.util.ArrayList;
 import java.util.Enumeration;
-import java.util.Hashtable;
-import java.util.Map.Entry;
 
 import gear.CmdArgs;
 import gear.ConstValues;
+import gear.data.FamilySet;
 import gear.family.pedigree.file.MapFile;
 import gear.family.pedigree.file.PedigreeFile;
 import gear.family.pedigree.genotype.BFamilyStruct;
@@ -59,10 +58,10 @@ public class ParentIBD
 		Enumeration<String> perList1;
 		BFamilyStruct fam;
 
-		Hashtable<String, BFamilyStruct> Fam = PedData.getFamilyStruct();
-		for (Entry<String, BFamilyStruct> entry : Fam.entrySet())
+		FamilySet familySet = PedData.getFamilySet();
+		for (int famIdx = 0; famIdx < familySet.size(); ++famIdx)
 		{
-			fam = (BFamilyStruct) entry.getValue();
+			fam = familySet.getFamily(famIdx);
 			perList1 = fam.getPersonList();
 
 			ArrayList<String> perID = NewIt.newArrayList();

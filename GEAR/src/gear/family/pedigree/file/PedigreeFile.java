@@ -5,14 +5,13 @@ import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Enumeration;
 import java.util.HashSet;
-import java.util.Hashtable;
 
 import org.apache.commons.lang3.ArrayUtils;
 
 import gear.ConstValues;
 import gear.CmdArgs;
+import gear.data.FamilySet;
 import gear.family.pedigree.Hukou;
 import gear.family.pedigree.genotype.BFamilyStruct;
 import gear.family.pedigree.genotype.BPerson;
@@ -27,35 +26,14 @@ public class PedigreeFile
 
 	protected char[][] AlleleSet;
 	protected short[][] AlleleFreq;
-	protected Hashtable<String, BFamilyStruct> familystructure;
-	protected ArrayList<String> FamID;
 	protected ArrayList<Hukou> HukouBook;
-
+	protected FamilySet familySet = new FamilySet();
 	protected HashSet<String> SixthCol = NewIt.newHashSet();
 	protected boolean IsSixthColBinary = true;
 	protected int num_marker;
 	protected String titleLine = null;
 	protected String pedfile;
 	protected boolean header = true;
-
-	// public static String MissingGenotype="00";
-	public PedigreeFile()
-	{
-		this.familystructure = NewIt.newHashtable();
-		FamID = NewIt.newArrayList();
-	}
-
-	public String[] getFamList()
-	{
-		Enumeration<String> famstrList = this.familystructure.keys();
-		String[] FID = new String[familystructure.size()];
-		int ind = 0;
-		while (famstrList.hasMoreElements())
-		{
-			FID[ind++] = famstrList.nextElement();
-		}
-		return FID;
-	}
 
 	public String[] getFamListSorted()
 	{
@@ -83,7 +61,7 @@ public class PedigreeFile
 
 	public BFamilyStruct getFamilyStruct(String familystrID)
 	{
-		return this.familystructure.get(familystrID);
+		return this.familySet.getFamily(familystrID);
 	}
 
 	/**
@@ -95,19 +73,18 @@ public class PedigreeFile
 	 */
 	public int getNumIndividuals()
 	{
-		Enumeration<BFamilyStruct> famEnum = familystructure.elements();
 		int total = 0;
-		while (famEnum.hasMoreElements())
+		for (int ii = 0; ii < familySet.size(); ++ii)
 		{
-			BFamilyStruct fam = famEnum.nextElement();
+			BFamilyStruct fam = familySet.getFamily(ii);
 			total += fam.getNumPersons();
 		}
 		return total;
 	}
 
-	public Hashtable<String, BFamilyStruct> getFamilyStruct()
+	public FamilySet getFamilySet()
 	{
-		return familystructure;
+		return familySet;
 	}
 
 	public void initial() throws IOException
@@ -205,12 +182,12 @@ public class PedigreeFile
 					c++;
 				}
 				// check if the family exists already in the Hashtable
-				BFamilyStruct famstr = familystructure.get(per.getFamilyID());
+				BFamilyStruct famstr = familySet.getFamily(per.getFamilyID());
 				if (famstr == null)
 				{
 					// it doesn't exist, so create a new FamilyStruct object
 					famstr = new BFamilyStruct(per.getFamilyID());
-					familystructure.put(per.getFamilyID(), famstr);
+					familySet.putFamily(famstr);
 				}
 
 				if (famstr.getPersons().containsKey(per.getPersonID()))

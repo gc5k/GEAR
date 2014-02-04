@@ -67,11 +67,11 @@ public class TransposePedigreeReader extends PedigreeFile
 			per.setGender(Integer.parseInt(tokens[4]));
 			per.setAffectedStatus(tokens[5]);
 
-			BFamilyStruct fam = familystructure.get(tokens[0]);
+			BFamilyStruct fam = familySet.getFamily(tokens[0]);
 			if (fam == null)
 			{
 				fam = new BFamilyStruct(tokens[0]);
-				familystructure.put(tokens[0], fam);
+				familySet.putFamily(fam);
 			}
 			fam.addPerson(per);
 		}
@@ -107,7 +107,7 @@ public class TransposePedigreeReader extends PedigreeFile
 			{
 				for (int i = 0; i < Famid.size(); i++)
 				{
-					BFamilyStruct bf = familystructure.get(Famid.get(i));
+					BFamilyStruct bf = familySet.getFamily(Famid.get(i));
 					per = bf.getPerson(Individualid.get(i));
 					String[] allele = { tokenizer[4 + i * 2],
 							tokenizer[4 + i * 2 + 1] };
