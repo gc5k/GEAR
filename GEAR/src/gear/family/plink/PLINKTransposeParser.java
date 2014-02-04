@@ -1,10 +1,7 @@
 package gear.family.plink;
 
-import java.io.IOException;
-
 import gear.family.pedigree.file.MapFile;
 import gear.family.pedigree.file.TransposePedigreeReader;
-import gear.util.Logger;
 
 public class PLINKTransposeParser extends PLINKParser
 {
@@ -15,7 +12,6 @@ public class PLINKTransposeParser extends PLINKParser
 	{
 		super(ped, null);
 		FamFile = Fam;
-		// TODO Auto-generated constructor stub
 	}
 
 	public void Parse()
@@ -33,13 +29,6 @@ public class PLINKTransposeParser extends PLINKParser
 
 	public void ParsePedFile()
 	{
-		try
-		{
-			pedData.parseLinkage(pedigreeFile, 0, snpFilter.getWorkingSNP());
-		} catch (IOException e)
-		{
-			Logger.handleException(e,
-					"An exception occurred when parsing the pedgree files.");
-		}
+		pedData.parseLinkage(pedigreeFile, 0, snpFilter.getWorkingSNP());
 	}
 }

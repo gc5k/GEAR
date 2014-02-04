@@ -9,11 +9,11 @@ import java.util.ArrayList;
 import java.util.HashMap;
 
 import gear.CmdArgs;
+import gear.data.Person;
 import gear.family.pedigree.Hukou;
 import gear.family.pedigree.file.MapFile;
 import gear.family.pedigree.file.PedigreeFile;
 import gear.family.pedigree.file.SNP;
-import gear.family.pedigree.genotype.BPerson;
 import gear.family.plink.PLINKBinaryParser;
 import gear.family.plink.PLINKParser;
 import gear.family.popstat.GenotypeMatrix;
@@ -358,8 +358,8 @@ public class MakeGRM
 			int g1 = G.getAdditiveScore(idx1, i);
 			int g2 = G.getAdditiveScore(idx2, i);
 			double m = allelefreq[i][1];
-			if (g1 == BPerson.MissingGenotypeCode
-					|| g2 == BPerson.MissingGenotypeCode)
+			if (g1 == Person.MissingGenotypeCode
+					|| g2 == Person.MissingGenotypeCode)
 			{
 				continue;
 			}

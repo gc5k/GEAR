@@ -1,18 +1,18 @@
 package gear.family.pedigree;
 
-import gear.family.pedigree.genotype.BPerson;
+import gear.data.Person;
 
 public class PersonIndex
 {
 	private String FamilyID;
 	private String IndividualID;
-	private BPerson person;
+	private Person person;
 	private boolean pseudo;
 	private boolean isFounder;
 	private int group;
 	private double permutatedScore;
 
-	public PersonIndex(String FamilyID, String IndividualID, BPerson person,
+	public PersonIndex(String FamilyID, String IndividualID, Person person,
 			boolean pseudo, boolean isFounder)
 	{
 		this.FamilyID = FamilyID;
@@ -33,7 +33,7 @@ public class PersonIndex
 		return IndividualID;
 	}
 
-	public BPerson getPerson()
+	public Person getPerson()
 	{
 		return person;
 	}

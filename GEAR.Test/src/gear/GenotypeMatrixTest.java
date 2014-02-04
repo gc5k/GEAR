@@ -6,8 +6,8 @@ import java.util.ArrayList;
 
 import org.junit.Test;
 
+import gear.data.Person;
 import gear.family.pedigree.PersonIndex;
-import gear.family.pedigree.genotype.BPerson;
 import gear.family.popstat.GenotypeMatrix;
 
 public class GenotypeMatrixTest
@@ -16,7 +16,7 @@ public class GenotypeMatrixTest
 	@Test
 	public void testAdditiveScoreGetterSetter()
 	{
-		BPerson person = new BPerson(31 /*markers*/);
+		Person person = new Person(31 /*markers*/);
 		PersonIndex personIdx = new PersonIndex("FAM1", "IND1", person, false /*pseudo*/, false /*founder*/);
 		ArrayList<PersonIndex> personIndexes = new ArrayList<PersonIndex>();
 		personIndexes.add(personIdx);

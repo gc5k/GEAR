@@ -1,17 +1,13 @@
-package gear.family.pedigree.genotype;
+package gear.data;
 
 import gear.CmdArgs;
 import gear.family.plink.PLINKBinaryParser;
 
 /**
- * stores the genotypes of each individual. this class is not thread safe
- * (untested)
- * 
- * @author Guo-Bo Chen, chenguobo@gmail.com
+ * stores the genotypes of each individual. this class is not thread safe (untested)
  */
-public class BPerson
+public class Person implements UniqueRecord
 {
-
 	protected String familyID;
 	protected String personID;
 	protected String momID;
@@ -27,7 +23,7 @@ public class BPerson
 	public static int MissingGenotypeCode = 3;
 	public static int MissingAlleleCode = 2;
 
-	public BPerson(int numMarkers)
+	public Person(int numMarkers)
 	{
 		this.numMarkers = numMarkers;
 		if (numMarkers % intL == 0)
@@ -40,7 +36,7 @@ public class BPerson
 		alleles = new int[genoLen];
 	}
 
-	public BPerson(BPerson p)
+	public Person(Person p)
 	{
 		familyID = p.getFamilyID();
 		personID = p.getPersonID() + "ajhg2008";
@@ -57,6 +53,12 @@ public class BPerson
 			genoLen = numMarkers / intL + 1;
 		}
 		alleles = new int[genoLen];
+	}
+	
+	@Override
+	public String getID()
+	{
+		return getPersonID();
 	}
 
 	/**

@@ -4,12 +4,12 @@ import static org.junit.Assert.*;
 
 import org.junit.Test;
 
-import gear.data.FamilySet;
+import gear.data.Person;
+import gear.data.Family;
+import gear.data.UniqueRecordSet;
 import gear.family.pedigree.file.MapFile;
 import gear.family.pedigree.file.PedigreeFile;
 import gear.family.pedigree.file.SNP;
-import gear.family.pedigree.genotype.BFamilyStruct;
-import gear.family.pedigree.genotype.BPerson;
 import gear.family.plink.PLINKParser;
 
 public class PlinkTextDataTest
@@ -18,7 +18,7 @@ public class PlinkTextDataTest
 	public void testTextData()
 	{
 		PLINKParser parser = new PLINKParser("data/sim.ped", "data/sim.map");
-parser.Parse();
+		parser.Parse();
 		
 		PedigreeFile pedData = parser.getPedigreeData();
 		
@@ -26,66 +26,72 @@ parser.Parse();
 		assertEquals(5, pedData.getNumMarker());
 
 		// individual info begin
-		FamilySet familySet = pedData.getFamilySet();
-		assertEquals(4, familySet.size());
+		UniqueRecordSet<Family> families = pedData.getFamilies();
+		assertEquals(4, families.size());
 		
-		BFamilyStruct fam0 = familySet.getFamily("fam0"); 
+		Family fam0 = families.get("fam0"); 
 		assertNotNull(fam0);
-		assertSame(fam0, familySet.getFamily(0));
-		assertEquals(3, fam0.getNumPersons());
+		assertSame(fam0, families.get(0));
+		assertEquals(3, fam0.size());
 		
-		BPerson per0 = fam0.getPerson("per0");
+		Person per0 = fam0.getPerson("per0");
 		assertNotNull(per0);
+		assertSame(per0, fam0.getPerson(0));
 		assertEquals("0", per0.getDadID());
 		assertEquals("0", per0.getMomID());
 		assertEquals(1, per0.getGender());
 		assertEquals("2", per0.getAffectedStatus());
 		
-		BPerson per1 = fam0.getPerson("per1");
+		Person per1 = fam0.getPerson("per1");
 		assertNotNull(per1);
+		assertSame(per1, fam0.getPerson(1));
 		assertEquals("0", per1.getDadID());
 		assertEquals("0", per1.getMomID());
 		assertEquals(2, per1.getGender());
 		assertEquals("2", per1.getAffectedStatus());
 		
-		BPerson per2 = fam0.getPerson("per2");
+		Person per2 = fam0.getPerson("per2");
 		assertNotNull(per2);
+		assertSame(per2, fam0.getPerson(2));
 		assertEquals("per0", per2.getDadID());
 		assertEquals("per1", per2.getMomID());
 		assertEquals(2, per2.getGender());
 		assertEquals("2", per2.getAffectedStatus());
 		
-		BFamilyStruct per3Fam = familySet.getFamily("per3"); 
+		Family per3Fam = families.get("per3"); 
 		assertNotNull(per3Fam);
-		assertSame(per3Fam, familySet.getFamily(1));
-		assertEquals(1, per3Fam.getNumPersons());
+		assertSame(per3Fam, families.get(1));
+		assertEquals(1, per3Fam.size());
 		
-		BPerson per3 = per3Fam.getPerson("per3");
+		Person per3 = per3Fam.getPerson("per3");
 		assertNotNull(per3);
+		assertSame(per3, per3Fam.getPerson(0));
 		assertEquals("0", per3.getDadID());
 		assertEquals("0", per3.getMomID());
 		assertEquals(2, per3.getGender());
 		assertEquals("2", per3.getAffectedStatus());
 		
-		BFamilyStruct per4Fam = familySet.getFamily("per4"); 
+		Family per4Fam = families.get("per4"); 
 		assertNotNull(per4Fam);
-		assertSame(per4Fam, familySet.getFamily(2));
-		assertEquals(1, per4Fam.getNumPersons());
+		assertSame(per4Fam, families.get(2));
+		assertEquals(1, per4Fam.size());
 		
-		BPerson per4 = per4Fam.getPerson("per4");
+		Person per4 = per4Fam.getPerson("per4");
 		assertNotNull(per4);
+		assertSame(per4, per4Fam.getPerson(0));
 		assertEquals("0", per4.getDadID());
 		assertEquals("0", per4.getMomID());
 		assertEquals(2, per4.getGender());
 		assertEquals("1", per4.getAffectedStatus());
 		
-		BFamilyStruct per5Fam = familySet.getFamily("per5"); 
+		Family per5Fam = families.get("per5"); 
 		assertNotNull(per5Fam);
-		assertSame(per5Fam, familySet.getFamily(3));
-		assertEquals(1, per5Fam.getNumPersons());
+		assertSame(per5Fam, families.get(3));
+		assertEquals(1, per5Fam.size());
 		
-		BPerson per5 = per5Fam.getPerson("per5");
+		Person per5 = per5Fam.getPerson("per5");
 		assertNotNull(per5);
+		assertSame(per5, per5Fam.getPerson(0));
 		assertEquals("0", per5.getDadID());
 		assertEquals("0", per5.getMomID());
 		assertEquals(2, per5.getGender());

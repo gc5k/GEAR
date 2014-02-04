@@ -1,19 +1,16 @@
 package gear.pscontrol.hierarchy;
 
 import java.util.ArrayList;
-import java.util.Enumeration;
-import java.util.Hashtable;
 import java.util.Random;
 import java.util.TreeMap;
 import java.util.TreeSet;
-import java.util.Map.Entry;
 
 import org.apache.commons.lang3.ArrayUtils;
 
-
-
 import gear.CmdArgs;
-import gear.data.FamilySet;
+import gear.data.Person;
+import gear.data.Family;
+import gear.data.UniqueRecordSet;
 import gear.family.RabinowitzLairdAlgorithm.AbstractGenoDistribution;
 import gear.family.RabinowitzLairdAlgorithm.lou.HeterozygousParent;
 import gear.family.RabinowitzLairdAlgorithm.lou.HomozygousParent;
@@ -22,14 +19,11 @@ import gear.family.RabinowitzLairdAlgorithm.lou.UnobservedParents;
 import gear.family.pedigree.PersonIndex;
 import gear.family.pedigree.file.MapFile;
 import gear.family.pedigree.file.PedigreeFile;
-import gear.family.pedigree.genotype.BFamilyStruct;
-import gear.family.pedigree.genotype.BPerson;
 import gear.family.pedigree.genotype.GenoSet;
 import gear.util.NewIt;
 
 public class AJHG2008 extends ChenBase
 {
-
 	private long seed = 2010;
 
 	public AJHG2008(PedigreeFile ped, MapFile map)
@@ -39,33 +33,29 @@ public class AJHG2008 extends ChenBase
 
 	public void RevvingUp(ArrayList<PersonIndex> pt)
 	{
-		FamilySet familySet = PedData.getFamilySet();
-		Hashtable<String, BFamilyStruct> fam_has_sib = NewIt.newHashtable();
+		UniqueRecordSet<Family> families = PedData.getFamilies();
+		ArrayList<Family> fam_has_sib = new ArrayList<Family>();
 		PersonTable.ensureCapacity(qualified_Sib);
 
 		ArrayList<PersonIndex> s_P = NewIt.newArrayList();
 
 		ArrayList<Integer> SibIdx = NewIt.newArrayList();
 
-		// int c = 0;
-		// int s = 0;
-		for (String fi : PedData.getFamListSorted())
+		for (int familyIdx = 0; familyIdx < families.size(); ++familyIdx)
 		{
-			BFamilyStruct fs = familySet.getFamily(fi);
-			String[] pi = fs.getPersonListSorted();
+			Family family = families.get(familyIdx);
 			int si = 0;
-			ArrayList<BPerson> plist = NewIt.newArrayList();
-			for (int i = 0; i < pi.length; i++)
+			ArrayList<Person> plist = NewIt.newArrayList();
+			for (int personIdx = 0; personIdx < family.size(); ++personIdx)
 			{
-				BPerson per = fs.getPerson(pi[i]);
+				Person person = family.getPerson(personIdx);
 
-				if (fs.hasAncestor(per))
+				if (family.hasAncestor(person))
 				{
-					s_P.add(new PersonIndex(fs.getFamilyStructName(), pi[i],
-							per, false, false));
-					BPerson pseudoper = new BPerson(per);
+					s_P.add(new PersonIndex(family.getID(), person.getID(), person, false, false));
+					Person pseudoper = new Person(person);
 					plist.add(pseudoper);
-					s_P.add(new PersonIndex(fs.getFamilyStructName(), pseudoper
+					s_P.add(new PersonIndex(family.getID(), pseudoper
 							.getPersonID(), pseudoper, true, false));
 					si++;
 					// s++;
@@ -78,9 +68,9 @@ public class AJHG2008 extends ChenBase
 				SibIdx.add(new Integer(si));
 				for (int i = 0; i < plist.size(); i++)
 				{
-					fs.addPerson(plist.get(i));
+					family.addPerson(plist.get(i));
 				}
-				fam_has_sib.put(fs.getFamilyStructName(), fs);
+				fam_has_sib.add(family);
 			}
 			// c++;
 		}
@@ -97,36 +87,29 @@ public class AJHG2008 extends ChenBase
 		seed = sd;
 	}
 
-	private void NonTransmitted(Hashtable<String, BFamilyStruct> Fam)
+	private void NonTransmitted(ArrayList<Family> families)
 	{
+		Person pseudoper;
 
-		Enumeration<String> perList;
-		BFamilyStruct fam;
-		BPerson per;
-		BPerson pseudoper;
-		String iid;
-
-		for (int i = 0; i < MapData.getMarkerNumber(); i++)
+		for (int markerIdx = 0; markerIdx < MapData.getMarkerNumber(); ++markerIdx)
 		{
-			for (Entry<String, BFamilyStruct> entry : Fam.entrySet())
+			for (Family family : families)
 			{
-				fam = entry.getValue();
-				perList = fam.getPersonList();
-				GenoSet genoset = GenotypeSummary(fam, i);
+				GenoSet genoset = GenotypeSummary(family, markerIdx);
 				int numGenotypedParents = genoset.getNumTypedParents();
 				AbstractGenoDistribution gDis;
 				TreeSet<String> aSet = new TreeSet<String>();
 				if (numGenotypedParents == 2)
 				{
-					fam.countAllele(genoset.getchildrenGenoMap(), aSet);
-					fam.countAllele(genoset.getparentsGenoMap(), aSet);
+					family.countAllele(genoset.getchildrenGenoMap(), aSet);
+					family.countAllele(genoset.getparentsGenoMap(), aSet);
 					gDis = new ObservedParents(genoset.getchildrenGenoMap(),
 							genoset.getparentsGenoMap());
 				} 
 				else
 				{
-					fam.countAllele(genoset.getchildrenGenoMap(), aSet);
-					fam.countAllele(genoset.getparentsGenoMap(), aSet);
+					family.countAllele(genoset.getchildrenGenoMap(), aSet);
+					family.countAllele(genoset.getparentsGenoMap(), aSet);
 					if (numGenotypedParents == 1)
 					{
 						String PG = genoset.getparentsGenoMap().firstKey();
@@ -146,57 +129,52 @@ public class AJHG2008 extends ChenBase
 					} 
 					else
 					{// table 3
-						gDis = new UnobservedParents(
-								genoset.getchildrenGenoMap());
+						gDis = new UnobservedParents(genoset.getchildrenGenoMap());
 					}
 				}
-				perList = fam.getPersonList();
-				while (perList.hasMoreElements())
+				
+				for (int personIdx = 0; personIdx < family.size(); ++personIdx)
 				{
-					iid = perList.nextElement();
-					if (iid.contains("ajhg2008") || !fam.hasAncestor(iid))
+					Person person = family.getPerson(personIdx);
+					if (person.getID().contains("ajhg2008") || !family.hasAncestor(person))
 					{
 						continue;
 					}
-					per = fam.getPerson(iid);
-					StringBuffer sb = new StringBuffer(iid);
-					sb.append("ajhg2008");
-					pseudoper = fam.getPerson(sb.toString());
-					String g = per.getBiAlleleGenotypeString(i);
+					pseudoper = family.getPerson(person + "ajhg2008");
+					String g = person.getBiAlleleGenotypeString(markerIdx);
 					boolean f = g.compareTo(CmdArgs.INSTANCE.missingGenotype) != 0;
 					String[] nontran_tran = new String[2];
 					if (f)
 					{
-						nontran_tran = fam.getNonTransmitted(g, gDis);
+						nontran_tran = family.getNonTransmitted(g, gDis);
 						int a1 = Integer.parseInt(nontran_tran[0].substring(0,
 								1));
 						int a2 = Integer.parseInt(nontran_tran[0].substring(1,
 								2));
-						pseudoper.addMarker(f, a1, a2, i);
+						pseudoper.addMarker(f, a1, a2, markerIdx);
 					} 
 					else
 					{
-						pseudoper.addMarker(f, 0, 0, i);
+						pseudoper.addMarker(f, 0, 0, markerIdx);
 					}
 				}
 			}
 		}
 	}
 
-	protected GenoSet GenotypeSummary(BFamilyStruct fs, int idx)
+	protected GenoSet GenotypeSummary(Family family, int idx)
 	{
 
 		TreeMap<String, Integer> Ps = NewIt.newTreeMap();
 		TreeMap<String, Integer> Ks = NewIt.newTreeMap();
-		Enumeration<String> perList = fs.getPersonList();
-		while (perList.hasMoreElements())
+		for (int personIdx = 0; personIdx < family.size(); ++personIdx)
 		{
-			String iid = perList.nextElement();
-			if (iid.contains("ajhg2008"))
+			Person person = family.getPerson(personIdx);
+			if (person.getID().contains("ajhg2008"))
 				continue;
-			BPerson per = fs.getPerson(iid);
+			Person per = family.getPerson(person.getID());
 			String genotype = per.getBiAlleleGenotypeString(idx);
-			if (fs.hasAncestor(per.getPersonID()))
+			if (family.hasAncestor(per.getPersonID()))
 			{
 				if (Ks.containsKey(genotype))
 				{

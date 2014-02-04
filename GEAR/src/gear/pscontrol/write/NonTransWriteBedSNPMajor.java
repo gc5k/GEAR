@@ -10,9 +10,9 @@ import java.util.Iterator;
 
 import gear.CmdArgs;
 import gear.ConstValues;
+import gear.data.Person;
 import gear.family.pedigree.PersonIndex;
 import gear.family.pedigree.file.SNP;
-import gear.family.pedigree.genotype.BPerson;
 import gear.family.plink.PLINKBinaryParser;
 import gear.family.plink.PLINKParser;
 import gear.family.qc.rowqc.SampleFilter;
@@ -81,7 +81,7 @@ public class NonTransWriteBedSNPMajor
 		for (Iterator<PersonIndex> e = PersonTable.iterator(); e.hasNext();)
 		{
 			PersonIndex per = e.next();
-			BPerson bp = per.getPerson();
+			Person bp = per.getPerson();
 			String[] id = bp.getPersonID().split("ajhg2008");
 			pfam.append(bp.getFamilyID() + "\t" + id[0] + "\t" + bp.getDadID()
 					+ "\t" + bp.getMomID() + "\t" + bp.getGender() + "\t"
@@ -112,13 +112,13 @@ public class NonTransWriteBedSNPMajor
 				byte gbyte = 0;
 				int idx = 0;
 
-				int posByte = i >> BPerson.shift;
+				int posByte = i >> Person.shift;
 				int posBit = (i & 0xf) << 1;
 
 				for (int j = 0; j < PersonTable.size(); j++)
 				{
 					PersonIndex pi = PersonTable.get(j);
-					BPerson bp = pi.getPerson();
+					Person bp = pi.getPerson();
 					byte g = bp.getOriginalGenotypeScore(posByte, posBit);
 
 					g <<= 2 * idx;

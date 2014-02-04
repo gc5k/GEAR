@@ -15,10 +15,10 @@ import org.apache.commons.math.random.RandomDataImpl;
 
 import gear.CmdArgs;
 import gear.ConstValues;
+import gear.data.Person;
 import gear.data.SubjectID;
 import gear.family.pedigree.PersonIndex;
 import gear.family.pedigree.file.SNP;
-import gear.family.pedigree.genotype.BPerson;
 import gear.family.plink.PLINKBinaryParser;
 import gear.family.plink.PLINKParser;
 import gear.family.qc.rowqc.SampleFilter;
@@ -229,7 +229,7 @@ public class WriteBedSNPMajor
 		for (int i = 0; i < PrintPerson.size(); i++)
 		{
 			PersonIndex per = PrintPerson.get(i);
-			BPerson bp = per.getPerson();
+			Person bp = per.getPerson();
 			pfam.append(bp.getFamilyID() + "\t" + bp.getPersonID() + "\t"
 					+ bp.getDadID() + "\t" + bp.getMomID() + "\t"
 					+ bp.getGender() + "\t" + bp.getAffectedStatus() + "\n");
@@ -267,14 +267,14 @@ public class WriteBedSNPMajor
 				byte gbyte = 0;
 				int idx = 0;
 
-				int posByte = i >> BPerson.shift;
+				int posByte = i >> Person.shift;
 				int posBit = (i & 0xf) << 1;
 
 
 				for (int j = 0; j < PrintPerson.size(); j++)
 				{
 					PersonIndex pi = PrintPerson.get(j);
-					BPerson bp = pi.getPerson();
+					Person bp = pi.getPerson();
 					byte g = bp.getOriginalGenotypeScore(posByte, posBit);
 
 					if (CmdArgs.INSTANCE.zerogenoFlag)

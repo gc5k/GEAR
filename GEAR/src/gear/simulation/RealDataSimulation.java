@@ -13,9 +13,9 @@ import org.apache.commons.math.random.RandomDataImpl;
 import org.apache.commons.math.stat.StatUtils;
 
 import gear.CmdArgs;
+import gear.data.Person;
 import gear.family.pedigree.PersonIndex;
 import gear.family.pedigree.file.SNP;
-import gear.family.pedigree.genotype.BPerson;
 import gear.family.plink.PLINKBinaryParser;
 import gear.family.plink.PLINKParser;
 import gear.family.qc.rowqc.SampleFilter;
@@ -209,7 +209,7 @@ public class RealDataSimulation
 				int idx = casualLociIdx[j];
 				int g = GM.getGenotypeScore(i, idx);
 
-				if (g == BPerson.MissingGenotypeCode)
+				if (g == Person.MissingGenotypeCode)
 					continue; // leave it alone if it is missing
 
 				bv[i] += ae[j] * GM.getGenotypeScore(i, idx);
