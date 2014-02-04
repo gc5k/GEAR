@@ -89,6 +89,10 @@ public enum CmdArgs
 		// ibd
 		ops.addOption(OptionBuilder.withLongOpt(cmd_quickibd_long).withDescription("quick ibd for dense markers" ).create(cmd_quickibd));
 
+		ops.addOption(OptionBuilder.withLongOpt(cmd_helink_long).withDescription("he linkage" ).create(cmd_helink));
+		ops.addOption(OptionBuilder.withLongOpt(cmd_ibd).withDescription("ibd score file" ).hasArg().create(cmd_helink));
+		ops.addOption(OptionBuilder.withDescription("reml" ).create(cmd_reml));
+
 		// nontransmitted
 		ops.addOption(OptionBuilder.withDescription("nontransmitted ")
 				.create(cmd_nontrans));
@@ -599,11 +603,23 @@ public enum CmdArgs
 	public boolean polyEffectFlag = false;
 	public String polyEffectFile = null;
 
+	//HE linkage
 	// /////////////////ibd
 	private final String cmd_quickibd = "quick_ibd";
 	private final String cmd_quickibd_long = "quick-ibd";
 
 	public boolean quickibdFlag = false;
+	
+	////Joint HE Linkage ls
+	private final String cmd_helink = "he_link";
+	private final String cmd_helink_long = "he-link";
+	public boolean helinkFlag = false;
+	
+	private final String cmd_ibd = "ibd";
+	public String ibdFile = null;
+	
+	private final String cmd_reml = "reml";
+	public boolean remlFlag = false;
 	
 	// /////////////////nontrans
 	private final String cmd_nontrans = "nontrans";
@@ -852,6 +868,7 @@ public enum CmdArgs
 			if (cmdLine.hasOption(cmd_pheno))
 			{
 				pheno = cmdLine.getOptionValue(cmd_pheno);
+				FileUtil.exists(pheno);
 			}
 
 			if (cmdLine.hasOption(targetTraitOpt))
@@ -1433,6 +1450,23 @@ public enum CmdArgs
 		{
 			quickibdFlag = true;
 		}
+		
+		if (cmdLine.hasOption(cmd_helink))
+		{
+			helinkFlag = true;
+		}
+
+		if (cmdLine.hasOption(cmd_reml))
+		{
+			remlFlag = true;
+		}
+
+		if (cmdLine.hasOption(cmd_ibd))
+		{
+			ibdFile = cmdLine.getOptionValue(cmd_ibd);
+			FileUtil.exists(ibdFile);
+		}
+
 		// nontrans
 		if (cmdLine.hasOption(cmd_nontrans))
 		{
