@@ -11,7 +11,7 @@ import gear.grm.MakeGRM;
 import gear.he.HEMCalculate;
 import gear.he.HEMRead;
 import gear.he.h2trans.H2Transformer;
-import gear.ibd.ParentIBD;
+import gear.ibd.ibd.ParentIBD;
 import gear.imputation.NaiveImputation;
 import gear.metawatchdog.decrypt.MetaWatchdog;
 import gear.metawatchdog.powercalculator.MetaWatchdogPowerCalculator;

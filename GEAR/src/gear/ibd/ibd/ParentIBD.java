@@ -1,4 +1,4 @@
-package gear.ibd;
+package gear.ibd.ibd;
 
 import java.io.PrintStream;
 
