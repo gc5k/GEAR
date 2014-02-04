@@ -12,6 +12,8 @@ import gear.he.HEMCalculate;
 import gear.he.HEMRead;
 import gear.he.h2trans.H2Transformer;
 import gear.ibd.ibd.ParentIBD;
+import gear.ibd.jhe.JointHELinkLS;
+import gear.ibd.jhe.JointHELinkML;
 import gear.imputation.NaiveImputation;
 import gear.metawatchdog.decrypt.MetaWatchdog;
 import gear.metawatchdog.powercalculator.MetaWatchdogPowerCalculator;
@@ -238,6 +240,17 @@ public enum Gear
 			{
 				ParentIBD ibd = new ParentIBD();
 				ibd.getIBD();
+			}
+			else if (CmdArgs.INSTANCE.helinkFlag)
+			{
+				if (CmdArgs.INSTANCE.remlFlag)
+				{
+					JointHELinkML heReml = new JointHELinkML();
+				}
+				else
+				{
+					JointHELinkLS heLS = new JointHELinkLS();
+				}
 			}
 
 			monitor.stopMonitoring();
