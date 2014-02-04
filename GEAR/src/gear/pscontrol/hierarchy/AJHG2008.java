@@ -13,6 +13,7 @@ import org.apache.commons.lang3.ArrayUtils;
 
 
 import gear.CmdArgs;
+import gear.data.FamilySet;
 import gear.family.RabinowitzLairdAlgorithm.AbstractGenoDistribution;
 import gear.family.RabinowitzLairdAlgorithm.lou.HeterozygousParent;
 import gear.family.RabinowitzLairdAlgorithm.lou.HomozygousParent;
@@ -38,7 +39,7 @@ public class AJHG2008 extends ChenBase
 
 	public void RevvingUp(ArrayList<PersonIndex> pt)
 	{
-		Hashtable<String, BFamilyStruct> Fam = PedData.getFamilyStruct();
+		FamilySet familySet = PedData.getFamilySet();
 		Hashtable<String, BFamilyStruct> fam_has_sib = NewIt.newHashtable();
 		PersonTable.ensureCapacity(qualified_Sib);
 
@@ -50,7 +51,7 @@ public class AJHG2008 extends ChenBase
 		// int s = 0;
 		for (String fi : PedData.getFamListSorted())
 		{
-			BFamilyStruct fs = Fam.get(fi);
+			BFamilyStruct fs = familySet.getFamily(fi);
 			String[] pi = fs.getPersonListSorted();
 			int si = 0;
 			ArrayList<BPerson> plist = NewIt.newArrayList();

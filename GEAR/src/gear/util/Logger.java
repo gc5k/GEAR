@@ -157,6 +157,7 @@ public class Logger
 	public static void fatalInternalBug(String msg)
 	{
 		getDevLogger().severe(printInternalBug(msg, /*fatal*/true));
+		printUserError("A fatal internal bug occurred in the program. Sorry this is the program authors' fault.");
 		System.exit(1);
 	}
 	

@@ -1,7 +1,6 @@
 package gear;
 
-import java.util.*;
-
+import gear.data.FamilySet;
 import gear.family.pedigree.file.MapFile;
 import gear.family.pedigree.file.PedigreeFile;
 import gear.family.pedigree.file.SNP;
@@ -38,11 +37,12 @@ public class PlinkBinaryDataTest
 		assertEquals(5, pedData.getNumMarker());
 
 		// individual info begin
-		Hashtable<String, BFamilyStruct> familyStructs = pedData.getFamilyStruct();
-		assertEquals(4, familyStructs.size());
+		FamilySet familySet = pedData.getFamilySet();
+		assertEquals(4, familySet.size());
 		
-		BFamilyStruct fam0 = familyStructs.get("fam0"); 
+		BFamilyStruct fam0 = familySet.getFamily("fam0"); 
 		assertNotNull(fam0);
+		assertSame(fam0, familySet.getFamily(0));
 		assertEquals(3, fam0.getNumPersons());
 		
 		BPerson per0 = fam0.getPerson("per0");
@@ -66,8 +66,9 @@ public class PlinkBinaryDataTest
 		assertEquals(2, per2.getGender());
 		assertEquals("2", per2.getAffectedStatus());
 		
-		BFamilyStruct per3Fam = familyStructs.get("per3"); 
+		BFamilyStruct per3Fam = familySet.getFamily("per3"); 
 		assertNotNull(per3Fam);
+		assertSame(per3Fam, familySet.getFamily(1));
 		assertEquals(1, per3Fam.getNumPersons());
 		
 		BPerson per3 = per3Fam.getPerson("per3");
@@ -77,8 +78,9 @@ public class PlinkBinaryDataTest
 		assertEquals(2, per3.getGender());
 		assertEquals("2", per3.getAffectedStatus());
 		
-		BFamilyStruct per4Fam = familyStructs.get("per4"); 
+		BFamilyStruct per4Fam = familySet.getFamily("per4"); 
 		assertNotNull(per4Fam);
+		assertSame(per4Fam, familySet.getFamily(2));
 		assertEquals(1, per4Fam.getNumPersons());
 		
 		BPerson per4 = per4Fam.getPerson("per4");
@@ -88,8 +90,9 @@ public class PlinkBinaryDataTest
 		assertEquals(2, per4.getGender());
 		assertEquals("1", per4.getAffectedStatus());
 		
-		BFamilyStruct per5Fam = familyStructs.get("per5"); 
+		BFamilyStruct per5Fam = familySet.getFamily("per5"); 
 		assertNotNull(per5Fam);
+		assertSame(per5Fam, familySet.getFamily(3));
 		assertEquals(1, per5Fam.getNumPersons());
 		
 		BPerson per5 = per5Fam.getPerson("per5");

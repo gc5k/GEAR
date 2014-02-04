@@ -69,11 +69,11 @@ public class BEDReader extends PedigreeFile
 
 			hukou = new Hukou(tokens[0], tokens[1], tokens[2], tokens[3],
 					tokens[4], tokens[5]);
-			BFamilyStruct famstr = familystructure.get(tokens[0]);
+			BFamilyStruct famstr = familySet.getFamily(tokens[0]);
 			if (famstr == null)
 			{
 				famstr = new BFamilyStruct(tokens[0]);
-				familystructure.put(tokens[0], famstr);
+				familySet.putFamily(famstr);
 			}
 			if (famstr.getPersons().containsKey(person.getPersonID()))
 			{
