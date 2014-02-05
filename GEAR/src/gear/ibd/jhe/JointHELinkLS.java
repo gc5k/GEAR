@@ -6,6 +6,7 @@ import java.util.ArrayList;
 import org.apache.commons.math.stat.regression.OLSMultipleLinearRegression;
 
 import gear.CmdArgs;
+import gear.ConstValues;
 import gear.data.PhenotypeFile;
 import gear.data.SubjectID;
 import gear.util.BufferedReader;
@@ -127,7 +128,7 @@ public class JointHELinkLS
 	
 	private void readPhenotypes()
 	{
-		phe = new PhenotypeFile(pheFile);
+		phe = new PhenotypeFile(pheFile, ConstValues.HeaderLineNo);
 		if (phe.getNumberOfTraits() < pheIdx)
 		{
 			Logger.printUserError("the index for the selected phenotype is too large! Only " + phe.getNumberOfTraits() + " phenotypes.");

@@ -5,6 +5,7 @@ import java.io.PrintStream;
 import org.apache.commons.math.stat.StatUtils;
 import org.apache.commons.math.stat.regression.SimpleRegression;
 
+import gear.ConstValues;
 import gear.data.PhenotypeFile;
 import gear.subcommands.CommandArguments;
 import gear.subcommands.CommandImpl;
@@ -20,8 +21,8 @@ public class MetaWatchdog2CommandImpl extends CommandImpl
 		
 		Logger.printUserLog("Cutoff: " + mwArgs.getCutoff());
 		
-		PhenotypeFile phe1 = new PhenotypeFile(mwArgs.getDataset1(), /*hasHeaders*/true);
-		PhenotypeFile phe2 = new PhenotypeFile(mwArgs.getDataset2(), /*hasHeaders*/true);
+		PhenotypeFile phe1 = new PhenotypeFile(mwArgs.getDataset1(), ConstValues.HeaderLineYes);
+		PhenotypeFile phe2 = new PhenotypeFile(mwArgs.getDataset2(), ConstValues.HeaderLineYes);
 		
 		PrintStream predictorFile = FileUtil.CreatePrintStream(mwArgs.getOutRoot() + ".watchdog");
 

@@ -9,10 +9,10 @@ import java.util.ArrayList;
 
 public class PhenotypeFile implements SubjectOrder
 {
-	public PhenotypeFile(String fileName)
-	{
-		this(fileName, /*hasHeaders*/false);
-	}
+//	public PhenotypeFile(String fileName)
+//	{
+//		this(fileName, /*hasHeaders*/false);
+//	}
 	
 	public PhenotypeFile(String fileName, boolean hasHeaders)
 	{
