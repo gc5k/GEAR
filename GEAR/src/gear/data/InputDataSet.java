@@ -1,5 +1,6 @@
 package gear.data;
 
+import gear.ConstValues;
 import gear.util.Logger;
 
 /**
@@ -20,7 +21,7 @@ public class InputDataSet implements SubjectOrder
 	
 	public void readPhenotypeFile(String fileName)
 	{
-		phenotypeFile = new PhenotypeFile(fileName);
+		phenotypeFile = new PhenotypeFile(fileName, ConstValues.HeaderLineNo);
 		makeSubjectOrderConsistent(phenotypeFile);
 	}
 	
