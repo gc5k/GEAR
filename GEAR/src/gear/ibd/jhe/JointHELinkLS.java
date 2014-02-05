@@ -172,7 +172,7 @@ public class JointHELinkLS
 			SubjectID id21 = new SubjectID(tokens2[0], tokens2[1]);
 			SubjectID id22 = new SubjectID(tokens2[2], tokens2[3]);
 
-			if (id11 != id21 && id12 != id22)
+			if (id11 != id21 || id12 != id22)
 			{
 				reader.errorPreviousLine("The IDs in this line and the above line do not match.");
 			}
