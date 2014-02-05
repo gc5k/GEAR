@@ -77,14 +77,14 @@ public class JointHELinkLS
 			System.arraycopy(mibd[id], 0, tmibd[id], 0, mibd[id].length);
 		}
 
-		double[][] pibd = new double[keepIBD.size()][tpibd[0].length];
-		double[][] mibd = new double[keepIBD.size()][tmibd[0].length];
+		pibd = new double[keepIBD.size()][tpibd[0].length];
+		mibd = new double[keepIBD.size()][tmibd[0].length];
 
 		for(int i = 0; i < keepIBD.size(); i++)
 		{
 			int id = keepIBD.get(i).intValue();
 			System.arraycopy(tpibd[id], 0, pibd[id], 0, pibd[id].length);
-			System.arraycopy(tmibd[id], 0, mibd[id], 0, pibd[id].length);
+			System.arraycopy(tmibd[id], 0, mibd[id], 0, mibd[id].length);
 		}
 
 		//make Y
