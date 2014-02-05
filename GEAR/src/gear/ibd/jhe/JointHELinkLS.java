@@ -2,12 +2,11 @@ package gear.ibd.jhe;
 
 import java.io.PrintStream;
 import java.util.ArrayList;
-import java.util.HashMap;
 
 import org.apache.commons.math.stat.regression.OLSMultipleLinearRegression;
 
 import gear.CmdArgs;
-import gear.data.InputDataSet;
+import gear.data.PhenotypeFile;
 import gear.data.SubjectID;
 import gear.util.BufferedReader;
 import gear.util.FileUtil;
@@ -19,16 +18,17 @@ public class JointHELinkLS
 	private String ibdFile;
 	private String pheFile;
 	private int pheIdx = 0;
-	private ArrayList<String> ibdID1 = NewIt.newArrayList();
-	private ArrayList<String> ibdID2 = NewIt.newArrayList();
+	private ArrayList<SubjectID> ibdID1 = NewIt.newArrayList();
+	private ArrayList<SubjectID> ibdID2 = NewIt.newArrayList();
 	private double[][] pibd;
 	private double[][] mibd;
 
-	private HashMap<String, Integer> pheID = NewIt.newHashMap();
-	private HashMap<String, Boolean> keep = NewIt.newHashMap();
 	private ArrayList<Integer> keepIBD = NewIt.newArrayList();
 	
-	private double[][] phe;
+	// PhenotypeFile is used here instead of InputDataSet,
+	// because the IBD file format is not consistent with the design
+	// purpose of InputDataSet and cannot be moved into InputDataSet.
+	private PhenotypeFile phe;
 	private double[] Y;
 
 	public JointHELinkLS ()
@@ -52,44 +52,31 @@ public class JointHELinkLS
 		ArrayList<Double> HEphe = NewIt.newArrayList();
 		for (int i = 0; i < ibdID1.size(); i++)
 		{
-
-			if(keep.containsKey(ibdID1.get(i)) && keep.containsKey(ibdID2.get(i)))
+			int idx1 = phe.getSubjectIndex(ibdID1.get(i));
+			int idx2 = phe.getSubjectIndex(ibdID2.get(i));
+			if (!phe.isMissing(idx1, pheIdx) && !phe.isMissing(idx2, pheIdx))
 			{
-				if (keep.get(ibdID1.get(i)) && keep.get(ibdID2.get(i)))
-				{
-					int idx1 = pheID.get(ibdID1.get(i)).intValue();
-					int idx2 = pheID.get(ibdID2.get(i)).intValue();
-					double d= phe[idx1][0] - phe[idx2][0];
-					HEphe.add(d*d);
-					keepIBD.add(i);
-				}
+				double d = phe.getPhenotype(idx1, pheIdx) - phe.getPhenotype(idx2, pheIdx);
+				HEphe.add(d*d);
+				keepIBD.add(i);
 			}
 		}
 
 		//make ibd
-		double[][] tpibd = new double[keepIBD.size()][pibd[0].length];
-		double[][] tmibd = new double[keepIBD.size()][mibd[0].length];
+		double[][] tpibd = new double[keepIBD.size()][];
+		double[][] tmibd = new double[keepIBD.size()][];
 		
-		for(int i = 0; i < keepIBD.size(); i++)
+		for(int originalIdx : keepIBD)
 		{
-			int id = keepIBD.get(i).intValue();
-			System.arraycopy(pibd[id], 0, tpibd[id], 0, pibd[id].length);
-			System.arraycopy(mibd[id], 0, tmibd[id], 0, mibd[id].length);
+			int newIdx = keepIBD.get(originalIdx).intValue();
+			tpibd[newIdx] = pibd[newIdx];
+			tmibd[newIdx] = mibd[newIdx];
 		}
-
-		pibd = new double[keepIBD.size()][tpibd[0].length];
-		mibd = new double[keepIBD.size()][tmibd[0].length];
-
-		for(int i = 0; i < keepIBD.size(); i++)
-		{
-			int id = keepIBD.get(i).intValue();
-			System.arraycopy(tpibd[id], 0, pibd[id], 0, pibd[id].length);
-			System.arraycopy(tmibd[id], 0, mibd[id], 0, mibd[id].length);
-		}
+		pibd = tpibd;
+		mibd = tmibd;
 
 		//make Y
 		Y = new double[HEphe.size()];
-
 		for (int i = 0; i < Y.length; i++)
 		{
 			Y[i] = HEphe.get(i);
@@ -110,10 +97,8 @@ public class JointHELinkLS
 
 	private void JHEpm()
 	{
-		StringBuffer sb = new StringBuffer();
-		sb.append(CmdArgs.INSTANCE.out);
-		sb.append(".helink");
-		PrintStream ps = FileUtil.CreatePrintStream(sb.toString());
+		String outFileName = CmdArgs.INSTANCE.out + ".helink";
+		PrintStream ps = FileUtil.CreatePrintStream(outFileName);
 		OLSMultipleLinearRegression regression = new OLSMultipleLinearRegression();
 		Logger.printUserLog("Started scannning...");
 		ps.println("mean\tb1(paternal)\tb2(maternal)");
@@ -135,49 +120,18 @@ public class JointHELinkLS
 			ps.println();
 		}
 		ps.close();
-		Logger.printUserLog("Finished HE scanning. The result has been saved in " + sb.toString());
+		Logger.printUserLog("Finished HE scanning. The result has been saved in " + outFileName);
 	}
 	
 	
 	private void readPhenotypes()
 	{
-		InputDataSet ds = new InputDataSet();
-		Logger.printUserLog("Reading " + pheFile);
-		ds.readPhenotypeFile(pheFile);
-		Logger.printUserLog("Read " + ds.getNumberOfSubjects() + " individuals, " + ds.getNumberOfTraits() + " phenotype(s) in " + pheFile);
-
-		if (ds.getNumberOfTraits() < pheIdx)
+		phe = new PhenotypeFile(pheFile);
+		if (phe.getNumberOfTraits() < pheIdx)
 		{
-			Logger.printUserError("the index for the selected phenotype is too large! Only " + ds.getNumberOfTraits() + " phenotypes.");
+			Logger.printUserError("the index for the selected phenotype is too large! Only " + phe.getNumberOfTraits() + " phenotypes.");
 			System.exit(1);
 		}
-
-		phe = new double[ds.getNumberOfSubjects()][1];
-		int cn = 0;
-		int Cn = 0;
-		for (int i = 0; i < ds.getNumberOfSubjects(); i++)
-		{
-			SubjectID subID = ds.getSubjectID(i);
-			StringBuffer sb = new StringBuffer(subID.getFamilyID());
-			sb.append(".");
-			sb.append(subID.getIndividualID());
-			for (int j = 0; j < 1; j++)
-			{
-				if (ds.isPhenotypeMissing(i, pheIdx))
-				{
-					keep.put(sb.toString(), false);
-					cn++;
-				}
-				else
-				{
-					pheID.put(sb.toString(), Cn++);
-					keep.put(sb.toString(), true);
-					phe[i][j] = ds.getPhenotype(i, j);
-				}
-			}
-		}
-		
-		Logger.printUserLog(Cn + " nonmissing values in " + pheFile + " for the selected trait.");
 	}
 	
 	private void readIBD()
@@ -213,12 +167,12 @@ public class JointHELinkLS
 
 			tokens2 = reader.readTokens(numCols);
 
-			String id11 = tokens1[0] + "." + tokens1[1];
-			String id12 = tokens1[2] + "." + tokens1[3];
-			String id21 = tokens2[0] + "." + tokens2[1];
-			String id22 = tokens2[2] + "." + tokens2[3];
+			SubjectID id11 = new SubjectID(tokens1[0], tokens1[1]);
+			SubjectID id12 = new SubjectID(tokens1[2], tokens1[3]);
+			SubjectID id21 = new SubjectID(tokens2[0], tokens2[1]);
+			SubjectID id22 = new SubjectID(tokens2[2], tokens2[3]);
 
-			if (!id11.equals(id21) && !id12.equals(id22))
+			if (id11 != id21 && id12 != id22)
 			{
 				reader.errorPreviousLine("The IDs in this line and the above line do not match.");
 			}
