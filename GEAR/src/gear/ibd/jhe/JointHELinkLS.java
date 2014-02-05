@@ -1,13 +1,11 @@
 package gear.ibd.jhe;
 
-import java.io.BufferedReader;
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
 
 import gear.CmdArgs;
 import gear.data.InputDataSet;
-import gear.util.FileUtil;
+import gear.util.BufferedReader;
 import gear.util.Logger;
 import gear.util.NewIt;
 
@@ -59,95 +57,68 @@ public class JointHELinkLS
 	
 	private void readIBD()
 	{
-		BufferedReader bf = FileUtil.FileOpen(ibdFile);
-		String line = null;
-		ArrayList<String> tibd = NewIt.newArrayList();
+		BufferedReader reader = BufferedReader.openTextFile(ibdFile, "ibd");
 
-		int cn = 0;
-		int Len = 0;
-		boolean quit = false;
-		try
+		String[] tokens1 = reader.readTokensAtLeast(4), tokens2;
+		
+		int numCols = tokens1.length;
+		if (numCols % 2 != 0)
 		{
-			while((line = bf.readLine()) !=null)
-			{
-				String[] s = line.split("\\s+");
-				if (cn == 0)
-				{
-					Len = s.length;
-				}
-				else
-				{
-					if(s.length != Len)
-					{
-						Logger.printUserError("Line " + (cn+1) + " does not have same number of elements as the first line");
-						quit = true;
-					}
-				}
-				cn++;
-				tibd.add(line);
-			}
-		}
-		catch (IOException e)
-		{
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-		if(quit)
-		{
-			System.exit(1);
+			reader.errorPreviousLine("Odd number of columns (" + numCols + " columns).");
 		}
 		
-		if(tibd.size() % 2 != 0)
-		{
-			Logger.printUserLog("Odd number of lines in " + ibdFile + ".");
-			Logger.printUserLog("gear quitted");
-		}
+		ArrayList<double[]> pibd = new ArrayList<double[]>();
+		ArrayList<double[]> mibd = new ArrayList<double[]>();
 
-		pibd = new double[tibd.size()][Len-4];
-		mibd = new double[tibd.size()][Len-4];
+		do
+		{	
+			double[] ibdThisDad = new double[numCols - 4];
+			for (int j = 4; j < numCols; ++j)
+			{
+				try
+				{
+					ibdThisDad[j - 4] = Double.parseDouble(tokens1[j]);
+				}
+				catch (NumberFormatException e)
+				{
+					reader.errorPreviousLine("'" + tokens1[j] + "' is not a valid floating point number.");
+				}
+			}
+			pibd.add(ibdThisDad);
 
-		for (int i = 0; i < tibd.size() /2 ; i++)
-		{
-			String s1[] = tibd.get(i*2).split("\\s+");
-			String s2[] = tibd.get(i*2+1).split("\\s+");
-			StringBuffer sb1 = new StringBuffer();
-			sb1.append(s1[0]);
-			sb1.append(".");
-			sb1.append(s1[1]);
-			ibdID1.add(sb1.toString());
+			tokens2 = reader.readTokens(numCols);
 			
-			StringBuffer sb2 = new StringBuffer();
-			sb2.append(s1[2]);
-			sb2.append(".");
-			sb2.append(s1[3]);
-			ibdID2.add(sb2.toString());
+			String id11 = tokens1[0] + "." + tokens1[1];
+			String id12 = tokens1[2] + "." + tokens1[3];
+			String id21 = tokens2[0] + "." + tokens2[1];
+			String id22 = tokens2[2] + "." + tokens2[3];
 
-			StringBuffer sb3 = new StringBuffer();
-			sb3.append(s2[0]);
-			sb3.append(".");
-			sb3.append(s2[1]);
+			if (!id11.equals(id21) && !id12.equals(id22))
+			{
+				reader.errorPreviousLine("The IDs in this line and the above line do not match.");
+			}
 			
-			StringBuffer sb4 = new StringBuffer();
-			sb4.append(s2[2]);
-			sb4.append(".");
-			sb4.append(s2[3]);
-			if (ibdID1.get(i).compareTo(sb3.toString())!= 0 && ibdID2.get(i).compareTo(sb4.toString()) != 0)
+			ibdID1.add(id11);
+			ibdID2.add(id12);
+			
+			double[] ibdThisMom = new double[numCols - 4];
+			for (int j = 4; j < numCols; ++j)
 			{
-				Logger.printUserError("Line " + (i*2) + " and line " + (i*2 +1) + " do not match ids.");
-				Logger.printUserLog("gear quitted.");
-				System.exit(1);
+				try
+				{
+					ibdThisMom[j - 4] = Double.parseDouble(tokens2[j]);
+				}
+				catch (NumberFormatException e)
+				{
+					reader.errorPreviousLine("'" + tokens2[j] + "' is not a valid floating point number.");
+				}
 			}
-
-			for (int j = 4; j < s1.length; j++)
-			{
-				pibd[i][j-4] = Double.parseDouble(s1[j]);
-			}
-			for (int j = 4; j < s2.length; j++)
-			{
-				mibd[i][j-4] = Double.parseDouble(s2[j]);
-			}
-
-		}
+			mibd.add(ibdThisMom);
+		} while ((tokens1 = reader.readTokens(numCols)) != null);
+		
+		this.pibd = pibd.toArray(new double[0][]);
+		this.mibd = mibd.toArray(new double[0][]);
+		
 		Logger.printUserLog("Read " + ibdID1.size() + " pairs in " + ibdFile);
 	}
 }
