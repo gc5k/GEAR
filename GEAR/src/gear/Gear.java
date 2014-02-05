@@ -250,6 +250,7 @@ public enum Gear
 				else
 				{
 					JointHELinkLS heLS = new JointHELinkLS();
+					heLS.JHE();
 				}
 			}
 
