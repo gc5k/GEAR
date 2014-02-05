@@ -54,7 +54,7 @@ public class JointHELinkLS
 		{
 			int idx1 = phe.getSubjectIndex(ibdID1.get(i));
 			int idx2 = phe.getSubjectIndex(ibdID2.get(i));
-			if (!phe.isMissing(idx1, pheIdx) && !phe.isMissing(idx2, pheIdx))
+			if (idx1 != -1 && idx2 != -1 && !phe.isMissing(idx1, pheIdx) && !phe.isMissing(idx2, pheIdx))
 			{
 				double d = phe.getPhenotype(idx1, pheIdx) - phe.getPhenotype(idx2, pheIdx);
 				HEphe.add(d*d);
@@ -66,11 +66,12 @@ public class JointHELinkLS
 		double[][] tpibd = new double[keepIBD.size()][];
 		double[][] tmibd = new double[keepIBD.size()][];
 		
+		int idx = 0;
 		for(int originalIdx : keepIBD)
 		{
-			int newIdx = keepIBD.get(originalIdx).intValue();
-			tpibd[newIdx] = pibd[newIdx];
-			tmibd[newIdx] = mibd[newIdx];
+			tpibd[idx] = pibd[originalIdx];
+			tmibd[idx] = mibd[originalIdx];
+			++idx;
 		}
 		pibd = tpibd;
 		mibd = tmibd;
