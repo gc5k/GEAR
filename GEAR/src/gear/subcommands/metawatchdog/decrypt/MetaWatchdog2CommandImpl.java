@@ -21,8 +21,8 @@ public class MetaWatchdog2CommandImpl extends CommandImpl
 		
 		Logger.printUserLog("Cutoff: " + mwArgs.getCutoff());
 		
-		PhenotypeFile phe1 = new PhenotypeFile(mwArgs.getDataset1(), ConstValues.HeaderLineYes);
-		PhenotypeFile phe2 = new PhenotypeFile(mwArgs.getDataset2(), ConstValues.HeaderLineYes);
+		PhenotypeFile phe1 = new PhenotypeFile(mwArgs.getDataset1(), ConstValues.HAS_HEADER);
+		PhenotypeFile phe2 = new PhenotypeFile(mwArgs.getDataset2(), ConstValues.HAS_HEADER);
 		
 		PrintStream predictorFile = FileUtil.CreatePrintStream(mwArgs.getOutRoot() + ".watchdog");
 

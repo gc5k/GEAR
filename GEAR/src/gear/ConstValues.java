@@ -22,8 +22,8 @@ public class ConstValues
 	public static final char MISSING_ALLELE_CHAR = '0';
 	public static final String MISSING_ALLELE_STRING = "0";
 	
-	public static final boolean HeaderLineYes = true;
-	public static final boolean HeaderLineNo = false;
+	public static final boolean HAS_HEADER = true;
+	public static final boolean NO_HEADER = false;
 	
 	public static boolean isNA(String s)
 	{
