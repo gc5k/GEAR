@@ -128,7 +128,7 @@ public class JointHELinkLS
 	
 	private void readPhenotypes()
 	{
-		phe = new PhenotypeFile(pheFile, ConstValues.HeaderLineNo);
+		phe = new PhenotypeFile(pheFile, ConstValues.NO_HEADER);
 		if (phe.getNumberOfTraits() < pheIdx)
 		{
 			Logger.printUserError("the index for the selected phenotype is too large! Only " + phe.getNumberOfTraits() + " phenotypes.");
