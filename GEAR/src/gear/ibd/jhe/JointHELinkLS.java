@@ -9,6 +9,12 @@ import gear.CmdArgs;
 import gear.ConstValues;
 import gear.data.PhenotypeFile;
 import gear.data.SubjectID;
+import gear.family.pedigree.file.MapFile;
+import gear.family.pedigree.file.SNP;
+import gear.family.plink.PLINKBinaryParser;
+import gear.family.plink.PLINKParser;
+import gear.family.qc.rowqc.SampleFilter;
+import gear.sumstat.qc.rowqc.SumStatQC;
 import gear.util.BufferedReader;
 import gear.util.FileUtil;
 import gear.util.Logger;
@@ -19,6 +25,7 @@ public class JointHELinkLS
 	private String ibdFile;
 	private String pheFile;
 	private int pheIdx = 0;
+	private MapFile snpMap;
 	private ArrayList<SubjectID> ibdID1 = NewIt.newArrayList();
 	private ArrayList<SubjectID> ibdID2 = NewIt.newArrayList();
 	private double[][] pibd;
@@ -42,6 +49,28 @@ public class JointHELinkLS
 
 	public void initial()
 	{
+		PLINKParser pp = null;
+		if (CmdArgs.INSTANCE.getFileArgs().isSet())
+		{
+			pp = new PLINKParser(CmdArgs.INSTANCE.getFileArgs()
+					.getPed(), CmdArgs.INSTANCE.getFileArgs()
+					.getMap());
+		} 
+		else if (CmdArgs.INSTANCE.getBFileArgs(0).isSet())
+		{
+			pp = new PLINKBinaryParser(CmdArgs.INSTANCE.getBFileArgs(0)
+					.getBed(), CmdArgs.INSTANCE.getBFileArgs(0)
+					.getBim(), CmdArgs.INSTANCE.getBFileArgs(0)
+					.getFam());
+		} 
+		else
+		{
+			Logger.printUserError("No input files.");
+			System.exit(1);
+		}
+		pp.Parse();
+		snpMap = pp.getMapData();
+
 		readPhenotypes();
 		readIBD();
 		lineup();
@@ -89,23 +118,57 @@ public class JointHELinkLS
 
 	public void JHE()
 	{
-		JHEpm();
+		if(CmdArgs.INSTANCE.hejointFlag)
+		{
+			JHEpm();
+		}
+		else
+		{
+			JHEAve();
+		}
 	}
 
 	private void JHEAve()
-	{
-		
-	}
-
-	private void JHEpm()
 	{
 		String outFileName = CmdArgs.INSTANCE.out + ".helink";
 		PrintStream ps = FileUtil.CreatePrintStream(outFileName);
 		OLSMultipleLinearRegression regression = new OLSMultipleLinearRegression();
 		Logger.printUserLog("Started scannning...");
-		ps.println("mean\tb1(paternal)\tb2(maternal)");
+		ps.println("snp\tchr\tGeneticDistance\tPosition\tmean\tse\tb1\tse");
 		for (int i = 0; i < pibd[0].length; i++)
 		{
+			SNP snp = snpMap.getSNP(i);
+			ps.print(snp.getName() + "\t" + snp.getChromosome() + "\t" + snp.getDistance() + "\t" + snp.getPosition() + "\t");
+			double [][] x = new double[Y.length][1];
+			for (int j = 0; j < pibd.length; j++)
+			{
+				x[j][0] = (pibd[j][i] + mibd[j][i])/2;
+			}
+			regression.newSampleData(Y, x);
+			double b[] = regression.estimateRegressionParameters();
+			double bv[][] = regression.estimateRegressionParametersVariance();
+			for (int j = 0; j < b.length; j++)
+			{
+				ps.print(b[j] + "\t" + Math.sqrt(bv[j][j]) + "\t");
+			}
+			ps.println();
+		}
+		ps.close();
+		Logger.printUserLog("Finished HE scanning. The result has been saved in " + outFileName);
+		
+	}
+
+	private void JHEpm()
+	{
+		String outFileName = CmdArgs.INSTANCE.out + ".hejlink";
+		PrintStream ps = FileUtil.CreatePrintStream(outFileName);
+		OLSMultipleLinearRegression regression = new OLSMultipleLinearRegression();
+		Logger.printUserLog("Started scannning...");
+		ps.println("snp\tchr\tGeneticDistance\tPosition\tmean\tse\tb1(paternal)\tse\tb2(maternal)\tse");
+		for (int i = 0; i < pibd[0].length; i++)
+		{
+			SNP snp = snpMap.getSNP(i);
+			ps.print(snp.getName() + "\t" + snp.getChromosome() + "\t" + snp.getDistance() + "\t" + snp.getPosition() + "\t");
 			double [][] x = new double[Y.length][2];
 			for (int j = 0; j < pibd.length; j++)
 			{
@@ -114,18 +177,17 @@ public class JointHELinkLS
 			}
 			regression.newSampleData(Y, x);
 			double b[] = regression.estimateRegressionParameters();
-			
+			double bv[][] = regression.estimateRegressionParametersVariance();
 			for (int j = 0; j < b.length; j++)
 			{
-				ps.print(b[j] + " ");
+				ps.print(b[j] + "\t" + Math.sqrt(bv[j][j]) + "\t");
 			}
 			ps.println();
 		}
 		ps.close();
 		Logger.printUserLog("Finished HE scanning. The result has been saved in " + outFileName);
 	}
-	
-	
+
 	private void readPhenotypes()
 	{
 		phe = new PhenotypeFile(pheFile, ConstValues.NO_HEADER);
@@ -174,7 +236,10 @@ public class JointHELinkLS
 			SubjectID id21 = new SubjectID(tokens2[0], tokens2[1]);
 			SubjectID id22 = new SubjectID(tokens2[2], tokens2[3]);
 
-			if (id11 != id21 || id12 != id22)
+			System.out.println(id11.getFamilyID() + "\t" + id11.getIndividualID() + "\t" + id12.getFamilyID() + "\t" + id12.getIndividualID());
+			System.out.println(id21.getFamilyID() + "\t" + id21.getIndividualID() + "\t" + id22.getFamilyID() + "\t" + id22.getIndividualID());
+
+			if (id11.getFamilyID().compareTo(id21.getFamilyID())!=0 || id11.getIndividualID().compareTo(id21.getIndividualID())!=0 || id12.getFamilyID().compareTo(id22.getFamilyID())!= 0 || id12.getIndividualID().compareTo(id22.getIndividualID())!= 0 )
 			{
 				reader.errorPreviousLine("The IDs in this line and the above line do not match.");
 			}
