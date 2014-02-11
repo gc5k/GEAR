@@ -90,6 +90,7 @@ public enum CmdArgs
 		ops.addOption(OptionBuilder.withLongOpt(cmd_quickibd_long).withDescription("quick ibd for dense markers" ).create(cmd_quickibd));
 
 		ops.addOption(OptionBuilder.withLongOpt(cmd_helink_long).withDescription("he linkage" ).create(cmd_helink));
+		ops.addOption(OptionBuilder.withLongOpt(cmd_hejoint_long).withDescription("he joint linkage" ).create(cmd_hejoint));
 		ops.addOption(OptionBuilder.withLongOpt(cmd_ibd).withDescription("ibd score file" ).hasArg().create(cmd_helink));
 		ops.addOption(OptionBuilder.withDescription("reml" ).create(cmd_reml));
 
@@ -604,7 +605,7 @@ public enum CmdArgs
 	public String polyEffectFile = null;
 
 	//HE linkage
-	// /////////////////ibd
+	///////////////////ibd
 	private final String cmd_quickibd = "quick_ibd";
 	private final String cmd_quickibd_long = "quick-ibd";
 
@@ -615,6 +616,10 @@ public enum CmdArgs
 	private final String cmd_helink_long = "he-link";
 	public boolean helinkFlag = false;
 	
+	private final String cmd_hejoint = "he_joint";
+	private final String cmd_hejoint_long = "he-joint";
+	public boolean hejointFlag = false;
+
 	private final String cmd_ibd = "ibd";
 	public String ibdFile = null;
 	
@@ -1450,10 +1455,15 @@ public enum CmdArgs
 		{
 			quickibdFlag = true;
 		}
-		
+
 		if (cmdLine.hasOption(cmd_helink))
 		{
 			helinkFlag = true;
+		}
+
+		if (cmdLine.hasOption(cmd_hejoint))
+		{
+			hejointFlag = true;
 		}
 
 		if (cmdLine.hasOption(cmd_reml))
