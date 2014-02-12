@@ -235,13 +235,15 @@ public class JointHELinkLS
 			SubjectID id12 = new SubjectID(tokens1[2], tokens1[3]);
 			SubjectID id21 = new SubjectID(tokens2[0], tokens2[1]);
 			SubjectID id22 = new SubjectID(tokens2[2], tokens2[3]);
-
-			System.out.println(id11.getFamilyID() + "\t" + id11.getIndividualID() + "\t" + id12.getFamilyID() + "\t" + id12.getIndividualID());
-			System.out.println(id21.getFamilyID() + "\t" + id21.getIndividualID() + "\t" + id22.getFamilyID() + "\t" + id22.getIndividualID());
-
-			if (id11.getFamilyID().compareTo(id21.getFamilyID())!=0 || id11.getIndividualID().compareTo(id21.getIndividualID())!=0 || id12.getFamilyID().compareTo(id22.getFamilyID())!= 0 || id12.getIndividualID().compareTo(id22.getIndividualID())!= 0 )
+			
+			if (!id11.equals(id21))
 			{
-				reader.errorPreviousLine("The IDs in this line and the above line do not match.");
+				reader.errorPreviousLine("Father ID in this line " + id21 + " does not match the previous line " + id11);
+			}
+
+			if (!id12.equals(id22))
+			{
+				reader.errorPreviousLine("Mother ID in this line " + id22 + " does not match the previous line " + id12);
 			}
 
 			ibdID1.add(id11);
