@@ -1,6 +1,7 @@
 package gear.data;
 
 import static org.junit.Assert.*;
+import gear.ConstValues;
 
 import org.junit.Test;
 
@@ -9,7 +10,7 @@ public class PhenotypeFileTest
 	@Test
 	public void testWithoutHeaders()
 	{
-		PhenotypeFile file = new PhenotypeFile("data/PhenotypeWithoutHeaders.txt");
+		PhenotypeFile file = new PhenotypeFile("data/PhenotypeWithoutHeaders.txt", ConstValues.NO_HEADER);
 		
 		assertEquals("data/PhenotypeWithoutHeaders.txt", file.getFileName());
 		assertEquals("file 'data/PhenotypeWithoutHeaders.txt'", file.getSubjectOrderName());
