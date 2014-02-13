@@ -82,10 +82,11 @@ public class RealCheckOne
 		double es = 0;
 		double ss = 0;
 		int n = 0;
+		int identical = 0;
 		ps.print("FID1 ID1 FID2 ID2 Match ExpMatch Score nmiss\n");
 		for (int i = 0; i < G1.getGRow(); i++)
 		{
-			for (int j = 0; j <= i; j++)
+			for (int j = 0; j < i; j++)
 			{
 				double[] s = similarityScore(i, j);
 				double ES = 0;
@@ -106,6 +107,7 @@ public class RealCheckOne
 							+ " " + ps2.getFamilyID() + " "
 							+ ps2.getIndividualID() + " " + s[0] + " " + (ES * s[1]) + " " + OS + " " + s[1]
 							+ "\n");
+					identical++;
 				}
 				if(i != j) 
 				{
@@ -141,7 +143,7 @@ public class RealCheckOne
 		Logger.printUserLog("Parent-offspring: " + (sChart[0] - sChart[3])/(1-sChart[3]));
 		Logger.printUserLog("Full sib: " + (sChart[1] - sChart[3])/(1-sChart[3]) + "\n");
 //		Logger.printUserLog("Half sib: " + sChart[2] + "\n");		
-
+		Logger.printUserLog(identical + " pair(s) were captured.");
 		Logger.printUserLog("The result has been saved into '" + sb.toString() + "'.");
 
 	}
