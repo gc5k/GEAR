@@ -39,6 +39,7 @@ public final class ProfileCommand extends Command
 		options.addOption(OptionBuilder.withDescription(OPT_MACH_DOSAGE_BATCH_DESC).withLongOpt(OPT_MACH_DOSAGE_BATCH_LONG).hasArg().create());
 		options.addOption(OptionBuilder.withDescription(OPT_MACH_INFO_BATCH_DESC).withLongOpt(OPT_MACH_INFO_BATCH_LONG).hasArg().create());
 		options.addOption(OptionBuilder.withDescription(OPT_MODEL_DESC).withLongOpt(OPT_MODEL_LONG).hasArg().create());
+		options.addOption(OptionBuilder.withDescription(OPT_MODEL_FILE_DESC).withLongOpt(OPT_MODEL_FILE_LONG).hasArg().create());
 		options.addOption(OptionBuilder.withDescription(OPT_LOGIT_DESC).withLongOpt(OPT_LOGIT_LONG).hasArg(false).create());
 		options.addOption(OptionBuilder.withDescription(OPT_AUTO_FLIP_OFF_DESC).withLongOpt(OPT_AUTO_FLIP_OFF_LONG).hasArg(false).create());
 		options.addOption(OptionBuilder.withDescription(OPT_NO_WEIGHT_DESC).withLongOpt(OPT_NO_WEIGHT_LONG).hasArg(false).create());
@@ -166,33 +167,44 @@ public final class ProfileCommand extends Command
 	
 	private void parseCoeffModelArgs(ProfileCommandArguments profCmdArgs, CommandLine cmdLine) throws CommandArgumentException
 	{
-		String sCoeffModel = cmdLine.getOptionValue(OPT_MODEL_LONG);
+		String coeffModel = cmdLine.getOptionValue(OPT_MODEL_LONG);
 		String resultFile = cmdLine.getOptionValue(OPT_OUT, OPT_OUT_DEFAULT);
 		
-		if (sCoeffModel == null)
+		profCmdArgs.setIsSameAsPlink(false);
+		
+		if (coeffModel == null)
 		{
-			profCmdArgs.setCoeffModel(new AdditiveCoeffModel());
-			profCmdArgs.setIsSameAsPlink(true);
+			String modelFile = cmdLine.getOptionValue(OPT_MODEL_FILE_LONG);
+			if (modelFile == null)
+			{
+				profCmdArgs.setCoeffModelType(CoeffModelType.ADDITIVE);
+				profCmdArgs.setIsSameAsPlink(true);
+			}
+			else
+			{
+				profCmdArgs.setCoeffModelType(CoeffModelType.FILE);
+				profCmdArgs.setCoeffModelFile(modelFile);
+			}
 		}
 		else
 		{
-			resultFile += "." + sCoeffModel;
-			if (sCoeffModel.equals(OPT_MODEL_ADDITIVE))
+			resultFile += "." + coeffModel;
+			if (coeffModel.equals(OPT_MODEL_ADDITIVE))
 			{
-				profCmdArgs.setCoeffModel(new AdditiveCoeffModel());
+				profCmdArgs.setCoeffModelType(CoeffModelType.ADDITIVE);
 			}
-			else if (sCoeffModel.equals(OPT_MODEL_DOMINANCE))
+			else if (coeffModel.equals(OPT_MODEL_DOMINANCE))
 			{
-				profCmdArgs.setCoeffModel(new DominanceCoeffModel());
+				profCmdArgs.setCoeffModelType(CoeffModelType.DOMINANCE);
 			}
-			else if (sCoeffModel.equals(OPT_MODEL_RECESSIVE))
+			else if (coeffModel.equals(OPT_MODEL_RECESSIVE))
 			{
-				profCmdArgs.setCoeffModel(new RecessiveCoeffModel());
+				profCmdArgs.setCoeffModelType(CoeffModelType.RECESSIVE);
 			}
 			else
 			{
 				String msg = "";
-				msg += "'" + sCoeffModel + "' is an invalid coefficient model. ";
+				msg += "'" + coeffModel + "' is an invalid coefficient model. ";
 				msg += "Valid models are '" + OPT_MODEL_ADDITIVE + "'(additive), ";
 				msg += "'" + OPT_MODEL_DOMINANCE + "'(dominance) and ";
 				msg += "'" + OPT_MODEL_RECESSIVE + "'(recessive).";
@@ -234,13 +246,16 @@ public final class ProfileCommand extends Command
 	private static final String OPT_MACH_INFO_BATCH_LONG = "mach-info-batch";
 	private static final String OPT_MACH_INFO_BATCH_DESC = "Specify the text file in which each line records the name of a .mlinfo file";
 	
+	private static final String OPT_MODEL_FILE_LONG = "model-file";
+	private static final String OPT_MODEL_FILE_DESC = "Specify the model file";
+	
 	private static final String OPT_MODEL_LONG = "model";
 	private static final String OPT_MODEL_ADDITIVE = "add";
 	private static final String OPT_MODEL_DOMINANCE = "dom";
 	private static final String OPT_MODEL_RECESSIVE = "rec";
 	private static final String OPT_MODEL_DESC = "Specify the compute Model, valid values are '" + OPT_MODEL_ADDITIVE + "'(additive), " +
 	                                             "'" + OPT_MODEL_DOMINANCE + "'(dominance) and '" + OPT_MODEL_RECESSIVE + "'(recessive). " +
-	                                             "If this option is not set, then PLINK model is used";
+	                                             "If this option and --" + OPT_MODEL_FILE_LONG + " is not set, then PLINK model is used";
 	
 	private static final String OPT_LOGIT_LONG = "logit";
 	private static final String OPT_LOGIT_DESC = "Take logit transform on the scores";

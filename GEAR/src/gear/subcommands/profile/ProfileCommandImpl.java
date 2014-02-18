@@ -20,8 +20,6 @@ public final class ProfileCommandImpl extends CommandImpl
 	{
 		profCmdArgs = (ProfileCommandArguments)cmdArgs;
 		
-		printWhichCoeffModelIsUsed();
-		
 		ScoreFile scoreFile = new ScoreFile(profCmdArgs.getScoreFile(), profCmdArgs.getHasScoreHeader());
 
 		HashMap<String, Float> qScoreMap = readQScores();  // LocusName-to-QScore map
@@ -29,6 +27,7 @@ public final class ProfileCommandImpl extends CommandImpl
 		
 		Data genoData = initData();
 		SNP[] snps = genoData.getSNPs();
+		CoeffModel[] coeffModels = initCoeffModels(snps);
 
 		FilteredSNPs filteredSNPs = new FilteredSNPs(snps, scoreFile, qScoreMap, qRanges, profCmdArgs);
 
@@ -89,7 +88,7 @@ public final class ProfileCommandImpl extends CommandImpl
 					continue;
 				}
 				
-				float riskValue = profCmdArgs.getCoeffModel().compute(scoreAlleleFrac) * filteredSNPs.getScore(traitIdx, locIdx);
+				float riskValue = coeffModels[locIdx].compute(scoreAlleleFrac) * filteredSNPs.getScore(traitIdx, locIdx);
 				
 				for (int locGrpIdx = 0; locGrpIdx < filteredSNPs.getNumLocusGroups(); ++locGrpIdx)
 				{
@@ -152,6 +151,97 @@ public final class ProfileCommandImpl extends CommandImpl
 		}
 	}
 
+	private CoeffModel[] initCoeffModels(SNP[] snps)
+	{
+		CoeffModel addModel = new AdditiveCoeffModel();
+		CoeffModel domModel = new DominanceCoeffModel();
+		CoeffModel recModel = new RecessiveCoeffModel();
+		
+		CoeffModel[] coeffModels = new CoeffModel[snps.length];
+		
+		switch (profCmdArgs.getCoeffModelType())
+		{
+		case ADDITIVE:
+			Logger.printUserLog("Additive model is used.");
+			for (int snpIdx = 0; snpIdx < snps.length; ++snpIdx)
+			{
+				coeffModels[snpIdx] = addModel;
+			}
+			break;
+		case DOMINANCE:
+			Logger.printUserLog("Dominance model is used.");
+			for (int snpIdx = 0; snpIdx < snps.length; ++snpIdx)
+			{
+				coeffModels[snpIdx] = domModel;
+			}
+			break;
+		case RECESSIVE:
+			Logger.printUserLog("Recessive model is used.");
+			for (int snpIdx = 0; snpIdx < snps.length; ++snpIdx)
+			{
+				coeffModels[snpIdx] = recModel;
+			}
+			break;
+		case FILE:
+			Logger.printUserLog("Model of each SNP is recorded in file '" + profCmdArgs.getCoeffModelFile() + "'.");
+			readCoeffModelFile(profCmdArgs.getCoeffModelFile(), snps, coeffModels);
+		}
+		
+		return coeffModels;
+	}
+	
+	private void readCoeffModelFile(String fileName, SNP[] snps, CoeffModel[] coeffModels)
+	{
+		CoeffModel addModel = new AdditiveCoeffModel();
+		CoeffModel domModel = new DominanceCoeffModel();
+		CoeffModel recModel = new RecessiveCoeffModel();
+		HashMap<String, CoeffModel> mapSNP2Model = new HashMap<String, CoeffModel>();
+		
+		BufferedReader reader = BufferedReader.openTextFile(fileName, "model");
+		String[] tokens;
+		while ((tokens = reader.readTokens(2)) != null)
+		{
+			String snpName = tokens[0];
+			String modelName = tokens[1]; 
+			CoeffModel prevModel = null;
+			
+			if (modelName.equalsIgnoreCase("ADD"))
+			{
+				prevModel = mapSNP2Model.put(snpName, addModel);
+			}
+			else if (modelName.equalsIgnoreCase("DOM"))
+			{
+				prevModel = mapSNP2Model.put(snpName, domModel);
+			}
+			else if (modelName.equalsIgnoreCase("REC"))
+			{
+				prevModel = mapSNP2Model.put(snpName, recModel);
+			}
+			else
+			{
+				reader.errorPreviousLine("Unrecognized model '" + modelName + "'. Model name must be 'ADD', 'DOM' or 'REC'");
+			}
+			
+			if (prevModel != null)
+			{
+				reader.errorPreviousLine("SNP '" + snpName + "' is duplicated.");
+			}
+		}
+		reader.close();
+		
+		for (int snpIdx = 0; snpIdx < snps.length; ++snpIdx)
+		{
+			String snpName = snps[snpIdx].getName();
+			CoeffModel coeffModel = mapSNP2Model.get(snpName);
+			if (coeffModel == null)
+			{
+				Logger.printUserError("The model file '" + fileName + "' doesn't contain SNP '" + snpName + "'.");
+				System.exit(1);
+			}
+			coeffModels[snpIdx] = coeffModel;
+		}
+	}
+
 	private void printSNPFilterResult(ScoreFile scoreFile, QRange[] qRanges, FilteredSNPs filteredSNPs)
 	{
 		Logger.printUserLog("Number of monomorphic loci (removed): " + filteredSNPs.getNumMonoLoci());
@@ -179,26 +269,6 @@ public final class ProfileCommandImpl extends CommandImpl
 		for (int traitIdx = 0; traitIdx < scoreFile.getNumberOfTraits(); ++traitIdx)
 		{
 			Logger.printUserLog("Number of loci having no score for trait " + scoreFile.getTrait(traitIdx) + ": " + filteredSNPs.getNumLociNoScore(traitIdx));
-		}
-	}
-	
-	private void printWhichCoeffModelIsUsed()
-	{
-		if (profCmdArgs.getIsSameAsPlink())
-		{
-			Logger.printUserLog("PLINK allelic model is used.");
-		}
-		else if (profCmdArgs.getCoeffModel() instanceof AdditiveCoeffModel)
-		{
-			Logger.printUserLog("Additive model is used.");
-		}
-		else if (profCmdArgs.getCoeffModel() instanceof DominanceCoeffModel)
-		{
-			Logger.printUserLog("Dominance model is used.");
-		}
-		else
-		{
-			Logger.printUserLog("Recessive model is used.");
 		}
 	}
 

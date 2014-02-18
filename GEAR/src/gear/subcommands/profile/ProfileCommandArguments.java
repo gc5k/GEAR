@@ -84,14 +84,24 @@ public final class ProfileCommandArguments extends CommandArguments
 		this.machInfoBatch = machInfoBatch;
 	}
 	
-	public CoeffModel getCoeffModel()
+	public CoeffModelType getCoeffModelType()
 	{
-		return coeffModel;
+		return coeffModelType;
 	}
 	
-	public void setCoeffModel(CoeffModel coeffModel)
+	public void setCoeffModelType(CoeffModelType coeffModelType)
 	{
-		this.coeffModel = coeffModel;
+		this.coeffModelType = coeffModelType;
+	}
+	
+	public String getCoeffModelFile()
+	{
+		return coeffModelFile;
+	}
+	
+	public void setCoeffModelFile(String coeffModelFile)
+	{
+		this.coeffModelFile = coeffModelFile;
 	}
 	
 	public boolean getIsSameAsPlink()
@@ -162,7 +172,8 @@ public final class ProfileCommandArguments extends CommandArguments
 	private String machInfoFile;
 	private String machDosageBatch;
 	private String machInfoBatch;
-	private CoeffModel coeffModel;
+	private CoeffModelType coeffModelType;
+	private String coeffModelFile;
 	private boolean isSameAsPlink;
 	private String resultFile;
 	private boolean isLogit;
