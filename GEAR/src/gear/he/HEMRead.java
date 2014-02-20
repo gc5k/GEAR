@@ -425,7 +425,7 @@ public class HEMRead
 			else
 			{
 				flag[ii] = false;
-//				reader.errorPreviousLine("Individual " + subID + " appears in the phenotype file but not in the grm id file(s).");
+				reader.warningPreviousLine("Individual " + subID + " appears in the phenotype file but not in the grm id file(s).");
 			}
 		}
 		reader.close();
