@@ -1,5 +1,9 @@
 package gear.metawatchdog.powercalculator;
 
+import java.io.DataOutputStream;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.IOException;
 import java.io.PrintStream;
 
 import gear.CmdArgs;
@@ -15,6 +19,7 @@ public class MetaWatchdogPowerCalculator
 	private double alpha = 0.05;
 	private double beta = 0.5;
 	private double h2 = 0.95;
+	private long eseed;
 	private NormalDistribution nd = new NormalDistributionImpl();
 	
 	public MetaWatchdogPowerCalculator()
@@ -23,7 +28,8 @@ public class MetaWatchdogPowerCalculator
 		beta = CmdArgs.INSTANCE.dog_beta;
 		tests = CmdArgs.INSTANCE.dog_tests;
 		h2 = CmdArgs.INSTANCE.dog_h2;
-
+		eseed = CmdArgs.INSTANCE.simuSeed;
+		
 		double za = 0;
 		double zb = 0;
 		try
@@ -50,5 +56,32 @@ public class MetaWatchdogPowerCalculator
 		predictorFile.println("tests: " + tests);
 		predictorFile.println("sample size to archive type I error rate at alphe = " + alpha + " and power = " + beta + " is " + k);
 
+		DataOutputStream os = null;
+		try
+		{
+			os = new DataOutputStream(new FileOutputStream(CmdArgs.INSTANCE.out + ".encode"));
+		}
+		catch (FileNotFoundException e)
+		{
+			Logger.printUserError("Cannot create file '" + CmdArgs.INSTANCE.out
+					+ "'.");
+			Logger.printUserError("Exception Message: " + e.getMessage());
+			System.exit(1);
+		}
+		try
+		{
+			os.writeDouble(alpha);
+			os.writeDouble(beta);
+			os.writeInt(tests);
+			os.writeDouble(h2);
+			os.writeLong(eseed);
+			os.writeDouble(k);
+			os.close();
+		}
+		catch (IOException e)
+		{
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 	}
 }
