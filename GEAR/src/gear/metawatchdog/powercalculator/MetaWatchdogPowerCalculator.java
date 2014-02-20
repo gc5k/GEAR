@@ -81,7 +81,7 @@ public class MetaWatchdogPowerCalculator
 		catch (IOException e)
 		{
 			// TODO Auto-generated catch block
-			e.printStackTrace();
+			Logger.handleException(e, "An I/O exception occurred when writing ecode.");
 		}
 	}
 }
