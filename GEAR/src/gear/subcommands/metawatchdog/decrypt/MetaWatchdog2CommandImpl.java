@@ -17,55 +17,88 @@ public class MetaWatchdog2CommandImpl extends CommandImpl
 	@Override
 	public void execute(CommandArguments cmdArgs)
 	{
-		MetaWatchdog2CommandArguments mwArgs = (MetaWatchdog2CommandArguments)cmdArgs;
+		mwArgs = (MetaWatchdog2CommandArguments)cmdArgs;
 		
 		Logger.printUserLog("Cutoff: " + mwArgs.getCutoff());
 		
-		PhenotypeFile phe1 = new PhenotypeFile(mwArgs.getDataset1(), ConstValues.HAS_HEADER);
-		PhenotypeFile phe2 = new PhenotypeFile(mwArgs.getDataset2(), ConstValues.HAS_HEADER);
+		initNormalizedScores();
 		
 		PrintStream predictorFile = FileUtil.CreatePrintStream(mwArgs.getOutRoot() + ".watchdog");
 
-		int test = Math.min(phe1.getNumberOfTraits(), phe2.getNumberOfTraits()); 
+		int numScoreCols = Math.min(normScores[0][0].length, normScores[1][0].length); 
 
-		int cnt = 0;
-		for (int i = 0; i < phe1.getNumberOfSubjects(); i++)
+		int cntSimilarPairs = 0, cntTotalPairs = 0;
+		for (int i = 0; i < normScores[0].length; i++)  // # of subjects in data 1
 		{
-			for (int j = 0; j < phe2.getNumberOfSubjects(); j++)
+			if (isSubjectIncluded[0][i])
 			{
-				// TODO: Move the normalization out of the for-loops to speed-up.
-				double[][] normPhes = new double[2][test];
-				for (int k = 0; k < test; ++k)
+				for (int j = 0; j < normScores[1].length; j++)  // # of subjects in data 2
 				{
-					normPhes[0][k] = phe1.getPhenotype(i, k);
-					normPhes[1][k] = phe2.getPhenotype(j, k);
-				}
-				normPhes[0] = StatUtils.normalize(normPhes[0]);
-				normPhes[1] = StatUtils.normalize(normPhes[1]);
-				
-				double[][] dat = new double[test][2];
-				for (int k = 0; k < test; ++k)
-				{
-					dat[k][0] = normPhes[0][k];
-					dat[k][1] = normPhes[1][k];
-				}
-				SimpleRegression sr = new SimpleRegression();
-				sr.addData(dat);
-				double b = sr.getSlope();
-
-				if (b > mwArgs.getCutoff())
-				{
-					String entry = "";
-					entry += phe1.getSubjectID(i).getFamilyID() + "\t" + phe1.getSubjectID(i).getIndividualID() + "\t";
-					entry += phe2.getSubjectID(j).getFamilyID() + "\t" + phe2.getSubjectID(j).getIndividualID() + "\t";
-					entry += b + "\t" + sr.getSlopeStdErr() + "\t" + sr.getN();
-					predictorFile.println(entry);
-					cnt++;
+					if (isSubjectIncluded[1][j])
+					{
+						double[][] dat = new double[numScoreCols][2];
+						for (int k = 0; k < numScoreCols; ++k)
+						{
+							dat[k][0] = normScores[0][i][k];
+							dat[k][1] = normScores[1][j][k];
+						}
+						SimpleRegression sr = new SimpleRegression();
+						sr.addData(dat);
+						double b = sr.getSlope();
+		
+						if (b > mwArgs.getCutoff())
+						{
+							String entry = "";
+							entry += scores[0].getSubjectID(i).getFamilyID() + "\t" + scores[0].getSubjectID(i).getIndividualID() + "\t";
+							entry += scores[1].getSubjectID(j).getFamilyID() + "\t" + scores[1].getSubjectID(j).getIndividualID() + "\t";
+							entry += b + "\t" + sr.getSlopeStdErr() + "\t" + sr.getN();
+							predictorFile.println(entry);
+							++cntSimilarPairs;
+						}
+						++cntTotalPairs;
+					}
 				}
 			}
 		}
 		predictorFile.close();
-		Logger.printUserLog("In total " + phe1.getNumberOfSubjects() * phe2.getNumberOfSubjects() + " pairs were compared.");
-		Logger.printUserLog("In total " + cnt + " similar pairs were detected.");
+		Logger.printUserLog("In total " + cntTotalPairs + " pairs were compared.");
+		Logger.printUserLog("In total " + cntSimilarPairs + " similar pairs were detected.");
 	}
+	
+	private void initNormalizedScores()
+	{
+		initNormalizedScores(0, mwArgs.getDataset1());
+		initNormalizedScores(1, mwArgs.getDataset2());
+	}
+	
+	private void initNormalizedScores(int dataIdx, String dataFile)
+	{
+		PhenotypeFile scores = this.scores[dataIdx] = new PhenotypeFile(dataFile, ConstValues.HAS_HEADER);
+		double[][] normScores = this.normScores[dataIdx] = new double[scores.getNumberOfSubjects()][scores.getNumberOfTraits()];
+		boolean[] isSubjectIncluded = this.isSubjectIncluded[dataIdx] = new boolean[scores.getNumberOfSubjects()];
+		PrintStream pstrm = FileUtil.CreatePrintStream(mwArgs.getOutRoot() + ".ignored." + dataFile);
+		for (int subjectIdx = 0; subjectIdx < scores.getNumberOfSubjects(); ++subjectIdx)
+		{
+			isSubjectIncluded[subjectIdx] = true;
+			for (int scoreCol = 0; scoreCol < scores.getNumberOfTraits() && isSubjectIncluded[subjectIdx]; ++scoreCol)
+			{
+				if (scores.isMissing(subjectIdx, scoreCol))
+				{
+					isSubjectIncluded[subjectIdx] = false;
+					break;
+				}
+				normScores[subjectIdx][scoreCol] = scores.getPhenotype(subjectIdx, scoreCol);
+			}
+			if (isSubjectIncluded[subjectIdx])
+			{
+				normScores[subjectIdx] = StatUtils.normalize(normScores[subjectIdx]);
+			}
+		}
+		pstrm.close();
+	}
+	
+	private PhenotypeFile[] scores = new PhenotypeFile[2];
+	private double[][][] normScores = new double[2][][];
+	private boolean[][] isSubjectIncluded = new boolean[2][];
+	MetaWatchdog2CommandArguments mwArgs;
 }
