@@ -85,6 +85,7 @@ public class MetaWatchdog2CommandImpl extends CommandImpl
 				if (scores.isMissing(subjectIdx, scoreCol))
 				{
 					isSubjectIncluded[subjectIdx] = false;
+					pstrm.println(scores.getSubjectID(subjectIdx));
 					break;
 				}
 				normScores[subjectIdx][scoreCol] = scores.getPhenotype(subjectIdx, scoreCol);
