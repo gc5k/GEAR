@@ -33,7 +33,7 @@ public class SubjectID
 	
 	public String toString()
 	{
-		return "[Family ID: " + famID + ", Individual ID: " + indID + "]";
+		return famID + "\t" + indID;
 	}
 	
 	private String famID;
