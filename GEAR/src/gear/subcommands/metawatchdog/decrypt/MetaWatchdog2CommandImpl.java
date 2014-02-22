@@ -100,5 +100,5 @@ public class MetaWatchdog2CommandImpl extends CommandImpl
 	private PhenotypeFile[] scores = new PhenotypeFile[2];
 	private double[][][] normScores = new double[2][][];
 	private boolean[][] isSubjectIncluded = new boolean[2][];
-	MetaWatchdog2CommandArguments mwArgs;
+	private MetaWatchdog2CommandArguments mwArgs;
 }
