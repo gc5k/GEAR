@@ -86,8 +86,25 @@ public class JointHELinkLS
 			int idx2 = phe.getSubjectIndex(ibdID2.get(i));
 			if (idx1 != -1 && idx2 != -1 && !phe.isMissing(idx1, pheIdx) && !phe.isMissing(idx2, pheIdx))
 			{
-				double d = phe.getPhenotype(idx1, pheIdx) - phe.getPhenotype(idx2, pheIdx);
-				HEphe.add(d*d);
+				double d = 0;
+				switch(CmdArgs.INSTANCE.getHEArgs().getType())
+				{
+				case SD:
+					d = phe.getPhenotype(idx1, pheIdx) - phe.getPhenotype(idx2, pheIdx);
+					HEphe.add(d*d);
+					break;
+				case SS:
+					d = phe.getPhenotype(idx1, pheIdx) + phe.getPhenotype(idx2, pheIdx);
+					HEphe.add(d*d);
+					break;
+				case CP:
+					d = phe.getPhenotype(idx1, pheIdx) * phe.getPhenotype(idx2, pheIdx);
+					HEphe.add(d);
+					break;
+				default:
+					break;
+
+				}
 				keepIBD.add(i);
 			}
 		}
