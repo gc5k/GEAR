@@ -11,6 +11,7 @@ import org.apache.commons.math.random.RandomDataImpl;
 
 import gear.subcommands.CommandArguments;
 import gear.subcommands.CommandImpl;
+import gear.util.BinaryInputFile;
 import gear.util.BufferedReader;
 import gear.util.Logger;
 
@@ -21,11 +22,12 @@ public class EnigmaCommandImpl extends CommandImpl
 	{
 		EnigmaCommandArguments enigmaArgs = (EnigmaCommandArguments)cmdArgs;
 		
+		readEncodeFile(enigmaArgs.getEncodeFile());
 		readRefAlleles(enigmaArgs.getMapFile());
 		
 		RandomDataImpl rnd = new RandomDataImpl();
-		rnd.reSeed(enigmaArgs.getSeed());
-		double[][] beta = new double[ref.size()][enigmaArgs.getNumberOfColumns()];
+		rnd.reSeed(seed);
+		double[][] beta = new double[ref.size()][numCols];
 		for(int i = 0; i < beta.length; i++)
 		{
 			for(int j = 0; j < beta[i].length; j++)
@@ -50,7 +52,7 @@ public class EnigmaCommandImpl extends CommandImpl
 		for(int snpIdx = 0; snpIdx < ref.size(); snpIdx++)
 		{
 			writer.print(ref.get(snpIdx));
-			for (int colIdx = 0; colIdx < enigmaArgs.getNumberOfColumns(); colIdx++)
+			for (int colIdx = 0; colIdx < numCols; colIdx++)
 			{
 				writer.print("\t" + df.format(beta[snpIdx][colIdx]));
 			}
@@ -58,6 +60,18 @@ public class EnigmaCommandImpl extends CommandImpl
 		}
 		writer.close();
 		Logger.printUserLog(ref.size() + " SNPs were used for generating Enigma scores.");
+	}
+	
+	private void readEncodeFile(String fileName)
+	{
+		BinaryInputFile file = new BinaryInputFile(fileName, "encode");
+		Logger.printUserLog("Alpha: " + file.readDouble());
+		Logger.printUserLog("Beta: " + file.readDouble());
+		Logger.printUserLog("Test: " + file.readInt());
+		Logger.printUserLog("h2: " + file.readDouble());
+		Logger.printUserLog("Seed: " + (seed = file.readLong()));
+		Logger.printUserLog("Columns: " + (numCols = (int)Math.round(file.readDouble())));
+		file.close();
 	}
 	
 	private void readRefAlleles(String mapFile)
@@ -71,4 +85,6 @@ public class EnigmaCommandImpl extends CommandImpl
 	}
 	
 	private ArrayList<String> ref = new ArrayList<String>();
+	private long seed;
+	private int numCols;
 }

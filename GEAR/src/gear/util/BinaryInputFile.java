@@ -74,16 +74,45 @@ public class BinaryInputFile
 		return size - position;
 	}
 	
+	public int readInt()
+	{
+		read(ConstValues.INT_SIZE);
+		return buffer.getInt();
+	}
+	
+	public long readLong()
+	{
+		read(ConstValues.LONG_SIZE);
+		return buffer.getLong();
+	}
+	
 	public float readFloat()
 	{
+		read(ConstValues.FLOAT_SIZE);
+		return buffer.getFloat();
+	}
+	
+	public double readDouble()
+	{
+		read(ConstValues.DOUBLE_SIZE);
+		return buffer.getDouble();
+	}
+	
+	public void setLittleEndian(boolean isLittleEndian)
+	{
+		buffer.order(isLittleEndian ? ByteOrder.LITTLE_ENDIAN : ByteOrder.BIG_ENDIAN);
+	}
+	
+	private void read(int size)
+	{
 		buffer.clear();
-		buffer.limit(ConstValues.FLOAT_SIZE);
+		buffer.limit(size);
 		
 		try
 		{
 			int nread = channel.read(buffer);
 			
-			if (nread != ConstValues.FLOAT_SIZE)
+			if (nread != size)
 			{
 				String msg = "";
 				msg += "The " + fileType + " file '" + fileName + "' contains an error at byte " + channel.position() + ". ";
@@ -93,7 +122,7 @@ public class BinaryInputFile
 				}
 				else
 				{
-					msg += "The program expected to read " + ConstValues.FLOAT_SIZE + " bytes, but actually read " + nread + ".";
+					msg += "The program expected to read " + size + " bytes, but actually read " + nread + ".";
 				}
 				Logger.printUserError(msg);
 				System.exit(1);
@@ -105,13 +134,6 @@ public class BinaryInputFile
 		}
 		
 		buffer.rewind();
-		
-		return buffer.getFloat();
-	}
-	
-	public void setLittleEndian(boolean isLittleEndian)
-	{
-		buffer.order(isLittleEndian ? ByteOrder.LITTLE_ENDIAN : ByteOrder.BIG_ENDIAN);
 	}
 	
 	private FileInputStream stream;

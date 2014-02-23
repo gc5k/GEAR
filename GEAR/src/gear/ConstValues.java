@@ -7,7 +7,10 @@ public class ConstValues
 	public static byte PLINK_BED_BYTE2 = 0x1b;
 	public static byte PLINK_BED_BYTE3 = 0x1;
 
+	public static final int INT_SIZE = Integer.SIZE / Byte.SIZE;
+	public static final int LONG_SIZE = Long.SIZE / Byte.SIZE;
 	public static final int FLOAT_SIZE = Float.SIZE / Byte.SIZE;
+	public static final int DOUBLE_SIZE = Double.SIZE / Byte.SIZE;
 	
 	public static final String WHITESPACE_DELIMITER = "\\s+";
 	public static final String LINE_SEPARATOR = System.getProperty("line.separator");

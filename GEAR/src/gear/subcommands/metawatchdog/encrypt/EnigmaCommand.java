@@ -27,8 +27,7 @@ public class EnigmaCommand extends Command
 	@Override
 	protected void prepareOptions(Options options)
 	{
-		options.addOption(OptionBuilder.withDescription(OPT_SEED_DESC).withLongOpt(OPT_SEED_LONG).hasArg().create());
-		options.addOption(OptionBuilder.withDescription(OPT_NUM_COLS_DESC).withLongOpt(OPT_NUM_COLS_LONG).hasArg().create());
+		options.addOption(OptionBuilder.withDescription(OPT_ENCODE_DESC).withLongOpt(OPT_ENCODE_LONG).hasArg().isRequired().create());
 		options.addOption(OptionBuilder.withDescription(OPT_MAP_DESC).withLongOpt(OPT_MAP_LONG).hasArg().isRequired().create());
 	}
 
@@ -36,59 +35,9 @@ public class EnigmaCommand extends Command
 	protected CommandArguments parse(CommandLine cmdLine) throws CommandArgumentException
 	{
 		EnigmaCommandArguments cmdArgs = new EnigmaCommandArguments();
-		parseSeed(cmdArgs, cmdLine);
-		parseNumberOfColumns(cmdArgs, cmdLine);
+		cmdArgs.setEncodeFile(cmdLine.getOptionValue(OPT_ENCODE_LONG));
 		cmdArgs.setMapFile(cmdLine.getOptionValue(OPT_MAP_LONG));
 		return cmdArgs;
-	}
-	
-	private void parseSeed(EnigmaCommandArguments cmdArgs, CommandLine cmdLine) throws CommandArgumentException
-	{
-		String sSeed = cmdLine.getOptionValue(OPT_SEED_LONG, OPT_SEED_DEFAULT);
-		try
-		{
-			cmdArgs.setSeed(Long.valueOf(sSeed));
-		}
-		catch (NumberFormatException e)
-		{
-			String msg = "";
-			msg += "The option value of --" + OPT_SEED_LONG + " is incorrect. ";
-			msg += "'" + sSeed + "' is not a valid integer.";
-			throw new CommandArgumentException(msg);
-		}
-	}
-	
-	private void parseNumberOfColumns(EnigmaCommandArguments cmdArgs, CommandLine cmdLine) throws CommandArgumentException
-	{
-		String sNumCols = cmdLine.getOptionValue(OPT_NUM_COLS_LONG, OPT_NUM_COLS_DEFAULT);
-		
-		int numCols = 0;
-		boolean valid = true;
-		try
-		{
-			numCols = Integer.valueOf(sNumCols);
-		}
-		catch (NumberFormatException e)
-		{
-			valid = false;
-		}
-		
-		if (valid && numCols < 0)
-		{
-			valid = false;
-		}
-		
-		if (valid)
-		{
-			cmdArgs.setNumberOfColumns(numCols);
-		}
-		else
-		{
-			String msg = "";
-			msg += "The option value of --" + OPT_NUM_COLS_LONG + " is incorrect. ";
-			msg += "'" + sNumCols + "' is not a valid positive integer.";
-			throw new CommandArgumentException(msg);
-		}
 	}
 
 	@Override
@@ -96,14 +45,9 @@ public class EnigmaCommand extends Command
 	{
 		return new EnigmaCommandImpl();
 	}
-	
-	private final static String OPT_SEED_LONG = "ecode";
-	private final static String OPT_SEED_DESC = "Random number seed";
-	private final static String OPT_SEED_DEFAULT = "2013";
-	
-	private final static String OPT_NUM_COLS_LONG = "ecol";
-	private final static String OPT_NUM_COLS_DESC = "Number of columns";
-	private final static String OPT_NUM_COLS_DEFAULT = "5";
+
+	private final static String OPT_ENCODE_LONG = "encode";
+	private final static String OPT_ENCODE_DESC = "The .encode file output by dogpower";
 	
 	private final static String OPT_MAP_LONG = "refallele";
 	private final static String OPT_MAP_DESC = "Map file";
