@@ -39,7 +39,7 @@ public class MetaWatchdogPowerCalculator
 		}
 		catch (MathException e)
 		{
-			e.printStackTrace();
+			Logger.handleException(e, "A math exception occurred when calculating inverse cumulative probability.");
 		}
 
 		double k = (zb + za/Math.sqrt(1-h2 * h2)) * (zb + za /Math.sqrt(1-h2 * h2)) * (1-h2 * h2) / (h2 * h2);
