@@ -35,7 +35,7 @@ public final class HelpCommand extends Command
 	}
 	
 	@Override
-	protected void prepareOptions(Options options)
+	public void prepareOptions(Options options)
 	{
 	}
 	
@@ -45,7 +45,7 @@ public final class HelpCommand extends Command
 	}
 	
 	@Override
-	protected CommandArguments parse(CommandLine cmdLine)
+	public CommandArguments parse(CommandLine cmdLine)
 	{
 		HelpCommandArguments cmdArgs = new HelpCommandArguments();
 		cmdArgs.setSubcommands(cmdLine.getArgs());

@@ -31,7 +31,7 @@ public class HEAssocPowerCommand extends Command
 
 	@SuppressWarnings("static-access")
 	@Override
-	protected void prepareOptions(Options options)
+	public void prepareOptions(Options options)
 	{
 		options.addOption(OptionBuilder.withDescription(OPT_NUMBER_OF_MARKERS_DESC).withLongOpt(OPT_NUMBER_OF_MARKERS_LONG).hasArg().isRequired().create(OPT_NUMBER_OF_MARKERS));
 		options.addOption(OptionBuilder.withDescription(OPT_HERITABILITY_VARIANCE_DESC).withLongOpt(OPT_HERITABILITY_VARIANCE_LONG).hasArg().isRequired().create(OPT_HERITABILITY_VARIANCE));
@@ -40,7 +40,7 @@ public class HEAssocPowerCommand extends Command
 	}
 
 	@Override
-	protected CommandArguments parse(CommandLine cmdLine) throws CommandArgumentException
+	public CommandArguments parse(CommandLine cmdLine) throws CommandArgumentException
 	{
 		HEAssocPowerCommandArguments cmdArgs = new HEAssocPowerCommandArguments();
 		

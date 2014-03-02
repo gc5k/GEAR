@@ -75,7 +75,7 @@ public abstract class Command implements Comparable<Command>
 		return "";
 	}
 	
-	protected abstract void prepareOptions(Options options);
+	public abstract void prepareOptions(Options options);
 	
 	@SuppressWarnings("static-access")
 	public Options getOptions()
@@ -86,7 +86,7 @@ public abstract class Command implements Comparable<Command>
 		return options;
 	}
 	
-	protected abstract CommandArguments parse(CommandLine cmdLine) throws CommandArgumentException;
+	public abstract CommandArguments parse(CommandLine cmdLine) throws CommandArgumentException;
 	protected abstract CommandImpl createCommandImpl();
 	
 	protected void printOptionsInEffect(CommandLine cmdLine)

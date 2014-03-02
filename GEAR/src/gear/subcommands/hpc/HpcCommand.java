@@ -31,7 +31,7 @@ public final class HpcCommand extends Command
 
 	@SuppressWarnings("static-access")
 	@Override
-	protected void prepareOptions(Options options)
+	public void prepareOptions(Options options)
 	{
 		options.addOption(OptionBuilder.withDescription(OPT_NAME_DESC).hasArg().withLongOpt(OPT_NAME_LONG).create());
 		options.addOption(OptionBuilder.withDescription(OPT_RAM_DESC).hasArg().withLongOpt(OPT_RAM_LONG).create());
@@ -40,7 +40,7 @@ public final class HpcCommand extends Command
 	}
 
 	@Override
-	protected CommandArguments parse(CommandLine cmdLine) throws CommandArgumentException
+	public CommandArguments parse(CommandLine cmdLine) throws CommandArgumentException
 	{
 		HpcCommandArguments cmdArgs = new HpcCommandArguments();
 		

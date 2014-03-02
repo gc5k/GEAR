@@ -11,7 +11,6 @@ import gear.subcommands.CommandImpl;
 
 public final class ProfileCommand extends Command
 {
-
 	@Override
 	public String getName()
 	{
@@ -23,15 +22,23 @@ public final class ProfileCommand extends Command
 	{
 		return "Calculate the risk profile scores";
 	}
+	
+	public void setIsCalledByEnigma(boolean isCalledByEnigma)
+	{
+		this.isCalledByEnigma = isCalledByEnigma;
+	}
 
 	@SuppressWarnings("static-access")
 	@Override
-	protected void prepareOptions(Options options)
+	public void prepareOptions(Options options)
 	{
-		options.addOption(OptionBuilder.withDescription(OPT_SCORE_DESC).withLongOpt(OPT_SCORE_LONG).isRequired().hasArg().create(OPT_SCORE));
-		options.addOption(OptionBuilder.withDescription(OPT_NO_SCORE_HEADER_DESC).withLongOpt(OPT_NO_SCORE_HEADER_LONG).create());
-		options.addOption(OptionBuilder.withDescription(OPT_QSCORE_DESC).withLongOpt(OPT_QSCORE_LONG).hasArg().create());
-		options.addOption(OptionBuilder.withDescription(OPT_QRANGE_DESC).withLongOpt(OPT_QRANGE_LONG).hasArg().create());
+		if (!isCalledByEnigma)
+		{
+			options.addOption(OptionBuilder.withDescription(OPT_SCORE_DESC).withLongOpt(OPT_SCORE_LONG).isRequired().hasArg().create(OPT_SCORE));
+			options.addOption(OptionBuilder.withDescription(OPT_NO_SCORE_HEADER_DESC).withLongOpt(OPT_NO_SCORE_HEADER_LONG).create());
+			options.addOption(OptionBuilder.withDescription(OPT_QSCORE_DESC).withLongOpt(OPT_QSCORE_LONG).hasArg().create());
+			options.addOption(OptionBuilder.withDescription(OPT_QRANGE_DESC).withLongOpt(OPT_QRANGE_LONG).hasArg().create());
+		}
 		options.addOption(OptionBuilder.withDescription(OPT_FILE_DESC).withLongOpt(OPT_FILE_LONG).hasArg().create());
 		options.addOption(OptionBuilder.withDescription(OPT_BFILE_DESC).withLongOpt(OPT_BFILE_LONG).hasArg().create());
 		options.addOption(OptionBuilder.withDescription(OPT_MACH_DOSAGE_DESC).withLongOpt(OPT_MACH_DOSAGE_LONG).hasArg().create());
@@ -47,7 +54,7 @@ public final class ProfileCommand extends Command
 	}
 
 	@Override
-	protected CommandArguments parse(CommandLine cmdLine) throws CommandArgumentException
+	public CommandArguments parse(CommandLine cmdLine) throws CommandArgumentException
 	{
 		ProfileCommandArguments profCmdArgs = new ProfileCommandArguments();
 		profCmdArgs.setScoreFile(cmdLine.getOptionValue(OPT_SCORE_LONG));
@@ -221,6 +228,8 @@ public final class ProfileCommand extends Command
 		return new ProfileCommandImpl();
 	}
 	
+	private boolean isCalledByEnigma;
+	
 	private static final char OPT_SCORE = 's';
 	private static final String OPT_SCORE_LONG = "score";
 	private static final String OPT_SCORE_DESC = "Specify score file";
@@ -268,5 +277,4 @@ public final class ProfileCommand extends Command
 	
 	private static final String OPT_KEEP_ATGC_LONG = "keep-atgc";
 	private static final String OPT_KEEP_ATGC_DESC = "Keep A/T and G/C loci";
-
 }
