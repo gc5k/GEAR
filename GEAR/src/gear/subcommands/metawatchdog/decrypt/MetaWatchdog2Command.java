@@ -30,7 +30,7 @@ public class MetaWatchdog2Command extends Command
 
 	@SuppressWarnings("static-access")
 	@Override
-	protected void prepareOptions(Options options)
+	public void prepareOptions(Options options)
 	{
 		options.addOption(OptionBuilder.withDescription(OPT_DATASET1_DESC).withLongOpt(OPT_DATASET1_LONG).hasArg().create());
 		options.addOption(OptionBuilder.withDescription(OPT_DATASET2_DESC).withLongOpt(OPT_DATASET2_LONG).hasArg().create());
@@ -38,7 +38,7 @@ public class MetaWatchdog2Command extends Command
 	}
 
 	@Override
-	protected CommandArguments parse(CommandLine cmdLine) throws CommandArgumentException
+	public CommandArguments parse(CommandLine cmdLine) throws CommandArgumentException
 	{
 		MetaWatchdog2CommandArguments cmdArgs = new MetaWatchdog2CommandArguments();
 		cmdArgs.setDataset1(cmdLine.getOptionValue(OPT_DATASET1_LONG));

@@ -11,6 +11,8 @@ import org.apache.commons.math.random.RandomDataImpl;
 
 import gear.subcommands.CommandArguments;
 import gear.subcommands.CommandImpl;
+import gear.subcommands.profile.ProfileCommandArguments;
+import gear.subcommands.profile.ProfileCommandImpl;
 import gear.util.BinaryInputFile;
 import gear.util.BufferedReader;
 import gear.util.Logger;
@@ -36,15 +38,15 @@ public class EnigmaCommandImpl extends CommandImpl
 			}
 		}
 		
-		String fileName = enigmaArgs.getOutRoot() + ".enigma";
+		String scoreFileName = enigmaArgs.getOutRoot() + ".enigma";
 		PrintWriter writer = null;
 		try 
 		{
-			writer = new PrintWriter(new BufferedWriter(new FileWriter(fileName)));
+			writer = new PrintWriter(new BufferedWriter(new FileWriter(scoreFileName)));
 		}
 		catch (IOException e)
 		{
-			Logger.handleException(e, "An I/O exception occurred when writing '" + fileName + "'.");
+			Logger.handleException(e, "An I/O exception occurred when writing '" + scoreFileName + "'.");
 		}
 		
 		DecimalFormat df=new DecimalFormat("##.0000");
@@ -60,6 +62,13 @@ public class EnigmaCommandImpl extends CommandImpl
 		}
 		writer.close();
 		Logger.printUserLog(ref.size() + " SNPs were used for generating Enigma scores.");
+		
+		// Execute the profile part
+		ProfileCommandArguments profArgs = enigmaArgs.getProfileCommandArguments();
+		profArgs.setScoreFile(scoreFileName);
+		profArgs.setHasScoreHeader(false);
+		ProfileCommandImpl profImpl = new ProfileCommandImpl();
+		profImpl.execute(profArgs);
 	}
 	
 	private void readEncodeFile(String fileName)

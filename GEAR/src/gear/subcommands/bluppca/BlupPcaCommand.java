@@ -25,7 +25,7 @@ public class BlupPcaCommand extends Command
 
 	@SuppressWarnings("static-access")
 	@Override
-	protected void prepareOptions(Options options)
+	public void prepareOptions(Options options)
 	{
 		options.addOption(OptionBuilder.withDescription(OPT_GRM_BIN_DESC).withLongOpt(OPT_GRM_BIN_LONG).hasArg().create());
 		options.addOption(OptionBuilder.withDescription(OPT_GRM_TEXT_DESC).withLongOpt(OPT_GRM_TEXT_LONG).hasArg().create());
@@ -36,7 +36,7 @@ public class BlupPcaCommand extends Command
 	}
 
 	@Override
-	protected CommandArguments parse(CommandLine cmdLine) throws CommandArgumentException
+	public CommandArguments parse(CommandLine cmdLine) throws CommandArgumentException
 	{
 		BlupPcaCommandArguments blupArgs = new BlupPcaCommandArguments();
 		parseGRMArguments(blupArgs, cmdLine);

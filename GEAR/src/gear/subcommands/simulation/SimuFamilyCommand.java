@@ -12,7 +12,6 @@ import gear.util.Logger;
 
 public final class SimuFamilyCommand extends Command
 {
-
 	@Override
 	public String getName()
 	{
@@ -27,7 +26,7 @@ public final class SimuFamilyCommand extends Command
 
 	@SuppressWarnings("static-access")
 	@Override
-	protected void prepareOptions(Options options)
+	public void prepareOptions(Options options)
 	{
 		options.addOption(OptionBuilder.withDescription(OPT_NUM_FAMS_DESC).withLongOpt(OPT_NUM_FAMS_LONG).hasArg().isRequired().create(OPT_NUM_FAMS));
 		options.addOption(OptionBuilder.withDescription(OPT_NUM_MARKERS_DESC).withLongOpt(OPT_NUM_MARKERS_LONG).hasArg().isRequired().create(OPT_NUM_MARKERS));
@@ -45,7 +44,7 @@ public final class SimuFamilyCommand extends Command
 	}
 
 	@Override
-	protected CommandArguments parse(CommandLine cmdLine) throws CommandArgumentException
+	public CommandArguments parse(CommandLine cmdLine) throws CommandArgumentException
 	{
 		SimuFamilyCommandArguments cmdArgs = new SimuFamilyCommandArguments();
 		parseNumberOfFamilies(cmdArgs, cmdLine);
