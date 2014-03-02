@@ -91,7 +91,10 @@ public enum CmdArgs
 
 		ops.addOption(OptionBuilder.withLongOpt(cmd_helink_long).withDescription("he linkage" ).create(cmd_helink));
 		ops.addOption(OptionBuilder.withLongOpt(cmd_hejoint_long).withDescription("he joint linkage" ).create(cmd_hejoint));
-		ops.addOption(OptionBuilder.withLongOpt(cmd_ibd).withDescription("ibd score file" ).hasArg().create(cmd_helink));
+		ops.addOption(OptionBuilder.withDescription("ibd score file" ).hasArg().create(cmd_ibd));
+		ops.addOption(OptionBuilder.withDescription("squared difference" ).create(cmd_sd));
+		ops.addOption(OptionBuilder.withDescription("squared sum" ).create(cmd_ss));
+		ops.addOption(OptionBuilder.withDescription("cross-product" ).create(cmd_cp));
 		ops.addOption(OptionBuilder.withDescription("reml" ).create(cmd_reml));
 
 		// nontransmitted
@@ -612,6 +615,16 @@ public enum CmdArgs
 	public boolean quickibdFlag = false;
 	
 	////Joint HE Linkage ls
+	private final String cmd_sd = "sd";
+	public boolean sdFlag = true;
+
+	private final String cmd_ss = "ss";
+	public boolean ssFlag = false;
+
+	private final String cmd_cp = "cp";
+	public boolean cpFlag = true;
+
+	
 	private final String cmd_helink = "he_link";
 	private final String cmd_helink_long = "he-link";
 	public boolean helinkFlag = false;
@@ -1459,6 +1472,27 @@ public enum CmdArgs
 		if (cmdLine.hasOption(cmd_helink))
 		{
 			helinkFlag = true;
+		}
+
+		if (cmdLine.hasOption(cmd_sd))
+		{
+			sdFlag = true;
+			ssFlag = false;
+			cpFlag = false;
+		}
+
+		if (cmdLine.hasOption(cmd_ss))
+		{
+			sdFlag = false;
+			ssFlag = true;
+			cpFlag = false;
+		}
+
+		if (cmdLine.hasOption(cmd_cp))
+		{
+			sdFlag = false;
+			ssFlag = false;
+			cpFlag = true;
 		}
 
 		if (cmdLine.hasOption(cmd_hejoint))

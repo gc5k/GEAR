@@ -3,6 +3,9 @@ package gear.ibd.jhe;
 import java.io.PrintStream;
 import java.util.ArrayList;
 
+import org.apache.commons.math.MathException;
+import org.apache.commons.math.distribution.NormalDistribution;
+import org.apache.commons.math.distribution.NormalDistributionImpl;
 import org.apache.commons.math.stat.regression.OLSMultipleLinearRegression;
 
 import gear.CmdArgs;
@@ -82,28 +85,26 @@ public class JointHELinkLS
 		ArrayList<Double> HEphe = NewIt.newArrayList();
 		for (int i = 0; i < ibdID1.size(); i++)
 		{
+			double d = 0;
 			int idx1 = phe.getSubjectIndex(ibdID1.get(i));
 			int idx2 = phe.getSubjectIndex(ibdID2.get(i));
 			if (idx1 != -1 && idx2 != -1 && !phe.isMissing(idx1, pheIdx) && !phe.isMissing(idx2, pheIdx))
 			{
-				double d = 0;
-				switch(CmdArgs.INSTANCE.getHEArgs().getType())
+				if(CmdArgs.INSTANCE.sdFlag)
 				{
-				case SD:
 					d = phe.getPhenotype(idx1, pheIdx) - phe.getPhenotype(idx2, pheIdx);
 					HEphe.add(d*d);
-					break;
-				case SS:
+				} else if (CmdArgs.INSTANCE.ssFlag)
+				{
 					d = phe.getPhenotype(idx1, pheIdx) + phe.getPhenotype(idx2, pheIdx);
 					HEphe.add(d*d);
-					break;
-				case CP:
+				} else if (CmdArgs.INSTANCE.cpFlag)
+				{
 					d = phe.getPhenotype(idx1, pheIdx) * phe.getPhenotype(idx2, pheIdx);
 					HEphe.add(d);
-					break;
-				default:
-					break;
-
+				} else {
+					Logger.printUserError("no function for the phenotype is specified");
+					System.exit(1);
 				}
 				keepIBD.add(i);
 			}
@@ -147,11 +148,12 @@ public class JointHELinkLS
 
 	private void JHEAve()
 	{
+		NormalDistribution nd = new NormalDistributionImpl();
 		String outFileName = CmdArgs.INSTANCE.out + ".helink";
 		PrintStream ps = FileUtil.CreatePrintStream(outFileName);
 		OLSMultipleLinearRegression regression = new OLSMultipleLinearRegression();
 		Logger.printUserLog("Started scannning...");
-		ps.println("snp\tchr\tGeneticDistance\tPosition\tmean\tse\tb1\tse");
+		ps.println("snp\tchr\tGeneticDistance\tPosition\tmean\tse\tb1\tse\tp");
 		for (int i = 0; i < pibd[0].length; i++)
 		{
 			SNP snp = snpMap.getSNP(i);
@@ -163,10 +165,20 @@ public class JointHELinkLS
 			}
 			regression.newSampleData(Y, x);
 			double b[] = regression.estimateRegressionParameters();
-			double bv[][] = regression.estimateRegressionParametersVariance();
+			double be[] = regression.estimateRegressionParametersStandardErrors();
 			for (int j = 0; j < b.length; j++)
 			{
-				ps.print(b[j] + "\t" + Math.sqrt(bv[j][j]) + "\t");
+				double z = b[j]/be[j];
+				double p = 0;
+				try
+				{
+					p = nd.cumulativeProbability(z);
+				}
+				catch (MathException e)
+				{
+					e.printStackTrace();
+				}
+				ps.print(b[j] + "\t" + Math.sqrt(be[j]) + "\t" + p + "\t");
 			}
 			ps.println();
 		}
@@ -177,11 +189,12 @@ public class JointHELinkLS
 
 	private void JHEpm()
 	{
+		NormalDistribution nd = new NormalDistributionImpl();
 		String outFileName = CmdArgs.INSTANCE.out + ".hejlink";
 		PrintStream ps = FileUtil.CreatePrintStream(outFileName);
 		OLSMultipleLinearRegression regression = new OLSMultipleLinearRegression();
 		Logger.printUserLog("Started scannning...");
-		ps.println("snp\tchr\tGeneticDistance\tPosition\tmean\tse\tb1(paternal)\tse\tb2(maternal)\tse");
+		ps.println("snp\tchr\tGeneticDistance\tPosition\tmean\tse\tb1(paternal)\tse\tp\tb2(maternal)\tse\tp");
 		for (int i = 0; i < pibd[0].length; i++)
 		{
 			SNP snp = snpMap.getSNP(i);
@@ -194,10 +207,21 @@ public class JointHELinkLS
 			}
 			regression.newSampleData(Y, x);
 			double b[] = regression.estimateRegressionParameters();
-			double bv[][] = regression.estimateRegressionParametersVariance();
+			double be[] = regression.estimateRegressionParametersStandardErrors();
 			for (int j = 0; j < b.length; j++)
 			{
-				ps.print(b[j] + "\t" + Math.sqrt(bv[j][j]) + "\t");
+				double z = b[j]/be[j];
+				double p = 0;
+				try
+				{
+					p = nd.cumulativeProbability(z);
+				}
+				catch (MathException e)
+				{
+					e.printStackTrace();
+				}
+
+				ps.print(b[j] + "\t" + Math.sqrt(be[j]) + "\t" + p + "\t");
 			}
 			ps.println();
 		}
