@@ -30,7 +30,7 @@ public final class SimuFamilyCommand extends Command
 	{
 		options.addOption(OptionBuilder.withDescription(OPT_NUM_FAMS_DESC).withLongOpt(OPT_NUM_FAMS_LONG).hasArg().isRequired().create(OPT_NUM_FAMS));
 		options.addOption(OptionBuilder.withDescription(OPT_NUM_MARKERS_DESC).withLongOpt(OPT_NUM_MARKERS_LONG).hasArg().isRequired().create(OPT_NUM_MARKERS));
-		options.addOption(OptionBuilder.withDescription(OPT_SEED_DESC).withLongOpt(OPT_SEED_LONG).hasArg().create(OPT_SEED));
+		options.addOption(OptionBuilder.withDescription(OPT_SEED_DESC).withLongOpt(OPT_SEED_LONG).hasArg().create());
 		options.addOption(OptionBuilder.withDescription(OPT_MAKE_BED_DESC).withLongOpt(OPT_MAKE_BED_LONG).create(OPT_MAKE_BED));
 
 		options.addOption(OptionBuilder.withDescription(OPT_LD_DESC).withLongOpt(OPT_LD_LONG).hasArg().create(OPT_LD));
@@ -49,7 +49,7 @@ public final class SimuFamilyCommand extends Command
 		SimuFamilyCommandArguments cmdArgs = new SimuFamilyCommandArguments();
 		parseNumberOfFamilies(cmdArgs, cmdLine);
 		parseNumberOfMarkers(cmdArgs, cmdLine);
-		parseSeed(cmdArgs, cmdLine);
+		cmdArgs.setSeed(parseLongOptionValue(cmdLine, OPT_SEED_LONG, OPT_SEED_DEFAULT));
 		parseLD(cmdArgs, cmdLine);
 		parseMAF(cmdArgs, cmdLine);
 		parseRec(cmdArgs, cmdLine);
@@ -120,24 +120,6 @@ public final class SimuFamilyCommand extends Command
 		}
 		
 		cmdArgs.setNumberOfMarkers(numMarkers);
-	}
-
-	private void parseSeed(SimuFamilyCommandArguments cmdArgs, CommandLine cmdLine) throws CommandArgumentException
-	{
-		if (cmdLine.hasOption(OPT_SEED))
-		{
-			try
-			{
-				cmdArgs.setSeed(Long.parseLong(cmdLine.getOptionValue(OPT_SEED)));
-			}
-			catch (NumberFormatException e)
-			{
-				String msg = "";
-				msg += "The value of --" + OPT_SEED_LONG + "is invalid: '";
-				msg += cmdLine.getOptionValue(OPT_SEED) + "' is not a valid integer.";
-				throw new CommandArgumentException(msg);
-			}
-		}
 	}
 
 	private void parseRec(SimuFamilyCommandArguments cmdArgs, CommandLine cmdLine) throws CommandArgumentException
@@ -290,10 +272,6 @@ public final class SimuFamilyCommand extends Command
 	private static final char OPT_NUM_MARKERS = 'm';
 	private static final String OPT_NUM_MARKERS_LONG = "num-marker";
 	private static final String OPT_NUM_MARKERS_DESC = "Specify the number of markers";
-	
-	private static final char OPT_SEED = 's';
-	private static final String OPT_SEED_LONG = "seed";
-	private static final String OPT_SEED_DESC = "Specify the seed of random number generator";
 	
 	private static final char OPT_MAKE_BED = 'b';
 	private static final String OPT_MAKE_BED_LONG = "make-bed";

@@ -154,6 +154,70 @@ public abstract class Command implements Comparable<Command>
 		this.stopAtNonOption = stopAtNonOption;
 	}
 	
+	protected long parseLongOptionValue(CommandLine cmdLine, String opt) throws CommandArgumentException
+	{
+		return parseLongOptionValue(cmdLine, opt, null);
+	}
+	
+	protected long parseLongOptionValue(CommandLine cmdLine, String opt, String defaultOptVal) throws CommandArgumentException
+	{
+		long value;
+		try
+		{
+			value = Long.parseLong(cmdLine.getOptionValue(opt, defaultOptVal));
+		}
+		catch (NumberFormatException e)
+		{
+			String msg = "";
+			msg += "The value of --" + opt + "is invalid: '";
+			msg += cmdLine.getOptionValue(opt) + "' is not a valid integer.";
+			throw new CommandArgumentException(msg);
+		}
+		return value;
+	}
+	
+	protected long parseLongOptionValueInRange(CommandLine cmdLine, String opt, String defaultOptVal, long min, long max) throws CommandArgumentException
+	{
+		long value = parseLongOptionValue(cmdLine, opt, defaultOptVal);
+		if (value < min || value > max)
+		{
+			throw new CommandArgumentException("--" + opt + " must be no smaller than " + min + " and no larger than " + max);
+		}
+		return value;
+	}
+	
+	protected double parseDoubleOptionValue(CommandLine cmdLine, String opt) throws CommandArgumentException
+	{
+		return parseDoubleOptionValue(cmdLine, opt, null);
+	}
+	
+	protected double parseDoubleOptionValue(CommandLine cmdLine, String opt, String defaultOptVal) throws CommandArgumentException
+	{
+		double value;
+		try
+		{
+			value = Double.parseDouble(cmdLine.getOptionValue(opt, defaultOptVal));
+		}
+		catch (NumberFormatException e)
+		{
+			String msg = "";
+			msg += "The value of --" + opt + "is invalid: '";
+			msg += cmdLine.getOptionValue(opt) + "' is not a valid floating point number.";
+			throw new CommandArgumentException(msg);
+		}
+		return value;
+	}
+	
+	protected double parseDoubleOptionValueInRange(CommandLine cmdLine, String opt, String defaultOptVal, double min, double max) throws CommandArgumentException
+	{
+		double value = parseDoubleOptionValue(cmdLine, opt, defaultOptVal);
+		if (value < min || value > max)
+		{
+			throw new CommandArgumentException("--" + opt + " must be no smaller than " + min + " and no larger than " + max);
+		}
+		return value;
+	}
+	
 	private boolean stopAtNonOption;
 	
 	protected static final String OPT_FILE_LONG = "file";
@@ -164,6 +228,10 @@ public abstract class Command implements Comparable<Command>
 	
 	protected static final char OPT_OUT = 'o';
 	protected static final String OPT_OUT_LONG = "out";
-	protected static final String OPT_OUT_DESC = "Specify output root filename";
 	protected static final String OPT_OUT_DEFAULT = "gear";
+	protected static final String OPT_OUT_DESC = "Specify output root filename, default to '" + OPT_OUT_DEFAULT + "'";
+	
+	protected static final String OPT_SEED_LONG = "seed";
+	protected static final String OPT_SEED_DEFAULT = "2012";
+	protected static final String OPT_SEED_DESC = "Specify the seed of random number generator, default to " + OPT_SEED_DEFAULT;
 }
