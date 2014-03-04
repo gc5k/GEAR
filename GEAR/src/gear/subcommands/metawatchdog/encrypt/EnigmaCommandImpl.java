@@ -79,10 +79,19 @@ public class EnigmaCommandImpl extends CommandImpl
 		Logger.printUserLog("Test: " + file.readInt());
 		Logger.printUserLog("h2: " + file.readDouble());
 		Logger.printUserLog("Seed: " + (seed = file.readLong()));
-		Logger.printUserLog("Columns: " + (numCols = (int)Math.round(file.readDouble())));
+		double tmp = file.readDouble();
+		numCols = (int) Math.ceil(tmp);
+		if (numCols > tmp)
+		{
+			Logger.printUserLog("Columns: " + tmp + " (round up to " + numCols);			
+		}
+		else
+		{
+			Logger.printUserLog("Columns: " + (tmp));
+		}
 		file.close();
 	}
-	
+
 	private void readRefAlleles(String mapFile)
 	{
 		BufferedReader reader = BufferedReader.openTextFile(mapFile, "map");
