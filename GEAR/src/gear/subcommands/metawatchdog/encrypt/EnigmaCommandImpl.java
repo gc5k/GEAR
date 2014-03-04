@@ -83,7 +83,7 @@ public class EnigmaCommandImpl extends CommandImpl
 		numCols = (int) Math.ceil(tmp);
 		if (numCols > tmp)
 		{
-			Logger.printUserLog("Columns: " + tmp + " (round up to " + numCols);			
+			Logger.printUserLog("Columns: " + tmp + " (round up to " + numCols + ")");			
 		}
 		else
 		{
