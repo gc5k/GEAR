@@ -24,16 +24,6 @@ public final class SimuFamilyCommandArguments extends CommandArguments
 		this.numMarkers = numMarkers;
 	}
 	
-	public Long getSeed()
-	{
-		return seed;
-	}
-	
-	public void setSeed(Long seed)
-	{
-		this.seed = seed;
-	}
-	
 	public boolean getMakeBed()
 	{
 		return makeBed;
@@ -127,7 +117,6 @@ public final class SimuFamilyCommandArguments extends CommandArguments
 
 	private int numFams;
 	private int numMarkers;
-	private Long seed = Long.valueOf(2013);
 	private boolean makeBed;
 	private double maf = 0.5;
 	private boolean mafFlag = false;

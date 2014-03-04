@@ -22,8 +22,6 @@ public abstract class CommandArguments
 		return getFile() + ".map";
 	}
 	
-	private String file;
-	
 	public String getBFile()
 	{
 		return bfile;
@@ -49,8 +47,6 @@ public abstract class CommandArguments
 		return getBFile() + ".fam";
 	}
 	
-	private String bfile;
-	
 	public String getOutRoot()
 	{
 		return outRoot;
@@ -61,5 +57,18 @@ public abstract class CommandArguments
 		this.outRoot = outRoot;
 	}
 	
+	public long getSeed()
+	{
+		return seed;
+	}
+	
+	public void setSeed(long seed)
+	{
+		this.seed = seed;
+	}
+	
+	private String file;
+	private String bfile;
 	private String outRoot;
+	private long seed;
 }

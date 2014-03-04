@@ -16,7 +16,6 @@ import gear.ibd.jhe.JointHELinkLS;
 import gear.ibd.jhe.JointHELinkML;
 import gear.imputation.NaiveImputation;
 import gear.metawatchdog.decrypt.MetaWatchdog;
-import gear.metawatchdog.powercalculator.MetaWatchdogPowerCalculator;
 import gear.pscontrol.NonTransmitted;
 import gear.realcheck.RealCheck;
 import gear.realcheck.RealCheckOne;
@@ -41,6 +40,7 @@ public enum Gear
 		addCommand(new gear.subcommands.he.assocpower.HEAssocPowerCommand());
 		addCommand(new gear.subcommands.help.HelpCommand());
 		addCommand(new gear.subcommands.hpc.HpcCommand());
+		addCommand(new gear.subcommands.metawatchdog.powercalculator.DogPowerCommand());
 		addCommand(new gear.subcommands.metawatchdog.decrypt.MetaWatchdog2Command());
 		addCommand(new gear.subcommands.metawatchdog.encrypt.EnigmaCommand());
 		addCommand(new gear.subcommands.profile.ProfileCommand());
@@ -231,10 +231,6 @@ public enum Gear
 			{
 				MetaWatchdog mw = new MetaWatchdog();
 				mw.Bark();
-			}
-			else if (CmdArgs.INSTANCE.dogpowerFlag)
-			{
-				MetaWatchdogPowerCalculator p = new MetaWatchdogPowerCalculator();
 			}
 			else if (CmdArgs.INSTANCE.quickibdFlag)
 			{
