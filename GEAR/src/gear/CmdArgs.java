@@ -679,7 +679,7 @@ public enum CmdArgs
 	public int dog_tests = 100;
 
 	private final String cmd_dog_h2 = "dogh2";
-	public double dog_h2 = 100;
+	public double dog_h2 = 0.95;
 	
 	private final String cmd_watchdog = "watchdog";
 	public boolean watchdogFlag = false;
