@@ -19,10 +19,75 @@ public class MetaWatchdog2CommandImpl extends CommandImpl
 	{
 		mwArgs = (MetaWatchdog2CommandArguments)cmdArgs;
 		
-		Logger.printUserLog("Cutoff: " + mwArgs.getCutoff());
-		
 		initNormalizedScores();
+
+		Logger.printUserLog(normScores[0][0].length + " scores in set 1.");
+		Logger.printUserLog(normScores[1][0].length + " scores in set 2.");
+
+		if(normScores[0][0].length != normScores[1][0].length)
+		{
+			Logger.printUserLog("Warning: the number of scores in two sets are differnt. Only the first " + Math.min(normScores[0][0].length, normScores[1][0].length) + " scores in each file will be used.");
+		}
+
+		if(mwArgs.getSquare())
+		{
+			Logger.printUserLog("Square-distance method is used to detect overlapping individuals.");
+			Logger.printUserLog("Square-distance cutoff: " + mwArgs.getSquareDis());
+			squareMethod();
+		}
+		else
+		{
+			Logger.printUserLog("regression method is used to detect overlapping individuals.");
+			Logger.printUserLog("Cutoff: " + mwArgs.getCutoff());
+			regressionMethod();
+		}
+	}
+	
+	private void squareMethod()
+	{
+		PrintStream predictorFile = FileUtil.CreatePrintStream(mwArgs.getOutRoot() + ".watchdog");
+
+		int numScoreCols = Math.min(normScores[0][0].length, normScores[1][0].length); 
+
+		int cntSimilarPairs = 0, cntTotalPairs = 0;
+		for (int i = 0; i < normScores[0].length; i++)  // # of subjects in data 1
+		{
+			if (isSubjectIncluded[0][i])
+			{
+				for (int j = 0; j < normScores[1].length; j++)  // # of subjects in data 2
+				{
+					if (isSubjectIncluded[1][j])
+					{
+						double sd = 0;
+						for (int k = 0; k < numScoreCols; ++k)
+						{
+							sd += (normScores[0][i][k] - normScores[1][j][k]) * (normScores[0][i][k] - normScores[1][j][k]);
+						}
+						sd /= numScoreCols;
+
+						if (sd <= mwArgs.getSquareDis())
+						{
+							String entry = "";
+							entry += scores[0].getSubjectID(i).getFamilyID() + "\t" + scores[0].getSubjectID(i).getIndividualID() + "\t";
+							entry += scores[1].getSubjectID(j).getFamilyID() + "\t" + scores[1].getSubjectID(j).getIndividualID() + "\t";
+							entry += sd;
+							predictorFile.println(entry);
+							++cntSimilarPairs;
+						}
+						++cntTotalPairs;
+					}
+				}
+			}
+		}
+		predictorFile.close();
+		Logger.printUserLog("In total " + cntTotalPairs + " pairs were compared.");
+		Logger.printUserLog("In total " + cntSimilarPairs + " similar pairs were detected.");
 		
+	
+	}
+
+	private void regressionMethod()
+	{
 		PrintStream predictorFile = FileUtil.CreatePrintStream(mwArgs.getOutRoot() + ".watchdog");
 
 		int numScoreCols = Math.min(normScores[0][0].length, normScores[1][0].length); 
@@ -63,6 +128,7 @@ public class MetaWatchdog2CommandImpl extends CommandImpl
 		predictorFile.close();
 		Logger.printUserLog("In total " + cntTotalPairs + " pairs were compared.");
 		Logger.printUserLog("In total " + cntSimilarPairs + " similar pairs were detected.");
+		
 	}
 	
 	private void initNormalizedScores()
