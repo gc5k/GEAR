@@ -20,6 +20,19 @@ public class MetaWatchdog2CommandArguments extends CommandArguments
 	{
 		this.dataset2 = dataset2;
 	}
+	public void setSquare(float sd)
+	{
+		squareFlag = true;
+		squareDis = sd;
+	}
+	public boolean getSquare()
+	{
+		return squareFlag;
+	}
+	public float getSquareDis()
+	{
+		return squareDis;
+	}
 	public float getCutoff()
 	{
 		return cutoff;
@@ -31,4 +44,6 @@ public class MetaWatchdog2CommandArguments extends CommandArguments
 	private String dataset1;
 	private String dataset2;
 	private float cutoff;
+	private boolean squareFlag = false;
+	private float squareDis;
 }

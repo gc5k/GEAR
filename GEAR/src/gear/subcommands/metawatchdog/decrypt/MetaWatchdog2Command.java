@@ -34,6 +34,7 @@ public class MetaWatchdog2Command extends Command
 	{
 		options.addOption(OptionBuilder.withDescription(OPT_DATASET1_DESC).withLongOpt(OPT_DATASET1_LONG).hasArg().create());
 		options.addOption(OptionBuilder.withDescription(OPT_DATASET2_DESC).withLongOpt(OPT_DATASET2_LONG).hasArg().create());
+		options.addOption(OptionBuilder.withDescription(OPT_SQUARE_DESC).hasArg().create(OPT_SQUARE));
 		options.addOption(OptionBuilder.withDescription(OPT_CUTOFF_DESC).withLongOpt(OPT_CUTOFF_LONG).hasArg().create(OPT_CUTOFF));
 	}
 
@@ -43,10 +44,45 @@ public class MetaWatchdog2Command extends Command
 		MetaWatchdog2CommandArguments cmdArgs = new MetaWatchdog2CommandArguments();
 		cmdArgs.setDataset1(cmdLine.getOptionValue(OPT_DATASET1_LONG));
 		cmdArgs.setDataset2(cmdLine.getOptionValue(OPT_DATASET2_LONG));
+		if(cmdLine.hasOption(OPT_SQUARE))
+		{
+			parseSquare(cmdArgs, cmdLine);
+		}
 		parseCutoff(cmdArgs, cmdLine);
 		return cmdArgs;
 	}
 	
+	private void parseSquare(MetaWatchdog2CommandArguments cmdArgs, CommandLine cmdLine) throws CommandArgumentException
+	{
+		boolean throwException = false;
+		String disString = cmdLine.getOptionValue(OPT_SQUARE, OPT_SQUARE_DEFAULT);
+		try
+		{
+			float sd = Float.parseFloat(disString);
+			if (sd < 0)
+			{
+				throwException = true;
+			}
+			else
+			{
+				cmdArgs.setSquare(sd);
+			}
+		}
+		catch (NumberFormatException e)
+		{
+			throwException = true;
+		}
+		
+		if (throwException)
+		{
+			String msg = "";
+			msg += "'" + disString + "' is not a valid cutoff value.";
+			msg += "A square distance value must be a floating point number ";
+			msg += "which is no smaller than 0";
+			throw new CommandArgumentException(msg);
+		}
+	}
+
 	private void parseCutoff(MetaWatchdog2CommandArguments cmdArgs, CommandLine cmdLine) throws CommandArgumentException
 	{
 		boolean throwException = false;
@@ -89,6 +125,10 @@ public class MetaWatchdog2Command extends Command
 	
 	private final static String OPT_DATASET2_LONG = "set2";
 	private final static String OPT_DATASET2_DESC = "The score file of the second data set";
+	
+	private final static String OPT_SQUARE = "sd";
+	private final static String OPT_SQUARE_DESC = "squared distance";
+	private final static String OPT_SQUARE_DEFAULT = "0.05";
 	
 	private final static char OPT_CUTOFF = 'c';
 	private final static String OPT_CUTOFF_LONG = "cutoff";
