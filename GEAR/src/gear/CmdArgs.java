@@ -162,6 +162,11 @@ public enum CmdArgs
 
 		ops.addOption(OptionBuilder.withDescription("meta-analysis alpha ").hasArg().create(cmd_dog_cutoff));
 
+		//impute
+		ops.addOption(OptionBuilder.withDescription("convert impute probability to best-guess genotypes").withLongOpt(cmd_impute_format_long).create());
+
+		ops.addOption(OptionBuilder.withDescription("convert impute probability to best-guess batch file").withLongOpt(cmd_impute_batch_long).hasArg().create());
+
 		// snp
 		ops.addOption(OptionBuilder.withLongOpt(cmd_naive_imputation_long)
 				.withDescription("naive imputation ")
@@ -672,6 +677,12 @@ public enum CmdArgs
 
 	private final String cmd_dog_cutoff = "dogcutoff";
 	public double dog_cutoff = 0.05;
+
+	///////IMPUTE to bed
+	private final String cmd_impute_format_long = "impute";
+	public boolean imputeFlag = false;
+	private final String cmd_impute_batch_long = "impute-batch";
+	public String imputeBatchFile = null;
 
 	// fst
 	private final String cmd_fst = "fst";
@@ -1563,6 +1574,18 @@ public enum CmdArgs
 				Logger.printUserLog("alpha should be between 0 and 1.");
 				System.exit(0);
 			}
+		}
+
+		//impute
+		if (cmdLine.hasOption(cmd_impute_format_long))
+		{
+			imputeFlag = true;
+		}
+
+		if (cmdLine.hasOption(cmd_impute_batch_long))
+		{
+			imputeBatchFile = cmdLine.getOptionValue(cmd_impute_batch_long);
+			FileUtil.exists(imputeBatchFile);
 		}
 
 		// simulation real data

@@ -15,6 +15,7 @@ import gear.ibd.ibd.ParentIBD;
 import gear.ibd.jhe.JointHELinkLS;
 import gear.ibd.jhe.JointHELinkML;
 import gear.imputation.NaiveImputation;
+import gear.impute.ImputeProbabilityBestGuess;
 import gear.metawatchdog.decrypt.MetaWatchdog;
 import gear.pscontrol.NonTransmitted;
 import gear.realcheck.RealCheck;
@@ -248,6 +249,11 @@ public enum Gear
 					JointHELinkLS heLS = new JointHELinkLS();
 					heLS.JHE();
 				}
+			}
+			else if (CmdArgs.INSTANCE.imputeFlag)
+			{
+				ImputeProbabilityBestGuess bestGuess = new ImputeProbabilityBestGuess();
+				bestGuess.convert();
 			}
 
 			monitor.stopMonitoring();
