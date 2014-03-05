@@ -69,6 +69,8 @@ public class EnigmaCommandImpl extends CommandImpl
 		profArgs.setHasScoreHeader(false);
 		ProfileCommandImpl profImpl = new ProfileCommandImpl();
 		profImpl.execute(profArgs);
+		Logger.printUserLog("");
+		Logger.printUserLog("Generated profile scores have been saved in '" + enigmaArgs.getOutRoot() + ".profile'.");
 	}
 
 	private void readEncodeFile(String fileName)

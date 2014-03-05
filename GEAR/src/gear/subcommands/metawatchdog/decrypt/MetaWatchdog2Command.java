@@ -47,8 +47,14 @@ public class MetaWatchdog2Command extends Command
 		cmdArgs.setDataset1(cmdLine.getOptionValue(OPT_DATASET1_LONG));
 		cmdArgs.setDataset2(cmdLine.getOptionValue(OPT_DATASET2_LONG));
 		
-		cmdArgs.setChisq(parseDoubleOptionValueInRange(cmdLine, OPT_CHISQ, OPT_CHISQ_DEFAULT, 0, 10));
-		cmdArgs.setRegB(parseDoubleOptionValueInRange(cmdLine, OPT_B_LONG, OPT_B_DEFAULT, 0, 1));
+		if (cmdLine.hasOption(OPT_CHISQ))
+		{
+			cmdArgs.setChisq(parseDoubleOptionValueInRange(cmdLine, OPT_CHISQ, OPT_CHISQ_DEFAULT, 0, 10));
+		}
+		if (cmdLine.hasOption(OPT_B_LONG))
+		{
+			cmdArgs.setRegB(parseDoubleOptionValueInRange(cmdLine, OPT_B_LONG, OPT_B_DEFAULT, 0, 1));
+		}
 		if(cmdLine.hasOption(OPT_ENCODE_LONG))
 		{
 			cmdArgs.setEncodeFile(cmdLine.getOptionValue(OPT_ENCODE_LONG));			

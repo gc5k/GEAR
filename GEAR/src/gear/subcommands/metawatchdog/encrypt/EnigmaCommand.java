@@ -16,7 +16,7 @@ public class EnigmaCommand extends Command
 	@Override
 	public String getName()
 	{
-		return "enigma";
+		return "mwscore";
 	}
 
 	@Override

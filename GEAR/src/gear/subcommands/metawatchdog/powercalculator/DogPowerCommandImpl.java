@@ -23,15 +23,20 @@ public class DogPowerCommandImpl extends CommandImpl
 	{
 		dogpowerArgs = (DogPowerCommandArguments) cmdArgs;
 
-		if(dogpowerArgs.getChisq())
+		if(dogpowerArgs.getChisqFlag())
 		{
 			method = 0;
 			chisq();
 		}
-		else
+		else if (dogpowerArgs.getRegressionFlag())
 		{
 			method = 1;
 			regression();
+		}
+		else
+		{
+			Logger.printUserLog("No method has been specified. GEAR quitted.");
+			System.exit(0);
 		}
 		
 		Logger.printUserLog("Parameters have been saved into '" + dogpowerArgs.getOutRoot() + ".encode'.");

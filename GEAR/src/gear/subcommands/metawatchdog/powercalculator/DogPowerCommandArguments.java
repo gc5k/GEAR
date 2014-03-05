@@ -40,13 +40,13 @@ public class DogPowerCommandArguments extends CommandArguments
 	{
 		this.regFlag = f;
 	}
-	public boolean getRegression()
+	public boolean getRegressionFlag()
 	{
 		return regFlag;
 	}
 	public void setChisq(boolean f)
 	{
-		this.chisqFlag = true;
+		this.chisqFlag = f;
 	}
 	public void setQValue(double q)
 	{
@@ -56,7 +56,7 @@ public class DogPowerCommandArguments extends CommandArguments
 	{
 		return q;
 	}
-	public boolean getChisq()
+	public boolean getChisqFlag()
 	{
 		return chisqFlag;
 	}

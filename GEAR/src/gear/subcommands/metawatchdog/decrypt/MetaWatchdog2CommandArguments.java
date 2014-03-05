@@ -25,7 +25,7 @@ public class MetaWatchdog2CommandArguments extends CommandArguments
 		chisqFlag = true;
 		chisqCutoff = chi;
 	}
-	public boolean getChisq()
+	public boolean getChisqFlag()
 	{
 		return chisqFlag;
 	}
@@ -39,6 +39,7 @@ public class MetaWatchdog2CommandArguments extends CommandArguments
 	}
 	public void setRegB(double cutoff)
 	{
+		regBFlag = true;
 		this.regB = cutoff;
 	}
 	public boolean getRegFlag()
@@ -64,10 +65,10 @@ public class MetaWatchdog2CommandArguments extends CommandArguments
 	private boolean encodeFlag = false;
 	private String dataset1;
 	private String dataset2;
-	
+
 	private boolean regBFlag = false;
 	private double regB;
 
-	private boolean chisqFlag = true;
+	private boolean chisqFlag = false;
 	private double chisqCutoff;
 }

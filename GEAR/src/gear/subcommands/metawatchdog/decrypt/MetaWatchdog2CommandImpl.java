@@ -32,20 +32,28 @@ public class MetaWatchdog2CommandImpl extends CommandImpl
 			Logger.printUserLog("Warning: the number of scores in two sets are differnt. Only the first " + Math.min(normScores[0][0].length, normScores[1][0].length) + " scores in each file will be used.");
 		}
 
-		if (mwArgs.getEncodeFlag())
+
+		if (!mwArgs.getRegFlag() && !mwArgs.getChisqFlag())
 		{
-			readEncodeFile();
+			if (mwArgs.getEncodeFlag())
+			{
+				readEncodeFile();
+			}			
+		}
+		else 
+		{
+			Logger.printUserLog("Encode parameters has been masked manually.");
 		}
 
-		if (mwArgs.getChisq())
+		if (mwArgs.getChisqFlag())
 		{
 			Logger.printUserLog("Chi-sq method is used to detect overlapping individuals.");
 			Logger.printUserLog("Chi-sq cutoff: " + mwArgs.getChisqCutoff());
 			chisqMethod();
 		}
-		else
+		else if (mwArgs.getRegFlag())
 		{
-			Logger.printUserLog("regression method is used to detect overlapping individuals.");
+			Logger.printUserLog("Regression method is used to detect overlapping individuals.");
 			Logger.printUserLog("Regression coefficient cut off: " + mwArgs.getRegB());
 			regressionMethod();
 		}
@@ -53,7 +61,7 @@ public class MetaWatchdog2CommandImpl extends CommandImpl
 
 	private void chisqMethod()
 	{
-		PrintStream predictorFile = FileUtil.CreatePrintStream(mwArgs.getOutRoot() + ".watchdog");
+		PrintStream predictorFile = FileUtil.CreatePrintStream(mwArgs.getOutRoot() + ".mw");
 
 		int numScoreCols = Math.min(normScores[0][0].length, normScores[1][0].length);
 
@@ -100,11 +108,15 @@ public class MetaWatchdog2CommandImpl extends CommandImpl
 		predictorFile.close();
 		Logger.printUserLog("In total " + cntTotalPairs + " pairs were compared.");
 		Logger.printUserLog("In total " + cntSimilarPairs + " similar pairs were detected.");
+		if (cntSimilarPairs > 0)
+		{
+			Logger.printUserLog("Detected pairs have been save in '" + mwArgs.getOutRoot() + ".mw'.");
+		}
 	}
 
 	private void regressionMethod()
 	{
-		PrintStream predictorFile = FileUtil.CreatePrintStream(mwArgs.getOutRoot() + ".watchdog");
+		PrintStream predictorFile = FileUtil.CreatePrintStream(mwArgs.getOutRoot() + ".mw");
 
 		int numScoreCols = Math.min(normScores[0][0].length, normScores[1][0].length); 
 
@@ -143,7 +155,11 @@ public class MetaWatchdog2CommandImpl extends CommandImpl
 		}
 		predictorFile.close();
 		Logger.printUserLog("In total " + cntTotalPairs + " pairs were compared.");
-		Logger.printUserLog("In total " + cntSimilarPairs + " similar pairs were detected.");	
+		Logger.printUserLog("In total " + cntSimilarPairs + " similar pairs were detected.");
+		if (cntSimilarPairs > 0)
+		{
+			Logger.printUserLog("Detected pairs have been save in '" + mwArgs.getOutRoot() + ".mw'.");
+		}
 	}
 
 	private void initNormalizedScores()
