@@ -29,7 +29,7 @@ public class DogPowerCommand extends Command
 	{
 		//generic parameters
 		options.addOption(OptionBuilder.withDescription(OPT_ALPHA_DESC).withLongOpt(OPT_ALPHA_LONG).hasArg().create());
-		options.addOption(OptionBuilder.withDescription(OPT_TESTS_DESC).withLongOpt(OPT_TESTS_LONG).hasArg().create());
+		options.addOption(OptionBuilder.withDescription(OPT_TEST_DESC).withLongOpt(OPT_TEST_LONG).hasArg().create());
 		options.addOption(OptionBuilder.withDescription(OPT_SEED_DESC).withLongOpt(OPT_SEED_LONG).hasArg().create());
 
 		//regression parameters
@@ -49,7 +49,7 @@ public class DogPowerCommand extends Command
 		DogPowerCommandArguments cmdArgs = new DogPowerCommandArguments();
 		cmdArgs.setAlpha(parseDoubleOptionValueInRange(cmdLine, OPT_ALPHA_LONG, OPT_ALPHA_DEFAULT, 0, 1));
 		cmdArgs.setSeed(parseLongOptionValue(cmdLine, OPT_SEED_LONG, OPT_SEED_DEFAULT));
-		cmdArgs.setTests((int)parseLongOptionValue(cmdLine, OPT_TESTS_LONG, OPT_TESTS_DEFAULT));
+		cmdArgs.setTests((int)parseLongOptionValue(cmdLine, OPT_TEST_LONG, OPT_TEST_DEFAULT));
 
 		cmdArgs.setRegression(cmdLine.hasOption(OPT_REGRESSION_LONG));
 		cmdArgs.setBeta(parseDoubleOptionValueInRange(cmdLine, OPT_BETA_LONG, OPT_BETA_DEFAULT, 0, 1));
@@ -72,9 +72,9 @@ public class DogPowerCommand extends Command
 	private static final String OPT_ALPHA_DEFAULT = "0.05";
 	private static final String OPT_ALPHA_DESC = "Specify type I error rate, default to " + OPT_ALPHA_DEFAULT;
 
-	private static final String OPT_TESTS_LONG = "tests";
-	private static final String OPT_TESTS_DEFAULT = "1000";
-	private static final String OPT_TESTS_DESC = "Specify the number of statistical tests, default to " + OPT_TESTS_DEFAULT;
+	private static final String OPT_TEST_LONG = "test";
+	private static final String OPT_TEST_DEFAULT = "1000";
+	private static final String OPT_TEST_DESC = "Specify the number of statistical tests, default to " + OPT_TEST_DEFAULT;
 
 //regression
 	private static final String OPT_REGRESSION_LONG = "reg";

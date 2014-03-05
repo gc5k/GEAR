@@ -41,6 +41,10 @@ public class MetaWatchdog2CommandArguments extends CommandArguments
 	{
 		this.regB = cutoff;
 	}
+	public boolean getRegFlag()
+	{
+		return regBFlag;
+	}
 
 	public void setEncodeFile(String ecodeFile)
 	{
