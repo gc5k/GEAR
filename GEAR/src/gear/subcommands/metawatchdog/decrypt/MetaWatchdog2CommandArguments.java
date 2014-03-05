@@ -20,30 +20,50 @@ public class MetaWatchdog2CommandArguments extends CommandArguments
 	{
 		this.dataset2 = dataset2;
 	}
-	public void setSquare(float sd)
+	public void setChisq(double chi)
 	{
-		squareFlag = true;
-		squareDis = sd;
+		chisqFlag = true;
+		chisqCutoff = chi;
 	}
-	public boolean getSquare()
+	public boolean getChisq()
 	{
-		return squareFlag;
+		return chisqFlag;
 	}
-	public float getSquareDis()
+	public double getChisqCutoff()
 	{
-		return squareDis;
+		return chisqCutoff;
 	}
-	public float getCutoff()
+	public double getRegB()
 	{
-		return cutoff;
+		return regB;
 	}
-	public void setCutoff(float cutoff)
+	public void setRegB(double cutoff)
 	{
-		this.cutoff = cutoff;
+		this.regB = cutoff;
 	}
+
+	public void setEncodeFile(String ecodeFile)
+	{
+		this.encodeFile = ecodeFile;
+		encodeFlag = true;
+	}
+	public String getEncodeFile()
+	{
+		return encodeFile;
+	}
+	public boolean getEncodeFlag()
+	{
+		return encodeFlag;
+	}
+
+	private String encodeFile;
+	private boolean encodeFlag = false;
 	private String dataset1;
 	private String dataset2;
-	private float cutoff;
-	private boolean squareFlag = false;
-	private float squareDis;
+	
+	private boolean regBFlag = false;
+	private double regB;
+
+	private boolean chisqFlag = true;
+	private double chisqCutoff;
 }

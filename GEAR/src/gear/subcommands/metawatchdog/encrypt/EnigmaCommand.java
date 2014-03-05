@@ -30,7 +30,7 @@ public class EnigmaCommand extends Command
 	public void prepareOptions(Options options)
 	{
 		options.addOption(OptionBuilder.withDescription(OPT_ENCODE_DESC).withLongOpt(OPT_ENCODE_LONG).hasArg().isRequired().create());
-		options.addOption(OptionBuilder.withDescription(OPT_MAP_DESC).withLongOpt(OPT_MAP_LONG).hasArg().isRequired().create());
+		options.addOption(OptionBuilder.withDescription(OPT_REFALLELE_DESC).withLongOpt(OPT_REFALLELE_LONG).hasArg().isRequired().create());
 		profCommand.setIsCalledByEnigma(true);
 		profCommand.prepareOptions(options);
 	}
@@ -40,7 +40,7 @@ public class EnigmaCommand extends Command
 	{
 		EnigmaCommandArguments cmdArgs = new EnigmaCommandArguments();
 		cmdArgs.setEncodeFile(cmdLine.getOptionValue(OPT_ENCODE_LONG));
-		cmdArgs.setMapFile(cmdLine.getOptionValue(OPT_MAP_LONG));
+		cmdArgs.setRefFile(cmdLine.getOptionValue(OPT_REFALLELE_LONG));
 		cmdArgs.setProfileCommandArguments((ProfileCommandArguments)profCommand.parse(cmdLine));
 		return cmdArgs;
 	}
@@ -53,9 +53,9 @@ public class EnigmaCommand extends Command
 
 	private final static String OPT_ENCODE_LONG = "encode";
 	private final static String OPT_ENCODE_DESC = "The .encode file output by dogpower";
-	
-	private final static String OPT_MAP_LONG = "refallele";
-	private final static String OPT_MAP_DESC = "Map file";
-	
+
+	private final static String OPT_REFALLELE_LONG = "refallele";
+	private final static String OPT_REFALLELE_DESC = "Map file";
+
 	private ProfileCommand profCommand = new ProfileCommand();
 }

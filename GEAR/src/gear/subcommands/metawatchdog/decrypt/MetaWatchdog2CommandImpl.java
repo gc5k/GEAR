@@ -2,6 +2,8 @@ package gear.subcommands.metawatchdog.decrypt;
 
 import java.io.PrintStream;
 
+import org.apache.commons.math.MathException;
+import org.apache.commons.math.distribution.ChiSquaredDistributionImpl;
 import org.apache.commons.math.stat.StatUtils;
 import org.apache.commons.math.stat.regression.SimpleRegression;
 
@@ -9,6 +11,7 @@ import gear.ConstValues;
 import gear.data.PhenotypeFile;
 import gear.subcommands.CommandArguments;
 import gear.subcommands.CommandImpl;
+import gear.util.BinaryInputFile;
 import gear.util.FileUtil;
 import gear.util.Logger;
 
@@ -17,39 +20,45 @@ public class MetaWatchdog2CommandImpl extends CommandImpl
 	@Override
 	public void execute(CommandArguments cmdArgs)
 	{
-		mwArgs = (MetaWatchdog2CommandArguments)cmdArgs;
-		
+		mwArgs = (MetaWatchdog2CommandArguments) cmdArgs;
+
 		initNormalizedScores();
 
-		Logger.printUserLog(normScores[0][0].length + " scores in set 1.");
-		Logger.printUserLog(normScores[1][0].length + " scores in set 2.");
+		Logger.printUserLog(normScores[0][0].length + " scores in '" + mwArgs.getDataset1() + "'.");
+		Logger.printUserLog(normScores[1][0].length + " scores in '" + mwArgs.getDataset2() + "'.");
 
-		if(normScores[0][0].length != normScores[1][0].length)
+		if (normScores[0][0].length != normScores[1][0].length)
 		{
 			Logger.printUserLog("Warning: the number of scores in two sets are differnt. Only the first " + Math.min(normScores[0][0].length, normScores[1][0].length) + " scores in each file will be used.");
 		}
 
-		if(mwArgs.getSquare())
+		if (mwArgs.getEncodeFlag())
 		{
-			Logger.printUserLog("Square-distance method is used to detect overlapping individuals.");
-			Logger.printUserLog("Square-distance cutoff: " + mwArgs.getSquareDis());
-			squareMethod();
+			readEncodeFile();
+		}
+
+		if (mwArgs.getChisq())
+		{
+			Logger.printUserLog("Chi-sq method is used to detect overlapping individuals.");
+			Logger.printUserLog("Chi-sq cutoff: " + mwArgs.getChisqCutoff());
+			chisqMethod();
 		}
 		else
 		{
 			Logger.printUserLog("regression method is used to detect overlapping individuals.");
-			Logger.printUserLog("Cutoff: " + mwArgs.getCutoff());
+			Logger.printUserLog("Regression coefficient cut off: " + mwArgs.getRegB());
 			regressionMethod();
 		}
 	}
-	
-	private void squareMethod()
+
+	private void chisqMethod()
 	{
 		PrintStream predictorFile = FileUtil.CreatePrintStream(mwArgs.getOutRoot() + ".watchdog");
 
-		int numScoreCols = Math.min(normScores[0][0].length, normScores[1][0].length); 
+		int numScoreCols = Math.min(normScores[0][0].length, normScores[1][0].length);
 
 		int cntSimilarPairs = 0, cntTotalPairs = 0;
+		ChiSquaredDistributionImpl chiDis = new ChiSquaredDistributionImpl(numScoreCols);
 		for (int i = 0; i < normScores[0].length; i++)  // # of subjects in data 1
 		{
 			if (isSubjectIncluded[0][i])
@@ -58,19 +67,28 @@ public class MetaWatchdog2CommandImpl extends CommandImpl
 				{
 					if (isSubjectIncluded[1][j])
 					{
-						double sd = 0;
+						double chi = 0;
 						for (int k = 0; k < numScoreCols; ++k)
 						{
-							sd += (normScores[0][i][k] - normScores[1][j][k]) * (normScores[0][i][k] - normScores[1][j][k]);
+							chi += (normScores[0][i][k] - normScores[1][j][k]) * (normScores[0][i][k] - normScores[1][j][k]) / 2;
 						}
-						sd /= numScoreCols;
+						double pchi = 1;
+						try
+						{
+							pchi = chiDis.cumulativeProbability(chi);
+						}
+						catch (MathException e)
+						{
+							e.printStackTrace();
+						}
 
-						if (sd <= mwArgs.getSquareDis())
+						if (chi <= mwArgs.getChisqCutoff())
 						{
 							String entry = "";
 							entry += scores[0].getSubjectID(i).getFamilyID() + "\t" + scores[0].getSubjectID(i).getIndividualID() + "\t";
 							entry += scores[1].getSubjectID(j).getFamilyID() + "\t" + scores[1].getSubjectID(j).getIndividualID() + "\t";
-							entry += sd;
+							entry += chi + "\t";
+							entry += pchi;
 							predictorFile.println(entry);
 							++cntSimilarPairs;
 						}
@@ -82,8 +100,6 @@ public class MetaWatchdog2CommandImpl extends CommandImpl
 		predictorFile.close();
 		Logger.printUserLog("In total " + cntTotalPairs + " pairs were compared.");
 		Logger.printUserLog("In total " + cntSimilarPairs + " similar pairs were detected.");
-		
-	
 	}
 
 	private void regressionMethod()
@@ -111,7 +127,7 @@ public class MetaWatchdog2CommandImpl extends CommandImpl
 						sr.addData(dat);
 						double b = sr.getSlope();
 		
-						if (b > mwArgs.getCutoff())
+						if (b > mwArgs.getRegB())
 						{
 							String entry = "";
 							entry += scores[0].getSubjectID(i).getFamilyID() + "\t" + scores[0].getSubjectID(i).getIndividualID() + "\t";
@@ -127,16 +143,15 @@ public class MetaWatchdog2CommandImpl extends CommandImpl
 		}
 		predictorFile.close();
 		Logger.printUserLog("In total " + cntTotalPairs + " pairs were compared.");
-		Logger.printUserLog("In total " + cntSimilarPairs + " similar pairs were detected.");
-		
+		Logger.printUserLog("In total " + cntSimilarPairs + " similar pairs were detected.");	
 	}
-	
+
 	private void initNormalizedScores()
 	{
 		initNormalizedScores(0, mwArgs.getDataset1());
 		initNormalizedScores(1, mwArgs.getDataset2());
 	}
-	
+
 	private void initNormalizedScores(int dataIdx, String dataFile)
 	{
 		PhenotypeFile scores = this.scores[dataIdx] = new PhenotypeFile(dataFile, ConstValues.HAS_HEADER);
@@ -163,7 +178,33 @@ public class MetaWatchdog2CommandImpl extends CommandImpl
 		}
 		pstrm.close();
 	}
-	
+
+	private void readEncodeFile()
+	{
+		BinaryInputFile file = new BinaryInputFile(mwArgs.getEncodeFile(), "encode");
+		double K = file.readDouble();
+		long seed = file.readLong();
+		double alpha = file.readDouble();
+		int tests = file.readInt();
+
+		double beta = file.readDouble();
+		double b = file.readDouble();
+		double q = file.readDouble();
+		int method = file.readInt();
+		file.close();
+
+		if (method == 0) // chisq
+		{
+			Logger.printUserLog("Encode file set the chisq q value to " + q + ".");
+			mwArgs.setChisq(q);
+		}
+		else
+		{
+			Logger.printUserLog("Encode file set the regression b value to " + b + ".");
+			mwArgs.setRegB(b);
+		}
+	}
+
 	private PhenotypeFile[] scores = new PhenotypeFile[2];
 	private double[][][] normScores = new double[2][][];
 	private boolean[][] isSubjectIncluded = new boolean[2][];

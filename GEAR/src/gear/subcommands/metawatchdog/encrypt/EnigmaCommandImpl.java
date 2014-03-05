@@ -25,7 +25,7 @@ public class EnigmaCommandImpl extends CommandImpl
 		EnigmaCommandArguments enigmaArgs = (EnigmaCommandArguments)cmdArgs;
 		
 		readEncodeFile(enigmaArgs.getEncodeFile());
-		readRefAlleles(enigmaArgs.getMapFile());
+		readRefAlleles(enigmaArgs.getRefFile());
 		
 		RandomDataImpl rnd = new RandomDataImpl();
 		rnd.reSeed(seed);
@@ -70,24 +70,28 @@ public class EnigmaCommandImpl extends CommandImpl
 		ProfileCommandImpl profImpl = new ProfileCommandImpl();
 		profImpl.execute(profArgs);
 	}
-	
+
 	private void readEncodeFile(String fileName)
 	{
 		BinaryInputFile file = new BinaryInputFile(fileName, "encode");
-		Logger.printUserLog("Alpha: " + file.readDouble());
-		Logger.printUserLog("Beta: " + file.readDouble());
-		Logger.printUserLog("Test: " + file.readInt());
-		Logger.printUserLog("h2: " + file.readDouble());
-		Logger.printUserLog("Seed: " + (seed = file.readLong()));
-		double tmp = file.readDouble();
-		numCols = (int) Math.ceil(tmp);
-		if (numCols > tmp)
+		double K = file.readDouble();
+		seed = file.readLong();
+		double alpha = file.readDouble();
+		int tests = file.readInt();
+
+		double beta = file.readDouble();
+		double b = file.readDouble();
+		double q = file.readDouble();
+		int method = file.readInt();
+
+		numCols = (int) Math.ceil(K);
+		if (numCols > K)
 		{
-			Logger.printUserLog("Columns: " + tmp + " (round up to " + numCols + ")");			
+			Logger.printUserLog("Columns: " + K + " (round up to " + numCols + ")");			
 		}
 		else
 		{
-			Logger.printUserLog("Columns: " + (tmp));
+			Logger.printUserLog("Columns: " + (K));
 		}
 		file.close();
 	}

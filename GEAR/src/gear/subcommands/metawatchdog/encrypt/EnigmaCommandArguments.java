@@ -5,14 +5,14 @@ import gear.subcommands.profile.ProfileCommandArguments;
 
 public class EnigmaCommandArguments extends CommandArguments
 {
-	public String getMapFile()
+	public String getRefFile()
 	{
-		return mapFile;
+		return RefFile;
 	}
 	
-	public void setMapFile(String mapFile)
+	public void setRefFile(String RefFile)
 	{
-		this.mapFile = mapFile;
+		this.RefFile = RefFile;
 	}
 	
 	public String getEncodeFile()
@@ -35,7 +35,7 @@ public class EnigmaCommandArguments extends CommandArguments
 		this.profileCommandArguments = profileCommandArguments;
 	}
 
-	private String mapFile;
+	private String RefFile;
 	private String encodeFile;
 	private ProfileCommandArguments profileCommandArguments;
 }

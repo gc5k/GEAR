@@ -28,16 +28,43 @@ public class DogPowerCommandArguments extends CommandArguments
 	{
 		this.tests = tests;
 	}
-	public double getH2()
+	public double getB()
 	{
-		return h2;
+		return b;
 	}
-	public void setH2(double h2)
+	public void setBValue(double b)
 	{
-		this.h2 = h2;
+		this.b = b;
+	}
+	public void setRegression(boolean f)
+	{
+		this.regFlag = f;
+	}
+	public boolean getRegression()
+	{
+		return regFlag;
+	}
+	public void setChisq(boolean f)
+	{
+		this.chisqFlag = true;
+	}
+	public void setQValue(double q)
+	{
+		this.q = q;
+	}
+	public double getQValue()
+	{
+		return q;
+	}
+	public boolean getChisq()
+	{
+		return chisqFlag;
 	}
 	private double alpha;
 	private double beta;
 	private int tests;
-	private double h2;
+	private double b;
+	private boolean regFlag;
+	private boolean chisqFlag;
+	private double q;
 }
