@@ -14,7 +14,7 @@ public class DogPowerCommand extends Command
 	@Override
 	public String getName()
 	{
-		return "dogpower";
+		return "mwpower";
 	}
 
 	@Override
@@ -27,11 +27,20 @@ public class DogPowerCommand extends Command
 	@Override
 	public void prepareOptions(Options options)
 	{
+		//generic parameters
 		options.addOption(OptionBuilder.withDescription(OPT_ALPHA_DESC).withLongOpt(OPT_ALPHA_LONG).hasArg().create());
-		options.addOption(OptionBuilder.withDescription(OPT_BETA_DESC).withLongOpt(OPT_BETA_LONG).hasArg().create());
 		options.addOption(OptionBuilder.withDescription(OPT_TESTS_DESC).withLongOpt(OPT_TESTS_LONG).hasArg().create());
-		options.addOption(OptionBuilder.withDescription(OPT_H2_DESC).withLongOpt(OPT_H2_LONG).hasArg().create());
 		options.addOption(OptionBuilder.withDescription(OPT_SEED_DESC).withLongOpt(OPT_SEED_LONG).hasArg().create());
+
+		//regression parameters
+		options.addOption(OptionBuilder.withDescription(OPT_REGRESSION_DESC).withLongOpt(OPT_REGRESSION_LONG).create());
+		options.addOption(OptionBuilder.withDescription(OPT_BETA_DESC).withLongOpt(OPT_BETA_LONG).hasArg().create());
+		options.addOption(OptionBuilder.withDescription(OPT_BVALUE_DESC).withLongOpt(OPT_BVALUE_LONG).hasArg().create());
+
+		//chisq parameters
+		options.addOption(OptionBuilder.withDescription(OPT_CHISQ_DESC).withLongOpt(OPT_CHISQ_LONG).create());
+		options.addOption(OptionBuilder.withDescription(OPT_QVALUE_DES).withLongOpt(OPT_QVALUE_LONG).create());
+		
 	}
 
 	@Override
@@ -39,10 +48,16 @@ public class DogPowerCommand extends Command
 	{
 		DogPowerCommandArguments cmdArgs = new DogPowerCommandArguments();
 		cmdArgs.setAlpha(parseDoubleOptionValueInRange(cmdLine, OPT_ALPHA_LONG, OPT_ALPHA_DEFAULT, 0, 1));
-		cmdArgs.setBeta(parseDoubleOptionValueInRange(cmdLine, OPT_BETA_LONG, OPT_BETA_DEFAULT, 0, 1));
-		cmdArgs.setTests((int)parseLongOptionValue(cmdLine, OPT_TESTS_LONG, OPT_TESTS_DEFAULT));
-		cmdArgs.setH2(parseDoubleOptionValueInRange(cmdLine, OPT_H2_LONG, OPT_H2_DEFAULT, 0, 1));
 		cmdArgs.setSeed(parseLongOptionValue(cmdLine, OPT_SEED_LONG, OPT_SEED_DEFAULT));
+		cmdArgs.setTests((int)parseLongOptionValue(cmdLine, OPT_TESTS_LONG, OPT_TESTS_DEFAULT));
+
+		cmdArgs.setRegression(cmdLine.hasOption(OPT_REGRESSION_LONG));
+		cmdArgs.setBeta(parseDoubleOptionValueInRange(cmdLine, OPT_BETA_LONG, OPT_BETA_DEFAULT, 0, 1));
+		cmdArgs.setBValue(parseDoubleOptionValueInRange(cmdLine, OPT_BVALUE_LONG, OPT_BVALUE_DEFAULT, 0, 1));
+
+		cmdArgs.setChisq(cmdLine.hasOption(OPT_CHISQ_LONG));
+		cmdArgs.setQValue(parseDoubleOptionValueInRange(cmdLine, OPT_QVALUE_LONG, OPT_QVALUE_DEFAULT, 0, 10));
+
 		return cmdArgs;
 	}
 
@@ -51,20 +66,34 @@ public class DogPowerCommand extends Command
 	{
 		return new DogPowerCommandImpl();
 	}
-	
+
+//generic
 	private static final String OPT_ALPHA_LONG = "alpha";
 	private static final String OPT_ALPHA_DEFAULT = "0.05";
 	private static final String OPT_ALPHA_DESC = "Specify type I error rate, default to " + OPT_ALPHA_DEFAULT;
-	
+
+	private static final String OPT_TESTS_LONG = "tests";
+	private static final String OPT_TESTS_DEFAULT = "1000";
+	private static final String OPT_TESTS_DESC = "Specify the number of statistical tests, default to " + OPT_TESTS_DEFAULT;
+
+//regression
+	private static final String OPT_REGRESSION_LONG = "reg";
+	private static final String OPT_REGRESSION_DESC = "Regression method.";
+
 	private static final String OPT_BETA_LONG = "beta";
 	private static final String OPT_BETA_DEFAULT = "0.95";
 	private static final String OPT_BETA_DESC = "Specify type II error rate, default to " + OPT_BETA_DEFAULT;
-	
-	private static final String OPT_TESTS_LONG = "tests";
-	private static final String OPT_TESTS_DEFAULT = "100";
-	private static final String OPT_TESTS_DESC = "Specify the number of statistical tests, default to " + OPT_TESTS_DEFAULT;
-	
-	private static final String OPT_H2_LONG = "h2";
-	private static final String OPT_H2_DEFAULT = "0.95";
-	private static final String OPT_H2_DESC = "Specify the heritability, default to " + OPT_H2_DEFAULT;
+
+	private static final String OPT_BVALUE_LONG = "b";
+	private static final String OPT_BVALUE_DEFAULT = "0.95";
+	private static final String OPT_BVALUE_DESC = "Specify the regression coefficient, default to " + OPT_BVALUE_DEFAULT;
+
+//chisq
+	private static final String OPT_CHISQ_LONG = "chisq";
+	private static final String OPT_CHISQ_DESC = "Chisq method.";
+
+	private static final String OPT_QVALUE_LONG = "q";
+	private static final String OPT_QVALUE_DEFAULT = "0.5";
+	private static final String OPT_QVALUE_DES = "Cut-off for chisq test.";
+
 }
