@@ -201,7 +201,7 @@ public class MetaWatchdog2CommandImpl extends CommandImpl
 		double K = file.readDouble();
 		long seed = file.readLong();
 		double alpha = file.readDouble();
-		int tests = file.readInt();
+		long tests = file.readInt();
 
 		double beta = file.readDouble();
 		double b = file.readDouble();

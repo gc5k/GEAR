@@ -47,7 +47,7 @@ public class DogPowerCommandImpl extends CommandImpl
 		ChiSquaredDistributionImpl chiDis = new ChiSquaredDistributionImpl(1);
 
 		double alpha = dogpowerArgs.getAlpha();
-		int tests = dogpowerArgs.getTests();
+		long tests = dogpowerArgs.getTests();
 		double q = dogpowerArgs.getQValue();
 		double logP = -1 * Math.log10(alpha/tests);
 
@@ -101,7 +101,7 @@ public class DogPowerCommandImpl extends CommandImpl
 			os.writeDouble(k);
 			os.writeLong(dogpowerArgs.getSeed());
 			os.writeDouble(dogpowerArgs.getAlpha());
-			os.writeInt(dogpowerArgs.getTests());
+			os.writeLong(dogpowerArgs.getTests());
 
 			os.writeDouble(dogpowerArgs.getBeta());
 			os.writeDouble(dogpowerArgs.getB());
@@ -122,7 +122,7 @@ public class DogPowerCommandImpl extends CommandImpl
 
 		double alpha = dogpowerArgs.getAlpha();
 		double beta = dogpowerArgs.getBeta();
-		int tests = dogpowerArgs.getTests();
+		long tests = dogpowerArgs.getTests();
 
 		double za = 0;
 		double zb = 0;
@@ -163,7 +163,7 @@ public class DogPowerCommandImpl extends CommandImpl
 			os.writeDouble(k);
 			os.writeLong(dogpowerArgs.getSeed());
 			os.writeDouble(dogpowerArgs.getAlpha());
-			os.writeInt(dogpowerArgs.getTests());
+			os.writeLong(dogpowerArgs.getTests());
 
 			os.writeDouble(dogpowerArgs.getBeta());
 			os.writeDouble(dogpowerArgs.getB());

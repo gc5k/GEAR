@@ -20,11 +20,11 @@ public class DogPowerCommandArguments extends CommandArguments
 	{
 		this.beta = beta;
 	}
-	public int getTests()
+	public long getTests()
 	{
 		return tests;
 	}
-	public void setTests(int tests)
+	public void setTests(long tests)
 	{
 		this.tests = tests;
 	}
@@ -56,7 +56,7 @@ public class DogPowerCommandArguments extends CommandArguments
 	}
 	private double alpha;
 	private double beta;
-	private int tests;
+	private long tests;
 	private double b;
 	private boolean regFlag;
 	private boolean chisqFlag;

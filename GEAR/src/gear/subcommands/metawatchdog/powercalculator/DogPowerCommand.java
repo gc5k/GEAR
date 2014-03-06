@@ -47,7 +47,7 @@ public class DogPowerCommand extends Command
 		DogPowerCommandArguments cmdArgs = new DogPowerCommandArguments();
 		cmdArgs.setAlpha(parseDoubleOptionValueInRange(cmdLine, OPT_ALPHA_LONG, OPT_ALPHA_DEFAULT, 0, 1));
 		cmdArgs.setSeed(parseLongOptionValue(cmdLine, OPT_SEED_LONG, OPT_SEED_DEFAULT));
-		cmdArgs.setTests((int)parseLongOptionValue(cmdLine, OPT_TEST_LONG, OPT_TEST_DEFAULT));
+		cmdArgs.setTests(parseLongOptionValue(cmdLine, OPT_TEST_LONG, OPT_TEST_DEFAULT));
 
 		if (cmdLine.hasOption(OPT_REGRESSION_LONG))
 		{
