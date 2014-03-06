@@ -79,7 +79,7 @@ public class EnigmaCommandImpl extends CommandImpl
 		double K = file.readDouble();
 		seed = file.readLong();
 		double alpha = file.readDouble();
-		int tests = file.readInt();
+		long tests = file.readInt();
 
 		double beta = file.readDouble();
 		double b = file.readDouble();
