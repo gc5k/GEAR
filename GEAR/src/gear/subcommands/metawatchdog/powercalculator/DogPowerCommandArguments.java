@@ -32,24 +32,18 @@ public class DogPowerCommandArguments extends CommandArguments
 	{
 		return b;
 	}
-	public void setBValue(double b)
+	public void setRegression(double b)
 	{
+		this.regFlag = true;
 		this.b = b;
-	}
-	public void setRegression(boolean f)
-	{
-		this.regFlag = f;
 	}
 	public boolean getRegressionFlag()
 	{
 		return regFlag;
 	}
-	public void setChisq(boolean f)
+	public void setChisq(double q)
 	{
-		this.chisqFlag = f;
-	}
-	public void setQValue(double q)
-	{
+		this.chisqFlag = true;
 		this.q = q;
 	}
 	public double getQValue()

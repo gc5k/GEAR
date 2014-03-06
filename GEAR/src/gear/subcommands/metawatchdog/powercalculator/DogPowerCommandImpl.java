@@ -50,7 +50,7 @@ public class DogPowerCommandImpl extends CommandImpl
 		int tests = dogpowerArgs.getTests();
 		double q = dogpowerArgs.getQValue();
 		double logP = -1 * Math.log10(alpha/tests);
-		
+
 		double logChisqP = 0;
 		try
 		{
