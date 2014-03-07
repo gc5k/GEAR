@@ -17,6 +17,7 @@ import gear.util.Logger;
 import gear.util.pop.PopStat;
 
 import java.io.PrintStream;
+import java.text.DecimalFormat;
 import java.util.ArrayList;
 
 import org.apache.commons.math.linear.Array2DRowRealMatrix;
@@ -98,6 +99,8 @@ public class BlupPcaCommandImpl extends CommandImpl
 			}
 		}
 
+		DecimalFormat fmt = new DecimalFormat("#.###E00");
+
 		for(int i = 0; i < gm.getNumMarker(); i++)
 		{
 			SNP snp = snpList.get(i);
@@ -106,17 +109,17 @@ public class BlupPcaCommandImpl extends CommandImpl
 			{
 				if (j == (blupPC[i].length - 1))
 				{
-					predictorFile.println(blupPC[i][j]);
+					predictorFile.println(fmt.format(blupPC[i][j]));
 				}
 				else
 				{
-					predictorFile.print(blupPC[i][j]+"\t");
+					predictorFile.print(fmt.format(blupPC[i][j])+"\t");
 				}
 			}
 		}
 		predictorFile.close();
 	}
-	
+
 	private void readGrm(BlupPcaCommandArguments blupArgs, int numSubjects)
 	{
 		if (blupArgs.getGrmBin() != null)
