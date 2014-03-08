@@ -2,6 +2,7 @@ package gear.subcommands.profile;
 
 import org.apache.commons.cli.CommandLine;
 import org.apache.commons.cli.OptionBuilder;
+import org.apache.commons.cli.OptionGroup;
 import org.apache.commons.cli.Options;
 
 import gear.subcommands.Command;
@@ -34,7 +35,11 @@ public final class ProfileCommand extends Command
 	{
 		if (!isCalledByEnigma)
 		{
-			options.addOption(OptionBuilder.withDescription(OPT_SCORE_DESC).withLongOpt(OPT_SCORE_LONG).isRequired().hasArg().create(OPT_SCORE));
+			OptionGroup scoreFileGroup = new OptionGroup();
+			scoreFileGroup.setRequired(true);
+			scoreFileGroup.addOption(OptionBuilder.withDescription(OPT_SCORE_DESC).withLongOpt(OPT_SCORE_LONG).hasArg().create(OPT_SCORE));
+			scoreFileGroup.addOption(OptionBuilder.withDescription(OPT_SCORE_GZ_DESC).withLongOpt(OPT_SCORE_GZ_LONG).hasArg().create());
+			options.addOptionGroup(scoreFileGroup);
 			options.addOption(OptionBuilder.withDescription(OPT_NO_SCORE_HEADER_DESC).withLongOpt(OPT_NO_SCORE_HEADER_LONG).create());
 			options.addOption(OptionBuilder.withDescription(OPT_QSCORE_DESC).withLongOpt(OPT_QSCORE_LONG).hasArg().create());
 			options.addOption(OptionBuilder.withDescription(OPT_QRANGE_DESC).withLongOpt(OPT_QRANGE_LONG).hasArg().create());
@@ -58,6 +63,7 @@ public final class ProfileCommand extends Command
 	{
 		ProfileCommandArguments profCmdArgs = new ProfileCommandArguments();
 		profCmdArgs.setScoreFile(cmdLine.getOptionValue(OPT_SCORE_LONG));
+		profCmdArgs.setScoreFileGZ(cmdLine.getOptionValue(OPT_SCORE_GZ_LONG));
 		profCmdArgs.setHasScoreHeader(!cmdLine.hasOption(OPT_NO_SCORE_HEADER_LONG));
 		parseQScoreQRangeArgs(profCmdArgs, cmdLine);
 		parseDataFileArgs(profCmdArgs, cmdLine);
@@ -233,6 +239,9 @@ public final class ProfileCommand extends Command
 	private static final char OPT_SCORE = 's';
 	private static final String OPT_SCORE_LONG = "score";
 	private static final String OPT_SCORE_DESC = "Specify score file";
+	
+	private static final String OPT_SCORE_GZ_LONG = "score-gz";
+	private static final String OPT_SCORE_GZ_DESC = "Specify score file in gzip format";
 	
 	private static final String OPT_NO_SCORE_HEADER_LONG = "no-score-header";
 	private static final String OPT_NO_SCORE_HEADER_DESC = "Indicate that the score file has no header (title) line";

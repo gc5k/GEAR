@@ -32,7 +32,7 @@ public class FilteredSNPsTest
 		snps[8] = new SNP("SNP9", 'T', 'C');
 		snps[9] = new SNP("SNP10", 'T', 'G');
 		
-		ScoreFile scoreFile = new ScoreFile("data/ScoresWithHeaders.txt", /*hasHeaders*/true);
+		ScoreFile scoreFile = ScoreFile.readTextFile("data/ScoresWithHeaders.txt", /*hasHeaders*/true);
 		
 		HashMap<String, Float> qScoreMap = new HashMap<String, Float>();
 		qScoreMap.put("SNP1", 2.0f);

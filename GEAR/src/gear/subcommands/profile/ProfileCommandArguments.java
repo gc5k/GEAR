@@ -14,6 +14,16 @@ public final class ProfileCommandArguments extends CommandArguments
 		this.scoreFile = scoreFile;
 	}
 	
+	public String getScoreFileGZ()
+	{
+		return scoreFileGZ;
+	}
+
+	public void setScoreFileGZ(String scoreFileGZ)
+	{
+		this.scoreFileGZ = scoreFileGZ;
+	}
+	
 	public boolean getHasScoreHeader()
 	{
 		return hasScoreHeader;
@@ -163,8 +173,9 @@ public final class ProfileCommandArguments extends CommandArguments
 	{
 		this.isKeepATGC = isKeepATGC;
 	}
-	
+
 	private String scoreFile;
+	private String scoreFileGZ;
 	private boolean hasScoreHeader;
 	private String qScoreFile;
 	private String qRangeFile;

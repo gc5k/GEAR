@@ -8,9 +8,20 @@ import java.util.HashMap;
 
 class ScoreFile
 {
-	protected ScoreFile(String fileName, boolean hasHeaders)
-	{	
+	protected static ScoreFile readTextFile(String fileName, boolean hasHeaders)
+	{
 		BufferedReader reader = BufferedReader.openTextFile(fileName, "score");
+		return new ScoreFile(reader, hasHeaders);
+	}
+	
+	protected static ScoreFile readTextFileGZ(String fileName, boolean hasHeaders)
+	{
+		BufferedReader reader = BufferedReader.openGZipFile(fileName, "score");
+		return new ScoreFile(reader, hasHeaders);
+	}
+	
+	private ScoreFile(BufferedReader reader, boolean hasHeaders)
+	{	
 		String[] tokens = readFirstLine(reader, hasHeaders);
 		
 		while (tokens != null)
@@ -25,7 +36,7 @@ class ScoreFile
 			
 			if (scores.put(/*locusName*/tokens[0], score) != null)
 			{
-				Logger.printUserError("SNP '" + tokens[0] + "' appears more than once in the score file '" + fileName + "'.");
+				Logger.printUserError("SNP '" + tokens[0] + "' appears more than once in the score file '" + reader.getFileName() + "'.");
 				System.exit(1);
 			}
 			
