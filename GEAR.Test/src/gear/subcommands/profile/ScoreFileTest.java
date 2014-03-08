@@ -11,7 +11,7 @@ public class ScoreFileTest
 	@Test
 	public void testHasHeader()
 	{
-		ScoreFile scoreFile = new ScoreFile("data/ScoresWithHeaders.txt", /*hasHeaders*/true);
+		ScoreFile scoreFile = ScoreFile.readTextFile("data/ScoresWithHeaders.txt", /*hasHeaders*/true);
 		
 		assertEquals(2, scoreFile.getNumberOfTraits());
 		assertEquals("Trait1", scoreFile.getTrait(0));
@@ -79,7 +79,7 @@ public class ScoreFileTest
 	@Test
 	public void testNoHeader()
 	{
-		ScoreFile scoreFile = new ScoreFile("data/ScoresWithoutHeaders.txt", /*hasHeaders*/false);
+		ScoreFile scoreFile = ScoreFile.readTextFile("data/ScoresWithoutHeaders.txt", /*hasHeaders*/false);
 		
 		assertEquals(2, scoreFile.getNumberOfTraits());
 		assertEquals("1", scoreFile.getTrait(0));

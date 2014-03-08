@@ -20,7 +20,15 @@ public final class ProfileCommandImpl extends CommandImpl
 	{
 		profCmdArgs = (ProfileCommandArguments)cmdArgs;
 		
-		ScoreFile scoreFile = new ScoreFile(profCmdArgs.getScoreFile(), profCmdArgs.getHasScoreHeader());
+		ScoreFile scoreFile;
+		if (profCmdArgs.getScoreFile() != null)
+		{
+			scoreFile = ScoreFile.readTextFile(profCmdArgs.getScoreFile(), profCmdArgs.getHasScoreHeader());
+		}
+		else
+		{
+			scoreFile = ScoreFile.readTextFileGZ(profCmdArgs.getScoreFileGZ(), profCmdArgs.getHasScoreHeader());
+		}
 
 		HashMap<String, Float> qScoreMap = readQScores();  // LocusName-to-QScore map
 		QRange[] qRanges = readQRanges();
