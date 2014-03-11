@@ -74,7 +74,7 @@ public final class ProfileCommand extends Command
 		profCmdArgs.setIsKeepATGC(cmdLine.hasOption(OPT_KEEP_ATGC_LONG));
 		return profCmdArgs;
 	}
-	
+
 	private void parseQScoreQRangeArgs(ProfileCommandArguments profCmdArgs, CommandLine cmdLine) throws CommandArgumentException
 	{
 		String qScoreFile = cmdLine.getOptionValue(OPT_QSCORE_LONG);
