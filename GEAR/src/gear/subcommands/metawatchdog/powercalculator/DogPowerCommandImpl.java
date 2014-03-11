@@ -12,12 +12,13 @@ import org.apache.commons.math.distribution.NormalDistributionImpl;
 
 import gear.subcommands.CommandArguments;
 import gear.subcommands.CommandImpl;
+import gear.subcommands.metawatchdog.MetaWatchdogConstant;
 import gear.util.Logger;
 
 public class DogPowerCommandImpl extends CommandImpl
 {
 	private DogPowerCommandArguments dogpowerArgs;
-	private int method = 0; //0 for chisq; 1 for regression;
+	private int method = MetaWatchdogConstant.Chisq;
 	@Override
 	public void execute(CommandArguments cmdArgs)
 	{
@@ -25,12 +26,12 @@ public class DogPowerCommandImpl extends CommandImpl
 
 		if(dogpowerArgs.getChisqFlag())
 		{
-			method = 0;
+			method = MetaWatchdogConstant.Chisq;
 			chisq();
 		}
 		else if (dogpowerArgs.getRegressionFlag())
 		{
-			method = 1;
+			method = MetaWatchdogConstant.Reg;
 			regression();
 		}
 		else
@@ -38,7 +39,7 @@ public class DogPowerCommandImpl extends CommandImpl
 			Logger.printUserLog("No method has been specified. GEAR quitted.");
 			System.exit(0);
 		}
-		
+
 		Logger.printUserLog("Parameters have been saved into '" + dogpowerArgs.getOutRoot() + ".encode'.");
 	}
 

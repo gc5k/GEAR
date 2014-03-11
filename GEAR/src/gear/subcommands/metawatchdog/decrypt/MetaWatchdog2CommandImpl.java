@@ -11,6 +11,7 @@ import gear.ConstValues;
 import gear.data.PhenotypeFile;
 import gear.subcommands.CommandArguments;
 import gear.subcommands.CommandImpl;
+import gear.subcommands.metawatchdog.MetaWatchdogConstant;
 import gear.util.BinaryInputFile;
 import gear.util.FileUtil;
 import gear.util.Logger;
@@ -209,15 +210,32 @@ public class MetaWatchdog2CommandImpl extends CommandImpl
 		int method = file.readInt();
 		file.close();
 
-		if (method == 0) // chisq
+		if (method == MetaWatchdogConstant.Chisq) // chisq
 		{
 			Logger.printUserLog("Encode file set the chisq q value to " + q + ".");
 			mwArgs.setChisq(q);
+			
+			Logger.printUserLog("Generating " + K + " profile scores under the following setting:");
+			Logger.printUserLog("Method: chi-sq");
+			Logger.printUserLog("Alpha: " + alpha);
+			Logger.printUserLog("Tests: " + tests);
+			Logger.printUserLog("Q: " + q);
+			Logger.printUserLog("Random seed: " + seed);
+
 		}
 		else
 		{
 			Logger.printUserLog("Encode file set the regression b value to " + b + ".");
 			mwArgs.setRegB(b);
+			
+			Logger.printUserLog("Generating " + K + " profile scores under the following setting:");
+			Logger.printUserLog("Method: regression");
+			Logger.printUserLog("Alpha: " + alpha);
+			Logger.printUserLog("Beta: " + beta);
+			Logger.printUserLog("B: " + b);
+			Logger.printUserLog("Tests: " + tests);
+			Logger.printUserLog("Random seed: " + seed);
+
 		}
 	}
 
