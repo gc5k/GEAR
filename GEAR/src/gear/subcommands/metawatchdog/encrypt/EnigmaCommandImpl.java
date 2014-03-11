@@ -11,6 +11,7 @@ import org.apache.commons.math.random.RandomDataImpl;
 
 import gear.subcommands.CommandArguments;
 import gear.subcommands.CommandImpl;
+import gear.subcommands.metawatchdog.MetaWatchdogConstant;
 import gear.subcommands.profile.ProfileCommandArguments;
 import gear.subcommands.profile.ProfileCommandImpl;
 import gear.util.BinaryInputFile;
@@ -85,6 +86,7 @@ public class EnigmaCommandImpl extends CommandImpl
 		double b = file.readDouble();
 		double q = file.readDouble();
 		int method = file.readInt();
+		file.close();
 
 		numCols = (int) Math.ceil(K);
 		if (numCols > K)
@@ -95,7 +97,26 @@ public class EnigmaCommandImpl extends CommandImpl
 		{
 			Logger.printUserLog("Columns: " + (K));
 		}
-		file.close();
+		
+		if (method == MetaWatchdogConstant.Chisq)
+		{
+			Logger.printUserLog("Generating " + K + " profile scores under the following setting:");
+			Logger.printUserLog("Method: chi-sq");
+			Logger.printUserLog("Alpha: " + alpha);
+			Logger.printUserLog("Tests: " + tests);
+			Logger.printUserLog("Q: " + q);
+			Logger.printUserLog("Random seed: " + seed);
+		}
+		else if (method == MetaWatchdogConstant.Reg)
+		{
+			Logger.printUserLog("Generating " + K + " profile scores under the following setting:");
+			Logger.printUserLog("Method: regression");
+			Logger.printUserLog("Alpha: " + alpha);
+			Logger.printUserLog("Beta: " + beta);
+			Logger.printUserLog("B: " + b);
+			Logger.printUserLog("Tests: " + tests);
+			Logger.printUserLog("Random seed: " + seed);
+		}
 	}
 
 	private void readRefAlleles(String mapFile)
@@ -107,7 +128,7 @@ public class EnigmaCommandImpl extends CommandImpl
 			ref.add(tokens[0] + "\t" + tokens[1]);
 		}
 	}
-	
+
 	private ArrayList<String> ref = new ArrayList<String>();
 	private long seed;
 	private int numCols;
