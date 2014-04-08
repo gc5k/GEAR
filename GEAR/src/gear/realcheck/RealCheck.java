@@ -161,7 +161,7 @@ public class RealCheck
 		Logger.printUserLog("In total " + N + " individual pairs were compared.\n");
 		Logger.printUserLog("Mean is: " + E);
 		Logger.printUserLog("Standard deviation is: " + v);
-		Logger.printUserLog("Mean and SD were calculated with the exclusion of the pair of the individual.\n");
+//		Logger.printUserLog("Mean and SD were calculated with the exclusion of the pair of the identical individual.\n");
 		
 		double[] sChart = similarityScoreChart();
 		Logger.printUserLog("=====Reference similarity score chart=====");
