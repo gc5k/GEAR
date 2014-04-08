@@ -80,7 +80,7 @@ public class EnigmaCommandImpl extends CommandImpl
 		double K = file.readDouble();
 		seed = file.readLong();
 		double alpha = file.readDouble();
-		long tests = file.readInt();
+		long tests = file.readLong();
 
 		double beta = file.readDouble();
 		double b = file.readDouble();
@@ -95,9 +95,9 @@ public class EnigmaCommandImpl extends CommandImpl
 		}
 		else
 		{
-			Logger.printUserLog("Columns: " + (K));
+			Logger.printUserLog("Columns: " + numCols);
 		}
-		
+
 		if (method == MetaWatchdogConstant.Chisq)
 		{
 			Logger.printUserLog("Generating " + K + " profile scores under the following setting:");
