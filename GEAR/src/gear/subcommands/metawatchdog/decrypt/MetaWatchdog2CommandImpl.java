@@ -202,7 +202,7 @@ public class MetaWatchdog2CommandImpl extends CommandImpl
 		double K = file.readDouble();
 		long seed = file.readLong();
 		double alpha = file.readDouble();
-		long tests = file.readInt();
+		long tests = file.readLong();
 
 		double beta = file.readDouble();
 		double b = file.readDouble();
@@ -210,12 +210,12 @@ public class MetaWatchdog2CommandImpl extends CommandImpl
 		int method = file.readInt();
 		file.close();
 
+		Logger.printUserLog("Generating " + K + " profile scores under the following setting:");
 		if (method == MetaWatchdogConstant.Chisq) // chisq
 		{
 			Logger.printUserLog("Encode file set the chisq q value to " + q + ".");
 			mwArgs.setChisq(q);
 			
-			Logger.printUserLog("Generating " + K + " profile scores under the following setting:");
 			Logger.printUserLog("Method: chi-sq");
 			Logger.printUserLog("Alpha: " + alpha);
 			Logger.printUserLog("Tests: " + tests);
@@ -228,7 +228,6 @@ public class MetaWatchdog2CommandImpl extends CommandImpl
 			Logger.printUserLog("Encode file set the regression b value to " + b + ".");
 			mwArgs.setRegB(b);
 			
-			Logger.printUserLog("Generating " + K + " profile scores under the following setting:");
 			Logger.printUserLog("Method: regression");
 			Logger.printUserLog("Alpha: " + alpha);
 			Logger.printUserLog("Beta: " + beta);

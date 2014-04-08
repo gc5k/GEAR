@@ -61,7 +61,7 @@ public class SampleFilter
 		qualification();
 		if (PersonTable.size() == 0)
 		{
-			Logger.printUserError("No individual is left for analysis.");
+			Logger.printUserError("No individuals are left for analysis.");
 			System.exit(1);
 		}
 	}
