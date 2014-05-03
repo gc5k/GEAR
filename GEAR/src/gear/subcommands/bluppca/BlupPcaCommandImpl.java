@@ -43,7 +43,8 @@ public class BlupPcaCommandImpl extends CommandImpl
 		mapFile = ssQC.getMapFile();
 		gm = new GenotypeMatrix(ssQC.getSample());
 
-		PopStat.Imputation(gm);
+		
+//		PopStat.Imputation(gm);
 
 		double[][] genoMat = new double[gm.getNumIndivdial()][gm.getNumMarker()];
 		for(int i = 0; i < genoMat.length; i++)
@@ -61,7 +62,26 @@ public class BlupPcaCommandImpl extends CommandImpl
 		RealMatrix grm = new Array2DRowRealMatrix(A);
 		RealMatrix grm_Inv = (new LUDecompositionImpl(grm)).getSolver().getInverse();
 
-		RealMatrix tmp = (new Array2DRowRealMatrix(genoMat)).transpose().multiply(grm_Inv);
+//		RealMatrix tmp = (new Array2DRowRealMatrix(genoMat)).transpose().multiply(grm_Inv);
+		RealMatrix t = (new Array2DRowRealMatrix(genoMat)).transpose();
+
+		RealMatrix tmp = new Array2DRowRealMatrix(t.getRowDimension(), grm_Inv.getColumnDimension());
+
+		for(int i = 0; i < t.getRowDimension(); i++)
+		{
+			for(int j = 0; j < grm_Inv.getColumnDimension(); j++)
+			{
+				double f = 0;
+				for(int k = 0; k < t.getColumnDimension(); k++)
+				{
+					if ( ((int) t.getEntry(i, k)) !=  ConstValues.BINARY_MISSING_GENOTYPE ) 
+					{
+						f += t.getEntry(i, k) * grm_Inv.getEntry(k, j);					
+					}
+				}
+				tmp.setEntry(i, j, f);
+			}
+		}
 
 		for(int traitIdx = 0; traitIdx < data.getNumberOfTraits(); traitIdx++)
 		{
