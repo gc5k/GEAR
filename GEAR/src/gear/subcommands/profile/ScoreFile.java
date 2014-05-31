@@ -5,25 +5,26 @@ import gear.util.BufferedReader;
 import gear.util.Logger;
 
 import java.util.HashMap;
+import java.util.HashSet;
 
 class ScoreFile
 {
-	protected static ScoreFile readTextFile(String fileName, boolean hasHeaders)
+	protected static ScoreFile readTextFile(String fileName, boolean hasHeaders, HashSet<String> SCsnp)
 	{
 		BufferedReader reader = BufferedReader.openTextFile(fileName, "score");
-		return new ScoreFile(reader, hasHeaders);
+		return new ScoreFile(reader, hasHeaders, SCsnp);
 	}
-	
-	protected static ScoreFile readTextFileGZ(String fileName, boolean hasHeaders)
+
+	protected static ScoreFile readTextFileGZ(String fileName, boolean hasHeaders, HashSet<String> SCsnp)
 	{
 		BufferedReader reader = BufferedReader.openGZipFile(fileName, "score");
-		return new ScoreFile(reader, hasHeaders);
+		return new ScoreFile(reader, hasHeaders, SCsnp);
 	}
 	
-	private ScoreFile(BufferedReader reader, boolean hasHeaders)
+	private ScoreFile(BufferedReader reader, boolean hasHeaders, HashSet<String> SCsnp)
 	{	
 		String[] tokens = readFirstLine(reader, hasHeaders);
-		
+		int cnt = 0;
 		while (tokens != null)
 		{
 			if (tokens[1].length() != 1)
@@ -32,32 +33,38 @@ class ScoreFile
 				continue;
 			}
 			
-			Score score = new Score(tokens[1].charAt(0), tokens.length - 2);
-			
-			if (scores.put(/*locusName*/tokens[0], score) != null)
+			if (SCsnp.contains(tokens[0]))
 			{
-				Logger.printUserError("SNP '" + tokens[0] + "' appears more than once in the score file '" + reader.getFileName() + "'.");
-				System.exit(1);
-			}
+	
+				Score score = new Score(tokens[1].charAt(0), tokens.length - 2);
 			
-			for (int ii = 2; ii < tokens.length; ++ii)
-			{
-				if (!ConstValues.isNA(tokens[ii]))
+				if (scores.put(/*locusName*/tokens[0], score) != null)
 				{
-					try
+					Logger.printUserError("SNP '" + tokens[0] + "' appears more than once in the score file '" + reader.getFileName() + "'.");
+					System.exit(1);
+				}
+			
+				for (int ii = 2; ii < tokens.length; ++ii)
+				{
+					if (!ConstValues.isNA(tokens[ii]))
 					{
-						score.setValue(ii - 2, Float.parseFloat(tokens[ii]));
-					}
-					catch (NumberFormatException e)
-					{
-						reader.errorPreviousLine("'" + tokens[ii] + "' is not a floating point number, so it it not a valid score.");
+						try
+						{
+							score.setValue(ii - 2, Float.parseFloat(tokens[ii]));
+						}
+						catch (NumberFormatException e)
+						{
+							reader.errorPreviousLine("'" + tokens[ii] + "' is not a floating point number, so it it not a valid score.");
+						}
 					}
 				}
+				cnt++;
 			}
-			
 			tokens = reader.readTokens(tokens.length);
+
 		}
 		reader.close();
+		Logger.printUserLog(cnt + " scores have been included.");
 	}
 
 	/**

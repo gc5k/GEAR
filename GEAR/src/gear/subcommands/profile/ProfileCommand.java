@@ -56,6 +56,8 @@ public final class ProfileCommand extends Command
 		options.addOption(OptionBuilder.withDescription(OPT_AUTO_FLIP_OFF_DESC).withLongOpt(OPT_AUTO_FLIP_OFF_LONG).hasArg(false).create());
 		options.addOption(OptionBuilder.withDescription(OPT_NO_WEIGHT_DESC).withLongOpt(OPT_NO_WEIGHT_LONG).hasArg(false).create());
 		options.addOption(OptionBuilder.withDescription(OPT_KEEP_ATGC_DESC).withLongOpt(OPT_KEEP_ATGC_LONG).hasArg(false).create());
+		options.addOption(OptionBuilder.withDescription(OPT_EXTRACT_DESC).withLongOpt(OPT_EXTRACT_LONG).hasArg().create());
+
 	}
 
 	@Override
@@ -63,6 +65,7 @@ public final class ProfileCommand extends Command
 	{
 		ProfileCommandArguments profCmdArgs = new ProfileCommandArguments();
 		profCmdArgs.setScoreFile(cmdLine.getOptionValue(OPT_SCORE_LONG));
+
 		profCmdArgs.setScoreFileGZ(cmdLine.getOptionValue(OPT_SCORE_GZ_LONG));
 		profCmdArgs.setHasScoreHeader(!cmdLine.hasOption(OPT_NO_SCORE_HEADER_LONG));
 		parseQScoreQRangeArgs(profCmdArgs, cmdLine);
@@ -72,6 +75,11 @@ public final class ProfileCommand extends Command
 		profCmdArgs.setIsAutoFlip(!cmdLine.hasOption(OPT_AUTO_FLIP_OFF_LONG));
 		profCmdArgs.setIsWeighted(!cmdLine.hasOption(OPT_NO_WEIGHT_LONG));
 		profCmdArgs.setIsKeepATGC(cmdLine.hasOption(OPT_KEEP_ATGC_LONG));
+		if (cmdLine.hasOption(OPT_EXTRACT_LONG))
+		{
+			profCmdArgs.setIsExtract(cmdLine.getOptionValue(OPT_EXTRACT_LONG));
+		}
+
 		return profCmdArgs;
 	}
 
@@ -286,4 +294,7 @@ public final class ProfileCommand extends Command
 	
 	private static final String OPT_KEEP_ATGC_LONG = "keep-atgc";
 	private static final String OPT_KEEP_ATGC_DESC = "Keep A/T and G/C loci";
+	
+	private static final String OPT_EXTRACT_LONG = "extract";
+	private static final String OPT_EXTRACT_DESC = "Extract score snps";
 }

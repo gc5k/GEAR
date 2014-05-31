@@ -174,6 +174,17 @@ public final class ProfileCommandArguments extends CommandArguments
 		this.isKeepATGC = isKeepATGC;
 	}
 
+	public void setIsExtract(String extractFile)
+	{
+		this.extractFile = extractFile;
+	}
+
+	public String getExtractFile()
+	{
+		return extractFile;	
+	}
+
+	private String extractFile;
 	private String scoreFile;
 	private String scoreFileGZ;
 	private boolean hasScoreHeader;
