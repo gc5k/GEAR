@@ -295,6 +295,6 @@ public final class ProfileCommand extends Command
 	private static final String OPT_KEEP_ATGC_LONG = "keep-atgc";
 	private static final String OPT_KEEP_ATGC_DESC = "Keep A/T and G/C loci";
 	
-	private static final String OPT_EXTRACT_LONG = "extract";
+	private static final String OPT_EXTRACT_LONG = "extract-score";
 	private static final String OPT_EXTRACT_DESC = "Extract score snps";
 }
