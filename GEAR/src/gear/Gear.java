@@ -46,6 +46,7 @@ public enum Gear
 		addCommand(new gear.subcommands.metawatchdog.encrypt.EnigmaCommand());
 		addCommand(new gear.subcommands.profile.ProfileCommand());
 		addCommand(new gear.subcommands.simulation.SimuFamilyCommand());
+		addCommand(new gear.subcommands.lambdaD.LambdaDCommand());
 	}
 	
 	private void addCommand(Command cmd)
@@ -90,8 +91,7 @@ public enum Gear
 		}
 		else
 		{
-			// TODO: Move the following routines to the subcommand system and print 'Unknown subcommand'.
-			
+	
 			CmdArgs.INSTANCE.parse(args);
 			
 			Logger.setLogFiles(CmdArgs.INSTANCE.out);

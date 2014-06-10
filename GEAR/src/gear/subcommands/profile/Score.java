@@ -23,7 +23,7 @@ class Score
 	{
 		return values[i];
 	}
-	
+
 	protected void setValue(int i, Float value)
 	{
 		values[i] = value;
