@@ -1,5 +1,12 @@
 package gear.subcommands.lambdaD;
 
+import java.io.BufferedWriter;
+import java.io.DataOutputStream;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.io.PrintWriter;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
@@ -24,7 +31,7 @@ public class LambdaDCommandImpl extends CommandImpl
 		initial();
 		SumStat1 = readMeta(0);
 		SumStat2 = readMeta(1);
-		
+
 		calculateLambdaD();
 		Logger.printUserLog("LambdaD median: " + LambdaMedian);
 		Logger.printUserLog("Estimated overlapping samples (lambdaD median): " + OSMedian);
@@ -40,6 +47,38 @@ public class LambdaDCommandImpl extends CommandImpl
 		{
 			Logger.printUserLog("Estiamted overlapping controls: " + OSCtrlMean);			
 		}
+
+		printOut();
+	}
+	
+	private void printOut()
+	{
+		PrintWriter writer = null;
+		try 
+		{
+			writer = new PrintWriter(new BufferedWriter(new FileWriter(lamArgs.getOutRoot() + ".lam")));
+		}
+		catch (IOException e)
+		{
+			Logger.handleException(e, "An I/O exception occurred when writing '" + lamArgs.getOutRoot() + ".lam" + "'.");
+		}
+		writer.println("Kappa: " + Kappa);
+		writer.println("LambdaD (median): " + LambdaMedian);
+		writer.println("rho (based on LambdaD median: " + rhoMedian);
+		writer.println("Overlapping samples: " + OSMedian);
+		if(!lamArgs.isQT())
+		{
+			writer.println("Overlapping controls: " + OSCtrlMedian);
+		}
+		writer.println();
+		writer.println("LambdaD (mean): " + LambdaMean);
+		writer.println("rho (based on LambdaD mean): " + rhoMean);
+		writer.println("Overlapping samples: " + OSMean);
+		if (!lamArgs.isQT())
+		{
+			writer.println("Overlapping controls: " + OSMedian);
+		}
+		writer.close();
 	}
 
 	private void initial()
@@ -49,7 +88,7 @@ public class LambdaDCommandImpl extends CommandImpl
 
 		if (lamArgs.isQT())
 		{
-			Logger.printUserLog("Summary statistics analysis for a quantitative trait.");
+			Logger.printUserLog("Summary statistics analysis for quantitative traits.");
 			double[] size = lamArgs.getQTsize();
 			Kappa = 2 / ( Math.sqrt(size[0]/size[1]) + Math.sqrt(size[1]/size[0]) );
 			Logger.printUserLog("Sample sizes meta-analysis 1: " + size[0]);
@@ -57,12 +96,12 @@ public class LambdaDCommandImpl extends CommandImpl
 		}
 		else
 		{
-			Logger.printUserLog("Summary statistics analysis for a case-contrl study.");
+			Logger.printUserLog("Summary statistics analysis for case-contrl studies.");
 			double[] size = lamArgs.getCCsize();
 			R1 = size[0]/size[1];
 			R2 = size[2]/size[3];
-			Logger.printUserLog("Sample sizes meta-analysis 1: " + size[0] + " cases, " + size[1] + " controls. (R1=" + R1 + ")");
-			Logger.printUserLog("Sample sizes meta-analysis 2: " + size[2] + " cases, " + size[3] + " controls. (R2=" + R2 + ")");
+			Logger.printUserLog("Sample size for meta-analysis 1: " + size[0] + " cases, " + size[1] + " controls. (R1=" + R1 + ")");
+			Logger.printUserLog("Sample size for meta-analysis 2: " + size[2] + " cases, " + size[3] + " controls. (R2=" + R2 + ")");
 			double s1 = size[0] + size[1];
 			double s2 = size[2] + size[3];
 			Kappa = 2 / (Math.sqrt(s1 /s2) + Math.sqrt(s2 / s1));
@@ -104,10 +143,10 @@ public class LambdaDCommandImpl extends CommandImpl
 			{
 				SMidx[metaIdx][3] = i;
 			}
-//			if (tokens[i].equalsIgnoreCase("a2"))
-//            {
-//				SMidx[metaIdx][4] = i;
-//			}
+			if (tokens[i].equalsIgnoreCase("a2"))
+            {
+				SMidx[metaIdx][4] = i;
+			}
 		}
 
 		boolean qFlag = false;
@@ -142,45 +181,113 @@ public class LambdaDCommandImpl extends CommandImpl
 
 		HashMap<String, MetaStat> sumstat = NewIt.newHashMap();
 		int cnt = 0;
+		int cntBadEffect = 0;
+		int cntBadSE = 0;
+		int cntBadA1 = 0;
+		int cntBadA2 = 0;
 		while( (tokens = reader.readTokens(tokenLen)) != null)
 		{
 			if (ConstValues.isNA(tokens[SMidx[metaIdx][1]]))
 			{
-				reader.errorPreviousLine("'" + tokens[SMidx[metaIdx][1]] + "' is not numeric, so it is not a valid effect.");
+				cntBadEffect++;
 				continue;
 			}
 			if (ConstValues.isNA(tokens[SMidx[metaIdx][2]]))
 			{
-				reader.errorPreviousLine("'" + tokens[SMidx[metaIdx][2]] + "' is not numeric, so it is not a valid se.");
+				cntBadSE++;
 				continue;
 			}
 			if (Float.parseFloat(tokens[SMidx[metaIdx][2]]) == 0)
 			{
+				cntBadSE++;
 				continue;
 			}
 			if (tokens[SMidx[metaIdx][3]].length() != 1)
 			{
-				reader.errorPreviousLine("'" + tokens[SMidx[metaIdx][3]] + "' is not a character, so it is not a valid allele.");
+				cntBadA1++;
 				continue;
 			}
-//			if (tokens[SMidx[metaIdx][4]].length() != 1)
-//			{
-//				reader.errorPreviousLine("'" + tokens[SMidx[metaIdx][4]] + "' is not a character, so it is not a valid allele.");
-//				continue;
-//			}
+			if (SMidx[metaIdx][4] != -1)
+			{
+				if (tokens[SMidx[metaIdx][4]].length() != 1)
+				{
+					cntBadA2++;
+					continue;
+				}				
+			}
 
-			MetaStat ms = new MetaStat(tokens[SMidx[metaIdx][0]], Float.parseFloat(tokens[SMidx[metaIdx][1]]), Float.parseFloat(tokens[SMidx[metaIdx][2]]), tokens[SMidx[metaIdx][3]].charAt(0));
+			MetaStat ms = null;
+			if (SMidx[metaIdx][4] == -1)
+			{
+				ms = new MetaStat(tokens[SMidx[metaIdx][0]], Float.parseFloat(tokens[SMidx[metaIdx][1]]), Float.parseFloat(tokens[SMidx[metaIdx][2]]), tokens[SMidx[metaIdx][3]].charAt(0));
+			}
+			else
+			{
+				ms = new MetaStat(tokens[SMidx[metaIdx][0]], Float.parseFloat(tokens[SMidx[metaIdx][1]]), Float.parseFloat(tokens[SMidx[metaIdx][2]]), tokens[SMidx[metaIdx][3]].charAt(0), tokens[SMidx[metaIdx][4]].charAt(0));				
+			}
 			sumstat.put(ms.getSNP(), ms);
 			cnt++;
 		}
-		Logger.printUserLog("Read " + cnt + " summary statistics from " + MetaFile[metaIdx]);
+		if(cntBadEffect > 0)
+		{
+			if (cntBadEffect == 1)
+			{
+				Logger.printUserLog("Removed " + cntBadEffect + " locus due to not numeric effect.");				
+			}
+			else
+			{
+				Logger.printUserLog("Removed " + cntBadEffect + " locus due to not numeric effect.");				
+			}
+		}
+		if(cntBadSE > 0)
+		{
+			if (cntBadSE == 1)
+			{
+				Logger.printUserLog("Removed " + cntBadSE + " locus due to not numeric se.");				
+			}
+			else
+			{
+				Logger.printUserLog("Removed " + cntBadSE + " loci due to not numeric se.");
+			}
+		}
+		if(cntBadA1 > 0)
+		{
+			if (cntBadA1 == 1)
+			{
+				Logger.printUserLog("Removed " + cntBadA1 + " locus due to bad a1 allele.");				
+			}
+			else
+			{
+				Logger.printUserLog("Removed " + cntBadA1 + " loci due to bad a1 allele.");
+			}
+		}
+		if(cntBadA2 > 0)
+		{
+			if (cntBadA2 == 1)
+			{
+				Logger.printUserLog("Removed " + cntBadA2 + " locus due to bad a2 allele.");
+			}
+			else
+			{
+				Logger.printUserLog("Removed " + cntBadA2 + " loci due to bad a2 allele.");				
+			}
+		}
+		if(cnt == 0)
+		{
+			Logger.printUserLog("Did not find any summary statistics from " + MetaFile[metaIdx]);
+		}
+		else
+		{
+			Logger.printUserLog("Read " + cnt + " summary statistics from " + MetaFile[metaIdx]);			
+		}
 
 		return sumstat;
 	}
 
 	private void calculateLambdaD()
 	{
-		lD = NewIt.newArrayList();
+		ArrayList<Double> lD = NewIt.newArrayList();
+		int cntAmbiguous = 0;
 		for(Map.Entry<String, MetaStat> entry : SumStat1.entrySet())
 		{
 			String key = entry.getKey();
@@ -191,6 +298,20 @@ public class LambdaDCommandImpl extends CommandImpl
 			MetaStat ms1 = entry.getValue();
 			MetaStat ms2 = SumStat2.get(key);
 			double d = 0;
+			
+			if (SMidx[0][4] != -1)
+			{
+				SNPMatch.isAmbiguous(ms1.getA1(), ms1.getA2());
+				cntAmbiguous++;
+				continue;
+			}
+			if (SMidx[1][4] != -1)
+			{
+				SNPMatch.isAmbiguous(ms1.getA1(), ms2.getA2());
+				cntAmbiguous++;
+				continue;
+			}
+			
 			if (ms1.getA1() == ms2.getA1() || ms1.getA1() == SNPMatch.Flip(ms2.getA1()))
 			{
 				d = (ms1.getEffect() - ms2.getEffect()) * (ms1.getEffect() - ms2.getEffect()) / (ms1.getSE() * ms1.getSE() + ms2.getSE() * ms2.getSE());
@@ -208,8 +329,18 @@ public class LambdaDCommandImpl extends CommandImpl
 			}
 			lD.add(d);
         }
-		
-		Logger.printUserLog("Lambda is calculated based on " + lD.size() + " summary statistics between two files.");
+		if (cntAmbiguous > 0)
+		{
+			if (cntAmbiguous == 1)
+			{
+				Logger.printUserLog("Removed " + cntAmbiguous + " locus (AT/GC).");				
+			}
+			else
+			{
+				Logger.printUserLog("Removed " + cntAmbiguous + " loci (AT/GC).");				
+			}
+		}
+		Logger.printUserLog("Lambda is calculated based on " + (lD.size() - cntAmbiguous) + " summary statistics between two files.");
 		double[] ld = new double[lD.size()];
 		for(int i = 0; i < ld.length; i++)
 		{
@@ -251,11 +382,10 @@ public class LambdaDCommandImpl extends CommandImpl
 	private double Kappa = 1;
 	private LambdaDCommandArguments lamArgs;
 
-	private int[][] SMidx = { {-1,-1,-1,-1,-1}, {-1,-1,-1,-1,-1}};
+	private int[][] SMidx = { {-1,-1,-1,-1,-1}, {-1,-1,-1,-1,-1}}; //snp, beta, se, a1, a2
 	private String[] MetaFile = {null, null};
 	private HashMap<String, MetaStat> SumStat1;
 	private HashMap<String, MetaStat> SumStat2;
-	private ArrayList<Double> lD;
 
 	private double LambdaMedian = 0;
 	private double LambdaMean = 0;
