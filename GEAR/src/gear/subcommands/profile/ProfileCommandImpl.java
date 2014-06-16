@@ -24,6 +24,7 @@ public final class ProfileCommandImpl extends CommandImpl
 		
 		if(profCmdArgs.getExtractFile() != null)
 		{
+			extractSCsnp = NewIt.newHashSet();
 			BufferedReader reader = BufferedReader.openTextFile(profCmdArgs.getExtractFile(), "Profile Extract score");
 			String[] tokens = null;
 
@@ -35,10 +36,6 @@ public final class ProfileCommandImpl extends CommandImpl
 				}
 			}
 			Logger.printUserLog("Read " + extractSCsnp.size() + " SNPs in " + profCmdArgs.getExtractFile());
-		}
-		else 
-		{
-			extractSCsnp.add("___CGB___Empty");
 		}
 
 		ScoreFile scoreFile;
@@ -393,5 +390,5 @@ public final class ProfileCommandImpl extends CommandImpl
 	}
 
 	private ProfileCommandArguments profCmdArgs;
-	private HashSet<String> extractSCsnp = NewIt.newHashSet();
+	private HashSet<String> extractSCsnp = null;
 }

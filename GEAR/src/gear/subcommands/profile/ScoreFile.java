@@ -33,11 +33,36 @@ class ScoreFile
 				continue;
 			}
 			
-			if (SCsnp.contains(tokens[0]))
+			if (SCsnp == null)
 			{
-	
 				Score score = new Score(tokens[1].charAt(0), tokens.length - 2);
+
+				if (scores.put(/*locusName*/tokens[0], score) != null)
+				{
+					Logger.printUserError("SNP '" + tokens[0] + "' appears more than once in the score file '" + reader.getFileName() + "'.");
+					System.exit(1);
+				}
 			
+				for (int ii = 2; ii < tokens.length; ++ii)
+				{
+					if (!ConstValues.isNA(tokens[ii]))
+					{
+						try
+						{
+							score.setValue(ii - 2, Float.parseFloat(tokens[ii]));
+						}
+						catch (NumberFormatException e)
+						{
+							reader.errorPreviousLine("'" + tokens[ii] + "' is not a floating point number, so it it not a valid score.");
+						}
+					}
+				}
+				cnt++;	
+			}
+			else if (SCsnp.contains(tokens[0]))
+			{
+				Score score = new Score(tokens[1].charAt(0), tokens.length - 2);
+
 				if (scores.put(/*locusName*/tokens[0], score) != null)
 				{
 					Logger.printUserError("SNP '" + tokens[0] + "' appears more than once in the score file '" + reader.getFileName() + "'.");
@@ -60,6 +85,7 @@ class ScoreFile
 				}
 				cnt++;
 			}
+
 			tokens = reader.readTokens(tokens.length);
 
 		}
