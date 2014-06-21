@@ -1,43 +1,78 @@
 package gear.subcommands.lambdaD;
 
+import java.util.ArrayList;
+
 import gear.subcommands.CommandArguments;
+import gear.util.BufferedReader;
 import gear.util.FileUtil;
 import gear.util.Logger;
+import gear.util.NewIt;
 
 public class LambdaDCommandArguments extends CommandArguments
 {
 
-	public void setMeta1(String m1)
+	public void setMetaBatch(String batch)
 	{
-		FileUtil.exists(m1);
-		this.m1 = m1;
+		FileUtil.exists(batch);
+		md = NewIt.newArrayList();
+		BufferedReader reader = BufferedReader.openTextFile(batch, "MetaBatch");
+
+		String[] tokens = null;
+		while((tokens = reader.readTokens())!=null)
+		{
+			md.add(tokens[0]);
+		}
 	}
 
-	public String getMeta1()
+	public void setMetaFile(String[] m)
 	{
-		return m1;
+		md = NewIt.newArrayList();
+		for (int i = 0; i < m.length; i++)
+		{
+			FileUtil.exists(m[i]);
+			md.add(m[i]);
+		}
+	}
+
+	public String[] getMetaFile() 
+	{
+		return md.toArray(new String[0]);
+	}
+
+	public void setGZ(boolean flag)
+	{
+		isGZ = flag;
 	}
 	
-	public void setMeta2(String m2)
+	public boolean isGZ()
 	{
-		FileUtil.exists(m2);
-		this.m2 = m2;
+		return isGZ;
 	}
 
-	public String getMeta2()
+	public void setCCbatch(String ccBatch)
 	{
-		return m2;
+		FileUtil.exists(ccBatch);
+		ArrayList<String> s = NewIt.newArrayList();
+		BufferedReader reader = BufferedReader.openTextFile(ccBatch, "CC Batch");
+
+		String[] tokens = null;
+		while((tokens = reader.readTokensAtLeast(2))!=null)
+		{
+			s.add(tokens[0]);
+			s.add(tokens[1]);
+		}
+
+		String[] cc = s.toArray(new String[0]);
+		setCC(cc);
 	}
 
 	public void setCC(String[] cc)
 	{
-		ccSize[0] = Double.parseDouble(cc[0]);
-		ccSize[1] = Double.parseDouble(cc[1]);
-		ccSize[2] = Double.parseDouble(cc[2]);
-		ccSize[3] = Double.parseDouble(cc[3]);
+		ccSize = new double[cc.length];
 
-		for (int i = 0; i < ccSize.length; i++)
+		for (int i = 0; i < cc.length; i++)
 		{
+			ccSize[i] = Double.parseDouble(cc[i]);
 			if(ccSize[i] <= 1)
 			{
 				Logger.printUserError("The sample size should be greater than 1.");
@@ -45,6 +80,12 @@ public class LambdaDCommandArguments extends CommandArguments
 			}
 		}
 		isQT = false;
+		if ( (ccSize.length/2) != md.size())
+		{
+			Logger.printUserLog("The cc sample size parameters [" + ccSize.length + "] do not meet the length of the meta files [" + md.size()+"].");
+			System.exit(0);
+		}
+
 	}
 	
 	public double[] getCCsize()
@@ -52,13 +93,28 @@ public class LambdaDCommandArguments extends CommandArguments
 		return ccSize;
 	}
 
+	public void setQTbatch(String qtBatch)
+	{
+		ArrayList<String> s = NewIt.newArrayList();
+		BufferedReader reader = BufferedReader.openTextFile(qtBatch, "QT Batch");
+
+		String[] tokens = null;
+		while((tokens = reader.readTokensAtLeast(1))!=null)
+		{
+			s.add(tokens[0]);
+		}
+
+		String[] qt = s.toArray(new String[0]);
+		setQT(qt);
+	}
+	
 	public void setQT(String[] qt)
 	{
-		qtSize[0] = Double.parseDouble(qt[0]);
-		qtSize[1] = Double.parseDouble(qt[1]);
+		qtSize = new double[qt.length];
 		
 		for (int i = 0; i < qtSize.length; i++)
 		{
+			qtSize[i] = Double.parseDouble(qt[i]);
 			if (qtSize[i] <= 1)
 			{
 				Logger.printUserError("The sample size should be greater than 1.");
@@ -66,6 +122,12 @@ public class LambdaDCommandArguments extends CommandArguments
 			}
 		}
 		isQT = true;
+		
+		if ( qtSize.length != md.size())
+		{
+			Logger.printUserLog("The qt sample size parameters [" + qtSize.length + "] do not meet the length of the meta files [" + md.size()+"].");
+			System.exit(0);
+		}
 	}
 
 	public double[] getQTsize()
@@ -78,10 +140,30 @@ public class LambdaDCommandArguments extends CommandArguments
 		return isQT;
 	}
 
-	private String m1;
-	private String m2;
+	public String getKey(int i)
+	{
+		return field[i];
+	}
 
+	public void setKey(String[] k)
+	{
+		field[0] = k[0];
+		field[1] = k[1];
+		field[3] = k[2];
+		field[4] = k[3];
+		field[5] = k[4];
+	}
+	private ArrayList<String> md;
+	private boolean isGZ = false;
 	private boolean isQT = true;
-	private double[] qtSize = {0,0};
-	private double[] ccSize = {0,0,0,0};
+	private double[] qtSize;
+	private double[] ccSize;
+	private String[] field = {"snp", "beta", "or", "se", "a1", "a2"};
+
+	public static final int SNP = 0;
+	public static final int BETA = 1;
+	public static final int OR = 2;
+	public static final int SE = 3;
+	public static final int A1 = 4;
+	public static final int A2 = 5;	
 }

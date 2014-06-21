@@ -9,8 +9,6 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.apache.commons.math.stat.descriptive.DescriptiveStatistics;
-
 import gear.ConstValues;
 import gear.subcommands.CommandArguments;
 import gear.subcommands.CommandImpl;
@@ -21,156 +19,180 @@ import gear.util.SNPMatch;
 
 public class LambdaDCommandImpl extends CommandImpl
 {
+	private void initial()
+	{
+		MetaFile = lamArgs.getMetaFile();
+		mat = new double[MetaFile.length][MetaFile.length];
+		lamMat = new double[MetaFile.length][MetaFile.length];
+		olMat = new double[MetaFile.length][MetaFile.length];
+		olCtrlMat = new double[MetaFile.length][MetaFile.length];
+		kMat = new double[MetaFile.length][MetaFile.length];
+
+		if (MetaFile.length < 2)
+		{
+			Logger.printUserError("At least two meta files should be specified.");
+			Logger.printUserError("GEAR quitted.");
+			System.exit(0);
+		}
+
+		logit = new boolean[MetaFile.length];
+		Arrays.fill(logit, false);
+
+		KeyIdx = new int[MetaFile.length][5];
+		for (int i = 0; i < KeyIdx.length; i++)
+		{
+			Arrays.fill(KeyIdx[i], -1);
+		}
+		
+		for (int i = 0; i < MetaFile.length; i++)
+		{
+			HashMap<String, MetaStat> m = readMeta(i);
+			meta.add(m);
+		}
+	}
 
 	@Override
 	public void execute(CommandArguments cmdArgs)
 	{
 		lamArgs = (LambdaDCommandArguments) cmdArgs;
 		initial();
-		SumStat1 = readMeta(0);
-		SumStat2 = readMeta(1);
 
-		calculateLambdaD();
-		Logger.printUserLog("LambdaD median: " + LambdaMedian);
-		Logger.printUserLog("Estimated overlapping samples (lambdaD median): " + OSMedian);
-		Logger.printUserLog("Estimated rho (lambdaD median): " + rhoMedian);
-		if(!lamArgs.isQT())
+		for (int i=0; i < MetaFile.length -1; i++)
 		{
-			Logger.printUserLog("Estiamted overlapping controls: " + OSCtrlMedian);
-		}
-		Logger.printUserLog("LambdaD mean: " + LambdaMean);
-		Logger.printUserLog("Estimated overlapping samples (lambdaD mean): " + OSMean);
-		Logger.printUserLog("Estimated rho (lambdaD mean): " + rhoMean);
-		if(!lamArgs.isQT())
-		{
-			Logger.printUserLog("Estiamted overlapping controls: " + OSCtrlMean);			
+			mat[i][i] = 1;
+//			SumStat1 = readMeta(i);
+			for (int j = (i+1); j < MetaFile.length; j++)
+			{
+//				SumStat2 = readMeta(j);
+
+				if (lamArgs.isQT())
+				{
+					Logger.printUserLog("Summary statistics analysis for quantitative traits.");
+					double[] size = lamArgs.getQTsize();
+					Kappa = 2 / ( Math.sqrt(size[i]/size[j]) + Math.sqrt(size[j]/size[i]) );
+					Logger.printUserLog("Sample sizes for '" + MetaFile[i] + "': " + size[0]);
+					Logger.printUserLog("Sample sizes for '" + MetaFile[j] + "': " +size[1]);
+				}
+				else
+				{
+					Logger.printUserLog("Summary statistics analysis for case-contrl studies.");
+					double[] size = lamArgs.getCCsize();
+					R1 = size[i*2]/size[i*2+1];
+					R2 = size[j*2]/size[j*2+1];
+					Logger.printUserLog("Sample size for '" + MetaFile[i] + "': " + size[i*2] + " cases, " + size[i*2+1] + " controls; R1 = " + R1 + ".");
+					Logger.printUserLog("Sample size for '" + MetaFile[j] + "': " + size[j*2] + " cases, " + size[j*2+1] + " controls; R2 = " + R2 + ".");
+					double s1 = size[i*2] + size[i*2+1];
+					double s2 = size[j*2] + size[j*2+1];
+					Kappa = 2 / (Math.sqrt(s1 / s2) + Math.sqrt(s2 / s1));
+				}
+				Logger.printUserLog("Kappa: " + Kappa);
+
+				calculateLambdaD(i, j);
+				Logger.printUserLog("LambdaD median: " + LambdaMedian);
+				Logger.printUserLog("Estimated rho (lambdaD median): " + rhoMedian);
+				Logger.printUserLog("Estimated overlapping samples (lambdaD median): " + OSMedian);
+				if (!lamArgs.isQT())
+				{
+					Logger.printUserLog("Estiamted overlapping controls: " + OSCtrlMedian);
+				}
+				Logger.printUserLog("LambdaD mean: " + LambdaMean);
+				Logger.printUserLog("Estimated rho (lambdaD mean): " + rhoMean);
+				Logger.printUserLog("Estimated overlapping samples (lambdaD mean): " + OSMean);
+				if (!lamArgs.isQT())
+				{
+					Logger.printUserLog("Estiamted overlapping controls: " + OSCtrlMean);
+				}
+				Logger.printUserLog("\n");
+
+				mat[i][j] = mat[j][i] = rhoMedian;
+				lamMat[i][j] = lamMat[j][i] = LambdaMedian;
+				olMat[i][j] = olMat[j][i] = OSMedian;
+				kMat[i][j] = kMat[j][i] = Kappa;
+				if (!lamArgs.isQT())
+				{
+					olCtrlMat[i][j] = olCtrlMat[j][i] = OSCtrlMedian;
+				}
+//				printOut(i,j);
+			}
 		}
 
-		printOut();
-	}
-	
-	private void printOut()
-	{
-		PrintWriter writer = null;
-		try 
-		{
-			writer = new PrintWriter(new BufferedWriter(new FileWriter(lamArgs.getOutRoot() + ".lam")));
-		}
-		catch (IOException e)
-		{
-			Logger.handleException(e, "An I/O exception occurred when writing '" + lamArgs.getOutRoot() + ".lam" + "'.");
-		}
-		writer.println("Kappa: " + Kappa);
-		writer.println("LambdaD (median): " + LambdaMedian);
-		writer.println("rho (based on LambdaD median: " + rhoMedian);
-		writer.println("Overlapping samples: " + OSMedian);
-		if(!lamArgs.isQT())
-		{
-			writer.println("Overlapping controls: " + OSCtrlMedian);
-		}
-		writer.println();
-		writer.println("LambdaD (mean): " + LambdaMean);
-		writer.println("rho (based on LambdaD mean): " + rhoMean);
-		writer.println("Overlapping samples: " + OSMean);
-		if (!lamArgs.isQT())
-		{
-			writer.println("Overlapping controls: " + OSMedian);
-		}
-		writer.close();
-	}
-
-	private void initial()
-	{
-		MetaFile[0] = lamArgs.getMeta1();
-		MetaFile[1] = lamArgs.getMeta2();
-
-		if (lamArgs.isQT())
-		{
-			Logger.printUserLog("Summary statistics analysis for quantitative traits.");
-			double[] size = lamArgs.getQTsize();
-			Kappa = 2 / ( Math.sqrt(size[0]/size[1]) + Math.sqrt(size[1]/size[0]) );
-			Logger.printUserLog("Sample sizes meta-analysis 1: " + size[0]);
-			Logger.printUserLog("Sample sizes meta-analysis 2: " + size[1]);
-		}
-		else
-		{
-			Logger.printUserLog("Summary statistics analysis for case-contrl studies.");
-			double[] size = lamArgs.getCCsize();
-			R1 = size[0]/size[1];
-			R2 = size[2]/size[3];
-			Logger.printUserLog("Sample size for meta-analysis 1: " + size[0] + " cases, " + size[1] + " controls. (R1=" + R1 + ")");
-			Logger.printUserLog("Sample size for meta-analysis 2: " + size[2] + " cases, " + size[3] + " controls. (R2=" + R2 + ")");
-			double s1 = size[0] + size[1];
-			double s2 = size[2] + size[3];
-			Kappa = 2 / (Math.sqrt(s1 /s2) + Math.sqrt(s2 / s1));
-		}
-		Logger.printUserLog("Kappa: " + Kappa);
+		WriteMat();
 	}
 
 	private HashMap<String, MetaStat> readMeta(int metaIdx)
 	{
-		BufferedReader reader = BufferedReader.openTextFile(MetaFile[metaIdx], "Summary Statistic file");
+		BufferedReader reader = null;
+		if (lamArgs.isGZ())
+		{
+			reader = BufferedReader.openGZipFile(MetaFile[metaIdx], "Summary Statistic file");
+			
+		}
+		else
+		{
+			reader = BufferedReader.openTextFile(MetaFile[metaIdx], "Summary Statistic file");
+		}
+
 		String[] tokens = reader.readTokens();
 		int tokenLen = tokens.length;
 
 		for(int i = 0; i < tokens.length; i++)
 		{
-			if (tokens[i].equalsIgnoreCase("snp"))
+			if (tokens[i].equalsIgnoreCase(lamArgs.getKey(LambdaDCommandArguments.SNP)))
 			{
-				SMidx[metaIdx][0] = i;
+				KeyIdx[metaIdx][0] = i;
 			}
 			if (lamArgs.isQT()) 
 			{
-				if (tokens[i].equalsIgnoreCase("beta"))
+				if (tokens[i].equalsIgnoreCase(lamArgs.getKey(LambdaDCommandArguments.BETA)))
 				{
-					SMidx[metaIdx][1] = i;
+					KeyIdx[metaIdx][1] = i;
 				}
 			}
 			else
 			{
-				if (tokens[i].equalsIgnoreCase("or"))
+				if(tokens[i].equalsIgnoreCase(lamArgs.getKey(LambdaDCommandArguments.BETA)))
 				{
-					SMidx[metaIdx][1] = i;
-					logit[metaIdx] = true;
-				}
-				else if(tokens[i].equalsIgnoreCase("beta"))
-				{
-					SMidx[metaIdx][1] = i;
+					KeyIdx[metaIdx][1] = i;
 					logit[metaIdx] = false;
 				}
+				else if (tokens[i].equalsIgnoreCase(lamArgs.getKey(LambdaDCommandArguments.OR)))
+				{
+					KeyIdx[metaIdx][1] = i;
+					logit[metaIdx] = true;
+				} 
 			}
-			if (tokens[i].equalsIgnoreCase("se"))
+			if (tokens[i].equalsIgnoreCase(lamArgs.getKey(LambdaDCommandArguments.SE)))
 			{
-				SMidx[metaIdx][2] = i;
+				KeyIdx[metaIdx][2] = i;
 			}
-			if (tokens[i].equalsIgnoreCase("a1"))
+			if (tokens[i].equalsIgnoreCase(lamArgs.getKey(LambdaDCommandArguments.A1)))
 			{
-				SMidx[metaIdx][3] = i;
+				KeyIdx[metaIdx][3] = i;
 			}
-			if (tokens[i].equalsIgnoreCase("a2"))
+			if (tokens[i].equalsIgnoreCase(lamArgs.getKey(LambdaDCommandArguments.A2)))
             {
-				SMidx[metaIdx][4] = i;
+				KeyIdx[metaIdx][4] = i;
 			}
 		}
 
 		boolean qFlag = false;
-		
-		if (SMidx[metaIdx][0] == -1)
+
+		if (KeyIdx[metaIdx][0] == -1)
 		{
 			Logger.printUserLog("Cannot find the snp column in " + MetaFile[metaIdx]);
 			qFlag = true;
 		}
-		if (SMidx[metaIdx][1] == -1)
+		if (KeyIdx[metaIdx][1] == -1)
 		{
 			Logger.printUserLog("Cannot find the effect column in " + MetaFile[metaIdx]);
 			qFlag = true;
 		}
-		if (SMidx[metaIdx][2] == -1)
+		if (KeyIdx[metaIdx][2] == -1)
 		{
 			Logger.printUserLog("Cannot find the se column in " + MetaFile[metaIdx]);
 			qFlag = true;
 		}
-		if (SMidx[metaIdx][3] == -1)
+		if (KeyIdx[metaIdx][3] == -1)
 		{
 			Logger.printUserLog("Cannot find the allele 1 in " + MetaFile[metaIdx]);
 		}
@@ -180,6 +202,7 @@ public class LambdaDCommandImpl extends CommandImpl
 //		}
 		if (qFlag)
 		{
+			Logger.printUserLog("GEAR quitted.");
 			System.exit(0);
 		}
 
@@ -191,29 +214,29 @@ public class LambdaDCommandImpl extends CommandImpl
 		int cntBadA2 = 0;
 		while( (tokens = reader.readTokens(tokenLen)) != null)
 		{
-			if (ConstValues.isNA(tokens[SMidx[metaIdx][1]]))
+			if (ConstValues.isNA(tokens[KeyIdx[metaIdx][1]]))
 			{
 				cntBadEffect++;
 				continue;
 			}
-			if (ConstValues.isNA(tokens[SMidx[metaIdx][2]]))
+			if (ConstValues.isNA(tokens[KeyIdx[metaIdx][2]]))
 			{
 				cntBadSE++;
 				continue;
 			}
-			if (Float.parseFloat(tokens[SMidx[metaIdx][2]]) == 0)
+			if (Float.parseFloat(tokens[KeyIdx[metaIdx][2]]) == 0)
 			{
 				cntBadSE++;
 				continue;
 			}
-			if (tokens[SMidx[metaIdx][3]].length() != 1)
+			if (tokens[KeyIdx[metaIdx][3]].length() != 1)
 			{
 				cntBadA1++;
 				continue;
 			}
-			if (SMidx[metaIdx][4] != -1)
+			if (KeyIdx[metaIdx][4] != -1)
 			{
-				if (tokens[SMidx[metaIdx][4]].length() != 1)
+				if (tokens[KeyIdx[metaIdx][4]].length() != 1)
 				{
 					cntBadA2++;
 					continue;
@@ -221,17 +244,26 @@ public class LambdaDCommandImpl extends CommandImpl
 			}
 
 			MetaStat ms = null;
-			if (SMidx[metaIdx][4] == -1)
+			if (KeyIdx[metaIdx][4] == -1)
 			{
-				ms = new MetaStat(tokens[SMidx[metaIdx][0]], Float.parseFloat(tokens[SMidx[metaIdx][1]]), Float.parseFloat(tokens[SMidx[metaIdx][2]]), tokens[SMidx[metaIdx][3]].charAt(0), logit[metaIdx]);
+				ms = new MetaStat(tokens[KeyIdx[metaIdx][0]], Float.parseFloat(tokens[KeyIdx[metaIdx][1]]), Float.parseFloat(tokens[KeyIdx[metaIdx][2]]), tokens[KeyIdx[metaIdx][3]].charAt(0), logit[metaIdx]);
 			}
 			else
 			{
-				ms = new MetaStat(tokens[SMidx[metaIdx][0]], Float.parseFloat(tokens[SMidx[metaIdx][1]]), Float.parseFloat(tokens[SMidx[metaIdx][2]]), tokens[SMidx[metaIdx][3]].charAt(0), tokens[SMidx[metaIdx][4]].charAt(0), logit[metaIdx]);			
+				ms = new MetaStat(tokens[KeyIdx[metaIdx][0]], Float.parseFloat(tokens[KeyIdx[metaIdx][1]]), Float.parseFloat(tokens[KeyIdx[metaIdx][2]]), tokens[KeyIdx[metaIdx][3]].charAt(0), tokens[KeyIdx[metaIdx][4]].charAt(0), logit[metaIdx]);			
 			}
 			sumstat.put(ms.getSNP(), ms);
 			cnt++;
 		}
+		if(cnt == 0)
+		{
+			Logger.printUserLog("Did not find any summary statistics from '" + MetaFile[metaIdx] + "'");
+		}
+		else
+		{
+			Logger.printUserLog("Read " + cnt + " effective summary statistics from '" + MetaFile[metaIdx] + "'");			
+		}
+
 		if(cntBadEffect > 0)
 		{
 			if (cntBadEffect == 1)
@@ -276,22 +308,17 @@ public class LambdaDCommandImpl extends CommandImpl
 				Logger.printUserLog("Removed " + cntBadA2 + " loci due to bad a2 allele.");				
 			}
 		}
-		if(cnt == 0)
-		{
-			Logger.printUserLog("Did not find any summary statistics from " + MetaFile[metaIdx]);
-		}
-		else
-		{
-			Logger.printUserLog("Read " + cnt + " summary statistics from " + MetaFile[metaIdx]);			
-		}
 
 		return sumstat;
 	}
 
-	private void calculateLambdaD()
+	private void calculateLambdaD(int idx1, int idx2)
 	{
 		ArrayList<Double> lD = NewIt.newArrayList();
 		int cntAmbiguous = 0;
+		HashMap<String, MetaStat> SumStat1 = meta.get(idx1);
+		HashMap<String, MetaStat> SumStat2 = meta.get(idx2);
+
 		for(Map.Entry<String, MetaStat> entry : SumStat1.entrySet())
 		{
 			String key = entry.getKey();
@@ -303,7 +330,7 @@ public class LambdaDCommandImpl extends CommandImpl
 			MetaStat ms2 = SumStat2.get(key);
 			double d = 0;
 
-			if (SMidx[0][4] != -1)
+			if (KeyIdx[idx1][4] != -1)
 			{
 				if (SNPMatch.isAmbiguous(ms1.getA1(), ms1.getA2()))
 				{
@@ -311,7 +338,7 @@ public class LambdaDCommandImpl extends CommandImpl
 					continue;
 				}
 			}
-			if (SMidx[1][4] != -1)
+			if (KeyIdx[idx2][4] != -1)
 			{
 				if (SNPMatch.isAmbiguous(ms2.getA1(), ms2.getA2()))
 				{
@@ -367,17 +394,117 @@ public class LambdaDCommandImpl extends CommandImpl
 		if (lamArgs.isQT())
 		{
 			double[] qtSize = lamArgs.getQTsize();
-			OSMedian = (1 - LambdaMedian) / Kappa * Math.sqrt(qtSize[0] * qtSize[1]);
-			OSMean = (1 - LambdaMean) / Kappa * Math.sqrt(qtSize[0] * qtSize[1]);
+			OSMedian = (1 - LambdaMedian) / Kappa * Math.sqrt(qtSize[idx1] * qtSize[idx2]);
+			OSMean = (1 - LambdaMean) / Kappa * Math.sqrt(qtSize[idx1] * qtSize[idx2]);
 		}
 		else
 		{
 			double[] ccSize = lamArgs.getCCsize();
-			OSMedian = (1 - LambdaMedian) / Kappa * Math.sqrt( (ccSize[0] + ccSize[1] ) * (ccSize[2] + ccSize[3]));
-			OSMean = (1 - LambdaMean) / Kappa * Math.sqrt((ccSize[0] + ccSize[1] ) * (ccSize[2] + ccSize[3]));
+			OSMedian = (1 - LambdaMedian) / Kappa * Math.sqrt( (ccSize[idx1*2] + ccSize[idx1*2+1] ) * (ccSize[idx2*2] + ccSize[idx2*2+1]) );
+			OSMean = (1 - LambdaMean) / Kappa * Math.sqrt( (ccSize[idx1*2] + ccSize[idx1*2+1] ) * (ccSize[idx2*2] + ccSize[idx2*2+1]) );
 			OSCtrlMedian = OSMedian / Math.sqrt(R1 * R2);
 			OSCtrlMean = OSMean / Math.sqrt(R1 * R2);
 		}
+	}
+
+	private void printOut(int idx1, int idx2)
+	{
+		PrintWriter writer = null;
+		try 
+		{
+			writer = new PrintWriter(new BufferedWriter(new FileWriter(lamArgs.getOutRoot() + "." + (idx1+1) + "-" + (idx2+1) + ".lam")));
+		}
+		catch (IOException e)
+		{
+			Logger.handleException(e, "An I/O exception occurred when writing '" + lamArgs.getOutRoot() + ".lam" + "'.");
+		}
+		writer.println("Meta File " + (idx1+1) + ": " +MetaFile[idx1]);
+		writer.println("Meta File " + (idx2+1) + ": " +MetaFile[idx2]);
+
+		writer.println("Kappa: " + Kappa);
+		writer.println("LambdaD (median): " + LambdaMedian);
+		writer.println("rho (based on LambdaD median: " + rhoMedian);
+		writer.println("Overlapping samples: " + OSMedian);
+		if(!lamArgs.isQT())
+		{
+			writer.println("Overlapping controls: " + OSCtrlMedian);
+		}
+		writer.println();
+		writer.println("LambdaD (mean): " + LambdaMean);
+		writer.println("rho (based on LambdaD mean): " + rhoMean);
+		writer.println("Overlapping samples: " + OSMean);
+		if (!lamArgs.isQT())
+		{
+			writer.println("Overlapping controls: " + OSCtrlMedian);
+		}
+		writer.close();
+	}
+
+	private void WriteMat()
+	{
+		PrintWriter writer = null;
+		try 
+		{
+			writer = new PrintWriter(new BufferedWriter(new FileWriter(lamArgs.getOutRoot() + ".lmat")));
+		}
+		catch (IOException e)
+		{
+			Logger.handleException(e, "An I/O exception occurred when writing '" + lamArgs.getOutRoot() + ".lmat" + "'.");
+		}
+		
+		writer.println("correlation:");
+		for (int i = 0; i < mat.length; i++)
+		{
+			for (int j = 0; j < mat[i].length; j++)
+			{
+				writer.print(String.format("%.4f", mat[i][j]) + " ");
+			}
+			writer.println();
+		}
+
+		writer.println("LambdaD:");
+		for (int i = 0; i < lamMat.length; i++)
+		{
+			for (int j = 0; j < lamMat[i].length; j++)
+			{
+				writer.print(String.format("%.4f", lamMat[i][j]) + " ");
+			}
+			writer.println();
+		}
+
+		writer.println("Kappa:");
+		for (int i = 0; i < kMat.length; i++)
+		{
+			for (int j = 0; j < kMat[i].length; j++)
+			{
+				writer.print(String.format("%.4f", kMat[i][j]) + " ");
+			}
+			writer.println();
+		}
+
+		writer.println("Overlapping Samples:");
+		for (int i = 0; i < olMat.length; i++)
+		{
+			for (int j = 0; j < olMat[i].length; j++)
+			{
+				writer.print(String.format("%.4f", olMat[i][j]) + " ");
+			}
+			writer.println();
+		}
+		if(!lamArgs.isQT())
+		{
+			writer.println("Overlapping Controls:");
+			for (int i = 0; i < olCtrlMat.length; i++)
+			{
+				for (int j = 0; j < olCtrlMat[i].length; j++)
+				{
+					writer.print(String.format("%.4f", olCtrlMat[i][j]) + " ");
+				}
+				writer.println();
+			}
+		}
+		
+		writer.close();
 	}
 
 	private double R1 = 1;
@@ -385,10 +512,11 @@ public class LambdaDCommandImpl extends CommandImpl
 	private double Kappa = 1;
 	private LambdaDCommandArguments lamArgs;
 
-	private int[][] SMidx = { {-1,-1,-1,-1,-1}, {-1,-1,-1,-1,-1}}; //snp, beta, se, a1, a2
-	private String[] MetaFile = {null, null};
-	private HashMap<String, MetaStat> SumStat1;
-	private HashMap<String, MetaStat> SumStat2;
+	private int[][] KeyIdx; //snp, beta, se, a1, a2
+	private String[] MetaFile;
+	private ArrayList<HashMap<String, MetaStat>> meta = NewIt.newArrayList();
+//	private HashMap<String, MetaStat> SumStat1;
+//	private HashMap<String, MetaStat> SumStat2;
 
 	private double LambdaMedian = 0;
 	private double LambdaMean = 0;
@@ -399,5 +527,11 @@ public class LambdaDCommandImpl extends CommandImpl
 	private double rhoMedian = 0;
 	private double rhoMean = 0;
 
-	private boolean[] logit = {false, false};
+	private boolean[] logit;
+	
+	private double[][] mat;
+	private double[][] lamMat;
+	private double[][] olMat;
+	private double[][] olCtrlMat;
+	private double[][] kMat;
 }
