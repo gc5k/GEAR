@@ -1,13 +1,11 @@
 package gear.subcommands.lambdaD;
 
 import java.io.BufferedWriter;
-import java.io.DataOutputStream;
-import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -114,7 +112,7 @@ public class LambdaDCommandImpl extends CommandImpl
 		BufferedReader reader = BufferedReader.openTextFile(MetaFile[metaIdx], "Summary Statistic file");
 		String[] tokens = reader.readTokens();
 		int tokenLen = tokens.length;
-		
+
 		for(int i = 0; i < tokens.length; i++)
 		{
 			if (tokens[i].equalsIgnoreCase("snp"))
@@ -133,6 +131,12 @@ public class LambdaDCommandImpl extends CommandImpl
 				if (tokens[i].equalsIgnoreCase("or"))
 				{
 					SMidx[metaIdx][1] = i;
+					logit[metaIdx] = true;
+				}
+				else if(tokens[i].equalsIgnoreCase("beta"))
+				{
+					SMidx[metaIdx][1] = i;
+					logit[metaIdx] = false;
 				}
 			}
 			if (tokens[i].equalsIgnoreCase("se"))
@@ -213,17 +217,17 @@ public class LambdaDCommandImpl extends CommandImpl
 				{
 					cntBadA2++;
 					continue;
-				}				
+				}
 			}
 
 			MetaStat ms = null;
 			if (SMidx[metaIdx][4] == -1)
 			{
-				ms = new MetaStat(tokens[SMidx[metaIdx][0]], Float.parseFloat(tokens[SMidx[metaIdx][1]]), Float.parseFloat(tokens[SMidx[metaIdx][2]]), tokens[SMidx[metaIdx][3]].charAt(0));
+				ms = new MetaStat(tokens[SMidx[metaIdx][0]], Float.parseFloat(tokens[SMidx[metaIdx][1]]), Float.parseFloat(tokens[SMidx[metaIdx][2]]), tokens[SMidx[metaIdx][3]].charAt(0), logit[metaIdx]);
 			}
 			else
 			{
-				ms = new MetaStat(tokens[SMidx[metaIdx][0]], Float.parseFloat(tokens[SMidx[metaIdx][1]]), Float.parseFloat(tokens[SMidx[metaIdx][2]]), tokens[SMidx[metaIdx][3]].charAt(0), tokens[SMidx[metaIdx][4]].charAt(0));				
+				ms = new MetaStat(tokens[SMidx[metaIdx][0]], Float.parseFloat(tokens[SMidx[metaIdx][1]]), Float.parseFloat(tokens[SMidx[metaIdx][2]]), tokens[SMidx[metaIdx][3]].charAt(0), tokens[SMidx[metaIdx][4]].charAt(0), logit[metaIdx]);			
 			}
 			sumstat.put(ms.getSNP(), ms);
 			cnt++;
@@ -298,34 +302,31 @@ public class LambdaDCommandImpl extends CommandImpl
 			MetaStat ms1 = entry.getValue();
 			MetaStat ms2 = SumStat2.get(key);
 			double d = 0;
-			
+
 			if (SMidx[0][4] != -1)
 			{
-				SNPMatch.isAmbiguous(ms1.getA1(), ms1.getA2());
-				cntAmbiguous++;
-				continue;
+				if (SNPMatch.isAmbiguous(ms1.getA1(), ms1.getA2()))
+				{
+					cntAmbiguous++;
+					continue;
+				}
 			}
 			if (SMidx[1][4] != -1)
 			{
-				SNPMatch.isAmbiguous(ms1.getA1(), ms2.getA2());
-				cntAmbiguous++;
-				continue;
+				if (SNPMatch.isAmbiguous(ms2.getA1(), ms2.getA2()))
+				{
+					cntAmbiguous++;
+					continue;					
+				}
 			}
-			
+
 			if (ms1.getA1() == ms2.getA1() || ms1.getA1() == SNPMatch.Flip(ms2.getA1()))
 			{
 				d = (ms1.getEffect() - ms2.getEffect()) * (ms1.getEffect() - ms2.getEffect()) / (ms1.getSE() * ms1.getSE() + ms2.getSE() * ms2.getSE());
 			}
 			else
 			{
-				if (lamArgs.isQT())
-				{
-					d = ((-1) * ms1.getEffect() - ms2.getEffect()) * ((-1) * ms1.getEffect() - ms2.getEffect()) / (ms1.getSE() * ms1.getSE() + ms2.getSE() * ms2.getSE());
-				}
-				else
-				{
-					d = (1/ ms1.getEffect() - ms2.getEffect()) * (1 / ms1.getEffect() - ms2.getEffect()) / (ms1.getSE() * ms1.getSE() + ms2.getSE() * ms2.getSE());					
-				}
+				d = ((-1) * ms1.getEffect() - ms2.getEffect()) * ((-1) * ms1.getEffect() - ms2.getEffect()) / (ms1.getSE() * ms1.getSE() + ms2.getSE() * ms2.getSE());
 			}
 			lD.add(d);
         }
@@ -342,22 +343,24 @@ public class LambdaDCommandImpl extends CommandImpl
 		}
 		Logger.printUserLog("Lambda is calculated based on " + (lD.size() - cntAmbiguous) + " summary statistics between two files.");
 		double[] ld = new double[lD.size()];
+		double mean = 0;
 		for(int i = 0; i < ld.length; i++)
 		{
 			ld[i] = lD.get(i).doubleValue();
+			mean += ld[i];
 		}
 
-		DescriptiveStatistics ds = new DescriptiveStatistics(ld);
-		double[] Sortld = ds.getSortedValues();
-		if (ds.getN() % 2 == 0) 
+		Arrays.sort(ld);
+		if (ld.length % 2 == 0)
 		{
-			LambdaMedian = (Sortld[(int) (ds.getN()/2)] + Sortld[(int) (ds.getN()/2) - 1])/2 / 0.4549364;
+			LambdaMedian = (ld[(int) (ld.length/2)] + ld[(int) (ld.length/2) - 1])/2 / 0.4549364;
 		}
 		else
 		{
-			LambdaMedian = Sortld[(int) ((ds.getN()-1)/2)] / 0.4549364;
+			LambdaMedian = ld[(int) ((ld.length-1)/2)] / 0.4549364;
 		}
-		LambdaMean = ds.getMean();
+
+		LambdaMean = mean/ld.length;
 		rhoMedian = (1-LambdaMedian) / Kappa;
 		rhoMean = (1 - LambdaMean) / Kappa;
 
@@ -395,4 +398,6 @@ public class LambdaDCommandImpl extends CommandImpl
 	private double OSCtrlMean = 0;
 	private double rhoMedian = 0;
 	private double rhoMean = 0;
+
+	private boolean[] logit = {false, false};
 }
