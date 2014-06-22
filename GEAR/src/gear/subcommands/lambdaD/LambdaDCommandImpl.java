@@ -9,10 +9,17 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.apache.commons.math.MathException;
+import org.apache.commons.math.distribution.ChiSquaredDistributionImpl;
+import org.apache.commons.math.stat.ranking.NaNStrategy;
+import org.apache.commons.math.stat.ranking.NaturalRanking;
+import org.apache.commons.math.stat.ranking.TiesStrategy;
+
 import gear.ConstValues;
 import gear.subcommands.CommandArguments;
 import gear.subcommands.CommandImpl;
 import gear.util.BufferedReader;
+import gear.util.FileUtil;
 import gear.util.Logger;
 import gear.util.NewIt;
 import gear.util.SNPMatch;
@@ -54,7 +61,7 @@ public class LambdaDCommandImpl extends CommandImpl
 		logit = new boolean[MetaFile.length];
 		Arrays.fill(logit, false);
 
-		KeyIdx = new int[MetaFile.length][5];
+		KeyIdx = new int[MetaFile.length][8];
 		for (int i = 0; i < KeyIdx.length; i++)
 		{
 			Arrays.fill(KeyIdx[i], -1);
@@ -77,8 +84,6 @@ public class LambdaDCommandImpl extends CommandImpl
 		{
 			for (int j = (i+1); j < MetaFile.length; j++)
 			{
-//				SumStat2 = readMeta(j);
-
 				if (lamArgs.isQT())
 				{
 					Logger.printUserLog("Summary statistics analysis for quantitative traits.");
@@ -132,7 +137,7 @@ public class LambdaDCommandImpl extends CommandImpl
 				}
 			}
 		}
-
+		Logger.printUserLog("Results has been saved in '" + lamArgs.getOutRoot() + ".lmat'.");
 		WriteMat();
 	}
 
@@ -142,7 +147,6 @@ public class LambdaDCommandImpl extends CommandImpl
 		if (lamArgs.isGZ())
 		{
 			reader = BufferedReader.openGZipFile(MetaFile[metaIdx], "Summary Statistic file");
-			
 		}
 		else
 		{
@@ -156,67 +160,92 @@ public class LambdaDCommandImpl extends CommandImpl
 		{
 			if (tokens[i].equalsIgnoreCase(lamArgs.getKey(LambdaDCommandArguments.SNP)))
 			{
-				KeyIdx[metaIdx][0] = i;
+				KeyIdx[metaIdx][SNP] = i;
 			}
-			if (lamArgs.isQT()) 
+			if (tokens[i].equalsIgnoreCase(lamArgs.getKey(LambdaDCommandArguments.CHR)))
+			{
+				KeyIdx[metaIdx][CHR] = i;
+			}
+			if (tokens[i].equalsIgnoreCase(lamArgs.getKey(LambdaDCommandArguments.BP)))
+			{
+				KeyIdx[metaIdx][BP] = i;
+			}
+			if (lamArgs.isQT())
 			{
 				if (tokens[i].equalsIgnoreCase(lamArgs.getKey(LambdaDCommandArguments.BETA)))
 				{
-					KeyIdx[metaIdx][1] = i;
+					KeyIdx[metaIdx][BETA] = i;
 				}
 			}
 			else
 			{
 				if(tokens[i].equalsIgnoreCase(lamArgs.getKey(LambdaDCommandArguments.BETA)))
 				{
-					KeyIdx[metaIdx][1] = i;
+					KeyIdx[metaIdx][BETA] = i;
 					logit[metaIdx] = false;
 				}
 				else if (tokens[i].equalsIgnoreCase(lamArgs.getKey(LambdaDCommandArguments.OR)))
 				{
-					KeyIdx[metaIdx][1] = i;
+					KeyIdx[metaIdx][OR] = i;
 					logit[metaIdx] = true;
 				} 
 			}
 			if (tokens[i].equalsIgnoreCase(lamArgs.getKey(LambdaDCommandArguments.SE)))
 			{
-				KeyIdx[metaIdx][2] = i;
+				KeyIdx[metaIdx][SE] = i;
+			}
+			if (tokens[i].equalsIgnoreCase(lamArgs.getKey(LambdaDCommandArguments.P)))
+			{
+				KeyIdx[metaIdx][P] = i;
 			}
 			if (tokens[i].equalsIgnoreCase(lamArgs.getKey(LambdaDCommandArguments.A1)))
 			{
-				KeyIdx[metaIdx][3] = i;
+				KeyIdx[metaIdx][A1] = i;
 			}
 			if (tokens[i].equalsIgnoreCase(lamArgs.getKey(LambdaDCommandArguments.A2)))
             {
-				KeyIdx[metaIdx][4] = i;
+				KeyIdx[metaIdx][A2] = i;
 			}
 		}
 
 		boolean qFlag = false;
 
-		if (KeyIdx[metaIdx][0] == -1)
+		if (KeyIdx[metaIdx][SNP] == -1)
 		{
 			Logger.printUserLog("Cannot find the snp column in " + MetaFile[metaIdx]);
 			qFlag = true;
 		}
-		if (KeyIdx[metaIdx][1] == -1)
+		if (KeyIdx[metaIdx][CHR] == -1)
 		{
-			Logger.printUserLog("Cannot find the effect column in " + MetaFile[metaIdx]);
+			Logger.printUserLog("Cannot find the chr column in " + MetaFile[metaIdx]);
 			qFlag = true;
 		}
-		if (KeyIdx[metaIdx][2] == -1)
+		if (KeyIdx[metaIdx][BP] == -1)
 		{
-			Logger.printUserLog("Cannot find the se column in " + MetaFile[metaIdx]);
+			Logger.printUserLog("Cannot find the bp column in " + MetaFile[metaIdx]);
 			qFlag = true;
 		}
-		if (KeyIdx[metaIdx][3] == -1)
+		if (KeyIdx[metaIdx][BETA] == -1)
+		{
+			Logger.printUserLog("Cannot find the beta/or in " + MetaFile[metaIdx]);
+		}		
+		if (KeyIdx[metaIdx][SE] == -1)
+		{
+			Logger.printUserLog("Cannot find the se value in " + MetaFile[metaIdx]);
+		}
+		if (KeyIdx[metaIdx][P] == -1)
+		{
+			Logger.printUserLog("Cannot find the p value in " + MetaFile[metaIdx]);
+		}
+		if (KeyIdx[metaIdx][A1] == -1)
 		{
 			Logger.printUserLog("Cannot find the allele 1 in " + MetaFile[metaIdx]);
 		}
-//		if (SMidx[metaIdx][4] == -1)
+//		if (KeyIdx[metaIdx][7] == -1)
 //		{
 //			Logger.printUserLog("Cannot find the allele 2 in " + MetaFile[metaIdx]);
 //		}
+		
 		if (qFlag)
 		{
 			Logger.printUserLog("GEAR quitted.");
@@ -224,36 +253,58 @@ public class LambdaDCommandImpl extends CommandImpl
 		}
 
 		HashMap<String, MetaStat> sumstat = NewIt.newHashMap();
+		ArrayList<String> snpArray = NewIt.newArrayList();
+		int total = 0;
 		int cnt = 0;
-		int cntBadEffect = 0;
+		int cntBadChr = 0;
+		int cntBadBp = 0;
+		int cntBadBeta = 0;
+		int cntBadP = 0;
 		int cntBadSE = 0;
 		int cntBadA1 = 0;
 		int cntBadA2 = 0;
 		while( (tokens = reader.readTokens(tokenLen)) != null)
 		{
-			if (ConstValues.isNA(tokens[KeyIdx[metaIdx][1]]))
+			total++;
+			if (ConstValues.isNA(tokens[KeyIdx[metaIdx][CHR]]))
 			{
-				cntBadEffect++;
+				cntBadChr++;
 				continue;
 			}
-			if (ConstValues.isNA(tokens[KeyIdx[metaIdx][2]]))
+			if (ConstValues.isNA(tokens[KeyIdx[metaIdx][BP]]))
+			{
+				cntBadBp++;
+				continue;
+			}
+
+			if (ConstValues.isNA(tokens[KeyIdx[metaIdx][BETA]]))
+			{
+				cntBadBeta++;
+				continue;
+			}
+			if (ConstValues.isNA(tokens[KeyIdx[metaIdx][SE]]))
 			{
 				cntBadSE++;
 				continue;
 			}
-			if (Float.parseFloat(tokens[KeyIdx[metaIdx][2]]) == 0)
+			if (Float.parseFloat(tokens[KeyIdx[metaIdx][SE]]) <= 0)
 			{
 				cntBadSE++;
 				continue;
 			}
-			if (tokens[KeyIdx[metaIdx][3]].length() != 1)
+			if (ConstValues.isNA(tokens[KeyIdx[metaIdx][P]]))
+			{
+				cntBadP++;
+				continue;
+			}
+			if (tokens[KeyIdx[metaIdx][A1]].length() != 1)
 			{
 				cntBadA1++;
 				continue;
 			}
-			if (KeyIdx[metaIdx][4] != -1)
+			if (KeyIdx[metaIdx][A2] != -1)
 			{
-				if (tokens[KeyIdx[metaIdx][4]].length() != 1)
+				if (tokens[KeyIdx[metaIdx][A2]].length() != 1)
 				{
 					cntBadA2++;
 					continue;
@@ -261,38 +312,66 @@ public class LambdaDCommandImpl extends CommandImpl
 			}
 
 			MetaStat ms = null;
-			if (KeyIdx[metaIdx][4] == -1)
+			if (KeyIdx[metaIdx][A2] == -1)
 			{
-				ms = new MetaStat(tokens[KeyIdx[metaIdx][0]], Float.parseFloat(tokens[KeyIdx[metaIdx][1]]), Float.parseFloat(tokens[KeyIdx[metaIdx][2]]), tokens[KeyIdx[metaIdx][3]].charAt(0), logit[metaIdx]);
+				ms = new MetaStat(tokens[KeyIdx[metaIdx][SNP]], Integer.parseInt(tokens[KeyIdx[metaIdx][CHR]]), Long.parseLong(tokens[KeyIdx[metaIdx][BP]]), Float.parseFloat(tokens[KeyIdx[metaIdx][BETA]]), Float.parseFloat(tokens[KeyIdx[metaIdx][SE]]), Double.parseDouble(tokens[KeyIdx[metaIdx][P]]), tokens[KeyIdx[metaIdx][A1]].charAt(0), logit[metaIdx]);
 			}
 			else
 			{
-				ms = new MetaStat(tokens[KeyIdx[metaIdx][0]], Float.parseFloat(tokens[KeyIdx[metaIdx][1]]), Float.parseFloat(tokens[KeyIdx[metaIdx][2]]), tokens[KeyIdx[metaIdx][3]].charAt(0), tokens[KeyIdx[metaIdx][4]].charAt(0), logit[metaIdx]);			
+				ms = new MetaStat(tokens[KeyIdx[metaIdx][SNP]], Integer.parseInt(tokens[KeyIdx[metaIdx][CHR]]), Long.parseLong(tokens[KeyIdx[metaIdx][BP]]), Float.parseFloat(tokens[KeyIdx[metaIdx][BETA]]), Float.parseFloat(tokens[KeyIdx[metaIdx][SE]]), Double.parseDouble(tokens[KeyIdx[metaIdx][P]]), tokens[KeyIdx[metaIdx][A1]].charAt(0), tokens[KeyIdx[metaIdx][A2]].charAt(0), logit[metaIdx]);
 			}
 			sumstat.put(ms.getSNP(), ms);
+			snpArray.add(ms.getSNP());
 			cnt++;
 		}
+
 		if(cnt == 0)
 		{
 			Logger.printUserLog("Did not find any summary statistics from '" + MetaFile[metaIdx] + "'");
+			System.exit(0);
 		}
 		else
 		{
-			Logger.printUserLog("Read " + cnt + " effective summary statistics from '" + MetaFile[metaIdx] + "'");			
+			Logger.printUserLog("Read " + total + " summary statistics from '" + MetaFile[metaIdx] + "'");			
 		}
 
-		if(cntBadEffect > 0)
+		if (cntBadChr > 0)
 		{
-			if (cntBadEffect == 1)
+			if (cntBadChr == 1)
 			{
-				Logger.printUserLog("Removed " + cntBadEffect + " locus due to not numeric effect.");				
+				Logger.printUserLog("Removed " + cntBadChr + " locus due to not numeric Chr.");				
 			}
 			else
 			{
-				Logger.printUserLog("Removed " + cntBadEffect + " locus due to not numeric effect.");				
+				Logger.printUserLog("Removed " + cntBadChr + " loci due to not numeric Chr.");				
 			}
 		}
-		if(cntBadSE > 0)
+
+		if (cntBadBp > 0)
+		{
+			if (cntBadBp == 1)
+			{
+				Logger.printUserLog("Removed " + cntBadBp + " locus due to not numeric Bp.");				
+			}
+			else
+			{
+				Logger.printUserLog("Removed " + cntBadChr + " loci due to not numeric Bp.");				
+			}
+		}
+
+		if (cntBadBeta > 0)
+		{
+			if (cntBadBeta == 1)
+			{
+				Logger.printUserLog("Removed " + cntBadBeta + " locus due to not numeric effect.");				
+			}
+			else
+			{
+				Logger.printUserLog("Removed " + cntBadBeta + " loci due to not numeric effect.");				
+			}
+		}
+
+		if (cntBadSE > 0)
 		{
 			if (cntBadSE == 1)
 			{
@@ -303,7 +382,20 @@ public class LambdaDCommandImpl extends CommandImpl
 				Logger.printUserLog("Removed " + cntBadSE + " loci due to not numeric se.");
 			}
 		}
-		if(cntBadA1 > 0)
+
+		if (cntBadP > 0)
+		{
+			if (cntBadP == 1)
+			{
+				Logger.printUserLog("Removed " + cntBadP + " locus due to not numeric p values.");				
+			}
+			else
+			{
+				Logger.printUserLog("Removed " + cntBadP + " loci due to not numeric p values.");
+			}
+		}
+
+		if (cntBadA1 > 0)
 		{
 			if (cntBadA1 == 1)
 			{
@@ -326,25 +418,27 @@ public class LambdaDCommandImpl extends CommandImpl
 			}
 		}
 
+		SNPArray.add(snpArray);
 		return sumstat;
 	}
 
 	private void calculateLambdaD(int idx1, int idx2)
 	{
+		ArrayList<LamUnit> LamArray = NewIt.newArrayList();
 		ArrayList<Double> lD = NewIt.newArrayList();
 		int cntAmbiguous = 0;
 		HashMap<String, MetaStat> SumStat1 = meta.get(idx1);
 		HashMap<String, MetaStat> SumStat2 = meta.get(idx2);
 
-		for(Map.Entry<String, MetaStat> entry : SumStat1.entrySet())
+		ArrayList<String> snpArray = SNPArray.get(idx1);
+		for(String snp : snpArray)
 		{
-			String key = entry.getKey();
-			if (!SumStat2.containsKey(key))
+			if (!SumStat2.containsKey(snp) || !SumStat1.containsKey(snp))
 			{
 				continue;
 			}
-			MetaStat ms1 = entry.getValue();
-			MetaStat ms2 = SumStat2.get(key);
+			MetaStat ms1 = SumStat1.get(snp);
+			MetaStat ms2 = SumStat2.get(snp);
 			double d = 0;
 
 			if (KeyIdx[idx1][4] != -1)
@@ -360,20 +454,27 @@ public class LambdaDCommandImpl extends CommandImpl
 				if (SNPMatch.isAmbiguous(ms2.getA1(), ms2.getA2()))
 				{
 					cntAmbiguous++;
-					continue;					
+					continue;	
 				}
 			}
 
-			if (ms1.getA1() == ms2.getA1() || ms1.getA1() == SNPMatch.Flip(ms2.getA1()))
+			if (ms1.getA1() == ms2.getA1() || ms1.getA1() == SNPMatch.Flip(ms2.getA1())) //match A1 in the second meta
 			{
 				d = (ms1.getEffect() - ms2.getEffect()) * (ms1.getEffect() - ms2.getEffect()) / (ms1.getSE() * ms1.getSE() + ms2.getSE() * ms2.getSE());
 			}
-			else
+			else if (ms1.getA1() == ms2.getA2() || ms1.getA1() == SNPMatch.Flip(ms2.getA2())) //match A2 in the second meta
 			{
 				d = ((-1) * ms1.getEffect() - ms2.getEffect()) * ((-1) * ms1.getEffect() - ms2.getEffect()) / (ms1.getSE() * ms1.getSE() + ms2.getSE() * ms2.getSE());
 			}
+			else
+			{
+				cntAmbiguous++;
+				continue;
+			}
 			lD.add(d);
+			LamArray.add(new LamUnit(d,ms1, ms2));
         }
+
 		if (cntAmbiguous > 0)
 		{
 			if (cntAmbiguous == 1)
@@ -382,10 +483,10 @@ public class LambdaDCommandImpl extends CommandImpl
 			}
 			else
 			{
-				Logger.printUserLog("Removed " + cntAmbiguous + " loci (AT/GC).");				
+				Logger.printUserLog("Removed " + cntAmbiguous + " loci (AT/GC).");
 			}
 		}
-		Logger.printUserLog("Lambda is calculated based on " + (lD.size() - cntAmbiguous) + " summary statistics between two files.");
+		Logger.printUserLog("Lambda is calculated based on " + lD.size() + " summary statistics between two files.");
 		double[] ld = new double[lD.size()];
 		double mean = 0;
 		for(int i = 0; i < ld.length; i++)
@@ -393,7 +494,17 @@ public class LambdaDCommandImpl extends CommandImpl
 			ld[i] = lD.get(i).doubleValue();
 			mean += ld[i];
 		}
+		
 
+		if(lamArgs.isVerboseGZ())
+		{
+			VerboseGZ(LamArray, ld, idx1, idx2);
+		}
+		else if (lamArgs.isVerbose())
+		{
+			Verbose(LamArray, ld, idx1, idx2);	
+		}
+		
 		Arrays.sort(ld);
 		if (ld.length % 2 == 0)
 		{
@@ -405,24 +516,118 @@ public class LambdaDCommandImpl extends CommandImpl
 		}
 
 		LambdaMean = mean/ld.length;
-		rhoMedian = (1-LambdaMedian) / Kappa;
+		rhoMedian = (1 - LambdaMedian) / Kappa;
 		rhoMean = (1 - LambdaMean) / Kappa;
 
 		if (lamArgs.isQT())
 		{
 			double[] qtSize = lamArgs.getQTsize();
-			OSMedian = (1 - LambdaMedian) / Kappa * Math.sqrt(qtSize[idx1] * qtSize[idx2]);
-			OSMean = (1 - LambdaMean) / Kappa * Math.sqrt(qtSize[idx1] * qtSize[idx2]);
+			OSMedian = rhoMedian * Math.sqrt(qtSize[idx1] * qtSize[idx2]);
+			OSMean = rhoMean * Math.sqrt(qtSize[idx1] * qtSize[idx2]);
 		}
 		else
 		{
 			double[] ccSize = lamArgs.getCCsize();
-			OSMedian = (1 - LambdaMedian) / Kappa * Math.sqrt( (ccSize[idx1*2] + ccSize[idx1*2+1] ) * (ccSize[idx2*2] + ccSize[idx2*2+1]) );
-			OSMean = (1 - LambdaMean) / Kappa * Math.sqrt( (ccSize[idx1*2] + ccSize[idx1*2+1] ) * (ccSize[idx2*2] + ccSize[idx2*2+1]) );
+			OSMedian = rhoMedian * Math.sqrt( (ccSize[idx1*2] + ccSize[idx1*2+1] ) * (ccSize[idx2*2] + ccSize[idx2*2+1]) );
+			OSMean = rhoMean * Math.sqrt( (ccSize[idx1*2] + ccSize[idx1*2+1] ) * (ccSize[idx2*2] + ccSize[idx2*2+1]) );
 			OSCtrlMedian = OSMedian / Math.sqrt(R1 * R2);
 			OSCtrlMean = OSMean / Math.sqrt(R1 * R2);
 			OSCsMedian = OSMedian * Math.sqrt(R1 * R2);
 			OSCsMean = OSMean * Math.sqrt(R1 * R2);
+		}
+		
+	}
+
+	private void Verbose(ArrayList<LamUnit> LamArray, double[] ld, int idx1, int idx2)
+	{
+		ChiSquaredDistributionImpl chiDis = new ChiSquaredDistributionImpl(1);
+
+		NaturalRanking ranking = new NaturalRanking(NaNStrategy.MINIMAL, TiesStrategy.SEQUENTIAL);
+        double[] ranks = ranking.rank(ld);
+
+        PrintWriter writer = null;
+        try
+        {
+        	writer = new PrintWriter(new BufferedWriter(new FileWriter(lamArgs.getOutRoot() + "." + (idx1+1) + "-" + (idx2+1) + ".lam")));
+        	Logger.printUserLog("Writting detailed test statistics into '"+lamArgs.getOutRoot() + "." + (idx1+1) + "-" + (idx2+1) + ".lam.'");
+        }
+		catch (IOException e)
+		{
+			Logger.handleException(e, "An I/O exception occurred when writing '" + lamArgs.getOutRoot() + "." + (idx1+1) + "-" + (idx2+1) + ".lam" + "'.");
+		}
+
+        FileUtil.CreatePrintStream(new String(lamArgs.getOutRoot() + "." + (idx1+1) + "-" + (idx2+1) + ".lam"));
+       	writer.write("SNP\tChr\tBp\tA1\tBETA1\tSE1\tP1\tBETA2\tSE2\tP2\tChiObs\tChiExp\n");
+
+        for (int i = 0; i < ranks.length; i++)
+        {
+        	LamUnit lu = LamArray.get(i);
+        	MetaStat ms1 = lu.getMS1();
+        	MetaStat ms2 = lu.getMS2();
+        	double chi0 = 0;
+			try
+			{
+				chi0 = chiDis.inverseCumulativeProbability((ranks[i]-1)/ranks.length);
+			}
+			catch (MathException e)
+			{
+				e.printStackTrace();
+			}
+        	writer.write(ms1.getSNP() + "\t" + ms1.getChr() + "\t" + ms1.getBP() + "\t" + ms1.getA1() + "\t" + ms1.getEffect() + "\t"  + ms1.getSE() + "\t" + ms1.getP() + "\t"+ ms2.getEffect() + "\t" + ms2.getSE() + "\t" + ms2.getP() + "\t" +lu.getChi1() + "\t" + chi0 + "\n");
+        }
+        writer.close();
+	}
+
+	private void VerboseGZ(ArrayList<LamUnit> LamArray, double[] ld, int idx1, int idx2)
+	{
+		ChiSquaredDistributionImpl chiDis = new ChiSquaredDistributionImpl(1);
+
+		NaturalRanking ranking = new NaturalRanking(NaNStrategy.MINIMAL, TiesStrategy.SEQUENTIAL);
+        double[] ranks = ranking.rank(ld);
+		BufferedWriter GZ = null;
+		GZ = FileUtil.ZipFileWriter(new String(lamArgs.getOutRoot() + "." + (idx1+1) + "-" + (idx2+1) + ".lam.gz"));
+    	Logger.printUserLog("Writting detailed test statistics into '"+lamArgs.getOutRoot() + "." + (idx1+1) + "-" + (idx2+1) + ".lam.gz.'");
+
+       	try
+		{
+			GZ.append("SNP\tChr\tBp\tA1\tBETA1\tSE1\tP1\tBETA2\tSE2\tP2\tChiObs\tChiExp\n");
+		}
+		catch (IOException e)
+		{
+			Logger.handleException(e, "error in writing " + new String(lamArgs.getOutRoot() + "." + (idx1+1) + "-" + (idx2+1) + ".lam.gz"));
+		}
+        
+        
+        for (int i = 0; i < ranks.length; i++)
+        {
+        	LamUnit lu = LamArray.get(i);
+        	MetaStat ms1 = lu.getMS1();
+        	MetaStat ms2 = lu.getMS2();
+        	double chi0 = 0;
+			try
+			{
+				chi0 = chiDis.inverseCumulativeProbability((ranks[i]-1)/ranks.length);
+			}
+			catch (MathException e)
+			{
+				e.printStackTrace();
+			}
+        	try
+			{
+				GZ.write(ms1.getSNP() + "\t" + ms1.getChr() + "\t" + ms1.getBP() + "\t" + ms1.getA1() + "\t" + ms1.getEffect() + "\t"  + ms1.getSE() + "\t" + ms1.getP() + "\t"+ ms2.getEffect() + "\t" + ms2.getSE() + "\t" + ms2.getP() + "\t" +lu.getChi1() + "\t" + chi0 + "\n");
+			}
+			catch (IOException e)
+			{
+				Logger.handleException(e, "error in writing " + new String(lamArgs.getOutRoot() + "." + (idx1+1) + "-" + (idx2+1) + ".lam.gz"));
+			}
+        }
+        try
+		{
+			GZ.close();
+		}
+		catch (IOException e)
+		{
+			Logger.handleException(e, "error in writing " + new String(lamArgs.getOutRoot() + "." + (idx1+1) + "-" + (idx2+1) + ".lam"));
 		}
 	}
 
@@ -486,9 +691,11 @@ public class LambdaDCommandImpl extends CommandImpl
 	private double Kappa = 1;
 	private LambdaDCommandArguments lamArgs;
 
-	private int[][] KeyIdx; //snp, beta, se, a1, a2
+	private int SNP = 0, CHR=1, BP=2, BETA=3, OR=3, SE=4, P=5, A1=6, A2=7;
+	private int[][] KeyIdx; //snp, chr, bp, beta, se, p, a1, a2
 	private String[] MetaFile;
 	private ArrayList<HashMap<String, MetaStat>> meta = NewIt.newArrayList();
+	private ArrayList<ArrayList<String>> SNPArray = NewIt.newArrayList();
 
 	private double LambdaMedian = 0;
 	private double LambdaMean = 0;
