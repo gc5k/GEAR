@@ -23,9 +23,10 @@ public class LambdaDCommandImpl extends CommandImpl
 	{
 		MetaFile = lamArgs.getMetaFile();
 		lamMat = new double[MetaFile.length][MetaFile.length];
-		olMat = new double[MetaFile.length][MetaFile.length];
+		olCtrlMat = new double[MetaFile.length][MetaFile.length];
+		olCsMat = new double[MetaFile.length][MetaFile.length];
+
 		kMat = new double[MetaFile.length][MetaFile.length];
-		
 
 		for(int i = 0; i < MetaFile.length; i++)
 		{
@@ -33,11 +34,13 @@ public class LambdaDCommandImpl extends CommandImpl
 			Arrays.fill(kMat[i], 1);
 			if (lamArgs.isQT())
 			{
-				olMat[i][i] = lamArgs.getQTsize()[i];
+				olCtrlMat[i][i] = lamArgs.getQTsize()[i];
+				olCsMat[i][i] = lamArgs.getQTsize()[i];
 			}
 			else
 			{
-				olMat[i][i] = lamArgs.getCCsize()[i*2] + lamArgs.getCCsize()[i*2+1];
+				olCtrlMat[i][i] = lamArgs.getCCsize()[i*2] + lamArgs.getCCsize()[i*2+1];
+				olCsMat[i][i] = lamArgs.getCCsize()[i*2] + lamArgs.getCCsize()[i*2+1];
 			}
 		}
 
@@ -105,6 +108,7 @@ public class LambdaDCommandImpl extends CommandImpl
 				if (!lamArgs.isQT())
 				{
 					Logger.printUserLog("Estiamted overlapping controls: " + OSCtrlMedian);
+					Logger.printUserLog("Estimated overlapping cases: " + OSCsMedian);
 				}
 				Logger.printUserLog("LambdaD mean: " + LambdaMean);
 				Logger.printUserLog("Estimated rho (lambdaD mean): " + rhoMean);
@@ -112,18 +116,20 @@ public class LambdaDCommandImpl extends CommandImpl
 				if (!lamArgs.isQT())
 				{
 					Logger.printUserLog("Estiamted overlapping controls: " + OSCtrlMean);
+					Logger.printUserLog("Estimated overlapping cases: " + OSCsMean);
 				}
 				Logger.printUserLog("\n");
 
 				lamMat[i][j] = LambdaMedian;
 				lamMat[j][i] = rhoMedian;
-				olMat[i][j] = olMat[j][i] = OSMedian;
+
+				olCtrlMat[i][j] = olCsMat[i][j] = OSMedian;
 				kMat[i][j] = kMat[j][i] = Kappa;
 				if (!lamArgs.isQT())
 				{
-					olMat[j][i] = OSCtrlMedian;
+					olCtrlMat[j][i] = OSCtrlMedian;
+					olCsMat[j][i] = OSCsMedian;
 				}
-//				printOut(i,j);
 			}
 		}
 
@@ -415,6 +421,8 @@ public class LambdaDCommandImpl extends CommandImpl
 			OSMean = (1 - LambdaMean) / Kappa * Math.sqrt( (ccSize[idx1*2] + ccSize[idx1*2+1] ) * (ccSize[idx2*2] + ccSize[idx2*2+1]) );
 			OSCtrlMedian = OSMedian / Math.sqrt(R1 * R2);
 			OSCtrlMean = OSMean / Math.sqrt(R1 * R2);
+			OSCsMedian = OSMedian * Math.sqrt(R1 * R2);
+			OSCsMean = OSMean * Math.sqrt(R1 * R2);
 		}
 	}
 
@@ -430,7 +438,7 @@ public class LambdaDCommandImpl extends CommandImpl
 			Logger.handleException(e, "An I/O exception occurred when writing '" + lamArgs.getOutRoot() + ".lmat" + "'.");
 		}
 
-		writer.println("LambdaD:");
+		writer.println("LambdaD (upper triangle) vs correlation (lower triangle):");
 		for (int i = 0; i < lamMat.length; i++)
 		{
 			for (int j = 0; j < lamMat[i].length; j++)
@@ -440,16 +448,26 @@ public class LambdaDCommandImpl extends CommandImpl
 			writer.println();
 		}
 
-		writer.println("Overlapping Samples:");
-		for (int i = 0; i < olMat.length; i++)
+		writer.println("Overlapping samples (upper triangle) vs overlapping controls (lower triangle):");
+		for (int i = 0; i < olCtrlMat.length; i++)
 		{
-			for (int j = 0; j < olMat[i].length; j++)
+			for (int j = 0; j < olCtrlMat[i].length; j++)
 			{
-				writer.print(String.format("%.4f", olMat[i][j]) + " ");
+				writer.print(String.format("%.4f", olCtrlMat[i][j]) + " ");
 			}
 			writer.println();
 		}
-		
+
+		writer.println("Overlapping samples (upper triangle) vs Overlapping cases (lower triangle):");
+		for (int i = 0; i < olCsMat.length; i++)
+		{
+			for (int j = 0; j < olCsMat[i].length; j++)
+			{
+				writer.print(String.format("%.4f", olCsMat[i][j]) + " ");
+			}
+			writer.println();
+		}
+
 		writer.println("Kappa:");
 		for (int i = 0; i < kMat.length; i++)
 		{
@@ -471,8 +489,6 @@ public class LambdaDCommandImpl extends CommandImpl
 	private int[][] KeyIdx; //snp, beta, se, a1, a2
 	private String[] MetaFile;
 	private ArrayList<HashMap<String, MetaStat>> meta = NewIt.newArrayList();
-//	private HashMap<String, MetaStat> SumStat1;
-//	private HashMap<String, MetaStat> SumStat2;
 
 	private double LambdaMedian = 0;
 	private double LambdaMean = 0;
@@ -480,12 +496,15 @@ public class LambdaDCommandImpl extends CommandImpl
 	private double OSMean = 0;
 	private double OSCtrlMedian = 0;
 	private double OSCtrlMean = 0;
+	private double OSCsMedian = 0;
+	private double OSCsMean = 0;
 	private double rhoMedian = 0;
 	private double rhoMean = 0;
 
 	private boolean[] logit;
 
 	private double[][] lamMat;
-	private double[][] olMat;
+	private double[][] olCtrlMat;
+	private double[][] olCsMat;
 	private double[][] kMat;
 }
