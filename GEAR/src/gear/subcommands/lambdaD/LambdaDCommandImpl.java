@@ -22,11 +22,24 @@ public class LambdaDCommandImpl extends CommandImpl
 	private void initial()
 	{
 		MetaFile = lamArgs.getMetaFile();
-		mat = new double[MetaFile.length][MetaFile.length];
 		lamMat = new double[MetaFile.length][MetaFile.length];
 		olMat = new double[MetaFile.length][MetaFile.length];
-		olCtrlMat = new double[MetaFile.length][MetaFile.length];
 		kMat = new double[MetaFile.length][MetaFile.length];
+		
+
+		for(int i = 0; i < MetaFile.length; i++)
+		{
+			Arrays.fill(lamMat[i], 1);
+			Arrays.fill(kMat[i], 1);
+			if (lamArgs.isQT())
+			{
+				olMat[i][i] = lamArgs.getQTsize()[i];
+			}
+			else
+			{
+				olMat[i][i] = lamArgs.getCCsize()[i*2] + lamArgs.getCCsize()[i*2+1];
+			}
+		}
 
 		if (MetaFile.length < 2)
 		{
@@ -59,8 +72,6 @@ public class LambdaDCommandImpl extends CommandImpl
 
 		for (int i=0; i < MetaFile.length -1; i++)
 		{
-			mat[i][i] = 1;
-//			SumStat1 = readMeta(i);
 			for (int j = (i+1); j < MetaFile.length; j++)
 			{
 //				SumStat2 = readMeta(j);
@@ -70,8 +81,8 @@ public class LambdaDCommandImpl extends CommandImpl
 					Logger.printUserLog("Summary statistics analysis for quantitative traits.");
 					double[] size = lamArgs.getQTsize();
 					Kappa = 2 / ( Math.sqrt(size[i]/size[j]) + Math.sqrt(size[j]/size[i]) );
-					Logger.printUserLog("Sample sizes for '" + MetaFile[i] + "': " + size[0]);
-					Logger.printUserLog("Sample sizes for '" + MetaFile[j] + "': " +size[1]);
+					Logger.printUserLog("Sample sizes for '" + MetaFile[i] + "': " + size[i]);
+					Logger.printUserLog("Sample sizes for '" + MetaFile[j] + "': " +size[j]);
 				}
 				else
 				{
@@ -104,13 +115,13 @@ public class LambdaDCommandImpl extends CommandImpl
 				}
 				Logger.printUserLog("\n");
 
-				mat[i][j] = mat[j][i] = rhoMedian;
-				lamMat[i][j] = lamMat[j][i] = LambdaMedian;
+				lamMat[i][j] = LambdaMedian;
+				lamMat[j][i] = rhoMedian;
 				olMat[i][j] = olMat[j][i] = OSMedian;
 				kMat[i][j] = kMat[j][i] = Kappa;
 				if (!lamArgs.isQT())
 				{
-					olCtrlMat[i][j] = olCtrlMat[j][i] = OSCtrlMedian;
+					olMat[j][i] = OSCtrlMedian;
 				}
 //				printOut(i,j);
 			}
@@ -407,39 +418,6 @@ public class LambdaDCommandImpl extends CommandImpl
 		}
 	}
 
-	private void printOut(int idx1, int idx2)
-	{
-		PrintWriter writer = null;
-		try 
-		{
-			writer = new PrintWriter(new BufferedWriter(new FileWriter(lamArgs.getOutRoot() + "." + (idx1+1) + "-" + (idx2+1) + ".lam")));
-		}
-		catch (IOException e)
-		{
-			Logger.handleException(e, "An I/O exception occurred when writing '" + lamArgs.getOutRoot() + ".lam" + "'.");
-		}
-		writer.println("Meta File " + (idx1+1) + ": " +MetaFile[idx1]);
-		writer.println("Meta File " + (idx2+1) + ": " +MetaFile[idx2]);
-
-		writer.println("Kappa: " + Kappa);
-		writer.println("LambdaD (median): " + LambdaMedian);
-		writer.println("rho (based on LambdaD median: " + rhoMedian);
-		writer.println("Overlapping samples: " + OSMedian);
-		if(!lamArgs.isQT())
-		{
-			writer.println("Overlapping controls: " + OSCtrlMedian);
-		}
-		writer.println();
-		writer.println("LambdaD (mean): " + LambdaMean);
-		writer.println("rho (based on LambdaD mean): " + rhoMean);
-		writer.println("Overlapping samples: " + OSMean);
-		if (!lamArgs.isQT())
-		{
-			writer.println("Overlapping controls: " + OSCtrlMedian);
-		}
-		writer.close();
-	}
-
 	private void WriteMat()
 	{
 		PrintWriter writer = null;
@@ -451,16 +429,6 @@ public class LambdaDCommandImpl extends CommandImpl
 		{
 			Logger.handleException(e, "An I/O exception occurred when writing '" + lamArgs.getOutRoot() + ".lmat" + "'.");
 		}
-		
-		writer.println("correlation:");
-		for (int i = 0; i < mat.length; i++)
-		{
-			for (int j = 0; j < mat[i].length; j++)
-			{
-				writer.print(String.format("%.4f", mat[i][j]) + " ");
-			}
-			writer.println();
-		}
 
 		writer.println("LambdaD:");
 		for (int i = 0; i < lamMat.length; i++)
@@ -468,16 +436,6 @@ public class LambdaDCommandImpl extends CommandImpl
 			for (int j = 0; j < lamMat[i].length; j++)
 			{
 				writer.print(String.format("%.4f", lamMat[i][j]) + " ");
-			}
-			writer.println();
-		}
-
-		writer.println("Kappa:");
-		for (int i = 0; i < kMat.length; i++)
-		{
-			for (int j = 0; j < kMat[i].length; j++)
-			{
-				writer.print(String.format("%.4f", kMat[i][j]) + " ");
 			}
 			writer.println();
 		}
@@ -491,19 +449,17 @@ public class LambdaDCommandImpl extends CommandImpl
 			}
 			writer.println();
 		}
-		if(!lamArgs.isQT())
-		{
-			writer.println("Overlapping Controls:");
-			for (int i = 0; i < olCtrlMat.length; i++)
-			{
-				for (int j = 0; j < olCtrlMat[i].length; j++)
-				{
-					writer.print(String.format("%.4f", olCtrlMat[i][j]) + " ");
-				}
-				writer.println();
-			}
-		}
 		
+		writer.println("Kappa:");
+		for (int i = 0; i < kMat.length; i++)
+		{
+			for (int j = 0; j < kMat[i].length; j++)
+			{
+				writer.print(String.format("%.4f", kMat[i][j]) + " ");
+			}
+			writer.println();
+		}
+
 		writer.close();
 	}
 
@@ -528,10 +484,8 @@ public class LambdaDCommandImpl extends CommandImpl
 	private double rhoMean = 0;
 
 	private boolean[] logit;
-	
-	private double[][] mat;
+
 	private double[][] lamMat;
 	private double[][] olMat;
-	private double[][] olCtrlMat;
 	private double[][] kMat;
 }
