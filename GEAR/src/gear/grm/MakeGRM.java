@@ -84,7 +84,7 @@ public class MakeGRM
 		else if (CmdArgs.INSTANCE.makeGRMFlag)
 		{
 			sb.append(".grm.gz");
-			grmGZ = FileUtil.ZipFielWriter(sb.toString());
+			grmGZ = FileUtil.ZipFileWriter(sb.toString());
 		}
 
 		for (int i = 0; i < G.getGRow(); i++)
@@ -264,7 +264,7 @@ public class MakeGRM
 		else if (CmdArgs.INSTANCE.makeGRMFlag)
 		{
 			sb.append(".grm.gz");
-			grmGZ = FileUtil.ZipFielWriter(sb.toString());
+			grmGZ = FileUtil.ZipFileWriter(sb.toString());
 		}
 
 		int i = 0, j = 0;

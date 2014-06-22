@@ -73,7 +73,7 @@ public class FileUtil
 		return is;
 	}
 
-	public static BufferedWriter ZipFielWriter(String file)
+	public static BufferedWriter ZipFileWriter(String file)
 	{
 		BufferedWriter writer = null;
 		try

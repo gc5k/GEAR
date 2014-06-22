@@ -153,17 +153,45 @@ public class LambdaDCommandArguments extends CommandArguments
 		field[4] = k[3];
 		field[5] = k[4];
 	}
+	
+	public void setVerbose()
+	{
+		isVerbose = true;
+	}
+	
+	public void setVerboseGZ()
+	{
+		isVerbose = true;
+		isVerboseGZ = true;
+	}
+	
+	public boolean isVerbose()
+	{
+		return isVerbose;
+	}
+	
+	public boolean isVerboseGZ()
+	{
+		return isVerboseGZ;
+	}
+
 	private ArrayList<String> md;
 	private boolean isGZ = false;
 	private boolean isQT = true;
+	private boolean isVerbose = false;
+	private boolean isVerboseGZ = false;
 	private double[] qtSize;
 	private double[] ccSize;
-	private String[] field = {"snp", "beta", "or", "se", "a1", "a2"};
+	private String[] field = {"snp", "chr", "bp", "beta", "or", "se", "p", "a1", "a2", };
 
 	public static final int SNP = 0;
-	public static final int BETA = 1;
-	public static final int OR = 2;
-	public static final int SE = 3;
-	public static final int A1 = 4;
-	public static final int A2 = 5;	
+	public static final int CHR = 1;
+	public static final int BP = 2;
+	public static final int BETA = 3;
+	public static final int OR = 4;
+	public static final int SE = 5;
+	public static final int P = 6;
+	public static final int A1 = 7;
+	public static final int A2 = 8;
+	
 }
