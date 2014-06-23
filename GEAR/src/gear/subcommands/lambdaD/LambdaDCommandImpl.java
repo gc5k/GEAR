@@ -80,13 +80,21 @@ public class LambdaDCommandImpl extends CommandImpl
 		lamArgs = (LambdaDCommandArguments) cmdArgs;
 		initial();
 
+		if (lamArgs.isQT())
+		{
+			Logger.printUserLog("Summary statistics analysis for quantitative traits.");			
+		}
+		else
+		{
+			Logger.printUserLog("Summary statistics analysis for case-contrl studies.");			
+		}
+
 		for (int i=0; i < MetaFile.length -1; i++)
 		{
 			for (int j = (i+1); j < MetaFile.length; j++)
 			{
 				if (lamArgs.isQT())
 				{
-					Logger.printUserLog("Summary statistics analysis for quantitative traits.");
 					double[] size = lamArgs.getQTsize();
 					Kappa = 2 / ( Math.sqrt(size[i]/size[j]) + Math.sqrt(size[j]/size[i]) );
 					Logger.printUserLog("Sample sizes for '" + MetaFile[i] + "': " + size[i]);
@@ -94,7 +102,6 @@ public class LambdaDCommandImpl extends CommandImpl
 				}
 				else
 				{
-					Logger.printUserLog("Summary statistics analysis for case-contrl studies.");
 					double[] size = lamArgs.getCCsize();
 					R1 = size[i*2]/size[i*2+1];
 					R2 = size[j*2]/size[j*2+1];
@@ -125,15 +132,15 @@ public class LambdaDCommandImpl extends CommandImpl
 				}
 				Logger.printUserLog("\n");
 
-				lamMat[i][j] = LambdaMedian;
-				lamMat[j][i] = rhoMedian;
+				lamMat[j][i] = LambdaMedian;
+				lamMat[i][j] = rhoMedian;
 
-				olCtrlMat[i][j] = olCsMat[i][j] = OSMedian;
+				olCtrlMat[j][i] = olCsMat[j][i] = OSMedian;
 				kMat[i][j] = kMat[j][i] = Kappa;
 				if (!lamArgs.isQT())
 				{
-					olCtrlMat[j][i] = OSCtrlMedian;
-					olCsMat[j][i] = OSCsMedian;
+					olCtrlMat[i][j] = OSCtrlMedian;
+					olCsMat[i][j] = OSCsMedian;
 				}
 			}
 		}
@@ -339,11 +346,11 @@ public class LambdaDCommandImpl extends CommandImpl
 		{
 			if (cntBadChr == 1)
 			{
-				Logger.printUserLog("Removed " + cntBadChr + " locus due to not numeric Chr.");				
+				Logger.printUserLog("Removed " + cntBadChr + " locus due to incorrect Chr.");				
 			}
 			else
 			{
-				Logger.printUserLog("Removed " + cntBadChr + " loci due to not numeric Chr.");				
+				Logger.printUserLog("Removed " + cntBadChr + " loci due to incorrect Chr.");				
 			}
 		}
 
@@ -351,11 +358,11 @@ public class LambdaDCommandImpl extends CommandImpl
 		{
 			if (cntBadBp == 1)
 			{
-				Logger.printUserLog("Removed " + cntBadBp + " locus due to not numeric Bp.");				
+				Logger.printUserLog("Removed " + cntBadBp + " locus due to incorrect Bp.");				
 			}
 			else
 			{
-				Logger.printUserLog("Removed " + cntBadChr + " loci due to not numeric Bp.");				
+				Logger.printUserLog("Removed " + cntBadChr + " loci due to incorrect Bp.");				
 			}
 		}
 
@@ -363,11 +370,11 @@ public class LambdaDCommandImpl extends CommandImpl
 		{
 			if (cntBadBeta == 1)
 			{
-				Logger.printUserLog("Removed " + cntBadBeta + " locus due to not numeric effect.");				
+				Logger.printUserLog("Removed " + cntBadBeta + " locus due to incorrect effect.");				
 			}
 			else
 			{
-				Logger.printUserLog("Removed " + cntBadBeta + " loci due to not numeric effect.");				
+				Logger.printUserLog("Removed " + cntBadBeta + " loci due to incorrect effect.");				
 			}
 		}
 
@@ -375,11 +382,11 @@ public class LambdaDCommandImpl extends CommandImpl
 		{
 			if (cntBadSE == 1)
 			{
-				Logger.printUserLog("Removed " + cntBadSE + " locus due to not numeric se.");				
+				Logger.printUserLog("Removed " + cntBadSE + " locus due to incorrect se.");				
 			}
 			else
 			{
-				Logger.printUserLog("Removed " + cntBadSE + " loci due to not numeric se.");
+				Logger.printUserLog("Removed " + cntBadSE + " loci due to incorrect se.");
 			}
 		}
 
@@ -387,11 +394,11 @@ public class LambdaDCommandImpl extends CommandImpl
 		{
 			if (cntBadP == 1)
 			{
-				Logger.printUserLog("Removed " + cntBadP + " locus due to not numeric p values.");				
+				Logger.printUserLog("Removed " + cntBadP + " locus due to incorrect p values.");				
 			}
 			else
 			{
-				Logger.printUserLog("Removed " + cntBadP + " loci due to not numeric p values.");
+				Logger.printUserLog("Removed " + cntBadP + " loci due to incorrect p values.");
 			}
 		}
 
@@ -479,11 +486,11 @@ public class LambdaDCommandImpl extends CommandImpl
 		{
 			if (cntAmbiguous == 1)
 			{
-				Logger.printUserLog("Removed " + cntAmbiguous + " locus (AT/GC).");				
+				Logger.printUserLog("Removed " + cntAmbiguous + " ambiguous locus (AT/GC).");				
 			}
 			else
 			{
-				Logger.printUserLog("Removed " + cntAmbiguous + " loci (AT/GC).");
+				Logger.printUserLog("Removed " + cntAmbiguous + " ambiguous loci (AT/GC).");
 			}
 		}
 		Logger.printUserLog("Lambda is calculated based on " + lD.size() + " summary statistics between two files.");
@@ -494,7 +501,6 @@ public class LambdaDCommandImpl extends CommandImpl
 			ld[i] = lD.get(i).doubleValue();
 			mean += ld[i];
 		}
-		
 
 		if(lamArgs.isVerboseGZ())
 		{
@@ -535,7 +541,6 @@ public class LambdaDCommandImpl extends CommandImpl
 			OSCsMedian = OSMedian * Math.sqrt(R1 * R2);
 			OSCsMean = OSMean * Math.sqrt(R1 * R2);
 		}
-		
 	}
 
 	private void Verbose(ArrayList<LamUnit> LamArray, double[] ld, int idx1, int idx2)
@@ -557,7 +562,7 @@ public class LambdaDCommandImpl extends CommandImpl
 		}
 
         FileUtil.CreatePrintStream(new String(lamArgs.getOutRoot() + "." + (idx1+1) + "-" + (idx2+1) + ".lam"));
-       	writer.write("SNP\tChr\tBp\tA1\tBETA1\tSE1\tP1\tBETA2\tSE2\tP2\tChiObs\tChiExp\n");
+       	writer.write("SNP\tChr\tBp\tA1\tBETA1\tSE1\tP1\tBETA2\tSE2\tP2\tChiObs\tChiExp\tLambdaD\n");
 
         for (int i = 0; i < ranks.length; i++)
         {
@@ -567,13 +572,14 @@ public class LambdaDCommandImpl extends CommandImpl
         	double chi0 = 0;
 			try
 			{
-				chi0 = chiDis.inverseCumulativeProbability((ranks[i]-1)/ranks.length);
+				chi0 = chiDis.inverseCumulativeProbability(ranks[i]/(ranks.length+1));
 			}
 			catch (MathException e)
 			{
 				e.printStackTrace();
 			}
-        	writer.write(ms1.getSNP() + "\t" + ms1.getChr() + "\t" + ms1.getBP() + "\t" + ms1.getA1() + "\t" + ms1.getEffect() + "\t"  + ms1.getSE() + "\t" + ms1.getP() + "\t"+ ms2.getEffect() + "\t" + ms2.getSE() + "\t" + ms2.getP() + "\t" +lu.getChi1() + "\t" + chi0 + "\n");
+			double lambda = lu.getChi1()/chi0;
+        	writer.write(ms1.getSNP() + "\t" + ms1.getChr() + "\t" + ms1.getBP() + "\t" + ms1.getA1() + "\t" + ms1.getEffect() + "\t"  + ms1.getSE() + "\t" + ms1.getP() + "\t"+ ms2.getEffect() + "\t" + ms2.getSE() + "\t" + ms2.getP() + "\t" +lu.getChi1() + "\t" + chi0 + "\t" + lambda + "\n");
         }
         writer.close();
 	}
@@ -606,15 +612,16 @@ public class LambdaDCommandImpl extends CommandImpl
         	double chi0 = 0;
 			try
 			{
-				chi0 = chiDis.inverseCumulativeProbability((ranks[i]-1)/ranks.length);
+				chi0 = chiDis.inverseCumulativeProbability(ranks[i]/(ranks.length+1));
 			}
 			catch (MathException e)
 			{
 				e.printStackTrace();
 			}
+			double lambda = lu.getChi1()/chi0;
         	try
 			{
-				GZ.write(ms1.getSNP() + "\t" + ms1.getChr() + "\t" + ms1.getBP() + "\t" + ms1.getA1() + "\t" + ms1.getEffect() + "\t"  + ms1.getSE() + "\t" + ms1.getP() + "\t"+ ms2.getEffect() + "\t" + ms2.getSE() + "\t" + ms2.getP() + "\t" +lu.getChi1() + "\t" + chi0 + "\n");
+				GZ.write(ms1.getSNP() + "\t" + ms1.getChr() + "\t" + ms1.getBP() + "\t" + ms1.getA1() + "\t" + ms1.getEffect() + "\t"  + ms1.getSE() + "\t" + ms1.getP() + "\t"+ ms2.getEffect() + "\t" + ms2.getSE() + "\t" + ms2.getP() + "\t" +lu.getChi1() + "\t" + chi0 + "\t" + lambda + "\n");
 			}
 			catch (IOException e)
 			{
@@ -643,7 +650,7 @@ public class LambdaDCommandImpl extends CommandImpl
 			Logger.handleException(e, "An I/O exception occurred when writing '" + lamArgs.getOutRoot() + ".lmat" + "'.");
 		}
 
-		writer.println("LambdaD (upper triangle) vs correlation (lower triangle):");
+		writer.println("LambdaD (lower triangle) vs correlation (upper triangle):");
 		for (int i = 0; i < lamMat.length; i++)
 		{
 			for (int j = 0; j < lamMat[i].length; j++)
@@ -653,24 +660,39 @@ public class LambdaDCommandImpl extends CommandImpl
 			writer.println();
 		}
 
-		writer.println("Overlapping samples (upper triangle) vs overlapping controls (lower triangle):");
-		for (int i = 0; i < olCtrlMat.length; i++)
+		if (!lamArgs.isQT())
 		{
-			for (int j = 0; j < olCtrlMat[i].length; j++)
+			writer.println("Overlapping samples (lower triangle) vs overlapping controls (upper triangle):");
+			for (int i = 0; i < olCtrlMat.length; i++)
 			{
-				writer.print(String.format("%.4f", olCtrlMat[i][j]) + " ");
+				for (int j = 0; j < olCtrlMat[i].length; j++)
+				{
+					writer.print(String.format("%.4f", olCtrlMat[i][j]) + " ");
+				}
+				writer.println();
 			}
-			writer.println();
-		}
 
-		writer.println("Overlapping samples (upper triangle) vs Overlapping cases (lower triangle):");
-		for (int i = 0; i < olCsMat.length; i++)
-		{
-			for (int j = 0; j < olCsMat[i].length; j++)
+			writer.println("Overlapping samples (lower triangle) vs Overlapping cases (upper triangle):");
+			for (int i = 0; i < olCsMat.length; i++)
 			{
-				writer.print(String.format("%.4f", olCsMat[i][j]) + " ");
+				for (int j = 0; j < olCsMat[i].length; j++)
+				{
+					writer.print(String.format("%.4f", olCsMat[i][j]) + " ");
+				}
+				writer.println();
 			}
-			writer.println();
+		}
+		else
+		{
+			writer.println("Overlapping samples (lower triangle)");
+			for (int i = 0; i < olCtrlMat.length; i++)
+			{
+				for (int j = 0; j < olCtrlMat[i].length; j++)
+				{
+					writer.print(String.format("%.4f", olCtrlMat[i][j]) + " ");
+				}
+				writer.println();
+			}
 		}
 
 		writer.println("Kappa:");
