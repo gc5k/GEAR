@@ -11,6 +11,7 @@ import java.util.Map;
 
 import org.apache.commons.math.MathException;
 import org.apache.commons.math.distribution.ChiSquaredDistributionImpl;
+import org.apache.commons.math.stat.descriptive.DescriptiveStatistics;
 import org.apache.commons.math.stat.ranking.NaNStrategy;
 import org.apache.commons.math.stat.ranking.NaturalRanking;
 import org.apache.commons.math.stat.ranking.TiesStrategy;
@@ -78,16 +79,17 @@ public class LambdaDCommandImpl extends CommandImpl
 	public void execute(CommandArguments cmdArgs)
 	{
 		lamArgs = (LambdaDCommandArguments) cmdArgs;
-		initial();
 
 		if (lamArgs.isQT())
 		{
-			Logger.printUserLog("Summary statistics analysis for quantitative traits.");			
+			Logger.printUserLog("Summary statistics analysis for quantitative traits.\n");			
 		}
 		else
 		{
-			Logger.printUserLog("Summary statistics analysis for case-contrl studies.");			
+			Logger.printUserLog("Summary statistics analysis for case-contrl studies.\n");			
 		}
+
+		initial();
 
 		for (int i=0; i < MetaFile.length -1; i++)
 		{
@@ -114,6 +116,7 @@ public class LambdaDCommandImpl extends CommandImpl
 				Logger.printUserLog("Kappa: " + Kappa);
 
 				calculateLambdaD(i, j);
+/*				
 				Logger.printUserLog("LambdaD median: " + LambdaMedian);
 				Logger.printUserLog("Estimated rho (lambdaD median): " + rhoMedian);
 				Logger.printUserLog("Estimated overlapping samples (lambdaD median): " + OSMedian);
@@ -131,7 +134,7 @@ public class LambdaDCommandImpl extends CommandImpl
 					Logger.printUserLog("Estimated overlapping cases: " + OSCsMean);
 				}
 				Logger.printUserLog("\n");
-
+*/
 				lamMat[j][i] = LambdaMedian;
 				lamMat[i][j] = rhoMedian;
 
@@ -502,7 +505,7 @@ public class LambdaDCommandImpl extends CommandImpl
 			mean += ld[i];
 		}
 
-		if(lamArgs.isVerboseGZ())
+		if (lamArgs.isVerboseGZ())
 		{
 			VerboseGZ(LamArray, ld, idx1, idx2);
 		}
@@ -525,11 +528,29 @@ public class LambdaDCommandImpl extends CommandImpl
 		rhoMedian = (1 - LambdaMedian) / Kappa;
 		rhoMean = (1 - LambdaMean) / Kappa;
 
+		double[] DesStat = null;
+		if (ld.length <= 100)
+		{
+			DesStat = new double[ld.length];
+			System.arraycopy(ld, 0, DesStat, 0, ld.length);
+		}
+		else
+		{
+			DesStat = new double[100];
+			for (int i = 0; i < DesStat.length; i++)
+			{
+				int idx = (int) Math.floor( (i*1.0 + 1)/100 * ld.length );
+				DesStat[i] = ld[idx-1];
+			}
+		}
+
 		if (lamArgs.isQT())
 		{
 			double[] qtSize = lamArgs.getQTsize();
 			OSMedian = rhoMedian * Math.sqrt(qtSize[idx1] * qtSize[idx2]);
 			OSMean = rhoMean * Math.sqrt(qtSize[idx1] * qtSize[idx2]);
+			EmpiricalLam el = new EmpiricalLam(DesStat, qtSize[idx1], qtSize[idx2]);
+			el.PrintQT();
 		}
 		else
 		{
@@ -540,6 +561,8 @@ public class LambdaDCommandImpl extends CommandImpl
 			OSCtrlMean = OSMean / Math.sqrt(R1 * R2);
 			OSCsMedian = OSMedian * Math.sqrt(R1 * R2);
 			OSCsMean = OSMean * Math.sqrt(R1 * R2);
+			EmpiricalLam el = new EmpiricalLam(DesStat, ccSize[idx1*2], ccSize[idx1*2+1], ccSize[idx2*2], ccSize[idx2*2+1]);
+			el.PrintCC();
 		}
 	}
 
@@ -718,6 +741,12 @@ public class LambdaDCommandImpl extends CommandImpl
 	private String[] MetaFile;
 	private ArrayList<HashMap<String, MetaStat>> meta = NewIt.newArrayList();
 	private ArrayList<ArrayList<String>> SNPArray = NewIt.newArrayList();
+
+	private double EpLamMean = 0;
+	private double EpRhoMean = 0;
+	private double EpOSMean = 0;
+	private double EpOSCtrlMean = 0;
+	private double EpOSCSMean = 0;
 
 	private double LambdaMedian = 0;
 	private double LambdaMean = 0;
