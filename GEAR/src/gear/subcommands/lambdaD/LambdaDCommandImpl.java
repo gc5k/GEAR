@@ -135,16 +135,6 @@ public class LambdaDCommandImpl extends CommandImpl
 				}
 				Logger.printUserLog("\n");
 */
-				lamMat[j][i] = LambdaMedian;
-				lamMat[i][j] = rhoMedian;
-
-				olCtrlMat[j][i] = olCsMat[j][i] = OSMedian;
-				kMat[i][j] = kMat[j][i] = Kappa;
-				if (!lamArgs.isQT())
-				{
-					olCtrlMat[i][j] = OSCtrlMedian;
-					olCsMat[i][j] = OSCsMedian;
-				}
 			}
 		}
 		Logger.printUserLog("Results has been saved in '" + lamArgs.getOutRoot() + ".lmat'.");
@@ -225,6 +215,7 @@ public class LambdaDCommandImpl extends CommandImpl
 			Logger.printUserLog("Cannot find the snp column in " + MetaFile[metaIdx]);
 			qFlag = true;
 		}
+/*
 		if (KeyIdx[metaIdx][CHR] == -1)
 		{
 			Logger.printUserLog("Cannot find the chr column in " + MetaFile[metaIdx]);
@@ -235,6 +226,7 @@ public class LambdaDCommandImpl extends CommandImpl
 			Logger.printUserLog("Cannot find the bp column in " + MetaFile[metaIdx]);
 			qFlag = true;
 		}
+*/
 		if (KeyIdx[metaIdx][BETA] == -1)
 		{
 			Logger.printUserLog("Cannot find the beta/or in " + MetaFile[metaIdx]);
@@ -276,12 +268,12 @@ public class LambdaDCommandImpl extends CommandImpl
 		while( (tokens = reader.readTokens(tokenLen)) != null)
 		{
 			total++;
-			if (ConstValues.isNA(tokens[KeyIdx[metaIdx][CHR]]))
+			if (KeyIdx[metaIdx][CHR] != -1 && ConstValues.isNA(tokens[KeyIdx[metaIdx][CHR]]))
 			{
 				cntBadChr++;
 				continue;
 			}
-			if (ConstValues.isNA(tokens[KeyIdx[metaIdx][BP]]))
+			if (KeyIdx[metaIdx][BP] != -1 && ConstValues.isNA(tokens[KeyIdx[metaIdx][BP]]))
 			{
 				cntBadBp++;
 				continue;
@@ -312,23 +304,25 @@ public class LambdaDCommandImpl extends CommandImpl
 				cntBadA1++;
 				continue;
 			}
-			if (KeyIdx[metaIdx][A2] != -1)
+			if (KeyIdx[metaIdx][A2] != -1 && tokens[KeyIdx[metaIdx][A2]].length() != 1)
 			{
-				if (tokens[KeyIdx[metaIdx][A2]].length() != 1)
-				{
-					cntBadA2++;
-					continue;
-				}
+				cntBadA2++;
+				continue;
 			}
 
 			MetaStat ms = null;
+			ms = new MetaStat(tokens[KeyIdx[metaIdx][SNP]], Float.parseFloat(tokens[KeyIdx[metaIdx][BETA]]), Float.parseFloat(tokens[KeyIdx[metaIdx][SE]]), Double.parseDouble(tokens[KeyIdx[metaIdx][P]]), tokens[KeyIdx[metaIdx][A1]].charAt(0), logit[metaIdx]);
+			if (KeyIdx[metaIdx][CHR] != -1)
+			{
+				ms.setChr(Integer.parseInt(tokens[KeyIdx[metaIdx][CHR]]));
+			}
+			if (KeyIdx[metaIdx][BP] != -1)
+			{
+				ms.setBP(Integer.parseInt(tokens[KeyIdx[metaIdx][BP]]));
+			}
 			if (KeyIdx[metaIdx][A2] == -1)
 			{
-				ms = new MetaStat(tokens[KeyIdx[metaIdx][SNP]], Integer.parseInt(tokens[KeyIdx[metaIdx][CHR]]), Long.parseLong(tokens[KeyIdx[metaIdx][BP]]), Float.parseFloat(tokens[KeyIdx[metaIdx][BETA]]), Float.parseFloat(tokens[KeyIdx[metaIdx][SE]]), Double.parseDouble(tokens[KeyIdx[metaIdx][P]]), tokens[KeyIdx[metaIdx][A1]].charAt(0), logit[metaIdx]);
-			}
-			else
-			{
-				ms = new MetaStat(tokens[KeyIdx[metaIdx][SNP]], Integer.parseInt(tokens[KeyIdx[metaIdx][CHR]]), Long.parseLong(tokens[KeyIdx[metaIdx][BP]]), Float.parseFloat(tokens[KeyIdx[metaIdx][BETA]]), Float.parseFloat(tokens[KeyIdx[metaIdx][SE]]), Double.parseDouble(tokens[KeyIdx[metaIdx][P]]), tokens[KeyIdx[metaIdx][A1]].charAt(0), tokens[KeyIdx[metaIdx][A2]].charAt(0), logit[metaIdx]);
+				ms.setA2(tokens[KeyIdx[metaIdx][A2]].charAt(0));
 			}
 			sumstat.put(ms.getSNP(), ms);
 			snpArray.add(ms.getSNP());
@@ -498,11 +492,10 @@ public class LambdaDCommandImpl extends CommandImpl
 		}
 		Logger.printUserLog("Lambda is calculated based on " + lD.size() + " summary statistics between two files.");
 		double[] ld = new double[lD.size()];
-		double mean = 0;
+
 		for(int i = 0; i < ld.length; i++)
 		{
 			ld[i] = lD.get(i).doubleValue();
-			mean += ld[i];
 		}
 
 		if (lamArgs.isVerboseGZ())
@@ -515,6 +508,8 @@ public class LambdaDCommandImpl extends CommandImpl
 		}
 		
 		Arrays.sort(ld);
+		
+/*
 		if (ld.length % 2 == 0)
 		{
 			LambdaMedian = (ld[(int) (ld.length/2)] + ld[(int) (ld.length/2) - 1])/2 / 0.4549364;
@@ -527,7 +522,7 @@ public class LambdaDCommandImpl extends CommandImpl
 		LambdaMean = mean/ld.length;
 		rhoMedian = (1 - LambdaMedian) / Kappa;
 		rhoMean = (1 - LambdaMean) / Kappa;
-
+*/
 		double[] DesStat = null;
 		if (ld.length <= 100)
 		{
@@ -547,22 +542,29 @@ public class LambdaDCommandImpl extends CommandImpl
 		if (lamArgs.isQT())
 		{
 			double[] qtSize = lamArgs.getQTsize();
-			OSMedian = rhoMedian * Math.sqrt(qtSize[idx1] * qtSize[idx2]);
-			OSMean = rhoMean * Math.sqrt(qtSize[idx1] * qtSize[idx2]);
 			EmpiricalLam el = new EmpiricalLam(DesStat, qtSize[idx1], qtSize[idx2]);
 			el.PrintQT();
+			
+			lamMat[idx2][idx1] = el.getEmpLamMean();
+			lamMat[idx1][idx2] = el.getEmpRhoMean();
+
+			olCtrlMat[idx2][idx1] = olCsMat[idx2][idx1] = el.getEmpOSMean();
+			kMat[idx1][idx2] = kMat[idx2][idx1] = Kappa;
+
 		}
 		else
 		{
 			double[] ccSize = lamArgs.getCCsize();
-			OSMedian = rhoMedian * Math.sqrt( (ccSize[idx1*2] + ccSize[idx1*2+1] ) * (ccSize[idx2*2] + ccSize[idx2*2+1]) );
-			OSMean = rhoMean * Math.sqrt( (ccSize[idx1*2] + ccSize[idx1*2+1] ) * (ccSize[idx2*2] + ccSize[idx2*2+1]) );
-			OSCtrlMedian = OSMedian / Math.sqrt(R1 * R2);
-			OSCtrlMean = OSMean / Math.sqrt(R1 * R2);
-			OSCsMedian = OSMedian * Math.sqrt(R1 * R2);
-			OSCsMean = OSMean * Math.sqrt(R1 * R2);
 			EmpiricalLam el = new EmpiricalLam(DesStat, ccSize[idx1*2], ccSize[idx1*2+1], ccSize[idx2*2], ccSize[idx2*2+1]);
 			el.PrintCC();
+			
+			lamMat[idx2][idx1] = el.getEmpLamMean();
+			lamMat[idx1][idx2] = el.getEmpRhoMean();
+
+			olCtrlMat[idx2][idx1] = olCsMat[idx2][idx1] = el.getEmpOSMean();
+			olCtrlMat[idx1][idx2] = el.getEmpOSCtrlMean();
+			olCsMat[idx1][idx2] = el.getEmpOSCsMean();
+			kMat[idx1][idx2] = kMat[idx2][idx1] = Kappa;			
 		}
 	}
 
@@ -625,8 +627,7 @@ public class LambdaDCommandImpl extends CommandImpl
 		{
 			Logger.handleException(e, "error in writing " + new String(lamArgs.getOutRoot() + "." + (idx1+1) + "-" + (idx2+1) + ".lam.gz"));
 		}
-        
-        
+
         for (int i = 0; i < ranks.length; i++)
         {
         	LamUnit lu = LamArray.get(i);
@@ -741,23 +742,6 @@ public class LambdaDCommandImpl extends CommandImpl
 	private String[] MetaFile;
 	private ArrayList<HashMap<String, MetaStat>> meta = NewIt.newArrayList();
 	private ArrayList<ArrayList<String>> SNPArray = NewIt.newArrayList();
-
-	private double EpLamMean = 0;
-	private double EpRhoMean = 0;
-	private double EpOSMean = 0;
-	private double EpOSCtrlMean = 0;
-	private double EpOSCSMean = 0;
-
-	private double LambdaMedian = 0;
-	private double LambdaMean = 0;
-	private double OSMedian = 0;
-	private double OSMean = 0;
-	private double OSCtrlMedian = 0;
-	private double OSCtrlMean = 0;
-	private double OSCsMedian = 0;
-	private double OSCsMean = 0;
-	private double rhoMedian = 0;
-	private double rhoMean = 0;
 
 	private boolean[] logit;
 

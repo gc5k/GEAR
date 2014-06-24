@@ -80,6 +80,31 @@ public class EmpiricalLam
 		EmpOSCsSD = EmpLamSD/k * Math.sqrt( (cs1 + ctrl1) * (cs2 + ctrl2) ) * Math.sqrt(R1 * R2);	
 	}
 
+	protected double getEmpLamMean()
+	{
+		return EmpLamMean;
+	}
+
+	protected double getEmpRhoMean()
+	{
+		return EmpRhoMean;
+	}
+	
+	protected double getEmpOSMean()
+	{
+		return EmpOSMean;
+	}
+	
+	protected double getEmpOSCtrlMean()
+	{
+		return EmpOSCtrlMean;
+	}
+	
+	protected double getEmpOSCsMean()
+	{
+		return EmpOSCsMean;
+	}
+
 	protected void PrintCC()
 	{
 		Logger.printUserLog("Empirical Distribution for lambdaD: ");
@@ -101,6 +126,10 @@ public class EmpiricalLam
 		Logger.printUserLog("Empirical Distribution for lambdaD:");
 		Logger.printUserLog("Mean: " + EmpLamMean);
 		Logger.printUserLog("Standard deviation: " + EmpLamSD);
+
+		Logger.printUserLog("Empirical Distribution for correlation:");
+		Logger.printUserLog("Mean: " + EmpRhoMean);
+		Logger.printUserLog("Standard deviation: " + EmpRhoSD + "\n");
 
 		Logger.printUserLog("Empirical Overlapping Samples: ");
 		Logger.printUserLog("Overlapping samples: " + EmpOSMean + " (" + EmpOSSD + ")");
