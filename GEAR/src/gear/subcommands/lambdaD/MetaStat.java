@@ -2,11 +2,9 @@ package gear.subcommands.lambdaD;
 
 public class MetaStat
 {
-	protected MetaStat(String snp, int chr, long bp, float effect, float se, double p, char a1, boolean logit)
+	protected MetaStat(String snp, float effect, float se, double p, char a1, boolean logit)
 	{
 		this.snp = snp;
-		this.chr = chr;
-		this.bp = bp;
 		this.effect = effect;
 		this.se = se;
 		this.p = p;
@@ -21,24 +19,19 @@ public class MetaStat
 		this.logit = logit;
 	}
 
-	protected MetaStat(String snp, int chr, long bp, float effect, float se, double p, char a1, char a2, boolean logit)
+	protected void setChr(int chr)
 	{
-		this.snp = snp;
 		this.chr = chr;
+	}
+	
+	protected void setBP(int bp)
+	{
 		this.bp = bp;
-		this.effect = effect;
-		this.se = se;
-		this.p = p;
-		if (a1 >=97 && a1 <= 122)
-		{
-			this.a1 = (char) (a1 - 32);			
-		}
-		else
-		{
-			this.a1 = a1;
-		}
-		
-		if (a2 >=97 && a1 <= 122)
+	}
+	
+	protected void setA2(char a2)
+	{
+		if (a2 >=97 && a2 <= 122)
 		{
 			this.a2 = (char) (a2 - 32);
 		}
@@ -46,9 +39,8 @@ public class MetaStat
 		{
 			this.a2 = a2;
 		}
-		this.logit = logit;
 	}
-
+	
 	protected String getSNP()
 	{
 		return snp;
@@ -90,8 +82,8 @@ public class MetaStat
 	}
 
 	private String snp;
-	private int chr;
-	private long bp;
+	private int chr = -1;
+	private long bp = -1;
 	private float se;	
 	private float effect;
 	private double p;
