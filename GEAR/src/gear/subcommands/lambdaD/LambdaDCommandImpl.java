@@ -6,8 +6,8 @@ import java.io.IOException;
 import java.io.PrintWriter;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.HashMap;
-import java.util.Map;
 
 import org.apache.commons.math.MathException;
 import org.apache.commons.math.distribution.ChiSquaredDistributionImpl;
@@ -116,25 +116,6 @@ public class LambdaDCommandImpl extends CommandImpl
 				Logger.printUserLog("Kappa: " + Kappa);
 
 				calculateLambdaD(i, j);
-/*				
-				Logger.printUserLog("LambdaD median: " + LambdaMedian);
-				Logger.printUserLog("Estimated rho (lambdaD median): " + rhoMedian);
-				Logger.printUserLog("Estimated overlapping samples (lambdaD median): " + OSMedian);
-				if (!lamArgs.isQT())
-				{
-					Logger.printUserLog("Estiamted overlapping controls: " + OSCtrlMedian);
-					Logger.printUserLog("Estimated overlapping cases: " + OSCsMedian);
-				}
-				Logger.printUserLog("LambdaD mean: " + LambdaMean);
-				Logger.printUserLog("Estimated rho (lambdaD mean): " + rhoMean);
-				Logger.printUserLog("Estimated overlapping samples (lambdaD mean): " + OSMean);
-				if (!lamArgs.isQT())
-				{
-					Logger.printUserLog("Estiamted overlapping controls: " + OSCtrlMean);
-					Logger.printUserLog("Estimated overlapping cases: " + OSCsMean);
-				}
-				Logger.printUserLog("\n");
-*/
 			}
 		}
 		Logger.printUserLog("Results has been saved in '" + lamArgs.getOutRoot() + ".lmat'.");
@@ -320,7 +301,7 @@ public class LambdaDCommandImpl extends CommandImpl
 			{
 				ms.setBP(Integer.parseInt(tokens[KeyIdx[metaIdx][BP]]));
 			}
-			if (KeyIdx[metaIdx][A2] == -1)
+			if (KeyIdx[metaIdx][A2] != -1)
 			{
 				ms.setA2(tokens[KeyIdx[metaIdx][A2]].charAt(0));
 			}
@@ -429,7 +410,8 @@ public class LambdaDCommandImpl extends CommandImpl
 	private void calculateLambdaD(int idx1, int idx2)
 	{
 		ArrayList<LamUnit> LamArray = NewIt.newArrayList();
-		ArrayList<Double> lD = NewIt.newArrayList();
+    	DescriptiveStatistics LD = new DescriptiveStatistics();
+
 		int cntAmbiguous = 0;
 		HashMap<String, MetaStat> SumStat1 = meta.get(idx1);
 		HashMap<String, MetaStat> SumStat2 = meta.get(idx2);
@@ -475,8 +457,8 @@ public class LambdaDCommandImpl extends CommandImpl
 				cntAmbiguous++;
 				continue;
 			}
-			lD.add(d);
-			LamArray.add(new LamUnit(d,ms1, ms2));
+			LD.addValue(d);
+			LamArray.add(new LamUnit(d, ms1, ms2));
         }
 
 		if (cntAmbiguous > 0)
@@ -490,52 +472,32 @@ public class LambdaDCommandImpl extends CommandImpl
 				Logger.printUserLog("Removed " + cntAmbiguous + " ambiguous loci (AT/GC).");
 			}
 		}
-		Logger.printUserLog("Lambda is calculated based on " + lD.size() + " summary statistics between two files.");
-		double[] ld = new double[lD.size()];
+		Logger.printUserLog("Lambda is calculated based on " + LD.getN() + " summary statistics between two files.");
 
-		for(int i = 0; i < ld.length; i++)
-		{
-			ld[i] = lD.get(i).doubleValue();
-		}
-
-		if (lamArgs.isVerboseGZ())
-		{
-			VerboseGZ(LamArray, ld, idx1, idx2);
-		}
-		else if (lamArgs.isVerbose())
-		{
-			Verbose(LamArray, ld, idx1, idx2);	
-		}
 		
-		Arrays.sort(ld);
 		
-/*
-		if (ld.length % 2 == 0)
-		{
-			LambdaMedian = (ld[(int) (ld.length/2)] + ld[(int) (ld.length/2) - 1])/2 / 0.4549364;
-		}
-		else
-		{
-			LambdaMedian = ld[(int) ((ld.length-1)/2)] / 0.4549364;
-		}
+		double[] sortLD = LD.getSortedValues();
 
-		LambdaMean = mean/ld.length;
-		rhoMedian = (1 - LambdaMedian) / Kappa;
-		rhoMean = (1 - LambdaMean) / Kappa;
-*/
 		double[] DesStat = null;
-		if (ld.length <= 100)
+		int[] selIdx = null;
+		if (sortLD.length <= 100)
 		{
-			DesStat = new double[ld.length];
-			System.arraycopy(ld, 0, DesStat, 0, ld.length);
+			DesStat = new double[sortLD.length];
+			System.arraycopy(sortLD, 0, DesStat, 0, sortLD.length);
+			selIdx = new int[sortLD.length];
+			for (int i = 0; i < sortLD.length; i++)
+			{
+				selIdx[i] = i;
+			}
 		}
 		else
 		{
 			DesStat = new double[100];
+			selIdx = new int[100];
 			for (int i = 0; i < DesStat.length; i++)
 			{
-				int idx = (int) Math.floor( (i*1.0 + 1)/100 * ld.length );
-				DesStat[i] = ld[idx-1];
+				selIdx[i] = (int) Math.floor( (i*1.0 + 1)/100 * sortLD.length ) -1;
+				DesStat[i] = sortLD[selIdx[i]];
 			}
 		}
 
@@ -544,20 +506,19 @@ public class LambdaDCommandImpl extends CommandImpl
 			double[] qtSize = lamArgs.getQTsize();
 			EmpiricalLam el = new EmpiricalLam(DesStat, qtSize[idx1], qtSize[idx2]);
 			el.PrintQT();
-			
+
 			lamMat[idx2][idx1] = el.getEmpLamMean();
 			lamMat[idx1][idx2] = el.getEmpRhoMean();
 
 			olCtrlMat[idx2][idx1] = olCsMat[idx2][idx1] = el.getEmpOSMean();
 			kMat[idx1][idx2] = kMat[idx2][idx1] = Kappa;
-
 		}
 		else
 		{
 			double[] ccSize = lamArgs.getCCsize();
 			EmpiricalLam el = new EmpiricalLam(DesStat, ccSize[idx1*2], ccSize[idx1*2+1], ccSize[idx2*2], ccSize[idx2*2+1]);
 			el.PrintCC();
-			
+
 			lamMat[idx2][idx1] = el.getEmpLamMean();
 			lamMat[idx1][idx2] = el.getEmpRhoMean();
 
@@ -566,6 +527,58 @@ public class LambdaDCommandImpl extends CommandImpl
 			olCsMat[idx1][idx2] = el.getEmpOSCsMean();
 			kMat[idx1][idx2] = kMat[idx2][idx1] = Kappa;			
 		}
+		
+		if (lamArgs.isVerboseGZ())
+		{
+			VerboseGZ(LamArray, LD.getValues(), idx1, idx2);
+		}
+		else if (lamArgs.isVerbose())
+		{
+			Verbose(LamArray, LD.getValues(), idx1, idx2);	
+		}
+		else
+		{
+			NotVerbose(LamArray, LD.getValues(), idx1, idx2, selIdx);
+		}
+	}
+
+	private void NotVerbose(ArrayList<LamUnit> LamArray, double[] ld, int idx1, int idx2, int[] selIdx)
+	{
+		Collections.sort(LamArray);
+		ChiSquaredDistributionImpl chiDis = new ChiSquaredDistributionImpl(1);
+
+        PrintWriter writer = null;
+        try
+        {
+        	writer = new PrintWriter(new BufferedWriter(new FileWriter(lamArgs.getOutRoot() + "." + (idx1+1) + "-" + (idx2+1) + ".lam")));
+        	Logger.printUserLog("Writting detailed test statistics into '"+lamArgs.getOutRoot() + "." + (idx1+1) + "-" + (idx2+1) + ".lam.'");
+        }
+		catch (IOException e)
+		{
+			Logger.handleException(e, "An I/O exception occurred when writing '" + lamArgs.getOutRoot() + "." + (idx1+1) + "-" + (idx2+1) + ".lam" + "'.");
+		}
+
+        FileUtil.CreatePrintStream(new String(lamArgs.getOutRoot() + "." + (idx1+1) + "-" + (idx2+1) + ".lam"));
+       	writer.write("SNP\tChr\tBp\tA1\tBETA1\tSE1\tP1\tBETA2\tSE2\tP2\tChiObs\tChiExp\tLambdaD\n");
+
+        for (int i = 0; i < selIdx.length; i++)
+        {
+        	LamUnit lu = LamArray.get(selIdx[i]);
+        	MetaStat ms1 = lu.getMS1();
+        	MetaStat ms2 = lu.getMS2();
+        	double chi0 = 0;
+			try
+			{
+				chi0 = chiDis.inverseCumulativeProbability((i+1)/(selIdx.length+0.05));;
+			}
+			catch (MathException e)
+			{
+				e.printStackTrace();
+			}
+			double lambda = lu.getChi1()/chi0;
+        	writer.write(ms1.getSNP() + "\t" + ms1.getChr() + "\t" + ms1.getBP() + "\t" + ms1.getA1() + "\t" + ms1.getEffect() + "\t"  + ms1.getSE() + "\t" + ms1.getP() + "\t"+ ms2.getEffect() + "\t" + ms2.getSE() + "\t" + ms2.getP() + "\t" +lu.getChi1() + "\t" + chi0 + "\t" + lambda + "\n");
+        }
+        writer.close();
 	}
 
 	private void Verbose(ArrayList<LamUnit> LamArray, double[] ld, int idx1, int idx2)
