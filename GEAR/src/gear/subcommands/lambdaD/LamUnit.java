@@ -1,6 +1,6 @@
 package gear.subcommands.lambdaD;
 
-public class LamUnit
+public class LamUnit implements Comparable<LamUnit>
 {
 	public LamUnit(double chi1, MetaStat ms1, MetaStat ms2)
 	{
@@ -27,4 +27,9 @@ public class LamUnit
 	private double chi1;
 	private MetaStat ms1;
 	private MetaStat ms2;
+	@Override
+	public int compareTo(LamUnit o)
+	{
+		return new Double (this.chi1).compareTo(new Double (o.getChi1()));
+	}
 }
