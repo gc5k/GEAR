@@ -117,7 +117,17 @@ class FilteredSNPs
 				Score score = scores[snpIdx]; 
 				if (score != null && score.getValue(traitIdx) != null)
 				{
-					this.scores[traitIdx][snpIdx] = isLogit ? (float)Math.log(score.getValue(traitIdx)) : score.getValue(traitIdx);
+					if (isLogit)
+					{
+						if (score.getValue(traitIdx).floatValue() > 0)
+						{
+							this.scores[traitIdx][snpIdx] = (float)Math.log(score.getValue(traitIdx));
+						}
+					}
+					else
+					{
+						this.scores[traitIdx][snpIdx] = (float) score.getValue(traitIdx);
+					}
 				}
 			}
 		}
