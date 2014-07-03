@@ -175,11 +175,38 @@ public class LambdaDCommandArguments extends CommandArguments
 		return isVerboseGZ;
 	}
 
+	public void setQRange(String[] pr)
+	{
+		qrLow = Double.parseDouble(pr[0]);
+		qrHigh = Double.parseDouble(pr[1]);
+		isQRange = true;
+	}
+
+	public double getQRLow()
+	{
+		return qrLow;
+	}
+
+	public double getQRHigh()
+	{
+		return qrHigh;
+	}
+
+	public boolean isQRange()
+	{
+		return isQRange;
+	}
+	
 	private ArrayList<String> md;
 	private boolean isGZ = false;
 	private boolean isQT = true;
 	private boolean isVerbose = false;
 	private boolean isVerboseGZ = false;
+
+	private boolean isQRange = false;
+	private double qrLow = 0;
+	private double qrHigh = 0;
+
 	private double[] qtSize;
 	private double[] ccSize;
 	private String[] field = {"snp", "chr", "bp", "beta", "or", "se", "p", "a1", "a2", };
