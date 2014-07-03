@@ -246,6 +246,8 @@ public class LambdaDCommandImpl extends CommandImpl
 		int cntBadSE = 0;
 		int cntBadA1 = 0;
 		int cntBadA2 = 0;
+		
+		int cntPRange = 0;
 		while( (tokens = reader.readTokens(tokenLen)) != null)
 		{
 			total++;
@@ -289,6 +291,17 @@ public class LambdaDCommandImpl extends CommandImpl
 			{
 				cntBadA2++;
 				continue;
+			}
+
+			//various filters
+			if (lamArgs.isQRange())
+			{
+				double p = Double.parseDouble(tokens[KeyIdx[metaIdx][P]]);
+				if (p < lamArgs.getQRLow() || p > lamArgs.getQRHigh())
+				{
+					cntPRange++;
+					continue;
+				}
 			}
 
 			MetaStat ms = null;
@@ -400,6 +413,18 @@ public class LambdaDCommandImpl extends CommandImpl
 			else
 			{
 				Logger.printUserLog("Removed " + cntBadA2 + " loci due to bad a2 allele.");				
+			}
+		}
+		
+		if(cntPRange > 0 && lamArgs.isQRange())
+		{
+			if (cntPRange == 1)
+			{
+				Logger.printUserLog("Removed " + cntPRange + " locus which were not inside the range [" + lamArgs.getQRLow() + ", " + lamArgs.getQRHigh() +"].");
+			}
+			else
+			{
+				Logger.printUserLog("Removed " + cntPRange + " loi which were not inside the range [" + lamArgs.getQRLow() + ", " + lamArgs.getQRHigh() +"].");
 			}
 		}
 
