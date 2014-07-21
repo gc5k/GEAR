@@ -1,5 +1,7 @@
 package gear.util.pop;
 
+import java.io.IOException;
+
 import org.apache.commons.math.MathException;
 import org.apache.commons.math.distribution.BinomialDistribution;
 import org.apache.commons.math.distribution.BinomialDistributionImpl;
@@ -94,8 +96,7 @@ public class PopStat
 					}
 					catch (MathException e)
 					{
-						// TODO Auto-generated catch block
-						e.printStackTrace();
+						Logger.handleException(e, "Error in imputation.");
 					}
 				}
 			}

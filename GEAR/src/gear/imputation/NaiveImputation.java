@@ -151,7 +151,7 @@ public class NaiveImputation
 		}
 		catch (IOException e)
 		{
-			e.printStackTrace();
+			Logger.handleException(e, "An exception occurred when wrtinging bed file.");
 		}
 	}
 }
