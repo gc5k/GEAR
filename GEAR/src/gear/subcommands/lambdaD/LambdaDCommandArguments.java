@@ -197,12 +197,22 @@ public class LambdaDCommandArguments extends CommandArguments
 		return isQRange;
 	}
 	
+	public double getMe()
+	{
+		return Me;
+	}
+	
+	public void setMe(String me)
+	{
+		Me = Double.parseDouble(me);
+	}
 	private ArrayList<String> md;
 	private boolean isGZ = false;
 	private boolean isQT = true;
 	private boolean isVerbose = false;
 	private boolean isVerboseGZ = false;
 
+	private double Me = 10000;
 	private boolean isQRange = false;
 	private double qrLow = 0;
 	private double qrHigh = 0;
