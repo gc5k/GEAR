@@ -37,6 +37,7 @@ public class LambdaDCommand extends Command
 		options.addOption(OptionBuilder.withDescription(OPT_META_GZ_DESC).withLongOpt(OPT_META_GZ_LONG).hasArgs().create(OPT_META_GZ));
 		options.addOption(OptionBuilder.withDescription(OPT_META_GZ_BATCH_DESC).withLongOpt(OPT_META_GZ_BATCH_LONG).hasArg().create(OPT_META_GZ_BATCH));
 
+		options.addOption(OptionBuilder.withDescription(OPT_ME).withLongOpt(OPT_ME_LONG).hasArgs(1).create(OPT_ME));
 		options.addOption(OptionBuilder.withDescription(OPT_CC_DESC).hasArgs().create(OPT_CC));
 		options.addOption(OptionBuilder.withDescription(OPT_CC_BATCH_LONG_DESC).withLongOpt(OPT_CC_BATCH_LONG).hasArg().create());
 		options.addOption(OptionBuilder.withDescription(OPT_QT_DESC).hasArgs().create(OPT_QT));
@@ -81,6 +82,12 @@ public class LambdaDCommand extends Command
 			{
 				lamD.setCCbatch(cmdLine.getOptionValue(OPT_CC_BATCH_LONG));
 			}
+		}
+
+		//me
+		if(cmdLine.hasOption(OPT_ME))
+		{
+			lamD.setMe(cmdLine.getOptionValue(OPT_ME));
 		}
 
 		//manual gzip meta files
@@ -185,4 +192,8 @@ public class LambdaDCommand extends Command
 	private final static String OPT_Q_RANGE_LONG = "q-range";
 	private final static String OPT_Q_RANGE_DESC = "cut off values for filtering snps.";
 	
+	private final static String OPT_ME = "m";
+	private final static String OPT_ME_LONG = "me";
+	private final static String OPT_ME_DESC = "effective number of markers.";
+
 }

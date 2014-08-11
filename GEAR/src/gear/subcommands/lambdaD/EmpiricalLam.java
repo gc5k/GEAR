@@ -40,7 +40,7 @@ public class EmpiricalLam
 			}
 			catch (MathException e)
 			{
-				e.printStackTrace();
+				Logger.handleException(e, "error in getting pvalue for Chi-sq in lambda.");
 			}
 		}
 	}
@@ -160,4 +160,9 @@ public class EmpiricalLam
 	private double ctrl1 = 0;
 	private double cs2 = 0;
 	private double ctrl2 = 0;
+
+	private double Chi0025 = 0;
+	private double Chi0975 = 0;
+	private double Chi005 = 0;
+	private double Chi095 = 0;
 }

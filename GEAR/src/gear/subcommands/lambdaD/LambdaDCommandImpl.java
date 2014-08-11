@@ -29,6 +29,7 @@ public class LambdaDCommandImpl extends CommandImpl
 {
 	private void initial()
 	{
+		Me = lamArgs.getMe();
 		MetaFile = lamArgs.getMetaFile();
 		lamMat = new double[MetaFile.length][MetaFile.length];
 		olCtrlMat = new double[MetaFile.length][MetaFile.length];
@@ -505,7 +506,7 @@ public class LambdaDCommandImpl extends CommandImpl
 
 		double[] DesStat = null;
 		int[] selIdx = null;
-		if (sortLD.length <= 100)
+		if (sortLD.length <= Me)
 		{
 			DesStat = new double[sortLD.length];
 			System.arraycopy(sortLD, 0, DesStat, 0, sortLD.length);
@@ -517,11 +518,11 @@ public class LambdaDCommandImpl extends CommandImpl
 		}
 		else
 		{
-			DesStat = new double[100];
-			selIdx = new int[100];
+			DesStat = new double[(int) Math.ceil(Me)];
+			selIdx = new int[(int) Math.ceil(Me)];
 			for (int i = 0; i < DesStat.length; i++)
 			{
-				selIdx[i] = (int) Math.floor( (i*1.0 + 1)/100 * sortLD.length ) -1;
+				selIdx[i] = (int) Math.floor( (i*1.0 + 1)/Me * sortLD.length ) -1;
 				DesStat[i] = sortLD[selIdx[i]];
 			}
 		}
@@ -529,13 +530,18 @@ public class LambdaDCommandImpl extends CommandImpl
 		if (lamArgs.isQT())
 		{
 			double[] qtSize = lamArgs.getQTsize();
-			EmpiricalLam el = new EmpiricalLam(DesStat, qtSize[idx1], qtSize[idx2]);
-			el.PrintQT();
+			XTest et = new XTest(DesStat, qtSize[idx1], qtSize[idx2]);
+			et.PrintQT();
 
-			lamMat[idx2][idx1] = el.getEmpLamMean();
-			lamMat[idx1][idx2] = el.getEmpRhoMean();
+			olCtrlMat[idx2][idx1] = olCsMat[idx2][idx1] = et.getN12();
 
-			olCtrlMat[idx2][idx1] = olCsMat[idx2][idx1] = el.getEmpOSMean();
+//			EmpiricalLam el = new EmpiricalLam(DesStat, qtSize[idx1], qtSize[idx2]);
+//			el.PrintQT();
+
+			lamMat[idx2][idx1] = et.getX();
+			lamMat[idx1][idx2] = et.getrho();
+
+//			olCtrlMat[idx2][idx1] = olCsMat[idx2][idx1] = el.getEmpOSMean();
 			kMat[idx1][idx2] = kMat[idx2][idx1] = Kappa;
 		}
 		else
@@ -552,7 +558,7 @@ public class LambdaDCommandImpl extends CommandImpl
 			olCsMat[idx1][idx2] = el.getEmpOSCsMean();
 			kMat[idx1][idx2] = kMat[idx2][idx1] = Kappa;			
 		}
-		
+
 		if (lamArgs.isVerboseGZ())
 		{
 			VerboseGZ(LamArray, LD.getValues(), idx1, idx2);
@@ -769,6 +775,9 @@ public class LambdaDCommandImpl extends CommandImpl
 
 		writer.close();
 	}
+
+//	private int M = 100;
+	private double Me = 10000;
 
 	private double R1 = 1;
 	private double R2 = 1;
