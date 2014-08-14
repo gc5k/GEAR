@@ -82,12 +82,31 @@ public class XTest
 
 	protected void PrintQT()
 	{
+		double mu = XVec.getSum();
+		double v = XVec.getVariance() * Me;
+
+		double a = v;
+		double b = 2 * v * Me - 4 * mu * mu;
+		double c = v * Me * Me - 2 * mu * mu * Me;
+		
+		double t = b * b - 4 * a * c;
+		double ncp = 0;
+		if (t>=0)
+		{
+			ncp = (-1*b + Math.sqrt(t))/(2*a);
+		}
+		double f = mu/(Me+ncp);
+		Logger.printUserLog("ncp:" + ncp/Me);
+		Logger.printUserLog("factor: " + f);
+
+		double n12_ = (1-f) * (n1+n2);
+		double sigma_n12_ = (n1+n2)/2 * (Math.sqrt(2*Me)/(Me+ncp));
 		Logger.printUserLog("X statistic: " + XVec.getSum()/Me);
 		Logger.printUserLog("p-value for X statistic: " + pX);
-		Logger.printUserLog("95% CI for overlapping samples: "  + "(" + (-1.96*Math.sqrt(2/Me)) + "," + 1.96*Math.sqrt(2/Me) + ")");		
-		Logger.printUserLog("Overlapping Samples: " + n12 + "\n");
-		Logger.printUserLog("p-value for overlapping sample: " + pN12 + "\n");
-		Logger.printUserLog("95% CI for overlapping samples: "  + "(" + -1.96*sigma_n12 + "," + 1.96*sigma_n12 + ")");
+		Logger.printUserLog("95% CI for X: "  + "(" + (-1.96*Math.sqrt(2/Me) + 1) + "," + (1.96*Math.sqrt(2/Me) + 1) + ")");		
+		Logger.printUserLog("Overlapping Samples: " + n12_ + "");
+		Logger.printUserLog("95% CI for overlapping samples: "  + "(" + -1.96*sigma_n12_ + "," + 1.96*sigma_n12_ + ")");
+		
 	}
 
 	protected double getX()
