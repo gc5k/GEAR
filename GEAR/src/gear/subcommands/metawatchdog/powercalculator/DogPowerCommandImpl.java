@@ -49,9 +49,10 @@ public class DogPowerCommandImpl extends CommandImpl
 
 		double alpha = dogpowerArgs.getAlpha();
 		long tests = dogpowerArgs.getTests();
-		double q = dogpowerArgs.getQValue();
-		double logP = -1 * Math.log10(alpha/tests);
+		double logP = -1 * Math.log10(alpha/(1.0*tests));
 
+		double q = 1 * dogpowerArgs.getMissingRate();
+		System.out.println(q);
 		double logChisqP = 0;
 		try
 		{
@@ -68,6 +69,7 @@ public class DogPowerCommandImpl extends CommandImpl
 		{
 			k = k + 1;
 			chiDis = new ChiSquaredDistributionImpl(k);
+			q = k * dogpowerArgs.getMissingRate();
 			try
 			{
 				logChisqP = -1 * Math.log10(chiDis.cumulativeProbability(q));
@@ -76,9 +78,11 @@ public class DogPowerCommandImpl extends CommandImpl
 			{
 				Logger.handleException(e, "error in getting p value for chisq distribution.");
 			}
+//			System.out.println(q+ " " + logChisqP + " " + logP);
 			dif = logChisqP - logP;
 		}
 		
+		Logger.printUserLog("Loci missing rate: " + dogpowerArgs.getMissingRate());
 		Logger.printUserLog("Alpha: " + alpha);
 		Logger.printUserLog("Q value: " + q);
 		Logger.printUserLog("Tests: " + tests);
@@ -106,9 +110,8 @@ public class DogPowerCommandImpl extends CommandImpl
 
 			os.writeDouble(dogpowerArgs.getBeta());
 			os.writeDouble(dogpowerArgs.getB());
-			os.writeDouble(dogpowerArgs.getQValue());
+			os.writeDouble(q);
 			os.writeInt(method);
-
 			os.close();
 		}
 		catch (IOException e)
@@ -140,6 +143,7 @@ public class DogPowerCommandImpl extends CommandImpl
 		double b = dogpowerArgs.getB();
 
 		double k = (zb + za/Math.sqrt(1-b * b)) * (zb + za /Math.sqrt(1-b * b)) * (1-b * b) / (b * b);
+		Logger.printUserLog("Loci missing rate: " + dogpowerArgs.getMissingRate());
 		Logger.printUserLog("Alpha: " + alpha);
 		Logger.printUserLog("Beta: " + beta);
 		Logger.printUserLog("Regression coefficient: " + b);
@@ -168,9 +172,9 @@ public class DogPowerCommandImpl extends CommandImpl
 
 			os.writeDouble(dogpowerArgs.getBeta());
 			os.writeDouble(dogpowerArgs.getB());
-			os.writeDouble(dogpowerArgs.getQValue());
+			double q = dogpowerArgs.getMissingRate() * k;
+			os.writeDouble(q);
 			os.writeInt(method);
-
 			os.close();
 		}
 		catch (IOException e)

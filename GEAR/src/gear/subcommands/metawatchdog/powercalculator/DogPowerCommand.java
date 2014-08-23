@@ -29,6 +29,7 @@ public class DogPowerCommand extends Command
 	{
 		//generic parameters
 		options.addOption(OptionBuilder.withDescription(OPT_ALPHA_DESC).withLongOpt(OPT_ALPHA_LONG).hasArg().create());
+		options.addOption(OptionBuilder.withDescription(OPT_MISSING_DESC).withLongOpt(OPT_MISSING_LONG).hasArg().create());
 		options.addOption(OptionBuilder.withDescription(OPT_TEST_DESC).withLongOpt(OPT_TEST_LONG).hasArg().create());
 		options.addOption(OptionBuilder.withDescription(OPT_SEED_DESC).withLongOpt(OPT_SEED_LONG).hasArg().create());
 
@@ -37,17 +38,25 @@ public class DogPowerCommand extends Command
 		options.addOption(OptionBuilder.withDescription(OPT_BETA_DESC).withLongOpt(OPT_BETA_LONG).hasArg().create());
 
 		//chisq parameters
-		options.addOption(OptionBuilder.withDescription(OPT_CHISQ_DESC).withLongOpt(OPT_CHISQ_LONG).hasArg().create());
-		
+		options.addOption(OptionBuilder.withDescription(OPT_CHISQ_DESC).withLongOpt(OPT_CHISQ_LONG).create());
 	}
 
 	@Override
 	public CommandArguments parse(CommandLine cmdLine) throws CommandArgumentException
 	{
 		DogPowerCommandArguments cmdArgs = new DogPowerCommandArguments();
-		cmdArgs.setAlpha(parseDoubleOptionValueInRange(cmdLine, OPT_ALPHA_LONG, OPT_ALPHA_DEFAULT, 0, 1));
-		cmdArgs.setSeed(parseLongOptionValue(cmdLine, OPT_SEED_LONG, OPT_SEED_DEFAULT));
+		if (cmdLine.hasOption(OPT_ALPHA_LONG))
+		{
+			cmdArgs.setAlpha(parseDoubleOptionValueInRange(cmdLine, OPT_ALPHA_LONG, OPT_ALPHA_DEFAULT, 0, 1));	
+		}
+		if (cmdLine.hasOption(OPT_MISSING_LONG))
+		{
+			cmdArgs.setMissingRate(parseDoubleOptionValueInRange(cmdLine, OPT_MISSING_LONG, OPT_MISSING_DEFAULT, 0.01, 0.05));
+		}
+
 		cmdArgs.setTests(parseLongOptionValue(cmdLine, OPT_TEST_LONG, OPT_TEST_DEFAULT));
+
+		cmdArgs.setSeed(parseLongOptionValue(cmdLine, OPT_SEED_LONG, OPT_SEED_DEFAULT));
 
 		if (cmdLine.hasOption(OPT_REGRESSION_LONG))
 		{
@@ -57,7 +66,7 @@ public class DogPowerCommand extends Command
 
 		if (cmdLine.hasOption(OPT_CHISQ_LONG))
 		{
-			cmdArgs.setChisq(parseDoubleOptionValueInRange(cmdLine, OPT_CHISQ_LONG, OPT_QVALUE_DEFAULT, 0, 10));
+			cmdArgs.setChisq();
 		}
 		return cmdArgs;
 	}
@@ -77,6 +86,10 @@ public class DogPowerCommand extends Command
 	private static final String OPT_TEST_DEFAULT = "1000";
 	private static final String OPT_TEST_DESC = "Specify the number of statistical tests, default to " + OPT_TEST_DEFAULT;
 
+	private static final String OPT_MISSING_LONG = "miss";
+	private static final String OPT_MISSING_DEFAULT = "0.015";
+	private static final String OPT_MISSING_DESC = "Missing rate used for detecting overlapping individuals, default to " + OPT_MISSING_DEFAULT;
+
 //regression
 	private static final String OPT_REGRESSION_LONG = "reg";
 	private static final String OPT_BVALUE_DEFAULT = "0.95";
@@ -88,7 +101,6 @@ public class DogPowerCommand extends Command
 
 //chisq
 	private static final String OPT_CHISQ_LONG = "chisq";
-	private static final String OPT_QVALUE_DEFAULT = "0.5";
-	private static final String OPT_CHISQ_DESC = "Chisq method.";
+	private static final String OPT_CHISQ_DESC = "Chisq method for detecting overlapping samples.";
 
 }
