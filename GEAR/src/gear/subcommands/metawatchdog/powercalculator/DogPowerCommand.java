@@ -96,7 +96,7 @@ public class DogPowerCommand extends Command
 	private static final String OPT_REGRESSION_DESC = "Regression method.";
 
 	private static final String OPT_BETA_LONG = "beta";
-	private static final String OPT_BETA_DEFAULT = "0.95";
+	private static final String OPT_BETA_DEFAULT = "0.05";
 	private static final String OPT_BETA_DESC = "Specify type II error rate, default to " + OPT_BETA_DEFAULT;
 
 //chisq

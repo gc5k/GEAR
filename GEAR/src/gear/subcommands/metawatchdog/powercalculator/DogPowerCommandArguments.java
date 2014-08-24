@@ -35,6 +35,7 @@ public class DogPowerCommandArguments extends CommandArguments
 	public void setRegression(double b)
 	{
 		this.regFlag = true;
+		this.chisqFlag = false;
 		this.b = b;
 	}
 	public boolean getRegressionFlag()
@@ -44,6 +45,7 @@ public class DogPowerCommandArguments extends CommandArguments
 	public void setChisq()
 	{
 		this.chisqFlag = true;
+		this.regFlag = false;
 	}
 	public boolean getChisqFlag()
 	{
@@ -58,7 +60,7 @@ public class DogPowerCommandArguments extends CommandArguments
 		return missingRate;
 	}
 	private double alpha = 0.05;
-	private double beta = 0.95;
+	private double beta = 0.05;
 	private long tests;
 	private double b = 0.95;
 	private boolean regFlag = false;

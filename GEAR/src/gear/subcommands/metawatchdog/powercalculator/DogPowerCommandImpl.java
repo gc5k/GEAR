@@ -46,13 +46,12 @@ public class DogPowerCommandImpl extends CommandImpl
 	private void chisq()
 	{
 		ChiSquaredDistributionImpl chiDis = new ChiSquaredDistributionImpl(1);
-
+		double constFactor = 8;
 		double alpha = dogpowerArgs.getAlpha();
 		long tests = dogpowerArgs.getTests();
 		double logP = -1 * Math.log10(alpha/(1.0*tests));
 
-		double q = 1 * dogpowerArgs.getMissingRate();
-		System.out.println(q);
+		double q = 1 * constFactor * dogpowerArgs.getMissingRate();
 		double logChisqP = 0;
 		try
 		{
@@ -69,7 +68,7 @@ public class DogPowerCommandImpl extends CommandImpl
 		{
 			k = k + 1;
 			chiDis = new ChiSquaredDistributionImpl(k);
-			q = k * dogpowerArgs.getMissingRate();
+			q = k * constFactor * dogpowerArgs.getMissingRate();
 			try
 			{
 				logChisqP = -1 * Math.log10(chiDis.cumulativeProbability(q));
