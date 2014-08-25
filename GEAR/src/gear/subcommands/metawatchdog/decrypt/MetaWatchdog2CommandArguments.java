@@ -61,6 +61,14 @@ public class MetaWatchdog2CommandArguments extends CommandArguments
 		return encodeFlag;
 	}
 
+	public void setVerbose()
+	{
+		verbose = true;
+	}
+	public boolean getVerbose()
+	{
+		return verbose;
+	}
 	private String encodeFile;
 	private boolean encodeFlag = false;
 	private String dataset1;
@@ -71,4 +79,7 @@ public class MetaWatchdog2CommandArguments extends CommandArguments
 
 	private boolean chisqFlag = false;
 	private double chisqCutoff;
+	
+	private boolean verbose = false;
+	
 }

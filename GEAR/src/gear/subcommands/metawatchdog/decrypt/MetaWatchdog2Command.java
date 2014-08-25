@@ -38,6 +38,8 @@ public class MetaWatchdog2Command extends Command
 		options.addOption(OptionBuilder.withDescription(OPT_B_DESC).withLongOpt(OPT_B_LONG).hasArg().create(OPT_B));
 
 		options.addOption(OptionBuilder.withDescription(OPT_ENCODE_DESC).withLongOpt(OPT_ENCODE_LONG).hasArg().isRequired().create());
+		options.addOption(OptionBuilder.withDescription(OPT_VERBOSE_DESC).withLongOpt(OPT_VERBOSE_LONG).create());
+
 	}
 
 	@Override
@@ -55,9 +57,13 @@ public class MetaWatchdog2Command extends Command
 		{
 			cmdArgs.setRegB(parseDoubleOptionValueInRange(cmdLine, OPT_B_LONG, OPT_B_DEFAULT, 0, 1));
 		}
-		if(cmdLine.hasOption(OPT_ENCODE_LONG))
+		if (cmdLine.hasOption(OPT_ENCODE_LONG))
 		{
 			cmdArgs.setEncodeFile(cmdLine.getOptionValue(OPT_ENCODE_LONG));			
+		}
+		if (cmdLine.hasOption(OPT_VERBOSE_LONG))
+		{
+			cmdArgs.setVerbose();
 		}
 
 		return cmdArgs;
@@ -86,4 +92,7 @@ public class MetaWatchdog2Command extends Command
 	
 	private final static String OPT_ENCODE_LONG = "encode";
 	private final static String OPT_ENCODE_DESC = "The .encode file output by dogpower";
+	
+	private final static String OPT_VERBOSE_LONG = "verbose";
+	private final static String OPT_VERBOSE_DESC = "Print out all results.";
 }
