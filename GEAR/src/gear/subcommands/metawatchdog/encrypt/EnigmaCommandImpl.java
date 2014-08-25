@@ -68,6 +68,7 @@ public class EnigmaCommandImpl extends CommandImpl
 		ProfileCommandArguments profArgs = enigmaArgs.getProfileCommandArguments();
 		profArgs.setScoreFile(scoreFileName);
 		profArgs.setHasScoreHeader(false);
+		profArgs.setScale(true);
 		ProfileCommandImpl profImpl = new ProfileCommandImpl();
 		profImpl.execute(profArgs);
 		Logger.printUserLog("");
