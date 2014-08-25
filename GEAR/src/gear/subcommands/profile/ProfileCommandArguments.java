@@ -184,6 +184,14 @@ public final class ProfileCommandArguments extends CommandArguments
 		return extractFile;	
 	}
 
+	public void setScale(boolean scale)
+	{
+		this.scale = scale;
+	}
+	public boolean isScale()
+	{
+		return scale;
+	}
 	private String extractFile;
 	private String scoreFile;
 	private String scoreFileGZ;
@@ -202,4 +210,5 @@ public final class ProfileCommandArguments extends CommandArguments
 	private boolean isAutoFlip;
 	private boolean isWeighted;
 	private boolean isKeepATGC;
+	private boolean scale;
 }

@@ -1,10 +1,7 @@
 package gear.util.pop;
 
-import java.io.IOException;
 
 import org.apache.commons.math.MathException;
-import org.apache.commons.math.distribution.BinomialDistribution;
-import org.apache.commons.math.distribution.BinomialDistributionImpl;
 import org.apache.commons.math.random.RandomDataImpl;
 
 import gear.CmdArgs;
@@ -16,7 +13,8 @@ public class PopStat
 {
 	public static double[][] calAlleleFrequency(GenotypeMatrix G, int numMarker)
 	{
-		//[][0]allele freq; [][1]geno freq; [][2] missing rate
+		//[][0]a1 freq; [][1]a2 freq; [][2] missing rate
+		//it calculates second allele frequency (so, likely the major one)
 		double[][] allelefreq = new double[numMarker][3];
 		for (int i = 0; i < G.getGRow(); i++)
 		{

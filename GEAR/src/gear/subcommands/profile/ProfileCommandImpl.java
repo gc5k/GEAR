@@ -3,12 +3,16 @@ package gear.subcommands.profile;
 import gear.ConstValues;
 import gear.family.pedigree.file.SNP;
 import gear.family.plink.PLINKParser;
+import gear.family.popstat.GenotypeMatrix;
+import gear.family.qc.rowqc.SampleFilter;
 import gear.subcommands.CommandArguments;
 import gear.subcommands.CommandImpl;
+import gear.sumstat.qc.rowqc.SumStatQC;
 import gear.util.BufferedReader;
 import gear.util.FileUtil;
 import gear.util.Logger;
 import gear.util.NewIt;
+import gear.util.pop.PopStat;
 
 import java.io.PrintStream;
 import java.util.ArrayList;
@@ -52,6 +56,7 @@ public final class ProfileCommandImpl extends CommandImpl
 		QRange[] qRanges = readQRanges();
 		
 		Data genoData = initData();
+
 		SNP[] snps = genoData.getSNPs();
 		CoeffModel[] coeffModels = initCoeffModels(snps);
 
@@ -105,15 +110,39 @@ public final class ProfileCommandImpl extends CommandImpl
 				case MATCH_ALLELE1:
 				case MATCH_ALLELE1_FLIPPED:
 					scoreAlleleFrac = iter.getAllele1Fraction();
+					if (profCmdArgs.isScale())
+					{
+						if(freq[locIdx][0] != Double.NaN && freq[locIdx][0] != 1.0)
+						{
+							float p = (float) freq[locIdx][0];
+							scoreAlleleFrac = (float) ((scoreAlleleFrac - 2 * p) / Math.sqrt(2 * p * (1-p)));							
+						}
+						else
+						{
+							scoreAlleleFrac = 0.0f;
+						}
+					}
 					break;
 				case MATCH_ALLELE2:
 				case MATCH_ALLELE2_FLIPPED:
 					scoreAlleleFrac = 2.0f - iter.getAllele1Fraction();
+					if (profCmdArgs.isScale())
+					{
+						if (freq[locIdx][1] != Double.NaN && freq[locIdx][1] != 1.0)
+						{
+							float p = (float) freq[locIdx][1];
+							scoreAlleleFrac = (float) ((scoreAlleleFrac - 2*p) / Math.sqrt(2 * p * (1-p)));
+						}
+						else
+						{
+							scoreAlleleFrac = 0.0f;
+						}
+					}
 					break;
 				default:
 					continue;
 				}
-				
+
 				float riskValue = coeffModels[locIdx].compute(scoreAlleleFrac) * filteredSNPs.getScore(traitIdx, locIdx);
 				
 				for (int locGrpIdx = 0; locGrpIdx < filteredSNPs.getNumLocusGroups(); ++locGrpIdx)
@@ -381,14 +410,29 @@ public final class ProfileCommandImpl extends CommandImpl
 		PLINKParser plinkParser = PLINKParser.parse(profCmdArgs);
 		if (plinkParser == null)
 		{
+			if (profCmdArgs.isScale()) 
+			{
+				Logger.printUserError("scale option is not only available for Mach format.");
+				System.exit(0);
+			}
 			return MachData.create(profCmdArgs.getMachDosageFile(),
 			                       profCmdArgs.getMachInfoFile(),
 			                       profCmdArgs.getMachDosageBatch(),
 			                       profCmdArgs.getMachInfoBatch());
+		} 
+		else if (profCmdArgs.isScale())
+		{
+
+			SampleFilter sf = new SampleFilter(plinkParser.getPedigreeData(), plinkParser.getMapData());
+			SumStatQC ssQC = new SumStatQC(plinkParser.getPedigreeData(), plinkParser.getMapData(), sf);
+			GenotypeMatrix gm = new GenotypeMatrix(ssQC.getSample());
+			freq = PopStat.calAlleleFrequency(gm, gm.getNumMarker());
+			System.out.println(freq[0][0] + " " + freq[0][1] + " " + freq[0][2]);
 		}
 		return new PlinkData(plinkParser);
 	}
 
 	private ProfileCommandArguments profCmdArgs;
 	private HashSet<String> extractSCsnp = null;
+	private double[][] freq = null;
 }
