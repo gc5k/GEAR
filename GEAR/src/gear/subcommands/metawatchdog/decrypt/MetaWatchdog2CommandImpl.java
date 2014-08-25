@@ -91,7 +91,7 @@ public class MetaWatchdog2CommandImpl extends CommandImpl
 							e.printStackTrace();
 						}
 
-						if (chi <= mwArgs.getChisqCutoff())
+						if (mwArgs.getVerbose())
 						{
 							String entry = "";
 							entry += scores[0].getSubjectID(i).getFamilyID() + "\t" + scores[0].getSubjectID(i).getIndividualID() + "\t";
@@ -99,7 +99,23 @@ public class MetaWatchdog2CommandImpl extends CommandImpl
 							entry += chi + "\t";
 							entry += pchi;
 							predictorFile.println(entry);
-							++cntSimilarPairs;
+							if(chi <= mwArgs.getChisqCutoff())
+							{
+								++cntSimilarPairs;
+								
+							}
+							
+						} else {
+							if (chi <= mwArgs.getChisqCutoff())
+							{
+								String entry = "";
+								entry += scores[0].getSubjectID(i).getFamilyID() + "\t" + scores[0].getSubjectID(i).getIndividualID() + "\t";
+								entry += scores[1].getSubjectID(j).getFamilyID() + "\t" + scores[1].getSubjectID(j).getIndividualID() + "\t";
+								entry += chi + "\t";
+								entry += pchi;
+								predictorFile.println(entry);
+								++cntSimilarPairs;
+							}							
 						}
 						++cntTotalPairs;
 					}
@@ -140,14 +156,29 @@ public class MetaWatchdog2CommandImpl extends CommandImpl
 						sr.addData(dat);
 						double b = sr.getSlope();
 		
-						if (b > mwArgs.getRegB())
+						if (mwArgs.getVerbose()) 
 						{
 							String entry = "";
 							entry += scores[0].getSubjectID(i).getFamilyID() + "\t" + scores[0].getSubjectID(i).getIndividualID() + "\t";
 							entry += scores[1].getSubjectID(j).getFamilyID() + "\t" + scores[1].getSubjectID(j).getIndividualID() + "\t";
 							entry += b + "\t" + sr.getSlopeStdErr() + "\t" + sr.getN();
 							predictorFile.println(entry);
-							++cntSimilarPairs;
+							if (b > mwArgs.getRegB())
+							{
+								++cntSimilarPairs;
+							}
+
+						} else
+						{
+							if (b > mwArgs.getRegB())
+							{
+								String entry = "";
+								entry += scores[0].getSubjectID(i).getFamilyID() + "\t" + scores[0].getSubjectID(i).getIndividualID() + "\t";
+								entry += scores[1].getSubjectID(j).getFamilyID() + "\t" + scores[1].getSubjectID(j).getIndividualID() + "\t";
+								entry += b + "\t" + sr.getSlopeStdErr() + "\t" + sr.getN();
+								predictorFile.println(entry);
+								++cntSimilarPairs;
+							}
 						}
 						++cntTotalPairs;
 					}
@@ -210,7 +241,7 @@ public class MetaWatchdog2CommandImpl extends CommandImpl
 		int method = file.readInt();
 		file.close();
 
-		Logger.printUserLog("Generating " + K + " profile scores under the following setting:");
+		Logger.printUserLog("Generating " + Math.ceil(K) + " profile scores under the following setting:");
 		if (method == MetaWatchdogConstant.Chisq) // chisq
 		{
 			Logger.printUserLog("Encode file set the chisq q value to " + q + ".");
