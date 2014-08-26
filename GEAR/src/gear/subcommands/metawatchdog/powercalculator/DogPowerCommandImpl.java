@@ -141,10 +141,11 @@ public class DogPowerCommandImpl extends CommandImpl
 
 		double b = dogpowerArgs.getB();
 
-		double k = (zb + za/Math.sqrt(1-b * b)) * (zb + za /Math.sqrt(1-b * b)) * (1-b * b) / (b * b);
+		double k = (zb * Math.sqrt(1-b * b) + za) / b;
+		k *= k;
 		Logger.printUserLog("Loci missing rate: " + dogpowerArgs.getMissingRate());
-		Logger.printUserLog("Alpha: " + alpha);
-		Logger.printUserLog("Beta: " + beta);
+		Logger.printUserLog("Alpha (Type I error rate): " + alpha);
+		Logger.printUserLog("Beta (Type II error rate; power = 1-Beta): " + beta);
 		Logger.printUserLog("Regression coefficient: " + b);
 		Logger.printUserLog("Tests: " + tests);
 		Logger.printUserLog("Method: regression");

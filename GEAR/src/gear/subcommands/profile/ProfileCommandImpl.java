@@ -419,17 +419,60 @@ public final class ProfileCommandImpl extends CommandImpl
 			                       profCmdArgs.getMachInfoFile(),
 			                       profCmdArgs.getMachDosageBatch(),
 			                       profCmdArgs.getMachInfoBatch());
-		} 
+		}
 		else if (profCmdArgs.isScale())
 		{
 
+			System.out.println("is scale.");
 			SampleFilter sf = new SampleFilter(plinkParser.getPedigreeData(), plinkParser.getMapData());
 			SumStatQC ssQC = new SumStatQC(plinkParser.getPedigreeData(), plinkParser.getMapData(), sf);
 			GenotypeMatrix gm = new GenotypeMatrix(ssQC.getSample());
 			freq = PopStat.calAlleleFrequency(gm, gm.getNumMarker());
-			System.out.println(freq[0][0] + " " + freq[0][1] + " " + freq[0][2]);
+			
+			if (profCmdArgs.getScaleFile() != null)
+			{
+				HashMap<String, ScaleMaf> scaleMaf = readScaleFile();
+				ArrayList<SNP> snplist = plinkParser.getMapData().getMarkerList();
+				for (int i = 0; i < snplist.size(); i++)
+				{
+					SNP snp = snplist.get(i);
+					if (scaleMaf.containsKey(snp.getName()))
+					{
+						ScaleMaf sm = scaleMaf.get(snp.getName());
+						switch (FilteredSNPs.getMatchScheme(sm.getA1(), snp.getFirstAllele(), snp.getSecAllele(), profCmdArgs.getIsAutoFlip()))
+						{
+						case MATCH_ALLELE1:
+						case MATCH_ALLELE1_FLIPPED:
+							System.out.println(freq[i][0] + " " + sm.getMaf());
+							freq[i][0] = sm.getMaf();
+							freq[i][1] = 1 - sm.getMaf();
+							break;
+						case MATCH_ALLELE2:
+						case MATCH_ALLELE2_FLIPPED:
+							freq[i][0] = 1 - sm.getMaf();
+							freq[i][1] = sm.getMaf();
+							break;
+						default:
+							continue;
+						}
+					}
+				}
+			}
 		}
 		return new PlinkData(plinkParser);
+	}
+
+	private HashMap<String, ScaleMaf> readScaleFile()
+	{
+		BufferedReader reader = BufferedReader.openTextFile(profCmdArgs.getScaleFile(), "maf");
+		HashMap<String, ScaleMaf> scaleMaf = NewIt.newHashMap();
+		String[] tokens;
+		while ((tokens = reader.readTokensAtLeast(3)) != null)
+		{
+			if (ConstValues.isNA(tokens[2])) continue;
+			scaleMaf.put(tokens[0], new ScaleMaf(tokens[0], tokens[1].charAt(0), Double.parseDouble(tokens[2])));
+		}
+		return scaleMaf;
 	}
 
 	private ProfileCommandArguments profCmdArgs;

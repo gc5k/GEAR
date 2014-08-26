@@ -68,7 +68,7 @@ public class EnigmaCommandImpl extends CommandImpl
 		ProfileCommandArguments profArgs = enigmaArgs.getProfileCommandArguments();
 		profArgs.setScoreFile(scoreFileName);
 		profArgs.setHasScoreHeader(false);
-		profArgs.setScale(true);
+		profArgs.setScale(enigmaArgs.getRefFile());
 		ProfileCommandImpl profImpl = new ProfileCommandImpl();
 		profImpl.execute(profArgs);
 		Logger.printUserLog("");
@@ -127,10 +127,20 @@ public class EnigmaCommandImpl extends CommandImpl
 		while ((tokens = reader.readTokensAtLeast(2)) != null)
 		{
 			ref.add(tokens[0] + "\t" + tokens[1]);
+			if(tokens.length == 3)
+			{
+				userFreq = true;
+			}
+			else
+			{
+				Logger.printUserError("It should be 2 columns (SNP and ref allele) or 3 columns (SNP, ref allele, frequency).");
+				System.exit(0);
+			}
 		}
 	}
 
 	private ArrayList<String> ref = new ArrayList<String>();
 	private long seed;
 	private int numCols;
+	private boolean userFreq = false;
 }

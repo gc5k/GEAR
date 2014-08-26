@@ -246,7 +246,7 @@ public class MetaWatchdog2CommandImpl extends CommandImpl
 		{
 			Logger.printUserLog("Encode file set the chisq q value to " + q + ".");
 			mwArgs.setChisq(q);
-			
+
 			Logger.printUserLog("Method: chi-sq");
 			Logger.printUserLog("Alpha: " + alpha);
 			Logger.printUserLog("Tests: " + tests);
@@ -258,11 +258,11 @@ public class MetaWatchdog2CommandImpl extends CommandImpl
 		{
 			Logger.printUserLog("Encode file set the regression b value to " + b + ".");
 			mwArgs.setRegB(b);
-			
+
 			Logger.printUserLog("Method: regression");
-			Logger.printUserLog("Alpha: " + alpha);
-			Logger.printUserLog("Beta: " + beta);
-			Logger.printUserLog("B: " + b);
+			Logger.printUserLog("Alpha (Type I error rate): " + alpha);
+			Logger.printUserLog("Beta (Type II error rate; power = 1-Beta): " + beta);
+			Logger.printUserLog("Regression coefficient: " + b);
 			Logger.printUserLog("Tests: " + tests);
 			Logger.printUserLog("Random seed: " + seed);
 
