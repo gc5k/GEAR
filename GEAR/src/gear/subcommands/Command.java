@@ -218,6 +218,12 @@ public abstract class Command implements Comparable<Command>
 		return value;
 	}
 	
+	protected String parseStringOptionValue(CommandLine cmdLine, String opt, String defaultOptVal) throws CommandArgumentException
+	{
+		String value = cmdLine.getOptionValue(opt, defaultOptVal);
+		return value;
+	}
+
 	private boolean stopAtNonOption;
 	
 	protected static final String OPT_FILE_LONG = "file";

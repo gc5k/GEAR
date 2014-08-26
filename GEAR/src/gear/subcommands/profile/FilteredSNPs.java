@@ -133,7 +133,7 @@ class FilteredSNPs
 		}
 	}
 	
-	private static AlleleMatchScheme getMatchScheme(char scoreAllele, char allele1, char allele2, boolean isAutoFlip)
+	protected static AlleleMatchScheme getMatchScheme(char scoreAllele, char allele1, char allele2, boolean isAutoFlip)
 	{
 		if (scoreAllele == allele1)
 		{

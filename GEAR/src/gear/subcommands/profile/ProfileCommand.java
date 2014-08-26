@@ -57,7 +57,7 @@ public final class ProfileCommand extends Command
 		options.addOption(OptionBuilder.withDescription(OPT_NO_WEIGHT_DESC).withLongOpt(OPT_NO_WEIGHT_LONG).hasArg(false).create());
 		options.addOption(OptionBuilder.withDescription(OPT_KEEP_ATGC_DESC).withLongOpt(OPT_KEEP_ATGC_LONG).hasArg(false).create());
 		options.addOption(OptionBuilder.withDescription(OPT_EXTRACT_DESC).withLongOpt(OPT_EXTRACT_LONG).hasArg().create());
-		options.addOption(OptionBuilder.withDescription(OPT_SCALE_DESC).withLongOpt(OPT_SCALE_LONG).create());
+		options.addOption(OptionBuilder.withDescription(OPT_SCALE_DESC).withLongOpt(OPT_SCALE_LONG).hasOptionalArg().create());
 	}
 
 	@Override
@@ -80,7 +80,10 @@ public final class ProfileCommand extends Command
 			profCmdArgs.setIsExtract(cmdLine.getOptionValue(OPT_EXTRACT_LONG));
 		}
 
-		profCmdArgs.setScale(cmdLine.hasOption(OPT_SCALE_LONG));
+		if (cmdLine.hasOption(OPT_SCALE_LONG))
+		{
+			profCmdArgs.setScale(parseStringOptionValue(cmdLine, OPT_SCALE_LONG, OPT_SCALE_DEFAULT));		
+		}
 		return profCmdArgs;
 	}
 
@@ -93,7 +96,7 @@ public final class ProfileCommand extends Command
 		{
 			throw new CommandArgumentException("--" + OPT_QSCORE_LONG + " and --" + OPT_QRANGE_LONG + " must be set together.");
 		}
-		
+
 		profCmdArgs.setQScoreFile(qScoreFile);
 		profCmdArgs.setQRangeFile(qRangeFile);
 	}
@@ -300,5 +303,6 @@ public final class ProfileCommand extends Command
 	private static final String OPT_EXTRACT_DESC = "Extract score snps";
 	
 	private static final String OPT_SCALE_LONG = "scale";
+	private static final String OPT_SCALE_DEFAULT = null;
 	private static final String OPT_SCALE_DESC = "Standardise genotypes";
 }
