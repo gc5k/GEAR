@@ -47,12 +47,9 @@ public class GenAboutInfo {
 		
 		// Read the SVN revision number
 		
-		Process proc = Runtime.getRuntime().exec("/opt/local/bin/svnversion -n");
-//		System.out.println(Runtime.getRuntime().toString());
-//		Process proc = Runtime.getRuntime().exec(cmd, arg, null);
+		Process proc = Runtime.getRuntime().exec("svnversion -n");
 		BufferedReader reader = new BufferedReader(new InputStreamReader(proc.getInputStream()));
 		String svnRev = reader.readLine();
-		
 		// Welcome message
 		String welcomeMessage = genWelcomeMessage(svnRev);
 		
