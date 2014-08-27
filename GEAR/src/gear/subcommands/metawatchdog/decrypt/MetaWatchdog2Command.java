@@ -85,7 +85,7 @@ public class MetaWatchdog2Command extends Command
 	private final static String OPT_CHISQ_DESC = "chi square test";
 	private final static String OPT_CHISQ_DEFAULT = "0.05";
 
-	private final static char OPT_B = 'c';
+	private final static char OPT_B = 'b';
 	private final static String OPT_B_LONG = "reg";
 	private final static String OPT_B_DEFAULT = "0.95";
 	private final static String OPT_B_DESC = "Cutoff value for regression. value should be no smaller than 0 and no larger than 1, default to " + OPT_B_DEFAULT;
