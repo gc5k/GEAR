@@ -38,15 +38,16 @@ public enum Gear
 	private Gear()
 	{
 		addCommand(new gear.subcommands.bluppca.BlupPcaCommand());
+		addCommand(new gear.subcommands.dnafingerprint.DFPCommand());
 		addCommand(new gear.subcommands.he.assocpower.HEAssocPowerCommand());
 		addCommand(new gear.subcommands.help.HelpCommand());
 		addCommand(new gear.subcommands.hpc.HpcCommand());
+		addCommand(new gear.subcommands.lambdaD.LambdaDCommand());
 		addCommand(new gear.subcommands.metawatchdog.powercalculator.DogPowerCommand());
 		addCommand(new gear.subcommands.metawatchdog.decrypt.MetaWatchdog2Command());
 		addCommand(new gear.subcommands.metawatchdog.encrypt.EnigmaCommand());
 		addCommand(new gear.subcommands.profile.ProfileCommand());
 		addCommand(new gear.subcommands.simulation.SimuFamilyCommand());
-		addCommand(new gear.subcommands.lambdaD.LambdaDCommand());
 	}
 	
 	private void addCommand(Command cmd)

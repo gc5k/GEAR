@@ -102,8 +102,8 @@ public class EnigmaCommandImpl extends CommandImpl
 		if (method == MetaWatchdogConstant.Chisq)
 		{
 			Logger.printUserLog("Generating " + K + " profile scores under the following setting:");
-			Logger.printUserLog("Method: chi-sq");
-			Logger.printUserLog("Alpha: " + alpha);
+			Logger.printUserLog("Method: chisq");
+			Logger.printUserLog("Alpha (Type I error rate): " + alpha);
 			Logger.printUserLog("Tests: " + tests);
 			Logger.printUserLog("Q: " + q);
 			Logger.printUserLog("Random seed: " + seed);
@@ -112,8 +112,8 @@ public class EnigmaCommandImpl extends CommandImpl
 		{
 			Logger.printUserLog("Generating " + K + " profile scores under the following setting:");
 			Logger.printUserLog("Method: regression");
-			Logger.printUserLog("Alpha: " + alpha);
-			Logger.printUserLog("Beta: " + beta);
+			Logger.printUserLog("Alpha (Type I error rate): " + alpha);
+			Logger.printUserLog("Beta (Type II error rate; power = 1-bete): " + beta);
 			Logger.printUserLog("B: " + b);
 			Logger.printUserLog("Tests: " + tests);
 			Logger.printUserLog("Random seed: " + seed);

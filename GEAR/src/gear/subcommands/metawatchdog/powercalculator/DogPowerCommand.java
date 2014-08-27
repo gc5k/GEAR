@@ -45,14 +45,8 @@ public class DogPowerCommand extends Command
 	public CommandArguments parse(CommandLine cmdLine) throws CommandArgumentException
 	{
 		DogPowerCommandArguments cmdArgs = new DogPowerCommandArguments();
-		if (cmdLine.hasOption(OPT_ALPHA_LONG))
-		{
-			cmdArgs.setAlpha(parseDoubleOptionValueInRange(cmdLine, OPT_ALPHA_LONG, OPT_ALPHA_DEFAULT, 0, 1));	
-		}
-		if (cmdLine.hasOption(OPT_MISSING_LONG))
-		{
-			cmdArgs.setMissingRate(parseDoubleOptionValueInRange(cmdLine, OPT_MISSING_LONG, OPT_MISSING_DEFAULT, 0.01, 0.05));
-		}
+		cmdArgs.setAlpha(parseDoubleOptionValueInRange(cmdLine, OPT_ALPHA_LONG, OPT_ALPHA_DEFAULT, 0, 1));	
+		cmdArgs.setMissingRate(parseDoubleOptionValueInRange(cmdLine, OPT_MISSING_LONG, OPT_MISSING_DEFAULT, 0.01, 0.05));
 
 		cmdArgs.setTests(parseLongOptionValue(cmdLine, OPT_TEST_LONG, OPT_TEST_DEFAULT));
 
