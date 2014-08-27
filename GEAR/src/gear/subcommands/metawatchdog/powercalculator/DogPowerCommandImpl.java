@@ -82,11 +82,12 @@ public class DogPowerCommandImpl extends CommandImpl
 		}
 		
 		Logger.printUserLog("Loci missing rate: " + dogpowerArgs.getMissingRate());
-		Logger.printUserLog("Alpha: " + alpha);
-		Logger.printUserLog("Q value: " + q);
+		Logger.printUserLog("Seed: " + dogpowerArgs.getSeed());
+		Logger.printUserLog("Alpha (Type I error rate): " + alpha);
 		Logger.printUserLog("Tests: " + tests);
 		Logger.printUserLog("Method: chisq");
-		Logger.printUserLog("Sample size to archive type I error rate at alphe = " + alpha + " is " + k);
+		Logger.printUserLog("Q value (threshold for chisq): " + q);
+		Logger.printUserLog("Sample size to archive type I error rate at alpha = " + alpha + " is " + k);
 
 		DataOutputStream os = null;
 		try
@@ -144,12 +145,13 @@ public class DogPowerCommandImpl extends CommandImpl
 		double k = (zb * Math.sqrt(1-b * b) + za) / b;
 		k *= k;
 		Logger.printUserLog("Loci missing rate: " + dogpowerArgs.getMissingRate());
+		Logger.printUserLog("Seed: " + dogpowerArgs.getSeed());
 		Logger.printUserLog("Alpha (Type I error rate): " + alpha);
-		Logger.printUserLog("Beta (Type II error rate; power = 1-Beta): " + beta);
-		Logger.printUserLog("Regression coefficient: " + b);
+		Logger.printUserLog("Beta (Type II error rate; power = 1-beta): " + beta);
 		Logger.printUserLog("Tests: " + tests);
 		Logger.printUserLog("Method: regression");
-		Logger.printUserLog("Sample size to archive type I error rate at alphe = " + alpha + " and power = " + beta + " is " + k);
+		Logger.printUserLog("Regression coefficient (threshold for regression): " + b);
+		Logger.printUserLog("Sample size to archive type I error rate at alpha = " + alpha + " and power = " + (1-beta) + " is " + k);
 
 		DataOutputStream os = null;
 		try
