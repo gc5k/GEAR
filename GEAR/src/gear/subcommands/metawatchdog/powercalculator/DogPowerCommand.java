@@ -34,7 +34,7 @@ public class DogPowerCommand extends Command
 		options.addOption(OptionBuilder.withDescription(OPT_SEED_DESC).withLongOpt(OPT_SEED_LONG).hasArg().create());
 
 		//regression parameters
-		options.addOption(OptionBuilder.withDescription(OPT_REGRESSION_DESC).withLongOpt(OPT_REGRESSION_LONG).hasArg().create());
+		options.addOption(OptionBuilder.withDescription(OPT_REGRESSION_DESC).withLongOpt(OPT_REGRESSION_LONG).hasOptionalArg().create());
 		options.addOption(OptionBuilder.withDescription(OPT_BETA_DESC).withLongOpt(OPT_BETA_LONG).hasArg().create());
 
 		//chisq parameters
@@ -60,7 +60,7 @@ public class DogPowerCommand extends Command
 
 		if (cmdLine.hasOption(OPT_REGRESSION_LONG))
 		{
-			cmdArgs.setRegression(parseDoubleOptionValueInRange(cmdLine, OPT_BVALUE_DEFAULT, OPT_BVALUE_DEFAULT, 0, 1));
+			cmdArgs.setRegression(parseDoubleOptionValueInRange(cmdLine, OPT_REGRESSION_LONG, OPT_BVALUE_DEFAULT, 0, 1));
 		}
 		cmdArgs.setBeta(parseDoubleOptionValueInRange(cmdLine, OPT_BETA_LONG, OPT_BETA_DEFAULT, 0, 1));
 
