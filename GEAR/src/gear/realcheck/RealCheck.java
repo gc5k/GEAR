@@ -28,23 +28,24 @@ import gear.util.pop.PopStat;
 public class RealCheck
 {
 	private GenotypeMatrix G1;
-	private GenotypeMatrix G2;
 
 	private double[][] allelefreq;
 	private int[] markerIdx;
 
-	private int[][] comSNPIdx;
-	private HashMap<String, Integer> comSNPIdxMap;
-
 	private ArrayList<SNP> snpList;
 
 	private ArrayList<PersonIndex> PersonTable1;
-	private ArrayList<PersonIndex> PersonTable2;
 
 	private SampleFilter sf1;
+	
+	private GenotypeMatrix G2;
+	private ArrayList<PersonIndex> PersonTable2;
 	private SampleFilter sf2;
+	private int[][] comSNPIdx;
 
 	private boolean[] snpMatch;
+	private HashMap<String, Integer> comSNPIdxMap;
+
 	public RealCheck()
 	{
 		PLINKParser pp1 = null;
