@@ -55,7 +55,7 @@ public class RealCheckOne
 
 	}
 
-	public void Check()
+	public void CheckOne()
 	{
 
 		allelefreq = PopStat.calAlleleFrequency(G1, snpList.size());
@@ -67,11 +67,11 @@ public class RealCheckOne
 
 		if (CmdArgs.INSTANCE.getRealCheckParameter().getSnps() != null)
 		{
-			getSelectedMarker();
+			getSelectedMarkerOne();
 		} 
 		else
 		{
-			getRandomMarker();
+			getRandomMarkerOne();
 		}
 
 		StringBuffer sb1 = new StringBuffer();
@@ -88,7 +88,7 @@ public class RealCheckOne
 		{
 			for (int j = 0; j < i; j++)
 			{
-				double[] s = similarityScore(i, j);
+				double[] s = similarityScoreOne(i, j);
 				double ES = 0;
 				double OS = 0;
 				if (s[1] > 0)
@@ -138,7 +138,7 @@ public class RealCheckOne
 		Logger.printUserLog("Standard deviation is: " + v);
 		Logger.printUserLog("Mean and SD were calculated with the exclusion of the pair of the individual.\n");
 		
-		double[] sChart = similarityScoreChart();
+		double[] sChart = similarityScoreChartOne();
 		Logger.printUserLog("=====Reference similarity score chart=====");
 		Logger.printUserLog("Parent-offspring: " + (sChart[0] - sChart[3])/(1-sChart[3]));
 		Logger.printUserLog("Full sib: " + (sChart[1] - sChart[3])/(1-sChart[3]) + "\n");
@@ -148,7 +148,7 @@ public class RealCheckOne
 
 	}
 
-	private double[] similarityScoreChart() {
+	private double[] similarityScoreChartOne() {
 		double[] sChart = new double[4];
 		//0 for parent-offsprint
 		//1 for full sib
@@ -171,7 +171,7 @@ public class RealCheckOne
 		return sChart;
 	}
 
-	private double[] similarityScore(int idx1, int idx2)
+	private double[] similarityScoreOne(int idx1, int idx2)
 	{
 		double[] s = { 0, 0, 0};
 
@@ -197,7 +197,7 @@ public class RealCheckOne
 		return s;
 	}
 
-	public void getSelectedMarker()
+	public void getSelectedMarkerOne()
 	{
 
 		markerIdx = new int[sf1.getMapFile().getMarkerList().size()];
@@ -221,7 +221,7 @@ public class RealCheckOne
 		ps.close();
 	}
 
-	public void getRandomMarker()
+	public void getRandomMarkerOne()
 	{
 		int mn = 0;
 		int nMarker = sf1.getMapFile().getMarkerList().size();

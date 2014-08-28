@@ -116,7 +116,7 @@ public enum Gear
 				else
 				{
 					RealCheckOne realcheckone = new RealCheckOne();
-					realcheckone.Check();
+					realcheckone.CheckOne();
 				}
 			}
 			else if (CmdArgs.INSTANCE.bsimuFlag)
