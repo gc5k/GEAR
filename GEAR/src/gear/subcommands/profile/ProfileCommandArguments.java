@@ -190,6 +190,16 @@ public final class ProfileCommandArguments extends CommandArguments
 		this.scaleFile = scaleFile;
 	}
 
+	protected void turneoffScale()
+	{
+		this.scale = false;
+	}
+	
+	protected void turnonScale()
+	{
+		this.scale = true;
+	}
+
 	public boolean isScale()
 	{
 		return scale;

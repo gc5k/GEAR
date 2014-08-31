@@ -423,7 +423,6 @@ public final class ProfileCommandImpl extends CommandImpl
 		else if (profCmdArgs.isScale())
 		{
 
-			System.out.println("is scale.");
 			SampleFilter sf = new SampleFilter(plinkParser.getPedigreeData(), plinkParser.getMapData());
 			SumStatQC ssQC = new SumStatQC(plinkParser.getPedigreeData(), plinkParser.getMapData(), sf);
 			GenotypeMatrix gm = new GenotypeMatrix(ssQC.getSample());
@@ -432,30 +431,36 @@ public final class ProfileCommandImpl extends CommandImpl
 			if (profCmdArgs.getScaleFile() != null)
 			{
 				HashMap<String, ScaleMaf> scaleMaf = readScaleFile();
-				ArrayList<SNP> snplist = plinkParser.getMapData().getMarkerList();
-				for (int i = 0; i < snplist.size(); i++)
+				if (scaleMaf.size() > 0)
 				{
-					SNP snp = snplist.get(i);
-					if (scaleMaf.containsKey(snp.getName()))
+					ArrayList<SNP> snplist = plinkParser.getMapData().getMarkerList();
+					for (int i = 0; i < snplist.size(); i++)
 					{
-						ScaleMaf sm = scaleMaf.get(snp.getName());
-						switch (FilteredSNPs.getMatchScheme(sm.getA1(), snp.getFirstAllele(), snp.getSecAllele(), profCmdArgs.getIsAutoFlip()))
+						SNP snp = snplist.get(i);
+						if (scaleMaf.containsKey(snp.getName()))
 						{
-						case MATCH_ALLELE1:
-						case MATCH_ALLELE1_FLIPPED:
-							System.out.println(freq[i][0] + " " + sm.getMaf());
-							freq[i][0] = sm.getMaf();
-							freq[i][1] = 1 - sm.getMaf();
-							break;
-						case MATCH_ALLELE2:
-						case MATCH_ALLELE2_FLIPPED:
-							freq[i][0] = 1 - sm.getMaf();
-							freq[i][1] = sm.getMaf();
-							break;
-						default:
-							continue;
+							ScaleMaf sm = scaleMaf.get(snp.getName());
+							switch (FilteredSNPs.getMatchScheme(sm.getA1(), snp.getFirstAllele(), snp.getSecAllele(), profCmdArgs.getIsAutoFlip()))
+							{
+								case MATCH_ALLELE1:
+								case MATCH_ALLELE1_FLIPPED:
+									freq[i][0] = sm.getMaf();
+									freq[i][1] = 1 - sm.getMaf();
+									break;
+								case MATCH_ALLELE2:
+								case MATCH_ALLELE2_FLIPPED:
+									freq[i][0] = 1 - sm.getMaf();
+									freq[i][1] = sm.getMaf();
+									break;
+								default:
+									continue;
+							}
 						}
 					}
+				}
+				else
+				{
+					profCmdArgs.turneoffScale();
 				}
 			}
 		}
