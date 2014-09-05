@@ -80,14 +80,20 @@ public class DogPowerCommandImpl extends CommandImpl
 //			System.out.println(q+ " " + logChisqP + " " + logP);
 			dif = logChisqP - logP;
 		}
-		
+		double[][] RsqTab = Rsq(k);
+
 		Logger.printUserLog("Loci missing rate: " + dogpowerArgs.getMissingRate());
 		Logger.printUserLog("Seed: " + dogpowerArgs.getSeed());
 		Logger.printUserLog("Alpha (Type I error rate): " + alpha);
 		Logger.printUserLog("Tests: " + tests);
 		Logger.printUserLog("Method: chisq");
 		Logger.printUserLog("Q value (threshold for chisq): " + q);
-		Logger.printUserLog("Sample size to archive type I error rate at alpha = " + alpha + " is " + k);
+		Logger.printUserLog("Number of pseudo profile scores to archive type I error rate at alpha = " + alpha + " is " + k);
+		Logger.printUserLog("Rsq chart==============");
+		for (int i = 0; i < RsqTab.length; i++)
+		{
+			Logger.printUserLog("Keep Rsq < " + RsqTab[i][0] + ", " + RsqTab[i][1] + " markers are required");
+		}
 
 		DataOutputStream os = null;
 		try
@@ -144,6 +150,7 @@ public class DogPowerCommandImpl extends CommandImpl
 
 		double k = (zb * Math.sqrt(1-b * b) + za) / b;
 		k *= k;
+		double[][] RsqTab = Rsq(k);
 		Logger.printUserLog("Loci missing rate: " + dogpowerArgs.getMissingRate());
 		Logger.printUserLog("Seed: " + dogpowerArgs.getSeed());
 		Logger.printUserLog("Alpha (Type I error rate): " + alpha);
@@ -151,8 +158,13 @@ public class DogPowerCommandImpl extends CommandImpl
 		Logger.printUserLog("Tests: " + tests);
 		Logger.printUserLog("Method: regression");
 		Logger.printUserLog("Regression coefficient (threshold for regression): " + b);
-		Logger.printUserLog("Sample size to archive type I error rate at alpha = " + alpha + " and power = " + (1-beta) + " is " + k);
+		Logger.printUserLog("Number of pseudo profile scores to archive type I error rate at alpha = " + alpha + " and power = " + (1-beta) + " is " + k);
 
+		Logger.printUserLog("Rsq chart==============");
+		for (int i = 0; i < RsqTab.length; i++)
+		{
+			Logger.printUserLog("Keep Rsq < " + RsqTab[i][0] + ", " + RsqTab[i][1] + " markers are required");
+		}
 		DataOutputStream os = null;
 		try
 		{
@@ -183,5 +195,15 @@ public class DogPowerCommandImpl extends CommandImpl
 		{
 			Logger.handleException(e, "An I/O exception occurred when writing ecode.");
 		}
+	}
+	
+	private double[][] Rsq(double k)
+	{
+		double lambda=0.6;
+		double[][] RsqTab = new double[3][2];
+		RsqTab[0][0] = 0.01; RsqTab[0][1] = Math.ceil(k * (1 - RsqTab[0][0])/RsqTab[0][0] * lambda);
+		RsqTab[1][0] = 0.05; RsqTab[1][1] = Math.ceil(k * (1 - RsqTab[1][0])/RsqTab[1][0] * lambda);
+		RsqTab[2][0] = 0.1; RsqTab[2][1] = Math.ceil(k * (1 - RsqTab[2][0])/RsqTab[2][0] * lambda);
+		return RsqTab;
 	}
 }
