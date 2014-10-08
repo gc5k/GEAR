@@ -72,7 +72,7 @@ public class LambdaDCommandImpl extends CommandImpl
 			}
 		}
 		WriteMat();
-		Logger.printUserLog("=========================================================\n");
+		Logger.printUserLog("=========================================================");
 		Logger.printUserLog("Results has been saved in '" + lamArgs.getOutRoot() + ".lmat'.");
 	}
 
@@ -440,7 +440,7 @@ public class LambdaDCommandImpl extends CommandImpl
 	private void calculateLambdaD(int idx1, int idx2)
 	{
 		ArrayList<LamUnit> LamArray = NewIt.newArrayList();
-    	DescriptiveStatistics LD = new DescriptiveStatistics();
+    	DescriptiveStatistics T0 = new DescriptiveStatistics();
 
 		int cntAmbiguous = 0;
 		HashMap<String, MetaStat> SumStat1 = meta.get(idx1);
@@ -487,7 +487,7 @@ public class LambdaDCommandImpl extends CommandImpl
 				cntAmbiguous++;
 				continue;
 			}
-			LD.addValue(d);
+			T0.addValue(d);
 			LamArray.add(new LamUnit(d, ms1, ms2));
         }
 
@@ -502,14 +502,25 @@ public class LambdaDCommandImpl extends CommandImpl
 				Logger.printUserLog("Removed " + cntAmbiguous + " ambiguous loci (AT/GC).");
 			}
 		}
-		Logger.printUserLog("Lambda is calculated based on " + LD.getN() + " summary statistics between two files.");
+		Logger.printUserLog("Lambda is calculated based on " + T0.getN() + " summary statistics between two files.");
 
 //select independent snps
-		double[] sortLD = LD.getSortedValues();
+		double[] sortLD = T0.getSortedValues();
 		double[] DesStat = null;
 		int[] selIdx = null;
-		if (sortLD.length <= Me)
-		{
+		
+		if (Me < 0)
+		{//use all 
+			DesStat = new double[sortLD.length];
+			System.arraycopy(sortLD, 0, DesStat, 0, sortLD.length);
+			selIdx = new int[sortLD.length];
+			for (int i = 0; i < sortLD.length; i++)
+			{
+				selIdx[i] = i;
+			}	
+		}
+		else if (sortLD.length <= Me)
+		{//use available ones
 			DesStat = new double[sortLD.length];
 			System.arraycopy(sortLD, 0, DesStat, 0, sortLD.length);
 			selIdx = new int[sortLD.length];
@@ -519,7 +530,7 @@ public class LambdaDCommandImpl extends CommandImpl
 			}
 		}
 		else
-		{
+		{//use Me
 			DesStat = new double[(int) Math.ceil(Me)];
 			selIdx = new int[(int) Math.ceil(Me)];
 			for (int i = 0; i < DesStat.length; i++)
@@ -534,13 +545,13 @@ public class LambdaDCommandImpl extends CommandImpl
 			double[] qtSize = lamArgs.getQTsize();
 			XTest et = new XTest(DesStat, qtSize[idx1], qtSize[idx2]);
 
-			olCtrlMat[idx2][idx1] = olCsMat[idx2][idx1] = et.getN12();
+			olCtrlMat[idx1][idx2] = olCsMat[idx1][idx2] = et.getN12();
 
-			zMat[idx2][idx1] = et.getZ();
-			zMat[idx1][idx2] = et.getRho();
+			zMat[idx2][idx1] = et.getRho();
+			zMat[idx1][idx2] = et.getZ();
 
 			kMat[idx1][idx2] = kMat[idx2][idx1] = Kappa;
-			
+
 			et.PrintQT();
 		}
 		else
@@ -548,30 +559,30 @@ public class LambdaDCommandImpl extends CommandImpl
 			double[] ccSize = lamArgs.getCCsize();
 			XTest et = new XTest(DesStat, ccSize[idx1*2], ccSize[idx1*2+1], ccSize[idx2*2], ccSize[idx2*2+1]);
 
-			olCtrlMat[idx2][idx1] = olCsMat[idx2][idx1] = et.getN12();
+			olCtrlMat[idx1][idx2] = olCsMat[idx1][idx2] = et.getN12();
 
-			zMat[idx2][idx1] = et.getZ();
-			zMat[idx1][idx2] = et.getRho();
+			zMat[idx2][idx1] = et.getRho();
+			zMat[idx1][idx2] = et.getZ();
 
 			kMat[idx1][idx2] = kMat[idx2][idx1] = Kappa;
 
 			et.PrintCC();
 
-			olCtrlMat[idx1][idx2] = et.getN12cl();
-			olCsMat[idx1][idx2] = et.getN12cs();
+			olCtrlMat[idx2][idx1] = et.getN12cl();
+			olCsMat[idx2][idx1] = et.getN12cs();
 		}
 
 		if (lamArgs.isVerboseGZ())
 		{
-			VerboseGZ(LamArray, LD.getValues(), idx1, idx2);
+			VerboseGZ(LamArray, T0.getValues(), idx1, idx2);
 		}
 		else if (lamArgs.isVerbose())
 		{
-			Verbose(LamArray, LD.getValues(), idx1, idx2);
+			Verbose(LamArray, T0.getValues(), idx1, idx2);
 		}
 		else
 		{
-			NotVerbose(LamArray, LD.getValues(), idx1, idx2, selIdx);
+			NotVerbose(LamArray, T0.getValues(), idx1, idx2, selIdx);
 		}
 	}
 

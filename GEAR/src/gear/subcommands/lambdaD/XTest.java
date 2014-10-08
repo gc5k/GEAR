@@ -3,7 +3,9 @@ package gear.subcommands.lambdaD;
 import gear.util.Logger;
 
 import org.apache.commons.math.MathException;
+import org.apache.commons.math.distribution.ChiSquaredDistributionImpl;
 import org.apache.commons.math.distribution.NormalDistributionImpl;
+import org.apache.commons.math.random.RandomDataImpl;
 import org.apache.commons.math.stat.descriptive.DescriptiveStatistics;
 
 public class XTest
@@ -60,6 +62,18 @@ public class XTest
 		n12 = (1 - XS/Me) * (n1 + n2)/2;
 		//sigma_n12
 		sigma_n12 = (n1 + n2)/Math.sqrt(2*Me);
+
+		if(XVec.getN() % 2 == 0)
+		{
+			ChiMedian = ( XVec.getElement((int) (XVec.getN()/2-1)) + XVec.getElement((int) XVec.getN()/2) )/2;
+		}
+		else
+		{
+			ChiMedian = XVec.getElement((int) (XVec.getN()+1)/2);
+		}
+		
+		lambdaM = ChiMedian/ChiMedianConstant;
+		lambdaMSD();
 	}
 
 	private void CalCC()
@@ -101,6 +115,11 @@ public class XTest
 		return n12cl;
 	}
 
+	protected double getLambda()
+	{
+		return lambdaM;
+	}
+
 	protected void PrintQT()
 	{
 		double z_l = -1.96;
@@ -122,8 +141,38 @@ public class XTest
 		Logger.printUserLog("Effective number of markers is: " + Me);
 		Logger.printUserLog("Z score: " + Z);
 		Logger.printUserLog("p-value for z score (two-tails): " + pZ);
+		Logger.printUserLog("LambdaMeta: " + lambdaM + " (based on " + Me + " markers)");
+		Logger.printUserLog("p-value for LambdaMeta: " + pLam);
 		Logger.printUserLog("Correlation: " + rho + ", 95% confidence interval is (" + z_l * sigma_rho + ", " + z_h * sigma_rho + ")");
 		Logger.printUserLog("Overlapping samples: " + n12 + ", 95% confidence interval is (" + z_l * sigma_n12  + ", " + z_h * sigma_n12 + ")");
+	}
+
+	private void lambdaMSD()
+	{
+		long seed = 2014;
+		double alpha = XVec.getN()/2;
+		double beta = XVec.getN() - alpha + 1;
+
+		DescriptiveStatistics LamVec = new DescriptiveStatistics();
+		ChiSquaredDistributionImpl chiDis = new ChiSquaredDistributionImpl(1);		
+		RandomDataImpl rdg = new RandomDataImpl();
+		rdg.reSeed(seed);
+		try
+		{
+			for(int i = 0; i < Me; i++)
+			{
+				double p = rdg.nextBeta(alpha, beta);
+				double lam = chiDis.inverseCumulativeProbability(p)/ChiMedianConstant;
+				LamVec.addValue(lam);
+			}
+			sigma_lambdaM = LamVec.getStandardDeviation();
+			pLam = 2*(1 - nDis.cumulativeProbability(Math.abs(ChiMedian - 1) / sigma_lambdaM));
+		}
+		catch (MathException e)
+		{
+			Logger.printUserError("problems in generating beta distribution.");
+		}
+		
 	}
 
 	private NormalDistributionImpl nDis = new NormalDistributionImpl();
@@ -153,4 +202,10 @@ public class XTest
 	private double sigma_n12cs = 0;
 	private double n12cl = 0;
 	private double sigma_n12cl = 0;
+	
+	private double ChiMedianConstant = 0.4549364;
+	private double ChiMedian = 0;
+	private double lambdaM = 0;
+	private double sigma_lambdaM = 0;
+	private double pLam = 0;
 }
