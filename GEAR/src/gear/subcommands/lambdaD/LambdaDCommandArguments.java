@@ -212,7 +212,7 @@ public class LambdaDCommandArguments extends CommandArguments
 	private boolean isVerbose = false;
 	private boolean isVerboseGZ = false;
 
-	private double Me = 10000;
+	private double Me;
 	private boolean isQRange = false;
 	private double qrLow = 0;
 	private double qrHigh = 0;

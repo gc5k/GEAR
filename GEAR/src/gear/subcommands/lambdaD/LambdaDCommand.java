@@ -37,7 +37,7 @@ public class LambdaDCommand extends Command
 		options.addOption(OptionBuilder.withDescription(OPT_META_GZ_DESC).withLongOpt(OPT_META_GZ_LONG).hasArgs().create(OPT_META_GZ));
 		options.addOption(OptionBuilder.withDescription(OPT_META_GZ_BATCH_DESC).withLongOpt(OPT_META_GZ_BATCH_LONG).hasArg().create(OPT_META_GZ_BATCH));
 
-		options.addOption(OptionBuilder.withDescription(OPT_ME).withLongOpt(OPT_ME_LONG).hasArgs(1).create(OPT_ME));
+		options.addOption(OptionBuilder.withDescription(OPT_ME_DESC).withLongOpt(OPT_ME_LONG).hasArgs(1).create(OPT_ME));
 		options.addOption(OptionBuilder.withDescription(OPT_CC_DESC).hasArgs().create(OPT_CC));
 		options.addOption(OptionBuilder.withDescription(OPT_CC_BATCH_LONG_DESC).withLongOpt(OPT_CC_BATCH_LONG).hasArg().create());
 		options.addOption(OptionBuilder.withDescription(OPT_QT_DESC).hasArgs().create(OPT_QT));
@@ -53,6 +53,8 @@ public class LambdaDCommand extends Command
 	public CommandArguments parse(CommandLine cmdLine) throws CommandArgumentException
 	{
 		LambdaDCommandArguments lamD = new LambdaDCommandArguments();
+
+		lamD.setMe(OPT_ME_DEFAULT);
 
 		//manual text meta files
 		if (cmdLine.hasOption(OPT_META))
@@ -179,11 +181,11 @@ public class LambdaDCommand extends Command
 
 	private final static String OPT_KEY = "key";
 	private final static String OPT_KEY_DESC = "Self defined key workds: snp, beta, se, a1, a2";
-	
+
 	private final static String OPT_VERBOSE = "v";
 	private final static String OPT_VERBOSE_LONG = "verbose";
 	private final static String OPT_VERBOSE_DESC = "Print test statistic for every pair of meta files.";
-	
+
 	private final static String OPT_VERBOSE_GZ = "vg";
 	private final static String OPT_VERBOSE_GZ_LONG = "verbose-gz";
 	private final static String OPT_VERBOSE_GZ_DESC = "Print test statistic in gz format for every pair of meta files.";
@@ -191,9 +193,10 @@ public class LambdaDCommand extends Command
 	private final static String OPT_Q_RANGE = "q";
 	private final static String OPT_Q_RANGE_LONG = "q-range";
 	private final static String OPT_Q_RANGE_DESC = "cut off values for filtering snps.";
-	
+
 	private final static String OPT_ME = "m";
 	private final static String OPT_ME_LONG = "me";
+	private final static String OPT_ME_DEFAULT = "30000";
 	private final static String OPT_ME_DESC = "effective number of markers.";
 
 }

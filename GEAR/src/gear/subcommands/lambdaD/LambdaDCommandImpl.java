@@ -27,54 +27,6 @@ import gear.util.SNPMatch;
 
 public class LambdaDCommandImpl extends CommandImpl
 {
-	private void initial()
-	{
-		Me = lamArgs.getMe();
-		MetaFile = lamArgs.getMetaFile();
-		lamMat = new double[MetaFile.length][MetaFile.length];
-		olCtrlMat = new double[MetaFile.length][MetaFile.length];
-		olCsMat = new double[MetaFile.length][MetaFile.length];
-
-		kMat = new double[MetaFile.length][MetaFile.length];
-
-		for(int i = 0; i < MetaFile.length; i++)
-		{
-			Arrays.fill(lamMat[i], 1);
-			Arrays.fill(kMat[i], 1);
-			if (lamArgs.isQT())
-			{
-				olCtrlMat[i][i] = lamArgs.getQTsize()[i];
-				olCsMat[i][i] = lamArgs.getQTsize()[i];
-			}
-			else
-			{
-				olCtrlMat[i][i] = lamArgs.getCCsize()[i*2] + lamArgs.getCCsize()[i*2+1];
-				olCsMat[i][i] = lamArgs.getCCsize()[i*2] + lamArgs.getCCsize()[i*2+1];
-			}
-		}
-
-		if (MetaFile.length < 2)
-		{
-			Logger.printUserError("At least two meta files should be specified.");
-			Logger.printUserError("GEAR quitted.");
-			System.exit(0);
-		}
-
-		logit = new boolean[MetaFile.length];
-		Arrays.fill(logit, false);
-
-		KeyIdx = new int[MetaFile.length][8];
-		for (int i = 0; i < KeyIdx.length; i++)
-		{
-			Arrays.fill(KeyIdx[i], -1);
-		}
-		
-		for (int i = 0; i < MetaFile.length; i++)
-		{
-			HashMap<String, MetaStat> m = readMeta(i);
-			meta.add(m);
-		}
-	}
 
 	@Override
 	public void execute(CommandArguments cmdArgs)
@@ -83,16 +35,16 @@ public class LambdaDCommandImpl extends CommandImpl
 
 		if (lamArgs.isQT())
 		{
-			Logger.printUserLog("Summary statistics analysis for quantitative traits.\n");			
+			Logger.printUserLog("Analysing summary statistics analysis for quantitative traits.\n");			
 		}
 		else
 		{
-			Logger.printUserLog("Summary statistics analysis for case-contrl studies.\n");			
+			Logger.printUserLog("Analysing summary statistics analysis for case-contrl studies.\n");			
 		}
 
 		initial();
 
-		for (int i=0; i < MetaFile.length -1; i++)
+		for (int i=0; i < MetaFile.length-1; i++)
 		{
 			for (int j = (i+1); j < MetaFile.length; j++)
 			{
@@ -108,21 +60,73 @@ public class LambdaDCommandImpl extends CommandImpl
 					double[] size = lamArgs.getCCsize();
 					R1 = size[i*2]/size[i*2+1];
 					R2 = size[j*2]/size[j*2+1];
-					Logger.printUserLog("Sample size for '" + MetaFile[i] + "': " + size[i*2] + " cases, " + size[i*2+1] + " controls; R1 = " + R1 + ".");
-					Logger.printUserLog("Sample size for '" + MetaFile[j] + "': " + size[j*2] + " cases, " + size[j*2+1] + " controls; R2 = " + R2 + ".");
 					double s1 = size[i*2] + size[i*2+1];
 					double s2 = size[j*2] + size[j*2+1];
 					Kappa = 2 / (Math.sqrt(s1 / s2) + Math.sqrt(s2 / s1));
+					Logger.printUserLog("Sample size for '" + MetaFile[i] + "': " + size[i*2] + " cases, " + size[i*2+1] + " controls; R1 = " + R1 + ".");
+					Logger.printUserLog("Sample size for '" + MetaFile[j] + "': " + size[j*2] + " cases, " + size[j*2+1] + " controls; R2 = " + R2 + ".");
 				}
 				Logger.printUserLog("Kappa: " + Kappa);
 
 				calculateLambdaD(i, j);
 			}
 		}
-		Logger.printUserLog("Results has been saved in '" + lamArgs.getOutRoot() + ".lmat'.");
 		WriteMat();
+		Logger.printUserLog("=========================================================\n");
+		Logger.printUserLog("Results has been saved in '" + lamArgs.getOutRoot() + ".lmat'.");
 	}
 
+	private void initial()
+	{
+		Me = lamArgs.getMe();
+		MetaFile = lamArgs.getMetaFile();
+		zMat = new double[MetaFile.length][MetaFile.length];
+		olCtrlMat = new double[MetaFile.length][MetaFile.length];
+		olCsMat = new double[MetaFile.length][MetaFile.length];
+
+		kMat = new double[MetaFile.length][MetaFile.length];
+
+		for(int i = 0; i < MetaFile.length; i++)
+		{
+			Arrays.fill(zMat[i], 1);
+			Arrays.fill(kMat[i], 1);
+			if (lamArgs.isQT())
+			{
+				olCtrlMat[i][i] = lamArgs.getQTsize()[i];
+				olCsMat[i][i] = lamArgs.getQTsize()[i];
+			}
+			else
+			{
+				olCtrlMat[i][i] = lamArgs.getCCsize()[i*2] + lamArgs.getCCsize()[i*2+1];
+				olCsMat[i][i] = lamArgs.getCCsize()[i*2] + lamArgs.getCCsize()[i*2+1];
+			}
+		}
+
+		if (MetaFile.length < 2)
+		{
+			Logger.printUserError("At least two summary statistic files should be specified.\n");
+			Logger.printUserError("GEAR quitted.\n");
+			System.exit(0);
+		}
+
+		logit = new boolean[MetaFile.length];
+		Arrays.fill(logit, false);
+
+		KeyIdx = new int[MetaFile.length][8];
+		for (int i = 0; i < KeyIdx.length; i++)
+		{
+			Arrays.fill(KeyIdx[i], -1);
+		}
+
+//reading meta files
+		for (int i = 0; i < MetaFile.length; i++)
+		{
+			HashMap<String, MetaStat> m = readMeta(i);
+			meta.add(m);
+		}
+	}
+
+	
 	private HashMap<String, MetaStat> readMeta(int metaIdx)
 	{
 		BufferedReader reader = null;
@@ -229,7 +233,7 @@ public class LambdaDCommandImpl extends CommandImpl
 //		{
 //			Logger.printUserLog("Cannot find the allele 2 in " + MetaFile[metaIdx]);
 //		}
-		
+
 		if (qFlag)
 		{
 			Logger.printUserLog("GEAR quitted.");
@@ -326,12 +330,12 @@ public class LambdaDCommandImpl extends CommandImpl
 
 		if(cnt == 0)
 		{
-			Logger.printUserLog("Did not find any summary statistics from '" + MetaFile[metaIdx] + "'");
+			Logger.printUserLog("Did not find any summary statistics from '" + MetaFile[metaIdx] + ".'");
 			System.exit(0);
 		}
 		else
 		{
-			Logger.printUserLog("Read " + total + " summary statistics from '" + MetaFile[metaIdx] + "'");			
+			Logger.printUserLog("Read " + total + " summary statistics from '" + MetaFile[metaIdx] + ".'");			
 		}
 
 		if (cntBadChr > 0)
@@ -453,7 +457,7 @@ public class LambdaDCommandImpl extends CommandImpl
 			MetaStat ms2 = SumStat2.get(snp);
 			double d = 0;
 
-			if (KeyIdx[idx1][4] != -1)
+			if (KeyIdx[idx1][SE] != -1)
 			{
 				if (SNPMatch.isAmbiguous(ms1.getA1(), ms1.getA2()))
 				{
@@ -461,12 +465,12 @@ public class LambdaDCommandImpl extends CommandImpl
 					continue;
 				}
 			}
-			if (KeyIdx[idx2][4] != -1)
+			if (KeyIdx[idx2][SE] != -1)
 			{
 				if (SNPMatch.isAmbiguous(ms2.getA1(), ms2.getA2()))
 				{
 					cntAmbiguous++;
-					continue;	
+					continue;
 				}
 			}
 
@@ -500,10 +504,8 @@ public class LambdaDCommandImpl extends CommandImpl
 		}
 		Logger.printUserLog("Lambda is calculated based on " + LD.getN() + " summary statistics between two files.");
 
-		
-		
+//select independent snps
 		double[] sortLD = LD.getSortedValues();
-
 		double[] DesStat = null;
 		int[] selIdx = null;
 		if (sortLD.length <= Me)
@@ -531,32 +533,32 @@ public class LambdaDCommandImpl extends CommandImpl
 		{
 			double[] qtSize = lamArgs.getQTsize();
 			XTest et = new XTest(DesStat, qtSize[idx1], qtSize[idx2]);
-			et.PrintQT();
 
 			olCtrlMat[idx2][idx1] = olCsMat[idx2][idx1] = et.getN12();
 
-//			EmpiricalLam el = new EmpiricalLam(DesStat, qtSize[idx1], qtSize[idx2]);
-//			el.PrintQT();
+			zMat[idx2][idx1] = et.getZ();
+			zMat[idx1][idx2] = et.getRho();
 
-			lamMat[idx2][idx1] = et.getX();
-			lamMat[idx1][idx2] = et.getrho();
-
-//			olCtrlMat[idx2][idx1] = olCsMat[idx2][idx1] = el.getEmpOSMean();
 			kMat[idx1][idx2] = kMat[idx2][idx1] = Kappa;
+			
+			et.PrintQT();
 		}
 		else
 		{
 			double[] ccSize = lamArgs.getCCsize();
-			EmpiricalLam el = new EmpiricalLam(DesStat, ccSize[idx1*2], ccSize[idx1*2+1], ccSize[idx2*2], ccSize[idx2*2+1]);
-			el.PrintCC();
+			XTest et = new XTest(DesStat, ccSize[idx1*2], ccSize[idx1*2+1], ccSize[idx2*2], ccSize[idx2*2+1]);
 
-			lamMat[idx2][idx1] = el.getEmpLamMean();
-			lamMat[idx1][idx2] = el.getEmpRhoMean();
+			olCtrlMat[idx2][idx1] = olCsMat[idx2][idx1] = et.getN12();
 
-			olCtrlMat[idx2][idx1] = olCsMat[idx2][idx1] = el.getEmpOSMean();
-			olCtrlMat[idx1][idx2] = el.getEmpOSCtrlMean();
-			olCsMat[idx1][idx2] = el.getEmpOSCsMean();
-			kMat[idx1][idx2] = kMat[idx2][idx1] = Kappa;			
+			zMat[idx2][idx1] = et.getZ();
+			zMat[idx1][idx2] = et.getRho();
+
+			kMat[idx1][idx2] = kMat[idx2][idx1] = Kappa;
+
+			et.PrintCC();
+
+			olCtrlMat[idx1][idx2] = et.getN12cl();
+			olCsMat[idx1][idx2] = et.getN12cs();
 		}
 
 		if (lamArgs.isVerboseGZ())
@@ -565,7 +567,7 @@ public class LambdaDCommandImpl extends CommandImpl
 		}
 		else if (lamArgs.isVerbose())
 		{
-			Verbose(LamArray, LD.getValues(), idx1, idx2);	
+			Verbose(LamArray, LD.getValues(), idx1, idx2);
 		}
 		else
 		{
@@ -590,7 +592,7 @@ public class LambdaDCommandImpl extends CommandImpl
 		}
 
         FileUtil.CreatePrintStream(new String(lamArgs.getOutRoot() + "." + (idx1+1) + "-" + (idx2+1) + ".lam"));
-       	writer.write("SNP\tChr\tBp\tA1\tBETA1\tSE1\tP1\tBETA2\tSE2\tP2\tChiObs\tChiExp\tLambdaD\n");
+       	writer.write(titleLine);
 
         for (int i = 0; i < selIdx.length; i++)
         {
@@ -623,7 +625,7 @@ public class LambdaDCommandImpl extends CommandImpl
         try
         {
         	writer = new PrintWriter(new BufferedWriter(new FileWriter(lamArgs.getOutRoot() + "." + (idx1+1) + "-" + (idx2+1) + ".lam")));
-        	Logger.printUserLog("Writting detailed test statistics into '"+lamArgs.getOutRoot() + "." + (idx1+1) + "-" + (idx2+1) + ".lam.'");
+        	Logger.printUserLog("Writting detailed test statistics into '" + lamArgs.getOutRoot() + "." + (idx1+1) + "-" + (idx2+1) + ".lam.'\n");
         }
 		catch (IOException e)
 		{
@@ -631,7 +633,7 @@ public class LambdaDCommandImpl extends CommandImpl
 		}
 
         FileUtil.CreatePrintStream(new String(lamArgs.getOutRoot() + "." + (idx1+1) + "-" + (idx2+1) + ".lam"));
-       	writer.write("SNP\tChr\tBp\tA1\tBETA1\tSE1\tP1\tBETA2\tSE2\tP2\tChiObs\tChiExp\tLambdaD\n");
+       	writer.write(titleLine);
 
         for (int i = 0; i < ranks.length; i++)
         {
@@ -661,11 +663,11 @@ public class LambdaDCommandImpl extends CommandImpl
         double[] ranks = ranking.rank(ld);
 		BufferedWriter GZ = null;
 		GZ = FileUtil.ZipFileWriter(new String(lamArgs.getOutRoot() + "." + (idx1+1) + "-" + (idx2+1) + ".lam.gz"));
-    	Logger.printUserLog("Writting detailed test statistics into '"+lamArgs.getOutRoot() + "." + (idx1+1) + "-" + (idx2+1) + ".lam.gz.'");
+    	Logger.printUserLog("Writting detailed test statistics into '"+lamArgs.getOutRoot() + "." + (idx1+1) + "-" + (idx2+1) + ".lam.gz.'\n");
 
        	try
 		{
-			GZ.append("SNP\tChr\tBp\tA1\tBETA1\tSE1\tP1\tBETA2\tSE2\tP2\tChiObs\tChiExp\n");
+			GZ.append(titleLine);
 		}
 		catch (IOException e)
 		{
@@ -718,12 +720,12 @@ public class LambdaDCommandImpl extends CommandImpl
 			Logger.handleException(e, "An I/O exception occurred when writing '" + lamArgs.getOutRoot() + ".lmat" + "'.");
 		}
 
-		writer.println("LambdaD (lower triangle) vs correlation (upper triangle):");
-		for (int i = 0; i < lamMat.length; i++)
+		writer.println("Z score (lower triangle) vs correlation (upper triangle):");
+		for (int i = 0; i < zMat.length; i++)
 		{
-			for (int j = 0; j < lamMat[i].length; j++)
+			for (int j = 0; j < zMat[i].length; j++)
 			{
-				writer.print(String.format("%.4f", lamMat[i][j]) + " ");
+				writer.print(String.format("%.4f", zMat[i][j]) + " ");
 			}
 			writer.println();
 		}
@@ -777,7 +779,7 @@ public class LambdaDCommandImpl extends CommandImpl
 	}
 
 //	private int M = 100;
-	private double Me = 10000;
+	private double Me = 30000;
 
 	private double R1 = 1;
 	private double R2 = 1;
@@ -785,6 +787,7 @@ public class LambdaDCommandImpl extends CommandImpl
 	private LambdaDCommandArguments lamArgs;
 
 	private int SNP = 0, CHR=1, BP=2, BETA=3, OR=3, SE=4, P=5, A1=6, A2=7;
+	private String titleLine= "SNP\tChr\tBp\tA1\tBETA1\tSE1\tP1\tBETA2\tSE2\tP2\tChiObs\tChiExp\tLambdaD\n";
 	private int[][] KeyIdx; //snp, chr, bp, beta, se, p, a1, a2
 	private String[] MetaFile;
 	private ArrayList<HashMap<String, MetaStat>> meta = NewIt.newArrayList();
@@ -792,7 +795,7 @@ public class LambdaDCommandImpl extends CommandImpl
 
 	private boolean[] logit;
 
-	private double[][] lamMat;
+	private double[][] zMat;
 	private double[][] olCtrlMat;
 	private double[][] olCsMat;
 	private double[][] kMat;

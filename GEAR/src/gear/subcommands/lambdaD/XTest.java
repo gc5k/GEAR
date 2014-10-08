@@ -3,7 +3,6 @@ package gear.subcommands.lambdaD;
 import gear.util.Logger;
 
 import org.apache.commons.math.MathException;
-import org.apache.commons.math.distribution.ChiSquaredDistributionImpl;
 import org.apache.commons.math.distribution.NormalDistributionImpl;
 import org.apache.commons.math.stat.descriptive.DescriptiveStatistics;
 
@@ -16,8 +15,7 @@ public class XTest
 		this.n1 = n1;
 		this.n2 = n2;
 		Me = DesStat.length;
-		CalX();
-		QT();
+		CalZ();
 	}
 
 	public XTest(double[] DesStat, double cs1, double ctrl1, double cs2, double ctrl2)
@@ -27,96 +25,60 @@ public class XTest
 		this.ctrl1 = ctrl1;
 		this.cs2 = cs2;
 		this.ctrl2 = ctrl2;
+		this.n1 = cs1 + ctrl1;
+		this.n2 = cs2 + ctrl2;
 		Me = DesStat.length;
-		CalX();
-//		CC();
+		CalZ();
+		CalCC();
 	}
 
-	private void CalX()
+	private void CalZ()
 	{
 		for(int i = 0; i < DesStat.length; i++)
 		{
 			XVec.addValue(DesStat[i]);
 		}
-		ChiSquaredDistributionImpl chiDis = new ChiSquaredDistributionImpl(Me);
+
+		double XS = XVec.getSum();
 
 		try
 		{
-			Chi0025 = chiDis.inverseCumulativeProbability(0.025);
-			Chi005 = chiDis.inverseCumulativeProbability(0.05);
-			Chi095 = chiDis.inverseCumulativeProbability(0.95);
-			Chi0975 = chiDis.inverseCumulativeProbability(0.975);
-		}
-		catch (MathException e)
-		{
-			Logger.handleException(e, "error in getting pvalue for Chi-sq in lambda.");
-		}
-
-		try
-		{
-			double z= (XVec.getSum() - Me)/Math.sqrt(2*Me);
-			pX = 2* (1-nDis.cumulativeProbability(Math.abs(z)));
+			// two-tail tests
+			Z = (XVec.getSum() - Me)/Math.sqrt(2 * Me);
+			pZ = 2 * (1 - nDis.cumulativeProbability(Math.abs(Z)));
 		}
 		catch (MathException e)
 		{
 			Logger.handleException(e, "error in getting pvalue.");
 		}
-		
+
+		//rho
+		rho = (1 - XS/Me) * (Math.sqrt(n1/n2) + Math.sqrt(n2/n1))/2;
+		//sigma_rho
+		sigma_rho = (n1+n2)/Math.sqrt(2 * Me * n1 * n2);
+		//n12
+		n12 = (1 - XS/Me) * (n1 + n2)/2;
+		//sigma_n12
+		sigma_n12 = (n1 + n2)/Math.sqrt(2*Me);
 	}
 
-	private void QT()
+	private void CalCC()
 	{
-		rho = (1-XVec.getSum()/Me) * (Math.sqrt(n1/n2) + Math.sqrt(n2/n1))/2;
-		n12 = (1-XVec.getSum()/Me) * (n1+n2)/2;
-		sigma_n12 = (n1+n2)/Math.sqrt(2*Me);
+		n12cl = n12 / Math.sqrt(cs1/ctrl1 * cs2/ctrl2);
+		sigma_n12cl = sigma_n12 / Math.sqrt(cs1/ctrl1 * cs2/ctrl2);
 
-		try
-		{
-			pN12 = 2 * (1-nDis.cumulativeProbability(Math.abs(n12/sigma_n12)));
-		}
-		catch (MathException e)
-		{
-			Logger.handleException(e, "error in getting pvalue.");
-		}
+		n12cs = n12 * Math.sqrt(cs1/ctrl1 * cs2/ctrl2);
+		sigma_n12cs = sigma_n12 * Math.sqrt(cs1/ctrl1 * cs2/ctrl2);
 	}
 
-	protected void PrintQT()
+	protected double getZ()
 	{
-		double mu = XVec.getSum();
-		double v = XVec.getVariance() * Me;
-
-		double a = v;
-		double b = 2 * v * Me - 4 * mu * mu;
-		double c = v * Me * Me - 2 * mu * mu * Me;
-		
-		double t = b * b - 4 * a * c;
-		double ncp = 0;
-		if (t>=0)
-		{
-			ncp = (-1*b + Math.sqrt(t))/(2*a);
-		}
-		double f = mu/(Me+ncp);
-		Logger.printUserLog("ncp:" + ncp/Me);
-		Logger.printUserLog("factor: " + f);
-
-		double n12_ = (1-f) * (n1+n2);
-		double sigma_n12_ = (n1+n2)/2 * (Math.sqrt(2*Me)/(Me+ncp));
-		Logger.printUserLog("X statistic: " + XVec.getSum()/Me);
-		Logger.printUserLog("p-value for X statistic: " + pX);
-		Logger.printUserLog("95% CI for X: "  + "(" + (-1.96*Math.sqrt(2/Me) + 1) + "," + (1.96*Math.sqrt(2/Me) + 1) + ")");		
-		Logger.printUserLog("Overlapping Samples: " + n12_ + "");
-		Logger.printUserLog("95% CI for overlapping samples: "  + "(" + -1.96*sigma_n12_ + "," + 1.96*sigma_n12_ + ")");
-		
+		return Z;
 	}
 
-	protected double getX()
+	protected double getpZ()
 	{
-		return XVec.getSum()/Me;
-	}
-
-	protected double getpX()
-	{
-		return pX;
+		return pZ;
 	}
 
 	protected double getN12()
@@ -124,42 +86,71 @@ public class XTest
 		return n12;
 	}
 
-	protected double getrho()
+	protected double getRho()
 	{
 		return rho;
 	}
+
+	protected double getN12cs()
+	{
+		return n12cs;
+	}
 	
-	private ChiSquaredDistributionImpl chiDis = null;
+	protected double getN12cl()
+	{
+		return n12cl;
+	}
+
+	protected void PrintQT()
+	{
+		double z_l = -1.96;
+		double z_h = 1.96;
+		printZ(z_l, z_h);
+	}
+
+	protected void PrintCC()
+	{
+		double z_l = -1.96;
+		double z_h = 1.96;
+		printZ(z_l, z_h);
+		Logger.printUserLog("Overlapping if only controls: " + n12cl + ", 95% confidence interval is (" + z_l * sigma_n12cl  + ", " + z_h * sigma_n12cl + ")");
+		Logger.printUserLog("Overlapping if only cases: " + n12cs + ", 95% confidence interval is (" + z_l * sigma_n12cs  + ", " + z_h * sigma_n12cs + ")");
+	}
+
+	private void printZ(double z_l, double z_h)
+	{
+		Logger.printUserLog("Effective number of markers is: " + Me);
+		Logger.printUserLog("Z score: " + Z);
+		Logger.printUserLog("p-value for z score (two-tails): " + pZ);
+		Logger.printUserLog("Correlation: " + rho + ", 95% confidence interval is (" + z_l * sigma_rho + ", " + z_h * sigma_rho + ")");
+		Logger.printUserLog("Overlapping samples: " + n12 + ", 95% confidence interval is (" + z_l * sigma_n12  + ", " + z_h * sigma_n12 + ")");
+	}
+
 	private NormalDistributionImpl nDis = new NormalDistributionImpl();
 
 	private double[] DesStat;
 	private DescriptiveStatistics XVec = new DescriptiveStatistics();
 
+	private double Z = 0;
 	private double Me = 0;
-	private double pX = 0;
-	private double rho = 0;
+	private double pZ = 0;
 	
-	private DescriptiveStatistics Lam = new DescriptiveStatistics();
+	private double rho = 0;
+	private double sigma_rho = 0;
+
+	private double n12 = 0;
+	private double sigma_n12 = 0;
 
 	private double n1 = 0;
 	private double n2 = 0;
-
-	private double lambda = 0;
 
 	private double cs1 = 0;
 	private double ctrl1 = 0;
 	private double cs2 = 0;
 	private double ctrl2 = 0;
 
-	private double Chi0025 = 0;
-	private double Chi005 = 0;
-	private double Chi0975 = 0;
-	private double Chi095 = 0;
-
-	private double n12 = 0;
-	private double sigma_n12 = 0;
-	private double pN12 = 0;
-
-	private double n12L = 0;
-	private double n12H = 0;
+	private double n12cs = 0;
+	private double sigma_n12cs = 0;
+	private double n12cl = 0;
+	private double sigma_n12cl = 0;
 }
