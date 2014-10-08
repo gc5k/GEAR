@@ -147,13 +147,20 @@ public class LambdaDCommandArguments extends CommandArguments
 
 	public void setKey(String[] k)
 	{
-		field[0] = k[0];
-		field[1] = k[1];
-		field[3] = k[2];
-		field[4] = k[3];
-		field[5] = k[4];
+		field[SNP] = k[0];
+		if (isQT)
+		{
+			field[BETA] = k[1];			
+		}
+		else
+		{
+			field[OR] = k[1];			
+		}
+		field[SE] = k[2];
+		field[A1] = k[3];
+		field[A2] = k[4];
 	}
-	
+
 	public void setVerbose()
 	{
 		isVerbose = true;
@@ -219,7 +226,7 @@ public class LambdaDCommandArguments extends CommandArguments
 
 	private double[] qtSize;
 	private double[] ccSize;
-	private String[] field = {"snp", "chr", "bp", "beta", "or", "se", "p", "a1", "a2", };
+	private String[] field = {"snp", "chr", "bp", "beta", "or", "se", "p", "a1", "a2"};
 
 	public static final int SNP = 0;
 	public static final int CHR = 1;

@@ -55,11 +55,11 @@ public class XTest
 		}
 
 		//rho
-		rho = (1 - XS/Me) * (Math.sqrt(n1/n2) + Math.sqrt(n2/n1))/2;
+		rho = -Z * (n1+n2)/Math.sqrt(2*Me*n1*n2);
 		//sigma_rho
 		sigma_rho = (n1+n2)/Math.sqrt(2 * Me * n1 * n2);
 		//n12
-		n12 = (1 - XS/Me) * (n1 + n2)/2;
+		n12 = -Z * (n1+n2)/Math.sqrt(2*Me);
 		//sigma_n12
 		sigma_n12 = (n1 + n2)/Math.sqrt(2*Me);
 
@@ -166,13 +166,12 @@ public class XTest
 				LamVec.addValue(lam);
 			}
 			sigma_lambdaM = LamVec.getStandardDeviation();
-			pLam = 2*(1 - nDis.cumulativeProbability(Math.abs(ChiMedian - 1) / sigma_lambdaM));
+			pLam = 2*(1 - nDis.cumulativeProbability(Math.abs(lambdaM - 1) / sigma_lambdaM));
 		}
 		catch (MathException e)
 		{
-			Logger.printUserError("problems in generating beta distribution.");
+			Logger.printUserError("Problems in generating beta distribution.");
 		}
-		
 	}
 
 	private NormalDistributionImpl nDis = new NormalDistributionImpl();
