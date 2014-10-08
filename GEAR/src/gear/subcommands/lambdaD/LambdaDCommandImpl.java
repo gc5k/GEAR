@@ -80,6 +80,7 @@ public class LambdaDCommandImpl extends CommandImpl
 	{
 		Me = lamArgs.getMe();
 		MetaFile = lamArgs.getMetaFile();
+		lamMat = new double[MetaFile.length][MetaFile.length];
 		zMat = new double[MetaFile.length][MetaFile.length];
 		olCtrlMat = new double[MetaFile.length][MetaFile.length];
 		olCsMat = new double[MetaFile.length][MetaFile.length];
@@ -88,6 +89,7 @@ public class LambdaDCommandImpl extends CommandImpl
 
 		for(int i = 0; i < MetaFile.length; i++)
 		{
+			Arrays.fill(lamMat[i], 1);
 			Arrays.fill(zMat[i], 1);
 			Arrays.fill(kMat[i], 1);
 			if (lamArgs.isQT())
@@ -174,7 +176,7 @@ public class LambdaDCommandImpl extends CommandImpl
 				{
 					KeyIdx[metaIdx][OR] = i;
 					logit[metaIdx] = true;
-				} 
+				}
 			}
 			if (tokens[i].equalsIgnoreCase(lamArgs.getKey(LambdaDCommandArguments.SE)))
 			{
@@ -546,7 +548,7 @@ public class LambdaDCommandImpl extends CommandImpl
 			XTest et = new XTest(DesStat, qtSize[idx1], qtSize[idx2]);
 
 			olCtrlMat[idx1][idx2] = olCsMat[idx1][idx2] = et.getN12();
-
+			lamMat[idx1][idx2] = lamMat[idx2][idx1] = et.getLambda();
 			zMat[idx2][idx1] = et.getRho();
 			zMat[idx1][idx2] = et.getZ();
 
@@ -560,7 +562,7 @@ public class LambdaDCommandImpl extends CommandImpl
 			XTest et = new XTest(DesStat, ccSize[idx1*2], ccSize[idx1*2+1], ccSize[idx2*2], ccSize[idx2*2+1]);
 
 			olCtrlMat[idx1][idx2] = olCsMat[idx1][idx2] = et.getN12();
-
+			lamMat[idx1][idx2] = lamMat[idx2][idx1] = et.getLambda();
 			zMat[idx2][idx1] = et.getRho();
 			zMat[idx1][idx2] = et.getZ();
 
@@ -731,7 +733,7 @@ public class LambdaDCommandImpl extends CommandImpl
 			Logger.handleException(e, "An I/O exception occurred when writing '" + lamArgs.getOutRoot() + ".lmat" + "'.");
 		}
 
-		writer.println("Z score (lower triangle) vs correlation (upper triangle):");
+		writer.println("Correlation (lower triangle) vs z score (upper triangle):");
 		for (int i = 0; i < zMat.length; i++)
 		{
 			for (int j = 0; j < zMat[i].length; j++)
@@ -741,9 +743,19 @@ public class LambdaDCommandImpl extends CommandImpl
 			writer.println();
 		}
 
+		writer.println("LambdaMeta:");
+		for (int i = 0; i < lamMat.length; i++)
+		{
+			for (int j = 0; j < lamMat[i].length; j++)
+			{
+				writer.print(String.format("%.4f", lamMat[i][j]) + " ");
+			}
+			writer.println();
+		}
+
 		if (!lamArgs.isQT())
 		{
-			writer.println("Overlapping samples (lower triangle) vs overlapping controls (upper triangle):");
+			writer.println("Overlapping controls (lower triangle) vs overlapping samples (upper triangle):");
 			for (int i = 0; i < olCtrlMat.length; i++)
 			{
 				for (int j = 0; j < olCtrlMat[i].length; j++)
@@ -753,7 +765,7 @@ public class LambdaDCommandImpl extends CommandImpl
 				writer.println();
 			}
 
-			writer.println("Overlapping samples (lower triangle) vs Overlapping cases (upper triangle):");
+			writer.println("Overlapping cases (lower triangle) vs Overlapping samples (upper triangle):");
 			for (int i = 0; i < olCsMat.length; i++)
 			{
 				for (int j = 0; j < olCsMat[i].length; j++)
@@ -806,6 +818,7 @@ public class LambdaDCommandImpl extends CommandImpl
 
 	private boolean[] logit;
 
+	private double[][] lamMat;
 	private double[][] zMat;
 	private double[][] olCtrlMat;
 	private double[][] olCsMat;
