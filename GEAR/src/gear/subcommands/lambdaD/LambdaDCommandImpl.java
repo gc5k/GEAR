@@ -48,6 +48,7 @@ public class LambdaDCommandImpl extends CommandImpl
 		{
 			for (int j = (i+1); j < MetaFile.length; j++)
 			{
+				Logger.printUserLog("File pair: " + (i+1) + "-" + (j+1));
 				if (lamArgs.isQT())
 				{
 					double[] size = lamArgs.getQTsize();
