@@ -8,6 +8,8 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.Iterator;
+import java.util.Set;
 
 import org.apache.commons.math.MathException;
 import org.apache.commons.math.distribution.ChiSquaredDistributionImpl;
@@ -44,6 +46,8 @@ public class LambdaDCommandImpl extends CommandImpl
 
 		initial();
 
+		
+//generating matrix
 		for (int i=0; i < MetaFile.length-1; i++)
 		{
 			for (int j = (i+1); j < MetaFile.length; j++)
@@ -75,6 +79,14 @@ public class LambdaDCommandImpl extends CommandImpl
 		WriteMat();
 		Logger.printUserLog("=========================================================");
 		Logger.printUserLog("Results has been saved in '" + lamArgs.getOutRoot() + ".lmat'.");
+		
+//run mate-analysis
+		Set<String> keys = MetaSNPTable.keySet();
+		for(Iterator<String> e=keys.iterator();e.hasNext();)
+		{
+			String key = e.next();
+			ArrayList<Integer> Int = MetaSNPTable.get(key);
+		}
 	}
 
 	private void initial()
@@ -129,7 +141,6 @@ public class LambdaDCommandImpl extends CommandImpl
 		}
 	}
 
-	
 	private HashMap<String, MetaStat> readMeta(int metaIdx)
 	{
 		BufferedReader reader = null;
@@ -328,6 +339,27 @@ public class LambdaDCommandImpl extends CommandImpl
 			}
 			sumstat.put(ms.getSNP(), ms);
 			snpArray.add(ms.getSNP());
+
+			if ( MetaSNPTable.containsKey(ms.getSNP()) )
+			{
+				ArrayList<Integer> snpCnt = MetaSNPTable.get(ms.getSNP());
+				snpCnt.set(metaIdx, 1);
+				Integer Int = snpCnt.get(snpCnt.size()-1);
+				Int++;
+				snpCnt.set(snpCnt.size()-1, Int);
+			}
+			else
+			{
+				ArrayList<Integer> snpCnt = NewIt.newArrayList();
+				snpCnt.ensureCapacity(MetaFile.length+1);
+				for(int ii = 0; ii < MetaFile.length + 1; ii++)
+				{
+					snpCnt.add(0);
+				}
+				snpCnt.set(metaIdx, 1);
+				snpCnt.set(snpCnt.size()-1, 1);
+				MetaSNPTable.put(ms.getSNP(), snpCnt);
+			}
 			cnt++;
 		}
 
@@ -816,6 +848,7 @@ public class LambdaDCommandImpl extends CommandImpl
 	private String[] MetaFile;
 	private ArrayList<HashMap<String, MetaStat>> meta = NewIt.newArrayList();
 	private ArrayList<ArrayList<String>> SNPArray = NewIt.newArrayList();
+	private HashMap<String, ArrayList<Integer>> MetaSNPTable = NewIt.newHashMap();
 
 	private boolean[] logit;
 
