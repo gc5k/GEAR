@@ -51,40 +51,48 @@ public class LambdaDCommandImpl extends CommandImpl
 
 		
 //generating matrix
-		for (int i=0; i < MetaFile.length-1; i++)
+		if(lamArgs.isCM())
 		{
-			for (int j = (i+1); j < MetaFile.length; j++)
-			{
-				Logger.printUserLog("File pair: " + (i+1) + "-" + (j+1));
-				if (lamArgs.isQT())
-				{
-					double[] size = lamArgs.getQTsize();
-					Kappa = 2 / ( Math.sqrt(size[i]/size[j]) + Math.sqrt(size[j]/size[i]) );
-					Logger.printUserLog("Sample sizes for '" + MetaFile[i] + "': " + size[i]);
-					Logger.printUserLog("Sample sizes for '" + MetaFile[j] + "': " +size[j]);
-				}
-				else
-				{
-					double[] size = lamArgs.getCCsize();
-					R1 = size[i*2]/size[i*2+1];
-					R2 = size[j*2]/size[j*2+1];
-					double s1 = size[i*2] + size[i*2+1];
-					double s2 = size[j*2] + size[j*2+1];
-					Kappa = 2 / (Math.sqrt(s1 / s2) + Math.sqrt(s2 / s1));
-					Logger.printUserLog("Sample size for '" + MetaFile[i] + "': " + size[i*2] + " cases, " + size[i*2+1] + " controls; R1 = " + R1 + ".");
-					Logger.printUserLog("Sample size for '" + MetaFile[j] + "': " + size[j*2] + " cases, " + size[j*2+1] + " controls; R2 = " + R2 + ".");
-				}
-				Logger.printUserLog("Kappa: " + Kappa);
-
-				calculateLambdaD(i, j);
-			}
+			readCMFile();
+			MetaAnalysis();
 		}
-		WriteMat();
-		Logger.printUserLog("=========================================================");
-		Logger.printUserLog("Results has been saved in '" + lamArgs.getOutRoot() + ".lmat'.");
+		else
+		{
+			for (int i=0; i < MetaFile.length-1; i++)
+			{
+				for (int j = (i+1); j < MetaFile.length; j++)
+				{
+					Logger.printUserLog("File pair: " + (i+1) + "-" + (j+1));
+					if (lamArgs.isQT())
+					{
+						double[] size = lamArgs.getQTsize();
+						Kappa = 2 / ( Math.sqrt(size[i]/size[j]) + Math.sqrt(size[j]/size[i]) );
+						Logger.printUserLog("Sample sizes for '" + MetaFile[i] + "': " + size[i]);
+						Logger.printUserLog("Sample sizes for '" + MetaFile[j] + "': " +size[j]);
+					}
+					else
+					{
+						double[] size = lamArgs.getCCsize();
+						R1 = size[i*2]/size[i*2+1];
+						R2 = size[j*2]/size[j*2+1];
+						double s1 = size[i*2] + size[i*2+1];
+						double s2 = size[j*2] + size[j*2+1];
+						Kappa = 2 / (Math.sqrt(s1 / s2) + Math.sqrt(s2 / s1));
+						Logger.printUserLog("Sample size for '" + MetaFile[i] + "': " + size[i*2] + " cases, " + size[i*2+1] + " controls; R1 = " + R1 + ".");
+						Logger.printUserLog("Sample size for '" + MetaFile[j] + "': " + size[j*2] + " cases, " + size[j*2+1] + " controls; R2 = " + R2 + ".");
+					}
+					Logger.printUserLog("Kappa: " + Kappa);
+
+					calculateLambdaD(i, j);
+				}
+			}
+			WriteMat();
+			Logger.printUserLog("=========================================================");
+			Logger.printUserLog("Results has been saved in '" + lamArgs.getOutRoot() + ".lmat'.");
+			
+		}
 		
 //run mate-analysis
-		MetaAnalysis();
 	}
 
 	private void initial()
@@ -901,6 +909,26 @@ public class LambdaDCommandImpl extends CommandImpl
 
 	private void WriteMat()
 	{
+		PrintWriter cwriter = null;
+		try 
+		{
+			cwriter = new PrintWriter(new BufferedWriter(new FileWriter(lamArgs.getOutRoot() + ".cm")));
+		}
+		catch (IOException e)
+		{
+			Logger.handleException(e, "An I/O exception occurred when writing '" + lamArgs.getOutRoot() + ".cm" + "'.");
+		}
+
+		for (int i = 0; i < zMat.length; i++)
+		{
+			for (int j = 0; j < zMat[i].length; j++)
+			{
+				cwriter.print(String.format("%.4f", zMat[i][j]) + " ");
+			}
+			cwriter.println();
+		}
+		cwriter.close();
+
 		PrintWriter writer = null;
 		try 
 		{
@@ -911,15 +939,6 @@ public class LambdaDCommandImpl extends CommandImpl
 			Logger.handleException(e, "An I/O exception occurred when writing '" + lamArgs.getOutRoot() + ".lmat" + "'.");
 		}
 
-		writer.println("Correlation (lower triangle) vs z score (upper triangle):");
-		for (int i = 0; i < zMat.length; i++)
-		{
-			for (int j = 0; j < zMat[i].length; j++)
-			{
-				writer.print(String.format("%.4f", zMat[i][j]) + " ");
-			}
-			writer.println();
-		}
 
 		writer.println("LambdaMeta:");
 		for (int i = 0; i < lamMat.length; i++)
@@ -979,6 +998,36 @@ public class LambdaDCommandImpl extends CommandImpl
 		writer.close();
 	}
 
+	private void readCMFile()
+	{
+		BufferedReader bf = BufferedReader.openTextFile(lamArgs.getCMFile(), "cm file.");
+		Logger.printUserLog("Reading '" + lamArgs.getCMFile() + "'.");
+		zMat = new double[MetaFile.length][MetaFile.length];
+		String[] d = null;
+		int cnt=0;
+		while ( (d = bf.readTokens())!= null ){
+			if (d.length != MetaFile.length )
+			{
+				Logger.printUserError("incorrect '" + lamArgs.getCMFile() + "'.");
+				System.exit(0);
+			}
+			for(int i = 0; i < d.length; i++)
+			{
+				zMat[cnt][i] = Double.parseDouble(d[i]);
+			}
+			cnt++;
+		}
+		
+		for(int i = 0; i < zMat.length; i++)
+		{
+			for(int j = 0; j < zMat[i].length; j++)
+			{
+				System.out.print(zMat[i][j] + " ");
+			}
+			System.out.println();
+		}
+	}
+
 //	private int M = 100;
 	private double Me = 30000;
 
@@ -1003,5 +1052,5 @@ public class LambdaDCommandImpl extends CommandImpl
 	private double[][] olCsMat;
 	private double[][] kMat;
 	
-//	private double[][] InvMx;
+	
 }

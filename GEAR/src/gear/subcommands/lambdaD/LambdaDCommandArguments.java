@@ -213,6 +213,24 @@ public class LambdaDCommandArguments extends CommandArguments
 	{
 		Me = Double.parseDouble(me);
 	}
+	
+	public void setCM(String cF)
+	{
+		FileUtil.exists(cF);
+		cmFile = cF;
+		isCM = true;
+	}
+	
+	public String getCMFile()
+	{
+		return cmFile;
+	}
+
+	public boolean isCM()
+	{
+		return isCM;
+	}
+
 	private ArrayList<String> md;
 	private boolean isGZ = false;
 	private boolean isQT = true;
@@ -238,4 +256,6 @@ public class LambdaDCommandArguments extends CommandArguments
 	public static final int A1 = 7;
 	public static final int A2 = 8;
 	
+	private String cmFile = null;
+	private boolean isCM = false;
 }
