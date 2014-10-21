@@ -7,6 +7,7 @@ import gear.util.Logger;
 import gear.util.NewIt;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 
 public class GWASReader
@@ -15,11 +16,56 @@ public class GWASReader
 	public GWASReader(LambdaDCommandArguments lamArgs)
 	{
 		this.lamArgs = lamArgs;
+		
+
+		MetaFile = lamArgs.getMetaFile();
+
+		logit = new boolean[MetaFile.length];
+		Arrays.fill(logit, false);
+
+		KeyIdx = new int[MetaFile.length][8];
+		for (int i = 0; i < KeyIdx.length; i++)
+		{
+			Arrays.fill(KeyIdx[i], -1);
+		}
+
+		this.size = lamArgs.getQTsize();
+		this.isQT = lamArgs.isQT();
 		for (int i = 0; i < MetaFile.length; i++)
 		{
 			HashMap<String, MetaStat> m = readMeta(i);
-			meta.add(m);
+			MetaStat.add(m);
 		}
+	}
+
+	public String[] getMetaFile()
+	{
+		return MetaFile;
+	}
+
+	public int[][] getKeyIndex()
+	{
+		return KeyIdx;
+	}
+
+	public int getNumMetaFile()
+	{
+		return MetaFile.length;
+	}
+
+	public ArrayList<HashMap<String, MetaStat>> getMetaStat()
+	{
+		return MetaStat;
+	}
+
+	public ArrayList<ArrayList<String>> getMetaSNPArray() 
+	{
+		return MetaSNPArray;
+	}
+
+	public HashMap<String, ArrayList<Integer>> getMetaSNPTable()
+	{
+		return MetaSNPTable;
 	}
 
 	private HashMap<String, MetaStat> readMeta(int metaIdx)
@@ -349,17 +395,19 @@ public class GWASReader
 			}
 		}
 
-		SNPArray.add(snpArray);
+		MetaSNPArray.add(snpArray);
 		return sumstat;
 	}
-
-	private LambdaDCommandArguments lamArgs;
 	
+	private LambdaDCommandArguments lamArgs;
+	private double[] size;
+
+	private boolean isQT;
 	private boolean[] logit;
-	private int SNP = 0, CHR=1, BP=2, BETA=3, OR=3, SE=4, P=5, A1=6, A2=7;
+	public static int SNP = 0, CHR=1, BP=2, BETA=3, OR=3, SE=4, P=5, A1=6, A2=7;
 	private int[][] KeyIdx; //snp, chr, bp, beta, se, p, a1, a2
 	private String[] MetaFile;
-	private ArrayList<HashMap<String, MetaStat>> meta = NewIt.newArrayList();
-	private ArrayList<ArrayList<String>> SNPArray = NewIt.newArrayList();
+	private ArrayList<HashMap<String, MetaStat>> MetaStat = NewIt.newArrayList();
+	private ArrayList<ArrayList<String>> MetaSNPArray = NewIt.newArrayList();
 	private HashMap<String, ArrayList<Integer>> MetaSNPTable = NewIt.newHashMap();
 }

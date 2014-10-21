@@ -21,7 +21,7 @@ import org.apache.commons.math.stat.ranking.NaNStrategy;
 import org.apache.commons.math.stat.ranking.NaturalRanking;
 import org.apache.commons.math.stat.ranking.TiesStrategy;
 
-import gear.ConstValues;
+import gear.gwassummary.GWASReader;
 import gear.gwassummary.MetaStat;
 import gear.subcommands.CommandArguments;
 import gear.subcommands.CommandImpl;
@@ -50,7 +50,6 @@ public class LambdaDCommandImpl extends CommandImpl
 
 		initial();
 
-		
 //generating matrix
 		if(lamArgs.isCM())
 		{
@@ -59,6 +58,7 @@ public class LambdaDCommandImpl extends CommandImpl
 		}
 		else
 		{
+			String[] MetaFile = gReader.getMetaFile();
 			for (int i=0; i < MetaFile.length-1; i++)
 			{
 				for (int j = (i+1); j < MetaFile.length; j++)
@@ -98,16 +98,26 @@ public class LambdaDCommandImpl extends CommandImpl
 
 	private void initial()
 	{
+		gReader = new GWASReader(lamArgs);
+
 		Me = lamArgs.getMe();
-		MetaFile = lamArgs.getMetaFile();
-		lamMat = new double[MetaFile.length][MetaFile.length];
-		zMat = new double[MetaFile.length][MetaFile.length];
-		olCtrlMat = new double[MetaFile.length][MetaFile.length];
-		olCsMat = new double[MetaFile.length][MetaFile.length];
+		int NumMetaFile = gReader.getNumMetaFile();
+		
+		if (NumMetaFile < 2)
+		{
+			Logger.printUserError("At least two summary statistic files should be specified.\n");
+			Logger.printUserError("GEAR quitted.\n");
+			System.exit(0);
+		}
 
-		kMat = new double[MetaFile.length][MetaFile.length];
+		lamMat = new double[NumMetaFile][NumMetaFile];
+		zMat = new double[NumMetaFile][NumMetaFile];
+		olCtrlMat = new double[NumMetaFile][NumMetaFile];
+		olCsMat = new double[NumMetaFile][NumMetaFile];
 
-		for(int i = 0; i < MetaFile.length; i++)
+		kMat = new double[NumMetaFile][NumMetaFile];
+
+		for(int i = 0; i < NumMetaFile; i++)
 		{
 			Arrays.fill(lamMat[i], 1);
 			Arrays.fill(zMat[i], 1);
@@ -124,33 +134,14 @@ public class LambdaDCommandImpl extends CommandImpl
 			}
 		}
 
-		if (MetaFile.length < 2)
-		{
-			Logger.printUserError("At least two summary statistic files should be specified.\n");
-			Logger.printUserError("GEAR quitted.\n");
-			System.exit(0);
-		}
-
-		logit = new boolean[MetaFile.length];
-		Arrays.fill(logit, false);
-
-		KeyIdx = new int[MetaFile.length][8];
-		for (int i = 0; i < KeyIdx.length; i++)
-		{
-			Arrays.fill(KeyIdx[i], -1);
-		}
-
 //reading meta files
-		for (int i = 0; i < MetaFile.length; i++)
-		{
-			HashMap<String, MetaStat> m = readMeta(i);
-			meta.add(m);
-		}
 	}
 
 	private void MetaAnalysis()
 	{
-		double[][] Mx = new double[MetaFile.length][MetaFile.length];
+		int NumMetaFile = gReader.getNumMetaFile();
+
+		double[][] Mx = new double[NumMetaFile][NumMetaFile];
 		for (int i = 0; i < Mx.length; i++)
 		{
 			for (int j = 0; j < i + 1; j++)
@@ -163,7 +154,7 @@ public class LambdaDCommandImpl extends CommandImpl
 		RealMatrix gg = new Array2DRowRealMatrix(Mx);
 		RealMatrix gg_Inv = (new LUDecompositionImpl(gg)).getSolver().getInverse();
 //		InvMx = gg_Inv.getData();
-		RealMatrix Unit = new Array2DRowRealMatrix(MetaFile.length, 1);
+		RealMatrix Unit = new Array2DRowRealMatrix(NumMetaFile, 1);
 		for (int i = 0; i < Unit.getRowDimension(); i++)
 		{
 			Unit.setEntry(i, 0, 1);
@@ -172,13 +163,13 @@ public class LambdaDCommandImpl extends CommandImpl
 		RealMatrix tmp1 = tmp.multiply(Unit);
 		RealMatrix W = tmp.scalarMultiply(1/tmp1.getEntry(0, 0));
 
-		Set<String> keys = MetaSNPTable.keySet();
+		Set<String> keys = gReader.getMetaSNPTable().keySet();
 		for (Iterator<String> e=keys.iterator(); e.hasNext();)
 		{
 			String key = e.next();
-			ArrayList<Integer> Int = MetaSNPTable.get(key);
+			ArrayList<Integer> Int = gReader.getMetaSNPTable().get(key);
 			//common snp only
-			if(Int.get(Int.size()-1) == MetaFile.length)
+			if(Int.get(Int.size()-1) == NumMetaFile)
 			{
 				MetaCommon(key, Mx, W, Int);
 			}
@@ -225,14 +216,14 @@ public class LambdaDCommandImpl extends CommandImpl
 		double gse = 0;
 		double[] se = new double[W.getColumnDimension()];
 		
-		HashMap<String, MetaStat> m1 = meta.get(idx[0]);
+		HashMap<String, MetaStat> m1 = gReader.getMetaStat().get(idx[0]);
 		MetaStat ms1 = m1.get(key);
 		gb += ms1.getEffect() * W.getEntry(0, 0);
 		se[0] = ms1.getSE();
 
 		for (int i = 1; i < idx.length; i++)
 		{
-			HashMap<String, MetaStat> m2 = meta.get(idx[i]);
+			HashMap<String, MetaStat> m2 = gReader.getMetaStat().get(idx[i]);
 			MetaStat ms2 = m2.get(key); 
 			se[i] = ms2.getSE();
 
@@ -263,14 +254,14 @@ public class LambdaDCommandImpl extends CommandImpl
 		double gse = 0;
 		double[] se = new double[W.getColumnDimension()];
 		
-		HashMap<String, MetaStat> m1 = meta.get(0);
+		HashMap<String, MetaStat> m1 = gReader.getMetaStat().get(0);
 		MetaStat ms1 = m1.get(key);
 		gb += ms1.getEffect() * W.getEntry(0, 0);
 		se[0] = ms1.getSE();
 			
-		for(int i = 1; i < meta.size(); i++)
+		for(int i = 1; i < gReader.getMetaStat().size(); i++)
 		{
-			HashMap<String, MetaStat> m2 = meta.get(i);
+			HashMap<String, MetaStat> m2 = gReader.getMetaStat().get(i);
 			MetaStat ms2 = m2.get(key); 
 			se[i] = ms2.getSE();
 
@@ -295,347 +286,18 @@ public class LambdaDCommandImpl extends CommandImpl
 		System.out.println(key + " " +gb + " " + gse + " " + Int.toString());
 	}
 
-	private HashMap<String, MetaStat> readMeta(int metaIdx)
-	{
-		BufferedReader reader = null;
-		if (lamArgs.isGZ())
-		{
-			reader = BufferedReader.openGZipFile(MetaFile[metaIdx], "Summary Statistic file");
-		}
-		else
-		{
-			reader = BufferedReader.openTextFile(MetaFile[metaIdx], "Summary Statistic file");
-		}
-
-		String[] tokens = reader.readTokens();
-		int tokenLen = tokens.length;
-
-		for(int i = 0; i < tokens.length; i++)
-		{
-			if (tokens[i].equalsIgnoreCase(lamArgs.getKey(LambdaDCommandArguments.SNP)))
-			{
-				KeyIdx[metaIdx][SNP] = i;
-			}
-			if (tokens[i].equalsIgnoreCase(lamArgs.getKey(LambdaDCommandArguments.CHR)))
-			{
-				KeyIdx[metaIdx][CHR] = i;
-			}
-			if (tokens[i].equalsIgnoreCase(lamArgs.getKey(LambdaDCommandArguments.BP)))
-			{
-				KeyIdx[metaIdx][BP] = i;
-			}
-			if (lamArgs.isQT())
-			{
-				if (tokens[i].equalsIgnoreCase(lamArgs.getKey(LambdaDCommandArguments.BETA)))
-				{
-					KeyIdx[metaIdx][BETA] = i;
-				}
-			}
-			else
-			{
-				if(tokens[i].equalsIgnoreCase(lamArgs.getKey(LambdaDCommandArguments.BETA)))
-				{
-					KeyIdx[metaIdx][BETA] = i;
-					logit[metaIdx] = false;
-				}
-				else if (tokens[i].equalsIgnoreCase(lamArgs.getKey(LambdaDCommandArguments.OR)))
-				{
-					KeyIdx[metaIdx][OR] = i;
-					logit[metaIdx] = true;
-				}
-			}
-			if (tokens[i].equalsIgnoreCase(lamArgs.getKey(LambdaDCommandArguments.SE)))
-			{
-				KeyIdx[metaIdx][SE] = i;
-			}
-			if (tokens[i].equalsIgnoreCase(lamArgs.getKey(LambdaDCommandArguments.P)))
-			{
-				KeyIdx[metaIdx][P] = i;
-			}
-			if (tokens[i].equalsIgnoreCase(lamArgs.getKey(LambdaDCommandArguments.A1)))
-			{
-				KeyIdx[metaIdx][A1] = i;
-			}
-			if (tokens[i].equalsIgnoreCase(lamArgs.getKey(LambdaDCommandArguments.A2)))
-            {
-				KeyIdx[metaIdx][A2] = i;
-			}
-		}
-
-		boolean qFlag = false;
-
-		if (KeyIdx[metaIdx][SNP] == -1)
-		{
-			Logger.printUserLog("Cannot find the snp column in " + MetaFile[metaIdx]);
-			qFlag = true;
-		}
-/*
-		if (KeyIdx[metaIdx][CHR] == -1)
-		{
-			Logger.printUserLog("Cannot find the chr column in " + MetaFile[metaIdx]);
-			qFlag = true;
-		}
-		if (KeyIdx[metaIdx][BP] == -1)
-		{
-			Logger.printUserLog("Cannot find the bp column in " + MetaFile[metaIdx]);
-			qFlag = true;
-		}
-*/
-		if (KeyIdx[metaIdx][BETA] == -1)
-		{
-			Logger.printUserLog("Cannot find the beta/or in " + MetaFile[metaIdx]);
-		}		
-		if (KeyIdx[metaIdx][SE] == -1)
-		{
-			Logger.printUserLog("Cannot find the se value in " + MetaFile[metaIdx]);
-		}
-		if (KeyIdx[metaIdx][P] == -1)
-		{
-			Logger.printUserLog("Cannot find the p value in " + MetaFile[metaIdx]);
-		}
-		if (KeyIdx[metaIdx][A1] == -1)
-		{
-			Logger.printUserLog("Cannot find the allele 1 in " + MetaFile[metaIdx]);
-		}
-//		if (KeyIdx[metaIdx][7] == -1)
-//		{
-//			Logger.printUserLog("Cannot find the allele 2 in " + MetaFile[metaIdx]);
-//		}
-
-		if (qFlag)
-		{
-			Logger.printUserLog("GEAR quitted.");
-			System.exit(0);
-		}
-
-		HashMap<String, MetaStat> sumstat = NewIt.newHashMap();
-		ArrayList<String> snpArray = NewIt.newArrayList();
-		int total = 0;
-		int cnt = 0;
-		int cntBadChr = 0;
-		int cntBadBp = 0;
-		int cntBadBeta = 0;
-		int cntBadP = 0;
-		int cntBadSE = 0;
-		int cntBadA1 = 0;
-		int cntBadA2 = 0;
-		
-		int cntPRange = 0;
-		while( (tokens = reader.readTokens(tokenLen)) != null)
-		{
-			total++;
-			if (KeyIdx[metaIdx][CHR] != -1 && ConstValues.isNA(tokens[KeyIdx[metaIdx][CHR]]))
-			{
-				cntBadChr++;
-				continue;
-			}
-			if (KeyIdx[metaIdx][BP] != -1 && ConstValues.isNA(tokens[KeyIdx[metaIdx][BP]]))
-			{
-				cntBadBp++;
-				continue;
-			}
-
-			if (ConstValues.isNA(tokens[KeyIdx[metaIdx][BETA]]))
-			{
-				cntBadBeta++;
-				continue;
-			}
-			if (ConstValues.isNA(tokens[KeyIdx[metaIdx][SE]]))
-			{
-				cntBadSE++;
-				continue;
-			}
-			if (Float.parseFloat(tokens[KeyIdx[metaIdx][SE]]) <= 0)
-			{
-				cntBadSE++;
-				continue;
-			}
-			if (ConstValues.isNA(tokens[KeyIdx[metaIdx][P]]))
-			{
-				cntBadP++;
-				continue;
-			}
-			if (tokens[KeyIdx[metaIdx][A1]].length() != 1)
-			{
-				cntBadA1++;
-				continue;
-			}
-			if (KeyIdx[metaIdx][A2] != -1 && tokens[KeyIdx[metaIdx][A2]].length() != 1)
-			{
-				cntBadA2++;
-				continue;
-			}
-
-			//various filters
-			if (lamArgs.isQRange())
-			{
-				double p = Double.parseDouble(tokens[KeyIdx[metaIdx][P]]);
-				if (p < lamArgs.getQRLow() || p > lamArgs.getQRHigh())
-				{
-					cntPRange++;
-					continue;
-				}
-			}
-
-			MetaStat ms = null;
-			ms = new MetaStat(tokens[KeyIdx[metaIdx][SNP]], Float.parseFloat(tokens[KeyIdx[metaIdx][BETA]]), Float.parseFloat(tokens[KeyIdx[metaIdx][SE]]), Double.parseDouble(tokens[KeyIdx[metaIdx][P]]), tokens[KeyIdx[metaIdx][A1]].charAt(0), logit[metaIdx]);
-			if (KeyIdx[metaIdx][CHR] != -1)
-			{
-				ms.setChr(Integer.parseInt(tokens[KeyIdx[metaIdx][CHR]]));
-			}
-			if (KeyIdx[metaIdx][BP] != -1)
-			{
-				ms.setBP(Integer.parseInt(tokens[KeyIdx[metaIdx][BP]]));
-			}
-			if (KeyIdx[metaIdx][A2] != -1)
-			{
-				ms.setA2(tokens[KeyIdx[metaIdx][A2]].charAt(0));
-			}
-			sumstat.put(ms.getSNP(), ms);
-			snpArray.add(ms.getSNP());
-
-			if ( MetaSNPTable.containsKey(ms.getSNP()) )
-			{
-				ArrayList<Integer> snpCnt = MetaSNPTable.get(ms.getSNP());
-				snpCnt.set(metaIdx, 1);
-				Integer Int = snpCnt.get(snpCnt.size()-1);
-				Int++;
-				snpCnt.set(snpCnt.size()-1, Int);
-			}
-			else
-			{
-				ArrayList<Integer> snpCnt = NewIt.newArrayList();
-				snpCnt.ensureCapacity(MetaFile.length+1);
-				for(int ii = 0; ii < MetaFile.length + 1; ii++)
-				{
-					snpCnt.add(0);
-				}
-				snpCnt.set(metaIdx, 1);
-				snpCnt.set(snpCnt.size()-1, 1);
-				MetaSNPTable.put(ms.getSNP(), snpCnt);
-			}
-			cnt++;
-		}
-
-		if(cnt == 0)
-		{
-			Logger.printUserLog("Did not find any summary statistics from '" + MetaFile[metaIdx] + ".'");
-			System.exit(0);
-		}
-		else
-		{
-			Logger.printUserLog("Read " + total + " summary statistics from '" + MetaFile[metaIdx] + ".'");			
-		}
-
-		if (cntBadChr > 0)
-		{
-			if (cntBadChr == 1)
-			{
-				Logger.printUserLog("Removed " + cntBadChr + " locus due to incorrect Chr.");				
-			}
-			else
-			{
-				Logger.printUserLog("Removed " + cntBadChr + " loci due to incorrect Chr.");				
-			}
-		}
-
-		if (cntBadBp > 0)
-		{
-			if (cntBadBp == 1)
-			{
-				Logger.printUserLog("Removed " + cntBadBp + " locus due to incorrect Bp.");				
-			}
-			else
-			{
-				Logger.printUserLog("Removed " + cntBadChr + " loci due to incorrect Bp.");				
-			}
-		}
-
-		if (cntBadBeta > 0)
-		{
-			if (cntBadBeta == 1)
-			{
-				Logger.printUserLog("Removed " + cntBadBeta + " locus due to incorrect effect.");				
-			}
-			else
-			{
-				Logger.printUserLog("Removed " + cntBadBeta + " loci due to incorrect effect.");				
-			}
-		}
-
-		if (cntBadSE > 0)
-		{
-			if (cntBadSE == 1)
-			{
-				Logger.printUserLog("Removed " + cntBadSE + " locus due to incorrect se.");				
-			}
-			else
-			{
-				Logger.printUserLog("Removed " + cntBadSE + " loci due to incorrect se.");
-			}
-		}
-
-		if (cntBadP > 0)
-		{
-			if (cntBadP == 1)
-			{
-				Logger.printUserLog("Removed " + cntBadP + " locus due to incorrect p values.");				
-			}
-			else
-			{
-				Logger.printUserLog("Removed " + cntBadP + " loci due to incorrect p values.");
-			}
-		}
-
-		if (cntBadA1 > 0)
-		{
-			if (cntBadA1 == 1)
-			{
-				Logger.printUserLog("Removed " + cntBadA1 + " locus due to bad a1 allele.");				
-			}
-			else
-			{
-				Logger.printUserLog("Removed " + cntBadA1 + " loci due to bad a1 allele.");
-			}
-		}
-		if(cntBadA2 > 0)
-		{
-			if (cntBadA2 == 1)
-			{
-				Logger.printUserLog("Removed " + cntBadA2 + " locus due to bad a2 allele.");
-			}
-			else
-			{
-				Logger.printUserLog("Removed " + cntBadA2 + " loci due to bad a2 allele.");				
-			}
-		}
-		
-		if(cntPRange > 0 && lamArgs.isQRange())
-		{
-			if (cntPRange == 1)
-			{
-				Logger.printUserLog("Removed " + cntPRange + " locus which were not inside the range [" + lamArgs.getQRLow() + ", " + lamArgs.getQRHigh() +"].");
-			}
-			else
-			{
-				Logger.printUserLog("Removed " + cntPRange + " loi which were not inside the range [" + lamArgs.getQRLow() + ", " + lamArgs.getQRHigh() +"].");
-			}
-		}
-
-		SNPArray.add(snpArray);
-		return sumstat;
-	}
-
 	private void calculateLambdaD(int idx1, int idx2)
 	{
 		ArrayList<LamUnit> LamArray = NewIt.newArrayList();
     	DescriptiveStatistics T0 = new DescriptiveStatistics();
 
 		int cntAmbiguous = 0;
-		HashMap<String, MetaStat> SumStat1 = meta.get(idx1);
-		HashMap<String, MetaStat> SumStat2 = meta.get(idx2);
+		HashMap<String, MetaStat> SumStat1 = gReader.getMetaStat().get(idx1);
+		HashMap<String, MetaStat> SumStat2 = gReader.getMetaStat().get(idx2);
 
-		ArrayList<String> snpArray = SNPArray.get(idx1);
+		ArrayList<String> snpArray = gReader.getMetaSNPArray().get(idx1);
+		
+		int[][] KeyIdx = gReader.getKeyIndex();
 		for(String snp : snpArray)
 		{
 			if (!SumStat2.containsKey(snp) || !SumStat1.containsKey(snp))
@@ -645,8 +307,8 @@ public class LambdaDCommandImpl extends CommandImpl
 			MetaStat ms1 = SumStat1.get(snp);
 			MetaStat ms2 = SumStat2.get(snp);
 			double d = 0;
-
-			if (KeyIdx[idx1][SE] != -1)
+			
+			if (KeyIdx[idx1][GWASReader.SE] != -1)
 			{
 				if (SNPMatch.isAmbiguous(ms1.getA1(), ms1.getA2()))
 				{
@@ -654,7 +316,7 @@ public class LambdaDCommandImpl extends CommandImpl
 					continue;
 				}
 			}
-			if (KeyIdx[idx2][SE] != -1)
+			if (KeyIdx[idx2][GWASReader.SE] != -1)
 			{
 				if (SNPMatch.isAmbiguous(ms2.getA1(), ms2.getA2()))
 				{
@@ -1001,13 +663,14 @@ public class LambdaDCommandImpl extends CommandImpl
 
 	private void readCMFile()
 	{
+		int NumMetaFile = gReader.getNumMetaFile();
 		BufferedReader bf = BufferedReader.openTextFile(lamArgs.getCMFile(), "cm file.");
 		Logger.printUserLog("Reading '" + lamArgs.getCMFile() + "'.");
-		zMat = new double[MetaFile.length][MetaFile.length];
+		zMat = new double[NumMetaFile][NumMetaFile];
 		String[] d = null;
 		int cnt=0;
 		while ( (d = bf.readTokens())!= null ){
-			if (d.length != MetaFile.length )
+			if (d.length != NumMetaFile )
 			{
 				Logger.printUserError("incorrect '" + lamArgs.getCMFile() + "'.");
 				System.exit(0);
@@ -1037,20 +700,18 @@ public class LambdaDCommandImpl extends CommandImpl
 	private double Kappa = 1;
 	private LambdaDCommandArguments lamArgs;
 
-	private int SNP = 0, CHR=1, BP=2, BETA=3, OR=3, SE=4, P=5, A1=6, A2=7;
 	private String titleLine= "SNP\tChr\tBp\tA1\tBETA1\tSE1\tP1\tBETA2\tSE2\tP2\tChiObs\tChiExp\tLambdaD\n";
-	private int[][] KeyIdx; //snp, chr, bp, beta, se, p, a1, a2
-	private String[] MetaFile;
-	private ArrayList<HashMap<String, MetaStat>> meta = NewIt.newArrayList();
-	private ArrayList<ArrayList<String>> SNPArray = NewIt.newArrayList();
-	private HashMap<String, ArrayList<Integer>> MetaSNPTable = NewIt.newHashMap();
+//	private int[][] KeyIdx; //snp, chr, bp, beta, se, p, a1, a2
+
+	private GWASReader gReader;
+//	private ArrayList<HashMap<String, MetaStat>> meta = NewIt.newArrayList();
+//	private ArrayList<ArrayList<String>> SNPArray = NewIt.newArrayList();
+//	private HashMap<String, ArrayList<Integer>> MetaSNPTable = NewIt.newHashMap();
 
 	private boolean[] logit;
 	private double[][] lamMat;
 	private double[][] zMat;
 	private double[][] olCtrlMat;
 	private double[][] olCsMat;
-	private double[][] kMat;
-	
-	
+	private double[][] kMat;	
 }
