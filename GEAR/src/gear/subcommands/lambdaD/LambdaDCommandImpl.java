@@ -22,6 +22,7 @@ import org.apache.commons.math.stat.ranking.NaturalRanking;
 import org.apache.commons.math.stat.ranking.TiesStrategy;
 
 import gear.ConstValues;
+import gear.gwassummary.MetaStat;
 import gear.subcommands.CommandArguments;
 import gear.subcommands.CommandImpl;
 import gear.util.BufferedReader;
@@ -1045,7 +1046,6 @@ public class LambdaDCommandImpl extends CommandImpl
 	private HashMap<String, ArrayList<Integer>> MetaSNPTable = NewIt.newHashMap();
 
 	private boolean[] logit;
-
 	private double[][] lamMat;
 	private double[][] zMat;
 	private double[][] olCtrlMat;
