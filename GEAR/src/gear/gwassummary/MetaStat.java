@@ -1,8 +1,8 @@
-package gear.subcommands.lambdaD;
+package gear.gwassummary;
 
 public class MetaStat
 {
-	protected MetaStat(String snp, float effect, float se, double p, char a1, boolean logit)
+	public MetaStat(String snp, float effect, float se, double p, char a1, boolean logit)
 	{
 		this.snp = snp;
 		this.effect = effect;
@@ -19,17 +19,17 @@ public class MetaStat
 		this.logit = logit;
 	}
 
-	protected void setChr(int chr)
+	public void setChr(int chr)
 	{
 		this.chr = chr;
 	}
 	
-	protected void setBP(int bp)
+	public void setBP(int bp)
 	{
 		this.bp = bp;
 	}
 	
-	protected void setA2(char a2)
+	public void setA2(char a2)
 	{
 		if (a2 >=97 && a2 <= 122)
 		{
@@ -41,42 +41,42 @@ public class MetaStat
 		}
 	}
 	
-	protected String getSNP()
+	public String getSNP()
 	{
 		return snp;
 	}
 
-	protected int getChr()
+	public int getChr()
 	{
 		return chr;
 	}
 	
-	protected long getBP()
+	public long getBP()
 	{
 		return bp;
 	}
 	
-	protected float getEffect()
+	public float getEffect()
 	{
 		return (float) (logit? Math.log(effect) : effect);
 	}
 
-	protected float getSE()
+	public float getSE()
 	{
 		return se;
 	}
 
-	protected double getP()
+	public double getP()
 	{
 		return p;
 	}
 
-	protected char getA1()
+	public char getA1()
 	{
 		return a1;
 	}
 
-	protected char getA2()
+	public char getA2()
 	{
 		return a2;
 	}

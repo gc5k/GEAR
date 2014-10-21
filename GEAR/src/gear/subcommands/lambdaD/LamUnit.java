@@ -1,5 +1,7 @@
 package gear.subcommands.lambdaD;
 
+import gear.gwassummary.MetaStat;
+
 public class LamUnit implements Comparable<LamUnit>
 {
 	public LamUnit(double chi1, MetaStat ms1, MetaStat ms2)
