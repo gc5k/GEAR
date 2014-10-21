@@ -48,7 +48,6 @@ public class LambdaDCommand extends Command
 		options.addOption(OptionBuilder.withDescription(OPT_VERBOSE_GZ_DESC).withLongOpt(OPT_VERBOSE_GZ_LONG).create(OPT_VERBOSE_GZ));
 		options.addOption(OptionBuilder.withDescription(OPT_Q_RANGE_DESC).withLongOpt(OPT_Q_RANGE_LONG).hasArgs(2).create(OPT_Q_RANGE));
 
-		options.addOption(OptionBuilder.withDescription(OPT_CM_DESC).hasArg().create(OPT_CM));
 	}
 
 	@Override
@@ -144,10 +143,6 @@ public class LambdaDCommand extends Command
 			lamD.setQRange(cmdLine.getOptionValues(OPT_Q_RANGE));
 		}
 		
-		if (cmdLine.hasOption(OPT_CM))
-		{
-			lamD.setCM(cmdLine.getOptionValue(OPT_CM));
-		}
 		return lamD;
 	}
 
@@ -206,7 +201,4 @@ public class LambdaDCommand extends Command
 	private final static String OPT_ME_DEFAULT = "30000";
 	private final static String OPT_ME_DESC = "effective number of markers.";
 	
-	private final static String OPT_CM = "cm";
-	private final static String OPT_CM_DESC = "correlation matrix";
-
 }
