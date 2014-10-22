@@ -1,6 +1,7 @@
 package gear.subcommands.weightedmeta;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Set;
@@ -13,7 +14,6 @@ import gear.gwassummary.GWASReader;
 import gear.gwassummary.MetaStat;
 import gear.subcommands.CommandArguments;
 import gear.subcommands.CommandImpl;
-import gear.subcommands.lambdaD.LambdaDCommandArguments;
 import gear.util.BufferedReader;
 import gear.util.Logger;
 import gear.util.SNPMatch;
@@ -24,24 +24,74 @@ public class WeightedMetaImpl extends CommandImpl
 	@Override
 	public void execute(CommandArguments cmdArgs)
 	{
-		// TODO Auto-generated method stub
+		wMetaArgs = (WeightedMetaArguments) cmdArgs;
+
+		if (wMetaArgs.isQT())
+		{
+			Logger.printUserLog("Analysing summary statistics analysis for quantitative traits.\n");			
+		}
+		else
+		{
+			Logger.printUserLog("Analysing summary statistics analysis for case-contrl studies.\n");			
+		}
+
+		initial();
+
 		readCMFile();
 		MetaAnalysis();
 
 	}
 
+	private void initial()
+	{
+		gReader = new GWASReader(wMetaArgs.getMetaFile(), wMetaArgs.getKeys(), wMetaArgs.isQT(), wMetaArgs.isGZ());
+
+		int NumMetaFile = gReader.getNumMetaFile();
+		
+		if (NumMetaFile < 2)
+		{
+			Logger.printUserError("At least two summary statistic files should be specified.\n");
+			Logger.printUserError("GEAR quitted.\n");
+			System.exit(0);
+		}
+
+		lamMat = new double[NumMetaFile][NumMetaFile];
+		zMat = new double[NumMetaFile][NumMetaFile];
+		olCtrlMat = new double[NumMetaFile][NumMetaFile];
+		olCsMat = new double[NumMetaFile][NumMetaFile];
+
+		kMat = new double[NumMetaFile][NumMetaFile];
+
+		for(int i = 0; i < NumMetaFile; i++)
+		{
+			Arrays.fill(lamMat[i], 1);
+			Arrays.fill(zMat[i], 1);
+			Arrays.fill(kMat[i], 1);
+			if (wMetaArgs.isQT())
+			{
+				olCtrlMat[i][i] = wMetaArgs.getQTsize()[i];
+				olCsMat[i][i] = wMetaArgs.getQTsize()[i];
+			}
+			else
+			{
+				olCtrlMat[i][i] = wMetaArgs.getCCsize()[i*2] + wMetaArgs.getCCsize()[i*2+1];
+				olCsMat[i][i] = wMetaArgs.getCCsize()[i*2] + wMetaArgs.getCCsize()[i*2+1];
+			}
+		}
+	}
+	
 	private void readCMFile()
 	{
 		int NumMetaFile = gReader.getNumMetaFile();
-		BufferedReader bf = BufferedReader.openTextFile(lamArgs.getCMFile(), "cm file.");
-		Logger.printUserLog("Reading '" + lamArgs.getCMFile() + "'.");
+		BufferedReader bf = BufferedReader.openTextFile(wMetaArgs.getCMFile(), "cm file.");
+		Logger.printUserLog("Reading '" + wMetaArgs.getCMFile() + "'.");
 		zMat = new double[NumMetaFile][NumMetaFile];
 		String[] d = null;
 		int cnt=0;
 		while ( (d = bf.readTokens())!= null ){
 			if (d.length != NumMetaFile )
 			{
-				Logger.printUserError("incorrect '" + lamArgs.getCMFile() + "'.");
+				Logger.printUserError("incorrect '" + wMetaArgs.getCMFile() + "'.");
 				System.exit(0);
 			}
 			for(int i = 0; i < d.length; i++)
@@ -209,22 +259,10 @@ public class WeightedMetaImpl extends CommandImpl
 		System.out.println(key + " " +gb + " " + gse + " " + Int.toString());
 	}
 
-	private double Me = 30000;
-
-	private double R1 = 1;
-	private double R2 = 1;
-	private double Kappa = 1;
-	private LambdaDCommandArguments lamArgs;
-
-	private String titleLine= "SNP\tChr\tBp\tA1\tBETA1\tSE1\tP1\tBETA2\tSE2\tP2\tChiObs\tChiExp\tLambdaD\n";
-//	private int[][] KeyIdx; //snp, chr, bp, beta, se, p, a1, a2
+	private WeightedMetaArguments wMetaArgs;
 
 	private GWASReader gReader;
-//	private ArrayList<HashMap<String, MetaStat>> meta = NewIt.newArrayList();
-//	private ArrayList<ArrayList<String>> SNPArray = NewIt.newArrayList();
-//	private HashMap<String, ArrayList<Integer>> MetaSNPTable = NewIt.newHashMap();
 
-	private boolean[] logit;
 	private double[][] lamMat;
 	private double[][] zMat;
 	private double[][] olCtrlMat;

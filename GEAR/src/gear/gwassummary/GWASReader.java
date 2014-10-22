@@ -13,12 +13,12 @@ import java.util.HashMap;
 public class GWASReader
 {
 
-	public GWASReader(LambdaDCommandArguments lamArgs)
+	public GWASReader(String[] MetaFile, String[] field, boolean isQT, boolean isGZ)
 	{
-		this.lamArgs = lamArgs;
-		
-
-		MetaFile = lamArgs.getMetaFile();
+		this.MetaFile = MetaFile;
+		this.field = field;
+		this.isQT = isQT;
+		this.isGZ = isGZ;
 
 		logit = new boolean[MetaFile.length];
 		Arrays.fill(logit, false);
@@ -29,8 +29,6 @@ public class GWASReader
 			Arrays.fill(KeyIdx[i], -1);
 		}
 
-		this.size = lamArgs.getQTsize();
-		this.isQT = lamArgs.isQT();
 		for (int i = 0; i < MetaFile.length; i++)
 		{
 			HashMap<String, MetaStat> m = readMeta(i);
@@ -71,7 +69,7 @@ public class GWASReader
 	private HashMap<String, MetaStat> readMeta(int metaIdx)
 	{
 		BufferedReader reader = null;
-		if (lamArgs.isGZ())
+		if (isGZ)
 		{
 			reader = BufferedReader.openGZipFile(MetaFile[metaIdx], "Summary Statistic file");
 		}
@@ -85,51 +83,51 @@ public class GWASReader
 
 		for(int i = 0; i < tokens.length; i++)
 		{
-			if (tokens[i].equalsIgnoreCase(lamArgs.getKey(LambdaDCommandArguments.SNP)))
+			if (tokens[i].equalsIgnoreCase(field[GWASConstant.SNP]))
 			{
 				KeyIdx[metaIdx][SNP] = i;
 			}
-			if (tokens[i].equalsIgnoreCase(lamArgs.getKey(LambdaDCommandArguments.CHR)))
+			if (tokens[i].equalsIgnoreCase(field[GWASConstant.CHR]))
 			{
 				KeyIdx[metaIdx][CHR] = i;
 			}
-			if (tokens[i].equalsIgnoreCase(lamArgs.getKey(LambdaDCommandArguments.BP)))
+			if (tokens[i].equalsIgnoreCase(field[GWASConstant.BP]))
 			{
 				KeyIdx[metaIdx][BP] = i;
 			}
-			if (lamArgs.isQT())
+			if (isQT)
 			{
-				if (tokens[i].equalsIgnoreCase(lamArgs.getKey(LambdaDCommandArguments.BETA)))
+				if (tokens[i].equalsIgnoreCase(field[GWASConstant.BETA]))
 				{
 					KeyIdx[metaIdx][BETA] = i;
 				}
 			}
 			else
 			{
-				if(tokens[i].equalsIgnoreCase(lamArgs.getKey(LambdaDCommandArguments.BETA)))
+				if(tokens[i].equalsIgnoreCase(field[GWASConstant.BETA]))
 				{
 					KeyIdx[metaIdx][BETA] = i;
 					logit[metaIdx] = false;
 				}
-				else if (tokens[i].equalsIgnoreCase(lamArgs.getKey(LambdaDCommandArguments.OR)))
+				else if (tokens[i].equalsIgnoreCase(field[GWASConstant.OR]))
 				{
 					KeyIdx[metaIdx][OR] = i;
 					logit[metaIdx] = true;
 				}
 			}
-			if (tokens[i].equalsIgnoreCase(lamArgs.getKey(LambdaDCommandArguments.SE)))
+			if (tokens[i].equalsIgnoreCase(field[GWASConstant.SE]))
 			{
 				KeyIdx[metaIdx][SE] = i;
 			}
-			if (tokens[i].equalsIgnoreCase(lamArgs.getKey(LambdaDCommandArguments.P)))
+			if (tokens[i].equalsIgnoreCase(field[GWASConstant.P]))
 			{
 				KeyIdx[metaIdx][P] = i;
 			}
-			if (tokens[i].equalsIgnoreCase(lamArgs.getKey(LambdaDCommandArguments.A1)))
+			if (tokens[i].equalsIgnoreCase(field[GWASConstant.A1]))
 			{
 				KeyIdx[metaIdx][A1] = i;
 			}
-			if (tokens[i].equalsIgnoreCase(lamArgs.getKey(LambdaDCommandArguments.A2)))
+			if (tokens[i].equalsIgnoreCase(field[GWASConstant.A2]))
             {
 				KeyIdx[metaIdx][A2] = i;
 			}
@@ -193,7 +191,6 @@ public class GWASReader
 		int cntBadA1 = 0;
 		int cntBadA2 = 0;
 		
-		int cntPRange = 0;
 		while( (tokens = reader.readTokens(tokenLen)) != null)
 		{
 			total++;
@@ -239,16 +236,6 @@ public class GWASReader
 				continue;
 			}
 
-			//various filters
-			if (lamArgs.isQRange())
-			{
-				double p = Double.parseDouble(tokens[KeyIdx[metaIdx][P]]);
-				if (p < lamArgs.getQRLow() || p > lamArgs.getQRHigh())
-				{
-					cntPRange++;
-					continue;
-				}
-			}
 
 			MetaStat ms = null;
 			ms = new MetaStat(tokens[KeyIdx[metaIdx][SNP]], Float.parseFloat(tokens[KeyIdx[metaIdx][BETA]]), Float.parseFloat(tokens[KeyIdx[metaIdx][SE]]), Double.parseDouble(tokens[KeyIdx[metaIdx][P]]), tokens[KeyIdx[metaIdx][A1]].charAt(0), logit[metaIdx]);
@@ -382,27 +369,14 @@ public class GWASReader
 				Logger.printUserLog("Removed " + cntBadA2 + " loci due to bad a2 allele.");				
 			}
 		}
-		
-		if(cntPRange > 0 && lamArgs.isQRange())
-		{
-			if (cntPRange == 1)
-			{
-				Logger.printUserLog("Removed " + cntPRange + " locus which were not inside the range [" + lamArgs.getQRLow() + ", " + lamArgs.getQRHigh() +"].");
-			}
-			else
-			{
-				Logger.printUserLog("Removed " + cntPRange + " loi which were not inside the range [" + lamArgs.getQRLow() + ", " + lamArgs.getQRHigh() +"].");
-			}
-		}
 
 		MetaSNPArray.add(snpArray);
 		return sumstat;
 	}
 	
-	private LambdaDCommandArguments lamArgs;
-	private double[] size;
-
+	private String[] field;
 	private boolean isQT;
+	private boolean isGZ;
 	private boolean[] logit;
 	public static int SNP = 0, CHR=1, BP=2, BETA=3, OR=3, SE=4, P=5, A1=6, A2=7;
 	private int[][] KeyIdx; //snp, chr, bp, beta, se, p, a1, a2
@@ -410,4 +384,5 @@ public class GWASReader
 	private ArrayList<HashMap<String, MetaStat>> MetaStat = NewIt.newArrayList();
 	private ArrayList<ArrayList<String>> MetaSNPArray = NewIt.newArrayList();
 	private HashMap<String, ArrayList<Integer>> MetaSNPTable = NewIt.newHashMap();
+
 }

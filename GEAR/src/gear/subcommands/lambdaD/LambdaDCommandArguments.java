@@ -2,6 +2,7 @@ package gear.subcommands.lambdaD;
 
 import java.util.ArrayList;
 
+import gear.gwassummary.GWASConstant;
 import gear.subcommands.CommandArguments;
 import gear.util.BufferedReader;
 import gear.util.FileUtil;
@@ -140,25 +141,25 @@ public class LambdaDCommandArguments extends CommandArguments
 		return isQT;
 	}
 
-	public String getKey(int i)
-	{
-		return field[i];
-	}
-
 	public void setKey(String[] k)
 	{
-		field[SNP] = k[0];
+		field[GWASConstant.SNP] = k[0];
 		if (isQT)
 		{
-			field[BETA] = k[1];			
+			field[GWASConstant.BETA] = k[1];			
 		}
 		else
 		{
-			field[OR] = k[1];			
+			field[GWASConstant.OR] = k[1];			
 		}
-		field[SE] = k[2];
-		field[A1] = k[3];
-		field[A2] = k[4];
+		field[GWASConstant.SE] = k[2];
+		field[GWASConstant.A1] = k[3];
+		field[GWASConstant.A2] = k[4];
+	}
+
+	public String[] getKeys()
+	{
+		return field;
 	}
 
 	public void setVerbose()
@@ -228,15 +229,4 @@ public class LambdaDCommandArguments extends CommandArguments
 	private double[] qtSize;
 	private double[] ccSize;
 	private String[] field = {"snp", "chr", "bp", "beta", "or", "se", "p", "a1", "a2"};
-
-	public static final int SNP = 0;
-	public static final int CHR = 1;
-	public static final int BP = 2;
-	public static final int BETA = 3;
-	public static final int OR = 4;
-	public static final int SE = 5;
-	public static final int P = 6;
-	public static final int A1 = 7;
-	public static final int A2 = 8;
-	
 }
