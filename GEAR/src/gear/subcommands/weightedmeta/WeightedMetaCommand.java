@@ -4,8 +4,6 @@ import gear.subcommands.Command;
 import gear.subcommands.CommandArgumentException;
 import gear.subcommands.CommandArguments;
 import gear.subcommands.CommandImpl;
-import gear.subcommands.lambdaD.LambdaDCommandArguments;
-import gear.subcommands.lambdaD.LambdaDCommandImpl;
 
 import org.apache.commons.cli.CommandLine;
 import org.apache.commons.cli.OptionBuilder;
@@ -56,7 +54,7 @@ public class WeightedMetaCommand extends Command
 	@Override
 	public CommandArguments parse(CommandLine cmdLine) throws CommandArgumentException
 	{
-		LambdaDCommandArguments lamD = new LambdaDCommandArguments();
+		WeightedMetaArguments lamD = new WeightedMetaArguments();
 
 		lamD.setMe(OPT_ME_DEFAULT);
 
@@ -156,7 +154,7 @@ public class WeightedMetaCommand extends Command
 	@Override
 	protected CommandImpl createCommandImpl()
 	{
-		return new LambdaDCommandImpl();
+		return new WeightedMetaImpl();
 	}
 
 	private final static String OPT_META = "m";

@@ -90,7 +90,7 @@ public class LambdaDCommandImpl extends CommandImpl
 
 	private void initial()
 	{
-		gReader = new GWASReader(lamArgs);
+		gReader = new GWASReader(lamArgs.getMetaFile(), lamArgs.getKeys(), lamArgs.isQT(), lamArgs.isGZ());
 
 		Me = lamArgs.getMe();
 		int NumMetaFile = gReader.getNumMetaFile();
@@ -504,38 +504,6 @@ public class LambdaDCommandImpl extends CommandImpl
 		writer.close();
 	}
 
-	private void readCMFile()
-	{
-		int NumMetaFile = gReader.getNumMetaFile();
-		BufferedReader bf = BufferedReader.openTextFile(lamArgs.getCMFile(), "cm file.");
-		Logger.printUserLog("Reading '" + lamArgs.getCMFile() + "'.");
-		zMat = new double[NumMetaFile][NumMetaFile];
-		String[] d = null;
-		int cnt=0;
-		while ( (d = bf.readTokens())!= null ){
-			if (d.length != NumMetaFile )
-			{
-				Logger.printUserError("incorrect '" + lamArgs.getCMFile() + "'.");
-				System.exit(0);
-			}
-			for(int i = 0; i < d.length; i++)
-			{
-				zMat[cnt][i] = Double.parseDouble(d[i]);
-			}
-			cnt++;
-		}
-		
-		for(int i = 0; i < zMat.length; i++)
-		{
-			for(int j = 0; j < zMat[i].length; j++)
-			{
-				System.out.print(zMat[i][j] + " ");
-			}
-			System.out.println();
-		}
-	}
-
-//	private int M = 100;
 	private double Me = 30000;
 
 	private double R1 = 1;
@@ -544,14 +512,9 @@ public class LambdaDCommandImpl extends CommandImpl
 	private LambdaDCommandArguments lamArgs;
 
 	private String titleLine= "SNP\tChr\tBp\tA1\tBETA1\tSE1\tP1\tBETA2\tSE2\tP2\tChiObs\tChiExp\tLambdaD\n";
-//	private int[][] KeyIdx; //snp, chr, bp, beta, se, p, a1, a2
 
 	private GWASReader gReader;
-//	private ArrayList<HashMap<String, MetaStat>> meta = NewIt.newArrayList();
-//	private ArrayList<ArrayList<String>> SNPArray = NewIt.newArrayList();
-//	private HashMap<String, ArrayList<Integer>> MetaSNPTable = NewIt.newHashMap();
 
-	private boolean[] logit;
 	private double[][] lamMat;
 	private double[][] zMat;
 	private double[][] olCtrlMat;
