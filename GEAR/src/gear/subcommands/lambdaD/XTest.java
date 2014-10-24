@@ -41,8 +41,6 @@ public class XTest
 			XVec.addValue(DesStat[i]);
 		}
 
-		double XS = XVec.getSum();
-
 		try
 		{
 			// two-tail tests

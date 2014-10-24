@@ -44,9 +44,6 @@ public class WeightedMetaCommand extends Command
 		options.addOption(OptionBuilder.withDescription(OPT_QT_BATCH_LONG_DESC).withLongOpt(OPT_QT_BATCH_LONG).hasArg().create());
 		
 		options.addOption(OptionBuilder.withDescription(OPT_KEY_DESC).hasArgs(5).create(OPT_KEY));
-		options.addOption(OptionBuilder.withDescription(OPT_VERBOSE_DESC).withLongOpt(OPT_VERBOSE_LONG).create(OPT_VERBOSE));
-		options.addOption(OptionBuilder.withDescription(OPT_VERBOSE_GZ_DESC).withLongOpt(OPT_VERBOSE_GZ_LONG).create(OPT_VERBOSE_GZ));
-		options.addOption(OptionBuilder.withDescription(OPT_Q_RANGE_DESC).withLongOpt(OPT_Q_RANGE_LONG).hasArgs(2).create(OPT_Q_RANGE));
 
 		options.addOption(OptionBuilder.withDescription(OPT_CM_DESC).hasArg().create(OPT_CM));
 	}
@@ -128,21 +125,6 @@ public class WeightedMetaCommand extends Command
 		{
 			lamD.setKey(cmdLine.getOptionValues(OPT_KEY));
 		}
-
-		if (cmdLine.hasOption(OPT_VERBOSE))
-		{
-			lamD.setVerbose();
-		}
-		
-		if (cmdLine.hasOption(OPT_VERBOSE_GZ))
-		{
-			lamD.setVerboseGZ();
-		}
-
-		if (cmdLine.hasOption(OPT_Q_RANGE))
-		{
-			lamD.setQRange(cmdLine.getOptionValues(OPT_Q_RANGE));
-		}
 		
 		if (cmdLine.hasOption(OPT_CM))
 		{
@@ -188,18 +170,6 @@ public class WeightedMetaCommand extends Command
 
 	private final static String OPT_KEY = "key";
 	private final static String OPT_KEY_DESC = "Self defined key workds: snp, beta, se, a1, a2";
-
-	private final static String OPT_VERBOSE = "v";
-	private final static String OPT_VERBOSE_LONG = "verbose";
-	private final static String OPT_VERBOSE_DESC = "Print test statistic for every pair of meta files.";
-
-	private final static String OPT_VERBOSE_GZ = "vg";
-	private final static String OPT_VERBOSE_GZ_LONG = "verbose-gz";
-	private final static String OPT_VERBOSE_GZ_DESC = "Print test statistic in gz format for every pair of meta files.";
-
-	private final static String OPT_Q_RANGE = "q";
-	private final static String OPT_Q_RANGE_LONG = "q-range";
-	private final static String OPT_Q_RANGE_DESC = "cut off values for filtering snps.";
 
 	private final static String OPT_ME = "m";
 	private final static String OPT_ME_LONG = "me";
