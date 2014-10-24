@@ -1,7 +1,6 @@
 package gear.gwassummary;
 
 import gear.ConstValues;
-import gear.subcommands.lambdaD.LambdaDCommandArguments;
 import gear.util.BufferedReader;
 import gear.util.Logger;
 import gear.util.NewIt;
