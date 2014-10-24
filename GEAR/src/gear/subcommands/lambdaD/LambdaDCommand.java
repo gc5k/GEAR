@@ -46,7 +46,6 @@ public class LambdaDCommand extends Command
 		options.addOption(OptionBuilder.withDescription(OPT_KEY_DESC).hasArgs(5).create(OPT_KEY));
 		options.addOption(OptionBuilder.withDescription(OPT_VERBOSE_DESC).withLongOpt(OPT_VERBOSE_LONG).create(OPT_VERBOSE));
 		options.addOption(OptionBuilder.withDescription(OPT_VERBOSE_GZ_DESC).withLongOpt(OPT_VERBOSE_GZ_LONG).create(OPT_VERBOSE_GZ));
-		options.addOption(OptionBuilder.withDescription(OPT_Q_RANGE_DESC).withLongOpt(OPT_Q_RANGE_LONG).hasArgs(2).create(OPT_Q_RANGE));
 
 	}
 
@@ -138,11 +137,6 @@ public class LambdaDCommand extends Command
 			lamD.setVerboseGZ();
 		}
 
-		if (cmdLine.hasOption(OPT_Q_RANGE))
-		{
-			lamD.setQRange(cmdLine.getOptionValues(OPT_Q_RANGE));
-		}
-		
 		return lamD;
 	}
 
@@ -191,10 +185,6 @@ public class LambdaDCommand extends Command
 	private final static String OPT_VERBOSE_GZ = "vg";
 	private final static String OPT_VERBOSE_GZ_LONG = "verbose-gz";
 	private final static String OPT_VERBOSE_GZ_DESC = "Print test statistic in gz format for every pair of meta files.";
-
-	private final static String OPT_Q_RANGE = "q";
-	private final static String OPT_Q_RANGE_LONG = "q-range";
-	private final static String OPT_Q_RANGE_DESC = "cut off values for filtering snps.";
 
 	private final static String OPT_ME = "m";
 	private final static String OPT_ME_LONG = "me";
