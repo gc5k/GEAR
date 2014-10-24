@@ -1,11 +1,19 @@
 package gear.subcommands.weightedmeta;
 
+import java.io.BufferedWriter;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.io.PrintWriter;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Set;
 
+import org.apache.commons.math.MathException;
+import org.apache.commons.math.distribution.NormalDistribution;
+import org.apache.commons.math.distribution.NormalDistributionImpl;
 import org.apache.commons.math.linear.Array2DRowRealMatrix;
 import org.apache.commons.math.linear.LUDecompositionImpl;
 import org.apache.commons.math.linear.RealMatrix;
@@ -16,6 +24,7 @@ import gear.subcommands.CommandArguments;
 import gear.subcommands.CommandImpl;
 import gear.util.BufferedReader;
 import gear.util.Logger;
+import gear.util.NewIt;
 import gear.util.SNPMatch;
 
 public class WeightedMetaImpl extends CommandImpl
@@ -37,9 +46,15 @@ public class WeightedMetaImpl extends CommandImpl
 
 		initial();
 
-		readCMFile();
+		if(wMetaArgs.getCMFile()!=null)
+		{
+			readCMFile();			
+		}
+		else
+		{
+			Logger.printUserLog("No correlation matrix is specified. The default correlation (unity matrix) will be used.");
+		}
 		MetaAnalysis();
-
 	}
 
 	private void initial()
@@ -55,37 +70,19 @@ public class WeightedMetaImpl extends CommandImpl
 			System.exit(0);
 		}
 
-		lamMat = new double[NumMetaFile][NumMetaFile];
 		zMat = new double[NumMetaFile][NumMetaFile];
-		olCtrlMat = new double[NumMetaFile][NumMetaFile];
-		olCsMat = new double[NumMetaFile][NumMetaFile];
-
-		kMat = new double[NumMetaFile][NumMetaFile];
-
-		for(int i = 0; i < NumMetaFile; i++)
+		for(int i = 0; i < zMat.length; i++)
 		{
-			Arrays.fill(lamMat[i], 1);
-			Arrays.fill(zMat[i], 1);
-			Arrays.fill(kMat[i], 1);
-			if (wMetaArgs.isQT())
-			{
-				olCtrlMat[i][i] = wMetaArgs.getQTsize()[i];
-				olCsMat[i][i] = wMetaArgs.getQTsize()[i];
-			}
-			else
-			{
-				olCtrlMat[i][i] = wMetaArgs.getCCsize()[i*2] + wMetaArgs.getCCsize()[i*2+1];
-				olCsMat[i][i] = wMetaArgs.getCCsize()[i*2] + wMetaArgs.getCCsize()[i*2+1];
-			}
+			zMat[i][i] = 1;
 		}
 	}
-	
+
 	private void readCMFile()
 	{
 		int NumMetaFile = gReader.getNumMetaFile();
 		BufferedReader bf = BufferedReader.openTextFile(wMetaArgs.getCMFile(), "cm file.");
 		Logger.printUserLog("Reading '" + wMetaArgs.getCMFile() + "'.");
-		zMat = new double[NumMetaFile][NumMetaFile];
+
 		String[] d = null;
 		int cnt=0;
 		while ( (d = bf.readTokens())!= null ){
@@ -99,17 +96,9 @@ public class WeightedMetaImpl extends CommandImpl
 				zMat[cnt][i] = Double.parseDouble(d[i]);
 			}
 			cnt++;
-		}
-		
-		for(int i = 0; i < zMat.length; i++)
-		{
-			for(int j = 0; j < zMat[i].length; j++)
-			{
-				System.out.print(zMat[i][j] + " ");
-			}
-			System.out.println();
-		}
+		}	
 	}
+
 	private void MetaAnalysis()
 	{
 		int NumMetaFile = gReader.getNumMetaFile();
@@ -126,7 +115,6 @@ public class WeightedMetaImpl extends CommandImpl
 
 		RealMatrix gg = new Array2DRowRealMatrix(Mx);
 		RealMatrix gg_Inv = (new LUDecompositionImpl(gg)).getSolver().getInverse();
-//		InvMx = gg_Inv.getData();
 		RealMatrix Unit = new Array2DRowRealMatrix(NumMetaFile, 1);
 		for (int i = 0; i < Unit.getRowDimension(); i++)
 		{
@@ -141,20 +129,106 @@ public class WeightedMetaImpl extends CommandImpl
 		{
 			String key = e.next();
 			ArrayList<Integer> Int = gReader.getMetaSNPTable().get(key);
-			//common snp only
 			if(Int.get(Int.size()-1) == NumMetaFile)
-			{
-				MetaCommon(key, Mx, W, Int);
+			{//common snp only
+				GMRes gr = MetaCommon(key, Mx, W, Int);
+				grArray.add(gr);
 			}
 			else
 			{
-				MetaSNP(key, Mx, Int);
+				GMRes gr = MetaSNP(key, Mx, Int);
+				grArray.add(gr);
 			}
 		}
+		Collections.sort(grArray);
+		PrintGMresults();
 	}
 
-	private void MetaSNP(String key, double[][] Mx, ArrayList<Integer> Int)
+	private GMRes MetaCommon(String key, double[][] Mx, RealMatrix W, ArrayList<Integer> Int)
 	{
+		StringBuffer direct = new StringBuffer();
+		double gb = 0;
+		double gse = 0;
+		double[] se = new double[W.getColumnDimension()];
+		GMRes gr = new GMRes(W.getColumnDimension());
+
+		HashMap<String, MetaStat> m1 = gReader.getMetaStat().get(0);
+		MetaStat ms1 = m1.get(key);
+		gb += ms1.getEffect() * W.getEntry(0, 0);
+		se[0] = ms1.getSE();
+	
+		gr.SetSNP(ms1.getSNP());
+		gr.SetChr(ms1.getChr());
+		gr.SetBP(ms1.getBP());
+		gr.SetA1(ms1.getA1());
+		gr.SetA2(ms1.getA2());
+		if(ms1.getEffect() > 0)
+		{
+			direct.append("+");
+		}
+		else
+		{
+			direct.append("-");
+		}
+		for(int i = 1; i < gReader.getMetaStat().size(); i++)
+		{
+			HashMap<String, MetaStat> m2 = gReader.getMetaStat().get(i);
+			MetaStat ms2 = m2.get(key); 
+			se[i] = ms2.getSE();
+			double b = 0;
+			if (ms1.getA1() == ms2.getA1() || ms1.getA1() == SNPMatch.Flip(ms2.getA1())) //match A1 in the second meta
+			{
+				gb += ms2.getEffect() * W.getEntry(0, i);
+				b = ms2.getEffect();
+			}
+			else if (ms1.getA1() == ms2.getA2() || ms1.getA1() == SNPMatch.Flip(ms2.getA2())) //match A2 in the second meta
+			{
+				gb += (-1) * ms2.getEffect() * W.getEntry(0, i);
+				b = (-1) * ms2.getEffect();
+			}
+			if(ms2.getEffect() > 0)
+			{
+				direct.append("+");
+			}
+			else
+			{
+				direct.append("-");
+			}
+		}
+
+		for(int i = 0; i < W.getRowDimension(); i++)
+		{
+			for(int j = 0; j < W.getRowDimension(); j++)
+			{
+				gse += W.getEntry(0, i) * W.getEntry(0, j) * se[i] * se[j] * Mx[i][j];
+			}
+		}
+		gse = Math.sqrt(gse);
+		double z= gb/gse;
+		double p = 1;
+		try
+		{
+			p=(1-unitNormal.cumulativeProbability(Math.abs(z)))*2;
+		}
+		catch (MathException e)
+		{
+			Logger.printUserError(e.toString());
+		}
+		gr.SetB(gb);
+		gr.SetSE(gse);
+		gr.SetP(p);
+		gr.SetDirect(direct.toString());
+		return gr;
+	}
+
+	private GMRes MetaSNP(String key, double[][] Mx, ArrayList<Integer> Int)
+	{
+		StringBuffer direct = new StringBuffer();
+		for(int i = 0; i < Mx.length; i++)
+		{
+			direct.append("?");
+		}
+		GMRes gr = new GMRes(Int.get(Int.size()-1));
 		int[] idx = new int[Int.get(Int.size()-1)];
 		
 		int cnt = 0;
@@ -175,7 +249,6 @@ public class WeightedMetaImpl extends CommandImpl
 
 		RealMatrix gg = new Array2DRowRealMatrix(mx);
 		RealMatrix gg_Inv = (new LUDecompositionImpl(gg)).getSolver().getInverse();
-//		double[][] Invmx = gg_Inv.getData();
 		RealMatrix Unit = new Array2DRowRealMatrix(mx.length, 1);
 		for (int i = 0; i < Unit.getRowDimension(); i++)
 		{
@@ -194,20 +267,45 @@ public class WeightedMetaImpl extends CommandImpl
 		gb += ms1.getEffect() * W.getEntry(0, 0);
 		se[0] = ms1.getSE();
 
+		gr.SetSNP(ms1.getSNP());
+		gr.SetChr(ms1.getChr());
+		gr.SetBP(ms1.getBP());
+		gr.SetA1(ms1.getA1());
+		gr.SetA2(ms1.getA2());
+		if(ms1.getEffect() > 0)
+		{
+			direct.setCharAt(idx[0], '+');
+		}
+		else
+		{
+			direct.setCharAt(idx[0], '-');
+		}
+
 		for (int i = 1; i < idx.length; i++)
 		{
 			HashMap<String, MetaStat> m2 = gReader.getMetaStat().get(idx[i]);
 			MetaStat ms2 = m2.get(key); 
 			se[i] = ms2.getSE();
-
+			double b = 0;
 			if (ms1.getA1() == ms2.getA1() || ms1.getA1() == SNPMatch.Flip(ms2.getA1())) //match A1 in the second meta
 			{
 				gb += ms2.getEffect() * W.getEntry(0, i);
+				b = ms2.getEffect();
 			}
 			else if (ms1.getA1() == ms2.getA2() || ms1.getA1() == SNPMatch.Flip(ms2.getA2())) //match A2 in the second meta
 			{
 				gb += (-1) * ms2.getEffect() * W.getEntry(0, i);
+				b = -1 * ms2.getEffect();
 			}
+			if(ms1.getEffect() > 0)
+			{
+				direct.setCharAt(idx[i], '+');
+			}
+			else
+			{
+				direct.setCharAt(idx[i], '-');
+			}
+
 		}
 
 		for (int i = 0; i < W.getRowDimension(); i++)
@@ -218,55 +316,52 @@ public class WeightedMetaImpl extends CommandImpl
 			}
 		}
 		gse = Math.sqrt(gse);
-		System.out.println(key + " " +gb + " " + gse + " " + Int.toString());
+		double z= gb/gse;
+		double p = 1;
+		try
+		{
+			p=(1-unitNormal.cumulativeProbability(Math.abs(z)))*2;
+		}
+		catch (MathException e)
+		{
+			Logger.printUserError(e.toString());
+		}
+		gr.SetB(gb);
+		gr.SetSE(gse);
+		gr.SetZ(z);
+		gr.SetP(p);
+		gr.SetDirect(direct.toString());
+		return gr;
 	}
 
-	private void MetaCommon(String key, double[][] Mx, RealMatrix W, ArrayList<Integer> Int)
+	private void PrintGMresults()
 	{
-		double gb = 0;
-		double gse = 0;
-		double[] se = new double[W.getColumnDimension()];
-		
-		HashMap<String, MetaStat> m1 = gReader.getMetaStat().get(0);
-		MetaStat ms1 = m1.get(key);
-		gb += ms1.getEffect() * W.getEntry(0, 0);
-		se[0] = ms1.getSE();
-			
-		for(int i = 1; i < gReader.getMetaStat().size(); i++)
+        PrintWriter writer = null;
+        try
+        {
+        	writer = new PrintWriter(new BufferedWriter(new FileWriter(wMetaArgs.getOutRoot()+".gmeta")));
+        	Logger.printUserLog("Writting detailed test statistics into '"+wMetaArgs.getOutRoot() + ".gmeta.'\n");
+        }
+		catch (IOException e)
 		{
-			HashMap<String, MetaStat> m2 = gReader.getMetaStat().get(i);
-			MetaStat ms2 = m2.get(key); 
-			se[i] = ms2.getSE();
-
-			if (ms1.getA1() == ms2.getA1() || ms1.getA1() == SNPMatch.Flip(ms2.getA1())) //match A1 in the second meta
-			{
-				gb += ms2.getEffect() * W.getEntry(0, i);
-			}
-			else if (ms1.getA1() == ms2.getA2() || ms1.getA1() == SNPMatch.Flip(ms2.getA2())) //match A2 in the second meta
-			{
-				gb += (-1) * ms2.getEffect() * W.getEntry(0, i);
-			}
+			Logger.handleException(e, "An I/O exception occurred when writing '" + wMetaArgs.getOutRoot() + ".gmeta" + "'.\n");
 		}
 
-		for(int i = 0; i < W.getRowDimension(); i++)
+		for(int i = 0; i < grArray.size(); i++)
 		{
-			for(int j = 0; j < W.getRowDimension(); j++)
+			GMRes gr = grArray.get(i);
+			if(i == 0)
 			{
-				gse += W.getEntry(0, i) * W.getEntry(0, j) * se[i] * se[j] * Mx[i][j];
+				writer.write(gr.printTitle() + "\n");
 			}
+			writer.write(gr.toString()+ "\n");
 		}
-		gse = Math.sqrt(gse);
-		System.out.println(key + " " +gb + " " + gse + " " + Int.toString());
+		writer.close();
 	}
 
 	private WeightedMetaArguments wMetaArgs;
-
 	private GWASReader gReader;
-
-	private double[][] lamMat;
 	private double[][] zMat;
-	private double[][] olCtrlMat;
-	private double[][] olCsMat;
-	private double[][] kMat;	
-
+	NormalDistributionImpl unitNormal = new NormalDistributionImpl(0, 1);
+	private ArrayList<GMRes> grArray = NewIt.newArrayList();
 }
