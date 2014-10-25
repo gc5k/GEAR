@@ -134,7 +134,7 @@ public class WeightedMetaImpl extends CommandImpl
 				GMRes gr = MetaCommon(key, Mx, W, Int);
 				grArray.add(gr);
 			}
-			else
+			else if(Int.get(Int.size()-1) > 1)
 			{
 				GMRes gr = MetaSNP(key, Mx, Int);
 				grArray.add(gr);
@@ -186,7 +186,7 @@ public class WeightedMetaImpl extends CommandImpl
 				gb += (-1) * ms2.getEffect() * W.getEntry(0, i);
 				b = (-1) * ms2.getEffect();
 			}
-			if(ms2.getEffect() > 0)
+			if(b > 0)
 			{
 				direct.append("+");
 			}
@@ -297,7 +297,7 @@ public class WeightedMetaImpl extends CommandImpl
 				gb += (-1) * ms2.getEffect() * W.getEntry(0, i);
 				b = -1 * ms2.getEffect();
 			}
-			if(ms1.getEffect() > 0)
+			if(b > 0)
 			{
 				direct.setCharAt(idx[i], '+');
 			}
