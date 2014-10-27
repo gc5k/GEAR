@@ -7,7 +7,11 @@ import gear.util.NewIt;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.HashMap;
+
+import org.apache.commons.math.MathException;
+import org.apache.commons.math.distribution.ChiSquaredDistributionImpl;
 
 public class GWASReader
 {
@@ -19,6 +23,8 @@ public class GWASReader
 		this.isQT = isQT;
 		this.isGZ = isGZ;
 
+		gc = new double[MetaFile.length];
+		Arrays.fill(gc, 1);
 		logit = new boolean[MetaFile.length];
 		Arrays.fill(logit, false);
 
@@ -67,6 +73,7 @@ public class GWASReader
 
 	private HashMap<String, MetaStat> readMeta(int metaIdx)
 	{
+		ArrayList<Double> pArray = NewIt.newArrayList();
 		BufferedReader reader = null;
 		if (isGZ)
 		{
@@ -224,6 +231,10 @@ public class GWASReader
 				cntBadP++;
 				continue;
 			}
+			else
+			{
+				pArray.add(new Double(Double.parseDouble(tokens[KeyIdx[metaIdx][P]])));
+			}
 			if (tokens[KeyIdx[metaIdx][A1]].length() != 1)
 			{
 				cntBadA1++;
@@ -370,9 +381,44 @@ public class GWASReader
 		}
 
 		MetaSNPArray.add(snpArray);
+		gc[metaIdx] = getGC(pArray);
+
 		return sumstat;
 	}
 	
+	private double getGC(ArrayList<Double> pArray)
+	{
+		ChiSquaredDistributionImpl chiDis = new ChiSquaredDistributionImpl(1);		
+
+		Collections.sort(pArray);
+		double p = 0.5;
+		if (pArray.size() % 2 == 0)
+		{
+			p = (pArray.get(pArray.size()/2) + pArray.get(pArray.size()/2 + 1))/2;
+		}
+		else
+		{
+			p = pArray.get((pArray.size()+1)/2);
+		}
+		double gc = 1;
+		try
+		{
+			gc = chiDis.inverseCumulativeProbability(p) / ChiMedianConstant;
+		}
+		catch (MathException e)
+		{
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		Logger.printUserLog("Genomic control factor is: " + gc);
+		return gc;
+	}
+	
+	public double[] GetGC()
+	{
+		return gc;
+	}
+
 	private String[] field;
 	private boolean isQT;
 	private boolean isGZ;
@@ -383,5 +429,8 @@ public class GWASReader
 	private ArrayList<HashMap<String, MetaStat>> MetaStat = NewIt.newArrayList();
 	private ArrayList<ArrayList<String>> MetaSNPArray = NewIt.newArrayList();
 	private HashMap<String, ArrayList<Integer>> MetaSNPTable = NewIt.newHashMap();
+
+	private double[] gc;
+	private double ChiMedianConstant = 0.4549364;
 
 }

@@ -29,6 +29,11 @@ public class MetaStat
 		this.bp = bp;
 	}
 	
+	public void setP(double p)
+	{
+		this.p = p;
+	}
+
 	public void setA2(char a2)
 	{
 		if (a2 >=97 && a2 <= 122)
