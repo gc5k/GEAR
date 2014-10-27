@@ -140,6 +140,16 @@ public class WeightedMetaArguments  extends CommandArguments
 		return isQT;
 	}
 
+	public void setGC()
+	{
+		isGC = true;
+	}
+	
+	public boolean getGC()
+	{
+		return isGC;
+	}
+
 	public String[] getKeys()
 	{
 		return field;
@@ -181,16 +191,6 @@ public class WeightedMetaArguments  extends CommandArguments
 	{
 		return isVerboseGZ;
 	}
-
-	public double getMe()
-	{
-		return Me;
-	}
-	
-	public void setMe(String me)
-	{
-		Me = Double.parseDouble(me);
-	}
 	
 	public void setCM(String cF)
 	{
@@ -212,10 +212,9 @@ public class WeightedMetaArguments  extends CommandArguments
 	private ArrayList<String> md;
 	private boolean isGZ = false;
 	private boolean isQT = true;
+	private boolean isGC = false;
 	private boolean isVerbose = false;
 	private boolean isVerboseGZ = false;
-
-	private double Me;
 
 	private double[] qtSize;
 	private double[] ccSize;

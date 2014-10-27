@@ -1,6 +1,7 @@
 package gear.subcommands.weightedmeta;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 
 import org.apache.commons.math.linear.Array2DRowRealMatrix;
 import org.apache.commons.math.linear.LUDecompositionImpl;
@@ -11,17 +12,32 @@ import gear.gwassummary.MetaStat;
 
 public class CovMatrix
 {
-	public CovMatrix(String snp, ArrayList<Integer> Int, double[][] corMat, GWASReader gReader)
+	public CovMatrix(String snp, ArrayList<Integer> Int, double[][] corMat, GWASReader gReader, boolean isGC)
 	{
 		this.snp = snp;
 		this.cohort = Int.get(Int.size() -1).intValue();
 		this.cohortIdx = new int[cohort];
+		this.isGC = isGC;
+		this.gc = new double[cohort];
 
 		int cnt = 0;
 		for(int i = 0; i < Int.size()-1; i++)
 		{
 			if(Int.get(i) == 0) continue;
 			cohortIdx[cnt++] = i;
+		}
+
+		if(this.isGC)
+		{
+			double[] Egc = gReader.GetGC();
+			for(int i = 0; i < cohortIdx.length; i++)
+			{
+				gc[i] = Egc[cohortIdx[i]]; 
+			}
+		}
+		else
+		{
+			Arrays.fill(this.gc, 1);
 		}
 
 		double[][] covMat = new double[cohort][cohort];
@@ -31,7 +47,7 @@ public class CovMatrix
 			for(int j = 0; j < cohortIdx.length; j++)
 			{
 				MetaStat ms2 = gReader.getMetaStat().get(cohortIdx[j]).get(snp);
-				covMat[i][j] = corMat[cohortIdx[i]][cohortIdx[j]] * ms1.getSE() * ms2.getSE();
+				covMat[i][j] = corMat[cohortIdx[i]][cohortIdx[j]] * ms1.getSE() * ms2.getSE() * Math.sqrt(gc[i]) *  Math.sqrt(gc[j]);
 			}
 		}
 
@@ -82,6 +98,8 @@ public class CovMatrix
 		return snp;
 	}
 
+	private boolean isGC;
+	private double[] gc;
 	private String snp;
 	private double[][] covMat;
 	private double gse;

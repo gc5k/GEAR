@@ -37,7 +37,6 @@ public class WeightedMetaCommand extends Command
 		options.addOption(OptionBuilder.withDescription(OPT_META_GZ_DESC).withLongOpt(OPT_META_GZ_LONG).hasArgs().create(OPT_META_GZ));
 		options.addOption(OptionBuilder.withDescription(OPT_META_GZ_BATCH_DESC).withLongOpt(OPT_META_GZ_BATCH_LONG).hasArg().create(OPT_META_GZ_BATCH));
 
-		options.addOption(OptionBuilder.withDescription(OPT_ME_DESC).withLongOpt(OPT_ME_LONG).hasArgs(1).create(OPT_ME));
 		options.addOption(OptionBuilder.withDescription(OPT_CC_DESC).hasArgs().create(OPT_CC));
 		options.addOption(OptionBuilder.withDescription(OPT_CC_BATCH_LONG_DESC).withLongOpt(OPT_CC_BATCH_LONG).hasArg().create());
 		options.addOption(OptionBuilder.withDescription(OPT_QT_DESC).hasArgs().create(OPT_QT));
@@ -46,14 +45,14 @@ public class WeightedMetaCommand extends Command
 		options.addOption(OptionBuilder.withDescription(OPT_KEY_DESC).hasArgs(5).create(OPT_KEY));
 
 		options.addOption(OptionBuilder.withDescription(OPT_CM_DESC).hasArg().create(OPT_CM));
+		options.addOption(OptionBuilder.withDescription(OPT_GC_CONTROL_LONG_DESC).withLongOpt(OPT_GC_CONTROL_LONG).create(OPT_GC_CONTROL));
+
 	}
 
 	@Override
 	public CommandArguments parse(CommandLine cmdLine) throws CommandArgumentException
 	{
 		WeightedMetaArguments lamD = new WeightedMetaArguments();
-
-		lamD.setMe(OPT_ME_DEFAULT);
 
 		//manual text meta files
 		if (cmdLine.hasOption(OPT_META))
@@ -84,11 +83,10 @@ public class WeightedMetaCommand extends Command
 				lamD.setCCbatch(cmdLine.getOptionValue(OPT_CC_BATCH_LONG));
 			}
 		}
-
-		//me
-		if(cmdLine.hasOption(OPT_ME))
+		
+		if(cmdLine.hasOption(OPT_GC_CONTROL))
 		{
-			lamD.setMe(cmdLine.getOptionValue(OPT_ME));
+			lamD.setGC();
 		}
 
 		//manual gzip meta files
@@ -153,7 +151,6 @@ public class WeightedMetaCommand extends Command
 	private final static String OPT_QT = "qt";
 	private final static String OPT_QT_DESC = "Quantitative trait: #sample size 1, #sample size 2";
 
-
 	private final static String OPT_META_BATCH = "mb";
 	private final static String OPT_META_BATCH_LONG = "meta-batch";
 	private final static String OPT_META_BATCH_DESC = "The summary statistic batch";
@@ -170,13 +167,12 @@ public class WeightedMetaCommand extends Command
 
 	private final static String OPT_KEY = "key";
 	private final static String OPT_KEY_DESC = "Self defined key workds: snp, beta, se, a1, a2";
-
-	private final static String OPT_ME = "m";
-	private final static String OPT_ME_LONG = "me";
-	private final static String OPT_ME_DEFAULT = "30000";
-	private final static String OPT_ME_DESC = "effective number of markers.";
 	
 	private final static String OPT_CM = "cm";
 	private final static String OPT_CM_DESC = "correlation matrix";
+	
+	private final static String OPT_GC_CONTROL = "gc";
+	private final static String OPT_GC_CONTROL_LONG = "gc-control";
+	private final static String OPT_GC_CONTROL_LONG_DESC = "genomic control factor adjustment";
 
 }

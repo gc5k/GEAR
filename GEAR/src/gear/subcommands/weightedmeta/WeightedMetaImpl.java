@@ -103,7 +103,7 @@ public class WeightedMetaImpl extends CommandImpl
 		{
 			String key = e.next();
 			ArrayList<Integer> Int = gReader.getMetaSNPTable().get(key);
-			CovMatrix covMat = new CovMatrix(key, Int, corMat, gReader);
+			CovMatrix covMat = new CovMatrix(key, Int, corMat, gReader, wMetaArgs.getGC());
 			GMRes gr = MetaSNP(covMat);
 			grArray.add(gr);
 			cnt++;
