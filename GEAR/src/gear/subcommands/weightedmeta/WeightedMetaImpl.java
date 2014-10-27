@@ -53,14 +53,14 @@ public class WeightedMetaImpl extends CommandImpl
 
 	private void generateCorMatrix()
 	{
+		corMat = new double[gReader.getNumMetaFile()][gReader.getNumMetaFile()];
 		if (wMetaArgs.getCMFile() == null)
 		{
-			Logger.printUserLog("No correlation matrix is specified. The default correlation (digonal matrix) will be used.");
-			corMat = new double[gReader.getNumMetaFile()][gReader.getNumMetaFile()];
 			for(int i = 0; i < corMat.length; i++)
 			{
 				corMat[i][i] = 1;
 			}
+			Logger.printUserLog("No correlation matrix is specified. The default correlation (digonal matrix) will be used.");
 		}
 		else
 		{
@@ -83,11 +83,20 @@ public class WeightedMetaImpl extends CommandImpl
 				}
 				cnt++;
 			}
+			for(int i = 0; i < corMat.length; i++)
+			{
+				for(int j = 0; j < i; j++)
+				{
+					corMat[j][i] = corMat[i][j];
+				}
+			}
+			Logger.printUserLog(corMat.length + "X" + corMat.length + " correlation matrix has been read in.");
 		}
 	}
 
 	private void MetaAnalysis()
 	{
+		Logger.printUserLog("Starting meta-analysis...");
 		int cnt = 0;
 		Set<String> keys = gReader.getMetaSNPTable().keySet();
 		for (Iterator<String> e=keys.iterator(); e.hasNext();)
@@ -100,7 +109,7 @@ public class WeightedMetaImpl extends CommandImpl
 			cnt++;
 		}
 		Collections.sort(grArray);
-		Logger.printUserLog("In total "+ cnt + "loci have been used for meta-analysis.");
+		Logger.printUserLog("In total "+ cnt + " loci have been used for meta-analysis.");
 		PrintGMresults();
 	}
 

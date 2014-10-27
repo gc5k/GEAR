@@ -46,9 +46,9 @@ public class CovMatrix
 		RealMatrix tmp1 = tmp.multiply(Unit);
 		RealMatrix W = tmp.scalarMultiply(1/tmp1.getEntry(0, 0));
 
-		for (int i = 0; i < W.getRowDimension(); i++)
+		for (int i = 0; i < covMat.length; i++)
 		{
-			for (int j = 0; j < W.getRowDimension(); j++)
+			for (int j = 0; j < covMat[i].length; j++)
 			{
 				gse += W.getEntry(0, i) * W.getEntry(0, j) * covMat[i][j];
 			}
