@@ -35,6 +35,16 @@ public class GMRes implements Comparable<GMRes>
 		this.A1 = A1;
 	}
 	
+	public char GetA1()
+	{
+		return A1;
+	}
+	
+	public char GetA2()
+	{
+		return A2;
+	}
+
 	public void SetA2(char A2)
 	{
 		this.A2 = A2;
