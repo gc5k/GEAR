@@ -394,26 +394,25 @@ public class GWASReader
 		double p = 0.5;
 		if (pArray.size() % 2 == 0)
 		{
-			p = (pArray.get(pArray.size()/2) + pArray.get(pArray.size()/2 + 1))/2;
+			p =1 - (pArray.get(pArray.size()/2) + pArray.get(pArray.size()/2 + 1))/2;
 		}
 		else
 		{
-			p = pArray.get((pArray.size()+1)/2);
+			p =1 - pArray.get((pArray.size()+1)/2);
 		}
-		double gc = 1;
+		double lambda = 1;
 		try
 		{
-			gc = chiDis.inverseCumulativeProbability(p) / ChiMedianConstant;
+			lambda = chiDis.inverseCumulativeProbability(p) / ChiMedianConstant;
 		}
 		catch (MathException e)
 		{
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+			Logger.printUserError(e.toString());
 		}
-		Logger.printUserLog("Genomic control factor is: " + gc);
-		return gc;
+		Logger.printUserLog("Genomic control factor is: " + lambda);
+		return lambda;
 	}
-	
+
 	public double[] GetGC()
 	{
 		return gc;
