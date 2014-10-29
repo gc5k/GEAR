@@ -9,24 +9,96 @@ public class SNPMatch
 		return a1 != ConstValues.MISSING_ALLELE_CHAR && a2 != ConstValues.MISSING_ALLELE_CHAR;
 	}
 
+	public static boolean isAllelsMatchForTwoLoci(char a1, char a2, char b1, char b2)
+	{
+		if (a1 >= 97 && a1 <= 122)
+		{
+			a1 -= 32;
+		}
+		if (a2 >= 97 && a2 <= 122)
+		{
+			a2 -= 32;
+		}
+		if (b1 >= 97 && b1 <= 122)
+		{
+			b1 -= 32;
+		}
+		if (b2 >= 97 && b2 <= 122)
+		{
+			b2 -= 32;
+		}
+
+		StringBuffer g1 = new StringBuffer();
+		StringBuffer g2 = new StringBuffer();
+
+		if(a1 < a2)
+		{
+			g1.append(a1);
+			g1.append(a2);
+		}
+		else
+		{
+			g1.append(a2);
+			g1.append(a1);
+		}
+
+		if(b1 < b2)
+		{
+			g2.append(b1);
+			g2.append(b2);
+		}
+		else
+		{
+			g2.append(b2);
+			g2.append(b1);
+		}
+
+		boolean isMatch = true;
+		if(g1.toString().compareTo(g2.toString()) != 0)
+		{
+			isMatch = false;
+		}
+		return isMatch;
+	}
+
 	public static String Flip(String a)
 	{
 		String f = "A";
 		if (a.compareTo("A") == 0)
 		{
 			f = "T";
-		} else if (a.compareTo("C") == 0)
+		} 
+		else if (a.compareTo("a") == 0)
+		{
+			f = "t";
+		}
+		else if (a.compareTo("C") == 0)
 		{
 			f = "G";
-		} else if (a.compareTo("G") == 0)
+		}
+		else if (a.compareTo("c") == 0)
+		{
+			f = "g";
+		}
+		else if (a.compareTo("G") == 0)
 		{
 			f = "C";
-		} else if (a.compareTo("T") == 0)
+		}
+		else if (a.compareTo("g") == 0)
+		{
+			f = "c";
+		}
+		else if (a.compareTo("T") == 0)
 		{
 			f = "A";
-		} else
+		}
+		else if (a.compareTo("t") == 0)
 		{
-			f = "N";
+			f = "a";
+		}
+		else
+		{
+			f = ConstValues.MISSING_ALLELE_STRING;
 		}
 		return f;
 	}
@@ -37,20 +109,39 @@ public class SNPMatch
 		if (a == 'A')
 		{
 			f = 'T';
-		} else if (a == 'C')
+		}
+		else if (a == 'a')
+		{
+			f = 't';
+		}
+		else if (a == 'C')
 		{
 			f = 'G';
-		} else if (a == 'G')
+		}
+		else if (a == 'c')
+		{
+			f = 'g';
+		}
+		else if (a == 'G')
 		{
 			f = 'C';
-		} else if (a == 'T')
+		}
+		else if (a == 'g')
+		{
+			f = 'c';
+		}
+		else if (a == 'T')
 		{
 			f = 'A';
-		} else
-		{
-			f = 'N';
 		}
-
+		else if (a == 't')
+		{
+			f = 'a';
+		}
+		else
+		{
+			f = ConstValues.MISSING_ALLELE_CHAR;
+		}
 		return f;
 	}
 
@@ -60,24 +151,32 @@ public class SNPMatch
 	}
 
 	public static boolean isAmbiguous(char a1, char a2)
-	{
+	{		
 		if (a1 > a2)
 		{
 			char t = a1;
 			a1 = a2;
 			a2 = t;
 		}
-		
+
+		if(a1 >= 97 && a1 <= 122)
+		{
+			a1 -= 32;
+		}
+		if(a2 >= 97 && a2 <= 122)
+		{
+			a2 -= 32;
+		}
+
 		if (a1 == 'A' && a2 == 'T')
 		{
 			return true;
 		}
-		
+
 		if (a1 == 'C' && a2 == 'G')
 		{
 			return true;
 		}
-		
 		return false;
 	}
 
@@ -117,38 +216,44 @@ public class SNPMatch
 				{
 					return true;
 				}
-			} else if (g1.compareTo("AG") == 0)
+			}
+			else if (g1.compareTo("AG") == 0)
 			{
 				if (g2.compareTo("AG") == 0 || g2.compareTo("CT") == 0)
 				{
 					return true;
 				}
-			} else if (g1.compareTo("AT") == 0)
+			}
+			else if (g1.compareTo("AT") == 0)
 			{
 				if (g2.compareTo("AT") == 0)
 				{
 					return true;
 				}
-			} else if (g1.compareTo("CG") == 0)
+			}
+			else if (g1.compareTo("CG") == 0)
 			{
 				if (g2.compareTo("CG") == 0)
 				{
 					return true;
 				}
-			} else if (g1.compareTo("CT") == 0)
+			}
+			else if (g1.compareTo("CT") == 0)
 			{
 				if (g2.compareTo("CT") == 0 || g2.compareTo("AG") == 0)
 				{
 					return true;
 				}
-			} else
+			}
+			else
 			{
 				if (g2.compareTo("GT") == 0 || g2.compareTo("AC") == 0)
 				{
 					return true;
 				}
 			}
-		} else
+		} 
+		else
 		{
 			return false;
 		}

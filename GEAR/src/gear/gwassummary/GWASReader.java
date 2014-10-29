@@ -385,7 +385,7 @@ public class GWASReader
 
 		return sumstat;
 	}
-	
+
 	private double getGC(ArrayList<Double> pArray)
 	{
 		ChiSquaredDistributionImpl chiDis = new ChiSquaredDistributionImpl(1);		

@@ -144,10 +144,20 @@ public class WeightedMetaArguments  extends CommandArguments
 	{
 		isGC = true;
 	}
-	
+
 	public boolean getGC()
 	{
 		return isGC;
+	}
+
+	public void setATGC()
+	{
+		isKeepATGC = true;
+	}
+
+	public boolean isKeepATGC()
+	{
+		return isKeepATGC;
 	}
 
 	public String[] getKeys()
@@ -213,6 +223,7 @@ public class WeightedMetaArguments  extends CommandArguments
 	private boolean isGZ = false;
 	private boolean isQT = true;
 	private boolean isGC = false;
+	private boolean isKeepATGC = false;
 	private boolean isVerbose = false;
 	private boolean isVerboseGZ = false;
 
