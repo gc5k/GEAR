@@ -14,6 +14,7 @@ public class GMRes implements Comparable<GMRes>
 	private String direct;
 	private double b;
 	private double se;
+	private boolean isAmbiguous;
 
 	public GMRes(int cohort)
 	{
@@ -64,7 +65,7 @@ public class GMRes implements Comparable<GMRes>
 	{
 		this.bp = bp;
 	}
-	
+
 	public void SetB(double b)
 	{
 		this.b = b;
@@ -74,10 +75,15 @@ public class GMRes implements Comparable<GMRes>
 	{
 		this.se = se;
 	}
-	
+
 	public void SetP(double p)
 	{
 		this.p = p;
+	}
+
+	public void SetAmbi(boolean ambi)
+	{
+		isAmbiguous = ambi;
 	}
 
 	public void SetDirect(String direct)
@@ -93,6 +99,11 @@ public class GMRes implements Comparable<GMRes>
 	public long getBp()
 	{
 		return bp;
+	}
+
+	public boolean getIsAmbiguous()
+	{
+		return isAmbiguous;
 	}
 
 	public String printTitle()

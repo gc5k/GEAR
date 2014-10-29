@@ -98,18 +98,31 @@ public class WeightedMetaImpl extends CommandImpl
 	{
 		Logger.printUserLog("Starting meta-analysis...");
 		int cnt = 0;
+		int atgcCnt = 0;
 		Set<String> keys = gReader.getMetaSNPTable().keySet();
 		for (Iterator<String> e=keys.iterator(); e.hasNext();)
 		{
+			cnt++;
 			String key = e.next();
 			ArrayList<Integer> Int = gReader.getMetaSNPTable().get(key);
 			CovMatrix covMat = new CovMatrix(key, Int, corMat, gReader, wMetaArgs.getGC());
 			GMRes gr = MetaSNP(covMat);
+			if (gr.getIsAmbiguous())
+			{
+				atgcCnt++;
+				if (!wMetaArgs.isKeepATGC())
+				{
+					continue;
+				}
+			}
 			grArray.add(gr);
-			cnt++;
 		}
 		Collections.sort(grArray);
-		Logger.printUserLog("In total "+ cnt + " loci have been used for meta-analysis.");
+		Logger.printUserLog("In total "+ cnt + " loci have been analyzed for meta-analysis.");
+		if( !wMetaArgs.isKeepATGC())
+		{
+			Logger.printUserLog(atgcCnt + " ambiguous loci have been eliminated.");
+		}
 		PrintGMresults();
 	}
 
@@ -132,10 +145,12 @@ public class WeightedMetaImpl extends CommandImpl
 		double gb = 0;
 
 		MetaStat ms = null;
-		char sign;
+		boolean isAmbiguousLocus = false;
 		for (int i = 0; i < idx.length; i++)
 		{
+			char sign = '+';
 			double b = 0;
+			boolean match = true;
 			ms = gReader.getMetaStat().get(idx[i]).get(SNP);
 			if (i == 0)
 			{
@@ -145,21 +160,33 @@ public class WeightedMetaImpl extends CommandImpl
 				gr.SetBP(ms.getBP());
 				gr.SetA1(ms.getA1());
 				gr.SetA2(ms.getA2());
+				isAmbiguousLocus = SNPMatch.isAmbiguous(ms.getA1(), ms.getA2());
 			}
 			else
 			{
-				if (gr.GetA1() == ms.getA1() || gr.GetA1() == SNPMatch.Flip(ms.getA1())) //match A1 in the second meta
+				match = SNPMatch.isAllelsMatchForTwoLoci(gr.GetA1(), gr.GetA2(), ms.getA1(), ms.getA2());
+				if (match)
 				{
-					b = ms.getEffect();
+					if (gr.GetA1() == ms.getA1() || gr.GetA1() == SNPMatch.Flip(ms.getA1())) //match A1 in the second meta
+					{
+						b = ms.getEffect();
+					}
+					else if (gr.GetA1() == ms.getA2() || gr.GetA1() == SNPMatch.Flip(ms.getA2())) //match A2 in the second meta
+					{
+						b = -1 * ms.getEffect();
+					}
 				}
-				else if (gr.GetA1() == ms.getA2() || gr.GetA1() == SNPMatch.Flip(ms.getA2())) //match A2 in the second meta
+				else
 				{
-					b = -1 * ms.getEffect();
+					sign = ',';
 				}
 			}
-			
-			gb += b * Weight[i];
-			sign = b > 0 ? '+':'-';
+
+			if(match)
+			{
+				gb += b * Weight[i];
+				sign = b > 0 ? '+':'-';
+			}
 			direct.setCharAt(idx[i], sign);
 		}
 		double z = gb/gse;
@@ -172,6 +199,7 @@ public class WeightedMetaImpl extends CommandImpl
 		{
 			Logger.printUserError(e.toString());
 		}
+		gr.SetAmbi(isAmbiguousLocus);
 		gr.SetB(gb);
 		gr.SetSE(gse);
 		gr.SetZ(z);

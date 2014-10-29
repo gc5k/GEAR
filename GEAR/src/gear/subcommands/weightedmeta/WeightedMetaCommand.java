@@ -46,6 +46,7 @@ public class WeightedMetaCommand extends Command
 
 		options.addOption(OptionBuilder.withDescription(OPT_CM_DESC).hasArg().create(OPT_CM));
 		options.addOption(OptionBuilder.withDescription(OPT_GC_CONTROL_LONG_DESC).withLongOpt(OPT_GC_CONTROL_LONG).create(OPT_GC_CONTROL));
+		options.addOption(OptionBuilder.withDescription(OPT_KEEPATGC_LONG_DESC).withLongOpt(OPT_KEEPATGC_LONG).create(OPT_KEEPATGC));
 
 	}
 
@@ -89,6 +90,10 @@ public class WeightedMetaCommand extends Command
 			lamD.setGC();
 		}
 
+		if(cmdLine.hasOption(OPT_KEEPATGC))
+		{
+			lamD.setATGC();
+		}
 		//manual gzip meta files
 		if (cmdLine.hasOption(OPT_META_GZ))
 		{
@@ -170,9 +175,12 @@ public class WeightedMetaCommand extends Command
 	
 	private final static String OPT_CM = "cm";
 	private final static String OPT_CM_DESC = "correlation matrix";
-	
+
 	private final static String OPT_GC_CONTROL = "gc";
 	private final static String OPT_GC_CONTROL_LONG = "gc-control";
 	private final static String OPT_GC_CONTROL_LONG_DESC = "genomic control factor adjustment";
 
+	private final static String OPT_KEEPATGC = "atgc";
+	private final static String OPT_KEEPATGC_LONG = "keep-atgc";
+	private final static String OPT_KEEPATGC_LONG_DESC = "using all snps including A/T and G/C loci";
 }
