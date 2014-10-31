@@ -160,19 +160,19 @@ public class GWASReader
 */
 		if (KeyIdx[metaIdx][BETA] == -1)
 		{
-			Logger.printUserLog("Cannot find the beta/or in " + MetaFile[metaIdx]);
+			Logger.printUserLog("Cannot find the beta/or column in " + MetaFile[metaIdx]);
 		}		
 		if (KeyIdx[metaIdx][SE] == -1)
 		{
-			Logger.printUserLog("Cannot find the se value in " + MetaFile[metaIdx]);
+			Logger.printUserLog("Cannot find the se value column in " + MetaFile[metaIdx]);
 		}
 		if (KeyIdx[metaIdx][P] == -1)
 		{
-			Logger.printUserLog("Cannot find the p value in " + MetaFile[metaIdx]);
+			Logger.printUserLog("Cannot find the p value column in " + MetaFile[metaIdx]);
 		}
 		if (KeyIdx[metaIdx][A1] == -1)
 		{
-			Logger.printUserLog("Cannot find the allele 1 in " + MetaFile[metaIdx]);
+			Logger.printUserLog("Cannot find the allele 1 column in " + MetaFile[metaIdx]);
 		}
 //		if (KeyIdx[metaIdx][7] == -1)
 //		{
@@ -210,7 +210,6 @@ public class GWASReader
 				cntBadBp++;
 				continue;
 			}
-
 			if (ConstValues.isNA(tokens[KeyIdx[metaIdx][BETA]]))
 			{
 				cntBadBeta++;
@@ -251,16 +250,58 @@ public class GWASReader
 			ms = new MetaStat(tokens[KeyIdx[metaIdx][SNP]], Float.parseFloat(tokens[KeyIdx[metaIdx][BETA]]), Float.parseFloat(tokens[KeyIdx[metaIdx][SE]]), Double.parseDouble(tokens[KeyIdx[metaIdx][P]]), tokens[KeyIdx[metaIdx][A1]].charAt(0), logit[metaIdx]);
 			if (KeyIdx[metaIdx][CHR] != -1)
 			{
-				ms.setChr(Integer.parseInt(tokens[KeyIdx[metaIdx][CHR]]));
+				if(tokens[KeyIdx[metaIdx][CHR]].equalsIgnoreCase("X"))
+				{
+					ms.setChr(23);
+				}
+				else if(tokens[KeyIdx[metaIdx][CHR]].equalsIgnoreCase("Y"))
+				{
+					ms.setChr(24);
+				}
+				else if(tokens[KeyIdx[metaIdx][CHR]].equalsIgnoreCase("XY"))
+				{
+					ms.setChr(25);
+				}				
+				else if(tokens[KeyIdx[metaIdx][CHR]].equalsIgnoreCase("MT"))
+				{
+					ms.setChr(26);
+				}
+				else 
+				{
+					int chr = 0;
+					try
+					{
+						chr = Integer.parseInt(tokens[KeyIdx[metaIdx][CHR]]);						
+					}
+					catch (NumberFormatException e)
+					{
+						Logger.printUserLog(e.toString() + " in line " + total + " in '" + MetaFile[metaIdx] + ".'");
+						continue;
+					}
+					ms.setChr(chr);					
+				}
+
 			}
 			if (KeyIdx[metaIdx][BP] != -1)
 			{
-				ms.setBP(Integer.parseInt(tokens[KeyIdx[metaIdx][BP]]));
+				int bp = 0;
+				try
+				{
+					bp = Integer.parseInt(tokens[KeyIdx[metaIdx][BP]]);	
+				} 
+				catch (NumberFormatException e)
+				{
+					Logger.printUserError(e.toString() + " in line " + total + " in '" + MetaFile[metaIdx] + ".'");
+					continue;
+				}
+
+				ms.setBP(bp);
 			}
 			if (KeyIdx[metaIdx][A2] != -1)
 			{
 				ms.setA2(tokens[KeyIdx[metaIdx][A2]].charAt(0));
 			}
+
 			sumstat.put(ms.getSNP(), ms);
 			snpArray.add(ms.getSNP());
 
@@ -294,7 +335,7 @@ public class GWASReader
 		}
 		else
 		{
-			Logger.printUserLog("Read " + total + " summary statistics from '" + MetaFile[metaIdx] + ".'");			
+			Logger.printUserLog("Read " + cnt +"(of " + total + ")" + " summary statistics from '" + MetaFile[metaIdx] + ".'");			
 		}
 
 		if (cntBadChr > 0)

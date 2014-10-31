@@ -104,6 +104,7 @@ public class WeightedMetaImpl extends CommandImpl
 		{
 			cnt++;
 			String key = e.next();
+			System.out.println(key);
 			ArrayList<Integer> Int = gReader.getMetaSNPTable().get(key);
 			CovMatrix covMat = new CovMatrix(key, Int, corMat, gReader, wMetaArgs.getGC());
 			GMRes gr = MetaSNP(covMat);
@@ -119,7 +120,7 @@ public class WeightedMetaImpl extends CommandImpl
 		}
 		Collections.sort(grArray);
 		Logger.printUserLog("In total "+ cnt + " loci have been analyzed for meta-analysis.");
-		if( !wMetaArgs.isKeepATGC())
+		if (!wMetaArgs.isKeepATGC())
 		{
 			Logger.printUserLog(atgcCnt + " ambiguous loci have been eliminated.");
 		}

@@ -84,7 +84,7 @@ public class WeightedMetaCommand extends Command
 				lamD.setCCbatch(cmdLine.getOptionValue(OPT_CC_BATCH_LONG));
 			}
 		}
-		
+
 		if(cmdLine.hasOption(OPT_GC_CONTROL))
 		{
 			lamD.setGC();

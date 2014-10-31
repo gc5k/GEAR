@@ -88,7 +88,7 @@ public class LambdaDCommandImpl extends CommandImpl
 
 		Me = lamArgs.getMe();
 		int NumMetaFile = gReader.getNumMetaFile();
-		
+
 		if (NumMetaFile < 2)
 		{
 			Logger.printUserError("At least two summary statistic files should be specified.\n");
