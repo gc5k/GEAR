@@ -155,6 +155,19 @@ public class LambdaDCommandArguments extends CommandArguments
 		field[GWASConstant.SE] = k[2];
 		field[GWASConstant.A1] = k[3];
 		field[GWASConstant.A2] = k[4];
+		
+		if(k.length >5)
+		{
+			field[GWASConstant.CHR] = k[5];
+		}
+		if(k.length >6)
+		{
+			field[GWASConstant.BP] = k[6];			
+		}
+		if(k.length >7)
+		{
+			field[GWASConstant.P] = k[7];
+		}
 	}
 
 	public String[] getKeys()

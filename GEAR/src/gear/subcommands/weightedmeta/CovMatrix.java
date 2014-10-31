@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 
 import org.apache.commons.math.linear.Array2DRowRealMatrix;
+import org.apache.commons.math.linear.EigenDecompositionImpl;
 import org.apache.commons.math.linear.LUDecompositionImpl;
 import org.apache.commons.math.linear.RealMatrix;
 
@@ -52,6 +53,13 @@ public class CovMatrix
 		}
 
 		RealMatrix gg = new Array2DRowRealMatrix(covMat);
+
+		double[] eigen = (new EigenDecompositionImpl(gg, 0.00000001)).getRealEigenvalues();
+		for(int i = 0; i < eigen.length; i++)
+		{
+			System.out.println(eigen[i]);
+		}
+
 		RealMatrix gg_Inv = (new LUDecompositionImpl(gg)).getSolver().getInverse();
 		RealMatrix Unit = new Array2DRowRealMatrix(covMat.length, 1);
 		for(int i = 0; i < Unit.getRowDimension(); i++)
