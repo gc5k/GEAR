@@ -185,17 +185,17 @@ public class LambdaDCommandArguments extends CommandArguments
 		isVerbose = true;
 		isVerboseGZ = true;
 	}
-	
+
 	public boolean isVerbose()
 	{
 		return isVerbose;
 	}
-	
+
 	public boolean isVerboseGZ()
 	{
 		return isVerboseGZ;
 	}
-	
+
 	public double getMe()
 	{
 		return Me;
