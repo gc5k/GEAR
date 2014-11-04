@@ -245,7 +245,6 @@ public class GWASReader
 				continue;
 			}
 
-
 			MetaStat ms = null;
 			ms = new MetaStat(tokens[KeyIdx[metaIdx][SNP]], Float.parseFloat(tokens[KeyIdx[metaIdx][BETA]]), Float.parseFloat(tokens[KeyIdx[metaIdx][SE]]), Double.parseDouble(tokens[KeyIdx[metaIdx][P]]), tokens[KeyIdx[metaIdx][A1]].charAt(0), logit[metaIdx]);
 			if (KeyIdx[metaIdx][CHR] != -1)

@@ -79,7 +79,6 @@ public class LambdaDCommandImpl extends CommandImpl
 		Logger.printUserLog("=========================================================");
 		Logger.printUserLog("Results has been saved in '" + lamArgs
 				.getOutRoot() + ".lmat'.");
-
 	}
 
 	private void initial()
@@ -238,7 +237,8 @@ public class LambdaDCommandImpl extends CommandImpl
 			zMat[idx2][idx1] = et.getRho();
 			zMat[idx1][idx2] = et.getZ();
 
-			kMat[idx1][idx2] = kMat[idx2][idx1] = Kappa;
+			kMat[idx1][idx2] = et.getX();
+			kMat[idx2][idx1] = Kappa;
 
 			et.PrintQT();
 		}
@@ -252,7 +252,8 @@ public class LambdaDCommandImpl extends CommandImpl
 			zMat[idx2][idx1] = et.getRho();
 			zMat[idx1][idx2] = et.getZ();
 
-			kMat[idx1][idx2] = kMat[idx2][idx1] = Kappa;
+			kMat[idx1][idx2] = Kappa;
+			kMat[idx2][idx1] = et.getX();
 
 			et.PrintCC();
 
@@ -409,6 +410,7 @@ public class LambdaDCommandImpl extends CommandImpl
 
 	private void WriteMat()
 	{
+		//cm matrix
 		PrintWriter cwriter = null;
 		try 
 		{
@@ -429,6 +431,27 @@ public class LambdaDCommandImpl extends CommandImpl
 		}
 		cwriter.close();
 
+		//Xmatrix
+		PrintWriter xwriter = null;
+		try 
+		{
+			xwriter = new PrintWriter(new BufferedWriter(new FileWriter(lamArgs.getOutRoot() + ".xm")));
+		}
+		catch (IOException e)
+		{
+			Logger.handleException(e, "An I/O exception occurred when writing '" + lamArgs.getOutRoot() + ".xm" + "'.");
+		}
+
+		for (int i = 0; i < kMat.length; i++)
+		{
+			for (int j = 0; j < kMat[i].length; j++)
+			{
+				xwriter.print(String.format("%.4f", kMat[i][j]) + " ");
+			}
+			xwriter.println();
+		}
+		xwriter.close();
+
 		PrintWriter writer = null;
 		try 
 		{
@@ -438,7 +461,6 @@ public class LambdaDCommandImpl extends CommandImpl
 		{
 			Logger.handleException(e, "An I/O exception occurred when writing '" + lamArgs.getOutRoot() + ".lmat" + "'.");
 		}
-
 
 		writer.println("LambdaMeta:");
 		for (int i = 0; i < lamMat.length; i++)
@@ -483,16 +505,6 @@ public class LambdaDCommandImpl extends CommandImpl
 				}
 				writer.println();
 			}
-		}
-
-		writer.println("Kappa:");
-		for (int i = 0; i < kMat.length; i++)
-		{
-			for (int j = 0; j < kMat[i].length; j++)
-			{
-				writer.print(String.format("%.4f", kMat[i][j]) + " ");
-			}
-			writer.println();
 		}
 
 		writer.close();
