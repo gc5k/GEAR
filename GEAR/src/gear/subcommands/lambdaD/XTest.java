@@ -17,6 +17,11 @@ public class XTest
 		this.n1 = n1;
 		this.n2 = n2;
 		Me = DesStat.length;
+		for(int i = 0; i < DesStat.length; i++)
+		{
+			XVec.addValue(DesStat[i]);
+		}
+
 		CalZ();
 	}
 
@@ -30,17 +35,17 @@ public class XTest
 		this.n1 = cs1 + ctrl1;
 		this.n2 = cs2 + ctrl2;
 		Me = DesStat.length;
+		for(int i = 0; i < DesStat.length; i++)
+		{
+			XVec.addValue(DesStat[i]);
+		}
+
 		CalZ();
 		CalCC();
 	}
 
 	private void CalZ()
 	{
-		for(int i = 0; i < DesStat.length; i++)
-		{
-			XVec.addValue(DesStat[i]);
-		}
-
 		try
 		{
 			// two-tail tests
@@ -81,6 +86,11 @@ public class XTest
 
 		n12cs = n12 * Math.sqrt(cs1/ctrl1 * cs2/ctrl2);
 		sigma_n12cs = sigma_n12 * Math.sqrt(cs1/ctrl1 * cs2/ctrl2);
+	}
+
+	protected double getX()
+	{
+		return XVec.getSum();
 	}
 
 	protected double getZ()
@@ -180,7 +190,7 @@ public class XTest
 	private double Z = 0;
 	private double Me = 0;
 	private double pZ = 0;
-	
+
 	private double rho = 0;
 	private double sigma_rho = 0;
 
