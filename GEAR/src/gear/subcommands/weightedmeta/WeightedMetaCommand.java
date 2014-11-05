@@ -184,7 +184,7 @@ public class WeightedMetaCommand extends Command
 	private final static String OPT_GC = "gc";
 	private final static String OPT_GC_DESC = "genomic control factor adjustment";
 
-	private final static String OPT_GC_INFLATION_ONLY = "gc-i";
+	private final static String OPT_GC_INFLATION_ONLY = "gci";
 	private final static String OPT_GC_INFLATION_ONLY_LONG = "gc-inflation-only";
 	private final static String OPT_GC_INFLATION_ONLY_LONG_DESC = "genomic control factor adjustment only for cohorts having lambda greater than 1";
 	
