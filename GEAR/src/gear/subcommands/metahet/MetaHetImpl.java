@@ -59,7 +59,7 @@ public class MetaHetImpl  extends CommandImpl
 		hMat = new double[cohortN][cohortN];
 		if(ccSize.length != cohortN)
 		{
-			Logger.printUserError("the sample size of the case-control cohort does not match. Please check '" + mhArgs.getCCBatchFile() + ".'");
+			Logger.printUserError("the sample size of the case-control cohort does not match. Please check '" + mhArgs.getCCSizeFile() + ".'");
 			System.exit(0);
 		}
 
@@ -143,17 +143,8 @@ public class MetaHetImpl  extends CommandImpl
 
 	public void readOMFile()
 	{
-		BufferedReader bf = null;
-		if(mhArgs.isQT())
-		{
-			bf = BufferedReader.openTextFile(mhArgs.getQMFile(), "qm file.");
-			Logger.printUserLog("Reading '" + mhArgs.getQMFile() + "'.");
-		}
-		else
-		{
-			bf = BufferedReader.openTextFile(mhArgs.getCCMFile(), "ccm file.");
-			Logger.printUserLog("Reading '" + mhArgs.getCCMFile() + "'.");			
-		}
+		BufferedReader bf =  BufferedReader.openTextFile(mhArgs.getOMFile(), "qm file.");
+		Logger.printUserLog("Reading '" + mhArgs.getOMFile() + "'.");
 
 		String[] d = null;
 		int cnt = 0;
@@ -167,7 +158,7 @@ public class MetaHetImpl  extends CommandImpl
 
 			if (d.length != cohortN )
 			{
-				String s = mhArgs.isQT() ? mhArgs.getQMFile():mhArgs.getCCMFile();
+				String s =  mhArgs.getOMFile();
 				Logger.printUserError("incorrect '" + s + "'.");
 				System.exit(0);
 			}

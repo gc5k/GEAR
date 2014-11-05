@@ -47,7 +47,7 @@ public class WeightedMetaImpl extends CommandImpl
 			System.exit(0);
 		}
 
-		generateCorMatrix();			
+		generateCorMatrix();
 		MetaAnalysis();
 	}
 
