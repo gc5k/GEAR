@@ -32,10 +32,9 @@ public class MetaHetCommand extends Command
 	@Override
 	public void prepareOptions(Options options)
 	{
-		options.addOption(OptionBuilder.withDescription(OPT_CC_BATCH_LONG_DESC).withLongOpt(OPT_CC_BATCH_LONG).hasArg().create());
+		options.addOption(OptionBuilder.withDescription(OPT_CC_SIZE_LONG_DESC).withLongOpt(OPT_CC_SIZE_LONG).hasArg().create());
 		options.addOption(OptionBuilder.withDescription(OPT_ME_DESC).hasArg().create(OPT_ME));
-		options.addOption(OptionBuilder.withDescription(OPT_CCO_DESC).hasArg().create(OPT_CCO));
-		options.addOption(OptionBuilder.withDescription(OPT_QO_DESC).hasArg().create(OPT_QO));
+		options.addOption(OptionBuilder.withDescription(OPT_OM_DESC).hasArg().create(OPT_OM));
 		options.addOption(OptionBuilder.withDescription(OPT_XM_DESC).hasArg().create(OPT_XM));
 	}
 
@@ -57,19 +56,14 @@ public class MetaHetCommand extends Command
 			mhArgs.setXMFile(cmdLine.getOptionValue(OPT_XM));
 		}
 
-		if (cmdLine.hasOption(OPT_QO))
+		if (cmdLine.hasOption(OPT_OM))
 		{
-			mhArgs.setQMFile(cmdLine.getOptionValue(OPT_QO));
+			mhArgs.setOMFile(cmdLine.getOptionValue(OPT_OM));
 		}
 
-		if (cmdLine.hasOption(OPT_CCO))
+		if (cmdLine.hasOption(OPT_CC_SIZE_LONG))
 		{
-			mhArgs.setCCMFile(cmdLine.getOptionValue(OPT_CCO));
-		}
-
-		if (cmdLine.hasOption(OPT_CC_BATCH_LONG))
-		{
-			mhArgs.setCCbatch(cmdLine.getOptionValue(OPT_CC_BATCH_LONG));
+			mhArgs.setCCbatch(cmdLine.getOptionValue(OPT_CC_SIZE_LONG));
 		}
 		return mhArgs;
 	}
@@ -87,12 +81,9 @@ public class MetaHetCommand extends Command
 	private final static String OPT_ME_DEFAULT = "30000";
 	private final static String OPT_ME_DESC = "effective number of markers";
 
-	private final static String OPT_QO = "qo";
-	private final static String OPT_QO_DESC = "Quantitative trait: #overlapping samples";
+	private final static String OPT_OM = "om";
+	private final static String OPT_OM_DESC = "#overlapping samples. The diagonal are sample size for cohorts, the lower triangle are overlapping samples. For case-control studies, the lower triangle elements are overalpping cases and the upper triangle elements are overlapping controls.";
 
-	private final static String OPT_CCO = "cco";
-	private final static String OPT_CCO_DESC = "Case-control study: #overlapping case:controls";
-
-	private final static String OPT_CC_BATCH_LONG = "cc-batch";
-	private final static String OPT_CC_BATCH_LONG_DESC = "Case-control study: #case 1, #ctrl 1, #case 2, #ctrl 2";
+	private final static String OPT_CC_SIZE_LONG = "cc-size";
+	private final static String OPT_CC_SIZE_LONG_DESC = "Case-control study: #case 1, #ctrl 1, #case 2, #ctrl 2";
 }

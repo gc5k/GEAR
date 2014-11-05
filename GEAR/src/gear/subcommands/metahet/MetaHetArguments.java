@@ -32,28 +32,16 @@ public class MetaHetArguments extends CommandArguments
 		return xmFile;
 	}
 
-	public void setQMFile(String qmFile)
+	public void setOMFile(String omFile)
 	{
-		FileUtil.exists(qmFile);
-		this.qmFile = qmFile;
+		FileUtil.exists(omFile);
+		this.omFile = omFile;
 		isQT = true;
 	}
 
-	public String getQMFile()
+	public String getOMFile()
 	{
-		return qmFile;
-	}
-
-	public void setCCMFile(String ccmFile)
-	{
-		FileUtil.exists(ccmFile);
-		this.ccmFile = ccmFile;
-		isQT = false;
-	}
-
-	public String getCCMFile()
-	{
-		return ccmFile;
+		return omFile;
 	}
 
 	public boolean isQT()
@@ -61,12 +49,12 @@ public class MetaHetArguments extends CommandArguments
 		return isQT;
 	}
 	
-	public void setCCbatch(String ccBatch)
+	public void setCCbatch(String ccSize)
 	{
-		FileUtil.exists(ccBatch);
-		this.ccBatchFile = ccBatch;
+		FileUtil.exists(ccSize);
+		this.ccSizeFile = ccSize;
 		ArrayList<String> s = NewIt.newArrayList();
-		BufferedReader reader = BufferedReader.openTextFile(ccBatch, "CC Batch File");
+		BufferedReader reader = BufferedReader.openTextFile(ccSize, "CC size file");
 
 		String[] tokens = null;
 		while((tokens = reader.readTokensAtLeast(2))!=null)
@@ -97,9 +85,9 @@ public class MetaHetArguments extends CommandArguments
 		isQT = false;
 	}
 
-	public String getCCBatchFile()
+	public String getCCSizeFile()
 	{
-		return ccBatchFile;
+		return ccSizeFile;
 	}
 
 	public double[][] getCCsize()
@@ -109,10 +97,9 @@ public class MetaHetArguments extends CommandArguments
 
 	private double Me;
 	private String xmFile;
-	private String qmFile;
+	private String omFile;
 	private boolean isQT = true;
-	private String ccmFile;
 
-	private String ccBatchFile;
+	private String ccSizeFile;
 	private double[][] ccSize;
 }
