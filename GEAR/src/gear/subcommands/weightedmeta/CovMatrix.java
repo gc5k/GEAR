@@ -13,12 +13,13 @@ import gear.gwassummary.MetaStat;
 
 public class CovMatrix
 {
-	public CovMatrix(String snp, ArrayList<Integer> Int, double[][] corMat, GWASReader gReader, boolean isGC)
+	public CovMatrix(String snp, ArrayList<Integer> Int, double[][] corMat, GWASReader gReader, boolean isGC, boolean isGCInflationOnly)
 	{
 		this.snp = snp;
 		this.cohort = Int.get(Int.size() -1).intValue();
 		this.cohortIdx = new int[cohort];
 		this.isGC = isGC;
+		this.isGCInflationOnly = isGCInflationOnly;
 		this.gc = new double[cohort];
 
 		int cnt = 0;
@@ -33,7 +34,11 @@ public class CovMatrix
 			double[] Egc = gReader.GetGC();
 			for(int i = 0; i < cohortIdx.length; i++)
 			{
-				gc[i] = Egc[cohortIdx[i]]; 
+				gc[i] = Egc[cohortIdx[i]];
+				if(this.isGCInflationOnly)
+				{
+					gc[i] = gc[i] > 1 ? gc[i]:1;
+				}				
 			}
 		}
 		else
@@ -107,6 +112,7 @@ public class CovMatrix
 	}
 
 	private boolean isGC;
+	private boolean isGCInflationOnly;
 	private double[] gc;
 	private String snp;
 	private double[][] covMat;
