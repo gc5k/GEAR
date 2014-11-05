@@ -107,7 +107,7 @@ public class WeightedMetaArguments  extends CommandArguments
 		String[] qt = s.toArray(new String[0]);
 		setQT(qt);
 	}
-	
+
 	public void setQT(String[] qt)
 	{
 		qtSize = new double[qt.length];
@@ -148,6 +148,16 @@ public class WeightedMetaArguments  extends CommandArguments
 	public boolean getGC()
 	{
 		return isGC;
+	}
+
+	public void setGCInflationOnly()
+	{
+		isGCInflationOnly = true;
+	}
+
+	public boolean getGCInflationOnly()
+	{
+		return isGCInflationOnly;
 	}
 
 	public void setATGC()
@@ -198,30 +208,30 @@ public class WeightedMetaArguments  extends CommandArguments
 	{
 		isVerbose = true;
 	}
-	
+
 	public void setVerboseGZ()
 	{
 		isVerbose = true;
 		isVerboseGZ = true;
 	}
-	
+
 	public boolean isVerbose()
 	{
 		return isVerbose;
 	}
-	
+
 	public boolean isVerboseGZ()
 	{
 		return isVerboseGZ;
 	}
-	
+
 	public void setCM(String cF)
 	{
 		FileUtil.exists(cF);
 		cmFile = cF;
 		isCM = true;
 	}
-	
+
 	public String getCMFile()
 	{
 		return cmFile;
@@ -236,6 +246,7 @@ public class WeightedMetaArguments  extends CommandArguments
 	private boolean isGZ = false;
 	private boolean isQT = true;
 	private boolean isGC = false;
+	private boolean isGCInflationOnly = false;
 	private boolean isKeepATGC = false;
 	private boolean isVerbose = false;
 	private boolean isVerboseGZ = false;

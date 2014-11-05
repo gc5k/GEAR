@@ -45,9 +45,9 @@ public class WeightedMetaCommand extends Command
 		options.addOption(OptionBuilder.withDescription(OPT_KEY_DESC).hasArgs(5).create(OPT_KEY));
 
 		options.addOption(OptionBuilder.withDescription(OPT_CM_DESC).hasArg().create(OPT_CM));
-		options.addOption(OptionBuilder.withDescription(OPT_GC_CONTROL_LONG_DESC).withLongOpt(OPT_GC_CONTROL_LONG).create(OPT_GC_CONTROL));
+		options.addOption(OptionBuilder.withDescription(OPT_GC_DESC).withLongOpt(OPT_GC).create(OPT_GC));
+		options.addOption(OptionBuilder.withDescription(OPT_GC_INFLATION_ONLY_LONG_DESC).withLongOpt(OPT_GC_INFLATION_ONLY_LONG).create(OPT_GC_INFLATION_ONLY));
 		options.addOption(OptionBuilder.withDescription(OPT_KEEPATGC_LONG_DESC).withLongOpt(OPT_KEEPATGC_LONG).create(OPT_KEEPATGC));
-
 	}
 
 	@Override
@@ -85,9 +85,14 @@ public class WeightedMetaCommand extends Command
 			}
 		}
 
-		if(cmdLine.hasOption(OPT_GC_CONTROL))
+		if(cmdLine.hasOption(OPT_GC))
 		{
 			lamD.setGC();
+		}
+
+		if(cmdLine.hasOption(OPT_GC_INFLATION_ONLY))
+		{
+			lamD.setGCInflationOnly();
 		}
 
 		if(cmdLine.hasOption(OPT_KEEPATGC))
@@ -171,15 +176,18 @@ public class WeightedMetaCommand extends Command
 	private final static String OPT_QT_BATCH_LONG_DESC = "Quantitative trait: #sample size 1, #sample size 2";
 
 	private final static String OPT_KEY = "key";
-	private final static String OPT_KEY_DESC = "Self defined key workds: snp, beta, se, a1, a2";
+	private final static String OPT_KEY_DESC = "Self defined key workds: snp, beta, se, a1, a2, chr, bp, p";
 	
 	private final static String OPT_CM = "cm";
 	private final static String OPT_CM_DESC = "correlation matrix";
 
-	private final static String OPT_GC_CONTROL = "gc";
-	private final static String OPT_GC_CONTROL_LONG = "gc-control";
-	private final static String OPT_GC_CONTROL_LONG_DESC = "genomic control factor adjustment";
+	private final static String OPT_GC = "gc";
+	private final static String OPT_GC_DESC = "genomic control factor adjustment";
 
+	private final static String OPT_GC_INFLATION_ONLY = "gc-i";
+	private final static String OPT_GC_INFLATION_ONLY_LONG = "gc-inflation-only";
+	private final static String OPT_GC_INFLATION_ONLY_LONG_DESC = "genomic control factor adjustment only for cohorts having lambda greater than 1";
+	
 	private final static String OPT_KEEPATGC = "atgc";
 	private final static String OPT_KEEPATGC_LONG = "keep-atgc";
 	private final static String OPT_KEEPATGC_LONG_DESC = "using all snps including A/T and G/C loci";

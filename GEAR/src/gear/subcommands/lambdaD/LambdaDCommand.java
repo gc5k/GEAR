@@ -176,7 +176,7 @@ public class LambdaDCommand extends Command
 	private final static String OPT_QT_BATCH_LONG_DESC = "Quantitative trait: #sample size 1, #sample size 2";
 
 	private final static String OPT_KEY = "key";
-	private final static String OPT_KEY_DESC = "Self defined key workds: snp, beta, se, a1, a2";
+	private final static String OPT_KEY_DESC = "Self defined key workds: snp, beta, se, a1, a2, chr, bp, p";
 
 	private final static String OPT_VERBOSE = "v";
 	private final static String OPT_VERBOSE_LONG = "verbose";
