@@ -242,6 +242,16 @@ public class WeightedMetaArguments  extends CommandArguments
 		return isCM;
 	}
 
+	public void setFullSNPOnly()
+	{
+		isFullSNPOnly = true;
+	}
+	
+	public boolean isFullSNPOnly()
+	{
+		return isFullSNPOnly;
+	}
+
 	private ArrayList<String> md;
 	private boolean isGZ = false;
 	private boolean isQT = true;
@@ -257,5 +267,5 @@ public class WeightedMetaArguments  extends CommandArguments
 	
 	private String cmFile = null;
 	private boolean isCM = false;
-
+	private boolean isFullSNPOnly = false;
 }

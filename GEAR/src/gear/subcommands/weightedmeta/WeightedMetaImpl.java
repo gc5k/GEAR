@@ -102,9 +102,15 @@ public class WeightedMetaImpl extends CommandImpl
 		Set<String> keys = gReader.getMetaSNPTable().keySet();
 		for (Iterator<String> e=keys.iterator(); e.hasNext();)
 		{
-			cnt++;
 			String key = e.next();
 			ArrayList<Integer> Int = gReader.getMetaSNPTable().get(key);
+			if (wMetaArgs.isFullSNPOnly())
+			{
+				if (Int.get(Int.size()-1).intValue() != (Int.size() -1))
+				{
+					continue;
+				}
+			}
 			CovMatrix covMat = new CovMatrix(key, Int, corMat, gReader, wMetaArgs.getGC(), wMetaArgs.getGCInflationOnly());
 			GMRes gr = MetaSNP(covMat);
 			if (gr.getIsAmbiguous())
@@ -116,6 +122,7 @@ public class WeightedMetaImpl extends CommandImpl
 				}
 			}
 			grArray.add(gr);
+			cnt++;
 		}
 		Collections.sort(grArray);
 		Logger.printUserLog("In total "+ cnt + " loci have been analyzed for meta-analysis.");

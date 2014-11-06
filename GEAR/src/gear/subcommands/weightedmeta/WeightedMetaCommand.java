@@ -48,6 +48,7 @@ public class WeightedMetaCommand extends Command
 		options.addOption(OptionBuilder.withDescription(OPT_GC_DESC).withLongOpt(OPT_GC).create(OPT_GC));
 		options.addOption(OptionBuilder.withDescription(OPT_GC_INFLATION_ONLY_LONG_DESC).withLongOpt(OPT_GC_INFLATION_ONLY_LONG).create(OPT_GC_INFLATION_ONLY));
 		options.addOption(OptionBuilder.withDescription(OPT_KEEPATGC_LONG_DESC).withLongOpt(OPT_KEEPATGC_LONG).create(OPT_KEEPATGC));
+		options.addOption(OptionBuilder.withDescription(OPT_FULL_SNP_ONLY_LONG_DESC).withLongOpt(OPT_FULL_SNP_ONLY_LONG).create(OPT_FULL_SNP_ONLY));
 	}
 
 	@Override
@@ -99,6 +100,12 @@ public class WeightedMetaCommand extends Command
 		{
 			lamD.setATGC();
 		}
+		
+		if(cmdLine.hasOption(OPT_FULL_SNP_ONLY))
+		{
+			lamD.setFullSNPOnly();
+		}
+
 		//manual gzip meta files
 		if (cmdLine.hasOption(OPT_META_GZ))
 		{
@@ -191,4 +198,8 @@ public class WeightedMetaCommand extends Command
 	private final static String OPT_KEEPATGC = "atgc";
 	private final static String OPT_KEEPATGC_LONG = "keep-atgc";
 	private final static String OPT_KEEPATGC_LONG_DESC = "using all snps including A/T and G/C loci";
+	
+	private final static String OPT_FULL_SNP_ONLY = "fs";
+	private final static String OPT_FULL_SNP_ONLY_LONG = "full-snp-only";
+	private final static String OPT_FULL_SNP_ONLY_LONG_DESC = "Only the SNPs available to all cohorts will be printed";
 }
