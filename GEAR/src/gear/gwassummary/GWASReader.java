@@ -334,7 +334,7 @@ public class GWASReader
 		}
 		else
 		{
-			Logger.printUserLog("Read " + cnt +"(of " + total + ")" + " summary statistics from '" + MetaFile[metaIdx] + ".'");			
+			Logger.printUserLog("Read " + cnt +" (of " + total + ")" + " summary statistics from '" + MetaFile[metaIdx] + ".'");			
 		}
 
 		if (cntBadChr > 0)

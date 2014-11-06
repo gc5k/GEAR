@@ -14,6 +14,8 @@ public class XTest
 	public XTest(double[] DesStat, double n1, double n2)
 	{
 		this.DesStat = DesStat;
+		checkStat();
+
 		this.n1 = n1;
 		this.n2 = n2;
 		Me = DesStat.length;
@@ -28,6 +30,8 @@ public class XTest
 	public XTest(double[] DesStat, double cs1, double ctrl1, double cs2, double ctrl2)
 	{
 		this.DesStat = DesStat;
+		checkStat();
+
 		this.cs1 = cs1;
 		this.ctrl1 = ctrl1;
 		this.cs2 = cs2;
@@ -44,6 +48,27 @@ public class XTest
 		CalCC();
 	}
 
+	private void checkStat()
+	{
+		int cnt = 0;
+		for(int i = 0; i < DesStat.length; i++)
+		{
+			if(DesStat[i] == Double.POSITIVE_INFINITY)
+			{
+				cnt++;
+				DesStat[i] = DesStat[i-1] + 0.05;
+			}
+		}
+		if(cnt == 1)
+		{
+			Logger.printUserLog(cnt + " point has been corrected in X statistics.");
+		}
+		if(cnt > 2)
+		{
+			Logger.printUserLog(cnt + " points have been corrected in X statistics.");
+		}
+	}
+	
 	private void CalZ()
 	{
 		try
