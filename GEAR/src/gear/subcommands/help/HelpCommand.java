@@ -40,7 +40,7 @@ public final class HelpCommand extends Command
 	}
 	
 	@Override
-	protected void printOptionsInEffect(CommandLine cmdLine)
+	protected void printOptionsInEffect(CommandLine cmdLine, String subcmd)
 	{
 	}
 	

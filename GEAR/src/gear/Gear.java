@@ -90,7 +90,7 @@ public enum Gear
 		
 		if (subcmd != null)
 		{
-			subcmd.execute(subcmdArgs);
+			subcmd.execute(subcmdArgs, subcmdName);
 		}
 		else
 		{

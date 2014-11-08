@@ -89,17 +89,17 @@ public abstract class Command implements Comparable<Command>
 	public abstract CommandArguments parse(CommandLine cmdLine) throws CommandArgumentException;
 	protected abstract CommandImpl createCommandImpl();
 	
-	protected void printOptionsInEffect(CommandLine cmdLine)
+	protected void printOptionsInEffect(CommandLine cmdLine, String subcmd)
 	{
+		Logger.printUserLog("Subcommand: " + subcmd);
 		Logger.printUserLog("Options in effect: ");
 		
 		@SuppressWarnings("rawtypes")
 		Iterator optIter = cmdLine.iterator();
-		
 		while (optIter.hasNext())
 		{
 			Option opt = (Option)optIter.next();
-			String line = opt.hasLongOpt() ? "\t--" + opt.getLongOpt() : "\t-" + opt.getOpt();
+			String line = opt.hasLongOpt() ? "\t--" + opt.getLongOpt() : "\t--" + opt.getOpt();
 			String[] argValues = opt.getValues();
 			if (argValues != null)
 			{
@@ -114,7 +114,7 @@ public abstract class Command implements Comparable<Command>
 		Logger.printUserLog("");
 	}
 	
-	public void execute(String[] args)
+	public void execute(String[] args, String subCmdName)
 	{
 		Options options = getOptions();
 		CommandLineParser cmdLineParser = new PosixParser();
@@ -129,8 +129,8 @@ public abstract class Command implements Comparable<Command>
 			Logger.hasUserLogTag(false);
 			Logger.printUserLog(AboutInfo.WELCOME_MESSAGE);
 			Logger.hasUserLogTag(true);
-			
-			printOptionsInEffect(cmdLine);
+
+			printOptionsInEffect(cmdLine, subCmdName);
 			
 			CommandImpl cmdImpl = createCommandImpl();
 			cmdImpl.preExecute();
