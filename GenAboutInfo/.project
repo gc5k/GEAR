@@ -17,7 +17,11 @@
 	<variableList>
 		<variable>
 			<name>SVN_LOC</name>
-			<value>file:/opt/subversion/bin</value>
+			<value>file:/opt/local/bin</value>
+		</variable>
+		<variable>
+			<name>svnversion</name>
+			<value>file:/opt/local/bin/svnversion</value>
 		</variable>
 	</variableList>
 </projectDescription>
