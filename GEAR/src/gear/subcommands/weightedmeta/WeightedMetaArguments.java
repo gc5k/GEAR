@@ -11,6 +11,58 @@ import gear.util.NewIt;
 
 public class WeightedMetaArguments  extends CommandArguments
 {
+	public void setKeepCohortFile(String KFile)
+	{
+		FileUtil.exists(KFile);
+		KeepFile = NewIt.newArrayList();
+		BufferedReader reader = BufferedReader.openTextFile(KFile, "Keep-cohort");
+
+		String[] tokens = null;
+		while((tokens = reader.readTokens())!=null)
+		{
+			KeepFile.add(tokens[0]);
+		}
+
+		isKeepFile = true;
+		isRevFile = false;
+	}
+
+	public boolean IsKeepFile()
+	{
+		return isKeepFile;
+	}
+
+	public String[] getKeepFile()
+	{
+		return KeepFile.toArray(new String[0]);
+	}
+	
+	public void setRemoveCohortFile(String RFile)
+	{
+		FileUtil.exists(RFile);
+		RevFile = NewIt.newArrayList();
+		BufferedReader reader = BufferedReader.openTextFile(RFile, "Keep-cohort");
+
+		String[] tokens = null;
+		while((tokens = reader.readTokens())!=null)
+		{
+			RevFile.add(tokens[0]);
+		}
+
+		isKeepFile = false;
+		isRevFile = true;
+	}
+
+	public boolean IsRevFile()
+	{
+		return isRevFile;
+	}
+	
+	public String[] getRemoveFile()
+	{
+		return RevFile.toArray(new String[0]);
+	}
+
 	public void setMetaBatch(String batch)
 	{
 		FileUtil.exists(batch);
@@ -268,4 +320,9 @@ public class WeightedMetaArguments  extends CommandArguments
 	private String cmFile = null;
 	private boolean isCM = false;
 	private boolean isFullSNPOnly = false;
+	
+	private ArrayList<String> KeepFile = null;
+	private boolean isKeepFile = false;
+	private ArrayList<String> RevFile = null;
+	private boolean isRevFile = false;
 }

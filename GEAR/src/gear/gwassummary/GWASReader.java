@@ -16,31 +16,55 @@ import org.apache.commons.math.distribution.ChiSquaredDistributionImpl;
 public class GWASReader
 {
 
-	public GWASReader(String[] MetaFile, String[] field, boolean isQT, boolean isGZ)
+	public GWASReader(String[] MetaFile, boolean[] FileKeep, String[] field, boolean isQT, boolean isGZ)
 	{
 		this.MetaFile = MetaFile;
 		this.field = field;
 		this.isQT = isQT;
 		this.isGZ = isGZ;
 
-		gc = new double[MetaFile.length];
-		Arrays.fill(gc, 1);
-		logit = new boolean[MetaFile.length];
-		Arrays.fill(logit, false);
-
-		KeyIdx = new int[MetaFile.length][8];
-		for (int i = 0; i < KeyIdx.length; i++)
+		Cohort = 0;
+		for (int i = 0; i < FileKeep.length; i++)
 		{
-			Arrays.fill(KeyIdx[i], -1);
+			if(FileKeep[i])
+			{
+				Cohort++;
+			}
 		}
 
+		if (Cohort == 0)
+		{
+			Logger.printUserLog("No cohort left. GEAR quitted.");
+			System.exit(0);
+		}
+
+		gc = new double[Cohort];
+		Arrays.fill(gc, 1);
+		logit = new boolean[Cohort];
+		Arrays.fill(logit, false);
+
+		KeyIdx = new int[Cohort][8];
+		for (int i = 0; i < KeyIdx.length; i++)
+		{
+			Arrays.fill (KeyIdx[i], -1);
+		}
+
+		int cnt = 0;
 		for (int i = 0; i < MetaFile.length; i++)
 		{
-			HashMap<String, MetaStat> m = readMeta(i);
-			MetaStat.add(m);
+			if (FileKeep[i])
+			{
+				HashMap<String, MetaStat> m = readMeta(cnt++);
+				MetaStat.add(m);
+			}
 		}
 	}
 
+	public int getCohortNum()
+	{
+		return Cohort;
+	}
+	
 	public String[] getMetaFile()
 	{
 		return MetaFile;
@@ -471,5 +495,6 @@ public class GWASReader
 
 	private double[] gc;
 	private double ChiMedianConstant = 0.4549364;
+	private int Cohort;
 
 }

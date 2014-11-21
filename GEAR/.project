@@ -24,4 +24,14 @@
 	<natures>
 		<nature>org.eclipse.jdt.core.javanature</nature>
 	</natures>
+	<variableList>
+		<variable>
+			<name>SVN_LOC</name>
+			<value>file:/opt/local/bin</value>
+		</variable>
+		<variable>
+			<name>svnversion</name>
+			<value>file:/opt/local/bin/svnversion</value>
+		</variable>
+	</variableList>
 </projectDescription>
