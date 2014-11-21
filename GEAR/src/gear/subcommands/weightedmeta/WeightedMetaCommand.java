@@ -49,6 +49,10 @@ public class WeightedMetaCommand extends Command
 		options.addOption(OptionBuilder.withDescription(OPT_GC_INFLATION_ONLY_LONG_DESC).withLongOpt(OPT_GC_INFLATION_ONLY_LONG).create(OPT_GC_INFLATION_ONLY));
 		options.addOption(OptionBuilder.withDescription(OPT_KEEPATGC_LONG_DESC).withLongOpt(OPT_KEEPATGC_LONG).create(OPT_KEEPATGC));
 		options.addOption(OptionBuilder.withDescription(OPT_FULL_SNP_ONLY_LONG_DESC).withLongOpt(OPT_FULL_SNP_ONLY_LONG).create(OPT_FULL_SNP_ONLY));
+
+		options.addOption(OptionBuilder.withDescription(OPT_KEEP_COHORT_LONG_DESC).hasArg().create(OPT_KEEP_COHORT));
+		options.addOption(OptionBuilder.withDescription(OPT_REMOVE_COHORT_LONG_DESC).hasArg().create(OPT_REMOVE_COHORT));
+
 	}
 
 	@Override
@@ -145,6 +149,16 @@ public class WeightedMetaCommand extends Command
 		{
 			lamD.setCM(cmdLine.getOptionValue(OPT_CM));
 		}
+		
+		if (cmdLine.hasOption(OPT_KEEP_COHORT))
+		{
+			lamD.setKeepCohortFile(cmdLine.getOptionValue(OPT_KEEP_COHORT));
+		}
+		
+		if (cmdLine.hasOption(OPT_REMOVE_COHORT))
+		{
+			lamD.setRemoveCohortFile(cmdLine.getOptionValue(OPT_REMOVE_COHORT));
+		}
 		return lamD;
 	}
 
@@ -202,4 +216,13 @@ public class WeightedMetaCommand extends Command
 	private final static String OPT_FULL_SNP_ONLY = "fs";
 	private final static String OPT_FULL_SNP_ONLY_LONG = "full-snp-only";
 	private final static String OPT_FULL_SNP_ONLY_LONG_DESC = "Only the SNPs available to all cohorts will be printed";
+	
+	private final static String OPT_KEEP_COHORT = "kc";
+	private final static String OPT_KEEP_COHORT_LONG = "keep-cohort";
+	private final static String OPT_KEEP_COHORT_LONG_DESC = "Keep cohorts will be used for meta-analysis";
+
+	private final static String OPT_REMOVE_COHORT = "rc";
+	private final static String OPT_REMOVE_COHORT_LONG = "remove-cohort";
+	private final static String OPT_REMOVE_COHORT_LONG_DESC = "Remove cohorts will be used for meta-analysis";
+
 }

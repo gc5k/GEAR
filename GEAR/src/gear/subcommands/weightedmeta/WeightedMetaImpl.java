@@ -5,6 +5,7 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.Iterator;
 import java.util.Set;
@@ -38,7 +39,12 @@ public class WeightedMetaImpl extends CommandImpl
 			Logger.printUserLog("Analysing summary statistics analysis for case-contrl studies.\n");			
 		}
 
-		gReader = new GWASReader(wMetaArgs.getMetaFile(), wMetaArgs.getKeys(), wMetaArgs.isQT(), wMetaArgs.isGZ());
+		if (wMetaArgs.IsKeepFile() || wMetaArgs.IsRevFile())
+		{
+			FilterFiles();
+		}
+
+		gReader = new GWASReader(wMetaArgs.getMetaFile(), FileKeep, wMetaArgs.getKeys(), wMetaArgs.isQT(), wMetaArgs.isGZ());
 		
 		if (gReader.getNumMetaFile() < 2)
 		{
@@ -53,7 +59,7 @@ public class WeightedMetaImpl extends CommandImpl
 
 	private void generateCorMatrix()
 	{
-		corMat = new double[gReader.getNumMetaFile()][gReader.getNumMetaFile()];
+		corMat = new double[gReader.getCohortNum()][gReader.getCohortNum()];
 		if (wMetaArgs.getCMFile() == null)
 		{
 			for(int i = 0; i < corMat.length; i++)
@@ -77,11 +83,19 @@ public class WeightedMetaImpl extends CommandImpl
 					Logger.printUserError("incorrect '" + wMetaArgs.getCMFile() + "'.");
 					System.exit(0);
 				}
-				for(int i = 0; i < d.length; i++)
+				if(FileKeep[cnt])
 				{
-					corMat[cnt][i] = Double.parseDouble(d[i]);
+					int c = 0;
+					for(int i = 0; i < d.length; i++)
+					{
+						if(FileKeep[i])
+						{
+							corMat[cnt][c] = Double.parseDouble(d[i]);
+							c++;
+						}
+					}
+					cnt++;
 				}
-				cnt++;
 			}
 			for(int i = 0; i < corMat.length; i++)
 			{
@@ -240,9 +254,49 @@ public class WeightedMetaImpl extends CommandImpl
 		writer.close();
 	}
 
+	private void FilterFiles()
+	{
+		String[] metaF = wMetaArgs.getMetaFile();
+		FileKeep = new boolean[metaF.length];
+		Arrays.fill(FileKeep, true);
+
+		if(wMetaArgs.IsKeepFile())
+		{
+			Arrays.fill(FileKeep, false);
+			String[] kf = wMetaArgs.getKeepFile();
+			for(int i = 0; i < metaF.length; i++)
+			{
+				for(int j = 0; j < kf.length; j++ )
+				{
+					if(metaF[i].compareTo(kf[j]) == 0)
+					{
+						FileKeep[i] = true;
+					}
+				}
+			}
+		}
+
+		if(wMetaArgs.IsRevFile())
+		{
+			Arrays.fill(FileKeep, true);
+			String[] kf = wMetaArgs.getRemoveFile();
+			for(int i = 0; i < metaF.length; i++)
+			{
+				for(int j = 0; j < kf.length; j++ )
+				{
+					if(metaF[i].compareTo(kf[j]) == 0)
+					{
+						FileKeep[i] = false;
+					}
+				}
+			}
+		}
+	}
+
 	private WeightedMetaArguments wMetaArgs;
 	private GWASReader gReader;
 	private double[][] corMat;
+	private boolean[] FileKeep;
 	private NormalDistributionImpl unitNormal = new NormalDistributionImpl(0, 1);
 	private ArrayList<GMRes> grArray = NewIt.newArrayList();
 }
