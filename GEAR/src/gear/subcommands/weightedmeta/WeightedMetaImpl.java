@@ -59,6 +59,7 @@ public class WeightedMetaImpl extends CommandImpl
 
 	private void generateCorMatrix()
 	{
+
 		corMat = new double[gReader.getCohortNum()][gReader.getCohortNum()];
 		if (wMetaArgs.getCMFile() == null)
 		{
@@ -76,6 +77,7 @@ public class WeightedMetaImpl extends CommandImpl
 
 			String[] d = null;
 			int cnt = 0;
+			int cIdx = 0;
 			while ( (d = bf.readTokens())!= null )
 			{
 				if (d.length != NumMetaFile )
@@ -90,13 +92,14 @@ public class WeightedMetaImpl extends CommandImpl
 					{
 						if(FileKeep[i])
 						{
-							corMat[cnt][c] = Double.parseDouble(d[i]);
-							c++;
+							corMat[cIdx][c++] = Double.parseDouble(d[i]);
 						}
 					}
-					cnt++;
+					cIdx++;
 				}
+				cnt++;
 			}
+
 			for(int i = 0; i < corMat.length; i++)
 			{
 				for(int j = 0; j < i; j++)
@@ -104,6 +107,7 @@ public class WeightedMetaImpl extends CommandImpl
 					corMat[j][i] = corMat[i][j];
 				}
 			}
+
 			Logger.printUserLog(corMat.length + "X" + corMat.length + " correlation matrix has been read in.");
 		}
 	}
@@ -290,6 +294,11 @@ public class WeightedMetaImpl extends CommandImpl
 					}
 				}
 			}
+		}
+		
+		for(int i = 0; i < FileKeep.length; i++)
+		{
+			System.out.println(metaF[i] + " " +FileKeep[i]);
 		}
 	}
 
