@@ -50,8 +50,8 @@ public class WeightedMetaCommand extends Command
 		options.addOption(OptionBuilder.withDescription(OPT_KEEPATGC_LONG_DESC).withLongOpt(OPT_KEEPATGC_LONG).create(OPT_KEEPATGC));
 		options.addOption(OptionBuilder.withDescription(OPT_FULL_SNP_ONLY_LONG_DESC).withLongOpt(OPT_FULL_SNP_ONLY_LONG).create(OPT_FULL_SNP_ONLY));
 
-		options.addOption(OptionBuilder.withDescription(OPT_KEEP_COHORT_LONG_DESC).hasArg().create(OPT_KEEP_COHORT));
-		options.addOption(OptionBuilder.withDescription(OPT_REMOVE_COHORT_LONG_DESC).hasArg().create(OPT_REMOVE_COHORT));
+		options.addOption(OptionBuilder.withDescription(OPT_KEEP_COHORT_LONG_DESC).withLongOpt(OPT_KEEP_COHORT_LONG).hasArg().create(OPT_KEEP_COHORT));
+		options.addOption(OptionBuilder.withDescription(OPT_REMOVE_COHORT_LONG_DESC).withLongOpt(OPT_REMOVE_COHORT_LONG).hasArg().create(OPT_REMOVE_COHORT));
 
 	}
 
