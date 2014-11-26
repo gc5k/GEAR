@@ -109,7 +109,7 @@ public class GMRes implements Comparable<GMRes>
 	public String printTitle()
 	{
 		StringBuffer sb = new StringBuffer();
-		sb.append("SNP CHR BP A1 A2 COHORT B SE Z P Direct");
+		sb.append("SNP CHR BP A1 A2 COHORT B SE Z P Direction");
 		return sb.toString();
 	}
 

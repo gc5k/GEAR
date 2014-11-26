@@ -62,8 +62,9 @@ public class CovMatrix
 		double[] eigen = (new EigenDecompositionImpl(gg, 0.00000001)).getRealEigenvalues();
 		for(int i = 0; i < eigen.length; i++)
 		{
-			System.out.println(eigen[i]);
+			System.out.print(eigen[i] + " ");
 		}
+		System.out.println();
 
 		RealMatrix gg_Inv = (new LUDecompositionImpl(gg)).getSolver().getInverse();
 		RealMatrix Unit = new Array2DRowRealMatrix(covMat.length, 1);
@@ -82,6 +83,7 @@ public class CovMatrix
 				gse += W.getEntry(0, i) * W.getEntry(0, j) * covMat[i][j];
 			}
 		}
+		System.out.println("V: " + gse);
 		gse = Math.sqrt(gse);
 		Weight = W.getRow(0);
 	}
