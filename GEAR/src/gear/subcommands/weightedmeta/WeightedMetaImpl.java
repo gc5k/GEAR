@@ -39,6 +39,9 @@ public class WeightedMetaImpl extends CommandImpl
 			Logger.printUserLog("Analysing summary statistics analysis for case-contrl studies.\n");			
 		}
 
+		FileKeep = new boolean[wMetaArgs.getMetaFile().length];
+		Arrays.fill(FileKeep, true);
+
 		if (wMetaArgs.IsKeepFile() || wMetaArgs.IsRevFile())
 		{
 			FilterFiles();
@@ -161,7 +164,7 @@ public class WeightedMetaImpl extends CommandImpl
 
 		StringBuffer direct = new StringBuffer();
 
-		for(int i = 0; i < gReader.getNumMetaFile(); i++)
+		for(int i = 0; i < gReader.getCohortNum(); i++)
 		{
 			direct.append('?');
 		}
@@ -261,8 +264,6 @@ public class WeightedMetaImpl extends CommandImpl
 	private void FilterFiles()
 	{
 		String[] metaF = wMetaArgs.getMetaFile();
-		FileKeep = new boolean[metaF.length];
-		Arrays.fill(FileKeep, true);
 
 		if(wMetaArgs.IsKeepFile())
 		{

@@ -37,6 +37,10 @@ public class GWASReader
 			Logger.printUserLog("No cohort left. GEAR quitted.");
 			System.exit(0);
 		}
+		else 
+		{
+			Logger.printUserLog(Cohort + " cohorts left for analysis.");
+		}
 
 		gc = new double[Cohort];
 		Arrays.fill(gc, 1);
