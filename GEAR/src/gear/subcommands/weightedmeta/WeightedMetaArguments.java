@@ -197,20 +197,20 @@ public class WeightedMetaArguments  extends CommandArguments
 		isGC = true;
 	}
 
-	public boolean getGC()
+	public boolean isGC()
 	{
 		return isGC;
 	}
 
-	public void setGCInflationOnly()
-	{
-		isGCInflationOnly = true;
-	}
+//	public void setGCInflationOnly()
+//	{
+//		isGCInflationOnly = true;
+//	}
 
-	public boolean getGCInflationOnly()
-	{
-		return isGCInflationOnly;
-	}
+//	public boolean getGCInflationOnly()
+//	{
+//		return isGCInflationOnly;
+//	}
 
 	public void setATGC()
 	{
@@ -308,7 +308,7 @@ public class WeightedMetaArguments  extends CommandArguments
 	private boolean isGZ = false;
 	private boolean isQT = true;
 	private boolean isGC = false;
-	private boolean isGCInflationOnly = false;
+//	private boolean isGCInflationOnly = false;
 	private boolean isKeepATGC = false;
 	private boolean isVerbose = false;
 	private boolean isVerboseGZ = false;
