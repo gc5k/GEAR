@@ -46,7 +46,7 @@ public class WeightedMetaCommand extends Command
 
 		options.addOption(OptionBuilder.withDescription(OPT_CM_DESC).hasArg().create(OPT_CM));
 		options.addOption(OptionBuilder.withDescription(OPT_GC_DESC).withLongOpt(OPT_GC).create(OPT_GC));
-		options.addOption(OptionBuilder.withDescription(OPT_GC_INFLATION_ONLY_LONG_DESC).withLongOpt(OPT_GC_INFLATION_ONLY_LONG).create(OPT_GC_INFLATION_ONLY));
+//		options.addOption(OptionBuilder.withDescription(OPT_GC_INFLATION_ONLY_LONG_DESC).withLongOpt(OPT_GC_INFLATION_ONLY_LONG).create(OPT_GC_INFLATION_ONLY));
 		options.addOption(OptionBuilder.withDescription(OPT_KEEPATGC_LONG_DESC).withLongOpt(OPT_KEEPATGC_LONG).create(OPT_KEEPATGC));
 		options.addOption(OptionBuilder.withDescription(OPT_FULL_SNP_ONLY_LONG_DESC).withLongOpt(OPT_FULL_SNP_ONLY_LONG).create(OPT_FULL_SNP_ONLY));
 
@@ -95,10 +95,10 @@ public class WeightedMetaCommand extends Command
 			lamD.setGC();
 		}
 
-		if(cmdLine.hasOption(OPT_GC_INFLATION_ONLY))
-		{
-			lamD.setGCInflationOnly();
-		}
+//		if(cmdLine.hasOption(OPT_GC_INFLATION_ONLY))
+//		{
+//			lamD.setGCInflationOnly();
+//		}
 
 		if(cmdLine.hasOption(OPT_KEEPATGC))
 		{
@@ -205,9 +205,9 @@ public class WeightedMetaCommand extends Command
 	private final static String OPT_GC = "gc";
 	private final static String OPT_GC_DESC = "genomic control factor adjustment";
 
-	private final static String OPT_GC_INFLATION_ONLY = "gci";
-	private final static String OPT_GC_INFLATION_ONLY_LONG = "gc-inflation-only";
-	private final static String OPT_GC_INFLATION_ONLY_LONG_DESC = "genomic control factor adjustment only for cohorts having lambda greater than 1";
+//	private final static String OPT_GC_INFLATION_ONLY = "gci";
+//	private final static String OPT_GC_INFLATION_ONLY_LONG = "gc-inflation-only";
+//	private final static String OPT_GC_INFLATION_ONLY_LONG_DESC = "genomic control factor adjustment only for cohorts having lambda greater than 1";
 	
 	private final static String OPT_KEEPATGC = "atgc";
 	private final static String OPT_KEEPATGC_LONG = "keep-atgc";

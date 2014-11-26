@@ -13,13 +13,12 @@ import gear.gwassummary.MetaStat;
 
 public class CovMatrix
 {
-	public CovMatrix(String snp, ArrayList<Integer> Int, double[][] corMat, GWASReader gReader, boolean isGC, boolean isGCInflationOnly)
+	public CovMatrix(String snp, ArrayList<Integer> Int, double[][] corMat, GWASReader gReader, boolean isGC)
 	{
 		this.snp = snp;
 		this.cohort = Int.get(Int.size() -1).intValue();
 		this.cohortIdx = new int[cohort];
 		this.isGC = isGC;
-		this.isGCInflationOnly = isGCInflationOnly;
 		this.gc = new double[cohort];
 
 		int cnt = 0;
@@ -35,10 +34,10 @@ public class CovMatrix
 			for(int i = 0; i < cohortIdx.length; i++)
 			{
 				gc[i] = Egc[cohortIdx[i]];
-				if(this.isGCInflationOnly)
+				if(this.isGC)
 				{
 					gc[i] = gc[i] > 1 ? gc[i]:1;
-				}				
+				}
 			}
 		}
 		else
@@ -59,12 +58,19 @@ public class CovMatrix
 
 		RealMatrix gg = new Array2DRowRealMatrix(covMat);
 
+		boolean isNonSingular = (new LUDecompositionImpl(gg)).getSolver().isNonSingular();
+		System.out.println(isNonSingular);
 		double[] eigen = (new EigenDecompositionImpl(gg, 0.00000001)).getRealEigenvalues();
 		for(int i = 0; i < eigen.length; i++)
 		{
 			System.out.print(eigen[i] + " ");
 		}
 		System.out.println();
+
+		
+		
+		double det = new LUDecompositionImpl(gg).getDeterminant();
+		System.out.println(det);
 
 		RealMatrix gg_Inv = (new LUDecompositionImpl(gg)).getSolver().getInverse();
 		RealMatrix Unit = new Array2DRowRealMatrix(covMat.length, 1);
@@ -114,7 +120,6 @@ public class CovMatrix
 	}
 
 	private boolean isGC;
-	private boolean isGCInflationOnly;
 	private double[] gc;
 	private String snp;
 	private double[][] covMat;

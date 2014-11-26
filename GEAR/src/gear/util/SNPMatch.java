@@ -9,7 +9,7 @@ public class SNPMatch
 		return a1 != ConstValues.MISSING_ALLELE_CHAR && a2 != ConstValues.MISSING_ALLELE_CHAR;
 	}
 
-	public static boolean isAllelsMatchForTwoLoci(char a1, char a2, char b1, char b2)
+	public static boolean isAllelesMatchForTwoLoci(char a1, char a2, char b1, char b2)
 	{
 		if (a1 >= 97 && a1 <= 122)
 		{
@@ -61,6 +61,15 @@ public class SNPMatch
 		return isMatch;
 	}
 
+	public static boolean isAllelesFlipMatchForTwoLoci(char a1, char a2, char b1, char b2)
+	{
+		char fa1 = Flip(a1);
+		char fa2 = Flip(a2);
+		boolean isMatch = isAllelesMatchForTwoLoci(fa1, fa2, b1, b2);
+		return isMatch;
+	}
+
+	
 	public static String Flip(String a)
 	{
 		String f = "A";

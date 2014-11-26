@@ -47,8 +47,12 @@ public class WeightedMetaImpl extends CommandImpl
 			FilterFiles();
 		}
 
+		if (wMetaArgs.isGC())
+		{
+			Logger.printUserLog("Genomic-control only applies for cohorts that have gc factor > 1.");
+		}
 		gReader = new GWASReader(wMetaArgs.getMetaFile(), FileKeep, wMetaArgs.getKeys(), wMetaArgs.isQT(), wMetaArgs.isGZ());
-		
+
 		if (gReader.getNumMetaFile() < 2)
 		{
 			Logger.printUserError("At least two summary statistic files should be specified.\n");
@@ -132,7 +136,7 @@ public class WeightedMetaImpl extends CommandImpl
 					continue;
 				}
 			}
-			CovMatrix covMat = new CovMatrix(key, Int, corMat, gReader, wMetaArgs.getGC(), wMetaArgs.getGCInflationOnly());
+			CovMatrix covMat = new CovMatrix(key, Int, corMat, gReader, wMetaArgs.isGC());
 			GMRes gr = MetaSNP(covMat);
 			if (gr.getIsAmbiguous())
 			{
@@ -162,11 +166,11 @@ public class WeightedMetaImpl extends CommandImpl
 		double[] Weight = covMat.getWeights();
 		double gse = covMat.getGSE();
 
-		StringBuffer direct = new StringBuffer();
+		StringBuffer direction = new StringBuffer();
 
 		for(int i = 0; i < gReader.getCohortNum(); i++)
 		{
-			direct.append('?');
+			direction.append('?');
 		}
 		GMRes gr = new GMRes(cohort);
 
@@ -177,7 +181,7 @@ public class WeightedMetaImpl extends CommandImpl
 		for (int i = 0; i < idx.length; i++)
 		{
 			char sign = '+';
-			double b = 0;
+			float b = 0;
 			boolean match = true;
 			ms = gReader.getMetaStat().get(idx[i]).get(SNP);
 			if (i == 0)
@@ -192,17 +196,25 @@ public class WeightedMetaImpl extends CommandImpl
 			}
 			else
 			{
-				match = SNPMatch.isAllelsMatchForTwoLoci(gr.GetA1(), gr.GetA2(), ms.getA1(), ms.getA2());
+				match = SNPMatch.isAllelesMatchForTwoLoci(gr.GetA1(), gr.GetA2(), ms.getA1(), ms.getA2());
+				if (!match)
+				{
+					match = SNPMatch.isAllelesFlipMatchForTwoLoci(gr.GetA1(), gr.GetA2(), ms.getA1(), ms.getA2());
+				}
+				
 				if (match)
 				{
+					b = ms.getEffect();
+
 					if (gr.GetA1() == ms.getA1() || gr.GetA1() == SNPMatch.Flip(ms.getA1())) //match A1 in the second meta
 					{
-						b = ms.getEffect();
+						b = 1 * b;
 					}
 					else if (gr.GetA1() == ms.getA2() || gr.GetA1() == SNPMatch.Flip(ms.getA2())) //match A2 in the second meta
 					{
-						b = -1 * ms.getEffect();
+						b = -1 * b;
 					}
+
 				}
 				else
 				{
@@ -213,9 +225,20 @@ public class WeightedMetaImpl extends CommandImpl
 			if(match)
 			{
 				gb += b * Weight[i];
-				sign = b > 0 ? '+':'-';
+				if(b == 0)
+				{
+					sign = '0';
+				}
+				else if(b > 0)
+				{
+					sign = '+';
+				}
+				else
+				{
+					sign = '-';
+				}
 			}
-			direct.setCharAt(idx[i], sign);
+			direction.setCharAt(idx[i], sign);
 		}
 		double z = gb/gse;
 		double p = 1;
@@ -232,7 +255,7 @@ public class WeightedMetaImpl extends CommandImpl
 		gr.SetSE(gse);
 		gr.SetZ(z);
 		gr.SetP(p);
-		gr.SetDirect(direct.toString());
+		gr.SetDirect(direction.toString());
 		return gr;
 	}
 

@@ -39,7 +39,7 @@ public class GWASReader
 		}
 		else 
 		{
-			Logger.printUserLog(Cohort + " cohorts left for analysis.");
+			Logger.printUserLog(Cohort + " cohorts are remained for analysis.");
 		}
 
 		gc = new double[Cohort];
