@@ -11,7 +11,12 @@ import java.util.Iterator;
 import java.util.Set;
 
 import org.apache.commons.math.MathException;
+import org.apache.commons.math.distribution.NormalDistribution;
 import org.apache.commons.math.distribution.NormalDistributionImpl;
+import org.apache.commons.math.linear.Array2DRowRealMatrix;
+import org.apache.commons.math.linear.EigenDecompositionImpl;
+import org.apache.commons.math.linear.LUDecompositionImpl;
+import org.apache.commons.math.linear.RealMatrix;
 
 import gear.gwassummary.GWASReader;
 import gear.gwassummary.MetaStat;
@@ -51,6 +56,8 @@ public class WeightedMetaImpl extends CommandImpl
 		{
 			Logger.printUserLog("Genomic-control only applies for cohorts that have gc factor > 1.");
 		}
+		generateCorMatrix();
+
 		gReader = new GWASReader(wMetaArgs.getMetaFile(), FileKeep, wMetaArgs.getKeys(), wMetaArgs.isQT(), wMetaArgs.isGZ());
 
 		if (gReader.getNumMetaFile() < 2)
@@ -60,14 +67,19 @@ public class WeightedMetaImpl extends CommandImpl
 			System.exit(0);
 		}
 
-		generateCorMatrix();
 		MetaAnalysis();
 	}
 
 	private void generateCorMatrix()
 	{
 
-		corMat = new double[gReader.getCohortNum()][gReader.getCohortNum()];
+		int cn = 0; 
+		for(int i = 0; i < FileKeep.length; i++)
+		{
+			if(FileKeep[i]) cn++;
+		}
+		corMat = new double[cn][cn];
+		zMat = new double[cn][cn];
 		if (wMetaArgs.getCMFile() == null)
 		{
 			for(int i = 0; i < corMat.length; i++)
@@ -78,7 +90,7 @@ public class WeightedMetaImpl extends CommandImpl
 		}
 		else
 		{
-			int NumMetaFile = gReader.getNumMetaFile();
+			int NumMetaFile = wMetaArgs.getMetaFile().length;
 			BufferedReader bf = BufferedReader.openTextFile(wMetaArgs.getCMFile(), "cm file.");
 			Logger.printUserLog("Reading '" + wMetaArgs.getCMFile() + "'.");
 
@@ -111,12 +123,136 @@ public class WeightedMetaImpl extends CommandImpl
 			{
 				for(int j = 0; j < i; j++)
 				{
+					zMat[i][j] = corMat[j][i];
+					zMat[j][i] = corMat[j][i];
 					corMat[j][i] = corMat[i][j];
 				}
 			}
 
 			Logger.printUserLog(corMat.length + "X" + corMat.length + " correlation matrix has been read in.");
+			
+			ArrayList<String> tWorkingMetaFile = NewIt.newArrayList();
+			for(int i = 0; i < FileKeep.length; i++)
+			{
+				if(FileKeep[i])
+				{
+					tWorkingMetaFile.add(wMetaArgs.getMetaFile()[i]);
+				}
+			}
+			RemMetaIdx = Zprune(tWorkingMetaFile);
+			for(int i = 0; i < RemMetaIdx.length; i++)
+			{
+				FileKeep[RemMetaIdx[i]] = false;
+			}
 		}
+	}
+
+	private int[] Zprune(ArrayList<String> workingMetaFile)
+	{
+		Logger.printUserLog("Starting matrix pruning...");
+		NormalDistribution nd = new NormalDistributionImpl();
+		double threshold = 0;
+		try
+		{
+			threshold = nd.inverseCumulativeProbability(1-0.05/(zMat.length * (zMat.length - 1) / 2));
+		}
+		catch (MathException e)
+		{
+			e.printStackTrace();
+		}
+		
+		ArrayList<Integer> Zidx = NewIt.newArrayList();
+		ArrayList<Integer> RemIdx = NewIt.newArrayList();
+		for(int i = 0; i < zMat.length; i++)
+		{
+			Zidx.add(i);
+		}
+
+		double[][] zm = new double[Zidx.size()][Zidx.size()];
+		double[][] cm = new double[Zidx.size()][Zidx.size()];
+		for(int i = 0; i < Zidx.size(); i++)
+		{
+			for(int j = 0; j < Zidx.size(); j++)
+			{
+				zm[i][j] = zMat[Zidx.get(i).intValue()][Zidx.get(j).intValue()];
+				cm[i][j] = corMat[Zidx.get(i).intValue()][Zidx.get(j).intValue()];
+			}
+		}
+
+		RealMatrix gg = new Array2DRowRealMatrix(cm);
+
+		boolean isNonSingular = (new LUDecompositionImpl(gg)).getSolver().isNonSingular();
+		System.out.println(isNonSingular);
+		EigenDecompositionImpl EI= new EigenDecompositionImpl(gg, 0.00000001);
+		double[] ei = EI.getRealEigenvalues();
+		Arrays.sort(ei);
+		while(ei[0] < 0)
+		{
+			int max = 0;
+			int maxIdx = 0;
+			int[] cnt = new int[zm.length];
+			for (int i = 0; i < zm.length; i++)
+			{
+				for (int j = 0; j < zm[i].length; j++)
+				{
+					if (threshold < zm[i][j])
+					{
+						cnt[i]++;
+					}
+				}
+				if (max < cnt[i])
+				{
+					max = cnt[i];
+					maxIdx = i;
+				}
+			}
+
+			Logger.printUserLog("Remove " + workingMetaFile.get(Zidx.get(maxIdx)));
+			RemIdx.add(Zidx.get(maxIdx));
+			Zidx.remove(maxIdx);
+
+			zm = new double[Zidx.size()][Zidx.size()];
+			cm = new double[Zidx.size()][Zidx.size()];
+			for(int i = 0; i < Zidx.size(); i++)
+			{
+				for(int j = 0; j < Zidx.size(); j++)
+				{
+					zm[i][j] = zMat[Zidx.get(i).intValue()][Zidx.get(j).intValue()];
+					cm[i][j] = corMat[Zidx.get(i).intValue()][Zidx.get(j).intValue()];
+				}
+			}
+
+			gg = new Array2DRowRealMatrix(cm);
+
+			isNonSingular = (new LUDecompositionImpl(gg)).getSolver().isNonSingular();
+			EI= new EigenDecompositionImpl(gg, 0.00000001);
+			ei = EI.getRealEigenvalues();
+			Arrays.sort(ei);
+		}
+
+//		for(int i = 0; i < cm.length; i++)
+//		{
+//			for(int j = 0; j < cm.length; j++)
+//			{
+//				System.out.print(cm[i][j] + " ");
+//			}
+//			System.out.println();
+//		}
+		
+		corMat = new double[cm.length][cm.length];
+		for(int i = 0; i < cm.length; i++)
+		{
+			System.arraycopy(cm[i], 0, corMat[i], 0, cm.length);
+		}
+
+		Collections.sort(RemIdx);
+		int[] RemMetaIdx = new int[RemIdx.size()];
+		for(int i = 0; i < RemIdx.size(); i++)
+		{
+			RemMetaIdx[i] = RemIdx.get(i).intValue();
+		}
+		System.out.println("Removed " + RemMetaIdx.length + " cohorts.");
+		return RemMetaIdx;
 	}
 
 	private void MetaAnalysis()
@@ -329,7 +465,10 @@ public class WeightedMetaImpl extends CommandImpl
 	private WeightedMetaArguments wMetaArgs;
 	private GWASReader gReader;
 	private double[][] corMat;
+	private double[][] zMat;
 	private boolean[] FileKeep;
+	private int[] RemMetaIdx;
+	
 	private NormalDistributionImpl unitNormal = new NormalDistributionImpl(0, 1);
 	private ArrayList<GMRes> grArray = NewIt.newArrayList();
 }

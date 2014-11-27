@@ -23,11 +23,14 @@ public class GWASReader
 		this.isQT = isQT;
 		this.isGZ = isGZ;
 
+		workingMetaFile = NewIt.newArrayList();
+
 		Cohort = 0;
 		for (int i = 0; i < FileKeep.length; i++)
 		{
 			if(FileKeep[i])
 			{
+				workingMetaFile.add(MetaFile[i]);
 				Cohort++;
 			}
 		}
@@ -486,6 +489,11 @@ public class GWASReader
 		return gc;
 	}
 
+	public ArrayList<String> getWorkingMetaFile()
+	{
+		return workingMetaFile;
+	}
+
 	private String[] field;
 	private boolean isQT;
 	private boolean isGZ;
@@ -493,6 +501,7 @@ public class GWASReader
 	public static int SNP = 0, CHR=1, BP=2, BETA=3, OR=3, SE=4, P=5, A1=6, A2=7;
 	private int[][] KeyIdx; //snp, chr, bp, beta, se, p, a1, a2
 	private String[] MetaFile;
+	private ArrayList<String> workingMetaFile;
 	private ArrayList<HashMap<String, MetaStat>> MetaStat = NewIt.newArrayList();
 	private ArrayList<ArrayList<String>> MetaSNPArray = NewIt.newArrayList();
 	private HashMap<String, ArrayList<Integer>> MetaSNPTable = NewIt.newHashMap();

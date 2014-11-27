@@ -45,6 +45,26 @@ public class CovMatrix
 			Arrays.fill(this.gc, 1);
 		}
 
+//		if(this.cohort == (Int.size() - 1))
+//		{
+//			System.out.println(this.cohort);
+//			RealMatrix gt = new Array2DRowRealMatrix(corMat);
+//
+//			boolean isNonSingular = (new LUDecompositionImpl(gt)).getSolver().isNonSingular();
+//			System.out.println(isNonSingular);
+//			double[] eigent = (new EigenDecompositionImpl(gt, 0.00000001)).getRealEigenvalues();
+//			System.out.println("test" + eigent);
+//			for(int i = 0; i < eigent.length; i++)
+//			{
+//				System.out.print("[" + (i+1) + "]"+eigent[i] + " ");
+//			}
+//			System.out.println("====");
+//			double dett = new LUDecompositionImpl(gt).getDeterminant();
+//			System.out.println("test det=" + dett);
+//
+//			System.exit(0);
+//		}
+
 		double[][] covMat = new double[cohort][cohort];
 		for(int i = 0; i < cohortIdx.length; i++)
 		{
@@ -60,17 +80,16 @@ public class CovMatrix
 
 		boolean isNonSingular = (new LUDecompositionImpl(gg)).getSolver().isNonSingular();
 		System.out.println(isNonSingular);
-		double[] eigen = (new EigenDecompositionImpl(gg, 0.00000001)).getRealEigenvalues();
-		for(int i = 0; i < eigen.length; i++)
+		EigenDecompositionImpl EI= new EigenDecompositionImpl(gg, 0.00000001);
+		for(int i = 0; i < this.cohort; i++)
 		{
-			System.out.print(eigen[i] + " ");
+			System.out.print(EI.getRealEigenvalue(i) + " ");
 		}
 		System.out.println();
 
-		
-		
+
 		double det = new LUDecompositionImpl(gg).getDeterminant();
-		System.out.println(det);
+		System.out.println("det=" + det);
 
 		RealMatrix gg_Inv = (new LUDecompositionImpl(gg)).getSolver().getInverse();
 		RealMatrix Unit = new Array2DRowRealMatrix(covMat.length, 1);
@@ -82,16 +101,19 @@ public class CovMatrix
 		RealMatrix tmp1 = tmp.multiply(Unit);
 		RealMatrix W = tmp.scalarMultiply(1/tmp1.getEntry(0, 0));
 
+		double gse1 = 1/tmp1.getEntry(0, 0);
 		for (int i = 0; i < covMat.length; i++)
 		{
 			for (int j = 0; j < covMat[i].length; j++)
 			{
+//				gse += covMat[i][j];
 				gse += W.getEntry(0, i) * W.getEntry(0, j) * covMat[i][j];
 			}
 		}
-		System.out.println("V: " + gse);
+		System.out.println("V: " + gse + " V1:" + gse1);
 		gse = Math.sqrt(gse);
 		Weight = W.getRow(0);
+//		System.out.println(W);
 	}
 
 	public double[][] getCovMatrix()
@@ -123,7 +145,7 @@ public class CovMatrix
 	private double[] gc;
 	private String snp;
 	private double[][] covMat;
-	private double gse;
+	private double gse = 0;
 	private int cohort;
 	private double[] Weight;
 	private int[] cohortIdx;
