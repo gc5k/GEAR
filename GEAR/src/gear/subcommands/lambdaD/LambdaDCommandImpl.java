@@ -88,7 +88,7 @@ public class LambdaDCommandImpl extends CommandImpl
 		gReader = new GWASReader(lamArgs.getMetaFile(), FileKeep, lamArgs.getKeys(), lamArgs.isQT(), lamArgs.isGZ());
 
 		Me = lamArgs.getMe();
-		int NumMetaFile = gReader.getNumMetaFile();
+		int NumMetaFile = lamArgs.getMetaFile().length;
 
 		if (NumMetaFile < 2)
 		{
