@@ -1,6 +1,7 @@
 package gear.subcommands.profile;
 
 import gear.subcommands.CommandArguments;
+import gear.util.FileUtil;
 
 public final class ProfileCommandArguments extends CommandArguments
 {
@@ -123,7 +124,7 @@ public final class ProfileCommandArguments extends CommandArguments
 	{
 		this.isSameAsPlink = isSameAsPlink;
 	}
-	
+
 	public String getResultFile()
 	{
 		return resultFile;
@@ -176,12 +177,24 @@ public final class ProfileCommandArguments extends CommandArguments
 
 	public void setIsExtract(String extractFile)
 	{
+		FileUtil.exists(extractFile);
 		this.extractFile = extractFile;
 	}
 
 	public String getExtractFile()
 	{
-		return extractFile;	
+		return extractFile;
+	}
+
+	public void setIsRemove(String removeFile)
+	{
+		FileUtil.exists(removeFile);
+		this.removeFile = removeFile;
+	}
+
+	public String getRemoveFile()
+	{
+		return removeFile;	
 	}
 
 	public void setScale(String scaleFile)
@@ -211,6 +224,7 @@ public final class ProfileCommandArguments extends CommandArguments
 	}
 
 	private String extractFile;
+	private String removeFile;
 	private String scoreFile;
 	private String scoreFileGZ;
 	private boolean hasScoreHeader;

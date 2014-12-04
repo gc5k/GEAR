@@ -65,7 +65,7 @@ public class CovMatrix
 //			System.exit(0);
 //		}
 
-		double[][] covMat = new double[cohort][cohort];
+		covMat = new double[cohort][cohort];
 		for(int i = 0; i < cohortIdx.length; i++)
 		{
 			MetaStat ms1 = gReader.getMetaStat().get(cohortIdx[i]).get(snp);

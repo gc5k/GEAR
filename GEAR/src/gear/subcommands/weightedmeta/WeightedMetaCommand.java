@@ -53,6 +53,9 @@ public class WeightedMetaCommand extends Command
 		options.addOption(OptionBuilder.withDescription(OPT_KEEP_COHORT_LONG_DESC).withLongOpt(OPT_KEEP_COHORT_LONG).hasArg().create(OPT_KEEP_COHORT));
 		options.addOption(OptionBuilder.withDescription(OPT_REMOVE_COHORT_LONG_DESC).withLongOpt(OPT_REMOVE_COHORT_LONG).hasArg().create(OPT_REMOVE_COHORT));
 
+		options.addOption(OptionBuilder.withDescription(OPT_DIAG_COHORT_DESC).create(OPT_DIAG_COHORT));
+		options.addOption(OptionBuilder.withDescription(OPT_NAIVE_DESC).create(OPT_NAIVE));
+
 	}
 
 	@Override
@@ -159,6 +162,16 @@ public class WeightedMetaCommand extends Command
 		{
 			lamD.setRemoveCohortFile(cmdLine.getOptionValue(OPT_REMOVE_COHORT));
 		}
+		
+		if (cmdLine.hasOption(OPT_NAIVE))
+		{
+			lamD.setNaive();
+		}
+		
+		if (cmdLine.hasOption(OPT_DIAG_COHORT))
+		{
+			lamD.setDiag();
+		}
 		return lamD;
 	}
 
@@ -224,5 +237,11 @@ public class WeightedMetaCommand extends Command
 	private final static String OPT_REMOVE_COHORT = "rc";
 	private final static String OPT_REMOVE_COHORT_LONG = "remove-cohort";
 	private final static String OPT_REMOVE_COHORT_LONG_DESC = "Remove cohorts will be used for meta-analysis";
+
+	private final static String OPT_DIAG_COHORT = "diag";
+	private final static String OPT_DIAG_COHORT_DESC = "Prune the correlation matrix to make it positive definite";
+
+	private final static String OPT_NAIVE = "naive";
+	private final static String OPT_NAIVE_DESC = "Naive meta-analysis";
 
 }

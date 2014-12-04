@@ -9,19 +9,19 @@ import java.util.HashSet;
 
 class ScoreFile
 {
-	protected static ScoreFile readTextFile(String fileName, boolean hasHeaders, HashSet<String> SCsnp)
+	protected static ScoreFile readTextFile(String fileName, boolean hasHeaders, HashSet<String> SCsnp, boolean isKeepSC)
 	{
 		BufferedReader reader = BufferedReader.openTextFile(fileName, "score");
-		return new ScoreFile(reader, hasHeaders, SCsnp);
+		return new ScoreFile(reader, hasHeaders, SCsnp, isKeepSC);
 	}
 
-	protected static ScoreFile readTextFileGZ(String fileName, boolean hasHeaders, HashSet<String> SCsnp)
+	protected static ScoreFile readTextFileGZ(String fileName, boolean hasHeaders, HashSet<String> SCsnp, boolean isKeepSC)
 	{
-		BufferedReader reader = BufferedReader.openGZipFile(fileName, "score");
-		return new ScoreFile(reader, hasHeaders, SCsnp);
+		BufferedReader reader = BufferedReader.openGZipFile(fileName, "gz score");
+		return new ScoreFile(reader, hasHeaders, SCsnp, isKeepSC);
 	}
 	
-	private ScoreFile(BufferedReader reader, boolean hasHeaders, HashSet<String> SCsnp)
+	private ScoreFile(BufferedReader reader, boolean hasHeaders, HashSet<String> SCsnp, boolean isKeepSC)
 	{	
 		String[] tokens = readFirstLine(reader, hasHeaders);
 		int cnt = 0;
@@ -32,7 +32,7 @@ class ScoreFile
 				reader.errorPreviousLine("'" + tokens[1] + "' is not a character, so it is not a valid allele.");
 				continue;
 			}
-			
+
 			if (SCsnp == null)
 			{
 				Score score = new Score(tokens[1].charAt(0), tokens.length - 2);
@@ -59,7 +59,7 @@ class ScoreFile
 				}
 				cnt++;	
 			}
-			else if (SCsnp.contains(tokens[0]))
+			else if ( (isKeepSC && SCsnp.contains(tokens[0])) || (!isKeepSC && !SCsnp.contains(tokens[0])) )
 			{
 				Score score = new Score(tokens[1].charAt(0), tokens.length - 2);
 

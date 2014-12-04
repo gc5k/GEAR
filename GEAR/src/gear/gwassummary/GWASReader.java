@@ -18,63 +18,56 @@ public class GWASReader
 
 	public GWASReader(String[] MetaFile, boolean[] FileKeep, String[] field, boolean isQT, boolean isGZ)
 	{
-		this.MetaFile = MetaFile;
 		this.field = field;
 		this.isQT = isQT;
 		this.isGZ = isGZ;
 
 		workingMetaFile = NewIt.newArrayList();
 
-		Cohort = 0;
 		for (int i = 0; i < FileKeep.length; i++)
 		{
 			if(FileKeep[i])
 			{
 				workingMetaFile.add(MetaFile[i]);
-				Cohort++;
 			}
 		}
 
-		if (Cohort == 0)
+		if (workingMetaFile.size() == 0)
 		{
 			Logger.printUserLog("No cohort left. GEAR quitted.");
 			System.exit(0);
 		}
-		else 
+		else
 		{
-			Logger.printUserLog(Cohort + " cohorts are remained for analysis.");
+			Logger.printUserLog(workingMetaFile.size() + " cohorts are remained for analysis.");
 		}
 
-		gc = new double[Cohort];
+		gc = new double[workingMetaFile.size()];
 		Arrays.fill(gc, 1);
-		logit = new boolean[Cohort];
+		logit = new boolean[workingMetaFile.size()];
 		Arrays.fill(logit, false);
 
-		KeyIdx = new int[Cohort][8];
+		KeyIdx = new int[workingMetaFile.size()][8];
 		for (int i = 0; i < KeyIdx.length; i++)
 		{
 			Arrays.fill (KeyIdx[i], -1);
 		}
 
-		int cnt = 0;
-		for (int i = 0; i < MetaFile.length; i++)
+		for (int i = 0; i < workingMetaFile.size(); i++)
 		{
-			if (FileKeep[i])
-			{
-				HashMap<String, MetaStat> m = readMeta(cnt++);
-				MetaStat.add(m);
-			}
+			HashMap<String, MetaStat> m = readMeta(i);
+			MetaStat.add(m);
 		}
 	}
 
 	public int getCohortNum()
 	{
-		return Cohort;
+		return workingMetaFile.size();
 	}
 	
 	public String[] getMetaFile()
 	{
-		return MetaFile;
+		return workingMetaFile.toArray(new String[0]);
 	}
 
 	public int[][] getKeyIndex()
@@ -84,7 +77,7 @@ public class GWASReader
 
 	public int getNumMetaFile()
 	{
-		return MetaFile.length;
+		return workingMetaFile.size();
 	}
 
 	public ArrayList<HashMap<String, MetaStat>> getMetaStat()
@@ -108,11 +101,11 @@ public class GWASReader
 		BufferedReader reader = null;
 		if (isGZ)
 		{
-			reader = BufferedReader.openGZipFile(MetaFile[metaIdx], "Summary Statistic file");
+			reader = BufferedReader.openGZipFile(workingMetaFile.get(metaIdx), "Summary Statistic file");
 		}
 		else
 		{
-			reader = BufferedReader.openTextFile(MetaFile[metaIdx], "Summary Statistic file");
+			reader = BufferedReader.openTextFile(workingMetaFile.get(metaIdx), "Summary Statistic file");
 		}
 
 		String[] tokens = reader.readTokens();
@@ -174,7 +167,7 @@ public class GWASReader
 
 		if (KeyIdx[metaIdx][SNP] == -1)
 		{
-			Logger.printUserLog("Cannot find the snp column in " + MetaFile[metaIdx]);
+			Logger.printUserLog("Cannot find the snp column in " + workingMetaFile.get(metaIdx));
 			qFlag = true;
 		}
 /*
@@ -191,19 +184,19 @@ public class GWASReader
 */
 		if (KeyIdx[metaIdx][BETA] == -1)
 		{
-			Logger.printUserLog("Cannot find the beta/or column in " + MetaFile[metaIdx]);
+			Logger.printUserLog("Cannot find the beta/or column in " + workingMetaFile.get(metaIdx));
 		}		
 		if (KeyIdx[metaIdx][SE] == -1)
 		{
-			Logger.printUserLog("Cannot find the se value column in " + MetaFile[metaIdx]);
+			Logger.printUserLog("Cannot find the se value column in " + workingMetaFile.get(metaIdx));
 		}
 		if (KeyIdx[metaIdx][P] == -1)
 		{
-			Logger.printUserLog("Cannot find the p value column in " + MetaFile[metaIdx]);
+			Logger.printUserLog("Cannot find the p value column in " + workingMetaFile.get(metaIdx));
 		}
 		if (KeyIdx[metaIdx][A1] == -1)
 		{
-			Logger.printUserLog("Cannot find the allele 1 column in " + MetaFile[metaIdx]);
+			Logger.printUserLog("Cannot find the allele 1 column in " + workingMetaFile.get(metaIdx));
 		}
 //		if (KeyIdx[metaIdx][7] == -1)
 //		{
@@ -305,7 +298,7 @@ public class GWASReader
 					}
 					catch (NumberFormatException e)
 					{
-						Logger.printUserLog(e.toString() + " in line " + total + " in '" + MetaFile[metaIdx] + ".'");
+						Logger.printUserLog(e.toString() + " in line " + total + " in '" + workingMetaFile.get(metaIdx) + ".'");
 						continue;
 					}
 					ms.setChr(chr);					
@@ -321,7 +314,7 @@ public class GWASReader
 				} 
 				catch (NumberFormatException e)
 				{
-					Logger.printUserError(e.toString() + " in line " + total + " in '" + MetaFile[metaIdx] + ".'");
+					Logger.printUserError(e.toString() + " in line " + total + " in '" + workingMetaFile.get(metaIdx) + ".'");
 					continue;
 				}
 
@@ -346,8 +339,8 @@ public class GWASReader
 			else
 			{
 				ArrayList<Integer> snpCnt = NewIt.newArrayList();
-				snpCnt.ensureCapacity(MetaFile.length+1);
-				for(int ii = 0; ii < MetaFile.length + 1; ii++)
+				snpCnt.ensureCapacity(workingMetaFile.size()+1);
+				for(int ii = 0; ii < workingMetaFile.size() + 1; ii++)
 				{
 					snpCnt.add(0);
 				}
@@ -360,12 +353,12 @@ public class GWASReader
 
 		if(cnt == 0)
 		{
-			Logger.printUserLog("Did not find any summary statistics from '" + MetaFile[metaIdx] + ".'");
+			Logger.printUserLog("Did not find any summary statistics from '" + workingMetaFile.get(metaIdx)+ ".'");
 			System.exit(0);
 		}
 		else
 		{
-			Logger.printUserLog("Read " + cnt +" (of " + total + ")" + " summary statistics from '" + MetaFile[metaIdx] + ".'");			
+			Logger.printUserLog("Read " + cnt +" (of " + total + ")" + " summary statistics from '" + workingMetaFile.get(metaIdx) + ".'");			
 		}
 
 		if (cntBadChr > 0)
@@ -500,7 +493,6 @@ public class GWASReader
 	private boolean[] logit;
 	public static int SNP = 0, CHR=1, BP=2, BETA=3, OR=3, SE=4, P=5, A1=6, A2=7;
 	private int[][] KeyIdx; //snp, chr, bp, beta, se, p, a1, a2
-	private String[] MetaFile;
 	private ArrayList<String> workingMetaFile;
 	private ArrayList<HashMap<String, MetaStat>> MetaStat = NewIt.newArrayList();
 	private ArrayList<ArrayList<String>> MetaSNPArray = NewIt.newArrayList();
@@ -508,6 +500,6 @@ public class GWASReader
 
 	private double[] gc;
 	private double ChiMedianConstant = 0.4549364;
-	private int Cohort;
+//	private int Cohort;
 
 }
