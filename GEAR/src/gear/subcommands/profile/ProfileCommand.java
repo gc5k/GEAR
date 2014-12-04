@@ -57,6 +57,7 @@ public final class ProfileCommand extends Command
 		options.addOption(OptionBuilder.withDescription(OPT_NO_WEIGHT_DESC).withLongOpt(OPT_NO_WEIGHT_LONG).hasArg(false).create());
 		options.addOption(OptionBuilder.withDescription(OPT_KEEP_ATGC_DESC).withLongOpt(OPT_KEEP_ATGC_LONG).hasArg(false).create());
 		options.addOption(OptionBuilder.withDescription(OPT_EXTRACT_DESC).withLongOpt(OPT_EXTRACT_LONG).hasArg().create());
+		options.addOption(OptionBuilder.withDescription(OPT_REMOVE_DESC).withLongOpt(OPT_REMOVE_LONG).hasArg().create());
 		options.addOption(OptionBuilder.withDescription(OPT_SCALE_DESC).withLongOpt(OPT_SCALE_LONG).hasOptionalArg().create());
 	}
 
@@ -78,6 +79,11 @@ public final class ProfileCommand extends Command
 		if (cmdLine.hasOption(OPT_EXTRACT_LONG))
 		{
 			profCmdArgs.setIsExtract(cmdLine.getOptionValue(OPT_EXTRACT_LONG));
+		}
+
+		if (cmdLine.hasOption(OPT_REMOVE_LONG))
+		{
+			profCmdArgs.setIsRemove(cmdLine.getOptionValue(OPT_REMOVE_LONG));
 		}
 
 		if (cmdLine.hasOption(OPT_SCALE_LONG))
@@ -301,6 +307,9 @@ public final class ProfileCommand extends Command
 	
 	private static final String OPT_EXTRACT_LONG = "extract-score";
 	private static final String OPT_EXTRACT_DESC = "Extract score snps";
+
+	private static final String OPT_REMOVE_LONG = "remove-score";
+	private static final String OPT_REMOVE_DESC = "Remove score snps";
 	
 	private static final String OPT_SCALE_LONG = "scale";
 	private static final String OPT_SCALE_DEFAULT = null;

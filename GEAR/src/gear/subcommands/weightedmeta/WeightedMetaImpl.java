@@ -72,14 +72,16 @@ public class WeightedMetaImpl extends CommandImpl
 
 	private void generateCorMatrix()
 	{
+		ArrayList<String> tWorkingMetaFile = NewIt.newArrayList();
 
-		int cn = 0; 
+		int cn = 0;
 		for(int i = 0; i < FileKeep.length; i++)
 		{
 			if(FileKeep[i]) cn++;
 		}
 		corMat = new double[cn][cn];
 		zMat = new double[cn][cn];
+
 		if (wMetaArgs.getCMFile() == null)
 		{
 			for(int i = 0; i < corMat.length; i++)
@@ -131,7 +133,6 @@ public class WeightedMetaImpl extends CommandImpl
 
 			Logger.printUserLog(corMat.length + "X" + corMat.length + " correlation matrix has been read in.");
 			
-			ArrayList<String> tWorkingMetaFile = NewIt.newArrayList();
 			for(int i = 0; i < FileKeep.length; i++)
 			{
 				if(FileKeep[i])
@@ -139,11 +140,36 @@ public class WeightedMetaImpl extends CommandImpl
 					tWorkingMetaFile.add(wMetaArgs.getMetaFile()[i]);
 				}
 			}
-			RemMetaIdx = Zprune(tWorkingMetaFile);
-			for(int i = 0; i < RemMetaIdx.length; i++)
+
+			if (wMetaArgs.getDiag())
 			{
-				FileKeep[RemMetaIdx[i]] = false;
+				RemMetaIdx = Zprune(tWorkingMetaFile);
+				if(RemMetaIdx != null)
+				{
+					for(int i = 0; i < RemMetaIdx.length; i++)
+					{
+						FileKeep[RemMetaIdx[i]] = false;
+					}		
+				}
 			}
+			if(wMetaArgs.getNaive())
+			{
+				Logger.printUserLog("Force the " + corMat.length + "X" + corMat.length + "correlation matrix to be diagonal matrix for naive meta-analysis.");
+				corMat = new double[corMat.length][corMat.length];
+				for(int i = 0; i < corMat.length; i++)
+				{
+					corMat[i][i] = 1;
+				}
+			}
+			
+//			for(int i = 0; i < corMat.length; i++)
+//			{
+//				for(int j = 0; j < corMat.length; j++)
+//				{
+//					System.out.print(corMat[i][j] + " ");
+//				}
+//				System.out.println();
+//			}
 		}
 	}
 
@@ -186,6 +212,7 @@ public class WeightedMetaImpl extends CommandImpl
 		EigenDecompositionImpl EI= new EigenDecompositionImpl(gg, 0.00000001);
 		double[] ei = EI.getRealEigenvalues();
 		Arrays.sort(ei);
+		int it = 0;
 		while(ei[0] < 0)
 		{
 			int max = 0;
@@ -228,30 +255,38 @@ public class WeightedMetaImpl extends CommandImpl
 			EI= new EigenDecompositionImpl(gg, 0.00000001);
 			ei = EI.getRealEigenvalues();
 			Arrays.sort(ei);
+			it++;
 		}
 
-//		for(int i = 0; i < cm.length; i++)
-//		{
-//			for(int j = 0; j < cm.length; j++)
-//			{
-//				System.out.print(cm[i][j] + " ");
-//			}
-//			System.out.println();
-//		}
-		
-		corMat = new double[cm.length][cm.length];
-		for(int i = 0; i < cm.length; i++)
+		if (it > 0)
 		{
-			System.arraycopy(cm[i], 0, corMat[i], 0, cm.length);
+			corMat = new double[cm.length][cm.length];
+			for(int i = 0; i < cm.length; i++)
+			{
+				System.arraycopy(cm[i], 0, corMat[i], 0, cm.length);
+			}
+
+			Collections.sort(RemIdx);
+			RemMetaIdx = new int[RemIdx.size()];
+			for(int i = 0; i < RemIdx.size(); i++)
+			{
+				System.out.println(RemIdx.get(i).intValue());
+				RemMetaIdx[i] = RemIdx.get(i).intValue();
+			}
+			if (it == 1)
+			{
+				Logger.printUserLog("Removed " + RemMetaIdx.length + " cohort.");				
+			}
+			else
+			{
+				Logger.printUserLog("Removed " + RemMetaIdx.length + " cohorts.");
+			}
+		}
+		else
+		{
+			Logger.printUserLog("No cohorts have been removed in matrix diagnosis.");
 		}
 
-		Collections.sort(RemIdx);
-		int[] RemMetaIdx = new int[RemIdx.size()];
-		for(int i = 0; i < RemIdx.size(); i++)
-		{
-			RemMetaIdx[i] = RemIdx.get(i).intValue();
-		}
-		System.out.println("Removed " + RemMetaIdx.length + " cohorts.");
 		return RemMetaIdx;
 	}
 
@@ -273,6 +308,7 @@ public class WeightedMetaImpl extends CommandImpl
 				}
 			}
 			CovMatrix covMat = new CovMatrix(key, Int, corMat, gReader, wMetaArgs.isGC());
+			
 			GMRes gr = MetaSNP(covMat);
 			if (gr.getIsAmbiguous())
 			{

@@ -304,6 +304,26 @@ public class WeightedMetaArguments  extends CommandArguments
 		return isFullSNPOnly;
 	}
 
+	public void setDiag()
+	{
+		diag = true;
+	}
+	
+	public boolean getDiag()
+	{
+		return diag;
+	}
+
+	public void setNaive()
+	{
+		naive = true;
+	}
+	
+	public boolean getNaive()
+	{
+		return naive;
+	}
+	
 	private ArrayList<String> md;
 	private boolean isGZ = false;
 	private boolean isQT = true;
@@ -325,4 +345,7 @@ public class WeightedMetaArguments  extends CommandArguments
 	private boolean isKeepFile = false;
 	private ArrayList<String> RevFile = null;
 	private boolean isRevFile = false;
+	
+	private boolean diag = false;
+	private boolean naive = false;
 }

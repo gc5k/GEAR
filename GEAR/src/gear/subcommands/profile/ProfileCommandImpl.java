@@ -26,6 +26,7 @@ public final class ProfileCommandImpl extends CommandImpl
 	{
 		profCmdArgs = (ProfileCommandArguments)cmdArgs;
 		
+		boolean isKeepSC = true;
 		if(profCmdArgs.getExtractFile() != null)
 		{
 			extractSCsnp = NewIt.newHashSet();
@@ -42,14 +43,31 @@ public final class ProfileCommandImpl extends CommandImpl
 			Logger.printUserLog("Read " + extractSCsnp.size() + " SNPs in " + profCmdArgs.getExtractFile());
 		}
 
+		if(profCmdArgs.getRemoveFile() != null)
+		{
+			extractSCsnp = NewIt.newHashSet();
+			BufferedReader reader = BufferedReader.openTextFile(profCmdArgs.getRemoveFile(), "Profile Remove score");
+			String[] tokens = null;
+
+			while((tokens = reader.readTokens(1)) != null)
+			{
+				for(int i = 0; i < tokens.length; i++)
+				{
+					extractSCsnp.add(tokens[i]);
+				}
+			}
+			Logger.printUserLog("Read " + extractSCsnp.size() + " SNPs in " + profCmdArgs.getRemoveFile());
+			isKeepSC = false;
+		}
+		
 		ScoreFile scoreFile;
 		if (profCmdArgs.getScoreFile() != null)
 		{
-			scoreFile = ScoreFile.readTextFile(profCmdArgs.getScoreFile(), profCmdArgs.getHasScoreHeader(), extractSCsnp);
+			scoreFile = ScoreFile.readTextFile(profCmdArgs.getScoreFile(), profCmdArgs.getHasScoreHeader(), extractSCsnp, isKeepSC);
 		}
 		else
 		{
-			scoreFile = ScoreFile.readTextFileGZ(profCmdArgs.getScoreFileGZ(), profCmdArgs.getHasScoreHeader(), extractSCsnp);
+			scoreFile = ScoreFile.readTextFileGZ(profCmdArgs.getScoreFileGZ(), profCmdArgs.getHasScoreHeader(), extractSCsnp, isKeepSC);
 		}
 
 		HashMap<String, Float> qScoreMap = readQScores();  // LocusName-to-QScore map
