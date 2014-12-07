@@ -1,6 +1,7 @@
 package gear.subcommands.lambdaD;
 
 import gear.util.Logger;
+import gear.util.stat.PrecisePvalue;
 
 import org.apache.commons.math.MathException;
 import org.apache.commons.math.distribution.ChiSquaredDistributionImpl;
@@ -75,7 +76,14 @@ public class XTest
 		{
 			// two-tail tests
 			Z = (XVec.getSum() - Me)/Math.sqrt(2 * Me);
-			pZ = 2 * (1 - nDis.cumulativeProbability(Math.abs(Z)));
+			if (Math.abs(Z) < 8)
+			{
+				pZ = 2 * (1 - nDis.cumulativeProbability(Math.abs(Z)));
+			}
+			else
+			{
+				pZ = PrecisePvalue.TwoTailZcumulativeProbability(Math.abs(Z));
+			}
 		}
 		catch (MathException e)
 		{
@@ -199,7 +207,15 @@ public class XTest
 				LamVec.addValue(lam);
 			}
 			sigma_lambdaM = LamVec.getStandardDeviation();
-			pLam = 2*(1 - nDis.cumulativeProbability(Math.abs(lambdaM - 1) / sigma_lambdaM));
+			double z1 = Math.abs(lambdaM - 1) / sigma_lambdaM;
+			if(z1 < 8)
+			{
+				pLam = 2*(1 - nDis.cumulativeProbability(z1));				
+			}
+			else
+			{
+				pLam = PrecisePvalue.TwoTailZcumulativeProbability(z1);
+			}
 		}
 		catch (MathException e)
 		{

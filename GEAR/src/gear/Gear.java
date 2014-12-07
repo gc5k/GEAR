@@ -136,15 +136,11 @@ public enum Gear
 			}
 			else if (CmdArgs.INSTANCE.simupolyCCFlag)
 			{
-				SimuPolyCC polyCC = new SimuPolyCC();
-				polyCC.GenerateSample();
-	
+				SimuPolyCC polyCC = new SimuPolyCC();	
 			}
 			else if (CmdArgs.INSTANCE.simupolyQTFlag)
 			{
-				SimuPolyQT polyQT = new SimuPolyQT();
-				polyQT.generateSample();
-	
+				SimuPolyQT polyQT = new SimuPolyQT();	
 			}
 			else if (CmdArgs.INSTANCE.sumStatFlag)
 			{
