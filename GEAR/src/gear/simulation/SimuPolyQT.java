@@ -40,7 +40,6 @@ public class SimuPolyQT
 	private double ld;
 	private double[] LD;
 
-	private double vy = 1;
 	private double h2 = 0.5;
 	private double E = 0.5;
 
@@ -87,8 +86,8 @@ public class SimuPolyQT
 		Logger.printUserLog("Null marker: " + M);
 		if (CmdArgs.INSTANCE.polyEffectFlag)
 		{
-			Logger.printUserLog("genetic effect file: "
-					+ CmdArgs.INSTANCE.polyEffectFile);
+			Logger.printUserLog("genetic effect file: '"
+					+ CmdArgs.INSTANCE.polyEffectFile + "'.");
 		} 
 		else
 		{
@@ -99,16 +98,8 @@ public class SimuPolyQT
 		Logger.printUserLog("h2: " + h2);
 		Logger.printUserLog("out: " + CmdArgs.INSTANCE.out);
 		Logger.printUserLog("");
-	}
-
-	public static void main(String[] args)
-	{
-		CmdArgs.INSTANCE.parse(args);
-	}
-
-	public void generateSample()
-	{
-		GenerateSampleNoSelection();
+		
+		generateSampleNoSelection();
 		if (CmdArgs.INSTANCE.makebedFlag)
 		{
 			writeBFile();
@@ -119,7 +110,12 @@ public class SimuPolyQT
 		}
 	}
 
-	public void GenerateSampleNoSelection()
+	public static void main(String[] args)
+	{
+		CmdArgs.INSTANCE.parse(args);
+	}
+
+	private void generateSampleNoSelection()
 	{
 		DecimalFormat fmt = new DecimalFormat("#.###E0");
 
@@ -137,9 +133,9 @@ public class SimuPolyQT
 		while (count < sample)
 		{
 			RealMatrix chr = SampleChromosome();
-			RealMatrix res = chr.transpose().multiply(effect);
+			RealMatrix genoEff = chr.transpose().multiply(effect);
 
-			double bv = res.getEntry(0, 0);
+			double bv = genoEff.getEntry(0, 0);
 
 			BV[count] = bv;
 			genotype[count] = chr.getColumn(0);
@@ -148,6 +144,7 @@ public class SimuPolyQT
 		}
 
 		double vg = StatUtils.variance(BV);
+		//rescale the phenotype to get the heritability and residual
 		double ve = vg * (1 - h2) / h2;
 		double E = Math.sqrt(ve);
 		Logger.printUserLog("Vg=" + fmt.format(vg));
@@ -169,7 +166,7 @@ public class SimuPolyQT
 		{
 			for (int i = 0; i < M - M_null; i++)
 			{
-				double sigma_b = Math.sqrt((vy * h2)
+				double sigma_b = Math.sqrt((h2)
 						/ ((M - M_null) * 2 * freq[i] * (1 - freq[i])));
 				effect[i] = sigma_b;
 			}
@@ -383,7 +380,6 @@ public class SimuPolyQT
 		bim.close();
 		fam.close();
 		cov.close();
-
 	}
 
 	public void writeFile()

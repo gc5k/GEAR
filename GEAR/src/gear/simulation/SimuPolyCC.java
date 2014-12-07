@@ -25,9 +25,10 @@ import org.apache.commons.math.stat.StatUtils;
 public class SimuPolyCC
 {
 
-	private NormalDistributionImpl norm;
 	private RandomDataImpl rnd;
 	private long seed = 2011;
+
+	RealMatrix effect = null;
 
 	private int M = 1;
 	private int M_null = 0;
@@ -47,7 +48,6 @@ public class SimuPolyCC
 	private double ld;
 	private double[] LD;
 
-	private double vy = 1;
 	private double h2 = 0.5;
 	private double E = 0.5;
 	private double K = 0.05;
@@ -76,11 +76,10 @@ public class SimuPolyCC
 			h2 *= 0.99;
 		}
 
-		E = Math.sqrt(1 - h2);
+		E = Math.sqrt(1 - h2);// will be rescaled in scaling();
 
 		rnd = new RandomDataImpl();
 		rnd.reSeed(seed);
-		norm = new NormalDistributionImpl(0, vy);
 
 		freq = new double[M];
 		DPrime = new double[M - 1];
@@ -103,61 +102,34 @@ public class SimuPolyCC
 		LOG.append("Null Marker: " + M_null + "\n");
 		if (CmdArgs.INSTANCE.polyEffectFlag)
 		{
-			LOG.append("genetic effect file: "
+			effect = readEffects();
+			LOG.append("Genetic effect file: "
 					+ CmdArgs.INSTANCE.polyEffectFile + "\n");
 		} 
 		else
 		{
+			effect = generateEffects();
 			LOG.append("Uniform Effect: " + U + "\n");
 		}
+		LOG.append("LD (Lewontin's Dprime): " + ld + "\n"); 
 		LOG.append("Sample size: " + sample + "\n");
-		LOG.append("case: " + N_case + "\n");
+		LOG.append("Case: " + N_case + "\n");
 		LOG.append("Control: " + N_control + "\n");
-		LOG.append("K: " + K + "\n");
+		LOG.append("K (prevalence): " + K + "\n");
 		LOG.append("h2: " + h2 + "\n");
 		LOG.append("out: " + CmdArgs.INSTANCE.out + "\n");
 		if (CmdArgs.INSTANCE.makebedFlag)
 		{
-			LOG.append("make bed");
+			LOG.append("Generated files in bed format.");
 		}
 		LOG.append("\n");
-	}
-
-	public static void main(String[] args)
-	{
-		CmdArgs.INSTANCE.parse(args);
-	}
-
-	public void writeLog()
-	{
-
-		Calendar calendar = Calendar.getInstance();
-		LOG.append("\nThe analysis was completed at: " + calendar.getTime()
-				+ "\n");
-		PrintWriter log = null;
-		try
-		{
-			log = new PrintWriter(new BufferedWriter(new FileWriter(CmdArgs.INSTANCE.out
-					+ ".plog")));
-		} 
-		catch (IOException e)
-		{
-			e.printStackTrace();
-		}
-		log.println(LOG.toString());
-		log.close();
-
-		Logger.printUserLog(LOG.toString());
-
-	}
-
-	public void GenerateSample()
-	{
-		GenerateSampleSelection();
+		
+		scaling();
+		generateSampleSelection();
 		if (CmdArgs.INSTANCE.makebedFlag)
 		{
 			writeBFile();
-		} 
+		}
 		else
 		{
 			writeFile();
@@ -165,32 +137,71 @@ public class SimuPolyCC
 		writeLog();
 	}
 
-	public void GenerateSampleSelection()
+	private void scaling()
+	{
+		int TestRun = N_case+N_control;
+		double[] bv = new double[TestRun];
+		Logger.printUserLog("Rescaling with " + TestRun + " runs.");
+
+		for(int i = 0; i < TestRun; i++)
+		{
+			RealMatrix chr = SampleChromosome();
+			RealMatrix genoEff = chr.transpose().multiply(effect);	
+			bv[i] = genoEff.getEntry(0, 0);
+		}
+
+		double vg = StatUtils.variance(bv);
+		double m = StatUtils.mean(bv);
+		double ve = vg*(1-h2)/h2;
+		E = Math.sqrt(ve);
+
+		Logger.printUserLog("Mean of breeding values: " + m);
+		Logger.printUserLog("Vg: "+ vg);
+		Logger.printUserLog("Rescale residual to " + E);
+		Logger.printUserLog("Vp: " + vg/h2);
+
+		double sd = Math.sqrt(E*E/(1-h2));
+		NormalDistributionImpl norm = new NormalDistributionImpl(0, sd);
+
+		double cnt=0;
+		for(int i = 0; i < TestRun; i++)
+		{
+			double L = bv[i] + rnd.nextGaussian(0, E);
+			double liability = 0;
+			try
+			{
+				liability = norm.cumulativeProbability(L);
+			} 
+			catch (MathException e)
+			{
+				e.printStackTrace();
+			}
+			
+			if ( (1 - liability) < K)
+			{
+				cnt++;
+			}
+		}
+		Logger.printUserLog("Emperical K: " + cnt/(TestRun));
+	}
+
+	public void generateSampleSelection()
 	{
 		int count_case = 0;
 		int count_control = 0;
 		int count = 0;
 
-		RealMatrix effect = null;
-		if (CmdArgs.INSTANCE.polyEffectFlag)
-		{
-			effect = readEffects();
-		} 
-		else
-		{
-			effect = GenerateEffects();
-		}
+		double sd = Math.sqrt(E*E/(1-h2));
+		NormalDistributionImpl norm = new NormalDistributionImpl(0, sd);
 
-		norm = new NormalDistributionImpl(0, 1);
-
-		int c = 0;
+		int cnt = 0;
 		while (count < sample)
 		{
-			c++;
+			cnt++;
 			RealMatrix chr = SampleChromosome();
-			RealMatrix res = chr.transpose().multiply(effect);
+			RealMatrix genoEff = chr.transpose().multiply(effect);
 
-			double bv = res.getEntry(0, 0);
+			double bv = genoEff.getEntry(0, 0);
 			double L = bv + rnd.nextGaussian(0, E);
 			double liability = 0;
 
@@ -233,66 +244,109 @@ public class SimuPolyCC
 					continue;
 				}
 			}
-
 			count++;
 		}
-		LOG.append("total individuals visited: " + c + "\n");
-	}
 
-	public void GenerateSampleNoSelection()
+		double EpCnt = N_case/K;
+		LOG.append("Total individuals have been visited (expected): " + cnt + " (" + EpCnt+ ")\n");
+		check();
+	}
+	
+	private void check()
 	{
+		double m_cs, m_ctrl, v_cs, v_cs_a, v_ctrl, v_ctrl_a;
+		double[] cs = new double[N_case];
+		double[] cs_a = new double[N_case];
+		System.arraycopy(phenotype, 0, cs, 0, N_case);
+		System.arraycopy(BV, 0, cs_a, 0, N_case);
+		m_cs = StatUtils.mean(cs);
+		v_cs = StatUtils.variance(cs);
+		v_cs_a = StatUtils.variance(cs_a);
 
-		int count_case = 0;
-		int count_control = 0;
-		int count = 0;
-		RealMatrix effect = GenerateEffects();
+		double[] ctrl = new double[N_control];
+		double[] ctrl_a = new double[N_control];
+		System.arraycopy(phenotype, N_case, ctrl, 0, N_control);
+		System.arraycopy(BV, N_case, ctrl_a, 0, N_control);
+		m_ctrl = StatUtils.mean(ctrl);
+		v_ctrl = StatUtils.variance(ctrl);
+		v_ctrl_a = StatUtils.variance(ctrl_a);
 
-		norm = new NormalDistributionImpl(0, 1);
-
-		while (count < sample)
+		double sd_p = Math.sqrt(E*E/(1-h2));
+		NormalDistributionImpl norm = new NormalDistributionImpl(0, 1);
+		double threshold = 0;
+		double x = 0; 
+		try
 		{
-			RealMatrix chr = SampleChromosome();
-			RealMatrix res = chr.transpose().multiply(effect);
-
-			double bv = res.getEntry(0, 0);
-			double L = bv + rnd.nextGaussian(0, E);
-			double liability = 0;
-
-			try
-			{
-				liability = norm.cumulativeProbability(L);
-			} 
-			catch (MathException e)
-			{
-				e.printStackTrace();
-			}
-
-			if (1 - liability < K)
-			{
-				BV[count_case] = bv;
-				phenotype[count_case] = L;
-				genotype[count_case] = chr.getColumn(0);
-				risk[count_case] = liability;
-				count_case++;
-			} 
-			else
-			{
-				count_control++;
-				BV[sample - count_control] = bv;
-				phenotype[sample - count_control] = L;
-				genotype[sample - count_control] = chr.getColumn(0);
-				risk[sample - count_control] = liability;
-			}
-
-			count++;
+			x = norm.inverseCumulativeProbability(1-K);
+			threshold = norm.density(x);
 		}
-		N_case = count_case;
-		LOG.append("total individuals visited (no selection): " + count
-				+ " (affected=" + N_case + ")\n");
+		catch (MathException e)
+		{
+			e.printStackTrace();
+		}
+		double selectionIntensity = threshold/K;
+		LOG.append("Selection intensity: " + selectionIntensity + "\n");
+
+		double Em_cs, Em_ctrl, Ev_cs, Ev_cs_a, Ev_ctrl, Ev_ctrl_a;
+		Em_cs = selectionIntensity * sd_p;
+		Em_ctrl = -1* Em_cs * K/(1-K);
+
+		double threshold_ctrl = 0;
+		double x_ctrl = 0; 
+		try
+		{
+			x_ctrl = norm.inverseCumulativeProbability(K);
+			threshold_ctrl = norm.density(x_ctrl);
+		}
+		catch (MathException e)
+		{
+			e.printStackTrace();
+		}
+
+		double selectionIntensity_ctrl = threshold_ctrl/(1-K);
+		Ev_cs = selectionIntensity_ctrl * (selectionIntensity_ctrl - x_ctrl) * sd_p * sd_p;
+		Ev_ctrl = selectionIntensity * (selectionIntensity - x) * sd_p * sd_p;
+
+		Ev_cs_a = (1 - h2*selectionIntensity * (selectionIntensity - x)) * sd_p * sd_p * h2;
+		Ev_ctrl_a = (1 - h2*selectionIntensity_ctrl * (selectionIntensity_ctrl - x_ctrl)) * sd_p * sd_p * h2;
+		
+		LOG.append("Expected mean of control phenotype (observed): " + Em_ctrl + " (" + m_ctrl + ")\n");
+		LOG.append("Expected variance of controls' phenotype (observed): " + Ev_ctrl + " (" + v_ctrl + ")\n");
+		LOG.append("Expected variance of controls' liability (observed): " + Ev_ctrl_a + " (" + v_ctrl_a + ")\n");
+
+		LOG.append("Expected mean of case phenotype (observed): " + Em_cs + " (" + m_cs + ")\n");
+		LOG.append("Expected variance of cases' phenotype (observed): " + Ev_cs + " (" + v_cs + ")\n");
+		LOG.append("Expected variance of cases' liability (observed): " + Ev_cs_a + " (" + v_cs_a + ")\n");
 
 	}
 
-	public RealMatrix GenerateEffects()
+	public static void main(String[] args)
+	{
+		CmdArgs.INSTANCE.parse(args);
+	}
+
+	public void writeLog()
+	{
+		Calendar calendar = Calendar.getInstance();
+		LOG.append("\nThe analysis was completed at: " + calendar.getTime()
+				+ "\n");
+		PrintWriter log = null;
+		try
+		{
+			log = new PrintWriter(new BufferedWriter(new FileWriter(CmdArgs.INSTANCE.out
+					+ ".plog")));
+		}
+		catch (IOException e)
+		{
+			e.printStackTrace();
+		}
+		log.println(LOG.toString());
+		log.close();
+
+		Logger.printUserLog(LOG.toString());
+	}
+
+	private RealMatrix generateEffects()
 	{
 
 		double[] effect = new double[M];
@@ -300,19 +354,16 @@ public class SimuPolyCC
 		{
 			for (int i = 0; i < effect.length - M_null; i++)
 			{
-				double sigma_b = Math.sqrt((vy * h2)
+				double sigma_b = Math.sqrt((h2)
 						/ ((M - M_null) * 2 * freq[i] * (1 - freq[i])));
 				effect[i] = sigma_b;
 			}
-		} 
+		}
 		else
 		{
 			for (int i = 0; i < effect.length - M_null; i++)
 			{
-				double sigma_b = Math
-						.sqrt((vy * h2)
-								/ ((freq.length - M_null) * 2 * freq[i] * (1 - freq[i])));
-				effect[i] = rnd.nextGaussian(0, sigma_b);
+				effect[i] = rnd.nextGaussian(0, 1);
 			}
 		}
 
@@ -339,7 +390,6 @@ public class SimuPolyCC
 		eff.close();
 
 		RealMatrix Eff = new Array2DRowRealMatrix(effect);
-		getMean(Eff);
 		return Eff;
 
 	}
@@ -376,26 +426,6 @@ public class SimuPolyCC
 
 		return chr;
 
-	}
-
-	public double getMean(RealMatrix effect)
-	{
-		int local_sample = 10000;
-		double[] P = new double[local_sample];
-		int c = 0;
-		while (c < local_sample)
-		{
-
-			RealMatrix chr = SampleChromosome();
-			RealMatrix res = chr.transpose().multiply(effect);
-			P[c++] = res.getEntry(0, 0) + rnd.nextGaussian(0, E);
-
-		}
-
-		Logger.printUserLog("Mean: " + StatUtils.mean(P) + ", Variance: "
-				+ StatUtils.variance(P));
-
-		return StatUtils.mean(P);
 	}
 
 	public void writeBFile()
