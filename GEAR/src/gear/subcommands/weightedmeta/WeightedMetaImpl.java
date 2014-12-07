@@ -26,6 +26,7 @@ import gear.util.BufferedReader;
 import gear.util.Logger;
 import gear.util.NewIt;
 import gear.util.SNPMatch;
+import gear.util.stat.PrecisePvalue;
 
 public class WeightedMetaImpl extends CommandImpl
 {
@@ -416,7 +417,14 @@ public class WeightedMetaImpl extends CommandImpl
 		double p = 1;
 		try
 		{
-			p = (1-unitNormal.cumulativeProbability(Math.abs(z)))*2;
+			if (Math.abs(z) < 8)
+			{
+				p = (1-unitNormal.cumulativeProbability(Math.abs(z)))*2;
+			}
+			else
+			{
+				p = PrecisePvalue.TwoTailZcumulativeProbability(Math.abs(z));
+			}
 		}
 		catch (MathException e)
 		{
