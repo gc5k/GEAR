@@ -5,6 +5,7 @@ import org.apache.commons.cli.OptionBuilder;
 import org.apache.commons.cli.OptionGroup;
 import org.apache.commons.cli.Options;
 
+import gear.Gear;
 import gear.subcommands.Command;
 import gear.subcommands.CommandArgumentException;
 import gear.subcommands.CommandArguments;
@@ -12,6 +13,11 @@ import gear.subcommands.CommandImpl;
 
 public final class ProfileCommand extends Command
 {
+	public ProfileCommand()
+	{
+		addAlias(alias);
+	}
+
 	@Override
 	public String getName()
 	{
@@ -74,7 +80,14 @@ public final class ProfileCommand extends Command
 		parseCoeffModelArgs(profCmdArgs, cmdLine);
 		profCmdArgs.setIsLogit(cmdLine.hasOption(OPT_LOGIT_LONG));
 		profCmdArgs.setIsAutoFlip(!cmdLine.hasOption(OPT_AUTO_FLIP_OFF_LONG));
-		profCmdArgs.setIsWeighted(!cmdLine.hasOption(OPT_NO_WEIGHT_LONG));
+		if (Gear.subcmdName.compareTo(ProfileCommand.alias) == 0)
+		{// for propc, by default there is no weight.
+			profCmdArgs.setIsWeighted(false);
+		}
+		else
+		{
+			profCmdArgs.setIsWeighted(!cmdLine.hasOption(OPT_NO_WEIGHT_LONG));
+		}
 		profCmdArgs.setIsKeepATGC(cmdLine.hasOption(OPT_KEEP_ATGC_LONG));
 		if (cmdLine.hasOption(OPT_EXTRACT_LONG))
 		{
@@ -314,4 +327,6 @@ public final class ProfileCommand extends Command
 	private static final String OPT_SCALE_LONG = "scale";
 	private static final String OPT_SCALE_DEFAULT = null;
 	private static final String OPT_SCALE_DESC = "Standardise genotypes";
+	
+	private static String alias = "propc";
 }
