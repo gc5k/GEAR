@@ -180,11 +180,13 @@ public class SNP implements Comparable<SNP>
 	{
 		if (snp.chr.compareTo(this.chr) == 0)
 		{
-			return snp.getPosition() - position;
-		} else if (snp.chr.compareTo(this.chr) < 0)
+			return this.position - snp.getPosition() ;
+		} 
+		else if (this.chr.compareTo(snp.chr) < 0)
 		{
 			return Integer.MIN_VALUE;
-		} else
+		}
+		else
 		{
 			return Integer.MAX_VALUE;
 		}

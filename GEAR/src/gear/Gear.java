@@ -50,7 +50,8 @@ public enum Gear
 		addCommand(new gear.subcommands.metawatchdog.encrypt.EnigmaCommand());
 		addCommand(new gear.subcommands.profile.ProfileCommand());
 		addCommand(new gear.subcommands.simulation.SimuFamilyCommand());
-		addCommand(new gear.subcommands.propc.ProPCCommand());
+//		addCommand(new gear.subcommands.propc.ProPCCommand());
+		addCommand(new gear.subcommands.exsnp.ExSNPCommand());
 	}
 	
 	private void addCommand(Command cmd)
