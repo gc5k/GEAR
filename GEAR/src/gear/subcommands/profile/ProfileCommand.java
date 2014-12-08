@@ -251,7 +251,7 @@ public final class ProfileCommand extends Command
 	{
 		return new ProfileCommandImpl();
 	}
-	
+
 	private boolean isCalledByEnigma;
 	
 	private static final char OPT_SCORE = 's';
