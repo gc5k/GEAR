@@ -56,7 +56,7 @@ public class ExSNPCommandImpl  extends CommandImpl
 				}
 				SNPcnt++;
 			}
-			Logger.printUserLog("Read " + SNPcnt + " snps in '" + bFile.get(i) + "'.");
+			Logger.printUserLog("Read " + SNPcnt + " snps in '" + bFile.get(i) + ".bim'.");
 		}
 
 		ArrayList<SNP> finalSNP = NewIt.newArrayList();
@@ -73,6 +73,7 @@ public class ExSNPCommandImpl  extends CommandImpl
 		}
 
 		Collections.sort(finalSNP);
+		Logger.printUserLog("Found " + finalSNP.size() + " consensus snps.");
 		
 		StringBuffer sb = new StringBuffer();
 		sb.append(esArgs.getOutRoot());
@@ -84,6 +85,7 @@ public class ExSNPCommandImpl  extends CommandImpl
 			ps.println(finalSNP.get(i).getName());
 		}
 		ps.close();
+		Logger.printUserLog("Save results in '" + esArgs.getOutRoot() + ".comsnp'.");
 	}
 
 	private HashMap<String, Integer> snpCnt = NewIt.newHashMap();
