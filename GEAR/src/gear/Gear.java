@@ -34,6 +34,7 @@ import gear.write.WriteBedSNPMajor;
 public enum Gear
 {
 	INSTANCE;
+	public static String subcmdName;
 	
 	private Gear()
 	{
@@ -84,7 +85,7 @@ public enum Gear
 			System.exit(1);
 		}
 		
-		String subcmdName = args[0];
+		subcmdName = args[0];
 		String[] subcmdArgs = new String[args.length - 1];
 		System.arraycopy(args, 1, subcmdArgs, 0, subcmdArgs.length);
 		
