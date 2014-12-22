@@ -296,11 +296,26 @@ public class WeightedMetaImpl extends CommandImpl
 		Logger.printUserLog("Starting meta-analysis...");
 		int cnt = 0;
 		int atgcCnt = 0;
-		Set<String> keys = gReader.getMetaSNPTable().keySet();
-		for (Iterator<String> e=keys.iterator(); e.hasNext();)
+		Set<String> snps = gReader.getMetaSNPTable().keySet();
+		for (Iterator<String> e=snps.iterator(); e.hasNext();)
 		{
-			String key = e.next();
-			ArrayList<Integer> Int = gReader.getMetaSNPTable().get(key);
+			String snp = e.next();
+			ArrayList<Integer> Int = gReader.getMetaSNPTable().get(snp);
+
+			if (wMetaArgs.isChr())
+			{
+				MetaStat ms = null;
+				int i = 0;
+				for( i = 0; i < (Int.size() - 2); i++)
+				{
+					if(Int.get(i).intValue() != 0) break; 
+				}
+				ms = gReader.getMetaStat().get(Int.get(i).intValue()).get(snp);
+				int chr = ms.getChr();
+				System.out.println(snp + " " + chr);
+				if(chr != wMetaArgs.getChr()) continue;
+			}
+
 			if (wMetaArgs.isFullSNPOnly())
 			{
 				if (Int.get(Int.size()-1).intValue() != (Int.size() -1))
@@ -308,8 +323,8 @@ public class WeightedMetaImpl extends CommandImpl
 					continue;
 				}
 			}
-			CovMatrix covMat = new CovMatrix(key, Int, corMat, gReader, wMetaArgs.isGC());
-			
+			CovMatrix covMat = new CovMatrix(snp, Int, corMat, gReader, wMetaArgs.isGC(), wMetaArgs.IsAdjOverlappingOnly());
+
 			GMRes gr = MetaSNP(covMat);
 			if (gr.getIsAmbiguous())
 			{
@@ -499,7 +514,7 @@ public class WeightedMetaImpl extends CommandImpl
 				}
 			}
 		}
-		
+
 		for(int i = 0; i < FileKeep.length; i++)
 		{
 			System.out.println(metaF[i] + " " +FileKeep[i]);
