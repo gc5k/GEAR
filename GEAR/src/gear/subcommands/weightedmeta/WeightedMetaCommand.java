@@ -55,7 +55,9 @@ public class WeightedMetaCommand extends Command
 
 		options.addOption(OptionBuilder.withDescription(OPT_DIAG_COHORT_DESC).create(OPT_DIAG_COHORT));
 		options.addOption(OptionBuilder.withDescription(OPT_NAIVE_DESC).create(OPT_NAIVE));
+		options.addOption(OptionBuilder.withDescription(OPT_CHR_DESC).hasArg().create(OPT_CHR));
 
+		options.addOption(OptionBuilder.withDescription(OPT_ADJUST_OVERLAPPING_LONG_DESC).withLongOpt(OPT_ADJUST_OVERLAPPING_LONG).create());
 	}
 
 	@Override
@@ -167,10 +169,20 @@ public class WeightedMetaCommand extends Command
 		{
 			lamD.setNaive();
 		}
-		
+
 		if (cmdLine.hasOption(OPT_DIAG_COHORT))
 		{
 			lamD.setDiag();
+		}
+
+		if (cmdLine.hasOption(OPT_CHR))
+		{
+			lamD.setChr(cmdLine.getOptionValue(OPT_CHR));
+		}
+		
+		if (cmdLine.hasOption(OPT_ADJUST_OVERLAPPING_LONG))
+		{
+			lamD.setAdjOverlapping();
 		}
 		return lamD;
 	}
@@ -243,5 +255,10 @@ public class WeightedMetaCommand extends Command
 
 	private final static String OPT_NAIVE = "naive";
 	private final static String OPT_NAIVE_DESC = "Naive meta-analysis";
+	
+	private final static String OPT_CHR = "chr";
+	private final static String OPT_CHR_DESC = "Choose chromosome for analysis";
 
+	private final static String OPT_ADJUST_OVERLAPPING_LONG = "adj-overlap";
+	private final static String OPT_ADJUST_OVERLAPPING_LONG_DESC = "Only adjust for overlapping samples";
 }

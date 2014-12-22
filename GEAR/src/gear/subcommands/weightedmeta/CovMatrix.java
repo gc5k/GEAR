@@ -13,7 +13,7 @@ import gear.gwassummary.MetaStat;
 
 public class CovMatrix
 {
-	public CovMatrix(String snp, ArrayList<Integer> Int, double[][] corMat, GWASReader gReader, boolean isGC)
+	public CovMatrix(String snp, ArrayList<Integer> Int, double[][] corMat, GWASReader gReader, boolean isGC, boolean isAdjOverlapping)
 	{
 		this.snp = snp;
 		this.cohort = Int.get(Int.size() -1).intValue();
@@ -72,7 +72,12 @@ public class CovMatrix
 			for(int j = 0; j < cohortIdx.length; j++)
 			{
 				MetaStat ms2 = gReader.getMetaStat().get(cohortIdx[j]).get(snp);
-				covMat[i][j] = corMat[cohortIdx[i]][cohortIdx[j]] * ms1.getSE() * ms2.getSE() * Math.sqrt(gc[i]) *  Math.sqrt(gc[j]);
+				double adjcor = 0;
+				if (isAdjOverlapping)
+				{
+					adjcor = corMat[cohortIdx[i]][cohortIdx[j]] < 0 ? 0:corMat[cohortIdx[i]][cohortIdx[j]];
+				}
+				covMat[i][j] = adjcor * ms1.getSE() * ms2.getSE() * Math.sqrt(gc[i]) *  Math.sqrt(gc[j]);
 			}
 		}
 
