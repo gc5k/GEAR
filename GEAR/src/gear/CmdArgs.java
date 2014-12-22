@@ -58,13 +58,13 @@ public enum CmdArgs
 				.withDescription("gwas simulation replication ").hasArg()
 				.create(cmd_simu_rep));
 
-		ops.addOption(OptionBuilder.withLongOpt(cmd_simu_casual_loci_long)
-				.withDescription("gwas simulation casual loci ").hasArg()
-				.create(cmd_simu_casual_loci));
+		ops.addOption(OptionBuilder.withLongOpt(cmd_simu_causal_loci_long)
+				.withDescription("gwas simulation causal loci ").hasArg()
+				.create(cmd_simu_causal_loci));
 
-		ops.addOption(OptionBuilder.withLongOpt(cmd_simu_rnd_casual_loci_long)
+		ops.addOption(OptionBuilder.withLongOpt(cmd_simu_rnd_causal_loci_long)
 				.withDescription("gwas simulation casual loci number ")
-				.hasArg().create(cmd_simu_rnd_casual_loci));
+				.hasArg().create(cmd_simu_rnd_causal_loci));
 
 		ops.addOption(OptionBuilder.withLongOpt(cmd_simu_hsq_long)
 				.withDescription("gwas simulation heritability ").hasArg()
@@ -543,13 +543,13 @@ public enum CmdArgs
 	private final String cmd_simu_rep_long = "simu-rep";
 	public int simuRep = 1;
 
-	private final String cmd_simu_casual_loci = "simu_casual_loci";
-	private final String cmd_simu_casual_loci_long = "simu-casual-loci";
+	private final String cmd_simu_causal_loci = "simu_causal_loci";
+	private final String cmd_simu_causal_loci_long = "simu-causal-loci";
 	public String simuCasualLoci = null;
 
-	private final String cmd_simu_rnd_casual_loci = "simu_rnd_casual_loci";
-	private final String cmd_simu_rnd_casual_loci_long = "simu-rnd-casual-loci";
-	public int simuRndCasualLoci = 0;
+	private final String cmd_simu_rnd_causal_loci = "simu_rnd_causal_loci";
+	private final String cmd_simu_rnd_causal_loci_long = "simu-rnd-causal-loci";
+	public int simuRndCausalLoci = 0;
 
 	private final String cmd_simu_hsq = "simu_hsq";
 	private final String cmd_simu_hsq_long = "simu-hsq";
@@ -1631,15 +1631,15 @@ public enum CmdArgs
 			}
 		}
 
-		if (cmdLine.hasOption(cmd_simu_casual_loci))
+		if (cmdLine.hasOption(cmd_simu_causal_loci))
 		{
-			simuCasualLoci = cmdLine.getOptionValue(cmd_simu_casual_loci);
+			simuCasualLoci = cmdLine.getOptionValue(cmd_simu_causal_loci);
 		}
 
-		if (cmdLine.hasOption(cmd_simu_rnd_casual_loci))
+		if (cmdLine.hasOption(cmd_simu_rnd_causal_loci))
 		{
-			simuRndCasualLoci = Integer.parseInt(cmdLine
-					.getOptionValue(cmd_simu_rnd_casual_loci));
+			simuRndCausalLoci = Integer.parseInt(cmdLine
+					.getOptionValue(cmd_simu_rnd_causal_loci));
 		}
 
 		if (cmdLine.hasOption(cmd_simu_k))
