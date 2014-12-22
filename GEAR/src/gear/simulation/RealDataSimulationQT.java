@@ -72,7 +72,7 @@ public class RealDataSimulationQT
 		} 
 		else
 		{
-			getRandomCasualLoci(CmdArgs.INSTANCE.simuRndCasualLoci);
+			getRandomCasualLoci(CmdArgs.INSTANCE.simuRndCausalLoci);
 		}
 		RealDataSimulationQC rdSimuQC = new RealDataSimulationQC(
 				pp.getPedigreeData(), pp.getMapData(), sf);
