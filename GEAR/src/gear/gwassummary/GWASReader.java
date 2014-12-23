@@ -213,6 +213,7 @@ public class GWASReader
 		ArrayList<String> snpArray = NewIt.newArrayList();
 		int total = 0;
 		int cnt = 0;
+		int cntDup = 0;
 		int cntBadChr = 0;
 		int cntBadBp = 0;
 		int cntBadBeta = 0;
@@ -325,30 +326,37 @@ public class GWASReader
 				ms.setA2(tokens[KeyIdx[metaIdx][A2]].charAt(0));
 			}
 
-			sumstat.put(ms.getSNP(), ms);
-			snpArray.add(ms.getSNP());
-
-			if ( MetaSNPTable.containsKey(ms.getSNP()) )
+			if(sumstat.containsKey(ms.getSNP()))
 			{
-				ArrayList<Integer> snpCnt = MetaSNPTable.get(ms.getSNP());
-				snpCnt.set(metaIdx, 1);
-				Integer Int = snpCnt.get(snpCnt.size()-1);
-				Int++;
-				snpCnt.set(snpCnt.size()-1, Int);
+				Logger.printUserLog("Warning: Marker '" + ms.getSNP() +"' duplicated in iput, first instance used, others skipped.");
 			}
 			else
 			{
-				ArrayList<Integer> snpCnt = NewIt.newArrayList();
-				snpCnt.ensureCapacity(workingMetaFile.size()+1);
-				for(int ii = 0; ii < workingMetaFile.size() + 1; ii++)
+				sumstat.put(ms.getSNP(), ms);
+				snpArray.add(ms.getSNP());
+			
+				if ( MetaSNPTable.containsKey(ms.getSNP()) )
 				{
-					snpCnt.add(0);
+					ArrayList<Integer> snpCnt = MetaSNPTable.get(ms.getSNP());
+					snpCnt.set(metaIdx, 1);
+					Integer Int = snpCnt.get(snpCnt.size()-1);
+					Int++;
+					snpCnt.set(snpCnt.size()-1, Int);
 				}
-				snpCnt.set(metaIdx, 1);
-				snpCnt.set(snpCnt.size()-1, 1);
-				MetaSNPTable.put(ms.getSNP(), snpCnt);
+				else
+				{
+					ArrayList<Integer> snpCnt = NewIt.newArrayList();
+					snpCnt.ensureCapacity(workingMetaFile.size()+1);
+					for(int ii = 0; ii < workingMetaFile.size() + 1; ii++)
+					{
+						snpCnt.add(0);
+					}
+					snpCnt.set(metaIdx, 1);
+					snpCnt.set(snpCnt.size()-1, 1);
+					MetaSNPTable.put(ms.getSNP(), snpCnt);
+				}
+				cnt++;
 			}
-			cnt++;
 		}
 
 		if(cnt == 0)
@@ -358,7 +366,7 @@ public class GWASReader
 		}
 		else
 		{
-			Logger.printUserLog("Read " + cnt +" (of " + total + ")" + " summary statistics from '" + workingMetaFile.get(metaIdx) + ".'");			
+			Logger.printUserLog("Read " + cnt +" (of " + total + ") summary statistics from '" + workingMetaFile.get(metaIdx) + ".'");			
 		}
 
 		if (cntBadChr > 0)
