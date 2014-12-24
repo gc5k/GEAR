@@ -359,16 +359,6 @@ public class GWASReader
 			}
 		}
 
-		if(cnt == 0)
-		{
-			Logger.printUserLog("Did not find any summary statistics from '" + workingMetaFile.get(metaIdx)+ ".'");
-			System.exit(0);
-		}
-		else
-		{
-			Logger.printUserLog("Read " + cnt +" (of " + total + ") summary statistics from '" + workingMetaFile.get(metaIdx) + ".'");			
-		}
-
 		if (cntBadChr > 0)
 		{
 			if (cntBadChr == 1)
@@ -454,6 +444,15 @@ public class GWASReader
 
 		MetaSNPArray.add(snpArray);
 		gc[metaIdx] = getGC(pArray);
+		if(cnt == 0)
+		{
+			Logger.printUserLog("Did not find any summary statistics from '" + workingMetaFile.get(metaIdx)+ ".'");
+			System.exit(0);
+		}
+		else
+		{
+			Logger.printUserLog("Read " + cnt +" (of " + total + ") summary statistics from '" + workingMetaFile.get(metaIdx) + ".'\n");
+		}
 
 		return sumstat;
 	}
