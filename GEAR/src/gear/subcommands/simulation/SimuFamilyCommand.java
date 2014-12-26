@@ -37,7 +37,7 @@ public final class SimuFamilyCommand extends Command
 		options.addOption(OptionBuilder.withDescription(OPT_MAF_DESC).hasArg().create(OPT_MAF_LONG));
 		options.addOption(OptionBuilder.withDescription(OPT_MAF_RAND_DESC).withLongOpt(OPT_MAF_RAND_LONG).create(OPT_MAF_RAND));
 		options.addOption(OptionBuilder.withDescription(OPT_REC_DESC).withLongOpt(OPT_REC_LONG).hasArg().create(OPT_REC));
-		options.addOption(OptionBuilder.withDescription(OPT_REC_SEX_DESC).withLongOpt(OPT_REC_SEX_LONG).hasArg().create(OPT_REC_SEX));
+		options.addOption(OptionBuilder.withDescription(OPT_REC_SEX_DESC).withLongOpt(OPT_REC_SEX_LONG).hasArgs(2).create(OPT_REC_SEX));
 		options.addOption(OptionBuilder.withDescription(OPT_REC_RAND_DESC).withLongOpt(OPT_REC_RAND_LONG).create(OPT_REC_RAND));
 
 		options.addOption(OptionBuilder.withDescription(OPT_QTL_DESC).withLongOpt(OPT_QTL_LONG).hasArg().create(OPT_QTL));
@@ -163,7 +163,7 @@ public final class SimuFamilyCommand extends Command
 			try
 			{
 				// TODO: Apache CLI should have its own routine to receive multiple arguments instead of split(",")
-				String[] s = cmdLine.getOptionValue(OPT_REC_SEX).split(",");
+				String[] s = cmdLine.getOptionValues(OPT_REC_SEX);
 				if (s.length < 2)
 				{
 					Logger.printUserError("The value of --" + OPT_REC_SEX_LONG + " should take two values.");
