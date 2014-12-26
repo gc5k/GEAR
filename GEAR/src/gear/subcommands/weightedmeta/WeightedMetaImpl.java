@@ -22,6 +22,8 @@ import gear.gwassummary.GWASReader;
 import gear.gwassummary.MetaStat;
 import gear.subcommands.CommandArguments;
 import gear.subcommands.CommandImpl;
+import gear.subcommands.weightedmeta.util.CovMatrix;
+import gear.subcommands.weightedmeta.util.GMRes;
 import gear.util.BufferedReader;
 import gear.util.Logger;
 import gear.util.NewIt;
