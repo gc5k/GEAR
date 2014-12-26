@@ -1,4 +1,4 @@
-package gear.subcommands.weightedmeta;
+package gear.subcommands.weightedmeta.util;
 
 import java.util.ArrayList;
 import java.util.Arrays;

@@ -1,4 +1,4 @@
-package gear.subcommands.weightedmeta;
+package gear.subcommands.weightedmeta.util;
 
 public class GMRes implements Comparable<GMRes>
 {
