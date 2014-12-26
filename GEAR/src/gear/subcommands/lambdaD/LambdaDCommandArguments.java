@@ -206,6 +206,21 @@ public class LambdaDCommandArguments extends CommandArguments
 		Me = Double.parseDouble(me);
 	}
 
+	public void setChr(String chr)
+	{
+		this.chr = Integer.parseInt(chr); 
+		chrFlag = true;
+	}
+	
+	public int getChr()
+	{
+		return chr;
+	}
+	
+	public boolean isChr()
+	{
+		return chrFlag;
+	}
 	private ArrayList<String> md;
 	private boolean isGZ = false;
 	private boolean isQT = true;
@@ -213,6 +228,9 @@ public class LambdaDCommandArguments extends CommandArguments
 	private boolean isVerboseGZ = false;
 
 	private double Me;
+
+	private int chr = 0;
+	private boolean chrFlag = false;
 
 	private double[] qtSize;
 	private double[] ccSize;

@@ -85,7 +85,7 @@ public class LambdaDCommandImpl extends CommandImpl
 	{
 		boolean[] FileKeep = new boolean[lamArgs.getMetaFile().length];
 		Arrays.fill(FileKeep, true);
-		gReader = new GWASReader(lamArgs.getMetaFile(), FileKeep, lamArgs.getKeys(), lamArgs.isQT(), lamArgs.isGZ());
+		gReader = new GWASReader(lamArgs.getMetaFile(), FileKeep, lamArgs.getKeys(), lamArgs.isQT(), lamArgs.isGZ(), lamArgs.isChr(), lamArgs.getChr());
 
 		Me = lamArgs.getMe();
 		int NumMetaFile = lamArgs.getMetaFile().length;
