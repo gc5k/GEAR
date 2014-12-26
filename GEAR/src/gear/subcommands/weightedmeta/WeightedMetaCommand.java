@@ -38,9 +38,9 @@ public class WeightedMetaCommand extends Command
 		options.addOption(OptionBuilder.withDescription(OPT_META_GZ_BATCH_DESC).withLongOpt(OPT_META_GZ_BATCH_LONG).hasArg().create(OPT_META_GZ_BATCH));
 
 		options.addOption(OptionBuilder.withDescription(OPT_CC_DESC).hasArgs().create(OPT_CC));
-		options.addOption(OptionBuilder.withDescription(OPT_CC_BATCH_LONG_DESC).withLongOpt(OPT_CC_BATCH_LONG).hasArg().create());
+		options.addOption(OptionBuilder.withDescription(OPT_CC_SIZE_LONG_DESC).withLongOpt(OPT_CC_SIZE_LONG).hasArg().create());
 		options.addOption(OptionBuilder.withDescription(OPT_QT_DESC).hasArgs().create(OPT_QT));
-		options.addOption(OptionBuilder.withDescription(OPT_QT_BATCH_LONG_DESC).withLongOpt(OPT_QT_BATCH_LONG).hasArg().create());
+		options.addOption(OptionBuilder.withDescription(OPT_QT_SIZE_LONG_DESC).withLongOpt(OPT_QT_SIZE_LONG).hasArg().create());
 		
 		options.addOption(OptionBuilder.withDescription(OPT_KEY_DESC).hasArgs().create(OPT_KEY));
 
@@ -85,13 +85,13 @@ public class WeightedMetaCommand extends Command
 		{
 			lamD.setMetaBatch(cmdLine.getOptionValue(OPT_META_BATCH));
 			lamD.setGZ(false);
-			if (cmdLine.hasOption(OPT_QT_BATCH_LONG))
+			if (cmdLine.hasOption(OPT_QT_SIZE_LONG))
 			{
-				lamD.setQTbatch(cmdLine.getOptionValue(OPT_QT_BATCH_LONG));
+				lamD.setQTbatch(cmdLine.getOptionValue(OPT_QT_SIZE_LONG));
 			}
-			if (cmdLine.hasOption(OPT_CC_BATCH_LONG))
+			if (cmdLine.hasOption(OPT_CC_SIZE_LONG))
 			{
-				lamD.setCCbatch(cmdLine.getOptionValue(OPT_CC_BATCH_LONG));
+				lamD.setCCbatch(cmdLine.getOptionValue(OPT_CC_SIZE_LONG));
 			}
 		}
 
@@ -135,13 +135,13 @@ public class WeightedMetaCommand extends Command
 		{
 			lamD.setMetaBatch(cmdLine.getOptionValue(OPT_META_GZ_BATCH));
 			lamD.setGZ(true);
-			if (cmdLine.hasOption(OPT_QT_BATCH_LONG))
+			if (cmdLine.hasOption(OPT_QT_SIZE_LONG))
 			{
-				lamD.setQTbatch(cmdLine.getOptionValue(OPT_QT_BATCH_LONG));
+				lamD.setQTbatch(cmdLine.getOptionValue(OPT_QT_SIZE_LONG));
 			}
-			if (cmdLine.hasOption(OPT_CC_BATCH_LONG))
+			if (cmdLine.hasOption(OPT_CC_SIZE_LONG))
 			{
-				lamD.setCCbatch(cmdLine.getOptionValue(OPT_CC_BATCH_LONG));
+				lamD.setCCbatch(cmdLine.getOptionValue(OPT_CC_SIZE_LONG));
 			}
 		}
 
@@ -215,11 +215,11 @@ public class WeightedMetaCommand extends Command
 	private final static String OPT_META_GZ_BATCH_LONG = "meta-gz-batch";
 	private final static String OPT_META_GZ_BATCH_DESC = "The summary statistic files in gz format";
 
-	private final static String OPT_CC_BATCH_LONG = "cc-batch";
-	private final static String OPT_CC_BATCH_LONG_DESC = "Case-control study: #case 1, #ctrl 1, #case 2, #ctrl 2";
+	private final static String OPT_CC_SIZE_LONG = "cc-size";
+	private final static String OPT_CC_SIZE_LONG_DESC = "Case-control study: #case 1, #ctrl 1, #case 2, #ctrl 2";
 
-	private final static String OPT_QT_BATCH_LONG = "qt-batch";
-	private final static String OPT_QT_BATCH_LONG_DESC = "Quantitative trait: #sample size 1, #sample size 2";
+	private final static String OPT_QT_SIZE_LONG = "qt-size";
+	private final static String OPT_QT_SIZE_LONG_DESC = "Quantitative trait: #sample size 1, #sample size 2";
 
 	private final static String OPT_KEY = "key";
 	private final static String OPT_KEY_DESC = "Self defined key workds: snp, beta, se, a1, a2, chr, bp, p";
