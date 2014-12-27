@@ -107,6 +107,11 @@ public class SimulationQTCommandArguments extends CommandArguments
 	{
 		FileUtil.exists(f);
 		polyEffectFile = f;
+
+		isPlainEffect = false;
+		isPolyEffect = false;
+		isPolyEffectSort = false;
+		isPolyEffectFile = true;
 	}
 	
 	public boolean isPolyEffectFile()

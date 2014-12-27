@@ -69,11 +69,9 @@ public class SimulationQTCommandImpl extends CommandImpl
 		for(int i = 0; i < sample; i++)
 		{
 			RealMatrix chr = SampleChromosome();
-			System.out.println(chr);
 			RealMatrix genoEff = chr.transpose().multiply(Meffect);
 
 			double bv = genoEff.getEntry(0, 0);
-			System.out.println(genoEff);
 			BV[i] = bv;
 			genotype[i] = chr.getColumn(0);
 		}
@@ -216,6 +214,7 @@ public class SimulationQTCommandImpl extends CommandImpl
 					if(c >= M)
 					{
 						Logger.printUserLog("Have already read " + M + " allelic effects.  Ignore the rest of the content in '" + qtArgs.getFreqFile() + "'.");
+						break;
 					}
 
 					line.trim();

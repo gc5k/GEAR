@@ -40,7 +40,7 @@ public class SimulationQTCommand extends Command
 
 		options.addOption(OptionBuilder.withDescription(OPT_FREQ_DESC).hasArg().create(OPT_FREQ));
 		options.addOption(OptionBuilder.withDescription(OPT_UNIF_FREQ_LONG_DESC).withLongOpt(OPT_UNIF_FREQ_LONG).create());
-		options.addOption(OptionBuilder.withDescription(OPT_FREQ_FILE_LONG_DESC).withLongOpt(OPT_FREQ_FILE_LONG).create());
+		options.addOption(OptionBuilder.withDescription(OPT_FREQ_FILE_LONG_DESC).withLongOpt(OPT_FREQ_FILE_LONG).hasArg().create());
 
 		options.addOption(OptionBuilder.withDescription(OPT_LD_DESC).hasArg().create(OPT_LD));
 		options.addOption(OptionBuilder.withDescription(OPT_RAND_LD_DESC).withLongOpt(OPT_RAND_LD_LONG).create());
@@ -134,7 +134,7 @@ public class SimulationQTCommand extends Command
 	private static final String OPT_MARKER_LONG = "marker";
 	private static final String OPT_MARKER_LONG_DESC = "Number of markers.";
 
-	private static final String OPT_NULL_MARKER_LONG = "null-makrer";
+	private static final String OPT_NULL_MARKER_LONG = "null-marker";
 	private static final String OPT_NULL_MARKER_LONG_DESC = "Number of null markers.";
 
 	//effect
