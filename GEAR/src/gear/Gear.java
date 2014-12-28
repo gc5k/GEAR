@@ -50,7 +50,7 @@ public enum Gear
 		addCommand(new gear.subcommands.metawatchdog.decrypt.MetaWatchdog2Command());
 		addCommand(new gear.subcommands.metawatchdog.encrypt.EnigmaCommand());
 		addCommand(new gear.subcommands.profile.ProfileCommand());
-		addCommand(new gear.subcommands.simulation.SimuFamilyCommand());
+		addCommand(new gear.subcommands.simulationfam.SimuFamilyCommand());
 		addCommand(new gear.subcommands.simulationqt.SimulationQTCommand());
 		addCommand(new gear.subcommands.exsnp.ExSNPCommand());
 		addCommand(new gear.subcommands.lmdr.LMDRCommand());

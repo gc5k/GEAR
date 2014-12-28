@@ -33,37 +33,13 @@ public class CovMatrix
 			double[] Egc = gReader.GetGC();
 			for(int i = 0; i < cohortIdx.length; i++)
 			{
-				gc[i] = Egc[cohortIdx[i]];
-				if(this.isGC)
-				{
-					gc[i] = gc[i] > 1 ? gc[i]:1;
-				}
+				gc[i] = Egc[cohortIdx[i]] > 1 ? Egc[cohortIdx[i]]:1;
 			}
 		}
 		else
 		{
 			Arrays.fill(this.gc, 1);
 		}
-
-//		if(this.cohort == (Int.size() - 1))
-//		{
-//			System.out.println(this.cohort);
-//			RealMatrix gt = new Array2DRowRealMatrix(corMat);
-//
-//			boolean isNonSingular = (new LUDecompositionImpl(gt)).getSolver().isNonSingular();
-//			System.out.println(isNonSingular);
-//			double[] eigent = (new EigenDecompositionImpl(gt, 0.00000001)).getRealEigenvalues();
-//			System.out.println("test" + eigent);
-//			for(int i = 0; i < eigent.length; i++)
-//			{
-//				System.out.print("[" + (i+1) + "]"+eigent[i] + " ");
-//			}
-//			System.out.println("====");
-//			double dett = new LUDecompositionImpl(gt).getDeterminant();
-//			System.out.println("test det=" + dett);
-//
-//			System.exit(0);
-//		}
 
 		covMat = new double[cohort][cohort];
 		for(int i = 0; i < cohortIdx.length; i++)
