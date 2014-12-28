@@ -16,13 +16,17 @@ import org.apache.commons.math.distribution.ChiSquaredDistributionImpl;
 public class GWASReader
 {
 
-	public GWASReader(String[] MetaFile, boolean[] FileKeep, String[] field, boolean isQT, boolean isGZ)
+	public GWASReader(String[] MetaFile, boolean[] FileKeep, String[] field, boolean isQT, boolean isGZ, boolean isChr, int Chr)
 	{
 		this.field = field;
 		this.isQT = isQT;
 		this.isGZ = isGZ;
 
 		workingMetaFile = NewIt.newArrayList();
+		this.isChr = isChr;
+		this.chrKeep = Chr;
+		
+		System.out.println(this.isChr + " " + this.chrKeep);
 
 		for (int i = 0; i < FileKeep.length; i++)
 		{
@@ -39,7 +43,7 @@ public class GWASReader
 		}
 		else
 		{
-			Logger.printUserLog(workingMetaFile.size() + " cohorts are remained for analysis.");
+			Logger.printUserLog(workingMetaFile.size() + " cohorts are remained for analysis.\n");
 		}
 
 		gc = new double[workingMetaFile.size()];
@@ -58,6 +62,7 @@ public class GWASReader
 			HashMap<String, MetaStat> m = readMeta(i);
 			MetaStat.add(m);
 		}
+		
 	}
 
 	public int getCohortNum()
@@ -304,7 +309,14 @@ public class GWASReader
 					}
 					ms.setChr(chr);					
 				}
-
+				
+				if (isChr)
+				{
+					if( ms.getChr() != chrKeep)
+					{
+						continue;
+					}
+				}
 			}
 			if (KeyIdx[metaIdx][BP] != -1)
 			{
@@ -329,6 +341,7 @@ public class GWASReader
 			if(sumstat.containsKey(ms.getSNP()))
 			{
 				Logger.printUserLog("Warning: Marker '" + ms.getSNP() +"' duplicated in iput, first instance used, others skipped.");
+				cntDup++;
 			}
 			else
 			{
@@ -441,6 +454,17 @@ public class GWASReader
 				Logger.printUserLog("Removed " + cntBadA2 + " loci due to bad a2 allele.");				
 			}
 		}
+		if(cntDup > 0)
+		{
+			if (cntDup == 1)
+			{
+				Logger.printUserLog("Removed " + cntDup + " duplicated locus.");				
+			}
+			else
+			{
+				Logger.printUserLog("Removed " + cntDup + " duplicated loci.");
+			}
+		}
 
 		MetaSNPArray.add(snpArray);
 		gc[metaIdx] = getGC(pArray);
@@ -494,6 +518,8 @@ public class GWASReader
 		return workingMetaFile;
 	}
 
+	private boolean isChr;
+	private int chrKeep=0;
 	private String[] field;
 	private boolean isQT;
 	private boolean isGZ;

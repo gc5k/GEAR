@@ -61,7 +61,7 @@ public class WeightedMetaImpl extends CommandImpl
 		}
 		generateCorMatrix();
 
-		gReader = new GWASReader(wMetaArgs.getMetaFile(), FileKeep, wMetaArgs.getKeys(), wMetaArgs.isQT(), wMetaArgs.isGZ());
+		gReader = new GWASReader(wMetaArgs.getMetaFile(), FileKeep, wMetaArgs.getKeys(), wMetaArgs.isQT(), wMetaArgs.isGZ(), wMetaArgs.isChr(), wMetaArgs.getChr());
 
 		if (gReader.getNumMetaFile() < 2)
 		{
@@ -302,21 +302,18 @@ public class WeightedMetaImpl extends CommandImpl
 		for (Iterator<String> e=snps.iterator(); e.hasNext();)
 		{
 			String snp = e.next();
+			System.out.println(snp);
 			ArrayList<Integer> Int = gReader.getMetaSNPTable().get(snp);
 
-			if (wMetaArgs.isChr())
+			MetaStat ms = null;
+			int i = 0;
+			for( i = 0; i < (Int.size() - 2); i++)
 			{
-				MetaStat ms = null;
-				int i = 0;
-				for( i = 0; i < (Int.size() - 2); i++)
-				{
-					if(Int.get(i).intValue() != 0) break; 
-				}
-				ms = gReader.getMetaStat().get(Int.get(i).intValue()).get(snp);
-				int chr = ms.getChr();
-				System.out.println(snp + " " + chr);
-				if(chr != wMetaArgs.getChr()) continue;
+				if(Int.get(i).intValue() != 0) break; 
 			}
+			ms = gReader.getMetaStat().get(Int.get(i).intValue()).get(snp);
+			int chr = ms.getChr();
+			System.out.println("Chr = " + chr);
 
 			if (wMetaArgs.isFullSNPOnly())
 			{

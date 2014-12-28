@@ -1,4 +1,4 @@
-package gear.subcommands.simulation;
+package gear.subcommands.simulationfam;
 
 import gear.ConstValues;
 import gear.subcommands.CommandArguments;
