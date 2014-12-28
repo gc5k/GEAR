@@ -34,6 +34,8 @@ public final class SimuFamilyCommand extends Command
 		options.addOption(OptionBuilder.withDescription(OPT_MAKE_BED_DESC).withLongOpt(OPT_MAKE_BED_LONG).create(OPT_MAKE_BED));
 
 		options.addOption(OptionBuilder.withDescription(OPT_LD_DESC).withLongOpt(OPT_LD_LONG).hasArg().create(OPT_LD));
+		options.addOption(OptionBuilder.withDescription(OPT_RAND_LD_DESC).withLongOpt(OPT_RAND_LD_LONG).hasArg().create());
+
 		options.addOption(OptionBuilder.withDescription(OPT_MAF_DESC).hasArg().create(OPT_MAF_LONG));
 		options.addOption(OptionBuilder.withDescription(OPT_MAF_RAND_DESC).withLongOpt(OPT_MAF_RAND_LONG).create(OPT_MAF_RAND));
 		options.addOption(OptionBuilder.withDescription(OPT_REC_DESC).withLongOpt(OPT_REC_LONG).hasArg().create(OPT_REC));
@@ -281,12 +283,15 @@ public final class SimuFamilyCommand extends Command
 	private static final String OPT_LD_LONG = "ld";
 	private static final String OPT_LD_DESC = "Specify the ld (Lewontin's DPrime)";
 
-	private static final String OPT_MAF_LONG = "maf";
-	private static final String OPT_MAF_DESC = "Specify the minor allele frequency";
+	private static final String OPT_RAND_LD_LONG = "rand-ld";
+	private static final String OPT_RAND_LD_DESC = "Generate the ld (Lewontin's DPrime) from uniform distribtuion between -1 and 1";
+
+	private static final String OPT_MAF_LONG = "freq";
+	private static final String OPT_MAF_DESC = "Specify the allele frequency";
 	
 	private static final String OPT_MAF_RAND = "mr";
-	private static final String OPT_MAF_RAND_LONG = "maf-rand";
-	private static final String OPT_MAF_RAND_DESC = "Use uniform distribution for MAF";
+	private static final String OPT_MAF_RAND_LONG = "unif-freq";
+	private static final String OPT_MAF_RAND_DESC = "Use uniform distribution for MAF, between 0.01~0.5.";
 
 	private static final char OPT_REC = 'r';
 	private static final String OPT_REC_LONG = "rec";
@@ -297,7 +302,7 @@ public final class SimuFamilyCommand extends Command
 	private static final String OPT_REC_SEX_DESC = "Specify the sex-specific recombination fraction";
 
 	private static final String OPT_REC_RAND = "rr";
-	private static final String OPT_REC_RAND_LONG = "rec-rand";
+	private static final String OPT_REC_RAND_LONG = "unif-rec";
 	private static final String OPT_REC_RAND_DESC = "Use uniform distribution recombination fractions beween (0~0.5)";
 
 	private static final String OPT_QTL = "q";

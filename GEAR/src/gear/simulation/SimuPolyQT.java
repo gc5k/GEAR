@@ -4,6 +4,7 @@ import gear.CmdArgs;
 import gear.ConstValues;
 import gear.util.FileUtil;
 import gear.util.Logger;
+import gear.util.pop.PopStat;
 
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
@@ -72,7 +73,7 @@ public class SimuPolyQT
 
 		Arrays.fill(freq, CmdArgs.INSTANCE.polyFreq);
 		Arrays.fill(DPrime, ld);
-		LD = CalculateDprime(freq, DPrime);
+		LD = PopStat.CalcLDfromDPrime(freq, DPrime);
 
 		genotype = new double[sample][M];
 		phenotype = new double[sample];
@@ -457,28 +458,6 @@ public class SimuPolyQT
 		map.close();
 		cov.close();
 		geno.close();
-	}
-
-	public double[] CalculateDprime(double[] f, double[] dprime)
-	{
-
-		double[] D = new double[dprime.length];
-
-		for (int i = 0; i < D.length; i++)
-		{
-			if (dprime[i] > 0)
-			{
-				D[i] = dprime[i]
-						* Math.min(f[i] * (1 - f[i + 1]), f[i + 1] * (1 - f[i]));
-			} 
-			else
-			{
-				D[i] = dprime[i]
-						* Math.min(f[i] * f[i + 1], (1 - f[i]) * (1 - f[i + 1]));
-			}
-		}
-
-		return D;
 	}
 
 	public RealMatrix readEffects()
