@@ -23,6 +23,7 @@ import gear.subcommands.CommandImpl;
 import gear.util.FileUtil;
 import gear.util.Logger;
 import gear.util.Sample;
+import gear.util.pop.PopStat;
 
 public class SimulationQTCommandImpl extends CommandImpl
 {
@@ -88,7 +89,7 @@ public class SimulationQTCommandImpl extends CommandImpl
 		double vp = StatUtils.variance(phenotype);
 		Logger.printUserLog("Vp=" + fmt.format(vp));
 		Logger.printUserLog("Total individuals visited (no selection): "
-				+ count + "\n");
+				+ BV.length + "\n");
 	}
 
 	public RealMatrix SampleChromosome()
@@ -250,21 +251,22 @@ public class SimulationQTCommandImpl extends CommandImpl
 
 	public void calLD()
 	{
-		LD = new double[M-1];
-
-		for (int i = 0; i < LD.length; i++)
-		{
-			if (dprime[i] > 0)
-			{
-				LD[i] = dprime[i]
-						* Math.min(freq[i] * (1 - freq[i + 1]), freq[i + 1] * (1 - freq[i]));
-			} 
-			else
-			{
-				LD[i] = dprime[i]
-						* Math.min(freq[i] * freq[i + 1], (1 - freq[i]) * (1 - freq[i + 1]));
-			}
-		}
+		LD = PopStat.CalcLDfromDPrime(freq, dprime);
+//		LD = new double[M-1];
+//
+//		for (int i = 0; i < LD.length; i++)
+//		{
+//			if (dprime[i] > 0)
+//			{
+//				LD[i] = dprime[i]
+//						* Math.min(freq[i] * (1 - freq[i + 1]), freq[i + 1] * (1 - freq[i]));
+//			} 
+//			else
+//			{
+//				LD[i] = dprime[i]
+//						* Math.min(freq[i] * freq[i + 1], (1 - freq[i]) * (1 - freq[i + 1]));
+//			}
+//		}
 	}
 
 	public void writeBFile()

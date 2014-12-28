@@ -5,6 +5,7 @@ import gear.subcommands.CommandArguments;
 import gear.subcommands.CommandImpl;
 import gear.util.FileUtil;
 import gear.util.Logger;
+import gear.util.pop.PopStat;
 
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
@@ -119,9 +120,17 @@ public final class SimuFamilyCommandImpl extends CommandImpl
 		}
 
 		DPrime = new double[cmdArgs.getNumberOfMarkers() - 1];
-		Arrays.fill(DPrime, cmdArgs.getLD());
-
-		LD = CalculateDprime(maf, DPrime);
+		if (cmdArgs.isPlainLD())
+		{
+			Arrays.fill(DPrime, cmdArgs.getLD());
+		} else if (cmdArgs.isRandLD())
+		{
+			for(int i = 0; i < DPrime.length; i++)
+			{
+				DPrime[i] = rnd.nextUniform(-1, 1);
+			}
+		}
+		LD = PopStat.CalcLDfromDPrime(maf, DPrime);
 
 		rec = new double[cmdArgs.getNumberOfMarkers()];
 		recSex = new double[cmdArgs.getNumberOfMarkers()][2];
@@ -467,29 +476,6 @@ public final class SimuFamilyCommandImpl extends CommandImpl
 		ped.close();
 		map.close();
 	}
-
-	public double[] CalculateDprime(double[] f, double[] dprime)
-	{
-
-		double[] D = new double[dprime.length];
-
-		for (int i = 0; i < D.length; i++)
-		{
-			if (dprime[i] > 0)
-			{
-				D[i] = dprime[i]
-						* Math.min(f[i] * (1 - f[i + 1]), f[i + 1] * (1 - f[i]));
-			} 
-			else
-			{
-				D[i] = dprime[i]
-						* Math.min(f[i] * f[i + 1], (1 - f[i]) * (1 - f[i + 1]));
-			}
-		}
-
-		return D;
-	}
-
 	
 	public void writeBFile()
 	{

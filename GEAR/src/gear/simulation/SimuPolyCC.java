@@ -4,6 +4,7 @@ import gear.CmdArgs;
 import gear.ConstValues;
 import gear.util.FileUtil;
 import gear.util.Logger;
+import gear.util.pop.PopStat;
 
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
@@ -86,7 +87,7 @@ public class SimuPolyCC
 
 		Arrays.fill(freq, CmdArgs.INSTANCE.polyFreq);
 		Arrays.fill(DPrime, ld);
-		LD = CalculateDprime(freq, DPrime);
+		LD = PopStat.CalcLDfromDPrime(freq, DPrime);
 
 		genotype = new double[N_case + N_control][M];
 		phenotype = new double[N_case + N_control];

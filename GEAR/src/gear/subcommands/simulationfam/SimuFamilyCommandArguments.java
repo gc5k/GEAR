@@ -62,6 +62,24 @@ public final class SimuFamilyCommandArguments extends CommandArguments
 	public void setLD(double l)
 	{
 		this.ld = l;
+		ldFlag = true;
+		RandldFlag = false;
+	}
+
+	public void setRandLD()
+	{
+		ldFlag = false;
+		RandldFlag = true;
+	}
+
+	public boolean isPlainLD()
+	{
+		return ldFlag;
+	}
+	
+	public boolean isRandLD()
+	{
+		return RandldFlag;
 	}
 
 	public double getMAF()
@@ -120,7 +138,11 @@ public final class SimuFamilyCommandArguments extends CommandArguments
 	private boolean makeBed;
 	private double maf = 0.5;
 	private boolean mafFlag = false;
+
 	private double ld = 0;
+	private boolean ldFlag = true;
+	private boolean RandldFlag = false;
+
 	private double rec = 0.5;
 	private boolean recSexFlag = false;
 	private double[] recSex = {0.5, 0.5};

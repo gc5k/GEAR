@@ -101,4 +101,26 @@ public class PopStat
 		}
 		Logger.printUserLog("In total " + cn + " genotypes have been imputed.");
 	}
+	
+	public static double[] CalcLDfromDPrime (double[] freq, double[] dprime)
+	{
+		double[] D = new double[dprime.length];
+
+		for (int i = 0; i < D.length; i++)
+		{
+			if (dprime[i] > 0)
+			{
+				D[i] = dprime[i]
+						* Math.min(freq[i] * (1 - freq[i + 1]), freq[i + 1] * (1 - freq[i]));
+			} 
+			else
+			{
+				D[i] = dprime[i]
+						* Math.min(freq[i] * freq[i + 1], (1 - freq[i]) * (1 - freq[i + 1]));
+			}
+		}
+
+		return D;
+
+	}
 }
