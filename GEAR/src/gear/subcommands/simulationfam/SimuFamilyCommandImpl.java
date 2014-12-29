@@ -25,28 +25,28 @@ public final class SimuFamilyCommandImpl extends CommandImpl
 	@Override
 	public void execute(CommandArguments cmdArgs)
 	{
-		this.cmdArgs = (SimuFamilyCommandArguments)cmdArgs;
+		famArgs = (SimuFamilyCommandArguments) cmdArgs;
 
 		init();
 
 		try
 		{
-			ibdF = new PrintWriter(new BufferedWriter(new FileWriter(cmdArgs.getOutRoot() + ".ibdo")));
+			ibdF = new PrintWriter(new BufferedWriter(new FileWriter(famArgs.getOutRoot() + ".ibdo")));
 		}
 		catch (IOException e)
 		{
 			Logger.handleException(e, "An I/O exception occurred when creating the .ibdo file.");
 		}
 
-		for (int i = 0; i < this.cmdArgs.getNumberOfFamilies(); i++)
+		for (int i = 0; i < famArgs.getNumberOfFamilies(); i++)
 		{
 			generateNuclearFamily(NKid[i], NAffKid[i], i);
 		}
 		ibdF.close();
 
 		writePheno();
-		
-		if (this.cmdArgs.getMakeBed())
+
+		if (famArgs.getMakeBed())
 		{
 			writeBFile();
 		}
@@ -55,13 +55,21 @@ public final class SimuFamilyCommandImpl extends CommandImpl
 			writeFile();
 		}
 	}
-	
+
 	private void init()
 	{
-		if (cmdArgs.getQTLFile() != null)
+		rnd = new RandomDataImpl();		
+		rnd.reSeed(famArgs.getSeed());
+
+		NKid = new int[famArgs.getNumberOfFamilies()];
+		Arrays.fill(NKid, 2);
+		NAffKid = new int[famArgs.getNumberOfFamilies()];
+		Arrays.fill(NAffKid, 1);
+
+		if (famArgs.isQTL())
 		{
-			FileUtil.exists(cmdArgs.getQTLFile());
-			BufferedReader qtlFile = FileUtil.FileOpen(cmdArgs.getQTLFile());
+			FileUtil.exists(famArgs.getQTLFile());
+			BufferedReader qtlFile = FileUtil.FileOpen(famArgs.getQTLFile());
 			String line = null;
 			try
 			{
@@ -94,75 +102,73 @@ public final class SimuFamilyCommandImpl extends CommandImpl
 				e.printStackTrace();
 			}
 		}
-		
-		
-		
-		rnd = new RandomDataImpl();
-		
-		rnd.reSeed(cmdArgs.getSeed());
+		else if (famArgs.isHsq())
+		{
+			hsq = famArgs.getHsq();
+			effect = new double[famArgs.getNumberOfMarkers()];
+			for(int i = 0; i < effect.length; i++)
+			{
+				effect[i] = rnd.nextGaussian(0, 1);
+			}
+		}
 
-		NKid = new int[cmdArgs.getNumberOfFamilies()];
-		Arrays.fill(NKid, 2);
-		NAffKid = new int[cmdArgs.getNumberOfFamilies()];
-		Arrays.fill(NAffKid, 1);
-	
-		maf = new double[cmdArgs.getNumberOfMarkers()];
-		if (cmdArgs.isMAFRand())
+		maf = new double[famArgs.getNumberOfMarkers()];
+		if (famArgs.isPlainMAF())
+		{
+			Arrays.fill(maf, famArgs.getMAF());			
+		}
+		else if (famArgs.isUnifMAF())
 		{
 			for (int i = 0; i < maf.length; i++)
 			{
 				maf[i] = rnd.nextUniform(0.01, 0.5);
 			}
 		}
-		else
-		{
-			Arrays.fill(maf, cmdArgs.getMAF());			
-		}
 
-		DPrime = new double[cmdArgs.getNumberOfMarkers() - 1];
-		if (cmdArgs.isPlainLD())
+		DPrime = new double[famArgs.getNumberOfMarkers() - 1];
+		if (famArgs.isPlainLD())
 		{
-			Arrays.fill(DPrime, cmdArgs.getLD());
-		} else if (cmdArgs.isRandLD())
+			Arrays.fill(DPrime, famArgs.getLD());
+		}
+		else if (famArgs.isRandLD())
 		{
-			for(int i = 0; i < DPrime.length; i++)
+			for (int i = 0; i < DPrime.length; i++)
 			{
 				DPrime[i] = rnd.nextUniform(-1, 1);
 			}
 		}
 		LD = PopStat.CalcLDfromDPrime(maf, DPrime);
 
-		rec = new double[cmdArgs.getNumberOfMarkers()];
-		recSex = new double[cmdArgs.getNumberOfMarkers()][2];
-
-		if (cmdArgs.isRecSex())
+		recSex = new double[famArgs.getNumberOfMarkers()][2];
+		if (famArgs.isPlainRec())
 		{
-			double[] rs = cmdArgs.getRecSex();
+			for (int i = 0; i < recSex.length; i++)
+			{
+				recSex[i][0] = famArgs.getRec();
+				recSex[i][1] = famArgs.getRec();
+			}
+		}
+		else if (famArgs.isSexRec())
+		{
+			double[] rs = famArgs.getRecSex();
 			for (int i = 0; i < recSex.length; i++)
 			{
 				recSex[i][0] = rs[0];
 				recSex[i][1] = rs[1];
 			}
-			recSex[0][0] = maf[0];
-			recSex[0][1] = maf[0];			
 		}
-		else
+		else if (famArgs.isRandRec())
 		{
-			if (cmdArgs.getRecRand())
+			for (int i = 0; i < recSex.length; i++)
 			{
-				for (int i = 0; i < rec.length; i++)
-				{
-					rec[i] = rnd.nextUniform(0.01, 0.5);
-				}
+				recSex[i][0] = recSex[i][1] = rnd.nextUniform(0.01, 0.5);
 			}
-			else
-			{
-				Arrays.fill(rec, cmdArgs.getRec());
-			}
-			rec[0] = maf[0];
 		}
-		gm = new int[cmdArgs.getNumberOfFamilies() * famSize][cmdArgs.getNumberOfMarkers()];
-		phe = new double[cmdArgs.getNumberOfFamilies() * famSize];
+		recSex[0][0] = maf[0];
+		recSex[0][1] = maf[1];
+
+		gm = new int[famArgs.getNumberOfFamilies() * famSize][famArgs.getNumberOfMarkers()];
+		phe = new double[famArgs.getNumberOfFamilies() * famSize];
 	}
 
 	private void generateNuclearFamily(int nkid, int affKid, int famIdx)
@@ -207,14 +213,24 @@ public final class SimuFamilyCommandImpl extends CommandImpl
 				}
 			}
 		}
-		
+
 		for (int i = 0; i < maf.length; i++)
 		{
 			gm[famIdx * famSize + shift][i] = v[i][0] + v[i][1];
 		}
 
-		phe[famIdx * famSize + shift] += v[qtlIdx[0]][0] * qtlEff[0][0] + v[qtlIdx[0]][1] * qtlEff[0][1];
-		phe[famIdx * famSize + shift] += v[qtlIdx[1]][0] * qtlEff[1][0] + v[qtlIdx[1]][1] * qtlEff[1][1];
+		if(famArgs.isQTL())
+		{
+			phe[famIdx * famSize +shift] += v[qtlIdx[0]][0] * qtlEff[0][0] + v[qtlIdx[0]][1] * qtlEff[0][1];
+			phe[famIdx * famSize +shift] += v[qtlIdx[1]][0] * qtlEff[1][0] + v[qtlIdx[1]][1] * qtlEff[1][1];			
+		}
+		else
+		{
+			for(int i = 0; i < maf.length; i++)
+			{
+				phe[famIdx * famSize + shift] += gm[famIdx * famSize + shift][i] * effect[i];
+			}
+		}
 		return v;
 	}
 
@@ -222,52 +238,26 @@ public final class SimuFamilyCommandImpl extends CommandImpl
 	{
 		int[][] v = new int[maf.length][2];
 		int[][] rc = new int[maf.length][2];
-		if(cmdArgs.isRecSex())
-		{
-			for (int i = 0; i < 2; i++)
-			{
-				int[][] chr = i == 0 ? p : m;
-				int idx = 1;
-				try
-				{
-					idx = rnd.nextBinomial(1, recSex[0][i]);
-				}
-				catch (MathException e)
-				{
-					e.printStackTrace();
-				}
 
-				for (int j = 0; j < maf.length; j++)
-				{
-					double r = rnd.nextUniform(0, 1);
-					idx = r < recSex[j][i] ? 1 - idx : idx;
-					rc[j][i] = idx;
-					v[j][i] = chr[j][idx];
-				}
+		for (int i = 0; i < 2; i++)
+		{
+			int[][] chr = i == 0 ? p : m;
+			int idx = 1;
+			try
+			{
+				idx = rnd.nextBinomial(1, recSex[0][i]);
 			}
-		}
-		else
-		{
-
-			for (int i = 0; i < 2; i++)
+			catch (MathException e)
 			{
-				int[][] chr = i == 0 ? p : m;
-				int idx = 1;
-				try
-				{
-					idx = rnd.nextBinomial(1, rec[0]);
-				}
-				catch (MathException e)
-				{
-					e.printStackTrace();
-				}
-				for (int j = 0; j < maf.length; j++)
-				{
-					double r = rnd.nextUniform(0, 1);
-					idx = r < rec[j] ? 1 - idx : idx;
-					rc[j][i] = idx;
-					v[j][i] = chr[j][idx];
-				}
+				e.printStackTrace();
+			}
+
+			for (int j = 0; j < maf.length; j++)
+			{
+				double r = rnd.nextUniform(0, 1);
+				idx = r < recSex[j][i] ? 1 - idx : idx;
+				rc[j][i] = idx;
+				v[j][i] = chr[j][idx];
 			}
 		}
 
@@ -276,8 +266,18 @@ public final class SimuFamilyCommandImpl extends CommandImpl
 			gm[famIdx * famSize + shift][i] = v[i][0] + v[i][1];
 		}
 
-		phe[famIdx * famSize +shift] += v[qtlIdx[0]][0] * qtlEff[0][0] + v[qtlIdx[0]][1] * qtlEff[0][1];
-		phe[famIdx * famSize +shift] += v[qtlIdx[1]][0] * qtlEff[1][0] + v[qtlIdx[1]][1] * qtlEff[1][1];
+		if(famArgs.isQTL())
+		{
+			phe[famIdx * famSize +shift] += v[qtlIdx[0]][0] * qtlEff[0][0] + v[qtlIdx[0]][1] * qtlEff[0][1];
+			phe[famIdx * famSize +shift] += v[qtlIdx[1]][0] * qtlEff[1][0] + v[qtlIdx[1]][1] * qtlEff[1][1];			
+		}
+		else
+		{
+			for(int i = 0; i < maf.length; i++)
+			{
+				phe[famIdx * famSize + shift] += gm[famIdx * famSize + shift][i] * effect[i];
+			}
+		}
 
 		return rc;
 	}
@@ -287,17 +287,17 @@ public final class SimuFamilyCommandImpl extends CommandImpl
 		PrintWriter pheno = null;
 		try
 		{
-			pheno = new PrintWriter(new BufferedWriter(new FileWriter(cmdArgs.getOutRoot() + ".phe")));
+			pheno = new PrintWriter(new BufferedWriter(new FileWriter(famArgs.getOutRoot() + ".phe")));
 		}
 		catch (IOException e)
 		{
 			Logger.handleException(e, "An I/O exception occurred when creating the .phe file.");
 		}
 
-		double [] p = new double[cmdArgs.getNumberOfFamilies() * 2];
+		double [] p = new double[famArgs.getNumberOfFamilies() * 2];
 		int cn=0;
 		
-		for (int h = 0; h < cmdArgs.getNumberOfFamilies(); h++)
+		for (int h = 0; h < famArgs.getNumberOfFamilies(); h++)
 		{
 			for (int j = 0; j < famSize; j++)
 			{
@@ -308,8 +308,17 @@ public final class SimuFamilyCommandImpl extends CommandImpl
 			}
 		}
 		double vb = StatUtils.variance(p);
-		double ve = vb * (1-h2[0]) / h2[0];
-		for (int h = 0; h < cmdArgs.getNumberOfFamilies(); h++)
+		double ve = 0;
+		if (famArgs.isHsq())
+		{
+			ve = vb * (1-hsq) / hsq;
+		}
+		else
+		{
+			ve = vb * (1-h2[0]) / h2[0];			
+		}
+
+		for (int h = 0; h < famArgs.getNumberOfFamilies(); h++)
 		{
 			int fid = (h + 1) * 10000;
 			
@@ -334,15 +343,15 @@ public final class SimuFamilyCommandImpl extends CommandImpl
 
 		try
 		{
-			ped = new PrintWriter(new BufferedWriter(new FileWriter(cmdArgs.getOutRoot() + ".ped")));
-			map = new PrintWriter(new BufferedWriter(new FileWriter(cmdArgs.getOutRoot() + ".map")));
+			ped = new PrintWriter(new BufferedWriter(new FileWriter(famArgs.getOutRoot() + ".ped")));
+			map = new PrintWriter(new BufferedWriter(new FileWriter(famArgs.getOutRoot() + ".map")));
 		}
 		catch (IOException e)
 		{
 			Logger.handleException(e, "An I/O exception occurred when creating the .ped and .map files.");
 		}
 
-		for (int h = 0; h < cmdArgs.getNumberOfFamilies(); h++)
+		for (int h = 0; h < famArgs.getNumberOfFamilies(); h++)
 		{
 			int fid = (h + 1) * 10000;
 			int pid = fid + 1;
@@ -485,9 +494,9 @@ public final class SimuFamilyCommandImpl extends CommandImpl
 
 		try
 		{
-			bedout = new DataOutputStream(new FileOutputStream(cmdArgs.getOutRoot() + ".bed"));
-			fam = new PrintWriter(new BufferedWriter(new FileWriter(cmdArgs.getOutRoot() + ".fam")));
-			bim = new PrintWriter(new BufferedWriter(new FileWriter(cmdArgs.getOutRoot() + ".bim")));
+			bedout = new DataOutputStream(new FileOutputStream(famArgs.getOutRoot() + ".bed"));
+			fam = new PrintWriter(new BufferedWriter(new FileWriter(famArgs.getOutRoot() + ".fam")));
+			bim = new PrintWriter(new BufferedWriter(new FileWriter(famArgs.getOutRoot() + ".bim")));
 
 		} 
 		catch (IOException e)
@@ -548,7 +557,7 @@ public final class SimuFamilyCommandImpl extends CommandImpl
 			bedout.writeByte(ConstValues.PLINK_BED_BYTE1);
 			bedout.writeByte(ConstValues.PLINK_BED_BYTE2);
 			bedout.writeByte(ConstValues.PLINK_BED_BYTE3);
-			for (int i = 0; i < cmdArgs.getNumberOfMarkers(); i++)
+			for (int i = 0; i < famArgs.getNumberOfMarkers(); i++)
 			{
 				byte gbyte = 0;
 				int idx = 0;
@@ -597,11 +606,11 @@ public final class SimuFamilyCommandImpl extends CommandImpl
 			Logger.handleException(e, "An I/O exception occurred when writing the .bed file.");
 		}
 
-		for (int i = 0; i < cmdArgs.getNumberOfMarkers(); i++)
+		for (int i = 0; i < famArgs.getNumberOfMarkers(); i++)
 		{
 			bim.print(1 + " ");
 			bim.print("rs" + i + " ");
-			bim.print(i / (cmdArgs.getNumberOfMarkers() * 1.0) + " ");
+			bim.print(i / (famArgs.getNumberOfMarkers() * 1.0) + " ");
 			bim.print(i * 100 + " ");
 			bim.println(A[0] + " " + A[1]);
 		}
@@ -611,14 +620,14 @@ public final class SimuFamilyCommandImpl extends CommandImpl
 
 	}
 
-	private SimuFamilyCommandArguments cmdArgs;
+	private SimuFamilyCommandArguments famArgs;
 
 	private RandomDataImpl rnd;
 	private final String[] A = { "A", "C" };
 	private int[] NKid = null;
 	private int[] NAffKid = null;
 	private double[] LD = null;
-	private double[] rec = null;
+//	private double[] rec = null;
 	private double[][] recSex = null;
 	private double[] maf = null;
 	private double[] DPrime = null;
@@ -629,6 +638,9 @@ public final class SimuFamilyCommandImpl extends CommandImpl
 	private int[] qtlIdx = {5, 5};
 	private double[][] qtlEff = {{1, 1}, {1,1}};
 	private double[] h2 = {0.5, 0.5};
-	
+
+	private double hsq;
+	private double[] effect;
+
 	PrintWriter ibdF = null;
 }

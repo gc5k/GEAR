@@ -8,7 +8,6 @@ import gear.subcommands.Command;
 import gear.subcommands.CommandArgumentException;
 import gear.subcommands.CommandArguments;
 import gear.subcommands.CommandImpl;
-import gear.util.Logger;
 
 public final class SimuFamilyCommand extends Command
 {
@@ -28,237 +27,72 @@ public final class SimuFamilyCommand extends Command
 	@Override
 	public void prepareOptions(Options options)
 	{
-		options.addOption(OptionBuilder.withDescription(OPT_NUM_FAMS_DESC).withLongOpt(OPT_NUM_FAMS_LONG).hasArg().isRequired().create(OPT_NUM_FAMS));
-		options.addOption(OptionBuilder.withDescription(OPT_NUM_MARKERS_DESC).withLongOpt(OPT_NUM_MARKERS_LONG).hasArg().isRequired().create(OPT_NUM_MARKERS));
+		options.addOption(OptionBuilder.withDescription(OPT_NUM_FAMS_DESC).withLongOpt(OPT_NUM_FAMS_LONG).hasArg().create(OPT_NUM_FAMS));
+		options.addOption(OptionBuilder.withDescription(OPT_NUM_MARKERS_DESC).withLongOpt(OPT_NUM_MARKERS_LONG).hasArg().create(OPT_NUM_MARKERS));
 		options.addOption(OptionBuilder.withDescription(OPT_SEED_DESC).withLongOpt(OPT_SEED_LONG).hasArg().create());
 		options.addOption(OptionBuilder.withDescription(OPT_MAKE_BED_DESC).withLongOpt(OPT_MAKE_BED_LONG).create(OPT_MAKE_BED));
 
-		options.addOption(OptionBuilder.withDescription(OPT_LD_DESC).withLongOpt(OPT_LD_LONG).hasArg().create(OPT_LD));
-		options.addOption(OptionBuilder.withDescription(OPT_RAND_LD_DESC).withLongOpt(OPT_RAND_LD_LONG).hasArg().create());
+		options.addOption(OptionBuilder.withDescription(OPT_LD_DESC).withLongOpt(OPT_LD_LONG).hasArg().create());
+		options.addOption(OptionBuilder.withDescription(OPT_RAND_LD_DESC).withLongOpt(OPT_RAND_LD_LONG).create());
 
-		options.addOption(OptionBuilder.withDescription(OPT_MAF_DESC).hasArg().create(OPT_MAF_LONG));
-		options.addOption(OptionBuilder.withDescription(OPT_MAF_RAND_DESC).withLongOpt(OPT_MAF_RAND_LONG).create(OPT_MAF_RAND));
-		options.addOption(OptionBuilder.withDescription(OPT_REC_DESC).withLongOpt(OPT_REC_LONG).hasArg().create(OPT_REC));
+		options.addOption(OptionBuilder.withDescription(OPT_MAF_DESC).hasArg().create(OPT_MAF));
+		options.addOption(OptionBuilder.withDescription(OPT_UNIF_MAF_LONG_DESC).withLongOpt(OPT_UNIF_MAF_LONG).create());
+		options.addOption(OptionBuilder.withDescription(OPT_REC_DESC).withLongOpt(OPT_REC_LONG).hasArg().create());
 		options.addOption(OptionBuilder.withDescription(OPT_REC_SEX_DESC).withLongOpt(OPT_REC_SEX_LONG).hasArgs(2).create(OPT_REC_SEX));
-		options.addOption(OptionBuilder.withDescription(OPT_REC_RAND_DESC).withLongOpt(OPT_REC_RAND_LONG).create(OPT_REC_RAND));
+		options.addOption(OptionBuilder.withDescription(OPT_REC_UNIF_DESC).withLongOpt(OPT_REC_UNIF_LONG).create());
 
 		options.addOption(OptionBuilder.withDescription(OPT_QTL_DESC).withLongOpt(OPT_QTL_LONG).hasArg().create(OPT_QTL));
+		options.addOption(OptionBuilder.withDescription(OPT_HSQ_DESC).hasArg().create(OPT_HSQ));
 	}
 
 	@Override
 	public CommandArguments parse(CommandLine cmdLine) throws CommandArgumentException
 	{
 		SimuFamilyCommandArguments cmdArgs = new SimuFamilyCommandArguments();
-		parseNumberOfFamilies(cmdArgs, cmdLine);
-		parseNumberOfMarkers(cmdArgs, cmdLine);
+		cmdArgs.setNumberOfFamilies(parseIntOptionValue(cmdLine, OPT_NUM_FAMS_LONG, "100"));
+		cmdArgs.setNumberOfMarkers(parseIntOptionValue(cmdLine, OPT_NUM_MARKERS_LONG, "100"));
 		cmdArgs.setSeed(parseLongOptionValue(cmdLine, OPT_SEED_LONG, OPT_SEED_DEFAULT));
-		parseLD(cmdArgs, cmdLine);
-		parseMAF(cmdArgs, cmdLine);
-		parseRec(cmdArgs, cmdLine);
-		parseRecSex(cmdArgs, cmdLine);
-		cmdArgs.setQTLFile(cmdLine.getOptionValue(OPT_QTL));
-		cmdArgs.setRecRandFlag(cmdLine.hasOption(OPT_REC_RAND));
-		cmdArgs.setMAFRandFlag(cmdLine.hasOption(OPT_MAF_RAND));
-		cmdArgs.setRecSexFlag(cmdLine.hasOption(OPT_REC_SEX));
-		cmdArgs.setMakeBed(cmdLine.hasOption(OPT_MAKE_BED));
+
+//maf
+		cmdArgs.setMAF(parseDoubleOptionValueInRange(cmdLine, OPT_MAF, "0.5", 0.01, 0.500001));
+		if (cmdLine.hasOption(OPT_UNIF_MAF_LONG))
+		{
+			cmdArgs.setUnifMAF();
+		}
+
+//ld
+		cmdArgs.setLD(parseDoubleOptionValueInRange(cmdLine, OPT_LD_LONG, "0", -1, 1));			
+		if (cmdLine.hasOption(OPT_RAND_LD_LONG))
+		{
+			cmdArgs.setRandLD();
+		}
+
+//rec
+		cmdArgs.setRec(parseDoubleOptionValueInRange(cmdLine, OPT_REC_LONG, "0.5", 0.01, 0.500001));
+		if(cmdLine.hasOption(OPT_REC_SEX_LONG))
+		{
+			cmdArgs.setRecSex(cmdLine.getOptionValues(OPT_REC_SEX_LONG));
+		}
+		if(cmdLine.hasOption(OPT_REC_UNIF_LONG))
+		{
+			cmdArgs.setRecRandFlag();
+		}
+
+//h2
+		if(cmdLine.hasOption(OPT_QTL))
+		{
+			cmdArgs.setQTLFile(cmdLine.getOptionValue(OPT_QTL));
+		}
+		if(cmdLine.hasOption(OPT_HSQ))
+		{
+			cmdArgs.setHsq(cmdLine.getOptionValue(OPT_HSQ));
+		}
+
+		if(cmdLine.hasOption(OPT_MAKE_BED))
+		{
+			cmdArgs.setMakeBed();
+		}
 		return cmdArgs;
-	}
-
-	private void parseNumberOfFamilies(SimuFamilyCommandArguments cmdArgs, CommandLine cmdLine) throws CommandArgumentException
-	{
-		int numFams = 0;
-		boolean throwException = false;
-		
-		try
-		{
-			numFams = Integer.parseInt(cmdLine.getOptionValue(OPT_NUM_FAMS));
-		}
-		catch (NumberFormatException e)
-		{
-			throwException = true;
-		}
-		
-		if (numFams <= 0)
-		{
-			throwException = true;
-		}
-		
-		if (throwException)
-		{
-			String msg = "";
-			msg += "The value of --" + OPT_NUM_FAMS_LONG + "is invalid: '";
-			msg += cmdLine.getOptionValue(OPT_NUM_FAMS) + "' is not a valid positive integer.";
-			throw new CommandArgumentException(msg);
-		}
-		
-		cmdArgs.setNumberOfFamilies(numFams);
-	}
-	
-	private void parseNumberOfMarkers(SimuFamilyCommandArguments cmdArgs, CommandLine cmdLine) throws CommandArgumentException
-	{
-		int numMarkers = 0;
-		boolean throwException = false;
-		
-		try
-		{
-			numMarkers = Integer.parseInt(cmdLine.getOptionValue(OPT_NUM_MARKERS));
-		}
-		catch (NumberFormatException e)
-		{
-			throwException = true;
-		}
-		
-		if (numMarkers <= 0)
-		{
-			throwException = true;
-		}
-		
-		if (throwException)
-		{
-			String msg = "";
-			msg += "The value of --" + OPT_NUM_MARKERS_LONG + " is invalid: '";
-			msg += cmdLine.getOptionValue(OPT_NUM_MARKERS) + "' is not a valid positive integer.";
-			throw new CommandArgumentException(msg);
-		}
-		
-		cmdArgs.setNumberOfMarkers(numMarkers);
-	}
-
-	private void parseRec(SimuFamilyCommandArguments cmdArgs, CommandLine cmdLine) throws CommandArgumentException
-	{
-		double r = 0.5;
-		boolean throwException = false;
-
-		if (cmdLine.hasOption(OPT_REC))
-		{
-			try
-			{
-				r = Double.parseDouble(cmdLine.getOptionValue(OPT_REC));
-			}
-			catch (NumberFormatException e)
-			{
-				throwException = true;
-			}
-
-			if (r < 0 || r > 0.5)
-			{
-				throwException = true;
-			}
-			
-			if (throwException)
-			{
-				String msg = "";
-				msg += "The value of --" + OPT_REC_LONG + " is invalid: '";
-				msg += cmdLine.getOptionValue(OPT_REC) + "' is not a valid real number between 0 and 0.5.";
-				throw new CommandArgumentException(msg);
-			}
-		}
-		cmdArgs.setRec(r);
-	}
-
-	private void parseRecSex(SimuFamilyCommandArguments cmdArgs, CommandLine cmdLine) throws CommandArgumentException
-	{
-		double[] rs = {0.5, 0.5};
-		
-		if(cmdLine.hasOption(OPT_REC_SEX))
-		{
-			try
-			{
-				// TODO: Apache CLI should have its own routine to receive multiple arguments instead of split(",")
-				String[] s = cmdLine.getOptionValues(OPT_REC_SEX);
-				if (s.length < 2)
-				{
-					Logger.printUserError("The value of --" + OPT_REC_SEX_LONG + " should take two values.");
-					System.exit(0);
-				}
-				rs[0] = Double.parseDouble(s[0]);
-				rs[1] = Double.parseDouble(s[1]);
-			}
-			catch (NumberFormatException e)
-			{
-			}
-
-			if (rs[0] < 0 || rs[0] > 0.5)
-			{
-				String msg = "";
-				msg += "The value of --" + OPT_REC_SEX_LONG + "is invalid: '";
-				msg += cmdLine.getOptionValue(OPT_REC_SEX) + "' is not a valid number between 0 and 0.5.";
-				throw new CommandArgumentException(msg);
-			}
-			
-			if (rs[1] < 0 || rs[1] > 0.5)
-			{
-				String msg = "";
-				msg += "The value of --" + OPT_REC_SEX_LONG + "is invalid: '";
-				msg += cmdLine.getOptionValue(OPT_REC_SEX) + "' is not a valid number between 0 and 0.5.";
-				throw new CommandArgumentException(msg);
-			}
-		}
-		cmdArgs.setRecSex(rs);
-	}
-
-	private void parseLD(SimuFamilyCommandArguments cmdArgs, CommandLine cmdLine) throws CommandArgumentException
-	{
-		double l = 0;
-		boolean throwException = false;
-		
-		if (cmdLine.hasOption(OPT_LD))
-		{
-			try
-			{
-				l = Double.parseDouble(cmdLine.getOptionValue(OPT_LD));
-			}
-			catch (NumberFormatException e)
-			{
-				throwException = true;
-			}
-
-			if (l < 0 || l > 1)
-			{
-				throwException = true;
-			}
-			
-			if (throwException)
-			{
-				String msg = "";
-				msg += "The value of --" + OPT_LD + " is invalid: '";
-				msg += cmdLine.getOptionValue(OPT_LD) + "' is not a valid real number between 0 and 1.";
-				throw new CommandArgumentException(msg);
-			}
-		}
-		cmdArgs.setLD(l);
-	}
-
-	private void parseMAF(SimuFamilyCommandArguments cmdArgs, CommandLine cmdLine) throws CommandArgumentException
-	{
-		double maf = 0.5;
-		boolean throwException = false;
-		
-		if (cmdLine.hasOption(OPT_MAF_LONG))
-		{
-			try
-			{
-				maf = Double.parseDouble(cmdLine.getOptionValue(OPT_MAF_LONG));
-			}
-			catch (NumberFormatException e)
-			{
-				throwException = true;
-			}
-
-			if (maf < 0 || maf > 1)
-			{
-				throwException = true;
-			}
-			
-			if (throwException)
-			{
-				String msg = "";
-				msg += "The value of --" + OPT_MAF_LONG + " is invalid: '";
-				msg += cmdLine.getOptionValue(OPT_MAF_LONG) + "' is not a valid real number between 0 and 1.";
-				throw new CommandArgumentException(msg);
-			}
-		}
-		cmdArgs.setMAF(maf);
 	}
 
 	@Override
@@ -279,21 +113,18 @@ public final class SimuFamilyCommand extends Command
 	private static final String OPT_MAKE_BED_LONG = "make-bed";
 	private static final String OPT_MAKE_BED_DESC = "Make .bed, .bim and .fam files";
 
-	private static final char OPT_LD = 'l';
 	private static final String OPT_LD_LONG = "ld";
 	private static final String OPT_LD_DESC = "Specify the ld (Lewontin's DPrime)";
 
 	private static final String OPT_RAND_LD_LONG = "rand-ld";
 	private static final String OPT_RAND_LD_DESC = "Generate the ld (Lewontin's DPrime) from uniform distribtuion between -1 and 1";
 
-	private static final String OPT_MAF_LONG = "freq";
+	private static final String OPT_MAF = "freq";
 	private static final String OPT_MAF_DESC = "Specify the allele frequency";
-	
-	private static final String OPT_MAF_RAND = "mr";
-	private static final String OPT_MAF_RAND_LONG = "unif-freq";
-	private static final String OPT_MAF_RAND_DESC = "Use uniform distribution for MAF, between 0.01~0.5.";
 
-	private static final char OPT_REC = 'r';
+	private static final String OPT_UNIF_MAF_LONG = "unif-freq";
+	private static final String OPT_UNIF_MAF_LONG_DESC = "Use uniform distribution for MAF, between 0.01~0.5.";
+
 	private static final String OPT_REC_LONG = "rec";
 	private static final String OPT_REC_DESC = "Specify the recombination fraction";
 
@@ -301,11 +132,14 @@ public final class SimuFamilyCommand extends Command
 	private static final String OPT_REC_SEX_LONG = "rec-sex";
 	private static final String OPT_REC_SEX_DESC = "Specify the sex-specific recombination fraction";
 
-	private static final String OPT_REC_RAND = "rr";
-	private static final String OPT_REC_RAND_LONG = "unif-rec";
-	private static final String OPT_REC_RAND_DESC = "Use uniform distribution recombination fractions beween (0~0.5)";
+	private static final String OPT_REC_UNIF_LONG = "unif-rec";
+	private static final String OPT_REC_UNIF_DESC = "Use uniform distribution recombination fractions beween (0~0.5)";
 
 	private static final String OPT_QTL = "q";
 	private static final String OPT_QTL_LONG = "qtl";
 	private static final String OPT_QTL_DESC = "qtl parameters (locp, locm, effm, effp, h2)";
+	
+	private static final String OPT_HSQ = "hsq";
+	private static final String OPT_HSQ_DESC = "Heritability for polygenic model, 0.5 by default.";
+
 }

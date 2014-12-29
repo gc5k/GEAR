@@ -682,28 +682,6 @@ public class SimuPolyCC
 		cov.close();
 	}
 
-	public double[] CalculateDprime(double[] f, double[] dprime)
-	{
-		double[] D = new double[dprime.length];
-
-		for (int i = 0; i < D.length; i++)
-		{
-			if (dprime[i] > 0)
-			{
-				D[i] = dprime[i]
-						* Math.min(f[i] * (1 - f[i + 1]), f[i + 1] * (1 - f[i]));
-			} 
-			else
-			{
-				D[i] = dprime[i]
-						* Math.min(f[i] * f[i + 1], (1 - f[i]) * (1 - f[i + 1]));
-			}
-		}
-
-		return D;
-
-	}
-
 	public RealMatrix readEffects()
 	{
 		BufferedReader reader = FileUtil

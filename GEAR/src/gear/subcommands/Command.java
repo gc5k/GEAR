@@ -153,6 +153,23 @@ public abstract class Command implements Comparable<Command>
 	{
 		this.stopAtNonOption = stopAtNonOption;
 	}
+
+	protected int parseIntOptionValue(CommandLine cmdLine, String opt, String defaultOptVal) throws CommandArgumentException
+	{
+		int value;
+		try
+		{
+			value = Integer.parseInt(cmdLine.getOptionValue(opt, defaultOptVal));
+		}
+		catch (NumberFormatException e)
+		{
+			String msg = "";
+			msg += "The value of --" + opt + "is invalid: '";
+			msg += cmdLine.getOptionValue(opt) + "' is not a valid integer.";
+			throw new CommandArgumentException(msg);
+		}
+		return value;
+	}
 	
 	protected long parseLongOptionValue(CommandLine cmdLine, String opt) throws CommandArgumentException
 	{
