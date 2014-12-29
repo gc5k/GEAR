@@ -67,6 +67,7 @@ public class HEMCalculate
 			{
 				int id1 = 0;
 				int id2 = 0;
+				int revGrm = 0;
 				for (int n = 0; n < heMReader.nRec; n++)
 				{
 					double[] row = new double[heMReader.grmList.size() + 1];
@@ -101,6 +102,7 @@ public class HEMCalculate
 							{
 								if (Math.abs(row[1+i]) > grmCutoff)
 								{
+									revGrm++;
 									pass = true;
 								}
 							}
@@ -108,6 +110,7 @@ public class HEMCalculate
 							{
 								if (row[1+i] > grmCutoff)
 								{
+									revGrm++;
 									pass = true;
 								}
 							}
@@ -144,6 +147,13 @@ public class HEMCalculate
 					}
 					heMReader.yyProd += ds * ds;
 					heMReader.lambda.N++;
+				}
+				if(heMReader.isSingleGrm)
+				{
+					if (revGrm > 0)
+					{
+						Logger.printUserLog("grm-cutoff removed " + revGrm + " GRM elements.");
+					}
 				}
 				for (int i = 0; i < heMReader.grmList.size(); i++)
 				{
@@ -277,7 +287,6 @@ public class HEMCalculate
 		RealMatrix Mat_K = Mat_B.transpose().multiply(Mat_XtY);
 
 		double mse = (heMReader.yyProd - Mat_K.getEntry(0, 0)) / (heMReader.lambda.N - heMReader.XtX.length);
-		System.out.println("mse: " + mse);
 		RealMatrix v = Mat_XtX_Inv.scalarMultiply(mse);
 
 		heMReader.sb.append("HE mode: ");
@@ -285,13 +294,13 @@ public class HEMCalculate
 		switch (heMReader.heType)
 		{
 		case SD:
-			heMReader.sb.append("squared difference (yi-yj)^2\n");
+			heMReader.sb.append("Squared difference\n");
 			break;
 		case SS:
-			heMReader.sb.append("squared sum (yi+yj)^2\n");
+			heMReader.sb.append("Squared sum\n");
 			break;
 		case CP:
-			heMReader.sb.append("cross-product [yi-E(y)][yj-E(y)]\n");
+			heMReader.sb.append("Cross-product\n");
 			break;
 		default:
 			// TODO: assert false or throw exception
@@ -310,15 +319,15 @@ public class HEMCalculate
 					.append("grm absolute cutoff is: |" + grmCutoff + "|\n");
 		}
 
-		heMReader.sb.append("keep list: " + heMReader.keepFile + "\n");
-		heMReader.sb.append("pheno: " + heMReader.phenoFile + "\n");
-		heMReader.sb.append("target trait: " + CmdArgs.INSTANCE.getHEArgs().getTargetTraitOptionValue() + "\n");
+		heMReader.sb.append("Keep list: " + heMReader.keepFile + "\n");
+		heMReader.sb.append("Pheno: " + heMReader.phenoFile + "\n");
+		heMReader.sb.append("Target trait: " + CmdArgs.INSTANCE.getHEArgs().getTargetTraitOptionValue() + "\n");
 
 		if (CmdArgs.INSTANCE.qcovar_file != null)
 		{
 			heMReader.sb
-					.append("quantitative covariate file: " + CmdArgs.INSTANCE.qcovar_file + "\n");
-			heMReader.sb.append("quantitative covariate index: ");
+					.append("Quantitative covariate file: " + CmdArgs.INSTANCE.qcovar_file + "\n");
+			heMReader.sb.append("Quantitative covariate index: ");
 			if (CmdArgs.INSTANCE.qcovar_num == null)
 			{
 				heMReader.sb.append("all");
@@ -336,8 +345,8 @@ public class HEMCalculate
 		if (CmdArgs.INSTANCE.covar_file != null)
 		{
 			heMReader.sb
-					.append("quality covariate file: " + CmdArgs.INSTANCE.covar_file + "\n");
-			heMReader.sb.append("quality covariate index: ");
+					.append("Quality covariate file: " + CmdArgs.INSTANCE.covar_file + "\n");
+			heMReader.sb.append("Quality covariate index: ");
 			if (CmdArgs.INSTANCE.covar_num == null)
 			{
 				heMReader.sb.append("all");
@@ -367,7 +376,7 @@ public class HEMCalculate
 		heMReader.sb.append("In total " + Len + " matched individuals.\n");
 		heMReader.sb
 				.append("In total read " + ((int) (heMReader.lambda.N)) + " lines in the grm file.\n");
-		heMReader.sb.append("\n========================\n");
+		heMReader.sb.append("\n==============================\n");
 		heMReader.sb.append("Coef\t" + "Estimate \t" + "se" + "\n");
 
 		for (int i = 0; i < Mat_B.getRowDimension(); i++)
@@ -439,7 +448,7 @@ public class HEMCalculate
 		}
 
 		heMReader.sb.append("\n");
-		heMReader.sb.append("variance-covariance\n");
+		heMReader.sb.append("Variance-covariance for the regression coefficients\n");
 		for (int i = 0; i < v.getRowDimension(); i++)
 		{
 			for (int j = 0; j <= i; j++)

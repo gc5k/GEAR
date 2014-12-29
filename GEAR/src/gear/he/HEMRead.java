@@ -113,7 +113,6 @@ public class HEMRead
 		Logger.printUserLog("Individuals matched phenotype and grm:" + numAvailSubjects);
 		if (CmdArgs.INSTANCE.scale) 
 		{
-			Logger.printUserLog("standardizing the phenotype...");
 			standardisePhenotypes(numAvailSubjects);
 		}
 	}
@@ -361,7 +360,7 @@ public class HEMRead
 		{
 			id2Idx.put(new SubjectID(tokens[0], tokens[1]), idx++);
 		}
-		Logger.printUserLog("individuals in grm id file: " + id2Idx.size());
+		Logger.printUserLog("Number of individuals in the grm id file: " + id2Idx.size());
 		reader.close();
 
 	}
