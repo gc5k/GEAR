@@ -1,6 +1,7 @@
 package gear.subcommands.simulationfam;
 
 import gear.subcommands.CommandArguments;
+import gear.util.Logger;
 
 public final class SimuFamilyCommandArguments extends CommandArguments
 {
@@ -23,42 +24,9 @@ public final class SimuFamilyCommandArguments extends CommandArguments
 	{
 		this.numMarkers = numMarkers;
 	}
-	
-	public boolean getMakeBed()
-	{
-		return makeBed;
-	}
-	
-	public void setMakeBed(boolean makeBed)
-	{
-		this.makeBed = makeBed;
-	}
 
-	public boolean getRecRand()
-	{
-		return recRandFlag;
-	}
-
-	public void setMAFRandFlag(boolean f)
-	{
-		this.mafFlag = f;
-	}
-
-	public boolean isMAFRand()
-	{
-		return mafFlag;
-	}
-	
-	public void setRecRandFlag(boolean f)
-	{
-		this.recRandFlag = f;
-	}
-
-	public double getLD()
-	{
-		return ld;
-	}
-
+//start ld
+	//1 plain ld
 	public void setLD(double l)
 	{
 		this.ld = l;
@@ -66,15 +34,21 @@ public final class SimuFamilyCommandArguments extends CommandArguments
 		RandldFlag = false;
 	}
 
-	public void setRandLD()
+	public double getLD()
 	{
-		ldFlag = false;
-		RandldFlag = true;
+		return ld;
 	}
 
 	public boolean isPlainLD()
 	{
 		return ldFlag;
+	}
+
+	//2 unif ld
+	public void setRandLD()
+	{
+		ldFlag = false;
+		RandldFlag = true;
 	}
 	
 	public boolean isRandLD()
@@ -82,70 +56,161 @@ public final class SimuFamilyCommandArguments extends CommandArguments
 		return RandldFlag;
 	}
 
+//start maf
+	//1 plain maf
+	public void setMAF(double m)
+	{
+		maf = m;
+		PlainmafFlag = true;
+		UnifmafFlag = false;
+	}
+
 	public double getMAF()
 	{
 		return maf;
 	}
 
-	public void setMAF(double m)
+	public boolean isPlainMAF()
 	{
-		this.maf = m;
+		return PlainmafFlag;
 	}
 
+	//2 unif maf
+	public void setUnifMAF()
+	{
+		PlainmafFlag = false;
+		UnifmafFlag = true;
+	}
+
+	public boolean isUnifMAF()
+	{
+		return UnifmafFlag;
+	}
+
+//start rec
+	//1 plain rec
+	public void setRec(double r)
+	{
+		this.rec = r;
+		PlainrecFlag = true;
+		SexrecFlag = false;
+		UnifrecFlag = false;
+	}
+	
 	public double getRec()
 	{
 		return rec;
 	}
 
-	public void setRec(double r)
+	public boolean isPlainRec()
 	{
-		this.rec = r;
+		return PlainrecFlag;
 	}
 
+	//2 sex rec
+	public void setRecSex(String[] rs)
+	{
+		recSex[0] = Double.parseDouble(rs[0]);
+		recSex[1] = Double.parseDouble(rs[1]);
+		PlainrecFlag = false;
+		SexrecFlag = true;
+		UnifrecFlag = false;
+	}
+	
 	public double[] getRecSex()
 	{
 		return recSex;
 	}
 
-	public void setRecSex(double[] rs)
+	public boolean isSexRec()
 	{
-		recSex[0] = rs[0];
-		recSex[1] = rs[1];
-	}
-	
-	public void setRecSexFlag(boolean f)
-	{
-		this.recSexFlag = f ;
+		return SexrecFlag;
 	}
 
-	public boolean isRecSex()
+	//3 rand rec
+	public void setRecRandFlag()
 	{
-		return recSexFlag;
+		this.UnifrecFlag = true;
+		this.SexrecFlag = false;
+		this.PlainrecFlag = false;
+	}
+
+	public boolean isRandRec()
+	{
+		return UnifrecFlag;
 	}
 
 	public void setQTLFile(String f)
 	{
 		qtlFile = f;
+		isQTLFlag = true;
+		isHsqFlag = false;
 	}
 
+//start h2
 	public String getQTLFile()
 	{
 		return qtlFile;
 	}
 
-	private int numFams;
-	private int numMarkers;
-	private boolean makeBed;
+	public boolean isQTL()
+	{
+		return isQTLFlag;
+	}
+
+	public void setHsq(String h2)
+	{
+		hsq = Double.parseDouble(h2);
+		if(hsq < 0 || hsq > 1.0)
+		{
+			Logger.printUserLog("hsq should be between 0~1.\n GEAR quitted.");
+			System.exit(0);
+		}
+		isHsqFlag = true;
+		isQTLFlag = false;
+	}
+
+	public double getHsq()
+	{
+		return hsq;
+	}
+
+	public boolean isHsq()
+	{
+		return isHsqFlag;
+	}
+
+	
+	public boolean getMakeBed()
+	{
+		return makeBed;
+	}
+	
+	public void setMakeBed()
+	{
+		this.makeBed = true;
+	}
+
+	private int numFams = 100;
+	private int numMarkers = 100;
+	private boolean makeBed = false;
+	
 	private double maf = 0.5;
-	private boolean mafFlag = false;
+	private boolean PlainmafFlag = true;
+	private boolean UnifmafFlag = false; 
 
 	private double ld = 0;
 	private boolean ldFlag = true;
 	private boolean RandldFlag = false;
 
 	private double rec = 0.5;
-	private boolean recSexFlag = false;
 	private double[] recSex = {0.5, 0.5};
-	private boolean recRandFlag = false;
+	private boolean PlainrecFlag = true;
+	private boolean SexrecFlag = false;
+	private boolean UnifrecFlag = false;
+
 	private String qtlFile = null;
+	private boolean isQTLFlag = false;
+	private double hsq = 0.5;
+	private boolean isHsqFlag = true;
 }
