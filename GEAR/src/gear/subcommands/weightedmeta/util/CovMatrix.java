@@ -20,7 +20,7 @@ public class CovMatrix
 		this.cohortIdx = new int[cohort];
 		this.isGC = isGC;
 		this.gc = new double[cohort];
-
+		
 		int cnt = 0;
 		for(int i = 0; i < Int.size()-1; i++)
 		{
@@ -48,15 +48,15 @@ public class CovMatrix
 			for(int j = 0; j < cohortIdx.length; j++)
 			{
 				MetaStat ms2 = gReader.getMetaStat().get(cohortIdx[j]).get(snp);
-				double adjcor = 0;
+				double adjcor = corMat[cohortIdx[i]][cohortIdx[j]];
 				if (isAdjOverlapping)
 				{
-					adjcor = corMat[cohortIdx[i]][cohortIdx[j]] < 0 ? 0:corMat[cohortIdx[i]][cohortIdx[j]];
+					adjcor = corMat[cohortIdx[i]][cohortIdx[j]] < 0 ? 0:adjcor;
 				}
 				covMat[i][j] = adjcor * ms1.getSE() * ms2.getSE() * Math.sqrt(gc[i]) *  Math.sqrt(gc[j]);
 			}
 		}
-
+		
 		RealMatrix gg = new Array2DRowRealMatrix(covMat);
 
 		boolean isNonSingular = (new LUDecompositionImpl(gg)).getSolver().isNonSingular();
