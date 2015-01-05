@@ -164,15 +164,6 @@ public class WeightedMetaImpl extends CommandImpl
 					corMat[i][i] = 1;
 				}
 			}
-			
-//			for(int i = 0; i < corMat.length; i++)
-//			{
-//				for(int j = 0; j < corMat.length; j++)
-//				{
-//					System.out.print(corMat[i][j] + " ");
-//				}
-//				System.out.println();
-//			}
 		}
 	}
 
