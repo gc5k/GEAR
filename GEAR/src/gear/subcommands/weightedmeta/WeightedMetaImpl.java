@@ -307,11 +307,11 @@ public class WeightedMetaImpl extends CommandImpl
 
 			MetaStat ms = null;
 			int i = 0;
-			for( i = 0; i < (Int.size() - 2); i++)
+			for( i = 0; i < (Int.size() - 1); i++)
 			{
 				if(Int.get(i).intValue() != 0) break; 
 			}
-			ms = gReader.getMetaStat().get(Int.get(i).intValue()).get(snp);
+			ms = gReader.getMetaStat().get(i).get(snp);
 			int chr = ms.getChr();
 			System.out.println("Chr = " + chr);
 
