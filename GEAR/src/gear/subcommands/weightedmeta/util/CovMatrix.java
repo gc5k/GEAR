@@ -4,12 +4,12 @@ import java.util.ArrayList;
 import java.util.Arrays;
 
 import org.apache.commons.math.linear.Array2DRowRealMatrix;
-import org.apache.commons.math.linear.EigenDecompositionImpl;
 import org.apache.commons.math.linear.LUDecompositionImpl;
 import org.apache.commons.math.linear.RealMatrix;
 
 import gear.gwassummary.GWASReader;
 import gear.gwassummary.MetaStat;
+import gear.util.Logger;
 
 public class CovMatrix
 {
@@ -60,17 +60,10 @@ public class CovMatrix
 		RealMatrix gg = new Array2DRowRealMatrix(covMat);
 
 		boolean isNonSingular = (new LUDecompositionImpl(gg)).getSolver().isNonSingular();
-		System.out.println(isNonSingular);
-		EigenDecompositionImpl EI= new EigenDecompositionImpl(gg, 0.00000001);
-		for(int i = 0; i < this.cohort; i++)
-		{
-			System.out.print(EI.getRealEigenvalue(i) + " ");
-		}
-		System.out.println();
-
+		Logger.printUserLog("Is singular: " + isNonSingular);
 
 		double det = new LUDecompositionImpl(gg).getDeterminant();
-		System.out.println("det=" + det);
+		Logger.printUserLog("Determinant = " + det);
 
 		RealMatrix gg_Inv = (new LUDecompositionImpl(gg)).getSolver().getInverse();
 		RealMatrix Unit = new Array2DRowRealMatrix(covMat.length, 1);
@@ -80,21 +73,16 @@ public class CovMatrix
 		}
 		RealMatrix tmp = Unit.transpose().multiply(gg_Inv);
 		RealMatrix tmp1 = tmp.multiply(Unit);
+		
 		RealMatrix W = tmp.scalarMultiply(1/tmp1.getEntry(0, 0));
-
-		double gse1 = 1/tmp1.getEntry(0, 0);
-		for (int i = 0; i < covMat.length; i++)
+		
+		double gse = 1/tmp1.getEntry(0, 0);
+		if(gse < 0)
 		{
-			for (int j = 0; j < covMat[i].length; j++)
-			{
-//				gse += covMat[i][j];
-				gse += W.getEntry(0, i) * W.getEntry(0, j) * covMat[i][j];
-			}
+			Logger.printUserLog("This locus has negative variance: " + gse);
 		}
-		System.out.println("V: " + gse + " V1:" + gse1);
 		gse = Math.sqrt(gse);
 		Weight = W.getRow(0);
-//		System.out.println(W);
 	}
 
 	public double[][] getCovMatrix()

@@ -25,8 +25,6 @@ public class GWASReader
 		workingMetaFile = NewIt.newArrayList();
 		this.isChr = isChr;
 		this.chrKeep = Chr;
-		
-		System.out.println(this.isChr + " " + this.chrKeep);
 
 		for (int i = 0; i < FileKeep.length; i++)
 		{
