@@ -16,7 +16,6 @@ import gear.ibd.jhe.JointHELinkLS;
 import gear.ibd.jhe.JointHELinkML;
 import gear.imputation.NaiveImputation;
 import gear.impute.ImputeProbabilityBestGuess;
-import gear.metawatchdog.decrypt.MetaWatchdog;
 import gear.pscontrol.NonTransmitted;
 import gear.realcheck.RealCheck;
 import gear.realcheck.RealCheckOne;
@@ -230,11 +229,6 @@ public enum Gear
 				WriteBedSNPMajor bedWriter = new WriteBedSNPMajor();
 				bedWriter.WriteFile();
 	
-			}
-			else if (CmdArgs.INSTANCE.watchdogFlag)
-			{
-				MetaWatchdog mw = new MetaWatchdog();
-				mw.Bark();
 			}
 			else if (CmdArgs.INSTANCE.quickibdFlag)
 			{
