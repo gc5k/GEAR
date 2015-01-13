@@ -42,6 +42,7 @@ public class GWASReader
 		else
 		{
 			Logger.printUserLog(workingMetaFile.size() + " cohorts are remained for analysis.\n");
+			Logger.printUserLog("Genomic inflation factors are estimated from the provided p values.\n");
 		}
 
 		gc = new double[workingMetaFile.size()];
