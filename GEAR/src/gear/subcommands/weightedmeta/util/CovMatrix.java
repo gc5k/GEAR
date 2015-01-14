@@ -59,30 +59,29 @@ public class CovMatrix
 		
 		RealMatrix gg = new Array2DRowRealMatrix(covMat);
 
-		boolean isNonSingular = (new LUDecompositionImpl(gg)).getSolver().isNonSingular();
-		Logger.printUserLog("Is singular: " + isNonSingular);
-
-		double det = new LUDecompositionImpl(gg).getDeterminant();
-		Logger.printUserLog("Determinant = " + det);
-
-		RealMatrix gg_Inv = (new LUDecompositionImpl(gg)).getSolver().getInverse();
-		RealMatrix Unit = new Array2DRowRealMatrix(covMat.length, 1);
-		for(int i = 0; i < Unit.getRowDimension(); i++)
-		{
-			Unit.setEntry(i, 0, 1);
-		}
-		RealMatrix tmp = Unit.transpose().multiply(gg_Inv);
-		RealMatrix tmp1 = tmp.multiply(Unit);
+		isNonSingular = (new LUDecompositionImpl(gg)).getSolver().isNonSingular();
 		
-		RealMatrix W = tmp.scalarMultiply(1/tmp1.getEntry(0, 0));
-		
-		double gse = 1/tmp1.getEntry(0, 0);
-		if(gse < 0)
+		if(isNonSingular)
 		{
-			Logger.printUserLog("This locus has negative variance: " + gse);
+			RealMatrix gg_Inv = (new LUDecompositionImpl(gg)).getSolver().getInverse();
+			RealMatrix Unit = new Array2DRowRealMatrix(covMat.length, 1);
+			for(int i = 0; i < Unit.getRowDimension(); i++)
+			{
+				Unit.setEntry(i, 0, 1);
+			}
+			RealMatrix tmp = Unit.transpose().multiply(gg_Inv);
+			RealMatrix tmp1 = tmp.multiply(Unit);
+			
+			RealMatrix W = tmp.scalarMultiply(1/tmp1.getEntry(0, 0));
+			
+			double gse = 1/tmp1.getEntry(0, 0);
+			if(gse < 0)
+			{
+				Logger.printUserLog("This locus has negative variance: " + gse);
+			}
+			gse = Math.sqrt(gse);
+			Weight = W.getRow(0);			
 		}
-		gse = Math.sqrt(gse);
-		Weight = W.getRow(0);
 	}
 
 	public double[][] getCovMatrix()
@@ -110,6 +109,11 @@ public class CovMatrix
 		return snp;
 	}
 
+	public boolean isNonSingular()
+	{
+		return isNonSingular;
+	}
+
 	private boolean isGC;
 	private double[] gc;
 	private String snp;
@@ -118,4 +122,5 @@ public class CovMatrix
 	private int cohort;
 	private double[] Weight;
 	private int[] cohortIdx;
+	private boolean isNonSingular;
 }
