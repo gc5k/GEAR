@@ -135,6 +135,21 @@ class FilteredSNPs
 	
 	protected static AlleleMatchScheme getMatchScheme(char scoreAllele, char allele1, char allele2, boolean isAutoFlip)
 	{
+		if (scoreAllele >= 97 && scoreAllele <= 122)
+		{
+			scoreAllele -= 32;
+		}
+		
+		if (allele1 >= 97 && allele1 <= 122)
+		{
+			allele1 -= 32;
+		}
+
+		if (allele2 >= 97 && allele2 <= 122)
+		{
+			allele2 -= 32;
+		}
+
 		if (scoreAllele == allele1)
 		{
 			return AlleleMatchScheme.MATCH_ALLELE1;
