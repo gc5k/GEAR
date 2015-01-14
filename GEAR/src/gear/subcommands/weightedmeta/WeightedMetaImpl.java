@@ -287,7 +287,9 @@ public class WeightedMetaImpl extends CommandImpl
 	private void MetaAnalysis()
 	{
 		Logger.printUserLog("Starting meta-analysis...");
+		int totalCnt = 0;
 		int cnt = 0;
+		int singularCnt = 0;
 		int atgcCnt = 0;
 		Set<String> snps = gReader.getMetaSNPTable().keySet();
 		for (Iterator<String> e=snps.iterator(); e.hasNext();)
@@ -315,24 +317,40 @@ public class WeightedMetaImpl extends CommandImpl
 			}
 			CovMatrix covMat = new CovMatrix(snp, Int, corMat, gReader, wMetaArgs.isGC(), wMetaArgs.IsAdjOverlappingOnly());
 
-			GMRes gr = MetaSNP(covMat);
-			if (gr.getIsAmbiguous())
+			if (covMat.isNonSingular())
 			{
-				atgcCnt++;
-				if (!wMetaArgs.isKeepATGC())
+				GMRes gr = MetaSNP(covMat);
+				if (gr.getIsAmbiguous())
 				{
-					continue;
+					atgcCnt++;
+					if (!wMetaArgs.isKeepATGC())
+					{
+						continue;
+					}
 				}
+				grArray.add(gr);
+				cnt++;
 			}
-			grArray.add(gr);
-			cnt++;
+			else
+			{
+				singularCnt++;
+			}
+			totalCnt++;
 		}
 		Collections.sort(grArray);
-		Logger.printUserLog("In total "+ cnt + " loci have been analyzed for meta-analysis.");
+
+		Logger.printUserLog("In total "+ totalCnt + " loci have been read.");
+		Logger.printUserLog("In total "+ cnt + " loci have been used for meta-analysis.");
+		if (singularCnt > 0)
+		{
+			Logger.printUserLog(singularCnt + " loci were excluded from analyais because of singular matrix.");
+		}
+
 		if (!wMetaArgs.isKeepATGC())
 		{
 			Logger.printUserLog(atgcCnt + " ambiguous loci have been eliminated.");
 		}
+
 		PrintGMresults();
 	}
 
