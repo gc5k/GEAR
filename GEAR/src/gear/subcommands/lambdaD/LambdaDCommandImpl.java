@@ -191,13 +191,13 @@ public class LambdaDCommandImpl extends CommandImpl
 				Logger.printUserLog("Removed " + cntAmbiguous + " ambiguous loci (AT/GC).");
 			}
 		}
-		Logger.printUserLog("Lambda is calculated based on " + T0.getN() + " summary statistics between two files.");
+		Logger.printUserLog("Found " + T0.getN() + " summary statistics between two files.");
 
 //select independent snps
 		double[] sortLD = T0.getSortedValues();
 		double[] DesStat = null;
 		int[] selIdx = null;
-		
+
 		if (Me < 0)
 		{//use all 
 			DesStat = new double[sortLD.length];
@@ -206,7 +206,7 @@ public class LambdaDCommandImpl extends CommandImpl
 			for (int i = 0; i < sortLD.length; i++)
 			{
 				selIdx[i] = i;
-			}	
+			}
 		}
 		else if (sortLD.length <= Me)
 		{//use available ones
