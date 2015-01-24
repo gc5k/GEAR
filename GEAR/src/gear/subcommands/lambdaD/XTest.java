@@ -121,54 +121,54 @@ public class XTest
 		sigma_n12cs = sigma_n12 * Math.sqrt(cs1/ctrl1 * cs2/ctrl2);
 	}
 
-	protected double getX()
+	public double getX()
 	{
 		return XVec.getSum();
 	}
 
-	protected double getZ()
+	public double getZ()
 	{
 		return Z;
 	}
 
-	protected double getpZ()
+	public double getpZ()
 	{
 		return pZ;
 	}
 
-	protected double getN12()
+	public double getN12()
 	{
 		return n12;
 	}
 
-	protected double getRho()
+	public double getRho()
 	{
 		return rho;
 	}
 
-	protected double getN12cs()
+	public double getN12cs()
 	{
 		return n12cs;
 	}
 	
-	protected double getN12cl()
+	public double getN12cl()
 	{
 		return n12cl;
 	}
 
-	protected double getLambda()
+	public double getLambda()
 	{
 		return lambdaM;
 	}
 
-	protected void PrintQT()
+	public void PrintQT()
 	{
 		double z_l = -1.96;
 		double z_h = 1.96;
 		printZ(z_l, z_h);
 	}
 
-	protected void PrintCC()
+	public void PrintCC()
 	{
 		double z_l = -1.96;
 		double z_h = 1.96;
@@ -177,7 +177,7 @@ public class XTest
 		Logger.printUserLog("Overlapping if only cases: " + n12cs + ", 95% confidence interval is (" + z_l * sigma_n12cs  + ", " + z_h * sigma_n12cs + ")");
 	}
 
-	private void printZ(double z_l, double z_h)
+	public void printZ(double z_l, double z_h)
 	{
 		Logger.printUserLog("Effective number of markers is: " + Me);
 		Logger.printUserLog("Z score: " + Z);

@@ -42,6 +42,7 @@ public enum Gear
 		addCommand(new gear.subcommands.he.assocpower.HEAssocPowerCommand());
 		addCommand(new gear.subcommands.help.HelpCommand());
 		addCommand(new gear.subcommands.hpc.HpcCommand());
+		addCommand(new gear.subcommands.randmeta.RandomMetaCommand());		
 		addCommand(new gear.subcommands.lambdaD.LambdaDCommand());
 		addCommand(new gear.subcommands.metahet.MetaHetCommand());
 		addCommand(new gear.subcommands.weightedmeta.WeightedMetaCommand());
