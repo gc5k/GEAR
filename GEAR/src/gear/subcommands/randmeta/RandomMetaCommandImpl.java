@@ -11,7 +11,6 @@ import java.util.HashMap;
 
 import org.apache.commons.math.MathException;
 import org.apache.commons.math.distribution.ChiSquaredDistributionImpl;
-import org.apache.commons.math.stat.correlation.PearsonsCorrelation;
 import org.apache.commons.math.stat.descriptive.DescriptiveStatistics;
 import org.apache.commons.math.stat.ranking.NaNStrategy;
 import org.apache.commons.math.stat.ranking.NaturalRanking;
@@ -22,7 +21,6 @@ import gear.gwassummary.MetaStat;
 import gear.subcommands.CommandArguments;
 import gear.subcommands.CommandImpl;
 import gear.subcommands.lambdaD.LamUnit;
-import gear.subcommands.lambdaD.XTest;
 import gear.util.FileUtil;
 import gear.util.Logger;
 import gear.util.NewIt;
@@ -74,7 +72,6 @@ public class RandomMetaCommandImpl extends CommandImpl
 					Logger.printUserLog("Sample size for '" + MetaFile[j] + "': " + size[j * 2] + " cases, " + size[j * 2 + 1] + " controls; R2 = " + R2 + ".");
 				}
 				Logger.printUserLog("Kappa: " + Kappa);
-
 				calculateLambdaD(i, j);
 			}
 		}
@@ -101,28 +98,17 @@ public class RandomMetaCommandImpl extends CommandImpl
 			System.exit(0);
 		}
 
-		lamMat = new double[NumMetaFile][NumMetaFile];
-		zMat = new double[NumMetaFile][NumMetaFile];
-		olCtrlMat = new double[NumMetaFile][NumMetaFile];
-		olCsMat = new double[NumMetaFile][NumMetaFile];
+		bMat = new double[NumMetaFile][NumMetaFile];
+		zscoreMat = new double[NumMetaFile][NumMetaFile];
 
 		kMat = new double[NumMetaFile][NumMetaFile];
 
 		for(int i = 0; i < NumMetaFile; i++)
 		{
-			Arrays.fill(lamMat[i], 1);
-			Arrays.fill(zMat[i], 1);
+//			Arrays.fill(lamMat[i], 1);
+			Arrays.fill(bMat[i], 1);
+			Arrays.fill(zscoreMat[i], 1);
 			Arrays.fill(kMat[i], 1);
-			if (randArgs.isQT())
-			{
-				olCtrlMat[i][i] = randArgs.getQTsize()[i];
-				olCsMat[i][i] = randArgs.getQTsize()[i];
-			}
-			else
-			{
-				olCtrlMat[i][i] = randArgs.getCCsize()[i*2] + randArgs.getCCsize()[i*2+1];
-				olCsMat[i][i] = randArgs.getCCsize()[i*2] + randArgs.getCCsize()[i*2+1];
-			}
 		}
 
 //reading meta files
@@ -131,7 +117,8 @@ public class RandomMetaCommandImpl extends CommandImpl
 	private void calculateLambdaD(int idx1, int idx2)
 	{
 		ArrayList<LamUnit> LamArray = NewIt.newArrayList();
-		ArrayList<BetaVec> BV = NewIt.newArrayList();
+		BetaVec Bvec = new BetaVec();
+//		ArrayList<BetaVec> BV = NewIt.newArrayList();
     	DescriptiveStatistics T0 = new DescriptiveStatistics();
 
 		int cntAmbiguous = 0;
@@ -168,23 +155,21 @@ public class RandomMetaCommandImpl extends CommandImpl
 				}
 			}
 
-			BetaVec bv = null;
 			if (ms1.getA1() == ms2.getA1() || ms1.getA1() == SNPMatch.Flip(ms2.getA1())) //match A1 in the second meta
 			{
 				d = (ms1.getEffect() - ms2.getEffect()) * (ms1.getEffect() - ms2.getEffect()) / (ms1.getSE() * ms1.getSE() + ms2.getSE() * ms2.getSE());
-				bv = new BetaVec(ms1.getEffect(), ms2.getEffect(), ms1.getSE(), ms2.getSE());
+				Bvec.addStats(ms1.getEffect(), ms2.getEffect(), ms1.getSE(), ms2.getSE());
 			}
 			else if (ms1.getA1() == ms2.getA2() || ms1.getA1() == SNPMatch.Flip(ms2.getA2())) //match A2 in the second meta
 			{
 				d = ((-1) * ms1.getEffect() - ms2.getEffect()) * ((-1) * ms1.getEffect() - ms2.getEffect()) / (ms1.getSE() * ms1.getSE() + ms2.getSE() * ms2.getSE());
-				bv = new BetaVec(ms1.getEffect(), -1 * ms2.getEffect(), ms1.getSE(), ms2.getSE());
+				Bvec.addStats(ms1.getEffect(), -1 * ms2.getEffect(), ms1.getSE(), ms2.getSE());
 			}
 			else
 			{
 				cntAmbiguous++;
 				continue;
 			}
-			BV.add(bv);
 			T0.addValue(d);
 			LamArray.add(new LamUnit(d, ms1, ms2));
         }
@@ -200,16 +185,15 @@ public class RandomMetaCommandImpl extends CommandImpl
 				Logger.printUserLog("Removed " + cntAmbiguous + " ambiguous loci (AT/GC).");
 			}
 		}
-		Logger.printUserLog("Lambda is calculated based on " + T0.getN() + " summary statistics between two files.");
+		Logger.printUserLog("Found " + T0.getN() + " paired summary statistics between two files.");
 
 //select independent snps
 		double[] sortLD = T0.getSortedValues();
 		double[] DesStat = null;
 		int[] selIdx = null;
 
-		double[][] beta = null;
-		double[][] zscore = null;
-		ArrayList<BetaVec> BVSel = NewIt.newArrayList();
+//		double[][] beta = null;
+//		double[][] zscore = null;
 		
 		if (Me < 0)
 		{//use all
@@ -220,18 +204,8 @@ public class RandomMetaCommandImpl extends CommandImpl
 			{
 				selIdx[i] = i;
 			}
+			Bvec.setSelected();
 
-			beta = new double[sortLD.length][2];
-			zscore = new double[sortLD.length][2];
-			for (int i = 0; i < sortLD.length; i++)
-			{
-				BetaVec b_v = BV.get(i);
-				beta[i][0] = b_v.getB1();
-				beta[i][1] = b_v.getB2();
-				
-				zscore[i][0] = b_v.getZ1();
-				zscore[i][1] = b_v.getZ2();
-			}
 		}
 		else if (sortLD.length <= Me)
 		{//use available ones
@@ -242,17 +216,7 @@ public class RandomMetaCommandImpl extends CommandImpl
 			{
 				selIdx[i] = i;
 			}
-			
-			beta = new double[sortLD.length][2];
-			zscore = new double[sortLD.length][2];
-			for (int i = 0; i < sortLD.length; i++)
-			{
-				BetaVec b_v = BV.get(i);
-				beta[i][0] = b_v.getB1();
-				beta[i][1] = b_v.getB2();
-				zscore[i][0] = b_v.getZ1();
-				zscore[i][1] = b_v.getZ2();
-			}
+			Bvec.setSelected();
 
 		}
 		else
@@ -264,61 +228,18 @@ public class RandomMetaCommandImpl extends CommandImpl
 				selIdx[i] = (int) Math.floor( (i*1.0 + 1)/Me * sortLD.length ) -1;
 				DesStat[i] = sortLD[selIdx[i]];
 			}
-			
-			beta = new double[(int) Math.ceil(Me)][2];
-			zscore = new double[(int) Math.ceil(Me)][2];
-			for (int i = 0; i < selIdx.length; i++)
-			{
-				BetaVec b_v = BV.get(selIdx[i]);
-				beta[i][0] = b_v.getB1();
-				beta[i][1] = b_v.getB2();
-				zscore[i][0] = b_v.getZ1();
-				zscore[i][1] = b_v.getZ2();
-			}
+			Bvec.setSelected(selIdx);
 		}
 
-		PearsonsCorrelation bpc = new PearsonsCorrelation(beta);
-		PearsonsCorrelation zpc = new PearsonsCorrelation(zscore);
+		Bvec.CalCorrelation();
+		Bvec.printOut();
+		bMat[idx2][idx1] = Bvec.getBcorrelation();
+		bMat[idx1][idx2] = Bvec.getPvBcorrelation();
+
+		zscoreMat[idx2][idx1] = Bvec.getZcorrelation();
+		zscoreMat[idx1][idx2] = Bvec.getPvZcorrelation();
+
 		
-		double[][] bCormat = bpc.getCorrelationMatrix().getData();
-		double[][] zCormat = zpc.getCorrelationMatrix().getData();
-		
-		System.out.println(bCormat[1][0]);
-		System.out.println(zCormat[1][0]);
-		if (randArgs.isQT())
-		{
-			double[] qtSize = randArgs.getQTsize();
-			XTest et = new XTest(DesStat, qtSize[idx1], qtSize[idx2]);
-
-			olCtrlMat[idx1][idx2] = olCsMat[idx1][idx2] = et.getN12();
-			lamMat[idx1][idx2] = lamMat[idx2][idx1] = et.getLambda();
-			zMat[idx2][idx1] = et.getRho();
-			zMat[idx1][idx2] = et.getZ();
-
-			kMat[idx1][idx2] = et.getX();
-			kMat[idx2][idx1] = Kappa;
-
-			et.PrintQT();
-		}
-		else
-		{
-			double[] ccSize = randArgs.getCCsize();
-			XTest et = new XTest(DesStat, ccSize[idx1*2], ccSize[idx1*2+1], ccSize[idx2*2], ccSize[idx2*2+1]);
-
-			olCtrlMat[idx1][idx2] = olCsMat[idx1][idx2] = et.getN12();
-			lamMat[idx1][idx2] = lamMat[idx2][idx1] = et.getLambda();
-			zMat[idx2][idx1] = et.getRho();
-			zMat[idx1][idx2] = et.getZ();
-
-			kMat[idx1][idx2] = Kappa;
-			kMat[idx2][idx1] = et.getX();
-
-			et.PrintCC();
-
-			olCtrlMat[idx2][idx1] = et.getN12cl();
-			olCsMat[idx2][idx1] = et.getN12cs();
-		}
-
 		if (randArgs.isVerboseGZ())
 		{
 			VerboseGZ(LamArray, T0.getValues(), idx1, idx2);
@@ -470,102 +391,45 @@ public class RandomMetaCommandImpl extends CommandImpl
 	{
 		//cm matrix
 		PrintWriter cwriter = null;
-		try 
+		try
 		{
-			cwriter = new PrintWriter(new BufferedWriter(new FileWriter(randArgs.getOutRoot() + ".rcm")));
+			cwriter = new PrintWriter(new BufferedWriter(new FileWriter(randArgs.getOutRoot() + ".zcm")));
 		}
 		catch (IOException e)
 		{
-			Logger.handleException(e, "An I/O exception occurred when writing '" + randArgs.getOutRoot() + ".rcm" + "'.");
+			Logger.handleException(e, "An I/O exception occurred when writing '" + randArgs.getOutRoot() + ".zcm" + "'.");
 		}
 
-		for (int i = 0; i < zMat.length; i++)
+		for (int i = 0; i < zscoreMat.length; i++)
 		{
-			for (int j = 0; j < zMat[i].length; j++)
+			for (int j = 0; j < zscoreMat[i].length; j++)
 			{
-				cwriter.print(String.format("%.4f", zMat[i][j]) + " ");
+				cwriter.print(String.format("%.4f", zscoreMat[i][j]) + " ");
 			}
 			cwriter.println();
 		}
 		cwriter.close();
 
 		//Xmatrix
-		PrintWriter xwriter = null;
-		try 
+		PrintWriter bwriter = null;
+		try
 		{
-			xwriter = new PrintWriter(new BufferedWriter(new FileWriter(randArgs.getOutRoot() + ".rxm")));
+			bwriter = new PrintWriter(new BufferedWriter(new FileWriter(randArgs.getOutRoot() + ".bcm")));
 		}
 		catch (IOException e)
 		{
-			Logger.handleException(e, "An I/O exception occurred when writing '" + randArgs.getOutRoot() + ".rxm" + "'.");
+			Logger.handleException(e, "An I/O exception occurred when writing '" + randArgs.getOutRoot() + ".bcm" + "'.");
 		}
 
-		for (int i = 0; i < kMat.length; i++)
+		for (int i = 0; i < bMat.length; i++)
 		{
-			for (int j = 0; j < kMat[i].length; j++)
+			for (int j = 0; j < bMat[i].length; j++)
 			{
-				xwriter.print(String.format("%.4f", kMat[i][j]) + " ");
+				bwriter.print(String.format("%.4f", bMat[i][j]) + " ");
 			}
-			xwriter.println();
+			bwriter.println();
 		}
-		xwriter.close();
-
-		PrintWriter writer = null;
-		try 
-		{
-			writer = new PrintWriter(new BufferedWriter(new FileWriter(randArgs.getOutRoot() + ".rlmat")));
-		}
-		catch (IOException e)
-		{
-			Logger.handleException(e, "An I/O exception occurred when writing '" + randArgs.getOutRoot() + ".rlmat" + "'.");
-		}
-
-		writer.println("LambdaMeta:");
-		for (int i = 0; i < lamMat.length; i++)
-		{
-			for (int j = 0; j < lamMat[i].length; j++)
-			{
-				writer.print(String.format("%.4f", lamMat[i][j]) + " ");
-			}
-			writer.println();
-		}
-
-		if (!randArgs.isQT())
-		{
-			writer.println("Overlapping controls (lower triangle) vs overlapping samples (upper triangle):");
-			for (int i = 0; i < olCtrlMat.length; i++)
-			{
-				for (int j = 0; j < olCtrlMat[i].length; j++)
-				{
-					writer.print(String.format("%.4f", olCtrlMat[i][j]) + " ");
-				}
-				writer.println();
-			}
-
-			writer.println("Overlapping cases (lower triangle) vs Overlapping samples (upper triangle):");
-			for (int i = 0; i < olCsMat.length; i++)
-			{
-				for (int j = 0; j < olCsMat[i].length; j++)
-				{
-					writer.print(String.format("%.4f", olCsMat[i][j]) + " ");
-				}
-				writer.println();
-			}
-		}
-		else
-		{
-			writer.println("Overlapping samples (lower triangle)");
-			for (int i = 0; i < olCtrlMat.length; i++)
-			{
-				for (int j = 0; j < olCtrlMat[i].length; j++)
-				{
-					writer.print(String.format("%.4f", olCtrlMat[i][j]) + " ");
-				}
-				writer.println();
-			}
-		}
-
-		writer.close();
+		bwriter.close();
 	}
 
 	private double Me = 30000;
@@ -579,10 +443,8 @@ public class RandomMetaCommandImpl extends CommandImpl
 
 	private GWASReader gReader;
 
-	private double[][] lamMat;
-	private double[][] zMat;
-	private double[][] olCtrlMat;
-	private double[][] olCsMat;
+	private double[][] bMat;
+	private double[][] zscoreMat;
 	private double[][] kMat;
 
 }
