@@ -4,6 +4,7 @@ import java.util.ArrayList;
 
 import org.apache.commons.math.MathException;
 import org.apache.commons.math.stat.correlation.PearsonsCorrelation;
+import org.apache.commons.math.stat.regression.SimpleRegression;
 
 import gear.util.Logger;
 import gear.util.NewIt;
@@ -52,6 +53,7 @@ public class BetaVec
 			zscore[i][1] = s.get(5);
 		}
 
+		
 		PearsonsCorrelation bpc = new PearsonsCorrelation(beta);
 		PearsonsCorrelation zpc = new PearsonsCorrelation(zscore);
 		
@@ -67,6 +69,13 @@ public class BetaVec
 		{
 			e.printStackTrace();
 		}
+		
+		blm = new SimpleRegression();
+		blm.addData(beta);
+		
+		
+		zlm = new SimpleRegression();
+		zlm.addData(zscore);		
 		
 	}
 
@@ -95,8 +104,17 @@ public class BetaVec
 		Logger.printUserLog("Effective number of markers is: " + selIdx.length);
 		Logger.printUserLog("Genetic effect correlation: " + rb);
 		Logger.printUserLog("p-value for z score (two-tails): " + prb);
+
+		Logger.printUserLog("Effects regression:");
+		Logger.printUserLog("Effect regression intercept: " + blm.getIntercept() + " (" + blm.getInterceptStdErr() + ")");
+		Logger.printUserLog("Effect regression intercept: " + blm.getSlope() + " (" + blm.getSlopeStdErr() + ")");
+
 		Logger.printUserLog("z score correlation: " + rz);
 		Logger.printUserLog("p-value for z score (two-tails): " + prz);
+		Logger.printUserLog("Z score regression:");
+		Logger.printUserLog("Effect regression intercept: " + zlm.getIntercept() + " (" + zlm.getInterceptStdErr() + ")");
+		Logger.printUserLog("Effect regression intercept: " + zlm.getSlope() + " (" + zlm.getSlopeStdErr() + ")");
+
 	}
 
 	ArrayList<ArrayList<Double>> sum = null;
@@ -109,4 +127,6 @@ public class BetaVec
 	private double rz;
 	private double prz;
 
+	private SimpleRegression blm;
+	private SimpleRegression zlm;
 }
