@@ -200,7 +200,7 @@ public class LambdaDCommandArguments extends CommandArguments
 	{
 		return Me;
 	}
-	
+
 	public void setMe(String me)
 	{
 		Me = Double.parseDouble(me);
@@ -211,7 +211,7 @@ public class LambdaDCommandArguments extends CommandArguments
 		this.chr = Integer.parseInt(chr); 
 		chrFlag = true;
 	}
-	
+
 	public int getChr()
 	{
 		return chr;
@@ -221,11 +221,24 @@ public class LambdaDCommandArguments extends CommandArguments
 	{
 		return chrFlag;
 	}
+	
+	public void setFrq()
+	{
+		isFrq = true;
+	}
+	
+	public boolean isFrq()
+	{
+		return isFrq;
+	}
+
 	private ArrayList<String> md;
 	private boolean isGZ = false;
 	private boolean isQT = true;
 	private boolean isVerbose = false;
 	private boolean isVerboseGZ = false;
+
+	private boolean isFrq = true;
 
 	private double Me;
 

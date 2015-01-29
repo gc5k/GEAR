@@ -254,15 +254,16 @@ public class GWASReader
 				cntBadSE++;
 				continue;
 			}
-			if (ConstValues.isNA(tokens[KeyIdx[metaIdx][P]]))
+			if (KeyIdx[metaIdx][P] != -1 && ConstValues.isNA(tokens[KeyIdx[metaIdx][P]]))
 			{
 				cntBadP++;
 				continue;
 			}
-			else
-			{
+			else if(KeyIdx[metaIdx][P] != -1 && !ConstValues.isNA(tokens[KeyIdx[metaIdx][P]]))
+			{//calculate gc 
 				pArray.add(new Double(Double.parseDouble(tokens[KeyIdx[metaIdx][P]])));
 			}
+
 			if (tokens[KeyIdx[metaIdx][A1]].length() != 1)
 			{
 				cntBadA1++;
@@ -275,7 +276,14 @@ public class GWASReader
 			}
 
 			MetaStat ms = null;
-			ms = new MetaStat(tokens[KeyIdx[metaIdx][SNP]], Float.parseFloat(tokens[KeyIdx[metaIdx][BETA]]), Float.parseFloat(tokens[KeyIdx[metaIdx][SE]]), Double.parseDouble(tokens[KeyIdx[metaIdx][P]]), tokens[KeyIdx[metaIdx][A1]].charAt(0), logit[metaIdx]);
+			if(KeyIdx[metaIdx][P] != -1)
+			{
+				ms = new MetaStat(tokens[KeyIdx[metaIdx][SNP]], Float.parseFloat(tokens[KeyIdx[metaIdx][BETA]]), Float.parseFloat(tokens[KeyIdx[metaIdx][SE]]), Double.parseDouble(tokens[KeyIdx[metaIdx][P]]), tokens[KeyIdx[metaIdx][A1]].charAt(0), logit[metaIdx]);
+			}
+			else
+			{
+				ms = new MetaStat(tokens[KeyIdx[metaIdx][SNP]], Float.parseFloat(tokens[KeyIdx[metaIdx][BETA]]), Float.parseFloat(tokens[KeyIdx[metaIdx][SE]]), Double.NaN, tokens[KeyIdx[metaIdx][A1]].charAt(0), logit[metaIdx]);				
+			}
 			if (KeyIdx[metaIdx][CHR] != -1)
 			{
 				if(tokens[KeyIdx[metaIdx][CHR]].equalsIgnoreCase("X"))
@@ -482,28 +490,35 @@ public class GWASReader
 
 	private double getGC(ArrayList<Double> pArray)
 	{
-		ChiSquaredDistributionImpl chiDis = new ChiSquaredDistributionImpl(1);		
-
-		Collections.sort(pArray);
-		double p = 0.5;
-		if (pArray.size() % 2 == 0)
+		double lambda = 1;
+		if (pArray.size() > 0)
 		{
-			p =1 - (pArray.get(pArray.size()/2) + pArray.get(pArray.size()/2 + 1))/2;
+			ChiSquaredDistributionImpl chiDis = new ChiSquaredDistributionImpl(1);		
+
+			Collections.sort(pArray);
+			double p = 0.5;
+			if (pArray.size() % 2 == 0)
+			{
+				p =1 - (pArray.get(pArray.size()/2) + pArray.get(pArray.size()/2 + 1))/2;
+			}
+			else
+			{
+				p =1 - pArray.get((pArray.size()+1)/2);
+			}
+			try
+			{
+				lambda = chiDis.inverseCumulativeProbability(p) / ChiMedianConstant;
+			}
+			catch (MathException e)
+			{
+				Logger.printUserError(e.toString());
+			}
+			Logger.printUserLog("Genomic control factor is: " + lambda);
 		}
 		else
 		{
-			p =1 - pArray.get((pArray.size()+1)/2);
+			Logger.printUserLog("No p values provided. Genomic control factor is set to 1.");
 		}
-		double lambda = 1;
-		try
-		{
-			lambda = chiDis.inverseCumulativeProbability(p) / ChiMedianConstant;
-		}
-		catch (MathException e)
-		{
-			Logger.printUserError(e.toString());
-		}
-		Logger.printUserLog("Genomic control factor is: " + lambda);
 		return lambda;
 	}
 
