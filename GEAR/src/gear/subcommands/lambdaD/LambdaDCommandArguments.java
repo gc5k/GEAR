@@ -238,7 +238,7 @@ public class LambdaDCommandArguments extends CommandArguments
 	private boolean isVerbose = false;
 	private boolean isVerboseGZ = false;
 
-	private boolean isFrq = true;
+	private boolean isFrq = false;
 
 	private double Me;
 

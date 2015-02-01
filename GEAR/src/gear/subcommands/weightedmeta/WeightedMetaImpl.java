@@ -62,6 +62,7 @@ public class WeightedMetaImpl extends CommandImpl
 		generateCorMatrix();
 
 		gReader = new GWASReader(wMetaArgs.getMetaFile(), FileKeep, wMetaArgs.getKeys(), wMetaArgs.isQT(), wMetaArgs.isGZ(), wMetaArgs.isChr(), wMetaArgs.getChr());
+		gReader.Start(false);
 
 		if (gReader.getNumMetaFile() < 2)
 		{

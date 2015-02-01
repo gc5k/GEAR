@@ -48,7 +48,8 @@ public class RandomMetaCommand extends Command
 		options.addOption(OptionBuilder.withDescription(OPT_VERBOSE_GZ_DESC).withLongOpt(OPT_VERBOSE_GZ_LONG).create(OPT_VERBOSE_GZ));
 
 		options.addOption(OptionBuilder.withDescription(OPT_CHR_DESC).hasArg().create(OPT_CHR));
-		
+		options.addOption(OptionBuilder.withDescription(OPT_FRQ_DESC).create(OPT_FRQ));
+
 	}
 
 	@Override
@@ -143,6 +144,12 @@ public class RandomMetaCommand extends Command
 		{
 			randD.setChr(cmdLine.getOptionValue(OPT_CHR));
 		}
+		
+		if (cmdLine.hasOption(OPT_FRQ))
+		{
+			randD.setFrq();
+		}
+
 		return randD;
 	}
 
@@ -198,5 +205,8 @@ public class RandomMetaCommand extends Command
 	
 	private final static String OPT_CHR = "chr";
 	private final static String OPT_CHR_DESC = "Choose chromosome for analysis";
+
+	private final static String OPT_FRQ = "frq";
+	private final static String OPT_FRQ_DESC = "Using frequency";
 
 }
