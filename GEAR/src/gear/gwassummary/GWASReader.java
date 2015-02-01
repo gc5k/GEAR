@@ -56,12 +56,22 @@ public class GWASReader
 			Arrays.fill (KeyIdx[i], -1);
 		}
 
+//		for (int i = 0; i < workingMetaFile.size(); i++)
+//		{
+//			HashMap<String, MetaStat> m = readMeta(i);
+//			MetaStat.add(m);
+//		}
+		
+	}
+
+	public void Start(boolean isFrq)
+	{
+		this.isFrq = isFrq;
 		for (int i = 0; i < workingMetaFile.size(); i++)
 		{
 			HashMap<String, MetaStat> m = readMeta(i);
 			MetaStat.add(m);
-		}
-		
+		}		
 	}
 
 	public int getCohortNum()
@@ -138,7 +148,7 @@ public class GWASReader
 			}
 			else
 			{
-				if(tokens[i].equalsIgnoreCase(field[GWASConstant.BETA]))
+				if (tokens[i].equalsIgnoreCase(field[GWASConstant.BETA]))
 				{
 					KeyIdx[metaIdx][BETA] = i;
 					logit[metaIdx] = false;
@@ -147,6 +157,10 @@ public class GWASReader
 				{
 					KeyIdx[metaIdx][OR] = i;
 					logit[metaIdx] = true;
+					if (isFrq)
+					{
+						logit[metaIdx] = false;
+					}
 				}
 			}
 			if (tokens[i].equalsIgnoreCase(field[GWASConstant.SE]))
@@ -547,6 +561,7 @@ public class GWASReader
 
 	private double[] gc;
 	private double ChiMedianConstant = 0.4549364;
+	private boolean isFrq;
 //	private int Cohort;
 
 }

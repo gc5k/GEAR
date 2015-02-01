@@ -221,6 +221,17 @@ public class RandomMetaCommandArguments extends CommandArguments
 	{
 		return chrFlag;
 	}
+	
+	public void setFrq()
+	{
+		isFrq = true;
+	}
+	
+	public boolean isFrq()
+	{
+		return isFrq;
+	}
+
 	private ArrayList<String> md;
 	private boolean isGZ = false;
 	private boolean isQT = true;
@@ -228,6 +239,8 @@ public class RandomMetaCommandArguments extends CommandArguments
 	private boolean isVerboseGZ = false;
 
 	private double Me;
+
+	private boolean isFrq = false;
 
 	private int chr = 0;
 	private boolean chrFlag = false;

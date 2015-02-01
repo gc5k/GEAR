@@ -87,6 +87,7 @@ public class RandomMetaCommandImpl extends CommandImpl
 		boolean[] FileKeep = new boolean[randArgs.getMetaFile().length];
 		Arrays.fill(FileKeep, true);
 		gReader = new GWASReader(randArgs.getMetaFile(), FileKeep, randArgs.getKeys(), randArgs.isQT(), randArgs.isGZ(), randArgs.isChr(), randArgs.getChr());
+		gReader.Start(randArgs.isFrq());
 
 		Me = randArgs.getMe();
 		int NumMetaFile = randArgs.getMetaFile().length;
