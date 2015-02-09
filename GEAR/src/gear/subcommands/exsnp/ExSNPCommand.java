@@ -8,7 +8,6 @@ import gear.subcommands.Command;
 import gear.subcommands.CommandArgumentException;
 import gear.subcommands.CommandArguments;
 import gear.subcommands.CommandImpl;
-import gear.util.Logger;
 
 public class ExSNPCommand extends Command
 {
@@ -29,6 +28,7 @@ public class ExSNPCommand extends Command
 		return "Extract common snps between files";
 	}
 
+	@SuppressWarnings("static-access")
 	@Override
 	public void prepareOptions(Options options)
 	{

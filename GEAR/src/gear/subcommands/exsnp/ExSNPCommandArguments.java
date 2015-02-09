@@ -26,7 +26,6 @@ public class ExSNPCommandArguments extends CommandArguments
 			String sfam = tokens[0] + ".fam";
 			FileUtil.exists(sfam);
 			bFile.add(tokens[0]);
-			System.out.println(tokens[0]);
 		}
 	}
 
@@ -53,6 +52,7 @@ public class ExSNPCommandArguments extends CommandArguments
 	{
 		return bFile;
 	}
+	
 	public String BatchFile = null;
 	public ArrayList<String> bFile = NewIt.newArrayList();
 
