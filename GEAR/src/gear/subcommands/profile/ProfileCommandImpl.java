@@ -364,6 +364,11 @@ public final class ProfileCommandImpl extends CommandImpl
 			{
 				try
 				{
+					if (qScores.containsKey(tokens[0]))
+					{
+						Logger.printUserLog("Warning: Marker '" + tokens[0] +"' duplicated in '" + profCmdArgs.getQScoreFile() + "'" + ", the first instance used, others skipped.");
+						continue;
+					}
 					qScores.put(/* locusName = */ tokens[0], Float.parseFloat(tokens[1]));
 				}
 				catch (NumberFormatException e)
