@@ -39,25 +39,26 @@ class ScoreFile
 
 				if (scores.put(/*locusName*/tokens[0], score) != null)
 				{
-					Logger.printUserError("SNP '" + tokens[0] + "' appears more than once in the score file '" + reader.getFileName() + "'.");
-					System.exit(1);
+					Logger.printUserLog("Warning: Marker '" + tokens[0] +"' duplicated in '" + reader.getFileName() + "'" + ", the first instance used, others skipped.");
 				}
-			
-				for (int ii = 2; ii < tokens.length; ++ii)
+				else
 				{
-					if (!ConstValues.isNA(tokens[ii]))
+					for (int ii = 2; ii < tokens.length; ++ii)
 					{
-						try
+						if (!ConstValues.isNA(tokens[ii]))
 						{
-							score.setValue(ii - 2, Float.parseFloat(tokens[ii]));
-						}
-						catch (NumberFormatException e)
-						{
-							reader.errorPreviousLine("'" + tokens[ii] + "' is not a floating point number, so it it not a valid score.");
+							try
+							{
+								score.setValue(ii - 2, Float.parseFloat(tokens[ii]));
+							}
+							catch (NumberFormatException e)
+							{
+								reader.errorPreviousLine("'" + tokens[ii] + "' is not a floating point number, so it it not a valid score.");
+							}
 						}
 					}
-				}
-				cnt++;	
+					cnt++;	
+				}			
 			}
 			else if ( (isKeepSC && SCsnp.contains(tokens[0])) || (!isKeepSC && !SCsnp.contains(tokens[0])) )
 			{
@@ -65,25 +66,26 @@ class ScoreFile
 
 				if (scores.put(/*locusName*/tokens[0], score) != null)
 				{
-					Logger.printUserError("SNP '" + tokens[0] + "' appears more than once in the score file '" + reader.getFileName() + "'.");
-					System.exit(1);
+					Logger.printUserLog("Warning: Marker '" + tokens[0] +"' duplicated in '" + reader.getFileName() + "'" + ", the first instance used, others skipped.");
 				}
-			
-				for (int ii = 2; ii < tokens.length; ++ii)
+				else
 				{
-					if (!ConstValues.isNA(tokens[ii]))
+					for (int ii = 2; ii < tokens.length; ++ii)
 					{
-						try
+						if (!ConstValues.isNA(tokens[ii]))
 						{
-							score.setValue(ii - 2, Float.parseFloat(tokens[ii]));
-						}
-						catch (NumberFormatException e)
-						{
-							reader.errorPreviousLine("'" + tokens[ii] + "' is not a floating point number, so it it not a valid score.");
+							try
+							{
+								score.setValue(ii - 2, Float.parseFloat(tokens[ii]));
+							}
+							catch (NumberFormatException e)
+							{
+								reader.errorPreviousLine("'" + tokens[ii] + "' is not a floating point number, so it it not a valid score.");
+							}
 						}
 					}
+					cnt++;					
 				}
-				cnt++;
 			}
 
 			tokens = reader.readTokens(tokens.length);
