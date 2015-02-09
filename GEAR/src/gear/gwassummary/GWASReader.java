@@ -55,12 +55,6 @@ public class GWASReader
 		{
 			Arrays.fill (KeyIdx[i], -1);
 		}
-
-//		for (int i = 0; i < workingMetaFile.size(); i++)
-//		{
-//			HashMap<String, MetaStat> m = readMeta(i);
-//			MetaStat.add(m);
-//		}
 		
 	}
 
@@ -70,7 +64,7 @@ public class GWASReader
 		for (int i = 0; i < workingMetaFile.size(); i++)
 		{
 			HashMap<String, MetaStat> m = readMeta(i);
-			MetaStat.add(m);
+			MStat.add(m);
 		}		
 	}
 
@@ -96,7 +90,7 @@ public class GWASReader
 
 	public ArrayList<HashMap<String, MetaStat>> getMetaStat()
 	{
-		return MetaStat;
+		return MStat;
 	}
 
 	public ArrayList<ArrayList<String>> getMetaSNPArray() 
@@ -555,13 +549,13 @@ public class GWASReader
 	public static int SNP = 0, CHR=1, BP=2, BETA=3, OR=3, SE=4, P=5, A1=6, A2=7;
 	private int[][] KeyIdx; //snp, chr, bp, beta, se, p, a1, a2
 	private ArrayList<String> workingMetaFile;
-	private ArrayList<HashMap<String, MetaStat>> MetaStat = NewIt.newArrayList();
+	private ArrayList<HashMap<String, MetaStat>> MStat = NewIt.newArrayList();
 	private ArrayList<ArrayList<String>> MetaSNPArray = NewIt.newArrayList();
 	private HashMap<String, ArrayList<Integer>> MetaSNPTable = NewIt.newHashMap();
 
 	private double[] gc;
 	private double ChiMedianConstant = 0.4549364;
 	private boolean isFrq;
-//	private int Cohort;
+	private int[] keepCohortIdx;
 
 }
