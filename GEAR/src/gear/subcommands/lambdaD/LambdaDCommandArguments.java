@@ -221,15 +221,27 @@ public class LambdaDCommandArguments extends CommandArguments
 	{
 		return chrFlag;
 	}
-	
+
 	public void setFrq()
 	{
 		isFrq = true;
+		isFst = false;
 	}
-	
+
 	public boolean isFrq()
 	{
 		return isFrq;
+	}
+
+	public void setFst()
+	{
+		isFst = true;
+		isFrq = false;
+	}
+	
+	public boolean isFst()
+	{
+		return isFst;
 	}
 
 	private ArrayList<String> md;
@@ -239,6 +251,7 @@ public class LambdaDCommandArguments extends CommandArguments
 	private boolean isVerboseGZ = false;
 
 	private boolean isFrq = false;
+	private boolean isFst = false;
 
 	private double Me;
 
