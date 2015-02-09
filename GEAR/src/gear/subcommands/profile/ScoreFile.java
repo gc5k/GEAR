@@ -37,7 +37,8 @@ class ScoreFile
 			{
 				Score score = new Score(tokens[1].charAt(0), tokens.length - 2);
 
-				if (scores.put(/*locusName*/tokens[0], score) != null)
+//				if (scores.put(/*locusName*/tokens[0], score) != null)
+				if (scores.containsKey(tokens[0]))
 				{
 					Logger.printUserLog("Warning: Marker '" + tokens[0] +"' duplicated in '" + reader.getFileName() + "'" + ", the first instance used, others skipped.");
 				}
@@ -57,14 +58,16 @@ class ScoreFile
 							}
 						}
 					}
-					cnt++;	
+					scores.put(tokens[0], score);
+					cnt++;
 				}			
 			}
 			else if ( (isKeepSC && SCsnp.contains(tokens[0])) || (!isKeepSC && !SCsnp.contains(tokens[0])) )
 			{
 				Score score = new Score(tokens[1].charAt(0), tokens.length - 2);
 
-				if (scores.put(/*locusName*/tokens[0], score) != null)
+//				if (scores.put(/*locusName*/tokens[0], score) != null)
+				if (scores.containsKey(tokens[0]))	
 				{
 					Logger.printUserLog("Warning: Marker '" + tokens[0] +"' duplicated in '" + reader.getFileName() + "'" + ", the first instance used, others skipped.");
 				}
@@ -84,6 +87,7 @@ class ScoreFile
 							}
 						}
 					}
+					scores.put(tokens[0], score);
 					cnt++;					
 				}
 			}
