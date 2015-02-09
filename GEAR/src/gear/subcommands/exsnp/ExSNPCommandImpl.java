@@ -4,8 +4,6 @@ import java.io.PrintStream;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
-import java.util.Iterator;
-import java.util.Set;
 
 import gear.family.pedigree.file.SNP;
 import gear.subcommands.CommandArguments;
@@ -21,7 +19,7 @@ public class ExSNPCommandImpl  extends CommandImpl
 	@Override
 	public void execute(CommandArguments cmdArgs)
 	{
-		ExSNPCommandArguments esArgs = (ExSNPCommandArguments) cmdArgs;
+		esArgs = (ExSNPCommandArguments) cmdArgs;
 		ArrayList<String> bFile = esArgs.getBFiles();
 		if(bFile.size() == 0)
 		{
@@ -88,6 +86,7 @@ public class ExSNPCommandImpl  extends CommandImpl
 		Logger.printUserLog("Save results in '" + esArgs.getOutRoot() + ".comsnp'.");
 	}
 
+	private ExSNPCommandArguments esArgs;
 	private HashMap<String, Integer> snpCnt = NewIt.newHashMap();
 	private ArrayList<SNP> snpInfo = NewIt.newArrayList();
 }

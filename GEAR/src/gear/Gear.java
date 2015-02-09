@@ -54,6 +54,7 @@ public enum Gear
 		addCommand(new gear.subcommands.simulationqt.SimulationQTCommand());
 		addCommand(new gear.subcommands.exsnp.ExSNPCommand());
 		addCommand(new gear.subcommands.lmdr.LMDRCommand());
+		addCommand(new gear.subcommands.ppcbatch.PPCBatchCommand());
 	}
 	
 	private void addCommand(Command cmd)

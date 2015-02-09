@@ -203,10 +203,10 @@ public final class ProfileCommand extends Command
 		{
 			throw new CommandArgumentException("--" + OPT_MACH_INFO_BATCH_LONG + " must be set with --" + OPT_MACH_DOSAGE_BATCH_LONG + ".");
 		}
-		else
-		{	
-			throw new CommandArgumentException("No input data files.");
-		}
+//		else
+//		{	
+//			throw new CommandArgumentException("No input data files.");
+//		}
 	}
 	
 	private void parseCoeffModelArgs(ProfileCommandArguments profCmdArgs, CommandLine cmdLine) throws CommandArgumentException
