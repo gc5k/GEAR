@@ -89,6 +89,28 @@ public class LambdaDCommandImpl extends CommandImpl
 		gReader.Start(lamArgs.isFrq());
 
 		Me = lamArgs.getMe();
+		if(Me > 0)
+		{
+			Logger.printUserLog("Set the effective number of marker: " + Me);			
+		}
+		else
+		{
+			Logger.printUserLog("Using all markers.");
+		}
+
+		if(lamArgs.isFrq())
+		{
+			Logger.printUserLog("Calculating allele frequency difference.");
+		}
+		else if(lamArgs.isFst())
+		{
+			Logger.printUserLog("Calculating Fst.");
+		}
+		else
+		{
+			Logger.printUserLog("Calculating genetic effects difference.");
+		}
+
 		int NumMetaFile = lamArgs.getMetaFile().length;
 
 		if (NumMetaFile < 2)
@@ -146,7 +168,7 @@ public class LambdaDCommandImpl extends CommandImpl
 			MetaStat ms1 = SumStat1.get(snp);
 			MetaStat ms2 = SumStat2.get(snp);
 			double d = 0;
-			
+
 			if (KeyIdx[idx1][GWASReader.SE] != -1)
 			{
 				if (SNPMatch.isAmbiguous(ms1.getA1(), ms1.getA2()))
@@ -166,19 +188,57 @@ public class LambdaDCommandImpl extends CommandImpl
 
 			if (lamArgs.isFrq())
 			{
+				double f1 = ms1.getEffect();
+				double f2 = ms2.getEffect();
+
 				if (ms1.getA1() == ms2.getA1() || ms1.getA1() == SNPMatch.Flip(ms2.getA1())) //match A1 in the second meta
 				{
-					d = (ms1.getEffect() -ms2.getEffect()) * (ms1.getEffect() -ms2.getEffect()) / (ms1.getSE() * ms1.getSE() + ms2.getSE() * ms2.getSE());
 				}
 				else if (ms1.getA1() == ms2.getA2() || ms1.getA1() == SNPMatch.Flip(ms2.getA2())) //match A2 in the second meta
 				{
-					d = ((1 - ms1.getEffect()) - ms2.getEffect()) * (( 1 - ms1.getEffect()) - ms2.getEffect()) / (ms1.getSE() * ms1.getSE() + ms2.getSE() * ms2.getSE());
+					f2 = 1-f2;
 				}
 				else
 				{
 					cntAmbiguous++;
 					continue;
 				}
+				d = (f1-f2)*(f1-f2)/(ms1.getSE()*ms1.getSE() + ms2.getSE() * ms2.getSE());
+			}
+			else if(lamArgs.isFst())
+			{
+				double f1 = ms1.getEffect();
+				double f2 = ms2.getEffect();
+				double s1 = 0;
+				double s2 = 0;
+
+				if(lamArgs.isQT())
+				{
+					s1 = lamArgs.getQTsize()[idx1];
+					s2 = lamArgs.getQTsize()[idx2];
+				}
+				else 
+				{
+					s1 = lamArgs.getCCsize()[idx1*2] + lamArgs.getCCsize()[idx1*2+1];
+					s2 = lamArgs.getCCsize()[idx2*2] + lamArgs.getCCsize()[idx2*2+1];
+				}
+
+				if (ms1.getA1() == ms2.getA1() || ms1.getA1() == SNPMatch.Flip(ms2.getA1()))
+				{
+				}
+				else if (ms1.getA1() == ms2.getA2() || ms1.getA1() == SNPMatch.Flip(ms2.getA2())) //match A2 in the second meta
+				{
+					f2 = 1-f2;						
+				}
+				else
+				{
+					cntAmbiguous++;
+					continue;
+				}
+
+				double f_m = s1/(s1+s2) * f1 + s2/(s1+s2) * f2;
+				double s_m = (s1 + s2)/2;
+				d = (s1/s_m * (f1-f_m)*(f1-f_m) + s2/s_m * (f2-f_m) * (f2-f_m))/(f_m * (1-f_m));
 			}
 			else
 			{
@@ -194,7 +254,7 @@ public class LambdaDCommandImpl extends CommandImpl
 				{
 					cntAmbiguous++;
 					continue;
-				}				
+				}
 			}
 			T0.addValue(d);
 			LamArray.add(new LamUnit(d, ms1, ms2));
