@@ -136,7 +136,7 @@ public class Inbreeding
 			fstOut.print("prop" + (i + 1) + "\t" + "Freq" + (i + 1) + "\t"
 					+ "NInd" + (i + 1) + "\t");
 		}
-		fstOut.println("Freq\tFstJ\tFstB");
+		fstOut.println("Freq\tFstG\tFstB");
 
 		for (int i = 0; i < numMarker; i++)
 		{
