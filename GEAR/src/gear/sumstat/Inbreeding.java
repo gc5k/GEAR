@@ -38,7 +38,8 @@ public class Inbreeding
 	private double[][] mafGroup;
 	private int[] IndGroup;
 	private double[][] w;
-	private double[] Fst;
+	private double[] FstG;
+	private double[] FstB;
 
 	private int missing = -1;
 
@@ -90,7 +91,9 @@ public class Inbreeding
 		w = new double[numMarker][groupID.size()];
 		N = new double[numMarker];
 
-		Fst = new double[numMarker];
+		FstG = new double[numMarker];
+		FstB = new double[numMarker];
+
 		for (int i = 0; i < g.length; i++)
 		{
 			int idx = IndGroup[i];
@@ -122,7 +125,8 @@ public class Inbreeding
 		{
 			fstOut = new PrintWriter(
 					new String(CmdArgs.INSTANCE.out + ".fst"));
-		} catch (IOException e)
+		}
+		catch (IOException e)
 		{
 			e.printStackTrace();
 		}
@@ -132,18 +136,20 @@ public class Inbreeding
 			fstOut.print("prop" + (i + 1) + "\t" + "Freq" + (i + 1) + "\t"
 					+ "NInd" + (i + 1) + "\t");
 		}
-		fstOut.println("Freq\tFst");
+		fstOut.println("Freq\tFstJ\tFstB");
 
 		for (int i = 0; i < numMarker; i++)
 		{
-			double f = 0;
+			double fj = 0;
+			double fb = 0;
 			maf[i] = maf[i] / (2 * N[i]);
 			for (int j = 0; j < groupID.size(); j++)
 			{
 				if (w[i][j] != 0)
 				{
 					mafGroup[i][j] = mafGroup[i][j] / (2 * w[i][j]);
-				} else
+				}
+				else
 				{
 					mafGroup[i][j] = 0;
 				}
@@ -156,16 +162,18 @@ public class Inbreeding
 					+ snpMap.getSNP(i).getFirstAllele() + "\t");
 			for (int j = 0; j < groupID.size(); j++)
 			{
-				f += w[i][j] * 2 * mafGroup[i][j] * (1 - mafGroup[i][j]);
+				fj += w[i][j] * 2 * mafGroup[i][j] * (1 - mafGroup[i][j]);
+				fb += w[i][j] * groupID.size() / (groupID.size() - 1) * (mafGroup[i][j] - maf[i]) * (mafGroup[i][j] -maf[i]);
 				fstOut.print(w[i][j] + "\t" + mafGroup[i][j] + "\t"
 						+ (int) (w[i][j] * N[i]) + "\t");
 			}
 			fstOut.print(maf[i] + "\t");
 			if (maf[i] != 0)
 			{
-				Fst[i] = 1 - f / (2 * maf[i] * (1 - maf[i]));
+				FstG[i] = 1 - fj / (2 * maf[i] * (1 - maf[i]));
+				FstB[i] = fb/(maf[i]*(1-maf[i]));
 			}
-			fstOut.println(Fst[i]);
+			fstOut.println(FstG[i]+"\t" + FstB[i]);
 		}
 		fstOut.close();
 	}
