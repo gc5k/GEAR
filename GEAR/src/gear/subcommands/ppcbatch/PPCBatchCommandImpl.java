@@ -34,6 +34,7 @@ public class PPCBatchCommandImpl extends CommandImpl
 				profCommandArguments.setIsExtract(scoreExtract);
 			}
 			profCommandArguments.setResultFile(pbCmdArgs.getOutRoot() + "." + pbCmdArgs.getBedFiles().get(i));
+			profCommandArguments.setIsWeighted(false);
 			ProfileCommandImpl profImpl = new ProfileCommandImpl();
 			profImpl.execute(profCommandArguments);
 			Logger.printUserLog("");
