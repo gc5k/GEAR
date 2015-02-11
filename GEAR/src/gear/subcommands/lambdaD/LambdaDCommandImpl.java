@@ -150,6 +150,8 @@ public class LambdaDCommandImpl extends CommandImpl
 	private void calculateLambdaD(int idx1, int idx2)
 	{
 		ArrayList<LamUnit> LamArray = NewIt.newArrayList();
+		BVec Bvec = new BVec();
+
     	DescriptiveStatistics T0 = new DescriptiveStatistics();
 
 		int cntAmbiguous = 0;
@@ -204,6 +206,8 @@ public class LambdaDCommandImpl extends CommandImpl
 					continue;
 				}
 				d = (f1-f2)*(f1-f2)/(ms1.getSE()*ms1.getSE() + ms2.getSE() * ms2.getSE());
+				Bvec.addStats(f1, f2, ms1.getSE(), ms2.getSE());
+
 			}
 			else if(lamArgs.isFst())
 			{
@@ -239,23 +243,30 @@ public class LambdaDCommandImpl extends CommandImpl
 				double f_m = s1/(s1+s2) * f1 + s2/(s1+s2) * f2;
 				double s_m = (s1 + s2)/2;
 				d = (s1/s_m * (f1-f_m)*(f1-f_m) + s2/s_m * (f2-f_m) * (f2-f_m))/(f_m * (1-f_m));
+				Bvec.addStats(f1, f2, ms1.getSE(), ms2.getSE());
+
 			}
 			else
 			{
+				double f1 = ms1.getEffect();
+				double f2 = ms2.getEffect();
+
 				if (ms1.getA1() == ms2.getA1() || ms1.getA1() == SNPMatch.Flip(ms2.getA1())) //match A1 in the second meta
 				{
-					d = (ms1.getEffect() - ms2.getEffect()) * (ms1.getEffect() - ms2.getEffect()) / (ms1.getSE() * ms1.getSE() + ms2.getSE() * ms2.getSE());
 				}
 				else if (ms1.getA1() == ms2.getA2() || ms1.getA1() == SNPMatch.Flip(ms2.getA2())) //match A2 in the second meta
 				{
-					d = ((-1) * ms1.getEffect() - ms2.getEffect()) * ((-1) * ms1.getEffect() - ms2.getEffect()) / (ms1.getSE() * ms1.getSE() + ms2.getSE() * ms2.getSE());
+					f2 = -1 * f2;
 				}
 				else
 				{
 					cntAmbiguous++;
 					continue;
 				}
+				d = (ms1.getEffect() - ms2.getEffect()) * (ms1.getEffect() - ms2.getEffect()) / (ms1.getSE() * ms1.getSE() + ms2.getSE() * ms2.getSE());
+				Bvec.addStats(f1, f2, ms1.getSE(), ms2.getSE());
 			}
+			
 			T0.addValue(d);
 			LamArray.add(new LamUnit(d, ms1, ms2));
         }
@@ -287,6 +298,7 @@ public class LambdaDCommandImpl extends CommandImpl
 			{
 				selIdx[i] = i;
 			}
+			Bvec.setSelected();
 		}
 		else if (sortLD.length <= Me)
 		{//use available ones
@@ -297,6 +309,7 @@ public class LambdaDCommandImpl extends CommandImpl
 			{
 				selIdx[i] = i;
 			}
+			Bvec.setSelected();
 		}
 		else
 		{//use Me
@@ -307,7 +320,11 @@ public class LambdaDCommandImpl extends CommandImpl
 				selIdx[i] = (int) Math.floor( (i*1.0 + 1)/Me * sortLD.length ) -1;
 				DesStat[i] = sortLD[selIdx[i]];
 			}
+			Bvec.setSelected(selIdx);
 		}
+
+		Bvec.CalCorrelation();
+		Bvec.printOut();
 
 		if (lamArgs.isQT())
 		{
@@ -345,19 +362,19 @@ public class LambdaDCommandImpl extends CommandImpl
 
 		if (lamArgs.isVerboseGZ())
 		{
-			VerboseGZ(LamArray, T0.getValues(), idx1, idx2);
+			VerboseGZ(LamArray, T0.getValues(), idx1, idx2, Bvec);
 		}
 		else if (lamArgs.isVerbose())
 		{
-			Verbose(LamArray, T0.getValues(), idx1, idx2);
+			Verbose(LamArray, T0.getValues(), idx1, idx2, Bvec);
 		}
 		else
 		{
-			NotVerbose(LamArray, T0.getValues(), idx1, idx2, selIdx);
+			NotVerbose(LamArray, T0.getValues(), idx1, idx2, selIdx, Bvec);
 		}
 	}
 
-	private void NotVerbose(ArrayList<LamUnit> LamArray, double[] ld, int idx1, int idx2, int[] selIdx)
+	private void NotVerbose(ArrayList<LamUnit> LamArray, double[] ld, int idx1, int idx2, int[] selIdx, BVec Bvec)
 	{
 		Collections.sort(LamArray);
 		ChiSquaredDistributionImpl chiDis = new ChiSquaredDistributionImpl(1);
@@ -381,6 +398,9 @@ public class LambdaDCommandImpl extends CommandImpl
         	LamUnit lu = LamArray.get(selIdx[i]);
         	MetaStat ms1 = lu.getMS1();
         	MetaStat ms2 = lu.getMS2();
+        	ArrayList<Double> d = Bvec.get(selIdx[i]);
+        	double f1 = d.get(0);
+        	double f2 = d.get(1);
         	double chi0 = 0;
 			try
 			{
@@ -391,12 +411,12 @@ public class LambdaDCommandImpl extends CommandImpl
 				e.printStackTrace();
 			}
 			double lambda = lu.getChi1()/chi0;
-        	writer.write(ms1.getSNP() + "\t" + ms1.getChr() + "\t" + ms1.getBP() + "\t" + ms1.getA1() + "\t" + ms1.getEffect() + "\t"  + ms1.getSE() + "\t" + ms1.getP() + "\t"+ ms2.getEffect() + "\t" + ms2.getSE() + "\t" + ms2.getP() + "\t" +lu.getChi1() + "\t" + chi0 + "\t" + lambda + "\n");
+        	writer.write(ms1.getSNP() + "\t" + ms1.getChr() + "\t" + ms1.getBP() + "\t" + ms1.getA1() + "\t" + f1 + "\t"  + ms1.getSE() + "\t" + ms1.getP() + "\t"+ f2 + "\t" + ms2.getSE() + "\t" + ms2.getP() + "\t" +lu.getChi1() + "\t" + chi0 + "\t" + lambda + "\n");
         }
         writer.close();
 	}
 
-	private void Verbose(ArrayList<LamUnit> LamArray, double[] ld, int idx1, int idx2)
+	private void Verbose(ArrayList<LamUnit> LamArray, double[] ld, int idx1, int idx2, BVec Bvec)
 	{
 		ChiSquaredDistributionImpl chiDis = new ChiSquaredDistributionImpl(1);
 
@@ -422,6 +442,9 @@ public class LambdaDCommandImpl extends CommandImpl
         	LamUnit lu = LamArray.get(i);
         	MetaStat ms1 = lu.getMS1();
         	MetaStat ms2 = lu.getMS2();
+        	ArrayList<Double> d = Bvec.get(i);
+        	double f1 = d.get(0);
+        	double f2 = d.get(1);
         	double chi0 = 0;
 			try
 			{
@@ -432,12 +455,12 @@ public class LambdaDCommandImpl extends CommandImpl
 				e.printStackTrace();
 			}
 			double lambda = lu.getChi1()/chi0;
-        	writer.write(ms1.getSNP() + "\t" + ms1.getChr() + "\t" + ms1.getBP() + "\t" + ms1.getA1() + "\t" + ms1.getEffect() + "\t"  + ms1.getSE() + "\t" + ms1.getP() + "\t"+ ms2.getEffect() + "\t" + ms2.getSE() + "\t" + ms2.getP() + "\t" +lu.getChi1() + "\t" + chi0 + "\t" + lambda + "\n");
+        	writer.write(ms1.getSNP() + "\t" + ms1.getChr() + "\t" + ms1.getBP() + "\t" + ms1.getA1() + "\t" + f1 + "\t"  + ms1.getSE() + "\t" + ms1.getP() + "\t"+ f2 + "\t" + ms2.getSE() + "\t" + ms2.getP() + "\t" +lu.getChi1() + "\t" + chi0 + "\t" + lambda + "\n");
         }
         writer.close();
 	}
 
-	private void VerboseGZ(ArrayList<LamUnit> LamArray, double[] ld, int idx1, int idx2)
+	private void VerboseGZ(ArrayList<LamUnit> LamArray, double[] ld, int idx1, int idx2, BVec Bvec)
 	{
 		ChiSquaredDistributionImpl chiDis = new ChiSquaredDistributionImpl(1);
 
@@ -461,6 +484,9 @@ public class LambdaDCommandImpl extends CommandImpl
         	LamUnit lu = LamArray.get(i);
         	MetaStat ms1 = lu.getMS1();
         	MetaStat ms2 = lu.getMS2();
+        	ArrayList<Double> d = Bvec.get(i);
+        	double f1 = d.get(0);
+        	double f2 = d.get(1);
         	double chi0 = 0;
 			try
 			{
@@ -473,7 +499,7 @@ public class LambdaDCommandImpl extends CommandImpl
 			double lambda = lu.getChi1()/chi0;
         	try
 			{
-				GZ.write(ms1.getSNP() + "\t" + ms1.getChr() + "\t" + ms1.getBP() + "\t" + ms1.getA1() + "\t" + ms1.getEffect() + "\t"  + ms1.getSE() + "\t" + ms1.getP() + "\t"+ ms2.getEffect() + "\t" + ms2.getSE() + "\t" + ms2.getP() + "\t" +lu.getChi1() + "\t" + chi0 + "\t" + lambda + "\n");
+				GZ.write(ms1.getSNP() + "\t" + ms1.getChr() + "\t" + ms1.getBP() + "\t" + ms1.getA1() + "\t" + f1 + "\t"  + ms1.getSE() + "\t" + ms1.getP() + "\t"+ f2 + "\t" + ms2.getSE() + "\t" + ms2.getP() + "\t" +lu.getChi1() + "\t" + chi0 + "\t" + lambda + "\n");
 			}
 			catch (IOException e)
 			{

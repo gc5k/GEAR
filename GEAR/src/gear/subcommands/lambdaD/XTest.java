@@ -179,6 +179,7 @@ public class XTest
 
 	public void printZ(double z_l, double z_h)
 	{
+		Logger.printUserLog("===Fixed effect model===================");
 		Logger.printUserLog("Effective number of markers is: " + Me);
 		Logger.printUserLog("Z score: " + Z);
 		Logger.printUserLog("p-value for z score (two-tails): " + pZ);
