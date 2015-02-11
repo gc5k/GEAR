@@ -1,4 +1,4 @@
-package gear.subcommands.randmeta;
+package gear.subcommands.lambdaD;
 
 import java.util.ArrayList;
 
@@ -9,9 +9,9 @@ import org.apache.commons.math.stat.regression.SimpleRegression;
 import gear.util.Logger;
 import gear.util.NewIt;
 
-public class BetaVec
+public class BVec
 {
-	public BetaVec()
+	public BVec()
 	{
 		sum= NewIt.newArrayList();
 	}
@@ -28,6 +28,11 @@ public class BetaVec
 		s.add(b1*b1/(se1*se1));
 		s.add(b2*b2/(se2*se2));
 		sum.add(s);
+	}
+
+	public ArrayList<Double> get(int i)
+	{
+		return sum.get(i);
 	}
 
 	public void setSelected()
@@ -111,6 +116,7 @@ public class BetaVec
 
 	public void printOut()
 	{
+		Logger.printUserLog("===Random effect model===================");
 		Logger.printUserLog("Effective number of markers is: " + selIdx.length);
 		Logger.printUserLog("Genetic effect correlation: " + rb);
 		Logger.printUserLog("p-value for z score (two-tails): " + prb);

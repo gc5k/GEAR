@@ -355,7 +355,7 @@ public class GWASReader
 
 			if(sumstat.containsKey(ms.getSNP()))
 			{
-				Logger.printUserLog("Warning: Marker '" + ms.getSNP() +"' duplicated in iput, first instance used, others skipped.");
+				Logger.printUserLog("Warning: Marker '" + ms.getSNP() +"' duplicated input, first instance used, others skipped.");
 				cntDup++;
 			}
 			else
@@ -521,7 +521,7 @@ public class GWASReader
 			{
 				Logger.printUserError(e.toString());
 			}
-			Logger.printUserLog("Genomic control factor is: " + lambda);
+			Logger.printUserLog("Genomic control factor (lambda_gc) is: " + lambda);
 		}
 		else
 		{
