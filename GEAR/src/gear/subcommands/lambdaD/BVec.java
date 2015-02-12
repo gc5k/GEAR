@@ -38,6 +38,10 @@ public class BVec
 	public void setSelected()
 	{
 		selIdx = new int[sum.size()];
+		for(int i = 0; i < selIdx.length; i++)
+		{
+			selIdx[i] = i;
+		}
 	}
 	
 	public void setSelected(int[] idx)

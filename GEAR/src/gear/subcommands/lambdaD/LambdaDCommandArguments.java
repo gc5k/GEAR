@@ -222,10 +222,17 @@ public class LambdaDCommandArguments extends CommandArguments
 		return chrFlag;
 	}
 
+	public boolean isBeta()
+	{
+		return isBeta;
+	}
+
 	public void setFrq()
 	{
+		isBeta = false;
 		isFrq = true;
 		isFst = false;
+		mode = FRQ;
 	}
 
 	public boolean isFrq()
@@ -235,14 +242,25 @@ public class LambdaDCommandArguments extends CommandArguments
 
 	public void setFst()
 	{
-		isFst = true;
+		isBeta = false;
 		isFrq = false;
+		isFst = true;
+		mode = FST;
 	}
-	
+
 	public boolean isFst()
 	{
 		return isFst;
 	}
+
+	public int getMode()
+	{
+		return mode;
+	}
+
+	protected static int BETA = 2;
+	protected static int FRQ = 0;
+	protected static int FST = 1;
 
 	private ArrayList<String> md;
 	private boolean isGZ = false;
@@ -250,8 +268,10 @@ public class LambdaDCommandArguments extends CommandArguments
 	private boolean isVerbose = false;
 	private boolean isVerboseGZ = false;
 
+	private boolean isBeta = true;
 	private boolean isFrq = false;
 	private boolean isFst = false;
+	private int mode = BETA;
 
 	private double Me;
 
@@ -261,4 +281,5 @@ public class LambdaDCommandArguments extends CommandArguments
 	private double[] qtSize;
 	private double[] ccSize;
 	private String[] field = {"snp", "chr", "bp", "beta", "or", "se", "p", "a1", "a2"};
+	
 }
