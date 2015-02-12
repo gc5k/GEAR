@@ -3,6 +3,7 @@ package gear.subcommands.lambdaD;
 import java.io.BufferedWriter;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.io.PrintStream;
 import java.io.PrintWriter;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -11,10 +12,6 @@ import java.util.HashMap;
 
 import org.apache.commons.math.MathException;
 import org.apache.commons.math.distribution.ChiSquaredDistributionImpl;
-import org.apache.commons.math.stat.descriptive.DescriptiveStatistics;
-import org.apache.commons.math.stat.ranking.NaNStrategy;
-import org.apache.commons.math.stat.ranking.NaturalRanking;
-import org.apache.commons.math.stat.ranking.TiesStrategy;
 
 import gear.gwassummary.GWASReader;
 import gear.gwassummary.MetaStat;
@@ -50,6 +47,7 @@ public class LambdaDCommandImpl extends CommandImpl
 		{
 			for (int j = (i + 1); j < MetaFile.length; j++)
 			{
+				Logger.printUserLog("");
 				Logger.printUserLog("File pair: " + (i + 1) + "-" + (j + 1));
 				if (lamArgs.isQT())
 				{
@@ -98,17 +96,17 @@ public class LambdaDCommandImpl extends CommandImpl
 			Logger.printUserLog("Using all markers.");
 		}
 
-		if(lamArgs.isFrq())
+		if (lamArgs.isBeta())
+		{
+			Logger.printUserLog("Calculating genetic effects difference.");			
+		}
+		else if(lamArgs.isFrq())
 		{
 			Logger.printUserLog("Calculating allele frequency difference.");
 		}
 		else if(lamArgs.isFst())
 		{
 			Logger.printUserLog("Calculating Fst.");
-		}
-		else
-		{
-			Logger.printUserLog("Calculating genetic effects difference.");
 		}
 
 		int NumMetaFile = lamArgs.getMetaFile().length;
@@ -127,7 +125,7 @@ public class LambdaDCommandImpl extends CommandImpl
 
 		kMat = new double[NumMetaFile][NumMetaFile];
 
-		for(int i = 0; i < NumMetaFile; i++)
+		for (int i = 0; i < NumMetaFile; i++)
 		{
 			Arrays.fill(lamMat[i], 1);
 			Arrays.fill(zMat[i], 1);
@@ -150,9 +148,8 @@ public class LambdaDCommandImpl extends CommandImpl
 	private void calculateLambdaD(int idx1, int idx2)
 	{
 		ArrayList<LamUnit> LamArray = NewIt.newArrayList();
-		BVec Bvec = new BVec();
 
-    	DescriptiveStatistics T0 = new DescriptiveStatistics();
+//    	DescriptiveStatistics T0 = new DescriptiveStatistics();
 
 		int cntAmbiguous = 0;
 		HashMap<String, MetaStat> SumStat1 = gReader.getMetaStat().get(idx1);
@@ -169,7 +166,6 @@ public class LambdaDCommandImpl extends CommandImpl
 			}
 			MetaStat ms1 = SumStat1.get(snp);
 			MetaStat ms2 = SumStat2.get(snp);
-			double d = 0;
 
 			if (KeyIdx[idx1][GWASReader.SE] != -1)
 			{
@@ -188,87 +184,33 @@ public class LambdaDCommandImpl extends CommandImpl
 				}
 			}
 
-			if (lamArgs.isFrq())
+			boolean lineup = true;
+			if (ms1.getA1() == ms2.getA1() || ms1.getA1() == SNPMatch.Flip(ms2.getA1())) //match A1 in the second meta
 			{
-				double f1 = ms1.getEffect();
-				double f2 = ms2.getEffect();
-
-				if (ms1.getA1() == ms2.getA1() || ms1.getA1() == SNPMatch.Flip(ms2.getA1())) //match A1 in the second meta
-				{
-				}
-				else if (ms1.getA1() == ms2.getA2() || ms1.getA1() == SNPMatch.Flip(ms2.getA2())) //match A2 in the second meta
-				{
-					f2 = 1-f2;
-				}
-				else
-				{
-					cntAmbiguous++;
-					continue;
-				}
-				d = (f1-f2)*(f1-f2)/(ms1.getSE()*ms1.getSE() + ms2.getSE() * ms2.getSE());
-				Bvec.addStats(f1, f2, ms1.getSE(), ms2.getSE());
-
 			}
-			else if(lamArgs.isFst())
+			else if (ms1.getA1() == ms2.getA2() || ms1.getA1() == SNPMatch.Flip(ms2.getA2())) //match A2 in the second meta
 			{
-				double f1 = ms1.getEffect();
-				double f2 = ms2.getEffect();
-				double s1 = 0;
-				double s2 = 0;
-
-				if(lamArgs.isQT())
-				{
-					s1 = lamArgs.getQTsize()[idx1];
-					s2 = lamArgs.getQTsize()[idx2];
-				}
-				else 
-				{
-					s1 = lamArgs.getCCsize()[idx1*2] + lamArgs.getCCsize()[idx1*2+1];
-					s2 = lamArgs.getCCsize()[idx2*2] + lamArgs.getCCsize()[idx2*2+1];
-				}
-
-				if (ms1.getA1() == ms2.getA1() || ms1.getA1() == SNPMatch.Flip(ms2.getA1()))
-				{
-				}
-				else if (ms1.getA1() == ms2.getA2() || ms1.getA1() == SNPMatch.Flip(ms2.getA2())) //match A2 in the second meta
-				{
-					f2 = 1-f2;						
-				}
-				else
-				{
-					cntAmbiguous++;
-					continue;
-				}
-
-				double f_m = s1/(s1+s2) * f1 + s2/(s1+s2) * f2;
-				double s_m = (s1 + s2)/2;
-				d = (s1/s_m * (f1-f_m)*(f1-f_m) + s2/s_m * (f2-f_m) * (f2-f_m))/(f_m * (1-f_m));
-				Bvec.addStats(f1, f2, ms1.getSE(), ms2.getSE());
-
+				lineup = false;
 			}
 			else
 			{
-				double f1 = ms1.getEffect();
-				double f2 = ms2.getEffect();
-
-				if (ms1.getA1() == ms2.getA1() || ms1.getA1() == SNPMatch.Flip(ms2.getA1())) //match A1 in the second meta
-				{
-				}
-				else if (ms1.getA1() == ms2.getA2() || ms1.getA1() == SNPMatch.Flip(ms2.getA2())) //match A2 in the second meta
-				{
-					f2 = -1 * f2;
-				}
-				else
-				{
-					cntAmbiguous++;
-					continue;
-				}
-				d = (ms1.getEffect() - ms2.getEffect()) * (ms1.getEffect() - ms2.getEffect()) / (ms1.getSE() * ms1.getSE() + ms2.getSE() * ms2.getSE());
-				Bvec.addStats(f1, f2, ms1.getSE(), ms2.getSE());
+				cntAmbiguous++;
+				continue;
 			}
-			
-			T0.addValue(d);
-			LamArray.add(new LamUnit(d, ms1, ms2));
+
+			double s1, s2;
+			if(lamArgs.isQT())
+			{
+				s1 = lamArgs.getQTsize()[idx1];
+				s2 = lamArgs.getQTsize()[idx2];
+			}
+			else 
+			{
+				s1 = lamArgs.getCCsize()[idx1*2] + lamArgs.getCCsize()[idx1*2+1];
+				s2 = lamArgs.getCCsize()[idx2*2] + lamArgs.getCCsize()[idx2*2+1];
+			}
+
+			LamArray.add(new LamUnit(ms1, ms2, lamArgs.getMode(), lineup, s1, s2));		
         }
 
 		if (cntAmbiguous > 0)
@@ -282,47 +224,39 @@ public class LambdaDCommandImpl extends CommandImpl
 				Logger.printUserLog("Removed " + cntAmbiguous + " ambiguous loci (AT/GC).");
 			}
 		}
-		Logger.printUserLog("Found " + T0.getN() + " summary statistics between two files.");
+		Logger.printUserLog("Found " + LamArray.size() + " consensus summary statistics between these two files.");
 
 //select independent snps
-		double[] sortLD = T0.getSortedValues();
-		double[] DesStat = null;
-		int[] selIdx = null;
+		Collections.sort(LamArray);
 
+		int[] selIdx = null;
 		if (Me < 0)
-		{//use all 
-			DesStat = new double[sortLD.length];
-			System.arraycopy(sortLD, 0, DesStat, 0, sortLD.length);
-			selIdx = new int[sortLD.length];
-			for (int i = 0; i < sortLD.length; i++)
-			{
-				selIdx[i] = i;
-			}
-			Bvec.setSelected();
+		{//use all
+			selIdx = new int[LamArray.size()];
+			for(int i = 0; i < selIdx.length; i++) selIdx[i] = i;
 		}
-		else if (sortLD.length <= Me)
+		else if (LamArray.size() <= Me)
 		{//use available ones
-			DesStat = new double[sortLD.length];
-			System.arraycopy(sortLD, 0, DesStat, 0, sortLD.length);
-			selIdx = new int[sortLD.length];
-			for (int i = 0; i < sortLD.length; i++)
-			{
-				selIdx[i] = i;
-			}
-			Bvec.setSelected();
+			selIdx = new int[LamArray.size()];
+			for(int i = 0; i < selIdx.length; i++) selIdx[i] = i;
 		}
 		else
 		{//use Me
-			DesStat = new double[(int) Math.ceil(Me)];
 			selIdx = new int[(int) Math.ceil(Me)];
-			for (int i = 0; i < DesStat.length; i++)
-			{
-				selIdx[i] = (int) Math.floor( (i*1.0 + 1)/Me * sortLD.length ) -1;
-				DesStat[i] = sortLD[selIdx[i]];
-			}
-			Bvec.setSelected(selIdx);
+			for (int i = 0; i < Me; i++) selIdx[i] = (int) Math.floor( (i*1.0 + 1)/Me * LamArray.size() ) -1;
 		}
 
+		BVec Bvec = new BVec();
+		double[] DesStat = new double[selIdx.length];
+
+		for (int i = 0; i < selIdx.length; i++)
+		{
+			LamUnit lu = LamArray.get(selIdx[i]);
+			DesStat[i] = lu.getIndicateStat();
+			Bvec.addStats(lu.getB1(), lu.getB2(), lu.getSE1(), lu.getSE2());
+		}
+
+		Bvec.setSelected();
 		Bvec.CalCorrelation();
 		Bvec.printOut();
 
@@ -362,113 +296,56 @@ public class LambdaDCommandImpl extends CommandImpl
 
 		if (lamArgs.isVerboseGZ())
 		{
-			VerboseGZ(LamArray, T0.getValues(), idx1, idx2, Bvec);
+			VerboseGZ(LamArray, idx1, idx2);
 		}
 		else if (lamArgs.isVerbose())
 		{
-			Verbose(LamArray, T0.getValues(), idx1, idx2, Bvec);
+			Verbose(LamArray, idx1, idx2);
 		}
 		else
 		{
-			NotVerbose(LamArray, T0.getValues(), idx1, idx2, selIdx, Bvec);
+			NotVerbose(LamArray, idx1, idx2, selIdx);
 		}
 	}
 
-	private void NotVerbose(ArrayList<LamUnit> LamArray, double[] ld, int idx1, int idx2, int[] selIdx, BVec Bvec)
+	private void NotVerbose(ArrayList<LamUnit> LamArray, int idx1, int idx2, int[] selIdx)
 	{
-		Collections.sort(LamArray);
-		ChiSquaredDistributionImpl chiDis = new ChiSquaredDistributionImpl(1);
-
-        PrintWriter writer = null;
-        try
-        {
-        	writer = new PrintWriter(new BufferedWriter(new FileWriter(lamArgs.getOutRoot() + "." + (idx1+1) + "-" + (idx2+1) + ".lam")));
-        	Logger.printUserLog("Writting detailed test statistics into '"+lamArgs.getOutRoot() + "." + (idx1+1) + "-" + (idx2+1) + ".lam" + ".'\n");
-        }
-		catch (IOException e)
-		{
-			Logger.handleException(e, "An I/O exception occurred when writing '" + lamArgs.getOutRoot() + "." + (idx1+1) + "-" + (idx2+1) + ".lam" + "'.\n");
-		}
-
-        FileUtil.CreatePrintStream(new String(lamArgs.getOutRoot() + "." + (idx1+1) + "-" + (idx2+1) + ".lam"));
-       	writer.write(titleLine);
+		double[] ChiExp = sampleChisq(selIdx.length, 1);
+        PrintStream writer = FileUtil.CreatePrintStream(new String(lamArgs.getOutRoot() + "." + (idx1+1) + "-" + (idx2+1) + ".lam"));
+       	writer.print(titleLine);
 
         for (int i = 0; i < selIdx.length; i++)
         {
         	LamUnit lu = LamArray.get(selIdx[i]);
-        	MetaStat ms1 = lu.getMS1();
-        	MetaStat ms2 = lu.getMS2();
-        	ArrayList<Double> d = Bvec.get(selIdx[i]);
-        	double f1 = d.get(0);
-        	double f2 = d.get(1);
-        	double chi0 = 0;
-			try
-			{
-				chi0 = chiDis.inverseCumulativeProbability((i+1)/(selIdx.length+0.05));;
-			}
-			catch (MathException e)
-			{
-				e.printStackTrace();
-			}
-			double lambda = lu.getChi1()/chi0;
-        	writer.write(ms1.getSNP() + "\t" + ms1.getChr() + "\t" + ms1.getBP() + "\t" + ms1.getA1() + "\t" + f1 + "\t"  + ms1.getSE() + "\t" + ms1.getP() + "\t"+ f2 + "\t" + ms2.getSE() + "\t" + ms2.getP() + "\t" +lu.getChi1() + "\t" + chi0 + "\t" + lambda + "\n");
+        	MetaStat ms1 = lu.getMetaStat1();
+        	MetaStat ms2 = lu.getMetaStat2();
+			double lambda = lu.getIndicateStat()/(ChiExp[i]);
+        	writer.print(ms1.getSNP() + "\t" + ms1.getChr() + "\t" + ms1.getBP() + "\t" + ms1.getA1() + "\t" + lu.getB1() + "\t"  + ms1.getSE() + "\t" + ms1.getP() + "\t"+ lu.getB2() + "\t" + ms2.getSE() + "\t" + ms2.getP() + "\t" +lu.getIndicateStat() + "\t" + ChiExp[i] + "\t" + lambda + "\n");
         }
         writer.close();
 	}
 
-	private void Verbose(ArrayList<LamUnit> LamArray, double[] ld, int idx1, int idx2, BVec Bvec)
+	private void Verbose(ArrayList<LamUnit> LamArray, int idx1, int idx2)
 	{
-		ChiSquaredDistributionImpl chiDis = new ChiSquaredDistributionImpl(1);
+		double[] ChiExp = sampleChisq(LamArray.size(), 1);
+        PrintStream writer = FileUtil.CreatePrintStream(new String(lamArgs.getOutRoot() + "." + (idx1+1) + "-" + (idx2+1) + ".lam"));
+       	writer.print(titleLine);
 
-		NaturalRanking ranking = new NaturalRanking(NaNStrategy.MINIMAL, TiesStrategy.SEQUENTIAL);
-        double[] ranks = ranking.rank(ld);
-
-        PrintWriter writer = null;
-        try
-        {
-        	writer = new PrintWriter(new BufferedWriter(new FileWriter(lamArgs.getOutRoot() + "." + (idx1+1) + "-" + (idx2+1) + ".lam")));
-        	Logger.printUserLog("Writting detailed test statistics into '" + lamArgs.getOutRoot() + "." + (idx1+1) + "-" + (idx2+1) + ".lam.'\n");
-        }
-		catch (IOException e)
-		{
-			Logger.handleException(e, "An I/O exception occurred when writing '" + lamArgs.getOutRoot() + "." + (idx1+1) + "-" + (idx2+1) + ".lam" + "'.");
-		}
-
-        FileUtil.CreatePrintStream(new String(lamArgs.getOutRoot() + "." + (idx1+1) + "-" + (idx2+1) + ".lam"));
-       	writer.write(titleLine);
-
-        for (int i = 0; i < ranks.length; i++)
+        for (int i = 0; i < LamArray.size(); i++)
         {
         	LamUnit lu = LamArray.get(i);
-        	MetaStat ms1 = lu.getMS1();
-        	MetaStat ms2 = lu.getMS2();
-        	ArrayList<Double> d = Bvec.get(i);
-        	double f1 = d.get(0);
-        	double f2 = d.get(1);
-        	double chi0 = 0;
-			try
-			{
-				chi0 = chiDis.inverseCumulativeProbability(ranks[i]/(ranks.length+1));
-			}
-			catch (MathException e)
-			{
-				e.printStackTrace();
-			}
-			double lambda = lu.getChi1()/chi0;
-        	writer.write(ms1.getSNP() + "\t" + ms1.getChr() + "\t" + ms1.getBP() + "\t" + ms1.getA1() + "\t" + f1 + "\t"  + ms1.getSE() + "\t" + ms1.getP() + "\t"+ f2 + "\t" + ms2.getSE() + "\t" + ms2.getP() + "\t" +lu.getChi1() + "\t" + chi0 + "\t" + lambda + "\n");
+        	MetaStat ms1 = lu.getMetaStat1();
+        	MetaStat ms2 = lu.getMetaStat2();
+			double lambda = lu.getIndicateStat()/(ChiExp[i]);
+        	writer.print(ms1.getSNP() + "\t" + ms1.getChr() + "\t" + ms1.getBP() + "\t" + ms1.getA1() + "\t" + lu.getB1() + "\t"  + ms1.getSE() + "\t" + ms1.getP() + "\t"+ lu.getB2() + "\t" + ms2.getSE() + "\t" + ms2.getP() + "\t" +lu.getIndicateStat() + "\t" + ChiExp[i] + "\t" + lambda);
         }
         writer.close();
 	}
 
-	private void VerboseGZ(ArrayList<LamUnit> LamArray, double[] ld, int idx1, int idx2, BVec Bvec)
+	private void VerboseGZ(ArrayList<LamUnit> LamArray, int idx1, int idx2)
 	{
-		ChiSquaredDistributionImpl chiDis = new ChiSquaredDistributionImpl(1);
-
-		NaturalRanking ranking = new NaturalRanking(NaNStrategy.MINIMAL, TiesStrategy.SEQUENTIAL);
-        double[] ranks = ranking.rank(ld);
-		BufferedWriter GZ = null;
-		GZ = FileUtil.ZipFileWriter(new String(lamArgs.getOutRoot() + "." + (idx1+1) + "-" + (idx2+1) + ".lam.gz"));
-    	Logger.printUserLog("Writting detailed test statistics into '"+lamArgs.getOutRoot() + "." + (idx1+1) + "-" + (idx2+1) + ".lam.gz.'\n");
+		double[] ChiExp = sampleChisq(LamArray.size(), 1);
+		BufferedWriter GZ = FileUtil.ZipFileWriter(new String(lamArgs.getOutRoot() + "." + (idx1+1) + "-" + (idx2+1) + ".lam.gz"));
 
        	try
 		{
@@ -479,27 +356,15 @@ public class LambdaDCommandImpl extends CommandImpl
 			Logger.handleException(e, "error in writing " + new String(lamArgs.getOutRoot() + "." + (idx1+1) + "-" + (idx2+1) + ".lam.gz"));
 		}
 
-        for (int i = 0; i < ranks.length; i++)
+        for (int i = 0; i < LamArray.size(); i++)
         {
         	LamUnit lu = LamArray.get(i);
-        	MetaStat ms1 = lu.getMS1();
-        	MetaStat ms2 = lu.getMS2();
-        	ArrayList<Double> d = Bvec.get(i);
-        	double f1 = d.get(0);
-        	double f2 = d.get(1);
-        	double chi0 = 0;
-			try
-			{
-				chi0 = chiDis.inverseCumulativeProbability(ranks[i]/(ranks.length+1));
-			}
-			catch (MathException e)
-			{
-				e.printStackTrace();
-			}
-			double lambda = lu.getChi1()/chi0;
+        	MetaStat ms1 = lu.getMetaStat1();
+        	MetaStat ms2 = lu.getMetaStat2();
+			double lambda = lu.getIndicateStat()/(ChiExp[i]);
         	try
 			{
-				GZ.write(ms1.getSNP() + "\t" + ms1.getChr() + "\t" + ms1.getBP() + "\t" + ms1.getA1() + "\t" + f1 + "\t"  + ms1.getSE() + "\t" + ms1.getP() + "\t"+ f2 + "\t" + ms2.getSE() + "\t" + ms2.getP() + "\t" +lu.getChi1() + "\t" + chi0 + "\t" + lambda + "\n");
+				GZ.write(ms1.getSNP() + "\t" + ms1.getChr() + "\t" + ms1.getBP() + "\t" + ms1.getA1() + "\t" + lu.getB1() + "\t"  + ms1.getSE() + "\t" + ms1.getP() + "\t"+ lu.getB2() + "\t" + ms2.getSE() + "\t" + ms2.getP() + "\t" +lu.getIndicateStat() + "\t" + ChiExp[i] + "\t" + lambda + "\n");
 			}
 			catch (IOException e)
 			{
@@ -512,7 +377,7 @@ public class LambdaDCommandImpl extends CommandImpl
 		}
 		catch (IOException e)
 		{
-			Logger.handleException(e, "error in writing " + new String(lamArgs.getOutRoot() + "." + (idx1+1) + "-" + (idx2+1) + ".lam"));
+			Logger.handleException(e, "error in writing " + new String(lamArgs.getOutRoot() + "." + (idx1+1) + "-" + (idx2+1) + ".lam.gz"));
 		}
 	}
 
@@ -618,6 +483,24 @@ public class LambdaDCommandImpl extends CommandImpl
 		writer.close();
 	}
 
+	private double[] sampleChisq(int Len, int df)
+	{
+		ChiSquaredDistributionImpl chiDis = new ChiSquaredDistributionImpl(df);
+		double[] ChiExp = new double[Len];
+        for (int i = 0; i < Len; i++)
+        {
+			try
+			{
+				ChiExp[i] = chiDis.inverseCumulativeProbability((i+1)/(Len+0.05));;
+			}
+			catch (MathException e)
+			{
+				e.printStackTrace();
+			}
+        }
+        return ChiExp;
+	}
+	
 	private double Me = 30000;
 
 	private double R1 = 1;
@@ -633,5 +516,9 @@ public class LambdaDCommandImpl extends CommandImpl
 	private double[][] zMat;
 	private double[][] olCtrlMat;
 	private double[][] olCsMat;
-	private double[][] kMat;	
+	private double[][] kMat;
+	
+	protected static int BETA = 2;
+	protected static int FRQ = 0;
+	protected static int FST = 1;
 }
