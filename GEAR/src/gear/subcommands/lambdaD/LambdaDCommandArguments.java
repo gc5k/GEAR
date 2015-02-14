@@ -231,7 +231,6 @@ public class LambdaDCommandArguments extends CommandArguments
 	{
 		isBeta = false;
 		isFrq = true;
-		isFst = false;
 		mode = FRQ;
 	}
 
@@ -243,24 +242,22 @@ public class LambdaDCommandArguments extends CommandArguments
 	public void setFst()
 	{
 		isBeta = false;
-		isFrq = false;
-		isFst = true;
-		mode = FST;
+		isFrq = true;
+		mode = FRQ;
 	}
 
-	public boolean isFst()
-	{
-		return isFst;
-	}
+//	public boolean isFst()
+//	{
+//		return isFst;
+//	}
 
 	public int getMode()
 	{
 		return mode;
 	}
 
-	protected static int BETA = 2;
-	protected static int FRQ = 0;
-	protected static int FST = 1;
+	protected static int BETA = 0;
+	protected static int FRQ = 1;
 
 	private ArrayList<String> md;
 	private boolean isGZ = false;
@@ -270,7 +267,6 @@ public class LambdaDCommandArguments extends CommandArguments
 
 	private boolean isBeta = true;
 	private boolean isFrq = false;
-	private boolean isFst = false;
 	private int mode = BETA;
 
 	private double Me;
