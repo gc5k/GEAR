@@ -49,6 +49,7 @@ public class LambdaDCommand extends Command
 
 		options.addOption(OptionBuilder.withDescription(OPT_CHR_DESC).hasArg().create(OPT_CHR));
 		options.addOption(OptionBuilder.withDescription(OPT_FST_DESC).create(OPT_FST));
+		options.addOption(OptionBuilder.withDescription(OPT_TOP_DESC).hasArg().create(OPT_TOP));
 	}
 
 	@Override
@@ -149,6 +150,11 @@ public class LambdaDCommand extends Command
 			lamD.setFst();
 		}
 
+		if (cmdLine.hasOption(OPT_TOP))
+		{
+			lamD.setTop(cmdLine.getOptionValue(OPT_TOP));
+		}
+
 		return lamD;
 	}
 
@@ -207,4 +213,7 @@ public class LambdaDCommand extends Command
 	
 	private final static String OPT_FST = "fst";
 	private final static String OPT_FST_DESC = "Using fst (Bruce Weir)";
+	
+	private final static String OPT_TOP = "top";
+	private final static String OPT_TOP_DESC = "Top x files as the reference.";
 }

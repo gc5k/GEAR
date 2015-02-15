@@ -32,18 +32,20 @@ public class LambdaDCommandImpl extends CommandImpl
 
 		if (lamArgs.isQT())
 		{
-			Logger.printUserLog("Analysing summary statistics analysis for quantitative traits.\n");			
+			Logger.printUserLog("Analysing summary statistics analysis for quantitative traits.\n");
 		}
 		else
 		{
-			Logger.printUserLog("Analysing summary statistics analysis for case-contrl studies.\n");			
+			Logger.printUserLog("Analysing summary statistics analysis for case-contrl studies.\n");
 		}
 
 		initial();
 
-//generating matrix
+		// generating matrix
 		String[] MetaFile = gReader.getMetaFile();
-		for (int i = 0; i < MetaFile.length - 1; i++)
+		int FileSize = lamArgs.getTop() > 0 ? lamArgs.getTop()
+				: (MetaFile.length - 1);
+		for (int i = 0; i < FileSize; i++)
 		{
 			for (int j = (i + 1); j < MetaFile.length; j++)
 			{
@@ -74,6 +76,10 @@ public class LambdaDCommandImpl extends CommandImpl
 			}
 		}
 		WriteMat();
+		if (lamArgs.isFrq())
+		{
+			WriteFstMat();
+		}
 		Logger.printUserLog("=========================================================");
 		Logger.printUserLog("Results has been saved in '" + lamArgs
 				.getOutRoot() + ".lmat'.");
@@ -83,13 +89,15 @@ public class LambdaDCommandImpl extends CommandImpl
 	{
 		boolean[] FileKeep = new boolean[lamArgs.getMetaFile().length];
 		Arrays.fill(FileKeep, true);
-		gReader = new GWASReader(lamArgs.getMetaFile(), FileKeep, lamArgs.getKeys(), lamArgs.isQT(), lamArgs.isGZ(), lamArgs.isChr(), lamArgs.getChr());
+		gReader = new GWASReader(lamArgs.getMetaFile(), FileKeep,
+				lamArgs.getKeys(), lamArgs.isQT(), lamArgs.isGZ(),
+				lamArgs.isChr(), lamArgs.getChr());
 		gReader.Start(lamArgs.isFrq());
 
 		Me = lamArgs.getMe();
-		if(Me > 0)
+		if (Me > 0)
 		{
-			Logger.printUserLog("Set the effective number of marker: " + Me);			
+			Logger.printUserLog("Set the effective number of marker: " + Me);
 		}
 		else
 		{
@@ -98,9 +106,9 @@ public class LambdaDCommandImpl extends CommandImpl
 
 		if (lamArgs.isBeta())
 		{
-			Logger.printUserLog("Calculating genetic effects difference.");			
+			Logger.printUserLog("Calculating genetic effects difference.");
 		}
-		else if(lamArgs.isFrq())
+		else if (lamArgs.isFrq())
 		{
 			Logger.printUserLog("Calculating allele frequency difference, and Fst.");
 		}
@@ -121,6 +129,7 @@ public class LambdaDCommandImpl extends CommandImpl
 
 		kMat = new double[NumMetaFile][NumMetaFile];
 
+		fstMat = new double[NumMetaFile][NumMetaFile];
 		for (int i = 0; i < NumMetaFile; i++)
 		{
 			Arrays.fill(lamMat[i], 1);
@@ -133,28 +142,30 @@ public class LambdaDCommandImpl extends CommandImpl
 			}
 			else
 			{
-				olCtrlMat[i][i] = lamArgs.getCCsize()[i*2] + lamArgs.getCCsize()[i*2+1];
-				olCsMat[i][i] = lamArgs.getCCsize()[i*2] + lamArgs.getCCsize()[i*2+1];
+				olCtrlMat[i][i] = lamArgs.getCCsize()[i * 2] + lamArgs
+						.getCCsize()[i * 2 + 1];
+				olCsMat[i][i] = lamArgs.getCCsize()[i * 2] + lamArgs
+						.getCCsize()[i * 2 + 1];
 			}
 		}
 
-//reading meta files
+		// reading meta files
 	}
 
 	private void calculateLambdaD(int idx1, int idx2)
 	{
 		ArrayList<LamUnit> LamArray = NewIt.newArrayList();
 
-//    	DescriptiveStatistics T0 = new DescriptiveStatistics();
+		// DescriptiveStatistics T0 = new DescriptiveStatistics();
 
 		int cntAmbiguous = 0;
 		HashMap<String, MetaStat> SumStat1 = gReader.getMetaStat().get(idx1);
 		HashMap<String, MetaStat> SumStat2 = gReader.getMetaStat().get(idx2);
 
 		ArrayList<String> snpArray = gReader.getMetaSNPArray().get(idx1);
-		
+
 		int[][] KeyIdx = gReader.getKeyIndex();
-		for(String snp : snpArray)
+		for (String snp : snpArray)
 		{
 			if (!SumStat2.containsKey(snp) || !SumStat1.containsKey(snp))
 			{
@@ -181,10 +192,12 @@ public class LambdaDCommandImpl extends CommandImpl
 			}
 
 			boolean lineup = true;
-			if (ms1.getA1() == ms2.getA1() || ms1.getA1() == SNPMatch.Flip(ms2.getA1())) //match A1 in the second meta
+			if (ms1.getA1() == ms2.getA1() || ms1.getA1() == SNPMatch.Flip(ms2
+					.getA1())) // match A1 in the second meta
 			{
 			}
-			else if (ms1.getA1() == ms2.getA2() || ms1.getA1() == SNPMatch.Flip(ms2.getA2())) //match A2 in the second meta
+			else if (ms1.getA1() == ms2.getA2() || ms1.getA1() == SNPMatch
+					.Flip(ms2.getA2())) // match A2 in the second meta
 			{
 				lineup = false;
 			}
@@ -195,25 +208,26 @@ public class LambdaDCommandImpl extends CommandImpl
 			}
 
 			double s1, s2;
-			if(lamArgs.isQT())
+			if (lamArgs.isQT())
 			{
 				s1 = lamArgs.getQTsize()[idx1];
 				s2 = lamArgs.getQTsize()[idx2];
 			}
-			else 
+			else
 			{
-				s1 = lamArgs.getCCsize()[idx1*2] + lamArgs.getCCsize()[idx1*2+1];
-				s2 = lamArgs.getCCsize()[idx2*2] + lamArgs.getCCsize()[idx2*2+1];
+				s1 = lamArgs.getCCsize()[idx1 * 2] + lamArgs.getCCsize()[idx1 * 2 + 1];
+				s2 = lamArgs.getCCsize()[idx2 * 2] + lamArgs.getCCsize()[idx2 * 2 + 1];
 			}
 
-			LamArray.add(new LamUnit(ms1, ms2, lamArgs.getMode(), lineup, s1, s2));
-        }
+			LamArray.add(new LamUnit(ms1, ms2, lamArgs.getMode(), lineup, s1,
+					s2));
+		}
 
 		if (cntAmbiguous > 0)
 		{
 			if (cntAmbiguous == 1)
 			{
-				Logger.printUserLog("Removed " + cntAmbiguous + " ambiguous locus (AT/GC).");				
+				Logger.printUserLog("Removed " + cntAmbiguous + " ambiguous locus (AT/GC).");
 			}
 			else
 			{
@@ -222,41 +236,52 @@ public class LambdaDCommandImpl extends CommandImpl
 		}
 		Logger.printUserLog("Found " + LamArray.size() + " consensus summary statistics between these two files.");
 
-//select independent snps
+		// select independent snps
 		Collections.sort(LamArray);
 
 		int[] selIdx = null;
 		if (Me < 0)
-		{//use all
+		{// use all
 			selIdx = new int[LamArray.size()];
-			for(int i = 0; i < selIdx.length; i++) selIdx[i] = i;
+			for (int i = 0; i < selIdx.length; i++)
+				selIdx[i] = i;
 		}
 		else if (LamArray.size() <= Me)
-		{//use available ones
+		{// use available ones
 			selIdx = new int[LamArray.size()];
-			for(int i = 0; i < selIdx.length; i++) selIdx[i] = i;
+			for (int i = 0; i < selIdx.length; i++)
+				selIdx[i] = i;
 		}
 		else
-		{//use Me
+		{// use Me
 			selIdx = new int[(int) Math.ceil(Me)];
-			for (int i = 0; i < Me; i++) selIdx[i] = (int) Math.floor( (i*1.0 + 1)/Me * LamArray.size() ) -1;
+			for (int i = 0; i < Me; i++)
+				selIdx[i] = (int) Math.floor((i * 1.0 + 1) / Me * LamArray
+						.size()) - 1;
 		}
 
 		BVec Bvec = new BVec();
 		double[] DesStat = new double[selIdx.length];
+		double fst = 0;
 
 		for (int i = 0; i < selIdx.length; i++)
 		{
 			LamUnit lu = LamArray.get(selIdx[i]);
 			DesStat[i] = lu.getIndicateStat(lamArgs.getMode());
+			fst += lu.getFstBW()/selIdx.length;
 			Bvec.addStats(lu.getB1(), lu.getB2(), lu.getSE1(), lu.getSE2());
 		}
 
-		if(lamArgs.isBeta())
+		if (lamArgs.isBeta())
 		{
 			Bvec.setSelected();
 			Bvec.CalCorrelation();
-			Bvec.printOut();			
+			Bvec.printOut();
+		}
+		else
+		{
+			Logger.printUserLog("Fst is " + fst);
+			fstMat[idx2][idx1] = fst;
 		}
 
 		if (lamArgs.isQT())
@@ -277,7 +302,9 @@ public class LambdaDCommandImpl extends CommandImpl
 		else
 		{
 			double[] ccSize = lamArgs.getCCsize();
-			XTest et = new XTest(DesStat, ccSize[idx1*2], ccSize[idx1*2+1], ccSize[idx2*2], ccSize[idx2*2+1]);
+			XTest et = new XTest(DesStat, ccSize[idx1 * 2],
+					ccSize[idx1 * 2 + 1], ccSize[idx2 * 2],
+					ccSize[idx2 * 2 + 1]);
 
 			olCtrlMat[idx1][idx2] = olCsMat[idx1][idx2] = et.getN12();
 			lamMat[idx1][idx2] = lamMat[idx2][idx1] = et.getLambda();
@@ -307,112 +334,139 @@ public class LambdaDCommandImpl extends CommandImpl
 		}
 	}
 
-	private void NotVerbose(ArrayList<LamUnit> LamArray, int idx1, int idx2, int[] selIdx)
+	private void NotVerbose(ArrayList<LamUnit> LamArray, int idx1, int idx2,
+			int[] selIdx)
 	{
 		double[] ChiExp = sampleChisq(selIdx.length, 1);
-        PrintStream writer = FileUtil.CreatePrintStream(new String(lamArgs.getOutRoot() + "." + (idx1+1) + "-" + (idx2+1) + ".lam"));
-       	writer.print(titleLine[lamArgs.getMode()]);
+		PrintStream writer = FileUtil.CreatePrintStream(new String(lamArgs
+				.getOutRoot() + "." + (idx1 + 1) + "-" + (idx2 + 1) + tail[lamArgs.getMode()]));
+		writer.print(titleLine[lamArgs.getMode()]);
 
-        for (int i = 0; i < selIdx.length; i++)
-        {
-        	LamUnit lu = LamArray.get(selIdx[i]);
-        	MetaStat ms1 = lu.getMetaStat1();
-        	MetaStat ms2 = lu.getMetaStat2();
-			double lambda = lu.getIndicateStat(lamArgs.getMode())/(ChiExp[i]);
+		for (int i = 0; i < selIdx.length; i++)
+		{
+			LamUnit lu = LamArray.get(selIdx[i]);
+			MetaStat ms1 = lu.getMetaStat1();
+			MetaStat ms2 = lu.getMetaStat2();
+			double lambda = lu.getIndicateStat(lamArgs.getMode()) / (ChiExp[i]);
 			if (lamArgs.getMode() == LambdaDCommandArguments.BETA)
 			{
-				writer.print(ms1.getSNP() + "\t" + ms1.getChr() + "\t" + ms1.getBP() + "\t" + ms1.getA1() + "\t" + lu.getB1() + "\t"  + ms1.getSE() + "\t" + ms1.getP() + "\t"+ lu.getB2() + "\t" + ms2.getSE() + "\t" + ms2.getP() + "\t" +lu.getIndicateStat(lamArgs.getMode()) + "\t" + ChiExp[i] + "\t" + lambda + "\n");
+				writer.print(ms1.getSNP() + "\t" + ms1.getChr() + "\t" + ms1
+						.getBP() + "\t" + ms1.getA1() + "\t" + lu.getB1() + "\t" + ms1
+						.getSE() + "\t" + ms1.getP() + "\t" + lu.getB2() + "\t" + ms2
+						.getSE() + "\t" + ms2.getP() + "\t" + lu
+						.getIndicateStat(lamArgs.getMode()) + "\t" + ChiExp[i] + "\t" + lambda + "\n");
 			}
 			else
 			{
-				writer.print(ms1.getSNP() + "\t" + ms1.getChr() + "\t" + ms1.getBP() + "\t" + ms1.getA1() + "\t" + lu.getB1() + "\t"  + ms1.getSE() + "\t" + ms1.getP() + "\t"+ lu.getB2() + "\t" + ms2.getSE() + "\t" + ms2.getP() + "\t" +lu.getFstBW()+ "\t"+ lu.getIndicateStat(lamArgs.getMode()) + "\t" + ChiExp[i] + "\t" + lambda + "\n");				
+				writer.print(ms1.getSNP() + "\t" + ms1.getChr() + "\t" + ms1
+						.getBP() + "\t" + ms1.getA1() + "\t" + lu.getB1() + "\t" + ms1
+						.getSE() + "\t" + ms1.getP() + "\t" + lu.getB2() + "\t" + ms2
+						.getSE() + "\t" + ms2.getP() + "\t" + lu.getFstBW() + "\t" + lu
+						.getIndicateStat(lamArgs.getMode()) + "\t" + ChiExp[i] + "\t" + lambda + "\n");
 			}
-        }
-        writer.close();
+		}
+		writer.close();
 	}
 
 	private void Verbose(ArrayList<LamUnit> LamArray, int idx1, int idx2)
 	{
 		double[] ChiExp = sampleChisq(LamArray.size(), 1);
-        PrintStream writer = FileUtil.CreatePrintStream(new String(lamArgs.getOutRoot() + "." + (idx1+1) + "-" + (idx2+1) + ".lam"));
-       	writer.print(titleLine[lamArgs.getMode()]);
+		PrintStream writer = FileUtil.CreatePrintStream(new String(lamArgs
+				.getOutRoot() + "." + (idx1 + 1) + "-" + (idx2 + 1) + tail[lamArgs.getMode()]));
+		writer.print(titleLine[lamArgs.getMode()]);
 
-        for (int i = 0; i < LamArray.size(); i++)
-        {
-        	LamUnit lu = LamArray.get(i);
-        	MetaStat ms1 = lu.getMetaStat1();
-        	MetaStat ms2 = lu.getMetaStat2();
-			double lambda = lu.getIndicateStat(lamArgs.getMode())/(ChiExp[i]);
+		for (int i = 0; i < LamArray.size(); i++)
+		{
+			LamUnit lu = LamArray.get(i);
+			MetaStat ms1 = lu.getMetaStat1();
+			MetaStat ms2 = lu.getMetaStat2();
+			double lambda = lu.getIndicateStat(lamArgs.getMode()) / (ChiExp[i]);
 			if (lamArgs.getMode() == LambdaDCommandArguments.BETA)
 			{
-	        	writer.print(ms1.getSNP() + "\t" + ms1.getChr() + "\t" + ms1.getBP() + "\t" + ms1.getA1() + "\t" + lu.getB1() + "\t"  + ms1.getSE() + "\t" + ms1.getP() + "\t"+ lu.getB2() + "\t" + ms2.getSE() + "\t" + ms2.getP() + "\t" +lu.getIndicateStat(lamArgs.getMode()) + "\t" + ChiExp[i] + "\t" + lambda);				
+				writer.print(ms1.getSNP() + "\t" + ms1.getChr() + "\t" + ms1
+						.getBP() + "\t" + ms1.getA1() + "\t" + lu.getB1() + "\t" + ms1
+						.getSE() + "\t" + ms1.getP() + "\t" + lu.getB2() + "\t" + ms2
+						.getSE() + "\t" + ms2.getP() + "\t" + lu
+						.getIndicateStat(lamArgs.getMode()) + "\t" + ChiExp[i] + "\t" + lambda);
 			}
 			else
 			{
-	        	writer.print(ms1.getSNP() + "\t" + ms1.getChr() + "\t" + ms1.getBP() + "\t" + ms1.getA1() + "\t" + lu.getB1() + "\t"  + ms1.getSE() + "\t" + ms1.getP() + "\t"+ lu.getB2() + "\t" + ms2.getSE() + "\t" + ms2.getP() + "\t" + lu.getFstBW() + "\t" + lu.getIndicateStat(lamArgs.getMode()) + "\t" + ChiExp[i] + "\t" + lambda);				
+				writer.print(ms1.getSNP() + "\t" + ms1.getChr() + "\t" + ms1
+						.getBP() + "\t" + ms1.getA1() + "\t" + lu.getB1() + "\t" + ms1
+						.getSE() + "\t" + ms1.getP() + "\t" + lu.getB2() + "\t" + ms2
+						.getSE() + "\t" + ms2.getP() + "\t" + lu.getFstBW() + "\t" + lu
+						.getIndicateStat(lamArgs.getMode()) + "\t" + ChiExp[i] + "\t" + lambda);
 			}
-        }
-        writer.close();
+		}
+		writer.close();
 	}
 
 	private void VerboseGZ(ArrayList<LamUnit> LamArray, int idx1, int idx2)
 	{
 		double[] ChiExp = sampleChisq(LamArray.size(), 1);
-		BufferedWriter GZ = FileUtil.ZipFileWriter(new String(lamArgs.getOutRoot() + "." + (idx1+1) + "-" + (idx2+1) + ".lam.gz"));
+		BufferedWriter GZ = FileUtil
+				.ZipFileWriter(new String(
+						lamArgs.getOutRoot() + "." + (idx1 + 1) + "-" + (idx2 + 1) + tail[lamArgs.getMode()] + ".gz"));
 
-       	try
+		try
 		{
 			GZ.append(titleLine[lamArgs.getMode()]);
 		}
 		catch (IOException e)
 		{
-			Logger.handleException(e, "error in writing " + new String(lamArgs.getOutRoot() + "." + (idx1+1) + "-" + (idx2+1) + ".lam.gz"));
+			Logger.handleException(	e,
+									"error in writing " + new String(
+											lamArgs.getOutRoot() + "." + (idx1 + 1) + "-" + (idx2 + 1) + tail[lamArgs.getMode()] + ".gz"));
 		}
 
-        for (int i = 0; i < LamArray.size(); i++)
-        {
-        	LamUnit lu = LamArray.get(i);
-        	MetaStat ms1 = lu.getMetaStat1();
-        	MetaStat ms2 = lu.getMetaStat2();
-			double lambda = lu.getIndicateStat(lamArgs.getMode())/(ChiExp[i]);
-        	try
+		for (int i = 0; i < LamArray.size(); i++)
+		{
+			LamUnit lu = LamArray.get(i);
+			MetaStat ms1 = lu.getMetaStat1();
+			MetaStat ms2 = lu.getMetaStat2();
+			double lambda = lu.getIndicateStat(lamArgs.getMode()) / (ChiExp[i]);
+			try
 			{
-        		if (lamArgs.getMode() == LambdaDCommandArguments.BETA)
-        		{
-    				GZ.write(ms1.getSNP() + "\t" + ms1.getChr() + "\t" + ms1.getBP() + "\t" + ms1.getA1() + "\t" + lu.getB1() + "\t"  + ms1.getSE() + "\t" + ms1.getP() + "\t"+ lu.getB2() + "\t" + ms2.getSE() + "\t" + ms2.getP() + "\t" + lu.getIndicateStat(lamArgs.getMode()) + "\t" + ChiExp[i] + "\t" + lambda + "\n");        			
-        		}
-        		else
-        		{
-    				GZ.write(ms1.getSNP() + "\t" + ms1.getChr() + "\t" + ms1.getBP() + "\t" + ms1.getA1() + "\t" + lu.getB1() + "\t"  + ms1.getSE() + "\t" + ms1.getP() + "\t"+ lu.getB2() + "\t" + ms2.getSE() + "\t" + ms2.getP() + "\t" + lu.getFstBW() + "\t" + lu.getIndicateStat(lamArgs.getMode()) + "\t" + ChiExp[i] + "\t" + lambda + "\n");        			
-        		}
+				if (lamArgs.getMode() == LambdaDCommandArguments.BETA)
+				{
+					GZ.write(ms1.getSNP() + "\t" + ms1.getChr() + "\t" + ms1
+							.getBP() + "\t" + ms1.getA1() + "\t" + lu.getB1() + "\t" + ms1
+							.getSE() + "\t" + ms1.getP() + "\t" + lu.getB2() + "\t" + ms2
+							.getSE() + "\t" + ms2.getP() + "\t" + lu
+							.getIndicateStat(lamArgs.getMode()) + "\t" + ChiExp[i] + "\t" + lambda + "\n");
+				}
+				else
+				{
+					GZ.write(ms1.getSNP() + "\t" + ms1.getChr() + "\t" + ms1
+							.getBP() + "\t" + ms1.getA1() + "\t" + lu.getB1() + "\t" + ms1
+							.getSE() + "\t" + ms1.getP() + "\t" + lu.getB2() + "\t" + ms2
+							.getSE() + "\t" + ms2.getP() + "\t" + lu.getFstBW() + "\t" + lu
+							.getIndicateStat(lamArgs.getMode()) + "\t" + ChiExp[i] + "\t" + lambda + "\n");
+				}
 			}
 			catch (IOException e)
 			{
-				Logger.handleException(e, "error in writing " + new String(lamArgs.getOutRoot() + "." + (idx1+1) + "-" + (idx2+1) + ".lam.gz"));
+				Logger.handleException(	e,
+										"error in writing " + new String(
+												lamArgs.getOutRoot() + "." + (idx1 + 1) + "-" + (idx2 + 1) + ".lam.gz"));
 			}
-        }
-        try
+		}
+		try
 		{
 			GZ.close();
 		}
 		catch (IOException e)
 		{
-			Logger.handleException(e, "error in writing " + new String(lamArgs.getOutRoot() + "." + (idx1+1) + "-" + (idx2+1) + ".lam.gz"));
+			Logger.handleException(	e,
+									"error in writing " + new String(
+											lamArgs.getOutRoot() + "." + (idx1 + 1) + "-" + (idx2 + 1) + ".lam.gz"));
 		}
 	}
 
 	private void WriteMat()
 	{
-		//cm matrix
-		PrintWriter cwriter = null;
-		try 
-		{
-			cwriter = new PrintWriter(new BufferedWriter(new FileWriter(lamArgs.getOutRoot() + ".cm")));
-		}
-		catch (IOException e)
-		{
-			Logger.handleException(e, "An I/O exception occurred when writing '" + lamArgs.getOutRoot() + ".cm" + "'.");
-		}
+		// cm matrix
+		PrintStream cwriter = FileUtil.CreatePrintStream(new String(lamArgs.getOutRoot() + ".cm"));
 
 		for (int i = 0; i < zMat.length; i++)
 		{
@@ -424,16 +478,8 @@ public class LambdaDCommandImpl extends CommandImpl
 		}
 		cwriter.close();
 
-		//Xmatrix
-		PrintWriter xwriter = null;
-		try 
-		{
-			xwriter = new PrintWriter(new BufferedWriter(new FileWriter(lamArgs.getOutRoot() + ".xm")));
-		}
-		catch (IOException e)
-		{
-			Logger.handleException(e, "An I/O exception occurred when writing '" + lamArgs.getOutRoot() + ".xm" + "'.");
-		}
+		// Xmatrix
+		PrintStream xwriter = FileUtil.CreatePrintStream(new String(lamArgs.getOutRoot() + ".xm"));
 
 		for (int i = 0; i < kMat.length; i++)
 		{
@@ -445,15 +491,7 @@ public class LambdaDCommandImpl extends CommandImpl
 		}
 		xwriter.close();
 
-		PrintWriter writer = null;
-		try 
-		{
-			writer = new PrintWriter(new BufferedWriter(new FileWriter(lamArgs.getOutRoot() + ".lmat")));
-		}
-		catch (IOException e)
-		{
-			Logger.handleException(e, "An I/O exception occurred when writing '" + lamArgs.getOutRoot() + ".lmat" + "'.");
-		}
+		PrintStream writer = FileUtil.CreatePrintStream(new String(lamArgs.getOutRoot() + ".lmat"));
 
 		writer.println("LambdaMeta:");
 		for (int i = 0; i < lamMat.length; i++)
@@ -507,20 +545,36 @@ public class LambdaDCommandImpl extends CommandImpl
 	{
 		ChiSquaredDistributionImpl chiDis = new ChiSquaredDistributionImpl(df);
 		double[] ChiExp = new double[Len];
-        for (int i = 0; i < Len; i++)
-        {
+		for (int i = 0; i < Len; i++)
+		{
 			try
 			{
-				ChiExp[i] = chiDis.inverseCumulativeProbability((i+1)/(Len+0.05));;
+				ChiExp[i] = chiDis
+						.inverseCumulativeProbability((i + 1) / (Len + 0.05));
+				;
 			}
 			catch (MathException e)
 			{
 				e.printStackTrace();
 			}
-        }
-        return ChiExp;
+		}
+		return ChiExp;
 	}
-	
+
+	private void WriteFstMat()
+	{
+		PrintStream FstWriter = FileUtil.CreatePrintStream(new String(lamArgs.getOutRoot() + ".fst"));
+		for (int i = 0; i < fstMat.length; i++)
+		{
+			for (int j = 0; j < fstMat[i].length; j++)
+			{
+				FstWriter.print(String.format("%.4f", fstMat[i][j]) + " ");
+			}
+			FstWriter.println();
+		}
+		FstWriter.close();
+	}
+
 	private double Me = 30000;
 
 	private double R1 = 1;
@@ -528,8 +582,11 @@ public class LambdaDCommandImpl extends CommandImpl
 	private double Kappa = 1;
 	private LambdaDCommandArguments lamArgs;
 
-	private String[] titleLine= {"SNP\tChr\tBp\tA1\tBeta1\tSE1\tP1\tBeta2\tSE2\tP2\tChiObs(beta)\tChiExp\tLambdaD\n",
-			"SNP\tChr\tBp\tA1\tFrq1\tSE1\tP1\tFrq2\tSE2\tP2\tFst\tChiObs(Frq)\tChiExp\tLambdaD\n"};
+	private String[] titleLine = {
+			"SNP\tChr\tBp\tA1\tBeta1\tSE1\tP1\tBeta2\tSE2\tP2\tChiObs(beta)\tChiExp\tLambdaD\n",
+			"SNP\tChr\tBp\tA1\tFrq1\tSE1\tP1\tFrq2\tSE2\tP2\tFst\tChiObs(Frq)\tChiExp\tLambdaD\n" };
+
+	private String[] tail = {".lamB", ".lamF"};
 
 	private GWASReader gReader;
 
@@ -538,5 +595,6 @@ public class LambdaDCommandImpl extends CommandImpl
 	private double[][] olCtrlMat;
 	private double[][] olCsMat;
 	private double[][] kMat;
-	
+	private double[][] fstMat;
+
 }
