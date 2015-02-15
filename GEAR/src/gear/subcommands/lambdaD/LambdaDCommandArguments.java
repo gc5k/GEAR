@@ -246,6 +246,16 @@ public class LambdaDCommandArguments extends CommandArguments
 		mode = FRQ;
 	}
 
+	public void setTop(String top)
+	{
+		this.Top = Integer.parseInt(top);
+	}
+	
+	public int getTop()
+	{
+		return Top;
+	}
+
 //	public boolean isFst()
 //	{
 //		return isFst;
@@ -269,7 +279,8 @@ public class LambdaDCommandArguments extends CommandArguments
 	private boolean isFrq = false;
 	private int mode = BETA;
 
-	private double Me;
+	private double Me = 30000;
+	private int Top = 0;
 
 	private int chr = 0;
 	private boolean chrFlag = false;
