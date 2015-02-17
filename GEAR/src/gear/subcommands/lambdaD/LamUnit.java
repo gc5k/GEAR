@@ -51,6 +51,7 @@ public class LamUnit implements Comparable<LamUnit>
 		double f_m = n1 / (n1+n2) * b1 + n2 / (n1+n2) * b2;
 		double s_m = (n1 + n2) / 2;
 		fstBW = (n1/s_m * (b1-f_m)*(b1-f_m) + n2/s_m * (b2-f_m) * (b2-f_m))/(f_m * (1-f_m));
+		fstChi = s_m * fstBW;
 	}
 
 	public double getIndicateStat(int m)
@@ -73,7 +74,7 @@ public class LamUnit implements Comparable<LamUnit>
 	{
 		return chi1;
 	}
-	
+
 	public double getFrqChi()
 	{
 		return chi1;
@@ -93,7 +94,12 @@ public class LamUnit implements Comparable<LamUnit>
 	{
 		return chi1;
 	}
-	
+
+	public double getFstChi()
+	{
+		return fstChi;
+	}
+
 	public MetaStat getMetaStat1()
 	{
 		return ms1;
@@ -126,6 +132,7 @@ public class LamUnit implements Comparable<LamUnit>
 
 	private double chi1;
 	private double fstBW;
+	private double fstChi;
 	private double b1;
 	private double b2;
 	private double se1;
