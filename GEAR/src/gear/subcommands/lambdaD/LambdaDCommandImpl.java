@@ -1,10 +1,8 @@
 package gear.subcommands.lambdaD;
 
 import java.io.BufferedWriter;
-import java.io.FileWriter;
 import java.io.IOException;
 import java.io.PrintStream;
-import java.io.PrintWriter;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -235,6 +233,12 @@ public class LambdaDCommandImpl extends CommandImpl
 			}
 		}
 		Logger.printUserLog("Found " + LamArray.size() + " consensus summary statistics between these two files.");
+		
+		if (LamArray.size() < ((int) (Me * 0.2)))
+		{
+			Logger.printUserLog("Too few overlapping snps, skip this pair of files");
+			return;
+		}
 
 		// select independent snps
 		Collections.sort(LamArray);
@@ -361,7 +365,7 @@ public class LambdaDCommandImpl extends CommandImpl
 				writer.print(ms1.getSNP() + "\t" + ms1.getChr() + "\t" + ms1
 						.getBP() + "\t" + ms1.getA1() + "\t" + lu.getB1() + "\t" + ms1
 						.getSE() + "\t" + ms1.getP() + "\t" + lu.getB2() + "\t" + ms2
-						.getSE() + "\t" + ms2.getP() + "\t" + lu.getFstBW() + "\t" + lu
+						.getSE() + "\t" + ms2.getP() + "\t" + lu.getFstBW() + "\t" + lu.getFrqChi() + "\t" + lu
 						.getIndicateStat(lamArgs.getMode()) + "\t" + ChiExp[i] + "\t" + lambda + "\n");
 			}
 		}
@@ -394,7 +398,7 @@ public class LambdaDCommandImpl extends CommandImpl
 				writer.print(ms1.getSNP() + "\t" + ms1.getChr() + "\t" + ms1
 						.getBP() + "\t" + ms1.getA1() + "\t" + lu.getB1() + "\t" + ms1
 						.getSE() + "\t" + ms1.getP() + "\t" + lu.getB2() + "\t" + ms2
-						.getSE() + "\t" + ms2.getP() + "\t" + lu.getFstBW() + "\t" + lu
+						.getSE() + "\t" + ms2.getP() + "\t" + lu.getFstBW() + "\t" + lu.getFrqChi() + "\t" + lu
 						.getIndicateStat(lamArgs.getMode()) + "\t" + ChiExp[i] + "\t" + lambda);
 			}
 		}
@@ -440,7 +444,7 @@ public class LambdaDCommandImpl extends CommandImpl
 					GZ.write(ms1.getSNP() + "\t" + ms1.getChr() + "\t" + ms1
 							.getBP() + "\t" + ms1.getA1() + "\t" + lu.getB1() + "\t" + ms1
 							.getSE() + "\t" + ms1.getP() + "\t" + lu.getB2() + "\t" + ms2
-							.getSE() + "\t" + ms2.getP() + "\t" + lu.getFstBW() + "\t" + lu
+							.getSE() + "\t" + ms2.getP() + "\t" + lu.getFstBW() + "\t" + lu.getFstChi() + "\t" + lu
 							.getIndicateStat(lamArgs.getMode()) + "\t" + ChiExp[i] + "\t" + lambda + "\n");
 				}
 			}
@@ -568,7 +572,7 @@ public class LambdaDCommandImpl extends CommandImpl
 		{
 			for (int j = 0; j < fstMat[i].length; j++)
 			{
-				FstWriter.print(String.format("%.4f", fstMat[i][j]) + " ");
+				FstWriter.print(String.format("%.5f", fstMat[i][j]) + " ");
 			}
 			FstWriter.println();
 		}
@@ -584,7 +588,7 @@ public class LambdaDCommandImpl extends CommandImpl
 
 	private String[] titleLine = {
 			"SNP\tChr\tBp\tA1\tBeta1\tSE1\tP1\tBeta2\tSE2\tP2\tChiObs(beta)\tChiExp\tLambdaD\n",
-			"SNP\tChr\tBp\tA1\tFrq1\tSE1\tP1\tFrq2\tSE2\tP2\tFst\tChiObs(Frq)\tChiExp\tLambdaD\n" };
+			"SNP\tChr\tBp\tA1\tFrq1\tSE1\tP1\tFrq2\tSE2\tP2\tFst\tChiObs(Fst)\tChiObs(Frq)\tChiExp\tLambdaD\n" };
 
 	private String[] tail = {".lamB", ".lamF"};
 
