@@ -365,7 +365,7 @@ public class LambdaDCommandImpl extends CommandImpl
 				writer.print(ms1.getSNP() + "\t" + ms1.getChr() + "\t" + ms1
 						.getBP() + "\t" + ms1.getA1() + "\t" + lu.getB1() + "\t" + ms1
 						.getSE() + "\t" + ms1.getP() + "\t" + lu.getB2() + "\t" + ms2
-						.getSE() + "\t" + ms2.getP() + "\t" + lu.getFstBW() + "\t" + lu.getFrqChi() + "\t" + lu
+						.getSE() + "\t" + ms2.getP() + "\t" + lu.getFstBW() + "\t" + lu.getFstChi() + "\t" + lu
 						.getIndicateStat(lamArgs.getMode()) + "\t" + ChiExp[i] + "\t" + lambda + "\n");
 			}
 		}
@@ -398,7 +398,7 @@ public class LambdaDCommandImpl extends CommandImpl
 				writer.print(ms1.getSNP() + "\t" + ms1.getChr() + "\t" + ms1
 						.getBP() + "\t" + ms1.getA1() + "\t" + lu.getB1() + "\t" + ms1
 						.getSE() + "\t" + ms1.getP() + "\t" + lu.getB2() + "\t" + ms2
-						.getSE() + "\t" + ms2.getP() + "\t" + lu.getFstBW() + "\t" + lu.getFrqChi() + "\t" + lu
+						.getSE() + "\t" + ms2.getP() + "\t" + lu.getFstBW() + "\t" + lu.getFstChi() + "\t" + lu
 						.getIndicateStat(lamArgs.getMode()) + "\t" + ChiExp[i] + "\t" + lambda);
 			}
 		}
