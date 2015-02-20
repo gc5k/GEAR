@@ -2,11 +2,13 @@ package gear.family.pedigree.file;
 
 import gear.util.Logger;
 import gear.util.NewIt;
+import gear.util.BufferedReader;
 
-import java.io.BufferedReader;
+//import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
+import java.util.HashSet;
 
 public class BIMReader extends MapFile
 {
@@ -19,56 +21,41 @@ public class BIMReader extends MapFile
 	public void parseMap()
 	{
 		mapfile = new File(mf);
-		BufferedReader reader = null;
-		try
+		BufferedReader reader = BufferedReader.openTextFile(mf, "bim");
+		String[] tokens = null;
+		int c = 0;
+		HashSet<String> markerSet = NewIt.newHashSet();
+		while ((tokens = reader.readTokens(6)) != null)
 		{
-			reader = new BufferedReader(new FileReader(mapfile));
-		} catch (IOException e)
-		{
-			Logger.handleException(e, "Can't open the file '" + mf + "'.");
-		}
-
-		String line = null;
-		try
-		{
-			int c = 0;
-			while ((line = reader.readLine()) != null)
+			c++;
+			if (tokens.length < 6)
 			{
-				c++;
-				String[] tokens = line.split(DELIMITER);
-				if (tokens.length < 6)
+				String badline = new String();
+				for(int i = 0; i < tokens.length; i++)
 				{
-					if (badline == null)
-						badline = NewIt.newArrayList();
-					badline.add(new Integer(c));
+					badline += tokens[i] + "  ";
 				}
-				String chr = tokens[0];
-				String name = tokens[1];
-				// Skip genetic distance field at tokens[2].
-				float dis = Float.parseFloat(tokens[2]);
-				int pos = Integer.parseInt(tokens[3]);
-				addSNP(chr, name, dis, pos, tokens[4].charAt(0),
-						tokens[5].charAt(0));
+				Logger.printUserLog("Line " + c + " has fewer than 6 elements. '" + badline + "'");
+				Logger.printUserError("Line " + c + " has fewer than 6 elements. '" + badline + "'");
+				Logger.printUserLog("GEAR quitted.");
+				System.exit(0);
 			}
-			reader.close();
-		} catch (IOException e)
-		{
-			Logger.handleException(e,
-					"An exception occurred when reading the map file '" + mf
-							+ "'.");
-		}
-
-		if (badline != null)
-		{
-			Logger.printUserError("problems with the lines below:");
-			String badlines = "";
-			for (Integer i : badline)
+			String chr = tokens[0];
+			String name = tokens[1];
+			float dis = Float.parseFloat(tokens[2]);
+			int pos = Integer.parseInt(tokens[3]);
+			addSNP(chr, name, dis, pos, tokens[4].charAt(0),
+					tokens[5].charAt(0));
+			if (markerSet.contains(name))
 			{
-				badlines += i + ",";
+				Logger.printUserLog("'"+ name + "' duplicated.");
 			}
-			Logger.printUserError(badlines);
-			System.exit(1);
-		}
+			else
+			{
+				markerSet.add(name);
+			}
+		} while ((tokens = reader.readTokens(6)) != null);
+
 		numMarkerOriginal = snpList.size();
 	}
 
