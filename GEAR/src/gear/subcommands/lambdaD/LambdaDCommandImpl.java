@@ -293,7 +293,7 @@ public class LambdaDCommandImpl extends CommandImpl
 			double[] qtSize = lamArgs.getQTsize();
 			XTest et = new XTest(DesStat, qtSize[idx1], qtSize[idx2]);
 
-			olCtrlMat[idx1][idx2] = olCsMat[idx1][idx2] = et.getN12();
+			olCtrlMat[idx2][idx1] = olCsMat[idx1][idx2] = et.getN12();
 			lamMat[idx1][idx2] = lamMat[idx2][idx1] = et.getLambda();
 			zMat[idx2][idx1] = et.getRho();
 			zMat[idx1][idx2] = et.getZ();
