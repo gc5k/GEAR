@@ -285,7 +285,7 @@ public class LambdaDCommandImpl extends CommandImpl
 		else
 		{
 			Logger.printUserLog("Fst is " + fst);
-			fstMat[idx2][idx1] = fst;
+			fstMat[idx2][idx1] = fstMat[idx1][idx2] = fst;
 		}
 
 		if (lamArgs.isQT())
@@ -324,17 +324,20 @@ public class LambdaDCommandImpl extends CommandImpl
 			olCsMat[idx2][idx1] = et.getN12cs();
 		}
 
-		if (lamArgs.isVerboseGZ())
+		if (!lamArgs.isClean())
 		{
-			VerboseGZ(LamArray, idx1, idx2);
-		}
-		else if (lamArgs.isVerbose())
-		{
-			Verbose(LamArray, idx1, idx2);
-		}
-		else
-		{
-			NotVerbose(LamArray, idx1, idx2, selIdx);
+			if (lamArgs.isVerboseGZ())
+			{
+				VerboseGZ(LamArray, idx1, idx2);
+			}
+			else if (lamArgs.isVerbose())
+			{
+				Verbose(LamArray, idx1, idx2);
+			}
+			else
+			{
+				NotVerbose(LamArray, idx1, idx2, selIdx);
+			}			
 		}
 	}
 
