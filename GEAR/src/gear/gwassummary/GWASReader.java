@@ -197,7 +197,7 @@ public class GWASReader
 		if (KeyIdx[metaIdx][BETA] == -1)
 		{
 			Logger.printUserLog("Cannot find the beta/or column in " + workingMetaFile.get(metaIdx));
-		}		
+		}
 		if (KeyIdx[metaIdx][SE] == -1)
 		{
 			Logger.printUserLog("Cannot find the se value column in " + workingMetaFile.get(metaIdx));
@@ -312,17 +312,17 @@ public class GWASReader
 				}
 				else 
 				{
-					int chr = 0;
+					int chr = -1;
 					try
 					{
 						chr = Integer.parseInt(tokens[KeyIdx[metaIdx][CHR]]);						
 					}
 					catch (NumberFormatException e)
 					{
-						Logger.printUserLog(e.toString() + " in line " + total + " in '" + workingMetaFile.get(metaIdx) + ".'");
+						Logger.printUserLog(e.toString() + " in line " + total + " in '" + workingMetaFile.get(metaIdx) + ".' is a bad value for chromosome. Skipped this marker.");
 						continue;
 					}
-					ms.setChr(chr);					
+					ms.setChr(chr);
 				}
 				
 				if (isChr)
@@ -335,17 +335,16 @@ public class GWASReader
 			}
 			if (KeyIdx[metaIdx][BP] != -1)
 			{
-				int bp = 0;
+				long bp = -1;
 				try
 				{
-					bp = Integer.parseInt(tokens[KeyIdx[metaIdx][BP]]);	
-				} 
+					bp = Long.parseLong(tokens[KeyIdx[metaIdx][BP]]);	
+				}
 				catch (NumberFormatException e)
 				{
-					Logger.printUserError(e.toString() + " in line " + total + " in '" + workingMetaFile.get(metaIdx) + ".'");
+					Logger.printUserLog(e.toString() + " in line " + total + " in '" + workingMetaFile.get(metaIdx) + "' is a bad value for position. Skipped this marker.");
 					continue;
 				}
-
 				ms.setBP(bp);
 			}
 			if (KeyIdx[metaIdx][A2] != -1)
@@ -362,8 +361,8 @@ public class GWASReader
 			{
 				sumstat.put(ms.getSNP(), ms);
 				snpArray.add(ms.getSNP());
-			
-				if ( MetaSNPTable.containsKey(ms.getSNP()) )
+
+				if ( MetaSNPTable.containsKey(ms.getSNP()))
 				{
 					ArrayList<Integer> snpCnt = MetaSNPTable.get(ms.getSNP());
 					snpCnt.set(metaIdx, 1);

@@ -24,7 +24,7 @@ public class MetaStat
 		this.chr = chr;
 	}
 	
-	public void setBP(int bp)
+	public void setBP(long bp)
 	{
 		this.bp = bp;
 	}
