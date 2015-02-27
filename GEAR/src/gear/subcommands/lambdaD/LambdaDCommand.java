@@ -50,6 +50,7 @@ public class LambdaDCommand extends Command
 		options.addOption(OptionBuilder.withDescription(OPT_CHR_DESC).hasArg().create(OPT_CHR));
 		options.addOption(OptionBuilder.withDescription(OPT_FST_DESC).create(OPT_FST));
 		options.addOption(OptionBuilder.withDescription(OPT_TOP_DESC).hasArg().create(OPT_TOP));
+		options.addOption(OptionBuilder.withDescription(OPT_CLEAN_DESC).create(OPT_CLEAN));
 	}
 
 	@Override
@@ -155,6 +156,10 @@ public class LambdaDCommand extends Command
 			lamD.setTop(cmdLine.getOptionValue(OPT_TOP));
 		}
 
+		if (cmdLine.hasOption(OPT_CLEAN))
+		{
+			lamD.setClean();
+		}
 		return lamD;
 	}
 
@@ -216,4 +221,7 @@ public class LambdaDCommand extends Command
 	
 	private final static String OPT_TOP = "top";
 	private final static String OPT_TOP_DESC = "Top x files as the reference.";
+	
+	private final static String OPT_CLEAN = "clean";
+	private final static String OPT_CLEAN_DESC = "No detailed result for each pair of cohorts.";
 }

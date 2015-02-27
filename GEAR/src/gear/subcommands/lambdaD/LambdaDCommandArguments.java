@@ -246,6 +246,16 @@ public class LambdaDCommandArguments extends CommandArguments
 		mode = FRQ;
 	}
 
+	public void setClean()
+	{
+		isClean = true;
+	}
+	
+	public boolean isClean()
+	{
+		return isClean;
+	}
+
 	public void setTop(String top)
 	{
 		this.Top = Integer.parseInt(top);
@@ -274,6 +284,8 @@ public class LambdaDCommandArguments extends CommandArguments
 	private boolean isQT = true;
 	private boolean isVerbose = false;
 	private boolean isVerboseGZ = false;
+
+	private boolean isClean = false;
 
 	private boolean isBeta = true;
 	private boolean isFrq = false;
