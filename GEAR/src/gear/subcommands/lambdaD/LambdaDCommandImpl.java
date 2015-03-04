@@ -8,9 +8,6 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
 
-import org.apache.commons.math.MathException;
-import org.apache.commons.math.distribution.ChiSquaredDistributionImpl;
-
 import gear.gwassummary.GWASReader;
 import gear.gwassummary.MetaStat;
 import gear.subcommands.CommandArguments;
@@ -19,6 +16,7 @@ import gear.util.FileUtil;
 import gear.util.Logger;
 import gear.util.NewIt;
 import gear.util.SNPMatch;
+import gear.util.Sample;
 
 public class LambdaDCommandImpl extends CommandImpl
 {
@@ -70,7 +68,14 @@ public class LambdaDCommandImpl extends CommandImpl
 				}
 				Logger.printUserLog("Kappa: " + Kappa);
 
-				calculateLambdaD(i, j);
+				if (lamArgs.isRapid())
+				{
+					calculateRapidLambdaD(i, j);
+				}
+				else
+				{
+					calculateLambdaD(i, j);
+				}
 			}
 		}
 		WriteMat();
@@ -150,6 +155,206 @@ public class LambdaDCommandImpl extends CommandImpl
 		// reading meta files
 	}
 
+	private void calculateRapidLambdaD(int idx1, int idx2)
+	{
+		ArrayList<LamUnit> LamArray = NewIt.newArrayList();
+
+		// DescriptiveStatistics T0 = new DescriptiveStatistics();
+
+		int cntAmbiguous = 0;
+		HashMap<String, MetaStat> SumStat1 = gReader.getMetaStat().get(idx1);
+		HashMap<String, MetaStat> SumStat2 = gReader.getMetaStat().get(idx2);
+
+		ArrayList<String> snpArray = gReader.getMetaSNPArray().get(idx1);
+
+		int[] RandIdx = Sample.SampleIndex(0, snpArray.size() - 1, snpArray.size());
+
+		int[][] KeyIdx = gReader.getKeyIndex();
+		int cnt = 0;
+		int idx = 0;
+		while( (cnt < lamArgs.getMe()) && (idx < RandIdx.length) )
+		{
+			String snp = snpArray.get(RandIdx[idx]);
+			idx++;
+			if (!SumStat2.containsKey(snp))
+			{
+				continue;
+			}
+
+			MetaStat ms1 = SumStat1.get(snp);
+			MetaStat ms2 = SumStat2.get(snp);
+
+			if (KeyIdx[idx1][GWASReader.SE] != -1)
+			{
+				if (SNPMatch.isAmbiguous(ms1.getA1(), ms1.getA2()))
+				{
+					cntAmbiguous++;
+					continue;
+				}
+			}
+
+			if (KeyIdx[idx2][GWASReader.SE] != -1)
+			{
+				if (SNPMatch.isAmbiguous(ms2.getA1(), ms2.getA2()))
+				{
+					cntAmbiguous++;
+					continue;
+				}
+			}
+
+			boolean lineup = true;
+			if (ms1.getA1() == ms2.getA1() || ms1.getA1() == SNPMatch.Flip(ms2
+					.getA1())) // match A1 in the second meta
+			{
+			}
+			else if (ms1.getA1() == ms2.getA2() || ms1.getA1() == SNPMatch
+					.Flip(ms2.getA2())) // match A2 in the second meta
+			{
+				lineup = false;
+			}
+			else
+			{
+				cntAmbiguous++;
+				continue;
+			}
+
+			double s1, s2;
+			if (lamArgs.isQT())
+			{
+				s1 = lamArgs.getQTsize()[idx1];
+				s2 = lamArgs.getQTsize()[idx2];
+			}
+			else
+			{
+				s1 = lamArgs.getCCsize()[idx1 * 2] + lamArgs.getCCsize()[idx1 * 2 + 1];
+				s2 = lamArgs.getCCsize()[idx2 * 2] + lamArgs.getCCsize()[idx2 * 2 + 1];
+			}
+
+			LamArray.add(new LamUnit(ms1, ms2, lamArgs.getMode(), lineup, s1,
+					s2));
+			cnt++;
+		}
+
+		if (cntAmbiguous > 0)
+		{
+			if (cntAmbiguous == 1)
+			{
+				Logger.printUserLog("Removed " + cntAmbiguous + " ambiguous locus (AT/GC).");
+			}
+			else
+			{
+				Logger.printUserLog("Removed " + cntAmbiguous + " ambiguous loci (AT/GC).");
+			}
+		}
+		Logger.printUserLog("Found " + LamArray.size() + " consensus summary statistics between these two files.");
+		
+		if (LamArray.size() < ((int) (Me * 0.2)))
+		{
+			Logger.printUserLog("Too few overlapping snps, skip this pair of files");
+			return;
+		}
+
+		// select independent snps
+		Collections.sort(LamArray);
+
+		int[] selIdx = null;
+		if (Me < 0)
+		{// use all
+			selIdx = new int[LamArray.size()];
+			for (int i = 0; i < selIdx.length; i++)
+				selIdx[i] = i;
+		}
+		else if (LamArray.size() <= Me)
+		{// use available ones
+			selIdx = new int[LamArray.size()];
+			for (int i = 0; i < selIdx.length; i++)
+				selIdx[i] = i;
+		}
+		else
+		{// use Me
+			selIdx = new int[(int) Math.ceil(Me)];
+			for (int i = 0; i < Me; i++)
+				selIdx[i] = (int) Math.floor((i * 1.0 + 1) / Me * LamArray
+						.size()) - 1;
+		}
+
+		BVec Bvec = new BVec();
+		double[] DesStat = new double[selIdx.length];
+		double fst = 0;
+
+		for (int i = 0; i < selIdx.length; i++)
+		{
+			LamUnit lu = LamArray.get(selIdx[i]);
+			DesStat[i] = lu.getIndicateStat(lamArgs.getMode());
+			fst += lu.getFstBW()/selIdx.length;
+			Bvec.addStats(lu.getB1(), lu.getB2(), lu.getSE1(), lu.getSE2());
+		}
+
+		if (lamArgs.isBeta())
+		{
+			Bvec.setSelected();
+			Bvec.CalCorrelation();
+			Bvec.printOut();
+		}
+		else
+		{
+			Logger.printUserLog("Fst is " + fst);
+			fstMat[idx2][idx1] = fstMat[idx1][idx2] = fst;
+		}
+
+		if (lamArgs.isQT())
+		{
+			double[] qtSize = lamArgs.getQTsize();
+			XTest et = new XTest(DesStat, qtSize[idx1], qtSize[idx2]);
+
+			olCtrlMat[idx2][idx1] = olCsMat[idx1][idx2] = et.getN12();
+			lamMat[idx1][idx2] = lamMat[idx2][idx1] = et.getLambda();
+			zMat[idx2][idx1] = et.getRho();
+			zMat[idx1][idx2] = et.getZ();
+
+			kMat[idx1][idx2] = et.getX();
+			kMat[idx2][idx1] = Kappa;
+
+			et.PrintQT();
+		}
+		else
+		{
+			double[] ccSize = lamArgs.getCCsize();
+			XTest et = new XTest(DesStat, ccSize[idx1 * 2],
+					ccSize[idx1 * 2 + 1], ccSize[idx2 * 2],
+					ccSize[idx2 * 2 + 1]);
+
+			olCtrlMat[idx1][idx2] = olCsMat[idx1][idx2] = et.getN12();
+			lamMat[idx1][idx2] = lamMat[idx2][idx1] = et.getLambda();
+			zMat[idx2][idx1] = et.getRho();
+			zMat[idx1][idx2] = et.getZ();
+
+			kMat[idx1][idx2] = et.getX();
+			kMat[idx2][idx1] = Kappa;
+
+			et.PrintCC();
+
+			olCtrlMat[idx2][idx1] = et.getN12cl();
+			olCsMat[idx2][idx1] = et.getN12cs();
+		}
+
+		if (!lamArgs.isClean())
+		{
+			if (lamArgs.isVerboseGZ())
+			{
+				VerboseGZ(LamArray, idx1, idx2);
+			}
+			else if (lamArgs.isVerbose())
+			{
+				Verbose(LamArray, idx1, idx2);
+			}
+			else
+			{
+				NotVerbose(LamArray, idx1, idx2, selIdx);
+			}			
+		}
+	}
+
 	private void calculateLambdaD(int idx1, int idx2)
 	{
 		ArrayList<LamUnit> LamArray = NewIt.newArrayList();
@@ -165,7 +370,7 @@ public class LambdaDCommandImpl extends CommandImpl
 		int[][] KeyIdx = gReader.getKeyIndex();
 		for (String snp : snpArray)
 		{
-			if (!SumStat2.containsKey(snp) || !SumStat1.containsKey(snp))
+			if (!SumStat2.containsKey(snp))
 			{
 				continue;
 			}
@@ -295,8 +500,17 @@ public class LambdaDCommandImpl extends CommandImpl
 
 			olCtrlMat[idx2][idx1] = olCsMat[idx1][idx2] = et.getN12();
 			lamMat[idx1][idx2] = lamMat[idx2][idx1] = et.getLambda();
-			zMat[idx2][idx1] = et.getRho();
-			zMat[idx1][idx2] = et.getZ();
+			
+			if (lamArgs.isRandom())
+			{
+				zMat[idx2][idx1] = Bvec.getZcorrelation();
+				zMat[idx1][idx2] = Bvec.getPvZcorrelation();
+			}
+			else
+			{
+				zMat[idx2][idx1] = et.getRho();
+				zMat[idx1][idx2] = et.getZ();				
+			}
 
 			kMat[idx1][idx2] = et.getX();
 			kMat[idx2][idx1] = Kappa;
@@ -312,11 +526,19 @@ public class LambdaDCommandImpl extends CommandImpl
 
 			olCtrlMat[idx1][idx2] = olCsMat[idx1][idx2] = et.getN12();
 			lamMat[idx1][idx2] = lamMat[idx2][idx1] = et.getLambda();
-			zMat[idx2][idx1] = et.getRho();
-			zMat[idx1][idx2] = et.getZ();
+			if (lamArgs.isRandom())
+			{
+				zMat[idx2][idx1] = Bvec.getZcorrelation();
+				zMat[idx1][idx2] = Bvec.getPvZcorrelation();
+			}
+			else
+			{
+				zMat[idx2][idx1] = et.getRho();
+				zMat[idx1][idx2] = et.getZ();				
+			}
 
-			kMat[idx1][idx2] = Kappa;
-			kMat[idx2][idx1] = et.getX();
+			kMat[idx1][idx2] = et.getX();
+			kMat[idx2][idx1] = Kappa;
 
 			et.PrintCC();
 
@@ -344,7 +566,7 @@ public class LambdaDCommandImpl extends CommandImpl
 	private void NotVerbose(ArrayList<LamUnit> LamArray, int idx1, int idx2,
 			int[] selIdx)
 	{
-		double[] ChiExp = sampleChisq(selIdx.length, 1);
+		double[] ChiExp = Sample.sampleChisq(selIdx.length, 1);
 		PrintStream writer = FileUtil.CreatePrintStream(new String(lamArgs
 				.getOutRoot() + "." + (idx1 + 1) + "-" + (idx2 + 1) + tail[lamArgs.getMode()]));
 		writer.print(titleLine[lamArgs.getMode()]);
@@ -377,7 +599,7 @@ public class LambdaDCommandImpl extends CommandImpl
 
 	private void Verbose(ArrayList<LamUnit> LamArray, int idx1, int idx2)
 	{
-		double[] ChiExp = sampleChisq(LamArray.size(), 1);
+		double[] ChiExp = Sample.sampleChisq(LamArray.size(), 1);
 		PrintStream writer = FileUtil.CreatePrintStream(new String(lamArgs
 				.getOutRoot() + "." + (idx1 + 1) + "-" + (idx2 + 1) + tail[lamArgs.getMode()]));
 		writer.print(titleLine[lamArgs.getMode()]);
@@ -410,7 +632,7 @@ public class LambdaDCommandImpl extends CommandImpl
 
 	private void VerboseGZ(ArrayList<LamUnit> LamArray, int idx1, int idx2)
 	{
-		double[] ChiExp = sampleChisq(LamArray.size(), 1);
+		double[] ChiExp = Sample.sampleChisq(LamArray.size(), 1);
 		BufferedWriter GZ = FileUtil
 				.ZipFileWriter(new String(
 						lamArgs.getOutRoot() + "." + (idx1 + 1) + "-" + (idx2 + 1) + tail[lamArgs.getMode()] + ".gz"));
@@ -473,7 +695,15 @@ public class LambdaDCommandImpl extends CommandImpl
 	private void WriteMat()
 	{
 		// cm matrix
-		PrintStream cwriter = FileUtil.CreatePrintStream(new String(lamArgs.getOutRoot() + ".cm"));
+		PrintStream cwriter = null;
+		if (lamArgs.isRandom() )
+		{
+			cwriter = FileUtil.CreatePrintStream(new String(lamArgs.getOutRoot() + ".rcm"));
+		}
+		else
+		{
+			cwriter = FileUtil.CreatePrintStream(new String(lamArgs.getOutRoot() + ".cm"));			
+		}
 
 		for (int i = 0; i < zMat.length; i++)
 		{
@@ -546,26 +776,6 @@ public class LambdaDCommandImpl extends CommandImpl
 		}
 
 		writer.close();
-	}
-
-	private double[] sampleChisq(int Len, int df)
-	{
-		ChiSquaredDistributionImpl chiDis = new ChiSquaredDistributionImpl(df);
-		double[] ChiExp = new double[Len];
-		for (int i = 0; i < Len; i++)
-		{
-			try
-			{
-				ChiExp[i] = chiDis
-						.inverseCumulativeProbability((i + 1) / (Len + 0.05));
-				;
-			}
-			catch (MathException e)
-			{
-				e.printStackTrace();
-			}
-		}
-		return ChiExp;
 	}
 
 	private void WriteFstMat()
