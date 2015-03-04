@@ -256,6 +256,26 @@ public class LambdaDCommandArguments extends CommandArguments
 		return isClean;
 	}
 
+	public void setRapid()
+	{
+		isRapid = true;
+	}
+	
+	public boolean isRapid()
+	{
+		return isRapid;
+	}
+
+	public void setRandom()
+	{
+		isRandom = true;
+	}
+	
+	public boolean isRandom()
+	{
+		return isRandom;
+	}
+
 	public void setTop(String top)
 	{
 		this.Top = Integer.parseInt(top);
@@ -286,6 +306,8 @@ public class LambdaDCommandArguments extends CommandArguments
 	private boolean isVerboseGZ = false;
 
 	private boolean isClean = false;
+	private boolean isRapid = false;
+	private boolean isRandom = false;
 
 	private boolean isBeta = true;
 	private boolean isFrq = false;

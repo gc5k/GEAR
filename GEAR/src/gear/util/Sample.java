@@ -4,6 +4,9 @@ import gear.CmdArgs;
 
 import java.util.Random;
 
+import org.apache.commons.math.MathException;
+import org.apache.commons.math.distribution.ChiSquaredDistributionImpl;
+
 /**
  * 
  * @author Guo-Bo Chen, chenguobo@gmail.com
@@ -67,5 +70,26 @@ public class Sample
 		}
 		return index;
 	}
+	
+	public static double[] sampleChisq(int Len, int df)
+	{
+		ChiSquaredDistributionImpl chiDis = new ChiSquaredDistributionImpl(df);
+		double[] ChiExp = new double[Len];
+		for (int i = 0; i < Len; i++)
+		{
+			try
+			{
+				ChiExp[i] = chiDis
+						.inverseCumulativeProbability((i + 1) / (Len + 0.05));
+				;
+			}
+			catch (MathException e)
+			{
+				e.printStackTrace();
+			}
+		}
+		return ChiExp;
+	}
+
 
 }

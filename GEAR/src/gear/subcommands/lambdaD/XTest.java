@@ -1,6 +1,7 @@
 package gear.subcommands.lambdaD;
 
 import gear.util.Logger;
+import gear.util.Sample;
 import gear.util.stat.PrecisePvalue;
 
 import org.apache.commons.math.MathException;
@@ -8,6 +9,7 @@ import org.apache.commons.math.distribution.ChiSquaredDistributionImpl;
 import org.apache.commons.math.distribution.NormalDistributionImpl;
 import org.apache.commons.math.random.RandomDataImpl;
 import org.apache.commons.math.stat.descriptive.DescriptiveStatistics;
+import org.apache.commons.math.stat.regression.SimpleRegression;
 
 public class XTest
 {
@@ -25,6 +27,7 @@ public class XTest
 			XVec.addValue(DesStat[i]);
 		}
 
+		ChisqSample = Sample.sampleChisq(DesStat.length, 1);
 		CalZ();
 	}
 
@@ -45,6 +48,7 @@ public class XTest
 			XVec.addValue(DesStat[i]);
 		}
 
+		ChisqSample = Sample.sampleChisq(DesStat.length, 1);
 		CalZ();
 		CalCC();
 	}
@@ -91,14 +95,15 @@ public class XTest
 		}
 
 		//rho
-		rho = -Z * (n1+n2)/Math.sqrt(2*Me*n1*n2);
+		rho = -Z * (n1 + n2)/Math.sqrt(2 * Me * n1 * n2);
 		//sigma_rho
-		sigma_rho = (n1+n2)/Math.sqrt(2 * Me * n1 * n2);
+		sigma_rho = (n1 + n2)/Math.sqrt(2 * Me * n1 * n2);
 		//n12
-		n12 = -Z * (n1+n2)/Math.sqrt(2*Me);
+		n12 = -Z * (n1 + n2)/Math.sqrt(2 * Me);
 		//sigma_n12
-		sigma_n12 = (n1 + n2)/Math.sqrt(2*Me);
+		sigma_n12 = (n1 + n2)/Math.sqrt(2 * Me);
 
+		RegChi();
 		if(XVec.getN() % 2 == 0)
 		{
 			ChiMedian = ( XVec.getElement((int) (XVec.getN()/2-1)) + XVec.getElement((int) XVec.getN()/2) )/2;
@@ -224,6 +229,19 @@ public class XTest
 		}
 	}
 
+	private void RegChi()
+	{
+		int start= (int) (Me * 0.05);
+		int end = (int) (Me * 0.95);
+		SimpleRegression reg = new SimpleRegression();
+
+		for(int i = start; i < end; i++)
+		{
+			reg.addData(ChisqSample[i], XVec.getElement(i));
+		}
+		System.out.println(reg.getSlope());
+	}
+
 	private NormalDistributionImpl nDis = new NormalDistributionImpl();
 
 	private double[] DesStat;
@@ -257,4 +275,7 @@ public class XTest
 	private double lambdaM = 0;
 	private double sigma_lambdaM = 0;
 	private double pLam = 0;
+	
+	private double[] ChisqSample;
+
 }

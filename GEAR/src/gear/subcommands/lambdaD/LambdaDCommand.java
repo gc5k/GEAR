@@ -51,6 +51,9 @@ public class LambdaDCommand extends Command
 		options.addOption(OptionBuilder.withDescription(OPT_FST_DESC).create(OPT_FST));
 		options.addOption(OptionBuilder.withDescription(OPT_TOP_DESC).hasArg().create(OPT_TOP));
 		options.addOption(OptionBuilder.withDescription(OPT_CLEAN_DESC).create(OPT_CLEAN));
+		options.addOption(OptionBuilder.withDescription(OPT_RAPID_DESC).create(OPT_RAPID));
+		
+		options.addOption(OptionBuilder.withDescription(OPT_RCM_DESC).create(OPT_RCM));		
 	}
 
 	@Override
@@ -160,6 +163,17 @@ public class LambdaDCommand extends Command
 		{
 			lamD.setClean();
 		}
+		
+		if (cmdLine.hasOption(OPT_RAPID))
+		{
+			lamD.setRapid();
+		}
+
+		if (cmdLine.hasOption(OPT_RCM))
+		{
+			lamD.setRandom();
+		}
+
 		return lamD;
 	}
 
@@ -224,4 +238,11 @@ public class LambdaDCommand extends Command
 	
 	private final static String OPT_CLEAN = "clean";
 	private final static String OPT_CLEAN_DESC = "No detailed result for each pair of cohorts.";
+	
+	private final static String OPT_RAPID = "rapid";
+	private final static String OPT_RAPID_DESC = "Rapid method to sample snps.";
+
+	private final static String OPT_RCM = "rcm";
+	private final static String OPT_RCM_DESC = "Random model to estimate correlation.";
+
 }
