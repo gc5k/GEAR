@@ -305,7 +305,7 @@ public class LambdaDCommandImpl extends CommandImpl
 		if (lamArgs.isQT())
 		{
 			double[] qtSize = lamArgs.getQTsize();
-			XTest et = new XTest(DesStat, qtSize[idx1], qtSize[idx2]);
+			XTest et = new XTest(DesStat, qtSize[idx1], qtSize[idx2], lamArgs.isTrim());
 
 			olCtrlMat[idx2][idx1] = olCsMat[idx1][idx2] = et.getN12();
 			lamMat[idx1][idx2] = lamMat[idx2][idx1] = et.getLambda();
@@ -322,7 +322,7 @@ public class LambdaDCommandImpl extends CommandImpl
 			double[] ccSize = lamArgs.getCCsize();
 			XTest et = new XTest(DesStat, ccSize[idx1 * 2],
 					ccSize[idx1 * 2 + 1], ccSize[idx2 * 2],
-					ccSize[idx2 * 2 + 1]);
+					ccSize[idx2 * 2 + 1], lamArgs.isTrim());
 
 			olCtrlMat[idx1][idx2] = olCsMat[idx1][idx2] = et.getN12();
 			lamMat[idx1][idx2] = lamMat[idx2][idx1] = et.getLambda();
@@ -496,7 +496,7 @@ public class LambdaDCommandImpl extends CommandImpl
 		if (lamArgs.isQT())
 		{
 			double[] qtSize = lamArgs.getQTsize();
-			XTest et = new XTest(DesStat, qtSize[idx1], qtSize[idx2]);
+			XTest et = new XTest(DesStat, qtSize[idx1], qtSize[idx2], lamArgs.isTrim());
 
 			olCtrlMat[idx2][idx1] = olCsMat[idx1][idx2] = et.getN12();
 			lamMat[idx1][idx2] = lamMat[idx2][idx1] = et.getLambda();
@@ -522,7 +522,7 @@ public class LambdaDCommandImpl extends CommandImpl
 			double[] ccSize = lamArgs.getCCsize();
 			XTest et = new XTest(DesStat, ccSize[idx1 * 2],
 					ccSize[idx1 * 2 + 1], ccSize[idx2 * 2],
-					ccSize[idx2 * 2 + 1]);
+					ccSize[idx2 * 2 + 1], lamArgs.isTrim());
 
 			olCtrlMat[idx1][idx2] = olCsMat[idx1][idx2] = et.getN12();
 			lamMat[idx1][idx2] = lamMat[idx2][idx1] = et.getLambda();
@@ -559,7 +559,7 @@ public class LambdaDCommandImpl extends CommandImpl
 			else
 			{
 				NotVerbose(LamArray, idx1, idx2, selIdx);
-			}			
+			}
 		}
 	}
 
