@@ -79,6 +79,10 @@ public class LambdaDCommandImpl extends CommandImpl
 			}
 		}
 		WriteMat();
+		if(lamArgs.isBeta())
+		{
+			WriteRandMat();
+		}
 		if (lamArgs.isFrq())
 		{
 			WriteFstMat();
@@ -133,8 +137,14 @@ public class LambdaDCommandImpl extends CommandImpl
 		kMat = new double[NumMetaFile][NumMetaFile];
 
 		fstMat = new double[NumMetaFile][NumMetaFile];
+		
+		RandOverlapMat = new double[NumMetaFile][NumMetaFile];
+		RandRgMat = new double[NumMetaFile][NumMetaFile];
+
 		for (int i = 0; i < NumMetaFile; i++)
 		{
+			RandOverlapMat[i][i] = 1;
+			RandRgMat[i][i] = 1;
 			Arrays.fill(lamMat[i], 1);
 			Arrays.fill(zMat[i], 1);
 			Arrays.fill(kMat[i], 1);
@@ -295,6 +305,8 @@ public class LambdaDCommandImpl extends CommandImpl
 			Bvec.setSelected();
 			Bvec.CalCorrelation();
 			Bvec.printOut();
+			RandOverlapMat[idx1][idx2] = RandOverlapMat[idx2][idx1] = Bvec.getZcorrelation();
+			RandRgMat[idx1][idx2] = RandRgMat[idx2][idx1] = Bvec.getRg();
 		}
 		else
 		{
@@ -305,7 +317,7 @@ public class LambdaDCommandImpl extends CommandImpl
 		if (lamArgs.isQT())
 		{
 			double[] qtSize = lamArgs.getQTsize();
-			XTest et = new XTest(DesStat, qtSize[idx1], qtSize[idx2], lamArgs.isTrim());
+			XTest et = new XTest(DesStat, qtSize[idx1], qtSize[idx2], lamArgs.getTrimValue());
 
 			olCtrlMat[idx2][idx1] = olCsMat[idx1][idx2] = et.getN12();
 			lamMat[idx1][idx2] = lamMat[idx2][idx1] = et.getLambda();
@@ -322,7 +334,7 @@ public class LambdaDCommandImpl extends CommandImpl
 			double[] ccSize = lamArgs.getCCsize();
 			XTest et = new XTest(DesStat, ccSize[idx1 * 2],
 					ccSize[idx1 * 2 + 1], ccSize[idx2 * 2],
-					ccSize[idx2 * 2 + 1], lamArgs.isTrim());
+					ccSize[idx2 * 2 + 1], lamArgs.getTrimValue());
 
 			olCtrlMat[idx1][idx2] = olCsMat[idx1][idx2] = et.getN12();
 			lamMat[idx1][idx2] = lamMat[idx2][idx1] = et.getLambda();
@@ -486,6 +498,8 @@ public class LambdaDCommandImpl extends CommandImpl
 			Bvec.setSelected();
 			Bvec.CalCorrelation();
 			Bvec.printOut();
+			RandOverlapMat[idx1][idx2] = RandOverlapMat[idx2][idx1] = Bvec.getZcorrelation();
+			RandRgMat[idx1][idx2] = RandRgMat[idx2][idx1] = Bvec.getRg();
 		}
 		else
 		{
@@ -496,21 +510,13 @@ public class LambdaDCommandImpl extends CommandImpl
 		if (lamArgs.isQT())
 		{
 			double[] qtSize = lamArgs.getQTsize();
-			XTest et = new XTest(DesStat, qtSize[idx1], qtSize[idx2], lamArgs.isTrim());
+			XTest et = new XTest(DesStat, qtSize[idx1], qtSize[idx2], lamArgs.getTrimValue());
 
 			olCtrlMat[idx2][idx1] = olCsMat[idx1][idx2] = et.getN12();
 			lamMat[idx1][idx2] = lamMat[idx2][idx1] = et.getLambda();
 			
-			if (lamArgs.isRandom())
-			{
-				zMat[idx2][idx1] = Bvec.getZcorrelation();
-				zMat[idx1][idx2] = Bvec.getPvZcorrelation();
-			}
-			else
-			{
-				zMat[idx2][idx1] = et.getRho();
-				zMat[idx1][idx2] = et.getZ();				
-			}
+			zMat[idx2][idx1] = et.getRho();
+			zMat[idx1][idx2] = et.getZ();			
 
 			kMat[idx1][idx2] = et.getX();
 			kMat[idx2][idx1] = Kappa;
@@ -522,20 +528,12 @@ public class LambdaDCommandImpl extends CommandImpl
 			double[] ccSize = lamArgs.getCCsize();
 			XTest et = new XTest(DesStat, ccSize[idx1 * 2],
 					ccSize[idx1 * 2 + 1], ccSize[idx2 * 2],
-					ccSize[idx2 * 2 + 1], lamArgs.isTrim());
+					ccSize[idx2 * 2 + 1], lamArgs.getTrimValue());
 
 			olCtrlMat[idx1][idx2] = olCsMat[idx1][idx2] = et.getN12();
 			lamMat[idx1][idx2] = lamMat[idx2][idx1] = et.getLambda();
-			if (lamArgs.isRandom())
-			{
-				zMat[idx2][idx1] = Bvec.getZcorrelation();
-				zMat[idx1][idx2] = Bvec.getPvZcorrelation();
-			}
-			else
-			{
-				zMat[idx2][idx1] = et.getRho();
-				zMat[idx1][idx2] = et.getZ();				
-			}
+			zMat[idx2][idx1] = et.getRho();
+			zMat[idx1][idx2] = et.getZ();				
 
 			kMat[idx1][idx2] = et.getX();
 			kMat[idx2][idx1] = Kappa;
@@ -692,6 +690,36 @@ public class LambdaDCommandImpl extends CommandImpl
 		}
 	}
 
+	private void WriteRandMat()
+	{
+		// cm matrix
+		PrintStream rwriter = null;
+		rwriter = FileUtil.CreatePrintStream(new String(lamArgs.getOutRoot() + ".rcm"));
+
+		for (int i = 0; i < RandOverlapMat.length; i++)
+		{
+			for (int j = 0; j < RandOverlapMat[i].length; j++)
+			{
+				rwriter.print(String.format("%.4f", RandOverlapMat[i][j]) + " ");
+			}
+			rwriter.println();
+		}
+		rwriter.close();
+
+		// Xmatrix
+		PrintStream gwriter = FileUtil.CreatePrintStream(new String(lamArgs.getOutRoot() + ".rgcm"));
+
+		for (int i = 0; i < RandRgMat.length; i++)
+		{
+			for (int j = 0; j < RandRgMat[i].length; j++)
+			{
+				gwriter.print(String.format("%.4f", RandRgMat[i][j]) + " ");
+			}
+			gwriter.println();
+		}
+		gwriter.close();
+	}
+
 	private void WriteMat()
 	{
 		// cm matrix
@@ -813,5 +841,7 @@ public class LambdaDCommandImpl extends CommandImpl
 	private double[][] olCsMat;
 	private double[][] kMat;
 	private double[][] fstMat;
+	private double[][] RandOverlapMat;
+	private double[][] RandRgMat;
 
 }

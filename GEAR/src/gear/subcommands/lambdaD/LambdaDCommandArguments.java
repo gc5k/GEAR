@@ -276,14 +276,20 @@ public class LambdaDCommandArguments extends CommandArguments
 		return isRandom;
 	}
 
-	public void setTrim()
+	public void setTrim(double tr)
 	{
 		isTrim = true;
+		trim = tr;
 	}
 
 	public boolean isTrim()
 	{
 		return isTrim;
+	}
+
+	public double getTrimValue()
+	{
+		return trim;
 	}
 
 	public void setTop(String top)
@@ -319,6 +325,7 @@ public class LambdaDCommandArguments extends CommandArguments
 	private boolean isRapid = false;
 	private boolean isRandom = false;
 	private boolean isTrim = false;
+	private double trim = 0;
 
 	private boolean isBeta = true;
 	private boolean isFrq = false;
