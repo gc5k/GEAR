@@ -276,6 +276,16 @@ public class LambdaDCommandArguments extends CommandArguments
 		return isRandom;
 	}
 
+	public void setTrim()
+	{
+		isTrim = true;
+	}
+
+	public boolean isTrim()
+	{
+		return isTrim;
+	}
+
 	public void setTop(String top)
 	{
 		this.Top = Integer.parseInt(top);
@@ -308,6 +318,7 @@ public class LambdaDCommandArguments extends CommandArguments
 	private boolean isClean = false;
 	private boolean isRapid = false;
 	private boolean isRandom = false;
+	private boolean isTrim = false;
 
 	private boolean isBeta = true;
 	private boolean isFrq = false;

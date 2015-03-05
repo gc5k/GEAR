@@ -14,15 +14,15 @@ import org.apache.commons.math.stat.regression.SimpleRegression;
 public class XTest
 {
 
-	public XTest(double[] DesStat, double n1, double n2)
+	public XTest(double[] DesStat, double n1, double n2, boolean isTrim)
 	{
-		this.DesStat = DesStat;
-		checkStat();
+//		this.DesStat = DesStat;
+		checkStat(DesStat, isTrim);
 
 		this.n1 = n1;
 		this.n2 = n2;
-		Me = DesStat.length;
-		for(int i = 0; i < DesStat.length; i++)
+		Me = this.DesStat.length;
+		for(int i = 0; i < this.DesStat.length; i++)
 		{
 			XVec.addValue(DesStat[i]);
 		}
@@ -31,10 +31,10 @@ public class XTest
 		CalZ();
 	}
 
-	public XTest(double[] DesStat, double cs1, double ctrl1, double cs2, double ctrl2)
+	public XTest(double[] DesStat, double cs1, double ctrl1, double cs2, double ctrl2, boolean isTrim)
 	{
-		this.DesStat = DesStat;
-		checkStat();
+//		this.DesStat = DesStat;
+		checkStat(DesStat, isTrim);
 
 		this.cs1 = cs1;
 		this.ctrl1 = ctrl1;
@@ -42,7 +42,7 @@ public class XTest
 		this.ctrl2 = ctrl2;
 		this.n1 = cs1 + ctrl1;
 		this.n2 = cs2 + ctrl2;
-		Me = DesStat.length;
+		Me = this.DesStat.length;
 		for(int i = 0; i < DesStat.length; i++)
 		{
 			XVec.addValue(DesStat[i]);
@@ -53,15 +53,24 @@ public class XTest
 		CalCC();
 	}
 
-	private void checkStat()
+	private void checkStat(double[] ds, boolean isTrim)
 	{
-		int cnt = 0;
-		for(int i = 0; i < DesStat.length; i++)
+		int start = 0;
+		int end = ds.length;
+		if (isTrim)
 		{
-			if(DesStat[i] == Double.POSITIVE_INFINITY)
+			start = (int) (ds.length * 0.025);
+			end = (int) (ds.length * 0.975);
+		}
+
+		this.DesStat = new double[end-start];
+		int cnt = 0;
+		for(int i = start; i < end; i++)
+		{
+			if(ds[i] == Double.POSITIVE_INFINITY)
 			{
 				cnt++;
-				DesStat[i] = DesStat[i-1] + 0.05;
+				DesStat[i] = ds[i-1] + 0.05;
 			}
 		}
 		if(cnt == 1)
