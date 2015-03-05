@@ -54,7 +54,7 @@ public class LambdaDCommand extends Command
 		options.addOption(OptionBuilder.withDescription(OPT_RAPID_DESC).create(OPT_RAPID));
 		
 		options.addOption(OptionBuilder.withDescription(OPT_RCM_DESC).create(OPT_RCM));
-		options.addOption(OptionBuilder.withDescription(OPT_TRIM_DESC).create(OPT_TRIM));
+		options.addOption(OptionBuilder.withDescription(OPT_TRIM_DESC).hasOptionalArg().create(OPT_TRIM));
 
 	}
 
@@ -178,7 +178,7 @@ public class LambdaDCommand extends Command
 
 		if (cmdLine.hasOption(OPT_TRIM))
 		{
-			lamD.setTrim();
+			lamD.setTrim(parseDoubleOptionValueInRange(cmdLine, OPT_TRIM, OPT_TRIM_DEFAULT, 0, 0.45));
 		}
 
 		return lamD;
@@ -253,6 +253,7 @@ public class LambdaDCommand extends Command
 	private final static String OPT_RCM_DESC = "Random model to estimate correlation.";
 
 	private final static String OPT_TRIM = "trim";
+	private final static String OPT_TRIM_DEFAULT = "0.001";
 	private final static String OPT_TRIM_DESC = "trim off the top and the bottom 5% of markers in calculating lambda_meta and its derived statistics.";
 
 }

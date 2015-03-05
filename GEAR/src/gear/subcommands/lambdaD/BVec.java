@@ -55,6 +55,8 @@ public class BVec
 		double[][] zscore = new double[selIdx.length][2];
 		double[][] chiscore = new double[selIdx.length][2];
 
+		double Z12 = 0, Z1sq = 0, Z2sq = 0;
+
 		for(int i = 0; i < selIdx.length; i++)
 		{
 			ArrayList<Double> s = sum.get(selIdx[i]);
@@ -63,7 +65,10 @@ public class BVec
 			
 			zscore[i][0] = s.get(4);
 			zscore[i][1] = s.get(5);
-			
+			Z12 += zscore[i][0] * zscore[i][1];
+			Z1sq += zscore[i][0] * zscore[i][0];
+			Z2sq += zscore[i][1] * zscore[i][1];
+
 			chiscore[i][0] = s.get(6);
 			chiscore[i][1] = s.get(7);
 		}
@@ -96,26 +101,34 @@ public class BVec
 		
 		chilm = new SimpleRegression();
 		chilm.addData(chiscore);
+
+		/////////////////
+		rg = Z12/Math.sqrt(((Z1sq - zscore.length) * (Z2sq - zscore.length)));
 	}
 
 	public double getBcorrelation()
 	{
 		return rb;
 	}
-	
+
 	public double getZcorrelation()
 	{
 		return rz;
 	}
-	
+
 	public double getPvBcorrelation()
 	{
 		return prb;
 	}
-	
+
 	public double getPvZcorrelation()
 	{
 		return prz;
+	}
+
+	public double getRg()
+	{
+		return rg;
 	}
 
 	public void printOut()
@@ -137,13 +150,14 @@ public class BVec
 		Logger.printUserLog("Effect regression intercept: " + zlm.getIntercept() + " (" + zlm.getInterceptStdErr() + ")");
 		Logger.printUserLog("Effect regression coefficient: " + zlm.getSlope() + " (" + zlm.getSlopeStdErr() + ")");
 
-		
 		Logger.printUserLog("Chisq score correlation: " + rchi);
 		Logger.printUserLog("p-value for z score (two-tails): " + prchi);
 
 		Logger.printUserLog("Chisq score regression:");
 		Logger.printUserLog("Effect regression intercept: " + chilm.getIntercept() + " (" + chilm.getInterceptStdErr() + ")");
 		Logger.printUserLog("Effect regression coefficient: " + chilm.getSlope() + " (" + chilm.getSlopeStdErr() + ")");
+		
+		Logger.printUserLog("Genetic correlation(rg):" + rg);
 	}
 
 	ArrayList<ArrayList<Double>> sum = null;
@@ -158,6 +172,8 @@ public class BVec
 
 	private double rchi;
 	private double prchi;
+
+	private double rg = 0;
 
 	private SimpleRegression blm;
 	private SimpleRegression zlm;
