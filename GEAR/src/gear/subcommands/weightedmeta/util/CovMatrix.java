@@ -13,12 +13,13 @@ import gear.util.Logger;
 
 public class CovMatrix
 {
-	public CovMatrix(String snp, ArrayList<Integer> Int, double[][] corMat, GWASReader gReader, boolean isGC, boolean isAdjOverlapping)
+	public CovMatrix(String snp, ArrayList<Integer> Int, double[][] corMat, GWASReader gReader, boolean isGC, boolean isGCALL, boolean isAdjOverlapping)
 	{
 		this.snp = snp;
 		this.cohort = Int.get(Int.size() -1).intValue();
 		this.cohortIdx = new int[cohort];
 		this.isGC = isGC;
+		this.isGCALL = isGCALL;
 		this.gc = new double[cohort];
 		
 		int cnt = 0;
@@ -28,12 +29,19 @@ public class CovMatrix
 			cohortIdx[cnt++] = i;
 		}
 
-		if(this.isGC)
+		if (this.isGC)
 		{
 			double[] Egc = gReader.GetGC();
 			for(int i = 0; i < cohortIdx.length; i++)
 			{
-				gc[i] = Egc[cohortIdx[i]] > 1 ? Egc[cohortIdx[i]]:1;
+				if (this.isGCALL)
+				{
+					gc[i] = Egc[cohortIdx[i]];
+				}
+				else
+				{
+					gc[i] = Egc[cohortIdx[i]] > 1 ? Egc[cohortIdx[i]]:1;					
+				}
 			}
 		}
 		else
@@ -74,7 +82,7 @@ public class CovMatrix
 			
 			RealMatrix W = tmp.scalarMultiply(1/tmp1.getEntry(0, 0));
 			
-			double gse = 1/tmp1.getEntry(0, 0);
+			gse = 1/tmp1.getEntry(0, 0);
 			if(gse < 0)
 			{
 				Logger.printUserLog("This locus has negative variance: " + gse);
@@ -115,6 +123,7 @@ public class CovMatrix
 	}
 
 	private boolean isGC;
+	private boolean isGCALL;
 	private double[] gc;
 	private String snp;
 	private double[][] covMat;

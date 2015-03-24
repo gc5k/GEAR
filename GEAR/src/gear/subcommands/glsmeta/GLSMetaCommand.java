@@ -1,4 +1,4 @@
-package gear.subcommands.weightedmeta;
+package gear.subcommands.glsmeta;
 
 import gear.subcommands.Command;
 import gear.subcommands.CommandArgumentException;
@@ -9,17 +9,17 @@ import org.apache.commons.cli.CommandLine;
 import org.apache.commons.cli.OptionBuilder;
 import org.apache.commons.cli.Options;
 
-public class WeightedMetaCommand extends Command
+public class GLSMetaCommand extends Command
 {
-	public WeightedMetaCommand()
+	public GLSMetaCommand()
 	{
-		addAlias("gm");
+		addAlias("glsmeta");
 	}
 
 	@Override
 	public String getName()
 	{
-		return "gmeta";
+		return "glsmeta";
 	}
 
 	@Override
@@ -46,7 +46,7 @@ public class WeightedMetaCommand extends Command
 
 		options.addOption(OptionBuilder.withDescription(OPT_CM_DESC).hasArg().create(OPT_CM));
 		options.addOption(OptionBuilder.withDescription(OPT_GC_DESC).create(OPT_GC));
-		options.addOption(OptionBuilder.withDescription(OPT_GC_ALL_LONG_DESC).withLongOpt(OPT_GC_ALL_LONG).create());
+		options.addOption(OptionBuilder.withDescription(OPT_GC_DESC).withLongOpt(OPT_GC_ALL_LONG).create());
 
 //		options.addOption(OptionBuilder.withDescription(OPT_GC_INFLATION_ONLY_LONG_DESC).withLongOpt(OPT_GC_INFLATION_ONLY_LONG).create(OPT_GC_INFLATION_ONLY));
 		options.addOption(OptionBuilder.withDescription(OPT_KEEPATGC_LONG_DESC).withLongOpt(OPT_KEEPATGC_LONG).create(OPT_KEEPATGC));
@@ -60,12 +60,17 @@ public class WeightedMetaCommand extends Command
 		options.addOption(OptionBuilder.withDescription(OPT_CHR_DESC).hasArg().create(OPT_CHR));
 
 		options.addOption(OptionBuilder.withDescription(OPT_ADJUST_OVERLAPPING_LONG_DESC).withLongOpt(OPT_ADJUST_OVERLAPPING_LONG).create());
+
+		options.addOption(OptionBuilder.withDescription(OPT_COVAR_DESC).hasArg().create(OPT_COVAR));
+		options.addOption(OptionBuilder.withDescription(OPT_COVAR_NUMBER_LONG_DESC).withLongOpt(OPT_COVAR_NUMBER_LONG).hasArgs().create());
+
+		options.addOption(OptionBuilder.withDescription(OPT_CENTER_LONG_DESC).withLongOpt(OPT_CENTER_LONG).create());
 	}
 
 	@Override
 	public CommandArguments parse(CommandLine cmdLine) throws CommandArgumentException
 	{
-		WeightedMetaArguments lamD = new WeightedMetaArguments();
+		GLSMetaCommandArguments lamD = new GLSMetaCommandArguments();
 
 		//manual text meta files
 		if (cmdLine.hasOption(OPT_META))
@@ -97,9 +102,14 @@ public class WeightedMetaCommand extends Command
 			}
 		}
 
-		if(cmdLine.hasOption(OPT_GC))
+		if (cmdLine.hasOption(OPT_GC))
 		{
 			lamD.setGC();
+		}
+
+		if (cmdLine.hasOption(OPT_GC_ALL_LONG))
+		{
+			lamD.setGCALL();
 		}
 
 //		if(cmdLine.hasOption(OPT_GC_INFLATION_ONLY))
@@ -107,12 +117,12 @@ public class WeightedMetaCommand extends Command
 //			lamD.setGCInflationOnly();
 //		}
 
-		if(cmdLine.hasOption(OPT_KEEPATGC))
+		if (cmdLine.hasOption(OPT_KEEPATGC))
 		{
 			lamD.setATGC();
 		}
-		
-		if(cmdLine.hasOption(OPT_FULL_SNP_ONLY))
+
+		if (cmdLine.hasOption(OPT_FULL_SNP_ONLY))
 		{
 			lamD.setFullSNPOnly();
 		}
@@ -186,13 +196,28 @@ public class WeightedMetaCommand extends Command
 		{
 			lamD.setAdjOverlapping();
 		}
+		
+		if (cmdLine.hasOption(OPT_COVAR))
+		{
+			lamD.setCovar(cmdLine.getOptionValue(OPT_COVAR));
+		}
+
+		if (cmdLine.hasOption(OPT_COVAR_NUMBER_LONG))
+		{
+			lamD.setCovarNumber(cmdLine.getOptionValues(OPT_COVAR_NUMBER_LONG));
+		}
+
+		if (cmdLine.hasOption(OPT_CENTER_LONG))
+		{
+			lamD.setCovCenter();
+		}
 		return lamD;
 	}
 
 	@Override
 	protected CommandImpl createCommandImpl()
 	{
-		return new WeightedMetaImpl();
+		return new GLSMetaCommandImpl();
 	}
 
 	private final static String OPT_META = "m";
@@ -233,11 +258,7 @@ public class WeightedMetaCommand extends Command
 	private final static String OPT_GC_DESC = "genomic control factor adjustment";
 
 	private final static String OPT_GC_ALL_LONG = "gc-all";
-	private final static String OPT_GC_ALL_LONG_DESC = "genomic control factor adjustment regardless of > 1 or < 1";
-
-//	private final static String OPT_GC_INFLATION_ONLY = "gci";
-//	private final static String OPT_GC_INFLATION_ONLY_LONG = "gc-inflation-only";
-//	private final static String OPT_GC_INFLATION_ONLY_LONG_DESC = "genomic control factor adjustment only for cohorts having lambda greater than 1";
+	private final static String OPT_GC_ALL_LONG_DESC = "genomic control factor adjustment regardless gc > 1 or <1.";
 	
 	private final static String OPT_KEEPATGC = "atgc";
 	private final static String OPT_KEEPATGC_LONG = "keep-atgc";
@@ -266,4 +287,14 @@ public class WeightedMetaCommand extends Command
 
 	private final static String OPT_ADJUST_OVERLAPPING_LONG = "adj-overlap";
 	private final static String OPT_ADJUST_OVERLAPPING_LONG_DESC = "Only adjust for overlapping samples";
+
+	private final static String OPT_COVAR = "covar";
+	private final static String OPT_COVAR_DESC = "Specify the covariate file.";
+
+	private final static String OPT_COVAR_NUMBER_LONG = "covar-number";
+	private final static String OPT_COVAR_NUMBER_LONG_DESC = "Specify the covariate number";
+	
+	private final static String OPT_CENTER_LONG = "cov-center";
+	private final static String OPT_CENTER_LONG_DESC = "Remove the mean of the covariance.";
+
 }

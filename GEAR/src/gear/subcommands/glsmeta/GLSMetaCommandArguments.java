@@ -1,6 +1,9 @@
-package gear.subcommands.weightedmeta;
+package gear.subcommands.glsmeta;
 
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashSet;
+import java.util.Set;
 
 import gear.gwassummary.GWASConstant;
 import gear.subcommands.CommandArguments;
@@ -9,7 +12,7 @@ import gear.util.FileUtil;
 import gear.util.Logger;
 import gear.util.NewIt;
 
-public class WeightedMetaArguments  extends CommandArguments
+public class GLSMetaCommandArguments extends CommandArguments
 {
 	public void setKeepCohortFile(String KFile)
 	{
@@ -137,7 +140,6 @@ public class WeightedMetaArguments  extends CommandArguments
 			Logger.printUserLog("The cc sample size parameters [" + ccSize.length + "] do not meet the length of the meta files [" + md.size()+"].");
 			System.exit(0);
 		}
-
 	}
 	
 	public double[] getCCsize()
@@ -330,7 +332,7 @@ public class WeightedMetaArguments  extends CommandArguments
 		this.chr = Integer.parseInt(chr); 
 		chrFlag = true;
 	}
-	
+
 	public int getChr()
 	{
 		return chr;
@@ -351,11 +353,56 @@ public class WeightedMetaArguments  extends CommandArguments
 		return IsAdjOverlappingOnly;
 	}
 
+	public void setCovar(String cov)
+	{
+		covar = cov;
+		FileUtil.exists(covar);
+	}
+	
+	public String getCovar()
+	{
+		return covar;
+	}
+
+	public void setCovarNumber(String[] cn)
+	{
+		Set<String> h = new HashSet<String>(Arrays.asList(cn));
+		
+		if (h.size() != cn.length) 
+		{
+			Logger.printUserLog("Duplicated Covariate index.");
+			Logger.printUserLog("GEAR quitted");
+		}
+		
+		covar_idx = new int[cn.length];
+		for(int i = 0; i < covar_idx.length; i++)
+		{
+			covar_idx[i] = Integer.parseInt(cn[i]);
+		}
+	}
+	
+	public int[] getCovarNumber()
+	{
+		return covar_idx;
+	}
+
+	public void setCovCenter()
+	{
+		isCovCenter = true;
+	}
+	
+	public boolean isCovCenter()
+	{
+		return isCovCenter;
+	}
+
 	private ArrayList<String> md;
 	private boolean isGZ = false;
 	private boolean isQT = true;
 	private boolean isGC = false;
-	private boolean isGCALL = false; 
+	private boolean isGCALL = false;
+	private boolean isCovCenter = false;
+
 //	private boolean isGCInflationOnly = false;
 	private boolean isKeepATGC = false;
 	private boolean isVerbose = false;
@@ -381,4 +428,7 @@ public class WeightedMetaArguments  extends CommandArguments
 	private boolean chrFlag = false;
 	
 	private boolean IsAdjOverlappingOnly = false;
+
+	private String covar = null;
+	private int[] covar_idx = null;
 }

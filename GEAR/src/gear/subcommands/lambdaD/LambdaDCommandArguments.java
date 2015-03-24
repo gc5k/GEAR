@@ -292,11 +292,21 @@ public class LambdaDCommandArguments extends CommandArguments
 		return trim;
 	}
 
+	public void setMeFrac(double mefrac)
+	{
+		meFrac = mefrac;
+	}
+
+	public double getMeFrac()
+	{
+		return meFrac;
+	}
+
 	public void setTop(String top)
 	{
 		this.Top = Integer.parseInt(top);
 	}
-	
+
 	public int getTop()
 	{
 		return Top;
@@ -332,6 +342,7 @@ public class LambdaDCommandArguments extends CommandArguments
 	private int mode = BETA;
 
 	private double Me = 30000;
+	private double meFrac = 0;
 	private int Top = 0;
 
 	private int chr = 0;

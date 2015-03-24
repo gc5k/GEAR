@@ -38,6 +38,8 @@ public class LambdaDCommand extends Command
 		options.addOption(OptionBuilder.withDescription(OPT_META_GZ_BATCH_DESC).withLongOpt(OPT_META_GZ_BATCH_LONG).hasArg().create(OPT_META_GZ_BATCH));
 
 		options.addOption(OptionBuilder.withDescription(OPT_ME_DESC).hasArgs(1).create(OPT_ME));
+		options.addOption(OptionBuilder.withDescription(OPT_ME_FRAC_LONG_DESC).withLongOpt(OPT_ME_FRAC_LONG).hasOptionalArg().create());
+
 		options.addOption(OptionBuilder.withDescription(OPT_CC_DESC).hasArgs().create(OPT_CC));
 		options.addOption(OptionBuilder.withDescription(OPT_CC_SIZE_LONG_DESC).withLongOpt(OPT_CC_SIZE_LONG).hasArg().create());
 		options.addOption(OptionBuilder.withDescription(OPT_QT_DESC).hasArgs().create(OPT_QT));
@@ -181,6 +183,8 @@ public class LambdaDCommand extends Command
 			lamD.setTrim(parseDoubleOptionValueInRange(cmdLine, OPT_TRIM, OPT_TRIM_DEFAULT, 0, 0.45));
 		}
 
+		lamD.setMeFrac(parseDoubleOptionValueInRange(cmdLine, OPT_ME_FRAC_LONG, OPT_ME_FRAC_LONG_DEFAULT, 0.01, 1));
+
 		return lamD;
 	}
 
@@ -233,7 +237,11 @@ public class LambdaDCommand extends Command
 	private final static String OPT_ME = "me";
 	private final static String OPT_ME_DEFAULT = "30000";
 	private final static String OPT_ME_DESC = "effective number of markers.";
-	
+
+	private final static String OPT_ME_FRAC_LONG = "me-frac";
+	private final static String OPT_ME_FRAC_LONG_DEFAULT = "0.05";
+	private final static String OPT_ME_FRAC_LONG_DESC = "Fraction of minumal markers required, at least 5% by default.";
+
 	private final static String OPT_CHR = "chr";
 	private final static String OPT_CHR_DESC = "Choose chromosome for analysis";
 	
@@ -255,5 +263,6 @@ public class LambdaDCommand extends Command
 	private final static String OPT_TRIM = "trim";
 	private final static String OPT_TRIM_DEFAULT = "0.001";
 	private final static String OPT_TRIM_DESC = "trim off the top and the bottom 5% of markers in calculating lambda_meta and its derived statistics.";
+
 
 }

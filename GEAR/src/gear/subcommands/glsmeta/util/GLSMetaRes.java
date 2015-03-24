@@ -1,8 +1,10 @@
-package gear.subcommands.weightedmeta.util;
+package gear.subcommands.glsmeta.util;
+
+import gear.util.stat.PrecisePvalue;
 
 import org.apache.commons.math.linear.RealMatrix;
 
-public class GMRes implements Comparable<GMRes>
+public class GLSMetaRes implements Comparable<GLSMetaRes>
 {
 	private String snp;
 	private int chr;
@@ -11,16 +13,12 @@ public class GMRes implements Comparable<GMRes>
 	private char A2;
 	private int cohort;
 	private int N;
-	private double z;
-	private double p;
 	private String direct;
-	private double b;
-	private double se;
 	private boolean isAmbiguous;
 	private RealMatrix B;
-	private RealMatrix Sigma;
+	private RealMatrix V;
 
-	public GMRes(int cohort)
+	public GLSMetaRes(int cohort)
 	{
 		this.cohort = cohort;
 	}
@@ -29,22 +27,22 @@ public class GMRes implements Comparable<GMRes>
 	{
 		this.snp = snp; 
 	}
-	
+
 	public void SetChr(int chr)
 	{
 		this.chr = chr;
 	}
-	
+
 	public void SetA1(char A1)
 	{
 		this.A1 = A1;
 	}
-	
+
 	public char GetA1()
 	{
 		return A1;
 	}
-	
+
 	public char GetA2()
 	{
 		return A2;
@@ -54,35 +52,25 @@ public class GMRes implements Comparable<GMRes>
 	{
 		this.A2 = A2;
 	}
-	
+
 	public void SetN(int N)
 	{
 		this.N = N;
 	}
-	
-	public void SetZ(double z)
-	{
-		this.z = z;
-	}
-	
+
 	public void SetBP(long bp)
 	{
 		this.bp = bp;
 	}
 
-	public void SetB(double b)
+	public void SetB(RealMatrix B)
 	{
-		this.b = b;
+		this.B = B;
 	}
 
-	public void SetSE(double se)
+	public void SetSE(RealMatrix V)
 	{
-		this.se = se;
-	}
-
-	public void SetP(double p)
-	{
-		this.p = p;
+		this.V = V;
 	}
 
 	public void SetAmbi(boolean ambi)
@@ -113,19 +101,33 @@ public class GMRes implements Comparable<GMRes>
 	public String printTitle()
 	{
 		StringBuffer sb = new StringBuffer();
-		sb.append("SNP CHR BP A1 A2 COHORT B SE Z P Direction");
+		sb.append("SNP CHR BP TEST A1 A2 COHORT B SE Z P Direction");
 		return sb.toString();
 	}
 
 	public String toString()
 	{
 		StringBuffer sb = new StringBuffer();
-		sb.append(snp + " " + chr + " " + bp + " " + A1 + " " + A2 + " " + cohort + " " + b + " " + se + " " + " " + z + " " + p + " " + direct);
+		for(int i = 0; i < B.getRowDimension(); i++)
+		{
+			double b = B.getEntry(i, 0);
+			double se = Math.sqrt(V.getEntry(i, i));
+			double z = b/se;
+			double p = PrecisePvalue.getPvalue4Z(z);
+			if (i == 0)
+			{
+				sb.append(snp + " " + chr + " " + bp + " " +"SNP " + A1 + " " + A2 + " " + cohort + " " + b + " " + se + " " + " " + z + " " + p + " " + direct + "\n");				
+			}
+			else
+			{
+				sb.append(snp + " " + chr + " " + bp + " " +"COV" + i + " " + A1 + " " + A2 + " " + cohort + " " + b + " " + se + " " + " " + z + " " + p + " " + direct);				
+			}
+		}
 		return sb.toString();
 	}
 
 	@Override
-	public int compareTo(GMRes o)
+	public int compareTo(GLSMetaRes o)
 	{
 		int c = this.chr - o.getChr();
 		if (c != 0)

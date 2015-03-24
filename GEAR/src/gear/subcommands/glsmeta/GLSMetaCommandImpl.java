@@ -1,4 +1,4 @@
-package gear.subcommands.weightedmeta;
+package gear.subcommands.glsmeta;
 
 import java.io.BufferedWriter;
 import java.io.FileWriter;
@@ -22,6 +22,9 @@ import gear.gwassummary.GWASReader;
 import gear.gwassummary.MetaStat;
 import gear.subcommands.CommandArguments;
 import gear.subcommands.CommandImpl;
+import gear.subcommands.glsmeta.util.CovReader;
+import gear.subcommands.glsmeta.util.GLSMetaRes;
+import gear.subcommands.glsmeta.util.MetaGLS;
 import gear.subcommands.weightedmeta.util.CovMatrix;
 import gear.subcommands.weightedmeta.util.GMRes;
 import gear.util.BufferedReader;
@@ -30,15 +33,17 @@ import gear.util.NewIt;
 import gear.util.SNPMatch;
 import gear.util.stat.PrecisePvalue;
 
-public class WeightedMetaImpl extends CommandImpl
+public class GLSMetaCommandImpl extends CommandImpl
 {
 
 	@Override
 	public void execute(CommandArguments cmdArgs)
 	{
-		wMetaArgs = (WeightedMetaArguments) cmdArgs;
+		gMetaArgs = (GLSMetaCommandArguments) cmdArgs;
 
-		if (wMetaArgs.isQT())
+		covReader = new CovReader(gMetaArgs.getCovar(), gMetaArgs.getCovarNumber(), gMetaArgs.getMetaFile().length);
+
+		if (gMetaArgs.isQT())
 		{
 			Logger.printUserLog("Analysing summary statistics analysis for quantitative traits.\n");			
 		}
@@ -47,21 +52,21 @@ public class WeightedMetaImpl extends CommandImpl
 			Logger.printUserLog("Analysing summary statistics analysis for case-contrl studies.\n");			
 		}
 
-		FileKeep = new boolean[wMetaArgs.getMetaFile().length];
+		FileKeep = new boolean[gMetaArgs.getMetaFile().length];
 		Arrays.fill(FileKeep, true);
 
-		if (wMetaArgs.IsKeepFile() || wMetaArgs.IsRevFile())
+		if (gMetaArgs.IsKeepFile() || gMetaArgs.IsRevFile())
 		{
 			FilterFiles();
 		}
 
-		if (wMetaArgs.isGC())
+		if (gMetaArgs.isGC())
 		{
 			Logger.printUserLog("Genomic-control only applies for cohorts that have gc factor > 1.");
 		}
 		generateCorMatrix();
 
-		gReader = new GWASReader(wMetaArgs.getMetaFile(), FileKeep, wMetaArgs.getKeys(), wMetaArgs.isQT(), wMetaArgs.isGZ(), wMetaArgs.isChr(), wMetaArgs.getChr());
+		gReader = new GWASReader(gMetaArgs.getMetaFile(), FileKeep, gMetaArgs.getKeys(), gMetaArgs.isQT(), gMetaArgs.isGZ(), gMetaArgs.isChr(), gMetaArgs.getChr());
 		gReader.Start(false);
 
 		if (gReader.getNumMetaFile() < 2)
@@ -86,7 +91,7 @@ public class WeightedMetaImpl extends CommandImpl
 		corMat = new double[cn][cn];
 		zMat = new double[cn][cn];
 
-		if (wMetaArgs.getCMFile() == null)
+		if (gMetaArgs.getCMFile() == null)
 		{
 			for(int i = 0; i < corMat.length; i++)
 			{
@@ -96,9 +101,9 @@ public class WeightedMetaImpl extends CommandImpl
 		}
 		else
 		{
-			int NumMetaFile = wMetaArgs.getMetaFile().length;
-			BufferedReader bf = BufferedReader.openTextFile(wMetaArgs.getCMFile(), "cm file.");
-			Logger.printUserLog("Reading '" + wMetaArgs.getCMFile() + "'.");
+			int NumMetaFile = gMetaArgs.getMetaFile().length;
+			BufferedReader bf = BufferedReader.openTextFile(gMetaArgs.getCMFile(), "cm file.");
+			Logger.printUserLog("Reading '" + gMetaArgs.getCMFile() + "'.");
 
 			String[] d = null;
 			int cnt = 0;
@@ -107,7 +112,7 @@ public class WeightedMetaImpl extends CommandImpl
 			{
 				if (d.length != NumMetaFile )
 				{
-					Logger.printUserError("incorrect '" + wMetaArgs.getCMFile() + "'.");
+					Logger.printUserError("incorrect '" + gMetaArgs.getCMFile() + "'.");
 					System.exit(0);
 				}
 				if(FileKeep[cnt])
@@ -141,11 +146,11 @@ public class WeightedMetaImpl extends CommandImpl
 			{
 				if(FileKeep[i])
 				{
-					tWorkingMetaFile.add(wMetaArgs.getMetaFile()[i]);
+					tWorkingMetaFile.add(gMetaArgs.getMetaFile()[i]);
 				}
 			}
 
-			if (wMetaArgs.getDiag())
+			if (gMetaArgs.getDiag())
 			{
 				RemMetaIdx = Zprune(tWorkingMetaFile);
 				if(RemMetaIdx != null)
@@ -156,7 +161,7 @@ public class WeightedMetaImpl extends CommandImpl
 					}		
 				}
 			}
-			if(wMetaArgs.getNaive())
+			if(gMetaArgs.getNaive())
 			{
 				Logger.printUserLog("Force the " + corMat.length + "X" + corMat.length + "correlation matrix to be diagonal matrix for naive meta-analysis.");
 				corMat = new double[corMat.length][corMat.length];
@@ -307,24 +312,24 @@ public class WeightedMetaImpl extends CommandImpl
 			}
 			ms = gReader.getMetaStat().get(i).get(snp);
 
-			if (wMetaArgs.isFullSNPOnly())
+			if (gMetaArgs.isFullSNPOnly())
 			{
 				if (Int.get(Int.size()-1).intValue() != (Int.size() -1))
 				{
 					continue;
 				}
 			}
-			CovMatrix covMat = new CovMatrix(snp, Int, corMat, gReader, wMetaArgs.isGC(), wMetaArgs.isGCALL(), wMetaArgs.IsAdjOverlappingOnly());
+			CovMatrix covMat = new CovMatrix(snp, Int, corMat, gReader, gMetaArgs.isGC(), gMetaArgs.isGCALL(), gMetaArgs.IsAdjOverlappingOnly());
 
-//			MetaGLS metaGLS = new MetaGLS(snp, Int, corMat, gReader, wMetaArgs.isGC(), wMetaArgs.IsAdjOverlappingOnly());
-			
+			MetaGLS metaGLS = new MetaGLS(snp, Int, corMat, gReader, gMetaArgs.isGC(), gMetaArgs.IsAdjOverlappingOnly(), covReader.getCovTable(), gMetaArgs.isCovCenter());
+
 			if (covMat.isNonSingular())
 			{
 				GMRes gr = MetaSNP(covMat);
 				if (gr.getIsAmbiguous())
 				{
 					atgcCnt++;
-					if (!wMetaArgs.isKeepATGC())
+					if (!gMetaArgs.isKeepATGC())
 					{
 						continue;
 					}
@@ -336,9 +341,12 @@ public class WeightedMetaImpl extends CommandImpl
 			{
 				singularCnt++;
 			}
+			
+			glsArray.add(metaGLS.getGLSMetaRes());
 			totalCnt++;
 		}
 		Collections.sort(grArray);
+		Collections.sort(glsArray);
 
 		Logger.printUserLog("In total "+ totalCnt + " loci have been read.");
 		Logger.printUserLog("In total "+ cnt + " loci have been used for meta-analysis.");
@@ -347,12 +355,13 @@ public class WeightedMetaImpl extends CommandImpl
 			Logger.printUserLog(singularCnt + " loci were excluded from analyais because of singular matrix.");
 		}
 
-		if (!wMetaArgs.isKeepATGC())
+		if (!gMetaArgs.isKeepATGC())
 		{
 			Logger.printUserLog(atgcCnt + " ambiguous loci have been eliminated.");
 		}
 
 		PrintGMresults();
+		PrintGLSMetaResults();
 	}
 
 	private GMRes MetaSNP(CovMatrix covMat)
@@ -422,11 +431,11 @@ public class WeightedMetaImpl extends CommandImpl
 			if(match)
 			{
 				gb += b * Weight[i];
-				if(b == 0)
+				if (b == 0)
 				{
 					sign = '0';
 				}
-				else if(b > 0)
+				else if (b > 0)
 				{
 					sign = '+';
 				}
@@ -468,12 +477,12 @@ public class WeightedMetaImpl extends CommandImpl
         PrintWriter writer = null;
         try
         {
-        	writer = new PrintWriter(new BufferedWriter(new FileWriter(wMetaArgs.getOutRoot()+".gmeta")));
-        	Logger.printUserLog("Writting detailed test statistics into '"+wMetaArgs.getOutRoot() + ".gmeta.'\n");
+        	writer = new PrintWriter(new BufferedWriter(new FileWriter(gMetaArgs.getOutRoot()+".gmeta")));
+        	Logger.printUserLog("Writting detailed test statistics into '"+gMetaArgs.getOutRoot() + ".gmeta.'\n");
         }
 		catch (IOException e)
 		{
-			Logger.handleException(e, "An I/O exception occurred when writing '" + wMetaArgs.getOutRoot() + ".gmeta" + "'.\n");
+			Logger.handleException(e, "An I/O exception occurred when writing '" + gMetaArgs.getOutRoot() + ".gmeta" + "'.\n");
 		}
 
 		for(int i = 0; i < grArray.size(); i++)
@@ -488,14 +497,39 @@ public class WeightedMetaImpl extends CommandImpl
 		writer.close();
 	}
 
+	private void PrintGLSMetaResults()
+	{
+        PrintWriter writer = null;
+        try
+        {
+        	writer = new PrintWriter(new BufferedWriter(new FileWriter(gMetaArgs.getOutRoot()+".glsmeta")));
+        	Logger.printUserLog("Writting detailed test statistics into '"+gMetaArgs.getOutRoot() + ".glsmeta.'\n");
+        }
+		catch (IOException e)
+		{
+			Logger.handleException(e, "An I/O exception occurred when writing '" + gMetaArgs.getOutRoot() + ".glsmeta" + "'.\n");
+		}
+
+		for(int i = 0; i < grArray.size(); i++)
+		{
+			GLSMetaRes gr = glsArray.get(i);
+			if(i == 0)
+			{
+				writer.write(gr.printTitle() + "\n");
+			}
+			writer.write(gr.toString()+ "\n");
+		}
+		writer.close();
+	}
+
 	private void FilterFiles()
 	{
-		String[] metaF = wMetaArgs.getMetaFile();
+		String[] metaF = gMetaArgs.getMetaFile();
 
-		if(wMetaArgs.IsKeepFile())
+		if(gMetaArgs.IsKeepFile())
 		{
 			Arrays.fill(FileKeep, false);
-			String[] kf = wMetaArgs.getKeepFile();
+			String[] kf = gMetaArgs.getKeepFile();
 			for(int i = 0; i < metaF.length; i++)
 			{
 				for(int j = 0; j < kf.length; j++ )
@@ -508,10 +542,10 @@ public class WeightedMetaImpl extends CommandImpl
 			}
 		}
 
-		if(wMetaArgs.IsRevFile())
+		if(gMetaArgs.IsRevFile())
 		{
 			Arrays.fill(FileKeep, true);
-			String[] kf = wMetaArgs.getRemoveFile();
+			String[] kf = gMetaArgs.getRemoveFile();
 			for(int i = 0; i < metaF.length; i++)
 			{
 				for(int j = 0; j < kf.length; j++ )
@@ -530,13 +564,16 @@ public class WeightedMetaImpl extends CommandImpl
 		}
 	}
 
-	private WeightedMetaArguments wMetaArgs;
+	private GLSMetaCommandArguments gMetaArgs;
 	private GWASReader gReader;
 	private double[][] corMat;
 	private double[][] zMat;
 	private boolean[] FileKeep;
 	private int[] RemMetaIdx;
-	
+
 	private NormalDistributionImpl unitNormal = new NormalDistributionImpl(0, 1);
 	private ArrayList<GMRes> grArray = NewIt.newArrayList();
+	private ArrayList<GLSMetaRes> glsArray = NewIt.newArrayList();
+	
+	private CovReader covReader;
 }
