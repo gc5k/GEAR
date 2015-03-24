@@ -451,9 +451,9 @@ public class LambdaDCommandImpl extends CommandImpl
 		}
 		Logger.printUserLog("Found " + LamArray.size() + " consensus summary statistics between these two files.");
 		
-		if (LamArray.size() < ((int) (Me * 0.2)))
+		if (LamArray.size() < ((int) (Me * lamArgs.getMeFrac())))
 		{
-			Logger.printUserLog("Too few overlapping snps, skip this pair of files");
+			Logger.printUserLog("Too few overlapping snps, skip this pair of files.");
 			return;
 		}
 

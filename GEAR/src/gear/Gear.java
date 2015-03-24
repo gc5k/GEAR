@@ -45,6 +45,7 @@ public enum Gear
 		addCommand(new gear.subcommands.lambdaD.LambdaDCommand());
 		addCommand(new gear.subcommands.metahet.MetaHetCommand());
 		addCommand(new gear.subcommands.weightedmeta.WeightedMetaCommand());
+		addCommand(new gear.subcommands.glsmeta.GLSMetaCommand());
 		addCommand(new gear.subcommands.metawatchdog.powercalculator.DogPowerCommand());
 		addCommand(new gear.subcommands.metawatchdog.decrypt.MetaWatchdog2Command());
 		addCommand(new gear.subcommands.metawatchdog.encrypt.EnigmaCommand());

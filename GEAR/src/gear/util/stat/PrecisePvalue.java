@@ -1,7 +1,14 @@
 package gear.util.stat;
 
+import gear.util.Logger;
+
+import org.apache.commons.math.MathException;
+import org.apache.commons.math.distribution.NormalDistributionImpl;
+
 public class PrecisePvalue
 {
+	private static NormalDistributionImpl unitNormal = new NormalDistributionImpl(0, 1);
+
 	public static double ZcumulativeProbability(double x)
 	{
 		//http://en.wikipedia.org/wiki/Q-function#cite_note-6
@@ -16,5 +23,28 @@ public class PrecisePvalue
 		//IEEE Communications Letters, 2007, 11, 644
 		double p1 = ZcumulativeProbability(x);
 		return p1*2;
+	}
+	
+	public static double getPvalue4Z(double z)
+	{
+		double p = 0;
+		try
+		{
+			if (Math.abs(z) < 8)
+			{
+				p = (1-unitNormal.cumulativeProbability(Math.abs(z)))*2;
+			}
+			else
+			{
+				p = PrecisePvalue.TwoTailZcumulativeProbability(Math.abs(z));
+			}
+		}
+		catch (MathException e)
+		{
+			Logger.printUserError(e.toString());
+		}
+
+		return p;
+
 	}
 }
