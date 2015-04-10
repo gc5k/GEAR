@@ -113,7 +113,7 @@ public class GLSMetaRes implements Comparable<GLSMetaRes>
 			double b = B.getEntry(i, 0);
 			double se = Math.sqrt(V.getEntry(i, i));
 			double z = b/se;
-			double p = PrecisePvalue.getPvalue4Z(z);
+			double p = PrecisePvalue.getPvalue4Z_2Tail(z);
 			if (i == 0)
 			{
 				sb.append(snp + " " + chr + " " + bp + " " +"SNP " + A1 + " " + A2 + " " + cohort + " " + b + " " + se + " " + " " + z + " " + p + " " + direct + "\n");				

@@ -55,8 +55,9 @@ public enum Gear
 		addCommand(new gear.subcommands.exsnp.ExSNPCommand());
 		addCommand(new gear.subcommands.lmdr.LMDRCommand());
 		addCommand(new gear.subcommands.ppcbatch.PPCBatchCommand());
+		addCommand(new gear.subcommands.sfst.SFstCommand());
 	}
-	
+
 	private void addCommand(Command cmd)
 	{
 		cmdMap.put(cmd.getName(), cmd);
