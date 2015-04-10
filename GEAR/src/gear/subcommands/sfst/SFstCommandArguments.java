@@ -1,6 +1,4 @@
-package gear.subcommands.lambdaD;
-
-import java.util.ArrayList;
+package gear.subcommands.sfst;
 
 import gear.gwassummary.GWASConstant;
 import gear.subcommands.CommandArguments;
@@ -9,9 +7,10 @@ import gear.util.FileUtil;
 import gear.util.Logger;
 import gear.util.NewIt;
 
-public class LambdaDCommandArguments extends CommandArguments
-{
+import java.util.ArrayList;
 
+public class SFstCommandArguments extends CommandArguments
+{
 	public void setMetaBatch(String batch)
 	{
 		FileUtil.exists(batch);
@@ -25,16 +24,6 @@ public class LambdaDCommandArguments extends CommandArguments
 		}
 	}
 
-	public void setMetaFile(String[] m)
-	{
-		md = NewIt.newArrayList();
-		for (int i = 0; i < m.length; i++)
-		{
-			FileUtil.exists(m[i]);
-			md.add(m[i]);
-		}
-	}
-
 	public String[] getMetaFile() 
 	{
 		return md.toArray(new String[0]);
@@ -44,7 +33,7 @@ public class LambdaDCommandArguments extends CommandArguments
 	{
 		isGZ = flag;
 	}
-	
+
 	public boolean isGZ()
 	{
 		return isGZ;
@@ -183,7 +172,6 @@ public class LambdaDCommandArguments extends CommandArguments
 	public void setVerboseGZ()
 	{
 		isVerbose = true;
-		isVerboseGZ = true;
 	}
 
 	public boolean isVerbose()
@@ -191,10 +179,6 @@ public class LambdaDCommandArguments extends CommandArguments
 		return isVerbose;
 	}
 
-	public boolean isVerboseGZ()
-	{
-		return isVerboseGZ;
-	}
 
 	public double getMe()
 	{
@@ -216,41 +200,17 @@ public class LambdaDCommandArguments extends CommandArguments
 	{
 		return chr;
 	}
-	
+
 	public boolean isChr()
 	{
 		return chrFlag;
-	}
-
-	public boolean isBeta()
-	{
-		return isBeta;
-	}
-
-	public void setFrq()
-	{
-		isBeta = false;
-		isFrq = true;
-		mode = FRQ;
-	}
-
-	public boolean isFrq()
-	{
-		return isFrq;
-	}
-
-	public void setFst()
-	{
-		isBeta = false;
-		isFrq = true;
-		mode = FRQ;
 	}
 
 	public void setClean()
 	{
 		isClean = true;
 	}
-	
+
 	public boolean isClean()
 	{
 		return isClean;
@@ -260,20 +220,10 @@ public class LambdaDCommandArguments extends CommandArguments
 	{
 		isRapid = true;
 	}
-	
+
 	public boolean isRapid()
 	{
 		return isRapid;
-	}
-
-	public void setRandom()
-	{
-		isRandom = true;
-	}
-	
-	public boolean isRandom()
-	{
-		return isRandom;
 	}
 
 	public void setTrim(double tr)
@@ -312,34 +262,30 @@ public class LambdaDCommandArguments extends CommandArguments
 		return Top;
 	}
 
-//	public boolean isFst()
-//	{
-//		return isFst;
-//	}
+	public boolean isFrq()
+	{
+		return isFrq;
+	}
 
 	public int getMode()
 	{
 		return mode;
 	}
 
-	protected static int BETA = 0;
 	protected static int FRQ = 1;
-	private int mode = BETA;
-	
+	private int mode = FRQ;
+
+	public boolean isFrq = true;
+
 	private ArrayList<String> md;
 	private boolean isGZ = false;
 	private boolean isQT = true;
 	private boolean isVerbose = false;
-	private boolean isVerboseGZ = false;
 
 	private boolean isClean = false;
 	private boolean isRapid = false;
-	private boolean isRandom = false;
 	private boolean isTrim = false;
 	private double trim = 0;
-
-	private boolean isBeta = true;
-	private boolean isFrq = false;
 
 	private double Me = 30000;
 	private double meFrac = 0;
@@ -351,5 +297,5 @@ public class LambdaDCommandArguments extends CommandArguments
 	private double[] qtSize;
 	private double[] ccSize;
 	private String[] field = {"snp", "chr", "bp", "beta", "or", "se", "p", "a1", "a2"};
-	
+
 }

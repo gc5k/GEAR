@@ -4,6 +4,7 @@ import gear.ConstValues;
 import gear.util.BufferedReader;
 import gear.util.Logger;
 import gear.util.NewIt;
+import gear.util.stat.PrecisePvalue;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -47,6 +48,10 @@ public class GWASReader
 
 		gc = new double[workingMetaFile.size()];
 		Arrays.fill(gc, 1);
+		
+		gcReal = new double[workingMetaFile.size()];
+		Arrays.fill(gcReal, 1);
+
 		logit = new boolean[workingMetaFile.size()];
 		Arrays.fill(logit, false);
 
@@ -106,6 +111,7 @@ public class GWASReader
 	private HashMap<String, MetaStat> readMeta(int metaIdx)
 	{
 		ArrayList<Double> pArray = NewIt.newArrayList();
+		ArrayList<Double> pRealArray = NewIt.newArrayList();
 		BufferedReader reader = null;
 		if (isGZ)
 		{
@@ -271,7 +277,7 @@ public class GWASReader
 			{//calculate gc 
 				pArray.add(new Double(Double.parseDouble(tokens[KeyIdx[metaIdx][P]])));
 			}
-
+			
 			if (tokens[KeyIdx[metaIdx][A1]].length() != 1)
 			{
 				cntBadA1++;
@@ -281,6 +287,12 @@ public class GWASReader
 			{
 				cntBadA2++;
 				continue;
+			}
+
+			double p1 = getRealP(tokens, metaIdx, logit[metaIdx]);
+			if ( p1 >= 0)
+			{
+				pRealArray.add(p1);
 			}
 
 			MetaStat ms = null;
@@ -482,6 +494,7 @@ public class GWASReader
 
 		MetaSNPArray.add(snpArray);
 		gc[metaIdx] = getGC(pArray);
+		gcReal[metaIdx] = getRealGC(pRealArray);
 		if(cnt == 0)
 		{
 			Logger.printUserLog("Did not find any summary statistics from '" + workingMetaFile.get(metaIdx)+ ".'");
@@ -520,7 +533,41 @@ public class GWASReader
 			{
 				Logger.printUserError(e.toString());
 			}
-			Logger.printUserLog("Genomic control factor (lambda_gc) is: " + lambda);
+			Logger.printUserLog("Genomic control factor (lambda_gc) is calculated from the provided p values: " + lambda);
+		}
+		else
+		{
+			Logger.printUserLog("No p values provided. Genomic control factor is set to 1.");
+		}
+		return lambda;
+	}
+
+	private double getRealGC(ArrayList<Double> pArray)
+	{
+		double lambda = 1;
+		if (pArray.size() > 0)
+		{
+			ChiSquaredDistributionImpl chiDis = new ChiSquaredDistributionImpl(1);
+
+			Collections.sort(pArray);
+			double p = 0.5;
+			if (pArray.size() % 2 == 0)
+			{
+				p =1 - (pArray.get(pArray.size()/2) + pArray.get(pArray.size()/2 + 1))/2;
+			}
+			else
+			{
+				p =1 - pArray.get((pArray.size()+1)/2);
+			}
+			try
+			{
+				lambda = chiDis.inverseCumulativeProbability(p) / ChiMedianConstant;
+			}
+			catch (MathException e)
+			{
+				Logger.printUserError(e.toString());
+			}
+			Logger.printUserLog("Genomic control factor (lambda_gc) is calculated from the provided beta and se: " + lambda);
 		}
 		else
 		{
@@ -532,6 +579,23 @@ public class GWASReader
 	public double[] GetGC()
 	{
 		return gc;
+	}
+
+	public double getRealP(String[] tokens, int metaIdx, boolean logit)
+	{
+		double z = 0;
+		double p = -1;
+		if (!ConstValues.isNA(tokens[KeyIdx[metaIdx][BETA]]) && !ConstValues.isNA(tokens[KeyIdx[metaIdx][SE]]))
+		{
+			if (Float.parseFloat(tokens[KeyIdx[metaIdx][SE]]) > 0)
+			{
+				double b = Double.parseDouble(tokens[KeyIdx[metaIdx][BETA]]);
+				double se = Double.parseDouble(tokens[KeyIdx[metaIdx][SE]]);
+				z = logit ? Math.log(b)/se : b/se;
+				p = PrecisePvalue.getPvalue4Z_2Tail(z);
+			}
+		}
+		return p;
 	}
 
 	public ArrayList<String> getWorkingMetaFile()
@@ -553,6 +617,7 @@ public class GWASReader
 	private HashMap<String, ArrayList<Integer>> MetaSNPTable = NewIt.newHashMap();
 
 	private double[] gc;
+	private double[] gcReal;
 	private double ChiMedianConstant = 0.4549364;
 	private boolean isFrq;
 	private int[] keepCohortIdx;
