@@ -78,6 +78,7 @@ public class LambdaDCommandImpl extends CommandImpl
 				}
 			}
 		}
+		WriteGC();
 		WriteMat();
 		if(lamArgs.isBeta())
 		{
@@ -718,6 +719,37 @@ public class LambdaDCommandImpl extends CommandImpl
 			gwriter.println();
 		}
 		gwriter.close();
+	}
+
+	private void WriteGC()
+	{
+		double[] gc = gReader.GetGC();
+		double[] gcReal = gReader.GetRealGC();
+		PrintStream gcwriter = FileUtil.CreatePrintStream(new String(lamArgs.getOutRoot() + ".gc"));
+
+		for(int i = 0; i < gc.length; i++)
+		{
+			gcwriter.println(gc[i] + " " + gcReal[i]);
+		}
+		gcwriter.close();
+
+		PrintStream gclwriter = FileUtil.CreatePrintStream(new String(lamArgs.getOutRoot() + ".gcl"));
+		for(int i = 0; i < lamMat.length; i++)
+		{
+			double u = 0;
+			double sq = 0;
+			for(int j = 0; j < lamMat[i].length; j++)
+			{
+				if(i != j)
+				{
+					u += lamMat[i][j] / (lamMat.length - 1);
+					sq += lamMat[i][j] * lamMat[i][j] / (lamMat.length - 1);
+				}
+			}
+			double sd = Math.sqrt(sq - u*u);
+			gclwriter.println(u + " " + sd);
+		}
+		gclwriter.close();
 	}
 
 	private void WriteMat()

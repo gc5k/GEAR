@@ -2,10 +2,12 @@ package gear.gwassummary;
 
 import gear.ConstValues;
 import gear.util.BufferedReader;
+import gear.util.FileUtil;
 import gear.util.Logger;
 import gear.util.NewIt;
 import gear.util.stat.PrecisePvalue;
 
+import java.io.PrintStream;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -60,7 +62,6 @@ public class GWASReader
 		{
 			Arrays.fill (KeyIdx[i], -1);
 		}
-		
 	}
 
 	public void Start(boolean isFrq)
@@ -70,7 +71,7 @@ public class GWASReader
 		{
 			HashMap<String, MetaStat> m = readMeta(i);
 			MStat.add(m);
-		}		
+		}	
 	}
 
 	public int getCohortNum()
@@ -579,6 +580,11 @@ public class GWASReader
 	public double[] GetGC()
 	{
 		return gc;
+	}
+
+	public double[] GetRealGC()
+	{
+		return gcReal;
 	}
 
 	public double getRealP(String[] tokens, int metaIdx, boolean logit)
