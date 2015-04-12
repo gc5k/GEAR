@@ -171,19 +171,26 @@ public class SFstCommandImpl extends CommandImpl
 			}
 
 			double s1, s2;
-			if (sfstArgs.isQT())
+			if (sfstArgs.isNoWeight())
 			{
-				s1 = sfstArgs.getQTsize()[idx1];
-				s2 = sfstArgs.getQTsize()[idx2];
+				s1 = sfstArgs.getNe();
+				s2 = sfstArgs.getNe();
 			}
 			else
 			{
-				s1 = sfstArgs.getCCsize()[idx1 * 2] + sfstArgs.getCCsize()[idx1 * 2 + 1];
-				s2 = sfstArgs.getCCsize()[idx2 * 2] + sfstArgs.getCCsize()[idx2 * 2 + 1];
+				if (sfstArgs.isQT())
+				{
+					s1 = sfstArgs.getQTsize()[idx1];
+					s2 = sfstArgs.getQTsize()[idx2];
+				}
+				else
+				{
+					s1 = sfstArgs.getCCsize()[idx1 * 2] + sfstArgs.getCCsize()[idx1 * 2 + 1];
+					s2 = sfstArgs.getCCsize()[idx2 * 2] + sfstArgs.getCCsize()[idx2 * 2 + 1];
+				}
 			}
 
-			FstArray.add(new FstUnit(ms1, ms2, lineup, s1,
-					s2));
+			FstArray.add(new FstUnit(ms1, ms2, lineup, s1, s2));
 		}
 
 		if (cntAmbiguous > 0)

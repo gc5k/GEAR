@@ -36,6 +36,8 @@ public class SFstCommand extends Command
 		options.addOption(OptionBuilder.withDescription(OPT_META_GZ_BATCH_DESC).withLongOpt(OPT_META_GZ_BATCH_LONG).hasArg().create(OPT_META_GZ_BATCH));
 
 		options.addOption(OptionBuilder.withDescription(OPT_ME_DESC).hasArgs(1).create(OPT_ME));
+		options.addOption(OptionBuilder.withDescription(OPT_NO_WEIGHT_LONG_DESC).withLongOpt(OPT_NO_WEIGHT_LONG).create(OPT_NO_WEIGHT));
+
 		options.addOption(OptionBuilder.withDescription(OPT_ME_FRAC_LONG_DESC).withLongOpt(OPT_ME_FRAC_LONG).hasOptionalArg().create());
 
 		options.addOption(OptionBuilder.withDescription(OPT_CC_SIZE_LONG_DESC).withLongOpt(OPT_CC_SIZE_LONG).hasArg().create());
@@ -81,6 +83,10 @@ public class SFstCommand extends Command
 			lamD.setMe(cmdLine.getOptionValue(OPT_ME));
 		}
 
+		if(cmdLine.hasOption(OPT_NO_WEIGHT))
+		{
+			lamD.setNoWeight();
+		}
 		//batch gzip meta files
 		if (cmdLine.hasOption(OPT_META_GZ_BATCH))
 		{
@@ -162,6 +168,10 @@ public class SFstCommand extends Command
 	private final static String OPT_ME_DEFAULT = "30000";
 	private final static String OPT_ME_DESC = "effective number of markers.";
 
+	private final static String OPT_NO_WEIGHT = "nw";
+	private final static String OPT_NO_WEIGHT_LONG = "no-weight";
+	private final static String OPT_NO_WEIGHT_LONG_DESC = "Set the sample size same, say 500, for each cohort when calculating Fst.";
+	
 	private final static String OPT_ME_FRAC_LONG = "me-frac";
 	private final static String OPT_ME_FRAC_LONG_DEFAULT = "0.05";
 	private final static String OPT_ME_FRAC_LONG_DESC = "Fraction of minumal markers required, at least 5% by default.";
