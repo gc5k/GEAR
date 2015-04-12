@@ -97,7 +97,7 @@ public class SFstCommandArguments extends CommandArguments
 		String[] qt = s.toArray(new String[0]);
 		setQT(qt);
 	}
-	
+
 	public void setQT(String[] qt)
 	{
 		qtSize = new double[qt.length];
@@ -179,10 +179,24 @@ public class SFstCommandArguments extends CommandArguments
 		return isVerbose;
 	}
 
-
 	public double getMe()
 	{
 		return Me;
+	}
+
+	public void setNoWeight()
+	{
+		isNoWeight = true;
+	}
+	
+	public boolean isNoWeight()
+	{
+		return isNoWeight;
+	}
+
+	public double getNe()
+	{
+		return Ne;
 	}
 
 	public void setMe(String me)
@@ -282,6 +296,8 @@ public class SFstCommandArguments extends CommandArguments
 	private boolean isQT = true;
 	private boolean isVerbose = false;
 
+	private boolean isNoWeight = false;
+	private double Ne = 500;
 	private boolean isClean = false;
 	private boolean isRapid = false;
 	private boolean isTrim = false;
