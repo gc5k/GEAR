@@ -383,11 +383,12 @@ public class HEMRead
 
 		while ((tokens = reader.readTokens()) != null)
 		{
+			
 			if (tokens.length < minNumCols)
 			{
 				reader.errorPreviousLine("There should be at least " + minNumCols + " columns.");
 			}
-			
+
 			SubjectID subID = new SubjectID(/*famID*/tokens[0], /*indID*/tokens[1]);
 
 			int ii = 0;
@@ -399,7 +400,6 @@ public class HEMRead
 				if (ConstValues.isNA(pheValStr))
 				{
 					f = false;
-					break;
 				}
 				else
 				{
