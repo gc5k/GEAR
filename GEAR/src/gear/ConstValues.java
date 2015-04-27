@@ -2,7 +2,7 @@ package gear;
 
 public class ConstValues
 {
-	
+
 	public static byte PLINK_BED_BYTE1 = 0x6c;
 	public static byte PLINK_BED_BYTE2 = 0x1b;
 	public static byte PLINK_BED_BYTE3 = 0x1;
@@ -11,7 +11,7 @@ public class ConstValues
 	public static final int LONG_SIZE = Long.SIZE / Byte.SIZE;
 	public static final int FLOAT_SIZE = Float.SIZE / Byte.SIZE;
 	public static final int DOUBLE_SIZE = Double.SIZE / Byte.SIZE;
-	
+
 	public static final String WHITESPACE_DELIMITER = "\\s+";
 	public static final String LINE_SEPARATOR = System.getProperty("line.separator");
 	
@@ -32,21 +32,21 @@ public class ConstValues
 	{
 		for (String naStr : naStrs)
 		{
-			if (naStr.equals(s))
+			if (naStr.equalsIgnoreCase(s))
 			{
 				return true;
 			}
 		}
 		return false;
 	}
-	
+
 	private static final String[] naStrs = initNAStrs();
-	
+
 	private static String[] initNAStrs()
 	{
 		if (CmdArgs.INSTANCE.getNA() == null)
 		{
-			return new String[] { "-9", "NA", "na", "-Inf", "Inf" };
+			return new String[] { "-9", "na", "-Inf", "Inf", ".", "-"};
 		}
 		return CmdArgs.INSTANCE.getNA().trim().split(",");
 	}

@@ -168,11 +168,6 @@ public class SFstCommandArguments extends CommandArguments
 	{
 		isVerbose = true;
 	}
-	
-	public void setVerboseGZ()
-	{
-		isVerbose = true;
-	}
 
 	public boolean isVerbose()
 	{
@@ -220,15 +215,15 @@ public class SFstCommandArguments extends CommandArguments
 		return chrFlag;
 	}
 
-	public void setClean()
-	{
-		isClean = true;
-	}
-
-	public boolean isClean()
-	{
-		return isClean;
-	}
+//	public void setClean()
+//	{
+//		isClean = true;
+//	}
+//
+//	public boolean isClean()
+//	{
+//		return isClean;
+//	}
 
 	public void setRapid()
 	{
@@ -240,21 +235,21 @@ public class SFstCommandArguments extends CommandArguments
 		return isRapid;
 	}
 
-	public void setTrim(double tr)
-	{
-		isTrim = true;
-		trim = tr;
-	}
-
-	public boolean isTrim()
-	{
-		return isTrim;
-	}
-
-	public double getTrimValue()
-	{
-		return trim;
-	}
+//	public void setTrim(double tr)
+//	{
+//		isTrim = true;
+//		trim = tr;
+//	}
+//
+//	public boolean isTrim()
+//	{
+//		return isTrim;
+//	}
+//
+//	public double getTrimValue()
+//	{
+//		return trim;
+//	}
 
 	public void setMeFrac(double mefrac)
 	{
@@ -298,10 +293,10 @@ public class SFstCommandArguments extends CommandArguments
 
 	private boolean isNoWeight = false;
 	private double Ne = 500;
-	private boolean isClean = false;
+//	private boolean isClean = false;
 	private boolean isRapid = false;
-	private boolean isTrim = false;
-	private double trim = 0;
+//	private boolean isTrim = false;
+//	private double trim = 0;
 
 	private double Me = 30000;
 	private double meFrac = 0;

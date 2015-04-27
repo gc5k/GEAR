@@ -246,19 +246,16 @@ public class SFstCommandImpl extends CommandImpl
 		FstDistance(FstArray, selIdx);
 
 		Logger.printUserLog("Fst is " + fst);
-		Logger.printUserLog("FstD is " + FstDistance);
+//		Logger.printUserLog("FstD is " + FstDistance);
 		fstMat[idx2][idx1] = fstMat[idx1][idx2] = fst;
 
-		if (!sfstArgs.isClean())
+		if (sfstArgs.isVerbose())
 		{
-			if (sfstArgs.isVerbose())
-			{
-				VerboseGZ(FstArray, idx1, idx2);
-			}
+			VerboseGZ(FstArray, idx1, idx2, selIdx);
 		}
 	}
 
-	private void VerboseGZ(ArrayList<FstUnit> LamArray, int idx1, int idx2)
+	private void VerboseGZ(ArrayList<FstUnit> FstArray, int idx1, int idx2, int[] selIdx)
 	{
 		BufferedWriter GZ = FileUtil
 				.ZipFileWriter(new String(
@@ -275,9 +272,9 @@ public class SFstCommandImpl extends CommandImpl
 											sfstArgs.getOutRoot() + "." + (idx1 + 1) + "-" + (idx2 + 1) + ".sFst.gz"));
 		}
 
-		for (int i = 0; i < LamArray.size(); i++)
+		for (int i = 0; i < selIdx.length; i++)
 		{
-			FstUnit lu = LamArray.get(i);
+			FstUnit lu = FstArray.get(selIdx[i]);
 			MetaStat ms1 = lu.getMetaStat1();
 			MetaStat ms2 = lu.getMetaStat2();
 			try
@@ -292,8 +289,9 @@ public class SFstCommandImpl extends CommandImpl
 				Logger.handleException(e,
 										"error in writing " + new String(
 												sfstArgs.getOutRoot() + "." + (idx1 + 1) + "-" + (idx2 + 1) + ".sFst.gz"));
-			}
+			}	
 		}
+		
 		try
 		{
 			GZ.close();
@@ -304,6 +302,8 @@ public class SFstCommandImpl extends CommandImpl
 									"error in writing " + new String(
 											sfstArgs.getOutRoot() + "." + (idx1 + 1) + "-" + (idx2 + 1) + ".sFst.gz"));
 		}
+
+		Logger.printUserLog("Save the fst results between this pair of files into " + sfstArgs.getOutRoot() + "." + (idx1 + 1) + "-" + (idx2 + 1) + ".sFst.gz");
 	}
 
 	private void WriteFstMat()
@@ -329,7 +329,7 @@ public class SFstCommandImpl extends CommandImpl
 		double beta1_d = 0;
 		double beta2_n = 0;
 		double beta2_d = 0;
-		
+
 		double beta3_n = 0;
 		double beta3_d = 0;
 		for(int i = 0; i < idx.length; i++)

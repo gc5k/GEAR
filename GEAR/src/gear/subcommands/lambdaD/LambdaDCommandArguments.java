@@ -35,7 +35,7 @@ public class LambdaDCommandArguments extends CommandArguments
 		}
 	}
 
-	public String[] getMetaFile() 
+	public String[] getMetaFile()
 	{
 		return md.toArray(new String[0]);
 	}
@@ -44,7 +44,7 @@ public class LambdaDCommandArguments extends CommandArguments
 	{
 		isGZ = flag;
 	}
-	
+
 	public boolean isGZ()
 	{
 		return isGZ;
@@ -180,21 +180,21 @@ public class LambdaDCommandArguments extends CommandArguments
 		isVerbose = true;
 	}
 	
-	public void setVerboseGZ()
-	{
-		isVerbose = true;
-		isVerboseGZ = true;
-	}
+//	public void setVerboseGZ()
+//	{
+//		isVerbose = true;
+//		isVerboseGZ = true;
+//	}
 
 	public boolean isVerbose()
 	{
 		return isVerbose;
 	}
 
-	public boolean isVerboseGZ()
-	{
-		return isVerboseGZ;
-	}
+//	public boolean isVerboseGZ()
+//	{
+//		return isVerboseGZ;
+//	}
 
 	public double getMe()
 	{
@@ -227,34 +227,34 @@ public class LambdaDCommandArguments extends CommandArguments
 		return isBeta;
 	}
 
-	public void setFrq()
-	{
-		isBeta = false;
-		isFrq = true;
-		mode = FRQ;
-	}
+//	public void setFrq()
+//	{
+//		isBeta = false;
+//		isFrq = true;
+//		mode = FRQ;
+//	}
+//
+//	public boolean isFrq()
+//	{
+//		return isFrq;
+//	}
+//
+//	public void setFst()
+//	{
+//		isBeta = false;
+//		isFrq = true;
+//		mode = FRQ;
+//	}
 
-	public boolean isFrq()
-	{
-		return isFrq;
-	}
-
-	public void setFst()
-	{
-		isBeta = false;
-		isFrq = true;
-		mode = FRQ;
-	}
-
-	public void setClean()
-	{
-		isClean = true;
-	}
-	
-	public boolean isClean()
-	{
-		return isClean;
-	}
+//	public void setClean()
+//	{
+//		isClean = true;
+//	}
+//	
+//	public boolean isClean()
+//	{
+//		return isClean;
+//	}
 
 	public void setRapid()
 	{
@@ -330,16 +330,16 @@ public class LambdaDCommandArguments extends CommandArguments
 	private boolean isGZ = false;
 	private boolean isQT = true;
 	private boolean isVerbose = false;
-	private boolean isVerboseGZ = false;
+//	private boolean isVerboseGZ = false;
 
-	private boolean isClean = false;
+//	private boolean isClean = false;
 	private boolean isRapid = false;
 	private boolean isRandom = false;
 	private boolean isTrim = false;
 	private double trim = 0;
 
 	private boolean isBeta = true;
-	private boolean isFrq = false;
+//	private boolean isFrq = false;
 
 	private double Me = 30000;
 	private double meFrac = 0;

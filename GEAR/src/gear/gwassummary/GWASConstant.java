@@ -11,4 +11,23 @@ public class GWASConstant
 	public static final int P = 6;
 	public static final int A1 = 7;
 	public static final int A2 = 8;
+	
+	public static boolean isNASNP(String snp)
+	{
+		String[] naSNP = initNASNP();
+		for (String naStr : naSNP)
+		{
+			if (naStr.equalsIgnoreCase(snp))
+			{
+				return true;
+			}
+		}
+		return false;
+	}
+
+	private static String[] initNASNP()
+	{
+		return new String[] { ".", "-", "na" };
+	}
+
 }
