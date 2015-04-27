@@ -48,9 +48,9 @@ public class SFstCommand extends Command
 
 		options.addOption(OptionBuilder.withDescription(OPT_CHR_DESC).hasArg().create(OPT_CHR));
 		options.addOption(OptionBuilder.withDescription(OPT_TOP_DESC).hasArg().create(OPT_TOP));
-		options.addOption(OptionBuilder.withDescription(OPT_CLEAN_DESC).create(OPT_CLEAN));
+//		options.addOption(OptionBuilder.withDescription(OPT_CLEAN_DESC).create(OPT_CLEAN));
 
-		options.addOption(OptionBuilder.withDescription(OPT_TRIM_DESC).hasOptionalArg().create(OPT_TRIM));
+//		options.addOption(OptionBuilder.withDescription(OPT_TRIM_DESC).hasOptionalArg().create(OPT_TRIM));
 
 	}
 
@@ -122,15 +122,15 @@ public class SFstCommand extends Command
 			lamD.setTop(cmdLine.getOptionValue(OPT_TOP));
 		}
 
-		if (cmdLine.hasOption(OPT_CLEAN))
-		{
-			lamD.setClean();
-		}
+//		if (cmdLine.hasOption(OPT_CLEAN))
+//		{
+//			lamD.setClean();
+//		}
 
-		if (cmdLine.hasOption(OPT_TRIM))
-		{
-			lamD.setTrim(parseDoubleOptionValueInRange(cmdLine, OPT_TRIM, OPT_TRIM_DEFAULT, 0, 0.45));
-		}
+//		if (cmdLine.hasOption(OPT_TRIM))
+//		{
+//			lamD.setTrim(parseDoubleOptionValueInRange(cmdLine, OPT_TRIM, OPT_TRIM_DEFAULT, 0, 0.45));
+//		}
 
 		lamD.setMeFrac(parseDoubleOptionValueInRange(cmdLine, OPT_ME_FRAC_LONG, OPT_ME_FRAC_LONG_DEFAULT, 0.01, 1));
 
@@ -171,7 +171,7 @@ public class SFstCommand extends Command
 	private final static String OPT_NO_WEIGHT = "nw";
 	private final static String OPT_NO_WEIGHT_LONG = "no-weight";
 	private final static String OPT_NO_WEIGHT_LONG_DESC = "Set the sample size same, say 500, for each cohort when calculating Fst.";
-	
+
 	private final static String OPT_ME_FRAC_LONG = "me-frac";
 	private final static String OPT_ME_FRAC_LONG_DEFAULT = "0.05";
 	private final static String OPT_ME_FRAC_LONG_DESC = "Fraction of minumal markers required, at least 5% by default.";
@@ -182,11 +182,11 @@ public class SFstCommand extends Command
 	private final static String OPT_TOP = "top";
 	private final static String OPT_TOP_DESC = "Top x files as the reference.";
 
-	private final static String OPT_CLEAN = "clean";
-	private final static String OPT_CLEAN_DESC = "No detailed result for each pair of cohorts.";
+//	private final static String OPT_CLEAN = "clean";
+//	private final static String OPT_CLEAN_DESC = "No detailed result for each pair of cohorts.";
 
-	private final static String OPT_TRIM = "trim";
-	private final static String OPT_TRIM_DEFAULT = "0.001";
-	private final static String OPT_TRIM_DESC = "trim off the top and the bottom 5% of markers in calculating lambda_meta and its derived statistics.";
+//	private final static String OPT_TRIM = "trim";
+//	private final static String OPT_TRIM_DEFAULT = "0.001";
+//	private final static String OPT_TRIM_DESC = "trim off the top and the bottom 5% of markers in calculating lambda_meta and its derived statistics.";
 
 }

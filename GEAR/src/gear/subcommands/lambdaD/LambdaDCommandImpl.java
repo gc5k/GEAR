@@ -84,10 +84,6 @@ public class LambdaDCommandImpl extends CommandImpl
 		{
 			WriteRandMat();
 		}
-		if (lamArgs.isFrq())
-		{
-			WriteFstMat();
-		}
 		Logger.printUserLog("=========================================================");
 		Logger.printUserLog("Results has been saved in '" + lamArgs
 				.getOutRoot() + ".lmat'.");
@@ -100,7 +96,7 @@ public class LambdaDCommandImpl extends CommandImpl
 		gReader = new GWASReader(lamArgs.getMetaFile(), FileKeep,
 				lamArgs.getKeys(), lamArgs.isQT(), lamArgs.isGZ(),
 				lamArgs.isChr(), lamArgs.getChr());
-		gReader.Start(lamArgs.isFrq());
+		gReader.Start(false);
 
 		Me = lamArgs.getMe();
 		if (Me > 0)
@@ -115,10 +111,6 @@ public class LambdaDCommandImpl extends CommandImpl
 		if (lamArgs.isBeta())
 		{
 			Logger.printUserLog("Calculating genetic effects difference.");
-		}
-		else if (lamArgs.isFrq())
-		{
-			Logger.printUserLog("Calculating allele frequency difference, and Fst.");
 		}
 
 		int NumMetaFile = lamArgs.getMetaFile().length;
@@ -351,20 +343,9 @@ public class LambdaDCommandImpl extends CommandImpl
 			olCsMat[idx2][idx1] = et.getN12cs();
 		}
 
-		if (!lamArgs.isClean())
+		if (lamArgs.isVerbose())
 		{
-			if (lamArgs.isVerboseGZ())
-			{
-				VerboseGZ(LamArray, idx1, idx2);
-			}
-			else if (lamArgs.isVerbose())
-			{
-				Verbose(LamArray, idx1, idx2);
-			}
-			else
-			{
-				NotVerbose(LamArray, idx1, idx2, selIdx);
-			}			
+			VerboseGZ(LamArray, idx1, idx2, selIdx);
 		}
 	}
 
@@ -545,93 +526,15 @@ public class LambdaDCommandImpl extends CommandImpl
 			olCsMat[idx2][idx1] = et.getN12cs();
 		}
 
-		if (!lamArgs.isClean())
+		if (lamArgs.isVerbose())
 		{
-			if (lamArgs.isVerboseGZ())
-			{
-				VerboseGZ(LamArray, idx1, idx2);
-			}
-			else if (lamArgs.isVerbose())
-			{
-				Verbose(LamArray, idx1, idx2);
-			}
-			else
-			{
-				NotVerbose(LamArray, idx1, idx2, selIdx);
-			}
+			VerboseGZ(LamArray, idx1, idx2, selIdx);
 		}
 	}
 
-	private void NotVerbose(ArrayList<LamUnit> LamArray, int idx1, int idx2,
-			int[] selIdx)
+	private void VerboseGZ(ArrayList<LamUnit> LamArray, int idx1, int idx2, int[] selIdx)
 	{
 		double[] ChiExp = Sample.sampleChisq(selIdx.length, 1);
-		PrintStream writer = FileUtil.CreatePrintStream(new String(lamArgs
-				.getOutRoot() + "." + (idx1 + 1) + "-" + (idx2 + 1) + tail[lamArgs.getMode()]));
-		writer.print(titleLine[lamArgs.getMode()]);
-
-		for (int i = 0; i < selIdx.length; i++)
-		{
-			LamUnit lu = LamArray.get(selIdx[i]);
-			MetaStat ms1 = lu.getMetaStat1();
-			MetaStat ms2 = lu.getMetaStat2();
-			double lambda = lu.getIndicateStat(lamArgs.getMode()) / (ChiExp[i]);
-			if (lamArgs.getMode() == LambdaDCommandArguments.BETA)
-			{
-				writer.print(ms1.getSNP() + "\t" + ms1.getChr() + "\t" + ms1
-						.getBP() + "\t" + ms1.getA1() + "\t" + lu.getB1() + "\t" + ms1
-						.getSE() + "\t" + ms1.getP() + "\t" + lu.getB2() + "\t" + ms2
-						.getSE() + "\t" + ms2.getP() + "\t" + lu
-						.getIndicateStat(lamArgs.getMode()) + "\t" + ChiExp[i] + "\t" + lambda + "\n");
-			}
-			else
-			{
-				writer.print(ms1.getSNP() + "\t" + ms1.getChr() + "\t" + ms1
-						.getBP() + "\t" + ms1.getA1() + "\t" + lu.getB1() + "\t" + ms1
-						.getSE() + "\t" + ms1.getP() + "\t" + lu.getB2() + "\t" + ms2
-						.getSE() + "\t" + ms2.getP() + "\t" + lu.getFstBW() + "\t" + lu.getFstChi() + "\t" + lu
-						.getIndicateStat(lamArgs.getMode()) + "\t" + ChiExp[i] + "\t" + lambda + "\n");
-			}
-		}
-		writer.close();
-	}
-
-	private void Verbose(ArrayList<LamUnit> LamArray, int idx1, int idx2)
-	{
-		double[] ChiExp = Sample.sampleChisq(LamArray.size(), 1);
-		PrintStream writer = FileUtil.CreatePrintStream(new String(lamArgs
-				.getOutRoot() + "." + (idx1 + 1) + "-" + (idx2 + 1) + tail[lamArgs.getMode()]));
-		writer.print(titleLine[lamArgs.getMode()]);
-
-		for (int i = 0; i < LamArray.size(); i++)
-		{
-			LamUnit lu = LamArray.get(i);
-			MetaStat ms1 = lu.getMetaStat1();
-			MetaStat ms2 = lu.getMetaStat2();
-			double lambda = lu.getIndicateStat(lamArgs.getMode()) / (ChiExp[i]);
-			if (lamArgs.getMode() == LambdaDCommandArguments.BETA)
-			{
-				writer.print(ms1.getSNP() + "\t" + ms1.getChr() + "\t" + ms1
-						.getBP() + "\t" + ms1.getA1() + "\t" + lu.getB1() + "\t" + ms1
-						.getSE() + "\t" + ms1.getP() + "\t" + lu.getB2() + "\t" + ms2
-						.getSE() + "\t" + ms2.getP() + "\t" + lu
-						.getIndicateStat(lamArgs.getMode()) + "\t" + ChiExp[i] + "\t" + lambda);
-			}
-			else
-			{
-				writer.print(ms1.getSNP() + "\t" + ms1.getChr() + "\t" + ms1
-						.getBP() + "\t" + ms1.getA1() + "\t" + lu.getB1() + "\t" + ms1
-						.getSE() + "\t" + ms1.getP() + "\t" + lu.getB2() + "\t" + ms2
-						.getSE() + "\t" + ms2.getP() + "\t" + lu.getFstBW() + "\t" + lu.getFstChi() + "\t" + lu
-						.getIndicateStat(lamArgs.getMode()) + "\t" + ChiExp[i] + "\t" + lambda);
-			}
-		}
-		writer.close();
-	}
-
-	private void VerboseGZ(ArrayList<LamUnit> LamArray, int idx1, int idx2)
-	{
-		double[] ChiExp = Sample.sampleChisq(LamArray.size(), 1);
 		BufferedWriter GZ = FileUtil
 				.ZipFileWriter(new String(
 						lamArgs.getOutRoot() + "." + (idx1 + 1) + "-" + (idx2 + 1) + tail[lamArgs.getMode()] + ".gz"));
@@ -647,9 +550,9 @@ public class LambdaDCommandImpl extends CommandImpl
 											lamArgs.getOutRoot() + "." + (idx1 + 1) + "-" + (idx2 + 1) + tail[lamArgs.getMode()] + ".gz"));
 		}
 
-		for (int i = 0; i < LamArray.size(); i++)
+		for (int i = 0; i < selIdx.length; i++)
 		{
-			LamUnit lu = LamArray.get(i);
+			LamUnit lu = LamArray.get(selIdx[i]);
 			MetaStat ms1 = lu.getMetaStat1();
 			MetaStat ms2 = lu.getMetaStat2();
 			double lambda = lu.getIndicateStat(lamArgs.getMode()) / (ChiExp[i]);
@@ -689,6 +592,8 @@ public class LambdaDCommandImpl extends CommandImpl
 									"error in writing " + new String(
 											lamArgs.getOutRoot() + "." + (idx1 + 1) + "-" + (idx2 + 1) + ".lam.gz"));
 		}
+
+		Logger.printUserLog("Save the lambdameta results between this pair of files into " + lamArgs.getOutRoot() + "." + (idx1 + 1) + "-" + (idx2 + 1) + ".lam.gz");
 	}
 
 	private void WriteRandMat()
@@ -790,7 +695,6 @@ public class LambdaDCommandImpl extends CommandImpl
 
 		PrintStream writer = FileUtil.CreatePrintStream(new String(lamArgs.getOutRoot() + ".lmat"));
 
-		writer.println("LambdaMeta:");
 		for (int i = 0; i < lamMat.length; i++)
 		{
 			for (int j = 0; j < lamMat[i].length; j++)
@@ -799,58 +703,60 @@ public class LambdaDCommandImpl extends CommandImpl
 			}
 			writer.println();
 		}
+		writer.close();
+
+		PrintStream Owriter = FileUtil.CreatePrintStream(new String(lamArgs.getOutRoot() + ".ol"));
 
 		if (!lamArgs.isQT())
 		{
-			writer.println("Overlapping controls (lower triangle) vs overlapping samples (upper triangle):");
+			Owriter.println("Overlapping controls (lower triangle) vs overlapping samples (upper triangle):");
 			for (int i = 0; i < olCtrlMat.length; i++)
 			{
 				for (int j = 0; j < olCtrlMat[i].length; j++)
 				{
-					writer.print(String.format("%.4f", olCtrlMat[i][j]) + " ");
+					Owriter.print(String.format("%.4f", olCtrlMat[i][j]) + " ");
 				}
-				writer.println();
+				Owriter.println();
 			}
 
-			writer.println("Overlapping cases (lower triangle) vs Overlapping samples (upper triangle):");
+			Owriter.println("Overlapping cases (lower triangle) vs Overlapping samples (upper triangle):");
 			for (int i = 0; i < olCsMat.length; i++)
 			{
 				for (int j = 0; j < olCsMat[i].length; j++)
 				{
-					writer.print(String.format("%.4f", olCsMat[i][j]) + " ");
+					Owriter.print(String.format("%.4f", olCsMat[i][j]) + " ");
 				}
-				writer.println();
+				Owriter.println();
 			}
 		}
 		else
 		{
-			writer.println("Overlapping samples (lower triangle)");
+			Owriter.println("Overlapping samples (lower triangle)");
 			for (int i = 0; i < olCtrlMat.length; i++)
 			{
 				for (int j = 0; j < olCtrlMat[i].length; j++)
 				{
-					writer.print(String.format("%.4f", olCtrlMat[i][j]) + " ");
+					Owriter.print(String.format("%.4f", olCtrlMat[i][j]) + " ");
 				}
-				writer.println();
+				Owriter.println();
 			}
 		}
-
-		writer.close();
+		Owriter.close();
 	}
 
-	private void WriteFstMat()
-	{
-		PrintStream FstWriter = FileUtil.CreatePrintStream(new String(lamArgs.getOutRoot() + ".fst"));
-		for (int i = 0; i < fstMat.length; i++)
-		{
-			for (int j = 0; j < fstMat[i].length; j++)
-			{
-				FstWriter.print(String.format("%.5f", fstMat[i][j]) + " ");
-			}
-			FstWriter.println();
-		}
-		FstWriter.close();
-	}
+//	private void WriteFstMat()
+//	{
+//		PrintStream FstWriter = FileUtil.CreatePrintStream(new String(lamArgs.getOutRoot() + ".fst"));
+//		for (int i = 0; i < fstMat.length; i++)
+//		{
+//			for (int j = 0; j < fstMat[i].length; j++)
+//			{
+//				FstWriter.print(String.format("%.5f", fstMat[i][j]) + " ");
+//			}
+//			FstWriter.println();
+//		}
+//		FstWriter.close();
+//	}
 
 	private double Me = 30000;
 
@@ -863,7 +769,7 @@ public class LambdaDCommandImpl extends CommandImpl
 			"SNP\tChr\tBp\tA1\tBeta1\tSE1\tP1\tBeta2\tSE2\tP2\tChiObs(beta)\tChiExp\tLambdaD\n",
 			"SNP\tChr\tBp\tA1\tFrq1\tSE1\tP1\tFrq2\tSE2\tP2\tFst\tChiObs(Fst)\tChiObs(Frq)\tChiExp\tLambdaD\n" };
 
-	private String[] tail = {".lamB", ".lamF"};
+	private String[] tail = {".lam", ".lamF"};
 
 	private GWASReader gReader;
 

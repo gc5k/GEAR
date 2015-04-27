@@ -47,12 +47,10 @@ public class LambdaDCommand extends Command
 
 		options.addOption(OptionBuilder.withDescription(OPT_KEY_DESC).hasArgs().create(OPT_KEY));
 		options.addOption(OptionBuilder.withDescription(OPT_VERBOSE_DESC).withLongOpt(OPT_VERBOSE_LONG).create(OPT_VERBOSE));
-		options.addOption(OptionBuilder.withDescription(OPT_VERBOSE_GZ_DESC).withLongOpt(OPT_VERBOSE_GZ_LONG).create(OPT_VERBOSE_GZ));
 
 		options.addOption(OptionBuilder.withDescription(OPT_CHR_DESC).hasArg().create(OPT_CHR));
-		options.addOption(OptionBuilder.withDescription(OPT_FST_DESC).create(OPT_FST));
+//		options.addOption(OptionBuilder.withDescription(OPT_FST_DESC).create(OPT_FST));
 		options.addOption(OptionBuilder.withDescription(OPT_TOP_DESC).hasArg().create(OPT_TOP));
-		options.addOption(OptionBuilder.withDescription(OPT_CLEAN_DESC).create(OPT_CLEAN));
 		options.addOption(OptionBuilder.withDescription(OPT_RAPID_DESC).create(OPT_RAPID));
 		
 		options.addOption(OptionBuilder.withDescription(OPT_RCM_DESC).create(OPT_RCM));
@@ -143,30 +141,30 @@ public class LambdaDCommand extends Command
 			lamD.setVerbose();
 		}
 		
-		if (cmdLine.hasOption(OPT_VERBOSE_GZ))
-		{
-			lamD.setVerboseGZ();
-		}
+//		if (cmdLine.hasOption(OPT_VERBOSE_GZ))
+//		{
+//			lamD.setVerboseGZ();
+//		}
 
 		if (cmdLine.hasOption(OPT_CHR))
 		{
 			lamD.setChr(cmdLine.getOptionValue(OPT_CHR));
 		}
 
-		if (cmdLine.hasOption(OPT_FST))
-		{
-			lamD.setFst();
-		}
+//		if (cmdLine.hasOption(OPT_FST))
+//		{
+//			lamD.setFst();
+//		}
 
 		if (cmdLine.hasOption(OPT_TOP))
 		{
 			lamD.setTop(cmdLine.getOptionValue(OPT_TOP));
 		}
 
-		if (cmdLine.hasOption(OPT_CLEAN))
-		{
-			lamD.setClean();
-		}
+//		if (cmdLine.hasOption(OPT_CLEAN))
+//		{
+//			lamD.setClean();
+//		}
 		
 		if (cmdLine.hasOption(OPT_RAPID))
 		{
@@ -230,10 +228,6 @@ public class LambdaDCommand extends Command
 	private final static String OPT_VERBOSE_LONG = "verbose";
 	private final static String OPT_VERBOSE_DESC = "Print test statistic for every pair of meta files.";
 
-	private final static String OPT_VERBOSE_GZ = "vg";
-	private final static String OPT_VERBOSE_GZ_LONG = "verbose-gz";
-	private final static String OPT_VERBOSE_GZ_DESC = "Print test statistic in gz format for every pair of meta files.";
-
 	private final static String OPT_ME = "me";
 	private final static String OPT_ME_DEFAULT = "30000";
 	private final static String OPT_ME_DESC = "effective number of markers.";
@@ -245,15 +239,9 @@ public class LambdaDCommand extends Command
 	private final static String OPT_CHR = "chr";
 	private final static String OPT_CHR_DESC = "Choose chromosome for analysis";
 	
-	private final static String OPT_FST = "fst";
-	private final static String OPT_FST_DESC = "Using fst (Bruce Weir)";
-	
 	private final static String OPT_TOP = "top";
 	private final static String OPT_TOP_DESC = "Top x files as the reference.";
-	
-	private final static String OPT_CLEAN = "clean";
-	private final static String OPT_CLEAN_DESC = "No detailed result for each pair of cohorts.";
-	
+		
 	private final static String OPT_RAPID = "rapid";
 	private final static String OPT_RAPID_DESC = "Rapid method to sample snps.";
 

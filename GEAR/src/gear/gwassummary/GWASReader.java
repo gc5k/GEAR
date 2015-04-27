@@ -2,12 +2,10 @@ package gear.gwassummary;
 
 import gear.ConstValues;
 import gear.util.BufferedReader;
-import gear.util.FileUtil;
 import gear.util.Logger;
 import gear.util.NewIt;
 import gear.util.stat.PrecisePvalue;
 
-import java.io.PrintStream;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -50,7 +48,7 @@ public class GWASReader
 
 		gc = new double[workingMetaFile.size()];
 		Arrays.fill(gc, 1);
-		
+
 		gcReal = new double[workingMetaFile.size()];
 		Arrays.fill(gcReal, 1);
 
@@ -204,10 +202,12 @@ public class GWASReader
 		if (KeyIdx[metaIdx][BETA] == -1)
 		{
 			Logger.printUserLog("Cannot find the beta/or column in " + workingMetaFile.get(metaIdx));
+			qFlag = true;
 		}
 		if (KeyIdx[metaIdx][SE] == -1)
 		{
 			Logger.printUserLog("Cannot find the se value column in " + workingMetaFile.get(metaIdx));
+			qFlag = true;
 		}
 		if (KeyIdx[metaIdx][P] == -1)
 		{
@@ -216,6 +216,7 @@ public class GWASReader
 		if (KeyIdx[metaIdx][A1] == -1)
 		{
 			Logger.printUserLog("Cannot find the allele 1 column in " + workingMetaFile.get(metaIdx));
+			qFlag = true;
 		}
 //		if (KeyIdx[metaIdx][7] == -1)
 //		{
@@ -240,35 +241,47 @@ public class GWASReader
 		int cntBadSE = 0;
 		int cntBadA1 = 0;
 		int cntBadA2 = 0;
+		int cntMissSNP = 0;
 		
 		while( (tokens = reader.readTokens(tokenLen)) != null)
 		{
 			total++;
+			if (GWASConstant.isNASNP(tokens[KeyIdx[metaIdx][SNP]]))
+			{
+				cntMissSNP++;
+				continue;
+			}
+			
 			if (KeyIdx[metaIdx][CHR] != -1 && ConstValues.isNA(tokens[KeyIdx[metaIdx][CHR]]))
 			{
 				cntBadChr++;
 				continue;
 			}
+
 			if (KeyIdx[metaIdx][BP] != -1 && ConstValues.isNA(tokens[KeyIdx[metaIdx][BP]]))
 			{
 				cntBadBp++;
 				continue;
 			}
+
 			if (ConstValues.isNA(tokens[KeyIdx[metaIdx][BETA]]))
 			{
 				cntBadBeta++;
 				continue;
 			}
+
 			if (ConstValues.isNA(tokens[KeyIdx[metaIdx][SE]]))
 			{
 				cntBadSE++;
 				continue;
 			}
+
 			if (Float.parseFloat(tokens[KeyIdx[metaIdx][SE]]) <= 0)
 			{
 				cntBadSE++;
 				continue;
 			}
+
 			if (KeyIdx[metaIdx][P] != -1 && ConstValues.isNA(tokens[KeyIdx[metaIdx][P]]))
 			{
 				cntBadP++;
@@ -284,6 +297,7 @@ public class GWASReader
 				cntBadA1++;
 				continue;
 			}
+
 			if (KeyIdx[metaIdx][A2] != -1 && tokens[KeyIdx[metaIdx][A2]].length() != 1)
 			{
 				cntBadA2++;
@@ -297,7 +311,7 @@ public class GWASReader
 			}
 
 			MetaStat ms = null;
-			if(KeyIdx[metaIdx][P] != -1)
+			if (KeyIdx[metaIdx][P] != -1)
 			{
 				ms = new MetaStat(tokens[KeyIdx[metaIdx][SNP]], Float.parseFloat(tokens[KeyIdx[metaIdx][BETA]]), Float.parseFloat(tokens[KeyIdx[metaIdx][SE]]), Double.parseDouble(tokens[KeyIdx[metaIdx][P]]), tokens[KeyIdx[metaIdx][A1]].charAt(0), logit[metaIdx]);
 			}
@@ -399,98 +413,58 @@ public class GWASReader
 			}
 		}
 
+		if (cntMissSNP > 0)
+		{
+			String lc = cntMissSNP == 1 ? "name." : "names.";
+			Logger.printUserLog("Removed " + cntMissSNP + " " + lc + " due to bad marker name(s)");
+		}
+
 		if (cntBadChr > 0)
 		{
-			if (cntBadChr == 1)
-			{
-				Logger.printUserLog("Removed " + cntBadChr + " locus due to incorrect Chr.");				
-			}
-			else
-			{
-				Logger.printUserLog("Removed " + cntBadChr + " loci due to incorrect Chr.");				
-			}
+			String lc = cntBadChr == 1 ? "locus" : "loci";
+			Logger.printUserLog("Removed " + cntBadChr + " " + lc + " due to incorrect chromosome(s).");
 		}
 
 		if (cntBadBp > 0)
 		{
-			if (cntBadBp == 1)
-			{
-				Logger.printUserLog("Removed " + cntBadBp + " locus due to incorrect Bp.");				
-			}
-			else
-			{
-				Logger.printUserLog("Removed " + cntBadChr + " loci due to incorrect Bp.");				
-			}
+			String lc = cntBadBp == 1 ? "locus" : "loci";
+			Logger.printUserLog("Removed " + cntBadBp + " " + lc + " due to incorrect physical position(s).");				
 		}
 
 		if (cntBadBeta > 0)
 		{
-			if (cntBadBeta == 1)
-			{
-				Logger.printUserLog("Removed " + cntBadBeta + " locus due to incorrect effect.");				
-			}
-			else
-			{
-				Logger.printUserLog("Removed " + cntBadBeta + " loci due to incorrect effect.");				
-			}
+			String lc = cntBadBeta == 1 ? "locus" : "loci";
+			Logger.printUserLog("Removed " + cntBadBeta + "" + lc + " due to incorrect effect(s).");
 		}
 
 		if (cntBadSE > 0)
 		{
-			if (cntBadSE == 1)
-			{
-				Logger.printUserLog("Removed " + cntBadSE + " locus due to incorrect se.");				
-			}
-			else
-			{
-				Logger.printUserLog("Removed " + cntBadSE + " loci due to incorrect se.");
-			}
+			String lc = cntBadSE == 1 ? "locus" : "loci";
+			Logger.printUserLog("Removed " + cntBadSE + " " + lc + " due to incorrect se.");
 		}
 
 		if (cntBadP > 0)
 		{
-			if (cntBadP == 1)
-			{
-				Logger.printUserLog("Removed " + cntBadP + " locus due to incorrect p values.");				
-			}
-			else
-			{
-				Logger.printUserLog("Removed " + cntBadP + " loci due to incorrect p values.");
-			}
+			String lc = cntBadP == 1 ? "locus" : "loci";
+			Logger.printUserLog("Removed " + cntBadP + " " + lc + " due to incorrect p value(s).");
 		}
 
 		if (cntBadA1 > 0)
 		{
-			if (cntBadA1 == 1)
-			{
-				Logger.printUserLog("Removed " + cntBadA1 + " locus due to bad a1 allele.");				
-			}
-			else
-			{
-				Logger.printUserLog("Removed " + cntBadA1 + " loci due to bad a1 allele.");
-			}
+			String lc = cntBadA1 == 1 ? "locus" : "loci";
+			Logger.printUserLog("Removed " + cntBadA1 + " " + lc + " due to bad a1 allele(s).");
 		}
+
 		if(cntBadA2 > 0)
 		{
-			if (cntBadA2 == 1)
-			{
-				Logger.printUserLog("Removed " + cntBadA2 + " locus due to bad a2 allele.");
-			}
-			else
-			{
-				Logger.printUserLog("Removed " + cntBadA2 + " loci due to bad a2 allele.");				
-			}
+			String lc = cntBadA2 == 1 ? "locus" : "loci";
+			Logger.printUserLog("Removed " + cntBadA2 + " " + lc + " due to bad a2 allele(s).");
 		}
+
 		if(cntDup > 0)
 		{
-			if (cntDup == 1)
-			{
-				Logger.printUserLog("Removed " + cntDup + " duplicated locus.");				
-			}
-			else
-			{
-				Logger.printUserLog("Removed " + cntDup + " duplicated loci.");
-			}
+			String lc = cntDup == 1 ? "locus" : "loci";
+			Logger.printUserLog("Removed " + cntDup + " duplicated " + lc);
 		}
 
 		MetaSNPArray.add(snpArray);
