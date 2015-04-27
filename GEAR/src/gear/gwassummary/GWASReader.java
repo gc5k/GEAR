@@ -415,7 +415,7 @@ public class GWASReader
 
 		if (cntMissSNP > 0)
 		{
-			String lc = cntMissSNP == 1 ? "name." : "names.";
+			String lc = cntMissSNP == 1 ? "locus" : "loci";
 			Logger.printUserLog("Removed " + cntMissSNP + " " + lc + " due to bad marker name(s)");
 		}
 
