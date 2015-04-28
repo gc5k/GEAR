@@ -17,11 +17,15 @@ public class SFstCommandArguments extends CommandArguments
 		md = NewIt.newArrayList();
 		BufferedReader reader = BufferedReader.openTextFile(batch, "MetaBatch");
 
+//		Logger.printUserLog("Checking the summary statistic files...");
 		String[] tokens = null;
 		while((tokens = reader.readTokens())!=null)
 		{
+			FileUtil.exists(tokens[0]);
 			md.add(tokens[0]);
 		}
+//		Logger.printUserLog("Found all of " + md.size() + " files.");
+
 	}
 
 	public String[] getMetaFile() 
