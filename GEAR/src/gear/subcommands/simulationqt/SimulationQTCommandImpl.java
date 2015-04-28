@@ -275,7 +275,6 @@ public class SimulationQTCommandImpl extends CommandImpl
 		PrintWriter fam = null;
 		PrintWriter bim = null;
 		PrintWriter phe = null;
-		PrintWriter cov = null;
 		PrintWriter geno = null;
 		PrintWriter eff = null;
 
@@ -290,8 +289,6 @@ public class SimulationQTCommandImpl extends CommandImpl
 
 			phe = new PrintWriter(new BufferedWriter(new FileWriter(qtArgs.getOutRoot()
 					+ ".phe")));
-			cov = new PrintWriter(new BufferedWriter(new FileWriter(qtArgs.getOutRoot()
-					+ ".cov")));
 			geno = new PrintWriter(new BufferedWriter(new FileWriter(qtArgs.getOutRoot()
 					+ ".add")));
 			eff = new PrintWriter(new BufferedWriter(new FileWriter(qtArgs.getOutRoot() + ".rnd")));
@@ -312,8 +309,7 @@ public class SimulationQTCommandImpl extends CommandImpl
 
 			fam.println(phenotype[i] + " ");
 
-			phe.println("sample_" + i + " " + 1 + " " + phenotype[i]);
-			cov.println("sample_" + i + " " + 1 + " " + BV[i]);
+			phe.println("sample_" + i + " " + 1 + " " + BV[i] + " " + phenotype[i]);
 		}
 
 		for (int i = 0; i < genotype.length; i++)
@@ -394,7 +390,6 @@ public class SimulationQTCommandImpl extends CommandImpl
 		phe.close();
 		bim.close();
 		fam.close();
-		cov.close();
 		eff.close();
 	}
 
@@ -402,7 +397,7 @@ public class SimulationQTCommandImpl extends CommandImpl
 	{
 		PrintWriter pedout = null;
 		PrintWriter map = null;
-		PrintWriter cov = null;
+		PrintWriter phe = null;
 		PrintWriter geno = null;
 		PrintWriter eff = null;
 		try
@@ -411,8 +406,8 @@ public class SimulationQTCommandImpl extends CommandImpl
 					+ ".ped")));
 			map = new PrintWriter(new BufferedWriter(new FileWriter(qtArgs.getOutRoot()
 					+ ".map")));
-			cov = new PrintWriter(new BufferedWriter(new FileWriter(qtArgs.getOutRoot()
-					+ ".cov")));
+			phe = new PrintWriter(new BufferedWriter(new FileWriter(qtArgs.getOutRoot()
+					+ ".phe")));
 			geno = new PrintWriter(new BufferedWriter(new FileWriter(qtArgs.getOutRoot()
 					+ ".add")));
 			eff = new PrintWriter(new BufferedWriter(new FileWriter(qtArgs.getOutRoot() + ".rnd")));
@@ -449,9 +444,7 @@ public class SimulationQTCommandImpl extends CommandImpl
 			}
 			pedout.println();
 
-			cov.print("sample_" + i + " " + 1 + " " + 1 + " ");
-			cov.print(BV[i] + " ");
-			cov.println(phenotype[i]);
+			phe.println("sample_" + i + " " + 1 + " " + 1 + " " + BV[i] + " " + phenotype[i]);
 		}
 
 		for (int i = 0; i < M; i++)
@@ -474,7 +467,7 @@ public class SimulationQTCommandImpl extends CommandImpl
 
 		pedout.close();
 		map.close();
-		cov.close();
+		phe.close();
 		geno.close();
 		eff.close();
 	}
