@@ -40,10 +40,12 @@ public class SimulationQTCommand extends Command
 
 		options.addOption(OptionBuilder.withDescription(OPT_FREQ_DESC).hasArg().create(OPT_FREQ));
 		options.addOption(OptionBuilder.withDescription(OPT_UNIF_FREQ_LONG_DESC).withLongOpt(OPT_UNIF_FREQ_LONG).create());
+		options.addOption(OptionBuilder.withDescription(OPT_FREQ_RANGE_LONG_DESC).withLongOpt(OPT_FREQ_RANGE_LONG).hasArgs(2).create());
 		options.addOption(OptionBuilder.withDescription(OPT_FREQ_FILE_LONG_DESC).withLongOpt(OPT_FREQ_FILE_LONG).hasArg().create());
 
 		options.addOption(OptionBuilder.withDescription(OPT_LD_DESC).hasArg().create(OPT_LD));
-		options.addOption(OptionBuilder.withDescription(OPT_RAND_LD_DESC).withLongOpt(OPT_RAND_LD_LONG).create());
+		options.addOption(OptionBuilder.withDescription(OPT_RAND_LD_LONG_DESC).withLongOpt(OPT_RAND_LD_LONG).create());
+		options.addOption(OptionBuilder.withDescription(OPT_LD_RANGE_LONG_DESC).withLongOpt(OPT_RAND_LD_LONG).create());
 
 		options.addOption(OptionBuilder.withDescription(OPT_HSQ_DESC).hasArg().create(OPT_HSQ));
 		options.addOption(OptionBuilder.withDescription(OPT_MAKE_BED_LONG_DESC).withLongOpt(OPT_MAKE_BED_LONG).create());
@@ -90,10 +92,15 @@ public class SimulationQTCommand extends Command
 		}
 
 		simuQTArgs.setFreq(parseDoubleOptionValue(cmdLine, OPT_FREQ, "0.5"));
-
+		
 		if(cmdLine.hasOption(OPT_UNIF_FREQ_LONG))
 		{
 			simuQTArgs.setUnifFreq();
+		}
+
+		if(cmdLine.hasOption(OPT_FREQ_RANGE_LONG))
+		{
+			simuQTArgs.setFreqRange(cmdLine.getOptionValues(OPT_FREQ_RANGE_LONG));
 		}
 
 		if(cmdLine.hasOption(OPT_FREQ_FILE_LONG))
@@ -106,6 +113,11 @@ public class SimulationQTCommand extends Command
 		if(cmdLine.hasOption(OPT_RAND_LD_LONG))
 		{
 			simuQTArgs.setRandLD();
+		}
+
+		if(cmdLine.hasOption(OPT_LD_RANGE_LONG))
+		{
+			simuQTArgs.setLDRange(cmdLine.getOptionValues(OPT_LD_RANGE_LONG));
 		}
 
 		simuQTArgs.setHsq(parseDoubleOptionValue(cmdLine, OPT_HSQ, "0.5"));
@@ -155,7 +167,10 @@ public class SimulationQTCommand extends Command
 	private static final String OPT_FREQ_DESC = "Equal frequency, 0.5 by default.";
 
 	private static final String OPT_UNIF_FREQ_LONG = "unif-freq";
-	private static final String OPT_UNIF_FREQ_LONG_DESC = "Uniform distriubted frequency between 0.01 to 0.5";
+	private static final String OPT_UNIF_FREQ_LONG_DESC = "Uniform distriubted frequency between 0.01~0.5";
+
+	private static final String OPT_FREQ_RANGE_LONG = "freq-range";
+	private static final String OPT_FREQ_RANGE_LONG_DESC = "Uniform distriubted frequency between a~b";
 
 	private static final String OPT_FREQ_FILE_LONG = "freq-file";
 	private static final String OPT_FREQ_FILE_LONG_DESC = "Read frequency from the file specified.";
@@ -165,7 +180,10 @@ public class SimulationQTCommand extends Command
 	private static final String OPT_LD_DESC = "LD (Lewontin's D prime), zero by default.";
 
 	private static final String OPT_RAND_LD_LONG = "rand-ld";
-	private static final String OPT_RAND_LD_DESC = "LD (Lewontin's D prime) follows uniform distribution between 0~1"; 
+	private static final String OPT_RAND_LD_LONG_DESC = "LD (Lewontin's D prime) follows uniform distribution between 0~1"; 
+
+	private static final String OPT_LD_RANGE_LONG = "ld-range";
+	private static final String OPT_LD_RANGE_LONG_DESC = "LD (Lewontin's D prime) follows uniform distribution between a~b"; 
 
 	//hsq
 	private static final String OPT_HSQ = "hsq";

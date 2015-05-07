@@ -159,6 +159,33 @@ public class SimulationQTCommandArguments extends CommandArguments
 		return isUnifFreq;
 	}
 
+	public void setFreqRange(String[] rf)
+	{
+		FreqRangeLow = Double.parseDouble(rf[0]);
+		FreqRangeHigh = Double.parseDouble(rf[1]);
+		if (FreqRangeLow <= 0 || FreqRangeHigh >= 1)
+		{
+			Logger.printUserError("Allele frequency is out of range: " + FreqRangeLow + "--" + FreqRangeHigh);
+		}
+		if (FreqRangeLow > FreqRangeHigh)
+		{
+			double t = FreqRangeLow;
+			FreqRangeLow = FreqRangeHigh;
+			FreqRangeLow = t;
+		}
+		setUnifFreq();
+	}
+
+	public double getFreqRangeLow()
+	{
+		return FreqRangeLow;
+	}
+	
+	public double getFreqRangeHigh()
+	{
+		return FreqRangeHigh;
+	}
+
 	public void setFreqFile(String ff)
 	{
 		FileUtil.exists(ff);
@@ -187,6 +214,35 @@ public class SimulationQTCommandArguments extends CommandArguments
 		}
 		isPlainLD = true;
 		isRandLD = false;
+	}
+
+	public void setLDRange(String[] ld)
+	{
+		ldRangeLow = Double.parseDouble(ld[0]);
+		ldRangeHigh = Double.parseDouble(ld[1]);
+		if (ldRangeLow <= 0 || ldRangeHigh >= 1)
+		{
+			Logger.printUserError("LD (Lewontin's) frequency is out of range: " + ldRangeLow + "--" + ldRangeHigh);
+		}
+		if (ldRangeLow > ldRangeHigh)
+		{
+			double t = FreqRangeLow;
+			FreqRangeLow = FreqRangeHigh;
+			FreqRangeLow = t;
+		}
+		setUnifFreq();
+		isPlainLD = false;
+		isRandLD = true;
+	}
+	
+	public double getLDRangeLow()
+	{
+		return ldRangeLow;
+	}
+	
+	public double getLDRangeHigh()
+	{
+		return ldRangeHigh;
 	}
 
 	public boolean isPlainLD()
@@ -251,9 +307,15 @@ public class SimulationQTCommandArguments extends CommandArguments
 	private boolean isFreqFile = false;
 	private String freqFile = null;
 
+	private double FreqRangeLow = 0.01;
+	private double FreqRangeHigh = 0.5;
+
 	private double ld = 0;
 	private boolean isPlainLD = true;
 	private boolean isRandLD = true;
+
+	private double ldRangeLow = -1;
+	private double ldRangeHigh = 1;
 
 	private double hsq = 0.5;
 	private boolean isMakeBed = false;

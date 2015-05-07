@@ -136,7 +136,7 @@ public class SimulationQTCommandImpl extends CommandImpl
 		{
 			for(int i = 0; i < M; i++)
 			{
-				freq[i] = rnd.nextUniform(0.01, 0.5);
+				freq[i] = rnd.nextUniform(qtArgs.getFreqRangeLow(), qtArgs.getFreqRangeHigh());
 			}
 		}
 		else if (qtArgs.isFreqFile())
@@ -244,7 +244,7 @@ public class SimulationQTCommandImpl extends CommandImpl
 		{
 			for(int i = 0; i < dprime.length; i++)
 			{
-				dprime[i] = rnd.nextUniform(-1, 1);
+				dprime[i] = rnd.nextUniform(qtArgs.getFreqRangeLow(), qtArgs.getFreqRangeHigh());
 			}
 		}
 	}
