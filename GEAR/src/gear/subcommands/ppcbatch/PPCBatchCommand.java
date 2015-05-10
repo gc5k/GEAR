@@ -64,8 +64,15 @@ public class PPCBatchCommand extends Command
 			pbCmdArgs.setHeader();
 		}
 
-		pbCmdArgs.setScoreFile(cmdLine.getOptionValue(OPT_SCORE_LONG));
-		pbCmdArgs.setScoreFileGZ(cmdLine.getOptionValue(OPT_SCORE_GZ_LONG));
+		if (cmdLine.hasOption(OPT_SCORE))
+		{
+			pbCmdArgs.setScoreFile(cmdLine.getOptionValue(OPT_SCORE_LONG));
+		}
+		
+		if (cmdLine.hasOption(OPT_SCORE_GZ_LONG))
+		{
+			pbCmdArgs.setScoreFileGZ(cmdLine.getOptionValue(OPT_SCORE_GZ_LONG));			
+		}
 		
 		if (cmdLine.hasOption(OPT_GREEDY))
 		{
