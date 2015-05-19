@@ -43,22 +43,36 @@ public class BlupPcaCommandImpl extends CommandImpl
 		mapFile = ssQC.getMapFile();
 		gm = new GenotypeMatrix(ssQC.getSample());
 
-		
+		double[][] freq=PopStat.calAlleleFrequency(gm, gm.getNumMarker());
 //		PopStat.Imputation(gm);
 
+		Logger.printUserLog("Standardizing genotypes...");
 		double[][] genoMat = new double[gm.getNumIndivdial()][gm.getNumMarker()];
 		for(int i = 0; i < genoMat.length; i++)
 		{
 			for(int j = 0; j < genoMat[i].length; j++)
 			{
-				genoMat[i][j] = gm.getAdditiveScoreOnFirstAllele(i, j);
+				if (gm.getAdditiveScoreOnFirstAllele(i, j) != ConstValues.BINARY_MISSING_GENOTYPE)
+				{
+					genoMat[i][j] = 0;
+				}
+				else
+				{
+					if (freq[j][0] < 0.001)
+					{
+						genoMat[i][j] = 0;						
+					}
+					else
+					{
+						genoMat[i][j] = (gm.getAdditiveScoreOnFirstAllele(i, j) - 2 * freq[j][0])/Math.sqrt(2*freq[j][0] * (1-freq[j][0]));						
+					}
+				}
 			}
 		}
 
 		double[][] blupPC = new double[gm.getNumMarker()][data.getNumberOfTraits()];
 
-		Logger.printUserLog("Revving up the BLUP machine...");
-
+		Logger.printUserLog("Inversing the matrix...");
 		RealMatrix grm = new Array2DRowRealMatrix(A);
 		RealMatrix grm_Inv = (new LUDecompositionImpl(grm)).getSolver().getInverse();
 
@@ -67,6 +81,8 @@ public class BlupPcaCommandImpl extends CommandImpl
 
 		RealMatrix tmp = new Array2DRowRealMatrix(t.getRowDimension(), grm_Inv.getColumnDimension());
 
+		Logger.printUserLog("Revving up the BLUP machine...");
+
 		for(int i = 0; i < t.getRowDimension(); i++)
 		{
 			for(int j = 0; j < grm_Inv.getColumnDimension(); j++)
@@ -74,9 +90,9 @@ public class BlupPcaCommandImpl extends CommandImpl
 				double f = 0;
 				for(int k = 0; k < t.getColumnDimension(); k++)
 				{
-					if ( ((int) t.getEntry(i, k)) !=  ConstValues.BINARY_MISSING_GENOTYPE ) 
+					if (gm.getAdditiveScoreOnFirstAllele(i, k) != ConstValues.BINARY_MISSING_GENOTYPE)
 					{
-						f += t.getEntry(i, k) * grm_Inv.getEntry(k, j);					
+						f += t.getEntry(i, k) * grm_Inv.getEntry(k, j);
 					}
 				}
 				tmp.setEntry(i, j, f);
