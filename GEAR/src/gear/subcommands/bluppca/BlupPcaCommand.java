@@ -44,7 +44,7 @@ public class BlupPcaCommand extends Command
 		blupArgs.setPhenotypeFile(cmdLine.getOptionValue(OPT_PHE_LONG));
 		return blupArgs;
 	}
-	
+
 	private void parseGRMArguments(BlupPcaCommandArguments blupArgs, CommandLine cmdLine) throws CommandArgumentException
 	{
 		String grmBin = cmdLine.getOptionValue(OPT_GRM_BIN_LONG);

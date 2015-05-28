@@ -142,12 +142,12 @@ public class Inbreeding
 		{
 			double fj = 0;
 			double fb = 0;
-			maf[i] = maf[i] / (2 * N[i]);
+			maf[i] = 1 - maf[i] / (2 * N[i]);
 			for (int j = 0; j < groupID.size(); j++)
 			{
 				if (w[i][j] != 0)
 				{
-					mafGroup[i][j] = mafGroup[i][j] / (2 * w[i][j]);
+					mafGroup[i][j] = 1 - mafGroup[i][j] / (2 * w[i][j]);
 				}
 				else
 				{
