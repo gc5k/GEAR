@@ -52,19 +52,19 @@ public class BlupPcaCommandImpl extends CommandImpl
 		{
 			for(int j = 0; j < genoMat[i].length; j++)
 			{
-				if (gm.getAdditiveScoreOnFirstAllele(i, j) != ConstValues.BINARY_MISSING_GENOTYPE)
+				if (gm.getAdditiveScore(i, j) == ConstValues.BINARY_MISSING_GENOTYPE)
 				{
 					genoMat[i][j] = 0;
 				}
 				else
 				{
-					if (freq[j][0] < 0.001)
+					if (freq[j][1] < 0.001)
 					{
-						genoMat[i][j] = 0;						
+						genoMat[i][j] = 0;	
 					}
 					else
 					{
-						genoMat[i][j] = (gm.getAdditiveScoreOnFirstAllele(i, j) - 2 * freq[j][0])/Math.sqrt(2*freq[j][0] * (1-freq[j][0]));						
+						genoMat[i][j] = (gm.getAdditiveScore(i, j) - 2 * freq[j][1])/Math.sqrt(2*freq[j][1] * (1-freq[j][1]));						
 					}
 				}
 			}
@@ -77,22 +77,22 @@ public class BlupPcaCommandImpl extends CommandImpl
 		RealMatrix grm_Inv = (new LUDecompositionImpl(grm)).getSolver().getInverse();
 
 //		RealMatrix tmp = (new Array2DRowRealMatrix(genoMat)).transpose().multiply(grm_Inv);
-		RealMatrix t = (new Array2DRowRealMatrix(genoMat)).transpose();
+		RealMatrix tGenoMat = (new Array2DRowRealMatrix(genoMat)).transpose();
 
-		RealMatrix tmp = new Array2DRowRealMatrix(t.getRowDimension(), grm_Inv.getColumnDimension());
+		RealMatrix tmp = new Array2DRowRealMatrix(tGenoMat.getRowDimension(), grm_Inv.getColumnDimension());
 
 		Logger.printUserLog("Revving up the BLUP machine...");
 
-		for(int i = 0; i < t.getRowDimension(); i++)
+		for(int i = 0; i < tGenoMat.getRowDimension(); i++)
 		{
 			for(int j = 0; j < grm_Inv.getColumnDimension(); j++)
 			{
 				double f = 0;
-				for(int k = 0; k < t.getColumnDimension(); k++)
+				for(int k = 0; k < tGenoMat.getColumnDimension(); k++)
 				{
-					if (gm.getAdditiveScoreOnFirstAllele(i, k) != ConstValues.BINARY_MISSING_GENOTYPE)
+					if (gm.getAdditiveScore(k, i) != ConstValues.BINARY_MISSING_GENOTYPE)
 					{
-						f += t.getEntry(i, k) * grm_Inv.getEntry(k, j);
+						f += tGenoMat.getEntry(i, k) * grm_Inv.getEntry(k, j);
 					}
 				}
 				tmp.setEntry(i, j, f);
@@ -169,7 +169,7 @@ public class BlupPcaCommandImpl extends CommandImpl
 					BufferedReader.openTextFile(blupArgs.getGrmText(), "GRM");
 			readGrm(reader, numSubjects);
 		}
-	}	
+	}
 
 	private void readGrmBin(String fileName, int numSubjects)
 	{
