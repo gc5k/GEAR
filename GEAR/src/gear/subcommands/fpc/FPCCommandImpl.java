@@ -17,9 +17,10 @@ public class FPCCommandImpl extends CommandImpl
 //		batch = FPCArgs.getMetaBatch();
 		refIdx = FPCArgs.getReference();
 		co = FPCArgs.getCoordinates();
-		System.out.println(co[0][0] + " " + co[0][1]);
-		System.out.println(co[1][0] + " " + co[1][1]);
-		System.out.println(co[2][0] + " " + co[2][1]);
+		System.out.println("The coordinates for the three referen populations are: ");
+		System.out.println("Ref pop1: " + co[0][0] + " " + co[0][1]);
+		System.out.println("Ref pop2: " + co[1][0] + " " + co[1][1]);
+		System.out.println("Ref pop3: " + co[2][0] + " " + co[2][1]);
 
 		readFst();
 		FstCartographer();

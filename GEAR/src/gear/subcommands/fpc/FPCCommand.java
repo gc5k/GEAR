@@ -71,7 +71,7 @@ public class FPCCommand extends Command
 	private final static String OPT_REF_DESC = "Specify the index for reference populations.";
 
 	private final static String OPT_COORDINATE = "c";
-	private final static String OPT_COORDINATE_LONG = "cordinates";
+	private final static String OPT_COORDINATE_LONG = "coordinate";
 	private final static String OPT_COORDINATE_LONG_DESC = "Specify the coordinates.";
 
 }
