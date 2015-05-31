@@ -61,5 +61,5 @@ public class FPCCommandArguments extends CommandArguments
 
 	private String fstFile = null;
 	private int[] ref = {0, 1, 2};
-	private double[][] coordinates = {{0, 0}, {-1 * Math.sqrt(3), 1}, {Math.sqrt(3), 1}};
+	private double[][] coordinates = {{0, -2}, {-1 * Math.sqrt(3), 1}, {Math.sqrt(3), 1}};
 }
