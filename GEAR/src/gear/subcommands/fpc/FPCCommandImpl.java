@@ -64,7 +64,7 @@ public class FPCCommandImpl extends CommandImpl
 				double C2 = (co[2][1] - co[1][1]) * (f1/(f1+f2)) + co[1][1];
 				Fpc[i][0] = (A1 + B1 + C1)/3;
 				Fpc[i][1] = (A2 + B2 + C2)/3;
-				System.out.println("Cohort " + (1+i) + "'s Fst: " + f0 + " " + f1 + " " + f2 + " " + Fpc[i][0] + " " + Fpc[i][1]);
+				System.out.println("Cohort " + (1+i) + "'s Fst: " + f0 + " " + f1 + " " + f2);
 				System.out.println("Coordinates on edge 1-2: " + A1 + " " + A2);
 				System.out.println("Coordinates on edge 1-3: " + B1 + " " + B2);
 				System.out.println("Coordinates on edge 2-3: " + C1 + " " + C2);
