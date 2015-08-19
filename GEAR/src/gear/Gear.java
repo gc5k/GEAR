@@ -58,6 +58,7 @@ public enum Gear
 		addCommand(new gear.subcommands.ppcbatch.PPCBatchCommand());
 		addCommand(new gear.subcommands.sfst.SFstCommand());
 		addCommand(new gear.subcommands.fpc.FPCCommand());
+		addCommand(new gear.subcommands.metapc.MetaPCCommand());
 	}
 
 	private void addCommand(Command cmd)
