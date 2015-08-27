@@ -2,7 +2,7 @@ package gear.subcommands.metapc;
 
 import java.util.ArrayList;
 
-import gear.gwassummary.GWASConstant;
+import gear.subcommands.metapc.freader.FConstant;
 import gear.subcommands.CommandArguments;
 import gear.util.BufferedReader;
 import gear.util.FileUtil;
@@ -135,30 +135,31 @@ public class MetaPCCommandArguments extends CommandArguments
 
 	public void setKey(String[] k)
 	{
-		field[GWASConstant.SNP] = k[0];
-		if (isQT)
+		field[FConstant.SNP] = k[0];
+		field[FConstant.CHR] = k[1];
+
+		field[FConstant.A1] = k[2];
+		field[FConstant.A2] = k[3];
+		field[FConstant.Fvalue] = k[4];
+	
+		Logger.printUserLog("The keyword for 'SNP' is set to " + field[FConstant.SNP]);
+		Logger.printUserLog("The keyword for 'CHR' is set to " + field[FConstant.CHR]);
+		Logger.printUserLog("The keyword for 'A1' (reference allele) is set to " + field[FConstant.A1]);
+		Logger.printUserLog("The keyword for 'A2' (the other allele) is set to " + field[FConstant.A2]);
+		Logger.printUserLog("The keyword for 'RAF' (reference allele frequency for A1) is set to " + field[FConstant.Fvalue]);
+
+		if(k.length > 5)
 		{
-			field[GWASConstant.BETA] = k[1];			
+			field[FConstant.BP] = k[5];
+			Logger.printUserLog("The keyword for 'BP' (base pair) is set to " + field[FConstant.BP]);
+			keyLen=6;
 		}
-		else
+
+		if(k.length > 6)
 		{
-			field[GWASConstant.OR] = k[1];			
-		}
-		field[GWASConstant.SE] = k[2];
-		field[GWASConstant.A1] = k[3];
-		field[GWASConstant.A2] = k[4];
-		
-		if(k.length >5)
-		{
-			field[GWASConstant.CHR] = k[5];
-		}
-		if(k.length >6)
-		{
-			field[GWASConstant.BP] = k[6];			
-		}
-		if(k.length >7)
-		{
-			field[GWASConstant.P] = k[7];
+			field[FConstant.BP] = k[6];
+			Logger.printUserLog("The keyword for 'N' (sample size) is set to " + field[FConstant.N]);
+			keyLen=7;
 		}
 	}
 
@@ -218,16 +219,6 @@ public class MetaPCCommandArguments extends CommandArguments
 		return chrFlag;
 	}
 
-//	public void setClean()
-//	{
-//		isClean = true;
-//	}
-//
-//	public boolean isClean()
-//	{
-//		return isClean;
-//	}
-
 	public void setRapid()
 	{
 		isRapid = true;
@@ -237,22 +228,6 @@ public class MetaPCCommandArguments extends CommandArguments
 	{
 		return isRapid;
 	}
-
-//	public void setTrim(double tr)
-//	{
-//		isTrim = true;
-//		trim = tr;
-//	}
-//
-//	public boolean isTrim()
-//	{
-//		return isTrim;
-//	}
-//
-//	public double getTrimValue()
-//	{
-//		return trim;
-//	}
 
 	public void setMeFrac(double mefrac)
 	{
@@ -284,6 +259,28 @@ public class MetaPCCommandArguments extends CommandArguments
 		return mode;
 	}
 
+	public String toString()
+	{
+		StringBuffer str = new StringBuffer();
+		str.append("\nThe keyword for 'SNP' is set to " + field[FConstant.SNP] + "\n");
+		str.append("The keyword for 'CHR' is set to " + field[FConstant.CHR] + "\n");
+		str.append("The keyword for 'A1' (reference allele) is set to " + field[FConstant.A1] + "\n");
+		str.append("The keyword for 'A2' (the other allele) is set to " + field[FConstant.A2] + "\n");
+		str.append("The keyword for 'RAF' (reference allele frequency for A1) is set to " + field[FConstant.Fvalue] + "\n");
+
+		if(keyLen > 5)
+		{
+			str.append("The keyword for 'BP' (base pair) is set to " + field[FConstant.BP] + "\n");
+		}
+
+		if(keyLen > 6)
+		{
+			str.append("The keyword for 'N' (sample size) is set to " + field[FConstant.N] + "\n");
+		}
+
+		return str.toString();
+	}
+
 	protected static int FRQ = 1;
 	private int mode = FRQ;
 
@@ -296,10 +293,8 @@ public class MetaPCCommandArguments extends CommandArguments
 
 	private boolean isNoWeight = false;
 	private double Ne = 500;
-//	private boolean isClean = false;
 	private boolean isRapid = false;
-//	private boolean isTrim = false;
-//	private double trim = 0;
+	private int keyLen=5;
 
 	private double Me = 30000;
 	private double meFrac = 0;

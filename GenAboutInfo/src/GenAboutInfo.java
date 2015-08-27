@@ -33,7 +33,7 @@ public class GenAboutInfo {
 		}
 		String packageDeclaration = "", folder = "src/";
 		if (packageName != null) {
-			packageDeclaration = "package " + args[0] + ";\n";
+			packageDeclaration = "package" + ";\n";
 			folder += packageName.replace('.', '/') + "/";
 		}
 		// Read the SVN revision number

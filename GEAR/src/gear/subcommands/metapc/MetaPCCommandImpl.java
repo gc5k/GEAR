@@ -10,8 +10,8 @@ import org.apache.commons.math.linear.Array2DRowRealMatrix;
 import org.apache.commons.math.linear.EigenDecompositionImpl;
 import org.apache.commons.math.stat.StatUtils;
 
-import gear.gwassummary.GWASReader;
-import gear.gwassummary.MetaStat;
+import gear.subcommands.metapc.freader.FReader;
+import gear.subcommands.metapc.freader.FStat;
 import gear.subcommands.CommandArguments;
 import gear.subcommands.CommandImpl;
 import gear.util.FileUtil;
@@ -27,14 +27,9 @@ public class MetaPCCommandImpl extends CommandImpl
 	{
 		mpcArgs = (MetaPCCommandArguments) cmdArgs;
 
-		if (mpcArgs.isQT())
-		{
-			Logger.printUserLog("Analysing summary statistics analysis for quantitative traits.\n");
-		}
-		else
-		{
-			Logger.printUserLog("Analysing summary statistics analysis for case-contrl studies.\n");
-		}
+		Logger.printUserLog("Analysing summary statistics analysis for principal components.\n");
+		
+		Logger.printUserLog(mpcArgs.toString());
 
 		initial();
 		calculateGRM();
@@ -45,16 +40,11 @@ public class MetaPCCommandImpl extends CommandImpl
 	{
 		boolean[] FileKeep = new boolean[mpcArgs.getMetaFile().length];
 		Arrays.fill(FileKeep, true);
-		gReader = new GWASReader(mpcArgs.getMetaFile(), FileKeep,
+		fReader = new FReader(mpcArgs.getMetaFile(), FileKeep,
 				mpcArgs.getKeys(), mpcArgs.isQT(), mpcArgs.isGZ(),
 				mpcArgs.isChr(), mpcArgs.getChr());
 
-		gReader.Start(mpcArgs.isFrq());
-
-		if (mpcArgs.isFrq())
-		{
-			Logger.printUserLog("Calculating allele frequency difference, and Fst.");
-		}
+		fReader.Start();
 
 		int NumMetaFile = mpcArgs.getMetaFile().length;
 
@@ -75,16 +65,16 @@ public class MetaPCCommandImpl extends CommandImpl
 
 		int cntAmbiguous = 0;
 		HashMap<String, ArrayList<Float>> snpFrq = NewIt.newHashMap();
-		HashMap<String, MetaStat> SumStat1 = gReader.getMetaStat().get(0);
+		HashMap<String, FStat> SumStat1 = fReader.getMetaStat().get(0);
 
-		HashMap<String, ArrayList<Integer>> snpCntTable = gReader.getMetaSNPTable();
+		HashMap<String, ArrayList<Integer>> snpCntTable = fReader.getMetaSNPTable();
 
 		HashSet<String> badSNP = NewIt.newHashSet();
 		for (String snp : snpCntTable.keySet())
 		{
 			if(SumStat1.containsKey(snp))
 			{
-				MetaStat ms = SumStat1.get(snp);
+				FStat ms = SumStat1.get(snp);
 
 				if (SNPMatch.isAmbiguous(ms.getA1(), ms.getA2()))
 				{
@@ -94,7 +84,7 @@ public class MetaPCCommandImpl extends CommandImpl
 				}
 
 				ArrayList<Integer> cnt = snpCntTable.get(snp);
-				if (cnt.get(cnt.size()-1) == gReader.getNumMetaFile())
+				if (cnt.get(cnt.size()-1) == fReader.getNumMetaFile())
 				{
 					ArrayList<Float> fq = NewIt.newArrayList();
 					fq.add(ms.getEffect());
@@ -103,9 +93,9 @@ public class MetaPCCommandImpl extends CommandImpl
 			}
 		}
 
-		for (int i = 1; i < gReader.getNumMetaFile(); i++)
+		for (int i = 1; i < fReader.getNumMetaFile(); i++)
 		{
-			HashMap<String, MetaStat> SumStat2 = gReader.getMetaStat().get(i);			
+			HashMap<String, FStat> SumStat2 = fReader.getMetaStat().get(i);			
 			for (String snp : snpCntTable.keySet())
 			{
 				
@@ -115,12 +105,12 @@ public class MetaPCCommandImpl extends CommandImpl
 				}
 				ArrayList<Integer> cnt = snpCntTable.get(snp);
 
-				if (cnt.get(cnt.size() -1) == gReader.getNumMetaFile())
+				if (cnt.get(cnt.size() -1) == fReader.getNumMetaFile())
 				{
 //					System.out.println(snp);
 
-					MetaStat ms1 = SumStat1.get(snp);
-					MetaStat ms2 = SumStat2.get(snp);
+					FStat ms1 = SumStat1.get(snp);
+					FStat ms2 = SumStat2.get(snp);
 
 					boolean lineup = true;
 					if (ms1.getA1() == ms2.getA1() || ms1.getA1() == SNPMatch.Flip(ms2
@@ -153,10 +143,10 @@ public class MetaPCCommandImpl extends CommandImpl
 			}
 		}
 
-		Logger.printUserLog(cntAmbiguous + " SNPs have been removed.");
+		Logger.printUserLog(cntAmbiguous + " marker(s) have been removed.");
 		Logger.printUserLog(snpFrq.size() + " consensus markers have been found.");
 
-		double[][] mg = new double[snpFrq.size()][gReader.getNumMetaFile()];
+		double[][] mg = new double[snpFrq.size()][fReader.getNumMetaFile()];
 
 		int cnt = 0;
 		for (String snp:snpFrq.keySet())
@@ -165,11 +155,31 @@ public class MetaPCCommandImpl extends CommandImpl
 			ArrayList<Float> fq = snpFrq.get(snp);
 			for (int j = 0; j < fq.size(); j++)
 			{
-				mg[cnt][j] = fq.get(j);
+				mg[cnt][j] = fq.get(j).doubleValue();
 			}
-			mg[cnt] = StatUtils.normalize(mg[cnt]);
+			
+			double st = StatUtils.variance(mg[cnt]);
+			if (st > 1e-6)
+			{
+				mg[cnt] = StatUtils.normalize(mg[cnt]);
+			}
+			else
+			{
+				for (int j = 0; j < fq.size(); j++)
+				{
+					mg[cnt][j] = 0;
+				}
+			}
 			cnt++;
 		}
+
+		PrintStream frqWriter = FileUtil.CreatePrintStream(new String(mpcArgs.getOutRoot() + ".msnp"));
+
+		for(int i = 0; i < mg.length; i++)
+		{
+			frqWriter.println(SNPlist.get(i));
+		}
+		frqWriter.close();
 
 		for (int i = 0; i < mGRM.length; i++)
 		{
@@ -177,7 +187,7 @@ public class MetaPCCommandImpl extends CommandImpl
 			{
 				for (int k = 0; k < mg.length; k++)
 				{
-					mGRM[i][j] += mg[k][i] * mg[k][j]; 
+					mGRM[i][j] += mg[k][i] * mg[k][j];
 				}
 				mGRM[i][j] /= mg.length;
 			}
@@ -186,7 +196,19 @@ public class MetaPCCommandImpl extends CommandImpl
 
 	private void EigenAnalysis()
 	{
+		PrintStream grmWriter = FileUtil.CreatePrintStream(new String(mpcArgs.getOutRoot() + ".crm"));
 		Array2DRowRealMatrix rm = new Array2DRowRealMatrix(mGRM);
+
+		for (int i = 0; i < rm.getRowDimension(); i++)
+		{
+			for (int j = 0; j < rm.getColumnDimension(); j++)
+			{
+				grmWriter.print(rm.getEntry(i, j) + " ");
+			}
+			grmWriter.println();
+		}
+		grmWriter.close();
+
 		EigenDecompositionImpl ed = new EigenDecompositionImpl(rm.copy(), 1e-6);
 
 		double[][] ev = new double[rm.getRowDimension()][rm.getColumnDimension()];
@@ -198,19 +220,8 @@ public class MetaPCCommandImpl extends CommandImpl
 		Array2DRowRealMatrix evM = new Array2DRowRealMatrix(ev);
 		Array2DRowRealMatrix evMat = (Array2DRowRealMatrix) evM.transpose();
 
-		PrintStream grmWriter = FileUtil.CreatePrintStream(new String(mpcArgs.getOutRoot() + ".mgrm"));
-		
-		for (int i = 0; i < rm.getRowDimension(); i++)
-		{
-			for (int j = 0; j < rm.getColumnDimension(); j++)
-			{
-				grmWriter.print(rm.getEntry(i, j) + " ");
-			}
-			grmWriter.println();
-		}
-		grmWriter.close();
-		
-		PrintStream evaWriter = FileUtil.CreatePrintStream(new String(mpcArgs.getOutRoot() + ".eigenval"));
+
+		PrintStream evaWriter = FileUtil.CreatePrintStream(new String(mpcArgs.getOutRoot() + ".mval"));
 		double[] eR=ed.getRealEigenvalues();
 
 		for (int i = 0; i < rm.getRowDimension(); i++)
@@ -220,8 +231,8 @@ public class MetaPCCommandImpl extends CommandImpl
 		}
 		evaWriter.close();
 
-		PrintStream eveWriter = FileUtil.CreatePrintStream(new String(mpcArgs.getOutRoot() + ".eigenvec"));
-		
+		PrintStream eveWriter = FileUtil.CreatePrintStream(new String(mpcArgs.getOutRoot() + ".mvec"));
+
 		for (int i = 0; i < evMat.getRowDimension(); i++)
 		{
 			for (int j = 0; j < evMat.getColumnDimension(); j++)
@@ -232,12 +243,10 @@ public class MetaPCCommandImpl extends CommandImpl
 		}
 		eveWriter.close();
 	}
-	
-	Array2DRowRealMatrix rm;
+
 	private MetaPCCommandArguments mpcArgs;
 
-	private GWASReader gReader;
+	private FReader fReader;
 	private double[][] mGRM;
 	private ArrayList<String> SNPlist = NewIt.newArrayList();
-
 }

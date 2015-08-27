@@ -1,5 +1,9 @@
 package gear;
 
+import java.io.BufferedReader;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.io.InputStreamReader;
 import java.util.Calendar;
 import java.util.Iterator;
 import java.util.SortedSet;
@@ -90,13 +94,13 @@ public enum Gear
 			System.out.println("Type 'gear help' or 'java -jar gear.jar help' for usage.");
 			System.exit(1);
 		}
-		
+
 		subcmdName = args[0];
 		String[] subcmdArgs = new String[args.length - 1];
 		System.arraycopy(args, 1, subcmdArgs, 0, subcmdArgs.length);
-		
+
 		Command subcmd = INSTANCE.getCommand(subcmdName);
-		
+
 		if (subcmd != null)
 		{
 			subcmd.execute(subcmdArgs, subcmdName);
@@ -266,4 +270,5 @@ public enum Gear
 			Logger.printUserLog("Peak memory consumption: " + monitor.getPeakMemoryFormatString());
 		}
 	}
+	
 }

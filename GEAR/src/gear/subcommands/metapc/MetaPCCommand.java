@@ -18,18 +18,21 @@ public class MetaPCCommand extends Command
 	}
 
 	@Override
-	public String getName() {
+	public String getName() 
+	{
 		return "metapc";
 	}
 
 	@Override
-	public String getDescription() {
+	public String getDescription() 
+	{
 		return "Generating principal components using allele frequency";
 	}
 
 	@SuppressWarnings("static-access")
 	@Override
-	public void prepareOptions(Options options) {
+	public void prepareOptions(Options options)
+	{
 		options.addOption(OptionBuilder.withDescription(OPT_META_BATCH_DESC).withLongOpt(OPT_META_BATCH_LONG).hasArg().create(OPT_META_BATCH));
 		options.addOption(OptionBuilder.withDescription(OPT_META_GZ_BATCH_DESC).withLongOpt(OPT_META_GZ_BATCH_LONG).hasArg().create(OPT_META_GZ_BATCH));
 
@@ -45,7 +48,6 @@ public class MetaPCCommand extends Command
 		options.addOption(OptionBuilder.withDescription(OPT_VERBOSE_DESC).withLongOpt(OPT_VERBOSE_LONG).create(OPT_VERBOSE));
 
 		options.addOption(OptionBuilder.withDescription(OPT_CHR_DESC).hasArg().create(OPT_CHR));
-		options.addOption(OptionBuilder.withDescription(OPT_TOP_DESC).hasArg().create(OPT_TOP));
 	}
 
 	@Override
@@ -110,10 +112,6 @@ public class MetaPCCommand extends Command
 			metaPC.setChr(cmdLine.getOptionValue(OPT_CHR));
 		}
 
-		if (cmdLine.hasOption(OPT_TOP))
-		{
-			metaPC.setTop(cmdLine.getOptionValue(OPT_TOP));
-		}
 
 		metaPC.setMeFrac(parseDoubleOptionValueInRange(cmdLine, OPT_ME_FRAC_LONG, OPT_ME_FRAC_LONG_DEFAULT, 0.01, 1));
 
@@ -161,8 +159,4 @@ public class MetaPCCommand extends Command
 
 	private final static String OPT_CHR = "chr";
 	private final static String OPT_CHR_DESC = "Choose chromosome for analysis";
-
-	private final static String OPT_TOP = "top";
-	private final static String OPT_TOP_DESC = "Top x files as the reference.";
-
 }

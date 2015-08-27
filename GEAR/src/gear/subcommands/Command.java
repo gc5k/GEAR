@@ -127,7 +127,7 @@ public abstract class Command implements Comparable<Command>
 			
 			Logger.setLogFiles(cmdArgs.getOutRoot());
 			Logger.hasUserLogTag(false);
-			Logger.printUserLog(AboutInfo.WELCOME_MESSAGE);
+//			Logger.printUserLog(AboutInfo.WELCOME_MESSAGE);
 			Logger.hasUserLogTag(true);
 
 			printOptionsInEffect(cmdLine, subCmdName);
