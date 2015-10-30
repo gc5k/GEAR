@@ -3,6 +3,7 @@ package gear.subcommands.lambdaD;
 import java.io.BufferedWriter;
 import java.io.IOException;
 import java.io.PrintStream;
+import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -38,6 +39,7 @@ public class LambdaDCommandImpl extends CommandImpl
 		initial();
 
 		// generating matrix
+		DecimalFormat fmt = new DecimalFormat("0.000");
 		String[] MetaFile = gReader.getMetaFile();
 		int FileSize = lamArgs.getTop() > 0 ? lamArgs.getTop()
 				: (MetaFile.length - 1);
@@ -45,7 +47,7 @@ public class LambdaDCommandImpl extends CommandImpl
 		{
 			for (int j = (i + 1); j < MetaFile.length; j++)
 			{
-				Logger.printUserLog("");
+				Logger.printUserLog("\n\n");
 				Logger.printUserLog("File pair: " + (i + 1) + "-" + (j + 1));
 				if (lamArgs.isQT())
 				{
@@ -63,10 +65,10 @@ public class LambdaDCommandImpl extends CommandImpl
 					double s1 = size[i * 2] + size[i * 2 + 1];
 					double s2 = size[j * 2] + size[j * 2 + 1];
 					Kappa = 2 / (Math.sqrt(s1 / s2) + Math.sqrt(s2 / s1));
-					Logger.printUserLog("Sample size for '" + MetaFile[i] + "': " + size[i * 2] + " cases, " + size[i * 2 + 1] + " controls; R1 = " + R1 + ".");
-					Logger.printUserLog("Sample size for '" + MetaFile[j] + "': " + size[j * 2] + " cases, " + size[j * 2 + 1] + " controls; R2 = " + R2 + ".");
+					Logger.printUserLog("Sample size for '" + MetaFile[i] + "': " + size[i * 2] + " cases, " + size[i * 2 + 1] + " controls.");// R1 = " + fmt.format(R1) + ".");
+					Logger.printUserLog("Sample size for '" + MetaFile[j] + "': " + size[j * 2] + " cases, " + size[j * 2 + 1] + " controls.");// R2 = " + fmt.format(R2) + ".");
 				}
-				Logger.printUserLog("Kappa: " + Kappa);
+//				Logger.printUserLog("Kappa: " + fmt.format(Kappa));
 
 				if (lamArgs.isRapid())
 				{
@@ -105,7 +107,7 @@ public class LambdaDCommandImpl extends CommandImpl
 		}
 		else
 		{
-			Logger.printUserLog("Using all markers.");
+			Logger.printUserLog("Using all markers (p value for LambdaMeta may be incorrect).");
 		}
 
 		if (lamArgs.isBeta())
@@ -249,7 +251,7 @@ public class LambdaDCommandImpl extends CommandImpl
 				Logger.printUserLog("Removed " + cntAmbiguous + " ambiguous loci (AT/GC).");
 			}
 		}
-		Logger.printUserLog("Found " + LamArray.size() + " consensus summary statistics between these two files.");
+		Logger.printUserLog("There are " + LamArray.size() + " consensus summary statistics between two files.");
 		
 		if (LamArray.size() < ((int) (Me * 0.2)))
 		{
@@ -297,7 +299,7 @@ public class LambdaDCommandImpl extends CommandImpl
 		{
 			Bvec.setSelected();
 			Bvec.CalCorrelation();
-			Bvec.printOut();
+//			Bvec.printOut();
 			RandOverlapMat[idx1][idx2] = RandOverlapMat[idx2][idx1] = Bvec.getZcorrelation();
 			RandRgMat[idx1][idx2] = RandRgMat[idx2][idx1] = Bvec.getRg();
 		}
@@ -479,7 +481,7 @@ public class LambdaDCommandImpl extends CommandImpl
 		{
 			Bvec.setSelected();
 			Bvec.CalCorrelation();
-			Bvec.printOut();
+//			Bvec.printOut();
 			RandOverlapMat[idx1][idx2] = RandOverlapMat[idx2][idx1] = Bvec.getZcorrelation();
 			RandRgMat[idx1][idx2] = RandRgMat[idx2][idx1] = Bvec.getRg();
 		}
@@ -546,7 +548,7 @@ public class LambdaDCommandImpl extends CommandImpl
 		catch (IOException e)
 		{
 			Logger.handleException(	e,
-									"error in writing " + new String(
+									" error in writing " + new String(
 											lamArgs.getOutRoot() + "." + (idx1 + 1) + "-" + (idx2 + 1) + tail[lamArgs.getMode()] + ".gz"));
 		}
 
@@ -612,18 +614,18 @@ public class LambdaDCommandImpl extends CommandImpl
 		}
 		rwriter.close();
 
-		// Xmatrix
-		PrintStream gwriter = FileUtil.CreatePrintStream(new String(lamArgs.getOutRoot() + ".rgcm"));
-
-		for (int i = 0; i < RandRgMat.length; i++)
-		{
-			for (int j = 0; j < RandRgMat[i].length; j++)
-			{
-				gwriter.print(String.format("%.4f", RandRgMat[i][j]) + " ");
-			}
-			gwriter.println();
-		}
-		gwriter.close();
+//		// Xmatrix
+//		PrintStream gwriter = FileUtil.CreatePrintStream(new String(lamArgs.getOutRoot() + ".rgcm"));
+//
+//		for (int i = 0; i < RandRgMat.length; i++)
+//		{
+//			for (int j = 0; j < RandRgMat[i].length; j++)
+//			{
+//				gwriter.print(String.format("%.4f", RandRgMat[i][j]) + " ");
+//			}
+//			gwriter.println();
+//		}
+//		gwriter.close();
 	}
 
 	private void WriteGC()

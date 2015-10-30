@@ -1,9 +1,5 @@
 package gear;
 
-import java.io.BufferedReader;
-import java.io.FileWriter;
-import java.io.IOException;
-import java.io.InputStreamReader;
 import java.util.Calendar;
 import java.util.Iterator;
 import java.util.SortedSet;
@@ -113,9 +109,11 @@ public enum Gear
 			Logger.setLogFiles(CmdArgs.INSTANCE.out);
 			Logger.hasUserLogTag(false);
 			Logger.printUserLog(AboutInfo.WELCOME_MESSAGE);
+			Logger.printUserLog("----------");
 			Logger.hasUserLogTag(true);
 			Logger.printUserLog("Analysis started: " + Calendar.getInstance().getTime() + "\n");
-			
+			Logger.printUserLog("******************************************************************\n| GEAR [GEnetic Analysis Repository] version 0.7.7               |\n| (C) 2013 Guo-Bo Chen, Zhi-Xiang Zhu                            |\n| Git r754, built on Thu Aug 27 17:06:18 AEST 2015               |\n| GNU General Public License, v2                                 |\n******************************************************************\n");
+
 			MonitorThread monitor = new MonitorThread();
 			monitor.start();
 	

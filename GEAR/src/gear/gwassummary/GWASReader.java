@@ -6,6 +6,7 @@ import gear.util.Logger;
 import gear.util.NewIt;
 import gear.util.stat.PrecisePvalue;
 
+import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -43,7 +44,7 @@ public class GWASReader
 		else
 		{
 			Logger.printUserLog(workingMetaFile.size() + " cohorts are remained for analysis.\n");
-			Logger.printUserLog("Genomic inflation factors are estimated from the provided p values.\n");
+//			Logger.printUserLog("Genomic inflation factors are estimated from the provided p values.\n");
 		}
 
 		gc = new double[workingMetaFile.size()];
@@ -508,7 +509,9 @@ public class GWASReader
 			{
 				Logger.printUserError(e.toString());
 			}
-			Logger.printUserLog("Genomic control factor (lambda_gc) is calculated from the provided p values: " + lambda);
+			DecimalFormat fmt = new DecimalFormat("0.000");
+
+			Logger.printUserLog("Genomic control factor (lambda_gc) is calculated from the provided p values: " + fmt.format(lambda));
 		}
 		else
 		{
@@ -542,7 +545,9 @@ public class GWASReader
 			{
 				Logger.printUserError(e.toString());
 			}
-			Logger.printUserLog("Genomic control factor (lambda_gc) is calculated from the provided beta and se: " + lambda);
+			DecimalFormat fmt = new DecimalFormat("0.000");
+
+			Logger.printUserLog("Genomic control factor (lambda_gc) is calculated from the provided beta and se: " + fmt.format(lambda));
 		}
 		else
 		{
