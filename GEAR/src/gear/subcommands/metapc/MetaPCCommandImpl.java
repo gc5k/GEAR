@@ -27,8 +27,8 @@ public class MetaPCCommandImpl extends CommandImpl
 	{
 		mpcArgs = (MetaPCCommandArguments) cmdArgs;
 
-		Logger.printUserLog("Analysing summary statistics analysis for principal components.\n");
-		
+		Logger.printUserLog("Principal component analysis for summary statistics.\n");
+
 		Logger.printUserLog(mpcArgs.toString());
 
 		initial();

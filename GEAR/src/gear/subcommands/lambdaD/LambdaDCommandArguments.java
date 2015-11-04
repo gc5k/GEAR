@@ -4,6 +4,7 @@ import java.util.ArrayList;
 
 import gear.gwassummary.GWASConstant;
 import gear.subcommands.CommandArguments;
+import gear.subcommands.metapc.freader.FConstant;
 import gear.util.BufferedReader;
 import gear.util.FileUtil;
 import gear.util.Logger;
@@ -163,14 +164,17 @@ public class LambdaDCommandArguments extends CommandArguments
 		if(k.length >5)
 		{
 			field[GWASConstant.CHR] = k[5];
+			keyLen = 6;
 		}
 		if(k.length >6)
 		{
-			field[GWASConstant.BP] = k[6];			
+			field[GWASConstant.BP] = k[6];
+			keyLen = 7;
 		}
 		if(k.length >7)
 		{
 			field[GWASConstant.P] = k[7];
+			keyLen = 8;
 		}
 	}
 
@@ -326,6 +330,33 @@ public class LambdaDCommandArguments extends CommandArguments
 		return mode;
 	}
 
+	public String toString()
+	{
+		StringBuffer str = new StringBuffer();
+		str.append("\n[INFO] The keyword for 'SNP' is set to " + field[GWASConstant.SNP] + "\n");
+		str.append("[INFO] The keyword for 'BETA' is set to " + field[GWASConstant.BETA] + "\n");
+		str.append("[INFO] The keyword for 'SE' is set to " + field[GWASConstant.SE] + "\n");
+		str.append("[INFO] The keyword for 'A1' (reference allele) is set to " + field[GWASConstant.A1] + "\n");
+		str.append("[INFO] The keyword for 'A2' (the other allele) is set to " + field[GWASConstant.A2] + "\n");
+		
+		if(keyLen > 5)
+		{
+			str.append("[INFO] The keyword for 'CHR' is set to " + field[FConstant.CHR] + "\n");
+		}
+
+		if(keyLen > 6)
+		{
+			str.append("[INFO] The keyword for 'BP' (base pair) is set to " + field[GWASConstant.BP] + "\n");
+		}
+
+		if(keyLen > 7)
+		{
+			str.append("[INFO] The keyword for 'P' (sample size) is set to " + field[GWASConstant.P] + "\n");
+		}
+
+		return str.toString();
+	}
+
 	protected static int BETA = 0;
 	protected static int FRQ = 1;
 	private int mode = BETA;
@@ -351,6 +382,7 @@ public class LambdaDCommandArguments extends CommandArguments
 
 	private int chr = 0;
 	private boolean chrFlag = false;
+	private int keyLen=6;
 
 	private double[] qtSize;
 	private double[] ccSize;

@@ -142,23 +142,23 @@ public class MetaPCCommandArguments extends CommandArguments
 		field[FConstant.A2] = k[3];
 		field[FConstant.Fvalue] = k[4];
 	
-		Logger.printUserLog("The keyword for 'SNP' is set to " + field[FConstant.SNP]);
-		Logger.printUserLog("The keyword for 'CHR' is set to " + field[FConstant.CHR]);
-		Logger.printUserLog("The keyword for 'A1' (reference allele) is set to " + field[FConstant.A1]);
-		Logger.printUserLog("The keyword for 'A2' (the other allele) is set to " + field[FConstant.A2]);
-		Logger.printUserLog("The keyword for 'RAF' (reference allele frequency for A1) is set to " + field[FConstant.Fvalue]);
+		Logger.printUserLog("[INFO] The keyword 'SNP' is set to " + field[FConstant.SNP]);
+		Logger.printUserLog("[INFO] The keyword 'CHR' is set to " + field[FConstant.CHR]);
+		Logger.printUserLog("[INFO] The keyword 'A1' (reference allele) is set to " + field[FConstant.A1]);
+		Logger.printUserLog("[INFO] The keyword 'A2' (the other allele) is set to " + field[FConstant.A2]);
+		Logger.printUserLog("[INFO] The keyword 'RAF' (reference allele frequency for A1) is set to " + field[FConstant.Fvalue]);
 
 		if(k.length > 5)
 		{
 			field[FConstant.BP] = k[5];
-			Logger.printUserLog("The keyword for 'BP' (base pair) is set to " + field[FConstant.BP]);
+			Logger.printUserLog("[INFO] The keyword for 'BP' (base pair) is set to " + field[FConstant.BP]);
 			keyLen=6;
 		}
 
 		if(k.length > 6)
 		{
 			field[FConstant.BP] = k[6];
-			Logger.printUserLog("The keyword for 'N' (sample size) is set to " + field[FConstant.N]);
+			Logger.printUserLog("[INFO] The keyword for 'N' (sample size) is set to " + field[FConstant.N]);
 			keyLen=7;
 		}
 	}
