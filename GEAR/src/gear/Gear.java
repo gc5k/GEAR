@@ -59,6 +59,7 @@ public enum Gear
 		addCommand(new gear.subcommands.sfst.SFstCommand());
 		addCommand(new gear.subcommands.fpc.FPCCommand());
 		addCommand(new gear.subcommands.metapc.MetaPCCommand());
+		addCommand(new gear.subcommands.eigengwas.EigenGWASCommand());
 	}
 
 	private void addCommand(Command cmd)

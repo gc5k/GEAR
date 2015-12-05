@@ -10,7 +10,7 @@ public class SubjectIDFile implements SubjectOrder
 		this.fileName = fileName;
 		BufferedReader reader = BufferedReader.openTextFile(fileName, "subject-ID");
 		String[] tokens;
-		while ((tokens = reader.readTokens(2)) != null)
+		while ((tokens = reader.readTokensAtLeast(2)) != null)
 		{
 			SubjectID id = new SubjectID(/*famID*/tokens[0], /*indID*/tokens[1]);
 			if (!subjectMap.add(id))

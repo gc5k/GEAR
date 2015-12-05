@@ -276,7 +276,7 @@ public class HEMCalculate
 	public void Regression()
 	{
 
-		DecimalFormat fmt = new DecimalFormat("#.###E0");
+		DecimalFormat fmt = new DecimalFormat("0.0000");
 
 		RealMatrix Mat_XtX = new Array2DRowRealMatrix(heMReader.XtX);
 		RealMatrix Mat_XtY = new Array2DRowRealMatrix(heMReader.XtY);
