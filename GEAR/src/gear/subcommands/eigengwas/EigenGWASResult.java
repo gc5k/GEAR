@@ -52,7 +52,7 @@ public class EigenGWASResult
 	   StringBuffer sb = new StringBuffer();
 	   double z1 = Z/Math.sqrt(gc);
 	   PGC = getP(z1);
-       sb.append(snp.getName()+"\t" + snp.getFirstAllele() + "\t" + snp.getSecAllele() + "\t" + freq+ "\t"+fmt.format(b) + "\t" + fmt.format(b_se) + "\t" + fmt.format(Z*Z) + "\t" +fmt.format(P) + "\t" + fmt.format(PGC) + "\t"+  (int)n1 + "\t" + fmt.format(freq1) + "\t" + (int)n2 + "\t" + fmt.format(freq2) + "\t" + fmt.format(fst));
+       sb.append(snp.getName()+"\t" + snp.getChromosome() + "\t" + snp.getPosition() + "\t" +  snp.getFirstAllele() + "\t" + snp.getSecAllele() + "\t" + freq+ "\t"+fmt.format(b) + "\t" + fmt.format(b_se) + "\t" + fmt.format(Z*Z) + "\t" +fmt.format(P) + "\t" + fmt.format(PGC) + "\t"+  (int)n1 + "\t" + fmt.format(freq1) + "\t" + (int)n2 + "\t" + fmt.format(freq2) + "\t" + fmt.format(fst));
        return sb.toString();
    }
    
