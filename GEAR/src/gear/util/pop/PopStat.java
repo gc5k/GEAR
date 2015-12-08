@@ -44,27 +44,40 @@ public class PopStat
 				allelefreq[i][0] = Double.NaN;
 				allelefreq[i][2] = 1;
 			}
-/*			
-			if (allelefreq[i][1] <= 0.5)
-			{
-				if (allelefreq[i][1] < CmdArgs.INSTANCE.maf_range[0]
-						|| allelefreq[i][1] > CmdArgs.INSTANCE.maf_range[1])
-				{
-					allelefreq[i][1] = 0;
-				}
-			} 
-			else
-			{
-				if ((1 - allelefreq[i][1]) < CmdArgs.INSTANCE.maf_range[0]
-						|| (1 - allelefreq[i][1]) > CmdArgs.INSTANCE.maf_range[1])
-				{
-					allelefreq[i][1] = 0;
-				}
-			}
-*/
 		}
 
 		return allelefreq;
+	}
+
+	public static double[] calGenoVariance(GenotypeMatrix G, int numMarker)
+	{
+		//[][0]a1 freq; [][1]a2 freq; [][2] missing rate
+		//it calculates second allele frequency (so, likely the major one)
+		double[] axsq = new double[numMarker];
+
+		for (int i = 0; i < numMarker; i++)
+		{
+			int cnt = 0;
+			double sq = 0;
+			double sm = 0;
+			for (int j = 0; j < G.getGRow(); j++)
+			{
+				int g = G.getAdditiveScore(j, i);
+				if (g != ConstValues.MISSING_GENOTYPE)
+				{
+					sq += g * g;
+					sm += g;
+					cnt++;
+				}
+			}
+
+			if (cnt > 2)
+			{
+				axsq[i] = (sq - cnt * (sm/cnt) * (sm/cnt))/(cnt-1);
+			}
+		}
+
+		return axsq;
 	}
 
 	public static void Imputation (GenotypeMatrix G)
