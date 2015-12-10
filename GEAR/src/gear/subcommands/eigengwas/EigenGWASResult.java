@@ -23,8 +23,8 @@ public class EigenGWASResult
    private double n2;
    private double freq2;
    private double fst;
-   private static DecimalFormat fmt = new DecimalFormat("0.0000");
-   private static DecimalFormat fmtP = new DecimalFormat("0.000E000");
+   private static DecimalFormat df = new DecimalFormat("0.0000");
+   private static DecimalFormat dfE = new DecimalFormat("0.00E000");
 
    private static NormalDistributionImpl unitNormal = new NormalDistributionImpl(0.0D, 1.0D);
 
@@ -54,10 +54,88 @@ public class EigenGWASResult
 	   StringBuffer sb = new StringBuffer();
 	   double z1 = Z/Math.sqrt(gc);
 	   PGC = getP(z1);
-       sb.append(snp.getName()+"\t" + snp.getChromosome() + "\t" + snp.getPosition() + "\t" +  snp.getFirstAllele() + "\t" + snp.getSecAllele() + "\t" + freq+ "\t"+fmt.format(b) + "\t" + fmt.format(b_se) + "\t" + fmt.format(Z*Z) + "\t" +fmtP.format(P) + "\t" + fmtP.format(PGC) + "\t"+  (int)n1 + "\t" + fmt.format(freq1) + "\t" + (int)n2 + "\t" + fmt.format(freq2) + "\t" + fmt.format(fst));
+       sb.append(snp.getName()+"\t" + snp.getChromosome() + "\t" + snp.getPosition() + "\t" +  snp.getFirstAllele() + "\t" + snp.getSecAllele() + "\t" + df.format(freq)+ "\t");
+       if(Math.abs(b) > 0.0001)
+       {
+    	   sb.append(df.format(b) + "\t");
+       }
+       else
+       {
+    	   sb.append(dfE.format(b) + "\t");    	   
+       }
+       
+       if(Math.abs(b_se) > 0.0001)
+       {
+    	   sb.append(df.format(b_se) + "\t");
+       }
+       else
+       {
+    	   sb.append(dfE.format(b_se) + "\t");    	   
+       }
+       
+       double chi = b * b / (b_se * b_se);
+
+       if(chi > 0.001)
+       {
+    	   sb.append(df.format(chi) + "\t");
+       }
+       else
+       {
+    	   sb.append(dfE.format(chi) + "\t");
+       }
+
+       if(P > 0.0001)
+       {
+    	   sb.append(df.format(P) + "\t");
+       }
+       else
+       {
+    	   sb.append(dfE.format(P) + "\t");    	   
+       }
+
+       if(PGC > 0.0001)
+       {
+    	   sb.append(df.format(PGC) + "\t");
+       }
+       else
+       {
+    	   sb.append(dfE.format(PGC) + "\t");    	   
+       }
+
+       sb.append((int) n1 + "\t");
+       
+       if(Math.abs(freq1) > 0.0001)
+       {
+    	   sb.append(df.format(freq1) + "\t");
+       }
+       else
+       {
+    	   sb.append(dfE.format(freq1) + "\t");    	   
+       }
+
+       sb.append((int) n2 + "\t");
+
+       if(Math.abs(freq2) > 0.0001)
+       {
+    	   sb.append(df.format(freq2) + "\t");
+       }
+       else
+       {
+    	   sb.append(dfE.format(freq2) + "\t");    	   
+       }
+
+       if(Math.abs(fst) > 0.0001)
+       {
+    	   sb.append(df.format(fst) + "\t");
+       }
+       else
+       {
+    	   sb.append(dfE.format(fst) + "\t");    	   
+       }
+
        return sb.toString();
    }
-   
+
    private double getP(double z)
    {
 	   double p = 1;

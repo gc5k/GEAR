@@ -3,11 +3,11 @@ package gear.subcommands.grm;
 import java.io.BufferedWriter;
 import java.io.IOException;
 import java.io.PrintStream;
+import java.text.DecimalFormat;
 import java.util.ArrayList;
 
 import gear.data.Person;
 import gear.family.pedigree.Hukou;
-import gear.family.pedigree.file.MapFile;
 import gear.family.pedigree.file.PedigreeFile;
 import gear.family.plink.PLINKParser;
 import gear.family.popstat.GenotypeMatrix;
@@ -17,6 +17,7 @@ import gear.subcommands.CommandImpl;
 import gear.sumstat.qc.rowqc.SumStatQC;
 import gear.util.FileUtil;
 import gear.util.Logger;
+import gear.util.NewIt;
 import gear.util.pop.PopStat;
 
 public class GRMImpl extends CommandImpl
@@ -52,6 +53,9 @@ public class GRMImpl extends CommandImpl
 
 	public void makeGeneticRelationshipScore()
 	{
+		double grmMean = 0;
+		double grmSq = 0;
+
 		prepareMAF();
 		StringBuffer sb = new StringBuffer();
 		sb.append(grmArgs.getOutRoot());
@@ -68,11 +72,18 @@ public class GRMImpl extends CommandImpl
 			grm = FileUtil.CreatePrintStream(sb.toString());
 		}
 
+		int cnt=0;
 		for (int i = 0; i < G.getGRow(); i++)
 		{
 			for (int j = 0; j <= i; j++)
 			{
 				double[] s = GRMScore(i, j);
+				if (i != j)
+				{
+					grmMean += s[1];
+					grmSq += s[1] * s[1];
+					cnt++;
+				}
 				if (grmArgs.isGZ())
 				{
 					try
@@ -127,6 +138,50 @@ public class GRMImpl extends CommandImpl
 		grm_id.close();
 		Logger.printUserLog("Writing individual information into '"
 				+ sb_id.toString() + "'.");
+		
+		grmMean /= cnt;
+		grmSq /=cnt;
+		double Effective_sample = -1/grmMean;
+		double grmSD = (grmSq - grmMean * grmMean) * cnt / (cnt-1);
+		double Effeictive_marker = 1/grmSD;
+		
+		DecimalFormat df = new DecimalFormat("0.0000");
+		DecimalFormat dfE = new DecimalFormat("0.00E0");
+		if (Math.abs(grmMean) > 0.0001)
+		{
+			Logger.printUserLog("Mean of genetic relatedness is : " + df.format(grmMean));
+		}
+		else
+		{
+			Logger.printUserLog("Mean of genetic relatedness is : " + dfE.format(grmMean));
+		}
+
+		if (Math.abs(grmSD) > 0.0001)
+		{
+			Logger.printUserLog("Sampling variance of genetic relatedness is: " + df.format(grmSD));
+		}
+		else
+		{
+			Logger.printUserLog("Sampling variance of genetic relatedness is: " + dfE.format(grmSD));
+		}
+		
+		if (Math.abs(Effeictive_marker) > 0.0001)
+		{
+			Logger.printUserLog("Effective sample size is : " + df.format(Effective_sample));
+		}
+		else
+		{
+			Logger.printUserLog("Effective sample size is : " + dfE.format(Effective_sample));			
+		}
+
+		if (Math.abs(Effeictive_marker) > 0.0001)
+		{
+			Logger.printUserLog("Effective number of genome segments is: " + df.format(Effeictive_marker));			
+		}
+		else
+		{
+			Logger.printUserLog("Effective number of genome segments is: " + dfE.format(Effeictive_marker));			
+		}
 	}
 
 //	public void makeGeneticRelationshipScore(int n0, int n1)
