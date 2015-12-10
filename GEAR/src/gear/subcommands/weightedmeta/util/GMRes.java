@@ -1,7 +1,5 @@
 package gear.subcommands.weightedmeta.util;
 
-import org.apache.commons.math.linear.RealMatrix;
-
 public class GMRes implements Comparable<GMRes>
 {
 	private String snp;
@@ -10,15 +8,12 @@ public class GMRes implements Comparable<GMRes>
 	private char A1;
 	private char A2;
 	private int cohort;
-	private int N;
 	private double z;
 	private double p;
 	private String direct;
 	private double b;
 	private double se;
 	private boolean isAmbiguous;
-	private RealMatrix B;
-	private RealMatrix Sigma;
 
 	public GMRes(int cohort)
 	{
@@ -53,11 +48,6 @@ public class GMRes implements Comparable<GMRes>
 	public void SetA2(char A2)
 	{
 		this.A2 = A2;
-	}
-	
-	public void SetN(int N)
-	{
-		this.N = N;
 	}
 	
 	public void SetZ(double z)

@@ -437,8 +437,8 @@ public class HEMCalculate
 					double ratioCaseCtrl = ((double)heMReader.getNumberOfCases()) / ((double)(heMReader.getNumberOfCases() + heMReader.getNumberOfControls()));
 					h_l[i - 1] = h_o[i - 1] * heMReader.k * (1 - heMReader.k) * heMReader.k * (1 - heMReader.k) / (z * z * ratioCaseCtrl * (1 - ratioCaseCtrl));
 
-					double f = (heMReader.k * (1 - heMReader.k) * heMReader.k * (1 - heMReader.k)) / (z * z * ratioCaseCtrl * (1 - ratioCaseCtrl));
-					double v_hl = v_ho * f * f;
+//					double f = (heMReader.k * (1 - heMReader.k) * heMReader.k * (1 - heMReader.k)) / (z * z * ratioCaseCtrl * (1 - ratioCaseCtrl));
+//					double v_hl = v_ho * f * f;
 //					heMReader.sb
 //							.append("h2(l) for b" + i + ": " + fmt
 //									.format(h_l[i - 1]) + "\t" + fmt

@@ -1,12 +1,9 @@
 package gear.subcommands.fpc;
 
-import java.util.ArrayList;
-
 import gear.subcommands.CommandArguments;
 import gear.util.BufferedReader;
 import gear.util.FileUtil;
 import gear.util.Logger;
-import gear.util.NewIt;
 
 public class FPCCommandArguments extends CommandArguments
 {

@@ -32,25 +32,13 @@ public class EigenGWASCommand extends Command
 		return "Eigen GWAS";
 	}
 
+	@SuppressWarnings("static-access")
 	public void prepareOptions(Options options)
 	{
-		OptionBuilder.withDescription("Specify PLINK format .bed, .bim and .fam files");
-		OptionBuilder.withLongOpt("bfile");
-		OptionBuilder.hasArg();
-		OptionBuilder.isRequired();
-		options.addOption(OptionBuilder.create());
-		OptionBuilder.withDescription("Specify the phenotype file (individual eigenvector)");
-		OptionBuilder.withLongOpt("pheno");
-		OptionBuilder.hasArg();
-		OptionBuilder.isRequired();
-		options.addOption(OptionBuilder.create());
-		OptionBuilder.withDescription("Specify the phenotype index");
-		OptionBuilder.withLongOpt("mpheno");
-		OptionBuilder.hasArg();
-		options.addOption(OptionBuilder.create());
-		OptionBuilder.withDescription("Specify the chromosomes for analysis");
-		OptionBuilder.hasArg();
-		options.addOption(OptionBuilder.create("chr"));
+		options.addOption(OptionBuilder.withDescription("Specify PLINK format .bed, .bim and .fam files").withLongOpt("bfile").hasArg().isRequired().create());
+		options.addOption(OptionBuilder.withDescription(OPT_PHE_DESC).withLongOpt(OPT_PHE_LONG).hasArg().isRequired().create());
+		options.addOption(OptionBuilder.withDescription(OPT_MPHE_DESC).withLongOpt(OPT_MPHE_LONG).hasArg().create());
+		options.addOption(OptionBuilder.withDescription(OPT_CHR_DESC).hasArg().create(OPT_CHR));
 	}
 
 	public CommandArguments parse(CommandLine cmdLine) throws CommandArgumentException
@@ -80,9 +68,9 @@ public class EigenGWASCommand extends Command
 		eigenArgs.setBFile(bfile);
 		eigenArgs.setFile(file);
 
-		if (cmdLine.hasOption("chr"))
+		if (cmdLine.hasOption(OPT_CHR))
 		{
-			eigenArgs.setChr(cmdLine.getOptionValue("chr"));
+			eigenArgs.setChr(cmdLine.getOptionValue(OPT_CHR));
 		}
 	}
 

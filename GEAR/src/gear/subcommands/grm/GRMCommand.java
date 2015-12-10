@@ -24,6 +24,7 @@ public class GRMCommand extends Command
 		return "Constructing whole-genome ibs matrix";
 	}
 
+	@SuppressWarnings("static-access")
 	@Override
 	public void prepareOptions(Options options)
 	{

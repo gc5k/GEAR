@@ -1,7 +1,6 @@
 package gear.subcommands.lambdaD;
 
 import gear.util.Logger;
-import gear.util.Sample;
 import gear.util.stat.PrecisePvalue;
 
 import java.text.DecimalFormat;
@@ -10,7 +9,6 @@ import org.apache.commons.math.MathException;
 import org.apache.commons.math.distribution.ChiSquaredDistributionImpl;
 import org.apache.commons.math.distribution.NormalDistributionImpl;
 import org.apache.commons.math.stat.descriptive.DescriptiveStatistics;
-import org.apache.commons.math.stat.regression.SimpleRegression;
 
 public class XTest
 {
@@ -23,7 +21,7 @@ public class XTest
 		this.n1 = n1;
 		this.n2 = n2;
 
-		ChisqSample = Sample.sampleChisq(DesStat.length, 1);
+//		ChisqSample = Sample.sampleChisq(DesStat.length, 1);
 		CalZ();
 	}
 
@@ -39,7 +37,7 @@ public class XTest
 		this.n1 = cs1 + ctrl1;
 		this.n2 = cs2 + ctrl2;
 
-		ChisqSample = Sample.sampleChisq(DesStat.length, 1);
+//		ChisqSample = Sample.sampleChisq(DesStat.length, 1);
 		CalZ();
 		CalCC();
 	}
@@ -319,6 +317,6 @@ public class XTest
 	private double lambdaM = 0;
 	private double LambdaM_sigma = 0;
 	
-	private double[] ChisqSample;
+//	private double[] ChisqSample;
 
 }

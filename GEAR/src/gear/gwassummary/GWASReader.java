@@ -605,6 +605,6 @@ public class GWASReader
 	private double[] gcReal;
 	private double ChiMedianConstant = 0.4549364;
 	private boolean isFrq;
-	private int[] keepCohortIdx;
+//	private int[] keepCohortIdx;
 
 }

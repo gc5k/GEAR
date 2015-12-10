@@ -17,7 +17,6 @@ import gear.subcommands.CommandImpl;
 import gear.sumstat.qc.rowqc.SumStatQC;
 import gear.util.FileUtil;
 import gear.util.Logger;
-import gear.util.NewIt;
 import gear.util.pop.PopStat;
 
 public class GRMImpl extends CommandImpl

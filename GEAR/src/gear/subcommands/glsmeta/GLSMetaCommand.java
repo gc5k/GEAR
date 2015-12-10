@@ -46,7 +46,7 @@ public class GLSMetaCommand extends Command
 
 		options.addOption(OptionBuilder.withDescription(OPT_CM_DESC).hasArg().create(OPT_CM));
 		options.addOption(OptionBuilder.withDescription(OPT_GC_DESC).create(OPT_GC));
-		options.addOption(OptionBuilder.withDescription(OPT_GC_DESC).withLongOpt(OPT_GC_ALL_LONG).create());
+		options.addOption(OptionBuilder.withDescription(OPT_GC_ALL_LONG_DESC).withLongOpt(OPT_GC_ALL_LONG).create());
 
 //		options.addOption(OptionBuilder.withDescription(OPT_GC_INFLATION_ONLY_LONG_DESC).withLongOpt(OPT_GC_INFLATION_ONLY_LONG).create(OPT_GC_INFLATION_ONLY));
 		options.addOption(OptionBuilder.withDescription(OPT_KEEPATGC_LONG_DESC).withLongOpt(OPT_KEEPATGC_LONG).create(OPT_KEEPATGC));

@@ -15,7 +15,6 @@ public class FReader
 	public FReader(String[] MetaFile, boolean[] FileKeep, String[] field, boolean isQT, boolean isGZ, boolean isChr, int Chr)
 	{
 		this.field = field;
-		this.isQT = isQT;
 		this.isGZ = isGZ;
 
 		workingMetaFile = NewIt.newArrayList();
@@ -393,7 +392,6 @@ public class FReader
 	private boolean isChr;
 	private int chrKeep=0;
 	private String[] field;
-	private boolean isQT;
 	private boolean isGZ;
 	private int[][] KeyIdx; //snp, chr, bp, beta, se, p, a1, a2
 	private ArrayList<String> workingMetaFile;
@@ -401,6 +399,6 @@ public class FReader
 	private ArrayList<ArrayList<String>> MetaSNPArray = NewIt.newArrayList();
 	private HashMap<String, ArrayList<Integer>> MetaSNPTable = NewIt.newHashMap();
 
-	private int[] keepCohortIdx;
+//	private int[] keepCohortIdx;
 
 }

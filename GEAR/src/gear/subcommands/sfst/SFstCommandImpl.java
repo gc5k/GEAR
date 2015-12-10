@@ -324,14 +324,12 @@ public class SFstCommandImpl extends CommandImpl
 	{
 		double fstD1 = 0;
 		double fstD2 = 0;
-		double fstD3 = 0;
+//		double fstD3 = 0;
 		double beta1_n = 0;
 		double beta1_d = 0;
 		double beta2_n = 0;
 		double beta2_d = 0;
 
-		double beta3_n = 0;
-		double beta3_d = 0;
 		for(int i = 0; i < idx.length; i++)
 		{
 			FstUnit fu = fstUnit.get(idx[i]);
@@ -346,13 +344,10 @@ public class SFstCommandImpl extends CommandImpl
 			beta2_n += (n2*2)/(n2*2-1)*(1-p2*p2 - (1-p2) * (1-p2));
 			beta2_d += (1-p1*p2 - (1-p1) * (1-p2));
 			
-			beta3_n += (1-p1*p2 - (1-p1) * (1-p2));
 		}
 		fstD1 = 1 - beta1_n / beta1_d;
 		fstD2 = 1 - beta2_n / beta2_d;
-		fstD3 = 1 - beta3_n / beta1_d;
 
-		beta3_n = (beta1_n + beta2_n)/2;
 		FstDistance = (fstD1 + fstD2)/2;
 	}
 

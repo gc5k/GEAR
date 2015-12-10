@@ -42,16 +42,13 @@ public class ExSNPCommand extends Command
 	{
 		ExSNPCommandArguments esArgs = new ExSNPCommandArguments();
 		
-		boolean hasOpt = false;
 		if (cmdLine.hasOption(OPT_BATCH))
 		{
 			esArgs.setBatch(cmdLine.getOptionValue(OPT_BATCH));
-			hasOpt = true;
 		}
 		if (cmdLine.hasOption(OPT_BFILES))
 		{
 			esArgs.setBFiles(cmdLine.getOptionValues(OPT_BFILES));
-			hasOpt = true;
 		}
 		return esArgs;
 	}

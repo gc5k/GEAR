@@ -56,7 +56,7 @@ public class CovReader
 			cov = NewIt.newArrayList();
 
 			String[] tokens = null;
-			int cnt = 0;
+//			int cnt = 0;
 			tokens = reader.readTokens();
 			ArrayList<String> s = NewIt.newArrayList();
 			for(int i = 0; i < tokens.length; i++) s.add(tokens[i]);
@@ -88,7 +88,7 @@ public class CovReader
 
 	private String covar = null;
 	private ArrayList<ArrayList<String>> cov;
-	private int[] covar_idx;
+//	private int[] covar_idx;
 
 	private int nCol = 0;
 	private double[][] covTable;

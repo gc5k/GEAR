@@ -299,13 +299,13 @@ public class WeightedMetaImpl extends CommandImpl
 			System.out.println(snp);
 			ArrayList<Integer> Int = gReader.getMetaSNPTable().get(snp);
 
-			MetaStat ms = null;
+//			MetaStat ms = null;
 			int i = 0;
 			for( i = 0; i < (Int.size() - 1); i++)
 			{
 				if(Int.get(i).intValue() != 0) break; 
 			}
-			ms = gReader.getMetaStat().get(i).get(snp);
+//			ms = gReader.getMetaStat().get(i).get(snp);
 
 			if (wMetaArgs.isFullSNPOnly())
 			{

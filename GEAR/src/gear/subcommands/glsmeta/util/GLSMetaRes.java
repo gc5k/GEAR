@@ -12,7 +12,6 @@ public class GLSMetaRes implements Comparable<GLSMetaRes>
 	private char A1;
 	private char A2;
 	private int cohort;
-	private int N;
 	private String direct;
 	private boolean isAmbiguous;
 	private RealMatrix B;
@@ -51,11 +50,6 @@ public class GLSMetaRes implements Comparable<GLSMetaRes>
 	public void SetA2(char A2)
 	{
 		this.A2 = A2;
-	}
-
-	public void SetN(int N)
-	{
-		this.N = N;
 	}
 
 	public void SetBP(long bp)

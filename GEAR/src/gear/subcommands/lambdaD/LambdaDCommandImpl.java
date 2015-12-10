@@ -42,7 +42,7 @@ public class LambdaDCommandImpl extends CommandImpl
 		initial();
 
 		// generating matrix
-		DecimalFormat fmt = new DecimalFormat("0.000");
+		DecimalFormat fmt = new DecimalFormat("0.0000");
 		String[] MetaFile = gReader.getMetaFile();
 		int FileSize = lamArgs.getTop() > 0 ? lamArgs.getTop()
 				: (MetaFile.length - 1);
@@ -63,8 +63,6 @@ public class LambdaDCommandImpl extends CommandImpl
 				else
 				{
 					double[] size = lamArgs.getCCsize();
-					R1 = size[i * 2] / size[i * 2 + 1];
-					R2 = size[j * 2] / size[j * 2 + 1];
 					double s1 = size[i * 2] + size[i * 2 + 1];
 					double s2 = size[j * 2] + size[j * 2 + 1];
 					Kappa = 2 / (Math.sqrt(s1 / s2) + Math.sqrt(s2 / s1));
@@ -765,8 +763,6 @@ public class LambdaDCommandImpl extends CommandImpl
 
 	private double Me = 30000;
 
-	private double R1 = 1;
-	private double R2 = 1;
 	private double Kappa = 1;
 	private LambdaDCommandArguments lamArgs;
 

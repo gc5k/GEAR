@@ -61,7 +61,6 @@ public class SimulationQTCommandImpl extends CommandImpl
 	{
 		DecimalFormat fmt = new DecimalFormat("#.###E0");
 
-		int count = 0;
 		RealMatrix Meffect = new Array2DRowRealMatrix(effect);
 		genotype = new double[sample][M];
 		phenotype = new double[sample];

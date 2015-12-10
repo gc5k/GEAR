@@ -1,14 +1,12 @@
 package gear.subcommands.qpca;
 
 import org.apache.commons.cli.CommandLine;
-import org.apache.commons.cli.OptionBuilder;
 import org.apache.commons.cli.Options;
 
 import gear.subcommands.Command;
 import gear.subcommands.CommandArgumentException;
 import gear.subcommands.CommandArguments;
 import gear.subcommands.CommandImpl;
-import gear.subcommands.profile.ProfileCommand;
 
 public class QPCACommand extends Command
 {
