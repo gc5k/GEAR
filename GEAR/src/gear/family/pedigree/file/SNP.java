@@ -2,6 +2,7 @@ package gear.family.pedigree.file;
 
 import java.text.DecimalFormat;
 
+import gear.ConstValues;
 import gear.util.Logger;
 
 /**
@@ -163,6 +164,16 @@ public class SNP implements Comparable<SNP>
 			sb.append(minor);
 		}
 		return sb.toString();
+	}
+
+	public boolean isMonopolic()
+	{
+		boolean flag = false;
+		if (alleles[0] == ConstValues.MISSING_ALLELE_CHAR || alleles[1] == ConstValues.MISSING_ALLELE_CHAR)
+		{
+			flag = true;
+		}
+		return flag;
 	}
 
 	public char getFirstAllele()

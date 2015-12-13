@@ -31,6 +31,7 @@ public class EigenGWASImpl extends CommandImpl {
 	private ArrayList<EigenGWASResult> eGWASResult = NewIt.newArrayList();
 
 	private double lambdaGC = 1;
+	private int monoLoci = 0;
 
 	public void execute(CommandArguments cmdArgs) 
 	{
@@ -118,14 +119,29 @@ public class EigenGWASImpl extends CommandImpl {
 				double b = sReg.getSlope();
 				double b_se = sReg.getSlopeStdErr();
 
+				if(snp.isMonopolic()) 
+				{
+					monoLoci++;
+					System.out.println(snp.getName());
+					continue;
+				}
+
 				EigenGWASResult e1 = new EigenGWASResult(snp, freq, b, b_se, n1, freq1, n2, freq2, fst);
 				eGWASResult.add(e1);
 				pArray.add(e1.GetP());
 			}
-
 		}
 		Collections.sort(pArray);
 		int idx = (int) Math.ceil(pArray.size() / 2);
+
+		if (monoLoci > 1)
+		{
+			Logger.printUserLog("Removed " + monoLoci + " monomorphic loci.");			
+		}
+		else if (monoLoci == 1)
+		{
+			Logger.printUserLog("Removed " + monoLoci + " monomorphic locus.");
+		}
 
 		Logger.printUserLog("Median of p values is " + pArray.get(idx));
 
