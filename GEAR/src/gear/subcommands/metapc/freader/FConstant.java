@@ -7,9 +7,9 @@ public class FConstant
 	public static final int A1 = 2;
 	public static final int A2 = 3;
 	public static final int Fvalue = 4;
-	public static final int BP = 5;
-	public static final int N = 6;
-	public static final int num_key=7;
+//	public static final int BP = 5;
+//	public static final int N = 6;
+	public static final int num_key=5;
 
 	public static boolean isNASNP(String snp)
 	{

@@ -122,7 +122,6 @@ public class EigenGWASImpl extends CommandImpl {
 				if(snp.isMonopolic()) 
 				{
 					monoLoci++;
-					System.out.println(snp.getName());
 					continue;
 				}
 

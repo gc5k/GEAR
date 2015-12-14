@@ -296,12 +296,12 @@ public class WeightedMetaImpl extends CommandImpl
 		for (Iterator<String> e=snps.iterator(); e.hasNext();)
 		{
 			String snp = e.next();
-			System.out.println(snp);
+//			System.out.println(snp);
 			ArrayList<Integer> Int = gReader.getMetaSNPTable().get(snp);
 
 //			MetaStat ms = null;
-			int i = 0;
-			for( i = 0; i < (Int.size() - 1); i++)
+//			int i = 0;
+			for(int i = 0; i < (Int.size() - 1); i++)
 			{
 				if(Int.get(i).intValue() != 0) break; 
 			}

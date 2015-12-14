@@ -5,6 +5,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Iterator;
 
 import org.apache.commons.math.linear.Array2DRowRealMatrix;
 import org.apache.commons.math.linear.EigenDecompositionImpl;
@@ -63,13 +64,12 @@ public class MetaPCCommandImpl extends CommandImpl
 	private void calculateGRM()
 	{
 
-		int cntAmbiguous = 0;
 		HashMap<String, ArrayList<Float>> snpFrq = NewIt.newHashMap();
 		HashMap<String, FStat> SumStat1 = fReader.getMetaStat().get(0);
 
 		HashMap<String, ArrayList<Integer>> snpCntTable = fReader.getMetaSNPTable();
 
-		HashSet<String> badSNP = NewIt.newHashSet();
+		HashSet<String> atgcSNP = NewIt.newHashSet();
 		for (String snp : snpCntTable.keySet())
 		{
 			if(SumStat1.containsKey(snp))
@@ -78,10 +78,8 @@ public class MetaPCCommandImpl extends CommandImpl
 
 				if (SNPMatch.isAmbiguous(ms.getA1(), ms.getA2()))
 				{
-					badSNP.add(snp);
-					cntAmbiguous++;
-					continue;
-				}
+					atgcSNP.add(snp);
+				}					
 
 				ArrayList<Integer> cnt = snpCntTable.get(snp);
 				if (cnt.get(cnt.size()-1) == fReader.getNumMetaFile())
@@ -98,16 +96,10 @@ public class MetaPCCommandImpl extends CommandImpl
 			HashMap<String, FStat> SumStat2 = fReader.getMetaStat().get(i);			
 			for (String snp : snpCntTable.keySet())
 			{
-				
-				if (badSNP.contains(snp))
-				{
-					continue;
-				}
 				ArrayList<Integer> cnt = snpCntTable.get(snp);
 
 				if (cnt.get(cnt.size() -1) == fReader.getNumMetaFile())
 				{
-//					System.out.println(snp);
 
 					FStat ms1 = SumStat1.get(snp);
 					FStat ms2 = SumStat2.get(snp);
@@ -124,10 +116,9 @@ public class MetaPCCommandImpl extends CommandImpl
 					}
 					else
 					{
-						cntAmbiguous++;
-						badSNP.add(snp);
-						snpFrq.remove(snp);
-						continue;
+						atgcSNP.add(snp);
+//						snpFrq.remove(snp);
+//						continue;
 					}
 
 					ArrayList<Float> fq = snpFrq.get(snp);
@@ -137,14 +128,33 @@ public class MetaPCCommandImpl extends CommandImpl
 					}
 					else
 					{
-						fq.add(1-ms2.getEffect());
+						if (mpcArgs.isBeta())
+						{
+							fq.add(-1*ms2.getEffect());
+						}
+						else
+						{
+							fq.add(1-ms2.getEffect());							
+						}
 					}
 				}
 			}
 		}
 
-		Logger.printUserLog(cntAmbiguous + " marker(s) have been removed.");
-		Logger.printUserLog(snpFrq.size() + " consensus markers have been found.");
+		if(!mpcArgs.isKeepATGC() )
+		{
+			if (atgcSNP.size() > 0)
+			{
+				Logger.printUserLog(atgcSNP.size() + " palindromic marker(s) have been removed.");
+				for(Iterator<String> s =  atgcSNP.iterator(); s.hasNext();)
+				{
+					String snp = s.next();
+					snpFrq.remove(snp);
+				}
+			}
+		}
+
+		Logger.printUserLog(snpFrq.size() + " consensus markers have been found and used for analysis.");
 
 		double[][] mg = new double[snpFrq.size()][fReader.getNumMetaFile()];
 
@@ -157,7 +167,7 @@ public class MetaPCCommandImpl extends CommandImpl
 			{
 				mg[cnt][j] = fq.get(j).doubleValue();
 			}
-			
+
 			double st = StatUtils.variance(mg[cnt]);
 			if (st > 1e-6)
 			{

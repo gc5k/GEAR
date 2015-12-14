@@ -435,7 +435,7 @@ public class GWASReader
 		if (cntBadBeta > 0)
 		{
 			String lc = cntBadBeta == 1 ? "locus" : "loci";
-			Logger.printUserLog("Removed " + cntBadBeta + "" + lc + " due to incorrect effect(s).");
+			Logger.printUserLog("Removed " + cntBadBeta + " " + lc + " due to incorrect effect(s).");
 		}
 
 		if (cntBadSE > 0)

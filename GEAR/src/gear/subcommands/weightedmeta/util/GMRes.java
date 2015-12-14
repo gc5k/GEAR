@@ -1,5 +1,7 @@
 package gear.subcommands.weightedmeta.util;
 
+import java.text.DecimalFormat;
+
 public class GMRes implements Comparable<GMRes>
 {
 	private String snp;
@@ -109,8 +111,38 @@ public class GMRes implements Comparable<GMRes>
 
 	public String toString()
 	{
+		DecimalFormat fmt = new DecimalFormat("0.0000");
+		DecimalFormat fmtp = new DecimalFormat("0.000E000");
+
 		StringBuffer sb = new StringBuffer();
-		sb.append(snp + " " + chr + " " + bp + " " + A1 + " " + A2 + " " + cohort + " " + b + " " + se + " " + " " + z + " " + p + " " + direct);
+		sb.append(snp + " " + chr + " " + bp + " " + A1 + " " + A2 + " " + cohort + " ");
+		if (Math.abs(b) >= 0.0001)
+		{
+			sb.append(fmt.format(b) + " ");
+		}
+		else
+		{
+			sb.append(fmtp.format(b) + " ");
+		}
+		
+		if (Math.abs(se) >= 0.0001)
+		{
+			sb.append(fmt.format(se) + " ");
+		}
+		else
+		{
+			sb.append(fmtp.format(se) + " ");
+		}
+		
+		if (Math.abs(z) >= 0.001)
+		{
+			sb.append(fmt.format(z) + " ");
+		}
+		else
+		{
+			sb.append(fmtp.format(z) + " ");
+		}
+		sb.append(direct);
 		return sb.toString();
 	}
 

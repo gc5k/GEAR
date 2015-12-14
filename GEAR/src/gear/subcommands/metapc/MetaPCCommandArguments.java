@@ -148,19 +148,19 @@ public class MetaPCCommandArguments extends CommandArguments
 		Logger.printUserLog("[INFO] The keyword 'A2' (the other allele) is set to " + field[FConstant.A2]);
 		Logger.printUserLog("[INFO] The keyword 'RAF' (reference allele frequency for A1) is set to " + field[FConstant.Fvalue]);
 
-		if(k.length > 5)
-		{
-			field[FConstant.BP] = k[5];
-			Logger.printUserLog("[INFO] The keyword for 'BP' (base pair) is set to " + field[FConstant.BP]);
-			keyLen=6;
-		}
-
-		if(k.length > 6)
-		{
-			field[FConstant.BP] = k[6];
-			Logger.printUserLog("[INFO] The keyword for 'N' (sample size) is set to " + field[FConstant.N]);
-			keyLen=7;
-		}
+//		if(k.length > 5)
+//		{
+//			field[FConstant.BP] = k[5];
+//			Logger.printUserLog("[INFO] The keyword for 'BP' (base pair) is set to " + field[FConstant.BP]);
+//			keyLen=6;
+//		}
+//
+//		if(k.length > 6)
+//		{
+//			field[FConstant.BP] = k[6];
+//			Logger.printUserLog("[INFO] The keyword for 'N' (sample size) is set to " + field[FConstant.N]);
+//			keyLen=7;
+//		}
 	}
 
 	public String[] getKeys()
@@ -168,40 +168,40 @@ public class MetaPCCommandArguments extends CommandArguments
 		return field;
 	}
 
-	public void setVerbose()
-	{
-		isVerbose = true;
-	}
+//	public void setVerbose()
+//	{
+//		isVerbose = true;
+//	}
+//
+//	public boolean isVerbose()
+//	{
+//		return isVerbose;
+//	}
 
-	public boolean isVerbose()
-	{
-		return isVerbose;
-	}
-
-	public double getMe()
-	{
-		return Me;
-	}
-
-	public void setNoWeight()
-	{
-		isNoWeight = true;
-	}
-	
-	public boolean isNoWeight()
-	{
-		return isNoWeight;
-	}
+//	public double getMe()
+//	{
+//		return Me;
+//	}
+//
+//	public void setNoWeight()
+//	{
+//		isNoWeight = true;
+//	}
+//	
+//	public boolean isNoWeight()
+//	{
+//		return isNoWeight;
+//	}
 
 	public double getNe()
 	{
 		return Ne;
 	}
 
-	public void setMe(String me)
-	{
-		Me = Double.parseDouble(me);
-	}
+//	public void setMe(String me)
+//	{
+//		Me = Double.parseDouble(me);
+//	}
 
 	public void setChr(String chr)
 	{
@@ -219,45 +219,65 @@ public class MetaPCCommandArguments extends CommandArguments
 		return chrFlag;
 	}
 
-	public void setRapid()
+	public void setBeta()
 	{
-		isRapid = true;
+		isBeta = true;
+	}
+	
+	public boolean isBeta()
+	{
+		return isBeta;
+	}
+	
+	public void keepATGC()
+	{
+		isKeepATGC = true;
 	}
 
-	public boolean isRapid()
+	public boolean isKeepATGC()
 	{
-		return isRapid;
+		return isKeepATGC;
 	}
 
-	public void setMeFrac(double mefrac)
-	{
-		meFrac = mefrac;
-	}
+//	public void setRapid()
+//	{
+//		isRapid = true;
+//	}
+//
+//	public boolean isRapid()
+//	{
+//		return isRapid;
+//	}
 
-	public double getMeFrac()
-	{
-		return meFrac;
-	}
+//	public void setMeFrac(double mefrac)
+//	{
+//		meFrac = mefrac;
+//	}
+//
+//	public double getMeFrac()
+//	{
+//		return meFrac;
+//	}
 
-	public void setTop(String top)
-	{
-		this.Top = Integer.parseInt(top);
-	}
+//	public void setTop(String top)
+//	{
+//		this.Top = Integer.parseInt(top);
+//	}
+//
+//	public int getTop()
+//	{
+//		return Top;
+//	}
 
-	public int getTop()
-	{
-		return Top;
-	}
-
-	public boolean isFrq()
-	{
-		return isFrq;
-	}
-
-	public int getMode()
-	{
-		return mode;
-	}
+//	public boolean isFrq()
+//	{
+//		return isFrq;
+//	}
+//
+//	public int getMode()
+//	{
+//		return mode;
+//	}
 
 	public String toString()
 	{
@@ -266,46 +286,49 @@ public class MetaPCCommandArguments extends CommandArguments
 		str.append("The keyword for 'CHR' is set to " + field[FConstant.CHR] + "\n");
 		str.append("The keyword for 'A1' (reference allele) is set to " + field[FConstant.A1] + "\n");
 		str.append("The keyword for 'A2' (the other allele) is set to " + field[FConstant.A2] + "\n");
-		str.append("The keyword for 'RAF' (reference allele frequency for A1) is set to " + field[FConstant.Fvalue] + "\n");
+		str.append("The keyword for 'Value' (reference value for A1) is set to " + field[FConstant.Fvalue] + "\n");
 
-		if(keyLen > 5)
-		{
-			str.append("The keyword for 'BP' (base pair) is set to " + field[FConstant.BP] + "\n");
-		}
-
-		if(keyLen > 6)
-		{
-			str.append("The keyword for 'N' (sample size) is set to " + field[FConstant.N] + "\n");
-		}
+//		if(keyLen > 5)
+//		{
+//			str.append("The keyword for 'BP' (base pair) is set to " + field[FConstant.BP] + "\n");
+//		}
+//
+//		if(keyLen > 6)
+//		{
+//			str.append("The keyword for 'N' (sample size) is set to " + field[FConstant.N] + "\n");
+//		}
 
 		return str.toString();
 	}
 
-	protected static int FRQ = 1;
-	private int mode = FRQ;
+//	protected static int FRQ = 1;
+//	private int mode = FRQ;
 
-	public boolean isFrq = true;
+//	public boolean isFrq = true;
 
 	private ArrayList<String> md;
 	private boolean isGZ = false;
 	private boolean isQT = true;
-	private boolean isVerbose = false;
+//	private boolean isVerbose = false;
 
-	private boolean isNoWeight = false;
+//	private boolean isNoWeight = false;
 	private double Ne = 500;
-	private boolean isRapid = false;
-	private int keyLen=5;
+//	private boolean isRapid = false;
+	private int keyLen = 5;
 
-	private double Me = 30000;
-	private double meFrac = 0;
-	private int Top = 0;
+//	private double Me = 30000;
+//	private double meFrac = 0;
+//	private int Top = 0;
 
 	private int chr = 0;
 	private boolean chrFlag = false;
 
+	private boolean isBeta = false;
+	private boolean isKeepATGC = false;
+
 	private double[] qtSize;
 	private double[] ccSize;
-	private String[] field = {"snp", "chr", "bp", "beta", "or", "se", "p", "a1", "a2"};
+	private String[] field = {"snp", "chr", "a1", "a2", "value"};//, "or", "se", "p", };
 
 
 }

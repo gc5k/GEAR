@@ -127,14 +127,14 @@ public class FReader
 			{
 				KeyIdx[metaIdx][FConstant.Fvalue] = i;
 			}
-			if (tokens[i].equalsIgnoreCase(field[FConstant.BP]))
-			{
-				KeyIdx[metaIdx][FConstant.BP] = i;
-			}
-			if (tokens[i].equalsIgnoreCase(field[FConstant.N]))
-			{
-				KeyIdx[metaIdx][FConstant.N] = i;
-			}
+//			if (tokens[i].equalsIgnoreCase(field[FConstant.BP]))
+//			{
+//				KeyIdx[metaIdx][FConstant.BP] = i;
+//			}
+//			if (tokens[i].equalsIgnoreCase(field[FConstant.N]))
+//			{
+//				KeyIdx[metaIdx][FConstant.N] = i;
+//			}
 		}
 
 		boolean qFlag = false;
@@ -186,7 +186,7 @@ public class FReader
 		int cnt = 0;
 		int cntDup = 0;
 		int cntBadChr = 0;
-		int cntBadBp = 0;
+//		int cntBadBp = 0;
 		int cntBadFvalue = 0;
 		int cntBadA1 = 0;
 		int cntBadA2 = 0;
@@ -207,11 +207,11 @@ public class FReader
 				continue;
 			}
 
-			if (KeyIdx[metaIdx][FConstant.BP] != -1 && ConstValues.isNA(tokens[KeyIdx[metaIdx][FConstant.BP]]))
-			{
-				cntBadBp++;
-				continue;
-			}
+//			if (KeyIdx[metaIdx][FConstant.BP] != -1 && ConstValues.isNA(tokens[KeyIdx[metaIdx][FConstant.BP]]))
+//			{
+//				cntBadBp++;
+//				continue;
+//			}
 
 			if (ConstValues.isNA(tokens[KeyIdx[metaIdx][FConstant.Fvalue]]))
 			{
@@ -273,20 +273,20 @@ public class FReader
 					}
 				}
 			}
-			if (KeyIdx[metaIdx][FConstant.BP] != -1)
-			{
-				long bp = -1;
-				try
-				{
-					bp = Long.parseLong(tokens[KeyIdx[metaIdx][FConstant.BP]]);	
-				}
-				catch (NumberFormatException e)
-				{
-					Logger.printUserLog(e.toString() + " in line " + total + " in '" + workingMetaFile.get(metaIdx) + "' is a bad value for position. Skipped this marker.");
-					continue;
-				}
-				ms.setBP(bp);
-			}
+//			if (KeyIdx[metaIdx][FConstant.BP] != -1)
+//			{
+//				long bp = -1;
+//				try
+//				{
+//					bp = Long.parseLong(tokens[KeyIdx[metaIdx][FConstant.BP]]);	
+//				}
+//				catch (NumberFormatException e)
+//				{
+//					Logger.printUserLog(e.toString() + " in line " + total + " in '" + workingMetaFile.get(metaIdx) + "' is a bad value for position. Skipped this marker.");
+//					continue;
+//				}
+//				ms.setBP(bp);
+//			}
 
 			if(sumstat.containsKey(ms.getSNP()))
 			{
@@ -334,16 +334,16 @@ public class FReader
 			Logger.printUserLog("Removed " + cntBadChr + " " + lc + " due to incorrect chromosome(s).");
 		}
 
-		if (cntBadBp > 0)
-		{
-			String lc = cntBadBp == 1 ? "locus" : "loci";
-			Logger.printUserLog("Removed " + cntBadBp + " " + lc + " due to incorrect physical position(s).");				
-		}
+//		if (cntBadBp > 0)
+//		{
+//			String lc = cntBadBp == 1 ? "locus" : "loci";
+//			Logger.printUserLog("Removed " + cntBadBp + " " + lc + " due to incorrect physical position(s).");				
+//		}
 
 		if (cntBadFvalue > 0)
 		{
 			String lc = cntBadFvalue == 1 ? "locus" : "loci";
-			Logger.printUserLog("Removed " + cntBadFvalue + "" + lc + " due to incorrect effect(s).");
+			Logger.printUserLog("Removed " + cntBadFvalue + " " + lc + " due to incorrect effect(s).");
 		}
 
 		if (cntBadFvalue > 0)
