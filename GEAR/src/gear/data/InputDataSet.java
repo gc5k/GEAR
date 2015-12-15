@@ -18,7 +18,7 @@ public class InputDataSet implements SubjectOrder
 		subjectIDFile = new SubjectIDFile(fileName);
 		makeSubjectOrderConsistent(subjectIDFile);
 	}
-	
+
 	public void readPhenotypeFile(String fileName)
 	{
 		phenotypeFile = new PhenotypeFile(fileName, ConstValues.NO_HEADER);

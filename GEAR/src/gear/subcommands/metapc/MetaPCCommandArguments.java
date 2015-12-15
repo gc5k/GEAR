@@ -314,7 +314,7 @@ public class MetaPCCommandArguments extends CommandArguments
 //	private boolean isNoWeight = false;
 	private double Ne = 500;
 //	private boolean isRapid = false;
-	private int keyLen = 5;
+//	private int keyLen = 5;
 
 //	private double Me = 30000;
 //	private double meFrac = 0;

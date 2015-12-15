@@ -11,10 +11,16 @@ import gear.subcommands.CommandImpl;
 
 public class DFPCommand extends Command
 {
+	
+	public DFPCommand()
+	{
+		addAlias("dfp");
+	}
+
 	@Override
 	public String getName()
 	{
-		return "dfp";
+		return "dnafinger";
 	}
 
 	@Override
