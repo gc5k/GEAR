@@ -25,7 +25,7 @@ public class EigenGWASArguments extends CommandArguments
 		this.mPheno = (i - 1);
 	}
 
-	public int getMphneo()
+	public int getMpheno()
 	{
 		return this.mPheno;
 	}
