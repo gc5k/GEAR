@@ -162,6 +162,7 @@ public class QPCACommandImpl extends CommandImpl
 			f.add(tokens[1]);
 			famID.add(f);
 		}
+		reader.close();
 	}
 
 	private double[][] grmMat;
