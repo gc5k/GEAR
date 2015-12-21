@@ -62,6 +62,7 @@ public enum Gear
 		addCommand(new gear.subcommands.eigengwas.EigenGWASCommand());
 		addCommand(new gear.subcommands.grm.GRMCommand());
 		addCommand(new gear.subcommands.qpca.QPCACommand());
+		addCommand(new gear.subcommands.locus.LocusCommand());
 	}
 
 	private void addCommand(Command cmd)

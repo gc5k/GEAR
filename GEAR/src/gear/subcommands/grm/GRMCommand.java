@@ -28,7 +28,7 @@ public class GRMCommand extends Command
 	@Override
 	public void prepareOptions(Options options)
 	{
-	    options.addOption(OptionBuilder.withDescription("Specify PLINK format .bed, .bim and .fam files").withLongOpt("bfile").hasArg().isRequired().create());
+	    options.addOption(OptionBuilder.withDescription(OPT_BFILE_DESC).withLongOpt(OPT_BFILE_LONG).hasArg().isRequired().create());
 	    options.addOption(OptionBuilder.withDescription("Specify the chromosomes for analysis").hasArg().create(OPT_CHR));
 	    options.addOption(OptionBuilder.withDescription("Make gz format").create(OPT_GZ));
 	    options.addOption(OptionBuilder.withDescription("Make txt format").create(OPT_TXT));

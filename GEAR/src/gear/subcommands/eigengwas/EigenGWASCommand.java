@@ -35,7 +35,7 @@ public class EigenGWASCommand extends Command
 	@SuppressWarnings("static-access")
 	public void prepareOptions(Options options)
 	{
-		options.addOption(OptionBuilder.withDescription("Specify PLINK format .bed, .bim and .fam files").withLongOpt("bfile").hasArg().isRequired().create());
+		options.addOption(OptionBuilder.withDescription(OPT_BFILE_DESC).withLongOpt(OPT_BFILE_LONG).hasArg().isRequired().create());
 		options.addOption(OptionBuilder.withDescription(OPT_PHE_DESC).withLongOpt(OPT_PHE_LONG).hasArg().isRequired().create());
 		options.addOption(OptionBuilder.withDescription(OPT_MPHE_DESC).withLongOpt(OPT_MPHE_LONG).hasArg().create());
 		options.addOption(OptionBuilder.withDescription(OPT_CHR_DESC).hasArg().create(OPT_CHR));
