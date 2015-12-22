@@ -36,9 +36,9 @@ public class DFPCommand extends Command
 		options.addOption(OptionBuilder.withDescription(OPT_BFILE_DESC).withLongOpt(OPT_BFILE_LONG).hasArg().create());
 		options.addOption(OptionBuilder.withDescription(OPT_BFILE2_DESC).withLongOpt(OPT_BFILE2_LONG).hasArg().create());
 		options.addOption(OptionBuilder.withDescription(OPT_EXTRACT_DESC).withLongOpt(OPT_EXTRACT_LONG).hasArg().create());
-		options.addOption(OptionBuilder.withDescription(OPT_NUM_MARKER_DESC).withLongOpt(OPT_NUM_MARKER_LONG).hasArg().create());
-		options.addOption(OptionBuilder.withDescription(OPT_LOW_CUTOFF_DESC).withLongOpt(OPT_LOW_CUTOFF_LONG).hasArg().create());
-		options.addOption(OptionBuilder.withDescription(OPT_HIGH_CUTOFF_DESC).withLongOpt(OPT_HIGH_CUTOFF_LONG).hasArg().create());
+		options.addOption(OptionBuilder.withDescription(OPT_NUM_MARKER_DESC).withLongOpt(OPT_NUM_MARKER_LONG).hasArg().create(OPT_NUM_MARKER));
+		options.addOption(OptionBuilder.withDescription(OPT_LOW_CUTOFF_DESC).withLongOpt(OPT_LOW_CUTOFF_LONG).hasArg().create(OPT_LOW_CUTOFF));
+		options.addOption(OptionBuilder.withDescription(OPT_HIGH_CUTOFF_DESC).withLongOpt(OPT_HIGH_CUTOFF_LONG).hasArg().create(OPT_HIGH_CUTOFF));
 		options.addOption(OptionBuilder.withDescription(OPT_SEED_DESC).withLongOpt(OPT_SEED_LONG).hasArg().create());
 	}
 
@@ -76,14 +76,17 @@ public class DFPCommand extends Command
 	private static final String OPT_EXTRACT_DEFAULT = null;
 	private static final String OPT_EXTRACT_DESC = "SNP list for calculating similarity";
 
+	private static final String OPT_NUM_MARKER = "m";
 	private static final String OPT_NUM_MARKER_LONG = "num-marker";
 	private static final String OPT_NUM_MARKER_DEFAULT = "100";
 	private static final String OPT_NUM_MARKER_DESC = "The number of markers for comparison.";
 	
+	private static final String OPT_LOW_CUTOFF = "l";
 	private static final String OPT_LOW_CUTOFF_LONG = "low-cutoff";
 	private static final String OPT_LOW_CUTOFF_DEFAULT = "-1";
 	private static final String OPT_LOW_CUTOFF_DESC = "The lower bound cutoff for similarity. Default is -1.0";
 
+	private static final String OPT_HIGH_CUTOFF = "h";
 	private static final String OPT_HIGH_CUTOFF_LONG = "high-cutoff";
 	private static final String OPT_HIGH_CUTOFF_DEFAULT = "1";
 	private static final String OPT_HIGH_CUTOFF_DESC = "The higher bound cutoff for similarity. Default is 1.0";
