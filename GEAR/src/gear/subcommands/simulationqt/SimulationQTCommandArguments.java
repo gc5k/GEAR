@@ -7,6 +7,24 @@ import gear.util.Logger;
 public class SimulationQTCommandArguments extends CommandArguments
 {
 
+	public void setRep(String rep)
+	{
+		this.rep = Integer.parseInt(rep);
+		if(this.rep < 1)
+		{
+			if (N < 1)
+			{
+				Logger.printUserLog("Replication should be greater than 0.\n GEAR quitted.");
+				System.exit(0);
+			}
+		}
+	}
+
+	public int getRep()
+	{
+		return this.rep;
+	}
+
 	public void setSampleSize(String n)
 	{
 		N = Integer.parseInt(n);
@@ -320,4 +338,5 @@ public class SimulationQTCommandArguments extends CommandArguments
 	private double hsq = 0.5;
 	private boolean isMakeBed = false;
 
+	private int rep = 1;
 }

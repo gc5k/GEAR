@@ -44,6 +44,8 @@ public class SimulationQTCommand extends Command
 		options.addOption(OptionBuilder.withDescription(OPT_FREQ_FILE_LONG_DESC).withLongOpt(OPT_FREQ_FILE_LONG).hasArg().create());
 
 		options.addOption(OptionBuilder.withDescription(OPT_LD_DESC).hasArg().create(OPT_LD));
+		options.addOption(OptionBuilder.withDescription(OPT_REP_DESC).hasArg().create(OPT_REP));
+
 		options.addOption(OptionBuilder.withDescription(OPT_RAND_LD_LONG_DESC).withLongOpt(OPT_RAND_LD_LONG).create());
 		options.addOption(OptionBuilder.withDescription(OPT_LD_RANGE_LONG_DESC).withLongOpt(OPT_RAND_LD_LONG).create());
 
@@ -64,6 +66,11 @@ public class SimulationQTCommand extends Command
 			simuQTArgs.setSampleSize(cmdLine.getOptionValue(OPT_SAMPLE_SIZE_LONG));
 		}
 		
+		if(cmdLine.hasOption(OPT_REP))
+		{
+			simuQTArgs.setRep(cmdLine.getOptionValue(OPT_REP));
+		}
+
 		if(cmdLine.hasOption(OPT_MARKER_LONG))
 		{
 			simuQTArgs.setMarkerNum(cmdLine.getOptionValue(OPT_MARKER_LONG));
@@ -191,4 +198,7 @@ public class SimulationQTCommand extends Command
 
 	private static final String OPT_MAKE_BED_LONG = "make-bed";
 	private static final String OPT_MAKE_BED_LONG_DESC = "make-bed";
+	
+	private static final String OPT_REP = "rep";
+	private static final String OPT_REP_DESC = "Replication for simulation. New error will be added to the same breeding values.";
 }

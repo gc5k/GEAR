@@ -39,6 +39,7 @@ public class SimulationQTCommandImpl extends CommandImpl
 		nullM = qtArgs.getNullMarkerNum();
 		seed = qtArgs.getSeed();
 		rnd.reSeed(seed);
+		rep = qtArgs.getRep();
 
 		getFreq();
 		getEffect();
@@ -63,7 +64,7 @@ public class SimulationQTCommandImpl extends CommandImpl
 
 		RealMatrix Meffect = new Array2DRowRealMatrix(effect);
 		genotype = new double[sample][M];
-		phenotype = new double[sample];
+		phenotype = new double[sample][rep];
 		BV = new double[sample];
 
 		for(int i = 0; i < sample; i++)
@@ -81,12 +82,17 @@ public class SimulationQTCommandImpl extends CommandImpl
 		double ve = vg * (1 - h2) / h2;
 		double E = Math.sqrt(ve);
 		Logger.printUserLog("Vg=" + fmt.format(vg));
-		for (int i = 0; i < sample; i++)
+		for (int i = 0; i < rep; i++)
 		{
-			phenotype[i] = BV[i] + rnd.nextGaussian(0, E);
+			double[] pv=new double[sample];
+			for (int j = 0; j < sample; j++)
+			{
+				phenotype[j][i] = BV[j] + rnd.nextGaussian(0, E);
+				pv[j] = phenotype[j][i];
+			}
+			double Vp=StatUtils.variance(pv);
+			Logger.printUserLog("Vp=" + fmt.format(Vp) + "; hsq=" + fmt.format(vg/Vp) + " for replicate " + (i+1));
 		}
-		double vp = StatUtils.variance(phenotype);
-		Logger.printUserLog("Vp=" + fmt.format(vp));
 		Logger.printUserLog("Total individuals visited (no selection): "
 				+ BV.length + "\n");
 	}
@@ -306,9 +312,14 @@ public class SimulationQTCommandImpl extends CommandImpl
 			fam.print(0 + " ");
 			fam.print(1 + " ");
 
-			fam.println(phenotype[i] + " ");
+			fam.println(phenotype[i][0] + " ");
 
-			phe.println("sample_" + i + " " + 1 + " " + BV[i] + " " + phenotype[i]);
+			phe.print("sample_" + i + " " + 1 + " " + BV[i]);
+			for (int j = 0; j < rep; j++)
+			{
+				phe.print(" " + phenotype[i][j]);
+			}
+			phe.println();
 		}
 
 		for (int i = 0; i < genotype.length; i++)
@@ -425,7 +436,7 @@ public class SimulationQTCommandImpl extends CommandImpl
 			pedout.print(0 + " ");
 			pedout.print(0 + " ");
 			pedout.print(1 + " ");
-			pedout.print(1 + " ");
+			pedout.print(phenotype[i][0] + " ");
 
 			for (int j = 0; j < genotype[i].length; j++)
 			{
@@ -443,7 +454,12 @@ public class SimulationQTCommandImpl extends CommandImpl
 			}
 			pedout.println();
 
-			phe.println("sample_" + i + " " + 1 + " " + 1 + " " + BV[i] + " " + phenotype[i]);
+			phe.print("sample_" + i + " " + 1 + " " + BV[i]);
+			for (int j = 0; j < rep; j++)
+			{
+				phe.print(" " + phenotype[i][j]);
+			}
+			phe.println();
 		}
 
 		for (int i = 0; i < M; i++)
@@ -480,10 +496,11 @@ public class SimulationQTCommandImpl extends CommandImpl
 	private int M;
 	private int nullM;
 	private int sample;
+	private int rep;
 
 	private double[][] genotype;
 	private double[] BV;
-	private double[] phenotype;
+	private double[][] phenotype;
 
 	private double[] effect;
 	private double[] freq;
@@ -495,4 +512,5 @@ public class SimulationQTCommandImpl extends CommandImpl
 
 	private String A1 = "A";
 	private String A2 = "C";
+
 }
