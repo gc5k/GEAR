@@ -12,11 +12,8 @@ public class SimulationQTCommandArguments extends CommandArguments
 		this.rep = Integer.parseInt(rep);
 		if(this.rep < 1)
 		{
-			if (N < 1)
-			{
-				Logger.printUserLog("Replication should be greater than 0.\n GEAR quitted.");
-				System.exit(0);
-			}
+			Logger.printUserLog("Replication should be greater than 0.\n GEAR quitted.");
+			System.exit(0);
 		}
 	}
 
@@ -226,9 +223,9 @@ public class SimulationQTCommandArguments extends CommandArguments
 	public void setLD(double ld)
 	{
 		this.ld = ld;
-		if(this.ld < 0 || this.ld >= 1)
+		if(this.ld < -1 || this.ld > 1)
 		{
-			Logger.printUserLog("LD should be between 0 and 1.\n GEAR quitted.");
+			Logger.printUserLog("LD should be between -1 and 1.\n GEAR quitted.");
 		}
 		isPlainLD = true;
 		isRandLD = false;
@@ -238,7 +235,7 @@ public class SimulationQTCommandArguments extends CommandArguments
 	{
 		ldRangeLow = Double.parseDouble(ld[0]);
 		ldRangeHigh = Double.parseDouble(ld[1]);
-		if (ldRangeLow <= 0 || ldRangeHigh >= 1)
+		if (ldRangeLow <= -1 || ldRangeHigh >= 1)
 		{
 			Logger.printUserError("LD (Lewontin's) frequency is out of range: " + ldRangeLow + "--" + ldRangeHigh);
 		}

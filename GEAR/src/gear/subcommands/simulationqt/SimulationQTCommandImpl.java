@@ -57,7 +57,7 @@ public class SimulationQTCommandImpl extends CommandImpl
 		}
 
 	}
-	
+
 	private void generateSampleNoSelection()
 	{
 		DecimalFormat fmt = new DecimalFormat("#.###E0");
@@ -162,6 +162,7 @@ public class SimulationQTCommandImpl extends CommandImpl
 					if (l.length < 1) continue;
 					freq[c++] = Double.parseDouble(l[0]);
 				}
+				reader.close();
 			}
 			catch (IOException e)
 			{
@@ -228,6 +229,7 @@ public class SimulationQTCommandImpl extends CommandImpl
 					if (l.length < 1) continue;
 					effect[c++] = Double.parseDouble(l[0]);
 				}
+				reader.close();
 			}
 			catch (IOException e)
 			{
@@ -331,8 +333,6 @@ public class SimulationQTCommandImpl extends CommandImpl
 			geno.println();
 		}
 
-		geno.close();
-
 		try
 		{
 			bedout.writeByte(ConstValues.PLINK_BED_BYTE1);
@@ -397,6 +397,7 @@ public class SimulationQTCommandImpl extends CommandImpl
 			eff.println("rs" + i + " " + A1 + " " + effect[i]);
 		}
 
+		geno.close();
 		phe.close();
 		bim.close();
 		fam.close();

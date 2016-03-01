@@ -19,12 +19,11 @@ public class EigenGWASCommand extends Command
 
 	public EigenGWASCommand()
 	{
-		addAlias("egwas");
 	}
 
 	public String getName()
 	{
-		return "eigengwas";
+		return "egwas";
 	}
 
 	public String getDescription()

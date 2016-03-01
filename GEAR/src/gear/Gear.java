@@ -53,6 +53,7 @@ public enum Gear
 		addCommand(new gear.subcommands.profile.ProfileCommand());
 		addCommand(new gear.subcommands.simulationfam.SimuFamilyCommand());
 		addCommand(new gear.subcommands.simulationqt.SimulationQTCommand());
+		addCommand(new gear.subcommands.simulationcc.SimulationCCCommand());
 		addCommand(new gear.subcommands.exsnp.ExSNPCommand());
 		addCommand(new gear.subcommands.lmdr.LMDRCommand());
 		addCommand(new gear.subcommands.ppcbatch.PPCBatchCommand());
@@ -63,6 +64,9 @@ public enum Gear
 		addCommand(new gear.subcommands.grm.GRMCommand());
 		addCommand(new gear.subcommands.qpca.QPCACommand());
 		addCommand(new gear.subcommands.locus.LocusCommand());
+		addCommand(new gear.subcommands.at.AtCommand());
+		addCommand(new gear.subcommands.arch.ArchCommand());
+		addCommand(new gear.subcommands.ebatchgwas.EbatchGWASCommand());
 	}
 
 	private void addCommand(Command cmd)

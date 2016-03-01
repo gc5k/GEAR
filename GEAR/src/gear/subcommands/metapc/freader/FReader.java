@@ -321,6 +321,7 @@ public class FReader
 				cnt++;
 			}
 		}
+		reader.close();
 
 		if (cntMissSNP > 0)
 		{

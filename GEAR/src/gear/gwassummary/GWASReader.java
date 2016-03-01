@@ -41,10 +41,14 @@ public class GWASReader
 			Logger.printUserLog("No cohort left. GEAR quitted.");
 			System.exit(0);
 		}
-		else
+		else if (workingMetaFile.size() > 1)
 		{
 			Logger.printUserLog(workingMetaFile.size() + " cohorts are remained for analysis.\n");
 //			Logger.printUserLog("Genomic inflation factors are estimated from the provided p values.\n");
+		}
+		else 
+		{
+			Logger.printUserLog(workingMetaFile.size() + " cohort is remained for analysis.\n");
 		}
 
 		gc = new double[workingMetaFile.size()];
@@ -413,6 +417,7 @@ public class GWASReader
 				cnt++;
 			}
 		}
+		reader.close();
 
 		if (cntMissSNP > 0)
 		{

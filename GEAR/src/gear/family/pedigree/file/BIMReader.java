@@ -52,7 +52,7 @@ public class BIMReader extends MapFile
 			{
 				markerSet.add(name);
 			}
-		} while ((tokens = reader.readTokens(6)) != null);
+		}
 
 		numMarkerOriginal = snpList.size();
 	}

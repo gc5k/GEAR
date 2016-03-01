@@ -61,6 +61,7 @@ public class QPCACommandImpl extends CommandImpl
 				}
 			}
 		}
+		grmBin.close();
 	}
 
 	private void readGrm(BufferedReader reader, int numSubjects)
@@ -125,6 +126,11 @@ public class QPCACommandImpl extends CommandImpl
 			else
 			{
 				evaWriter.println(fmtp.format(eR[i]));				
+			}
+			
+			if((i+1) <= qpcaArgs.getEV())
+			{
+				Logger.printUserLog("The " + (i+1) + "th eigenvalue is " + eR[i] + "."); 
 			}
 		}
 		evaWriter.close();

@@ -186,6 +186,7 @@ public class BlupPcaCommandImpl extends CommandImpl
 				}
 			}
 		}
+		grmBin.close();
 	}
 
 	private void readGrm(BufferedReader reader, int numSubjects)

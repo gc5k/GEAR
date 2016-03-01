@@ -4,6 +4,34 @@ import gear.ConstValues;
 
 public class SNPMatch
 {
+	public static boolean isAlleleMatch(char a1, char a2)
+	{
+		if (a1 >= 97 && a1 <= 122)
+		{
+			a1 -= 32;
+		}
+		if (a2 >= 97 && a2 <= 122)
+		{
+			a2 -= 32;
+		}
+		return a1 == a2 ? true:false;
+	}
+
+	public static boolean isAlleleFlipMatch(char a1, char a2)
+	{
+		if (a1 >= 97 && a1 <= 122)
+		{
+			a1 -= 32;
+		}
+		if (a2 >= 97 && a2 <= 122)
+		{
+			a2 -= 32;
+		}
+
+		return a1 == Flip(a2) ? true:false;
+	}
+
+	
 	public static boolean isBiallelic(char a1, char a2)
 	{
 		return a1 != ConstValues.MISSING_ALLELE_CHAR && a2 != ConstValues.MISSING_ALLELE_CHAR;
