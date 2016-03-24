@@ -67,6 +67,7 @@ public enum Gear
 		addCommand(new gear.subcommands.at.AtCommand());
 		addCommand(new gear.subcommands.arch.ArchCommand());
 		addCommand(new gear.subcommands.ebatchgwas.EbatchGWASCommand());
+		addCommand(new gear.subcommands.eigengwasdom.EigenGWASDomCommand());
 	}
 
 	private void addCommand(Command cmd)

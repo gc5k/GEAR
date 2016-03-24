@@ -80,6 +80,34 @@ public class PopStat
 		return axsq;
 	}
 
+	public static double[][] calGenoFrequency(GenotypeMatrix G, int numMarker)
+	{
+		double[][] gfreq = new double[numMarker][3];
+		for (int i = 0; i < G.getGRow(); i++)
+		{
+			for (int j = 0; j < numMarker; j++)
+			{
+				int g = G.getAdditiveScoreOnFirstAllele(i, j);
+				if(g != ConstValues.BINARY_MISSING_GENOTYPE)
+				{
+					gfreq[j][g]++;
+				}
+			}
+		}
+
+		for (int i = 0; i < numMarker; i++)
+		{
+			double wa = gfreq[i][0] + gfreq[i][1] + gfreq[i][2];
+			if (wa > 0)
+			{
+				gfreq[i][0] /= wa;
+				gfreq[i][1] /= wa;
+				gfreq[i][2] /= wa;
+			}
+		}
+		return gfreq;
+	}
+
 	public static void Imputation (GenotypeMatrix G)
 	{
 		Logger.printUserLog("Implementing naive imputatation......");

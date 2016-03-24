@@ -164,8 +164,8 @@ public final class SimuFamilyCommandImpl extends CommandImpl
 				recSex[i][0] = recSex[i][1] = rnd.nextUniform(0.01, 0.5);
 			}
 		}
-		recSex[0][0] = maf[0];
-		recSex[0][1] = maf[1];
+		recSex[0][0] = 0.5;
+		recSex[0][1] = 0.5;
 
 		gm = new int[famArgs.getNumberOfFamilies() * famSize][famArgs.getNumberOfMarkers()];
 		phe = new double[famArgs.getNumberOfFamilies() * famSize];
