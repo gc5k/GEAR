@@ -371,7 +371,7 @@ public class SimulationCCCommandImpl extends CommandImpl
 				{
 					if(c >= M)
 					{
-						Logger.printUserLog("Have already read " + M + " allelic effects.  Ignore the rest of the content in '" + ccArgs.getFreqFile() + "'.");
+						Logger.printUserLog("Have already read " + M + " allelic effects.  Ignore the rest of the content in '" + ccArgs.getPolyEffectFile() + "'.");
 						break;
 					}
 
