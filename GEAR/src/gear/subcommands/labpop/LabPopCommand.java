@@ -134,7 +134,7 @@ public class LabPopCommand extends Command
 	}
 
 	private static final char OPT_SIZE = 'n';
-	private static final String OPT_SIZE_LONG = "size";
+	private static final String OPT_SIZE_LONG = "sample-size";
 	private static final String OPT_SIZE_DESC = "Specify the sample size.";
 
 	private static final char OPT_NUM_MARKERS = 'm';
