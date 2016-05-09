@@ -28,14 +28,15 @@ public final class SimuFamilyCommandImpl extends CommandImpl
 		famArgs = (SimuFamilyCommandArguments) cmdArgs;
 
 		init();
-
 		try
 		{
 			ibdF = new PrintWriter(new BufferedWriter(new FileWriter(famArgs.getOutRoot() + ".ibdo")));
+			ibdSibF = new PrintWriter(new BufferedWriter(new FileWriter(famArgs.getOutRoot() + ".ibd")));
 		}
 		catch (IOException e)
 		{
 			Logger.handleException(e, "An I/O exception occurred when creating the .ibdo file.");
+			Logger.handleException(e, "An I/O exception occurred when creating the .ibd file.");
 		}
 
 		for (int i = 0; i < famArgs.getNumberOfFamilies(); i++)
@@ -43,6 +44,7 @@ public final class SimuFamilyCommandImpl extends CommandImpl
 			generateNuclearFamily(NKid[i], NAffKid[i], i);
 		}
 		ibdF.close();
+		ibdSibF.close();
 
 		writePheno();
 
@@ -66,46 +68,81 @@ public final class SimuFamilyCommandImpl extends CommandImpl
 		NAffKid = new int[famArgs.getNumberOfFamilies()];
 		Arrays.fill(NAffKid, 1);
 
-		if (famArgs.isQTL())
+//		if (famArgs.isQTL())
+//		{
+//			FileUtil.exists(famArgs.getQTLFile());
+//			BufferedReader qtlFile = FileUtil.FileOpen(famArgs.getQTLFile());
+//			String line = null;
+//			try
+//			{
+//				int cn = 0;
+//				while( (line = qtlFile.readLine()) != null)
+//				{
+//					String[] s = line.split(",");
+//					if (cn == 0)
+//					{
+//						qtlIdx[0] = Integer.parseInt(s[0]);
+//						qtlIdx[1] = Integer.parseInt(s[1]);
+//					}
+//					if (cn == 1)
+//					{
+//						qtlEff[0][0] = Double.parseDouble(s[0]);
+//						qtlEff[0][1] = Double.parseDouble(s[1]);
+//						qtlEff[1][0] = Double.parseDouble(s[2]);
+//						qtlEff[1][1] = Double.parseDouble(s[3]);
+//					}
+//					if (cn == 2)
+//					{
+//						h2[0] = Double.parseDouble(s[0]);
+//						h2[1] = Double.parseDouble(s[1]);
+//					}
+//					cn++;
+//				}
+//			}
+//			catch (IOException e)
+//			{
+//				e.printStackTrace();
+//			}
+//		}
+//		else 
+		if (famArgs.isHsq())
 		{
-			FileUtil.exists(famArgs.getQTLFile());
-			BufferedReader qtlFile = FileUtil.FileOpen(famArgs.getQTLFile());
+			hsq = famArgs.getHsq();
+		}
+
+		effect = new double[famArgs.getNumberOfMarkers()];
+		if(famArgs.isPolyEffectFile())
+		{
+			BufferedReader reader = FileUtil.FileOpen(famArgs.getPolyEffectFile());
+
+			int c = 0;
 			String line = null;
 			try
 			{
-				int cn = 0;
-				while( (line = qtlFile.readLine()) != null)
+				while ((line = reader.readLine()) != null)
 				{
-					String[] s = line.split(",");
-					if (cn == 0)
+					if(c >= famArgs.getNumberOfMarkers())
 					{
-						qtlIdx[0] = Integer.parseInt(s[0]);
-						qtlIdx[1] = Integer.parseInt(s[1]);
+						Logger.printUserLog("Have already read " + famArgs.getNumberOfMarkers() + " allelic effects.  Ignore the rest of the content in '" + famArgs.getPolyEffectFile() + "'.");
+						break;
 					}
-					if (cn == 1)
-					{
-						qtlEff[0][0] = Double.parseDouble(s[0]);
-						qtlEff[0][1] = Double.parseDouble(s[1]);
-						qtlEff[1][0] = Double.parseDouble(s[2]);
-						qtlEff[1][1] = Double.parseDouble(s[3]);
-					}
-					if (cn == 2)
-					{
-						h2[0] = Double.parseDouble(s[0]);
-						h2[1] = Double.parseDouble(s[1]);
-					}
-					cn++;
+
+					line.trim();
+					String[] l = line.split(ConstValues.WHITESPACE_DELIMITER);
+					if (l.length < 1) continue;
+					effect[c++] = Double.parseDouble(l[0]);
 				}
+				reader.close();
 			}
 			catch (IOException e)
 			{
-				e.printStackTrace();
+				Logger.handleException(e,
+						"An exception occurred when reading the effect file '"
+								+ famArgs.getPolyEffectFile() + "'.");
 			}
 		}
-		else if (famArgs.isHsq())
+		else 
 		{
-			hsq = famArgs.getHsq();
-			effect = new double[famArgs.getNumberOfMarkers()];
 			for(int i = 0; i < effect.length; i++)
 			{
 				effect[i] = rnd.nextGaussian(0, 1);
@@ -115,7 +152,7 @@ public final class SimuFamilyCommandImpl extends CommandImpl
 		maf = new double[famArgs.getNumberOfMarkers()];
 		if (famArgs.isPlainMAF())
 		{
-			Arrays.fill(maf, famArgs.getMAF());			
+			Arrays.fill(maf, famArgs.getMAF());
 		}
 		else if (famArgs.isUnifMAF())
 		{
@@ -176,18 +213,33 @@ public final class SimuFamilyCommandImpl extends CommandImpl
 		int[][] p = sampleChromosome(famIdx, 0);
 		int[][] m = sampleChromosome(famIdx, 1);
 
-		for (int i = 0; i < nkid; i++)
-		{
-			int[][] rc = generateBaby(p, m, famIdx, i + 2);
+			int[][] rc1 = generateBaby(p, m, famIdx, 2);
 			for (int j = 0; j < 2; j++)
 			{
-				for (int k = 0; k < rc.length; k++)
+				for (int k = 0; k < rc1.length; k++)
 				{
-					ibdF.print(rc[k][j] + " ");
+					ibdF.print(rc1[k][j] + " ");
 				}
 				ibdF.println();
 			}
+
+			int[][] rc2 = generateBaby(p, m, famIdx, 3);
+			for (int j = 0; j < 2; j++)
+			{
+				for (int k = 0; k < rc2.length; k++)
+				{
+					ibdF.print(rc2[k][j] + " ");
+				}
+				ibdF.println();
+			}
+		
+		int[] ibd = new int[maf.length];
+		for (int i = 0; i < maf.length; i++)
+		{
+			ibd[i] = 2 - Math.abs(rc1[i][0] - rc2[i][0]) - Math.abs(rc1[i][1] - rc2[i][1]);
+			ibdSibF.print(ibd[i] + " ");
 		}
+		ibdSibF.println();
 	}
 
 	private int[][] sampleChromosome(int famIdx, int shift)
@@ -219,17 +271,9 @@ public final class SimuFamilyCommandImpl extends CommandImpl
 			gm[famIdx * famSize + shift][i] = v[i][0] + v[i][1];
 		}
 
-		if(famArgs.isQTL())
+		for(int i = 0; i < maf.length; i++)
 		{
-			phe[famIdx * famSize +shift] += v[qtlIdx[0]][0] * qtlEff[0][0] + v[qtlIdx[0]][1] * qtlEff[0][1];
-			phe[famIdx * famSize +shift] += v[qtlIdx[1]][0] * qtlEff[1][0] + v[qtlIdx[1]][1] * qtlEff[1][1];			
-		}
-		else
-		{
-			for(int i = 0; i < maf.length; i++)
-			{
-				phe[famIdx * famSize + shift] += gm[famIdx * famSize + shift][i] * effect[i];
-			}
+			phe[famIdx * famSize + shift] += gm[famIdx * famSize + shift][i] * effect[i];
 		}
 		return v;
 	}
@@ -266,17 +310,9 @@ public final class SimuFamilyCommandImpl extends CommandImpl
 			gm[famIdx * famSize + shift][i] = v[i][0] + v[i][1];
 		}
 
-		if(famArgs.isQTL())
+		for (int i = 0; i < maf.length; i++)
 		{
-			phe[famIdx * famSize +shift] += v[qtlIdx[0]][0] * qtlEff[0][0] + v[qtlIdx[0]][1] * qtlEff[0][1];
-			phe[famIdx * famSize +shift] += v[qtlIdx[1]][0] * qtlEff[1][0] + v[qtlIdx[1]][1] * qtlEff[1][1];			
-		}
-		else
-		{
-			for(int i = 0; i < maf.length; i++)
-			{
-				phe[famIdx * famSize + shift] += gm[famIdx * famSize + shift][i] * effect[i];
-			}
+			phe[famIdx * famSize + shift] += gm[famIdx * famSize + shift][i] * effect[i];
 		}
 
 		return rc;
@@ -308,15 +344,9 @@ public final class SimuFamilyCommandImpl extends CommandImpl
 			}
 		}
 		double vb = StatUtils.variance(p);
+		Logger.printUserLog("Genetic variation is "+vb);
 		double ve = 0;
-		if (famArgs.isHsq())
-		{
-			ve = vb * (1-hsq) / hsq;
-		}
-		else
-		{
-			ve = vb * (1-h2[0]) / h2[0];			
-		}
+		ve = vb * (1-hsq) / hsq;
 
 		for (int h = 0; h < famArgs.getNumberOfFamilies(); h++)
 		{
@@ -635,12 +665,12 @@ public final class SimuFamilyCommandImpl extends CommandImpl
 	private int[][] gm = null;
 	private final int famSize = 4;
 	private double[] phe = null;
-	private int[] qtlIdx = {5, 5};
-	private double[][] qtlEff = {{1, 1}, {1,1}};
-	private double[] h2 = {0.5, 0.5};
+//	private double[] h2 = {0.5, 0.5};
 
 	private double hsq;
 	private double[] effect;
 
 	PrintWriter ibdF = null;
+	PrintWriter ibdSibF = null;
+	
 }

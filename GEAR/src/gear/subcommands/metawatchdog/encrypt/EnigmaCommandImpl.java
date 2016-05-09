@@ -35,7 +35,7 @@ public class EnigmaCommandImpl extends CommandImpl
 		{
 			for(int j = 0; j < beta[i].length; j++)
 			{
-				beta[i][j] = rnd.nextGaussian(0, 1);				
+				beta[i][j] = rnd.nextGaussian(0, 1);
 			}
 		}
 		

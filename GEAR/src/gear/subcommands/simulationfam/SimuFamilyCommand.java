@@ -41,8 +41,10 @@ public final class SimuFamilyCommand extends Command
 		options.addOption(OptionBuilder.withDescription(OPT_REC_SEX_DESC).withLongOpt(OPT_REC_SEX_LONG).hasArgs(2).create(OPT_REC_SEX));
 		options.addOption(OptionBuilder.withDescription(OPT_REC_UNIF_DESC).withLongOpt(OPT_REC_UNIF_LONG).create());
 
-		options.addOption(OptionBuilder.withDescription(OPT_QTL_DESC).withLongOpt(OPT_QTL_LONG).hasArg().create(OPT_QTL));
+//		options.addOption(OptionBuilder.withDescription(OPT_QTL_DESC).withLongOpt(OPT_QTL_LONG).hasArg().create(OPT_QTL));
 		options.addOption(OptionBuilder.withDescription(OPT_HSQ_DESC).hasArg().create(OPT_HSQ));
+		
+		options.addOption(OptionBuilder.withDescription(OPT_EFFECT_FILE_LONG_DESC).withLongOpt(OPT_EFFECT_FILE_LONG).hasArg().create());
 	}
 
 	@Override
@@ -79,13 +81,18 @@ public final class SimuFamilyCommand extends Command
 		}
 
 //h2
-		if(cmdLine.hasOption(OPT_QTL))
-		{
-			cmdArgs.setQTLFile(cmdLine.getOptionValue(OPT_QTL));
-		}
+//		if(cmdLine.hasOption(OPT_QTL))
+//		{
+//			cmdArgs.setQTLFile(cmdLine.getOptionValue(OPT_QTL));
+//		}
 		if(cmdLine.hasOption(OPT_HSQ))
 		{
 			cmdArgs.setHsq(cmdLine.getOptionValue(OPT_HSQ));
+		}
+
+		if(cmdLine.hasOption(OPT_EFFECT_FILE_LONG))
+		{
+			cmdArgs.setPolyEffectFile(cmdLine.getOptionValue(OPT_EFFECT_FILE_LONG));
 		}
 
 		if(cmdLine.hasOption(OPT_MAKE_BED))
@@ -135,11 +142,15 @@ public final class SimuFamilyCommand extends Command
 	private static final String OPT_REC_UNIF_LONG = "unif-rec";
 	private static final String OPT_REC_UNIF_DESC = "Use uniform distribution recombination fractions beween (0~0.5)";
 
-	private static final String OPT_QTL = "q";
-	private static final String OPT_QTL_LONG = "qtl";
-	private static final String OPT_QTL_DESC = "qtl parameters (locp, locm, effm, effp, h2)";
+//	private static final String OPT_QTL = "q";
+//	private static final String OPT_QTL_LONG = "qtl";
+//	private static final String OPT_QTL_DESC = "qtl parameters (locp, locm, effm, effp, h2)";
 	
 	private static final String OPT_HSQ = "hsq";
 	private static final String OPT_HSQ_DESC = "Heritability for polygenic model, 0.5 by default.";
+	
+	private static final String OPT_EFFECT_FILE_LONG = "effect-file";
+	private static final String OPT_EFFECT_FILE_LONG_DESC = "Read effect from the file specified.";
+
 
 }

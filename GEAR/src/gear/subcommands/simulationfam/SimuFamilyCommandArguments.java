@@ -1,6 +1,7 @@
 package gear.subcommands.simulationfam;
 
 import gear.subcommands.CommandArguments;
+import gear.util.FileUtil;
 import gear.util.Logger;
 
 public final class SimuFamilyCommandArguments extends CommandArguments
@@ -140,23 +141,23 @@ public final class SimuFamilyCommandArguments extends CommandArguments
 		return UnifrecFlag;
 	}
 
-	public void setQTLFile(String f)
-	{
-		qtlFile = f;
-		isQTLFlag = true;
-		isHsqFlag = false;
-	}
+//	public void setQTLFile(String f)
+//	{
+//		qtlFile = f;
+//		isQTLFlag = true;
+//		isHsqFlag = false;
+//	}
 
 //start h2
-	public String getQTLFile()
-	{
-		return qtlFile;
-	}
-
-	public boolean isQTL()
-	{
-		return isQTLFlag;
-	}
+//	public String getQTLFile()
+//	{
+//		return qtlFile;
+//	}
+//
+//	public boolean isQTL()
+//	{
+//		return isQTLFlag;
+//	}
 
 	public void setHsq(String h2)
 	{
@@ -167,7 +168,7 @@ public final class SimuFamilyCommandArguments extends CommandArguments
 			System.exit(0);
 		}
 		isHsqFlag = true;
-		isQTLFlag = false;
+//		isQTLFlag = false;
 	}
 
 	public double getHsq()
@@ -190,6 +191,26 @@ public final class SimuFamilyCommandArguments extends CommandArguments
 	{
 		this.makeBed = true;
 	}
+	
+	public void setPolyEffectFile(String f)
+	{
+		FileUtil.exists(f);
+		polyEffectFile = f;
+		isPolyEffectFile = true;
+	}
+
+	public boolean isPolyEffectFile()
+	{
+		return isPolyEffectFile;
+	}
+
+	public String getPolyEffectFile()
+	{
+		return polyEffectFile;
+	}
+
+	private boolean isPolyEffectFile = false;
+	private String polyEffectFile = null;
 
 	private int numFams = 100;
 	private int numMarkers = 100;
@@ -209,8 +230,8 @@ public final class SimuFamilyCommandArguments extends CommandArguments
 	private boolean SexrecFlag = false;
 	private boolean UnifrecFlag = false;
 
-	private String qtlFile = null;
-	private boolean isQTLFlag = false;
+//	private String qtlFile = null;
+//	private boolean isQTLFlag = false;
 	private double hsq = 0.5;
 	private boolean isHsqFlag = true;
 }
