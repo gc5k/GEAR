@@ -262,6 +262,26 @@ public class LabPopCommandArguments extends CommandArguments
 		return replication;
 	}
 
+	public void set1234mode()
+	{
+		is1234mode = true;
+		isATGCmode = false;
+	}
+	public boolean is1234mode()
+	{
+		return is1234mode;
+	}
+	
+	public void setATGCmode()
+	{
+		isATGCmode = true;
+		is1234mode = false;
+	}
+	public boolean isATGCmode()
+	{
+		return isATGCmode;
+	}
+
 	private boolean isBC = false;
 	private boolean isF2 = true;
 	private boolean isDH = false;
@@ -285,4 +305,6 @@ public class LabPopCommandArguments extends CommandArguments
 	
 	private RandomDataImpl rnd = new RandomDataImpl();		
 
+	private boolean is1234mode = false;
+	private boolean isATGCmode = true;
 }

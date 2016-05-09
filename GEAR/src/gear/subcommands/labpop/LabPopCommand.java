@@ -45,6 +45,9 @@ public class LabPopCommand extends Command
 		options.addOption(OptionBuilder.withDescription(OPT_RIL_DESC).create(OPT_RIL));
 		
 		options.addOption(OptionBuilder.withDescription(OPT_REP_DESC).hasArg().create(OPT_REP));
+		
+		options.addOption(OptionBuilder.withDescription(OPT_ATGC_DESC).withLongOpt(OPT_ATGC_LONG).create());
+		options.addOption(OptionBuilder.withDescription(OPT_1234_DESC).withLongOpt(OPT_1234_LONG).create());
 	}
 
 	@Override
@@ -112,6 +115,15 @@ public class LabPopCommand extends Command
 			lpArgs.setReplication(cmdLine.getOptionValue(OPT_REP));
 		}
 
+		if (cmdLine.hasOption(OPT_1234_LONG))
+		{
+			lpArgs.set1234mode();
+		}
+		if (cmdLine.hasOption(OPT_ATGC_LONG))
+		{
+			lpArgs.setATGCmode();
+		}
+
 		return lpArgs;
 	}
 
@@ -162,5 +174,11 @@ public class LabPopCommand extends Command
 	
 	private static final String OPT_REP = "rep";
 	private static final String OPT_REP_DESC = "Replication.";
+
+	private static final String OPT_ATGC_LONG = "agtc-mode";
+	private static final String OPT_ATGC_DESC = "Using atgc coding.";
+
+	private static final String OPT_1234_LONG = "1234-mode";
+	private static final String OPT_1234_DESC = "Using 1234 coding.";
 
 }

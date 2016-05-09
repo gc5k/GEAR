@@ -28,6 +28,18 @@ public class LabPopCommandImpl extends CommandImpl
 		bv = new double[lpArgs.getSampleSize()];
 		phe = new double[lpArgs.getSampleSize()][lpArgs.getReplication()];
 
+		if (lpArgs.is1234mode())
+		{
+			A[0] = "1";
+			A[1] = "2";
+		}
+
+		if (lpArgs.isATGCmode())
+		{
+			A[0] = "A";
+			A[1] = "C";
+		}
+
 		rnd = new RandomDataImpl();
 		rnd.reSeed(lpArgs.getSeed());
 
@@ -369,7 +381,7 @@ public class LabPopCommandImpl extends CommandImpl
 	private LabPopCommandArguments lpArgs;
 	private RandomDataImpl rnd = new RandomDataImpl();
 
-	private final String[] A = { "A", "C" };
+	private String[] A = { "A", "C" };
 
 	private int[][] gm = null;
 	private double[] bv = null;
