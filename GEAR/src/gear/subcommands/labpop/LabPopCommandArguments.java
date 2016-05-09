@@ -77,7 +77,7 @@ public class LabPopCommandArguments extends CommandArguments
 			{
 				if(c >= getNumberOfMarkers())
 				{
-					Logger.printUserLog("Have already read " + getNumberOfMarkers() + " allelic effects.  Ignore the rest of the content in '" + getPolyEffectFile() + "'.");
+					Logger.printUserLog("Have already read " + getNumberOfMarkers() + " recombination fractions.  Ignore the rest of the content in '" + f + "'.");
 					break;
 				}
 
@@ -85,14 +85,19 @@ public class LabPopCommandArguments extends CommandArguments
 				String[] l = line.split(ConstValues.WHITESPACE_DELIMITER);
 				if (l.length < 1) continue;
 				rec[c++] = Double.parseDouble(l[0]);
+				if (rec[c] > 0.5 || rec[c] < 0)
+				{
+					Logger.printUserError("incorrect recombination fraction : '" + rec[c] + "' in line " + c + ".\n Gear quitted.");
+					System.exit(0);
+				}
 			}
 			reader.close();
 		}
 		catch (IOException e)
 		{
 			Logger.handleException(e,
-						"An exception occurred when reading the effect file '"
-								+ getPolyEffectFile() + "'.");
+						"An exception occurred when reading the recombination fraction file '"
+								+ f + "'.");
 		}
 
 		if (rec.length < getNumberOfMarkers())
