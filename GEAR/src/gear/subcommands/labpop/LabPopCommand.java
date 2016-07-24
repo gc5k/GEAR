@@ -58,6 +58,7 @@ public class LabPopCommand extends Command
 		lpArgs.setSampleSize(parseIntOptionValue(cmdLine, OPT_SIZE_LONG, "100"));
 		lpArgs.setNumberOfMarkers(parseIntOptionValue(cmdLine, OPT_NUM_MARKERS_LONG, "100"));
 		lpArgs.setSeed(parseLongOptionValue(cmdLine, OPT_SEED_LONG, OPT_SEED_DEFAULT));
+		lpArgs.setRec(parseDoubleOptionValueInRange(cmdLine, OPT_REC_LONG, "0.5", 0.0, 0.5));
 
 //rec
 		if (cmdLine.hasOption(OPT_REC_LONG))
@@ -175,7 +176,7 @@ public class LabPopCommand extends Command
 	private static final String OPT_REP = "rep";
 	private static final String OPT_REP_DESC = "Replication.";
 
-	private static final String OPT_ATGC_LONG = "agtc-mode";
+	private static final String OPT_ATGC_LONG = "atgc-mode";
 	private static final String OPT_ATGC_DESC = "Using atgc coding.";
 
 	private static final String OPT_1234_LONG = "1234-mode";
