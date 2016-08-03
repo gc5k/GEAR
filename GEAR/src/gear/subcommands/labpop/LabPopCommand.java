@@ -54,10 +54,10 @@ public class LabPopCommand extends Command
 	public CommandArguments parse(CommandLine cmdLine) throws CommandArgumentException
 	{
 		LabPopCommandArguments lpArgs = new LabPopCommandArguments();
+		lpArgs.setSeed(parseLongOptionValue(cmdLine, OPT_SEED_LONG, OPT_SEED_DEFAULT));
 
 		lpArgs.setSampleSize(parseIntOptionValue(cmdLine, OPT_SIZE_LONG, "100"));
 		lpArgs.setNumberOfMarkers(parseIntOptionValue(cmdLine, OPT_NUM_MARKERS_LONG, "100"));
-		lpArgs.setSeed(parseLongOptionValue(cmdLine, OPT_SEED_LONG, OPT_SEED_DEFAULT));
 		lpArgs.setRec(parseDoubleOptionValueInRange(cmdLine, OPT_REC_LONG, "0.5", 0.0, 0.5));
 
 //rec

@@ -120,7 +120,7 @@ public class LabPopCommandImpl extends CommandImpl
 		{
 			for (int i = 0; i < gm.length; i++)
 			{
-				int[] hp = sampleHaploid();
+				int[] hp = new int[lpArgs.getNumberOfMarkers()];
 
 				for (int j = 0; j < lpArgs.getNumberOfMarkers(); j++)
 				{
