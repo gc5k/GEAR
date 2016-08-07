@@ -111,7 +111,8 @@ public class LabPopCommandArguments extends CommandArguments
 //heritability	
 	public void setHsq(double h2)
 	{
-		isHsqFlag = true;
+		hsq = h2;
+//		isHsqFlag = true;
 	}
 
 	public double getHsq()
@@ -119,10 +120,10 @@ public class LabPopCommandArguments extends CommandArguments
 		return hsq;
 	}
 
-	public boolean isHsq()
-	{
-		return isHsqFlag;
-	}
+//	public boolean isHsq()
+//	{
+//		return isHsqFlag;
+//	}
 
 //polygenic effects
 	public void setEffect()
@@ -304,7 +305,7 @@ public class LabPopCommandArguments extends CommandArguments
 	private String RecFile = null;
 
 	private double hsq = 0.5;
-	private boolean isHsqFlag = true;
+//	private boolean isHsqFlag = true;
 	
 	private int replication = 1;
 	
