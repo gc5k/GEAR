@@ -28,7 +28,8 @@ public class GRMCommand extends Command
 	@Override
 	public void prepareOptions(Options options)
 	{
-	    options.addOption(OptionBuilder.withDescription(OPT_BFILE_DESC).withLongOpt(OPT_BFILE_LONG).hasArg().isRequired().create());
+	    options.addOption(OptionBuilder.withDescription(OPT_FILE_DESC).withLongOpt(OPT_FILE_LONG).hasArg().create());
+	    options.addOption(OptionBuilder.withDescription(OPT_BFILE_DESC).withLongOpt(OPT_BFILE_LONG).hasArg().create());
 	    options.addOption(OptionBuilder.withDescription("Specify the chromosomes for analysis").hasArg().create(OPT_CHR));
 	    options.addOption(OptionBuilder.withDescription("Make gz format").create(OPT_GZ));
 	    options.addOption(OptionBuilder.withDescription("Make txt format").create(OPT_TXT));
@@ -52,6 +53,10 @@ public class GRMCommand extends Command
 	    {
 	    	grmArgs.setVar();
 	    }
+		if (cmdLine.hasOption(OPT_CHR))
+		{
+			grmArgs.setChr(cmdLine.getOptionValue(OPT_CHR));
+		}
 		return grmArgs;
 	}
 
@@ -70,13 +75,15 @@ public class GRMCommand extends Command
 			throw new CommandArgumentException("--bfile and --file cannot be set together.");
 		}
 
-		grmArgs.setBFile(bfile);
-		grmArgs.setFile(file);
-
-		if (cmdLine.hasOption("chr"))
+		if (bfile != null)
 		{
-			grmArgs.setChr(cmdLine.getOptionValue("chr"));
+			grmArgs.setBFile(bfile);			
 		}
+		if (file != null)
+		{
+			grmArgs.setFile(file);			
+		}
+
 	}
 
 	@Override

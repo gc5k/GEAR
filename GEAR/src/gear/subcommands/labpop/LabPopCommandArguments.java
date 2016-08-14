@@ -153,7 +153,7 @@ public class LabPopCommandArguments extends CommandArguments
 			{
 				if(c >= getNumberOfMarkers())
 				{
-					Logger.printUserLog("Have already read " + getNumberOfMarkers() + " allelic effects.  Ignore the rest of the content in '" + getPolyEffectFile() + "'.");
+					Logger.printUserLog("Have already read " + getNumberOfMarkers() + " allelic effects. Ignore the rest of the content in '" + getPolyEffectFile() + "'.");
 					break;
 				}
 

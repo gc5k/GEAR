@@ -79,7 +79,7 @@ public class MetaPCCommandImpl extends CommandImpl
 				if (SNPMatch.isAmbiguous(ms.getA1(), ms.getA2()))
 				{
 					atgcSNP.add(snp);
-				}					
+				}
 
 				ArrayList<Integer> cnt = snpCntTable.get(snp);
 				if (cnt.get(cnt.size()-1) == fReader.getNumMetaFile())

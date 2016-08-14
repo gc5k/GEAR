@@ -229,7 +229,7 @@ public class EigenGWASDomImpl extends CommandImpl
 			e.printStackTrace();
 		}
 
-		Logger.printUserLog("Lambda GC is : " + lambdaGC);
+		Logger.printUserLog("Lambda GC is: " + lambdaGC);
 
 	}
 

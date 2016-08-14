@@ -109,6 +109,11 @@ public class EigenGWASImpl extends CommandImpl {
 					}
 				}
 
+				if(snp.isMonopolic() && N <=1) 
+				{
+					monoLoci++;
+					continue;
+				}
 				freq1 /= 2.0D * n1;
 				freq2 /= 2.0D * n2;
 				freq /= 2.0D * N;
@@ -118,12 +123,6 @@ public class EigenGWASImpl extends CommandImpl {
 
 				double b = sReg.getSlope();
 				double b_se = sReg.getSlopeStdErr();
-
-				if(snp.isMonopolic()) 
-				{
-					monoLoci++;
-					continue;
-				}
 
 				EigenGWASResult e1 = new EigenGWASResult(snp, freq, b, b_se, n1, freq1, n2, freq2, fst);
 				eGWASResult.add(e1);

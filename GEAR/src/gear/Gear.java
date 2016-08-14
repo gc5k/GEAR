@@ -69,6 +69,8 @@ public enum Gear
 		addCommand(new gear.subcommands.ebatchgwas.EbatchGWASCommand());
 		addCommand(new gear.subcommands.eigengwasdom.EigenGWASDomCommand());
 		addCommand(new gear.subcommands.labpop.LabPopCommand());
+		addCommand(new gear.subcommands.oath.nss.NSSCommand());
+		addCommand(new gear.subcommands.oath.synthesize.SynthCommand());
 	}
 
 	private void addCommand(Command cmd)

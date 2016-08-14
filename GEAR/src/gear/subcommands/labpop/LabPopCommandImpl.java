@@ -188,7 +188,14 @@ public class LabPopCommandImpl extends CommandImpl
 			pheno.print(fid + " ");
 			for (int j = 0; j < lpArgs.getReplication(); j++)
 			{
-				pheno.print(phe[i][j] + " ");
+				if (j != lpArgs.getReplication())
+				{
+					pheno.print(phe[i][j] + " ");					
+				}
+				else
+				{
+					pheno.print(phe[i][j]);					
+				}
 			}
 			pheno.println();
 		}
@@ -197,11 +204,7 @@ public class LabPopCommandImpl extends CommandImpl
 		for (int i = 0; i < lpArgs.getSampleSize(); i++)
 		{
 			int fid = (i + 1) * 10000;
-
-			breed.print(fid + " ");
-			breed.print(fid + " ");
-			breed.print(bv[i] + " ");
-			breed.println();
+			breed.println(fid + " " + fid + " " + bv[i]);
 		}
 		breed.close();
 		
