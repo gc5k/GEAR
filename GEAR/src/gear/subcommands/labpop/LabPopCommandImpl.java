@@ -188,9 +188,9 @@ public class LabPopCommandImpl extends CommandImpl
 			pheno.print(fid + " ");
 			for (int j = 0; j < lpArgs.getReplication(); j++)
 			{
-				if (j != lpArgs.getReplication())
+				if (j != (lpArgs.getReplication() - 1))
 				{
-					pheno.print(phe[i][j] + " ");					
+					pheno.print(phe[i][j] + " ");			
 				}
 				else
 				{
