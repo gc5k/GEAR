@@ -79,7 +79,7 @@ public class SimulationQTCommandImpl extends CommandImpl
 
 		double vg = StatUtils.variance(BV);
 		//rescale the phenotype to get the heritability and residual
-		double ve = vg * (1 - h2) / h2;
+		double ve = h2 == 0 ? 1:vg * (1 - h2) / h2;
 		double E = Math.sqrt(ve);
 		Logger.printUserLog("Vg=" + fmt.format(vg));
 		for (int i = 0; i < rep; i++)
@@ -238,6 +238,11 @@ public class SimulationQTCommandImpl extends CommandImpl
 								+ qtArgs.getPolyEffectFile() + "'.");
 			}
 		}
+		
+		if (h2 == 0)
+		{
+			Arrays.fill(effect, 0);
+		}
 	}
 
 	private void getDPrime()
@@ -284,6 +289,7 @@ public class SimulationQTCommandImpl extends CommandImpl
 		PrintWriter phe = null;
 		PrintWriter geno = null;
 		PrintWriter eff = null;
+		PrintWriter breed = null;
 
 		try
 		{
@@ -299,6 +305,7 @@ public class SimulationQTCommandImpl extends CommandImpl
 			geno = new PrintWriter(new BufferedWriter(new FileWriter(qtArgs.getOutRoot()
 					+ ".add")));
 			eff = new PrintWriter(new BufferedWriter(new FileWriter(qtArgs.getOutRoot() + ".rnd")));
+			breed = new PrintWriter(new BufferedWriter(new FileWriter(qtArgs.getOutRoot() + ".breed")));
 
 		} 
 		catch (IOException e)
@@ -316,7 +323,9 @@ public class SimulationQTCommandImpl extends CommandImpl
 
 			fam.println(phenotype[i][0] + " ");
 
-			phe.print("sample_" + i + " " + 1 + " " + BV[i]);
+			phe.print("sample_" + i + " " + 1);
+			breed.println("sample_" + i + " " + 1 + " " + BV[i]);
+
 			for (int j = 0; j < rep; j++)
 			{
 				phe.print(" " + phenotype[i][j]);
@@ -402,6 +411,7 @@ public class SimulationQTCommandImpl extends CommandImpl
 		bim.close();
 		fam.close();
 		eff.close();
+		breed.close();
 	}
 
 	public void writeFile()
@@ -411,6 +421,7 @@ public class SimulationQTCommandImpl extends CommandImpl
 		PrintWriter phe = null;
 		PrintWriter geno = null;
 		PrintWriter eff = null;
+		PrintWriter breed = null;
 		try
 		{
 			pedout = new PrintWriter(new BufferedWriter(new FileWriter(qtArgs.getOutRoot()
@@ -422,6 +433,7 @@ public class SimulationQTCommandImpl extends CommandImpl
 			geno = new PrintWriter(new BufferedWriter(new FileWriter(qtArgs.getOutRoot()
 					+ ".add")));
 			eff = new PrintWriter(new BufferedWriter(new FileWriter(qtArgs.getOutRoot() + ".rnd")));
+			breed = new PrintWriter(new BufferedWriter(new FileWriter(qtArgs.getOutRoot() + ".breed")));
 		}
 		catch (IOException e)
 		{
@@ -455,7 +467,8 @@ public class SimulationQTCommandImpl extends CommandImpl
 			}
 			pedout.println();
 
-			phe.print("sample_" + i + " " + 1 + " " + BV[i]);
+			phe.print("sample_" + i + " " + 1);
+			breed.println("sample_" + i + " " + 1 + " " + BV[i]);
 			for (int j = 0; j < rep; j++)
 			{
 				phe.print(" " + phenotype[i][j]);
@@ -486,6 +499,7 @@ public class SimulationQTCommandImpl extends CommandImpl
 		phe.close();
 		geno.close();
 		eff.close();
+		breed.close();
 	}
 	
 

@@ -420,6 +420,7 @@ public class SimulationCCCommandImpl extends CommandImpl
 		PrintWriter phe = null;
 		PrintWriter geno = null;
 		PrintWriter eff = null;
+		PrintWriter breed = null;
 
 		try
 		{
@@ -435,7 +436,7 @@ public class SimulationCCCommandImpl extends CommandImpl
 			geno = new PrintWriter(new BufferedWriter(new FileWriter(ccArgs.getOutRoot()
 					+ ".add")));
 			eff = new PrintWriter(new BufferedWriter(new FileWriter(ccArgs.getOutRoot() + ".rnd")));
-
+			breed = new PrintWriter(new BufferedWriter(new FileWriter(ccArgs.getOutRoot() + ".breed")));
 		} 
 		catch (IOException e)
 		{
@@ -450,8 +451,9 @@ public class SimulationCCCommandImpl extends CommandImpl
 			fam.print(0 + " ");
 			fam.print(1 + " ");
 
-			phe.print("sample_" + i + " " + 1 + " " + BV[i]);
-			phe.print(" " + phenotype[i] + " ");
+			phe.print("sample_" + i + " " + 1 + " ");
+
+			breed.println("sample_" + i + " " + 1 + " " + BV[i] + " " + phenotype[i]);
 
 			if (i < sample_cs)
 			{
@@ -543,6 +545,7 @@ public class SimulationCCCommandImpl extends CommandImpl
 		bim.close();
 		fam.close();
 		eff.close();
+		breed.close();
 	}
 
 	public void writeFile()
@@ -552,6 +555,7 @@ public class SimulationCCCommandImpl extends CommandImpl
 		PrintWriter phe = null;
 		PrintWriter geno = null;
 		PrintWriter eff = null;
+		PrintWriter breed = null;
 		try
 		{
 			pedout = new PrintWriter(new BufferedWriter(new FileWriter(ccArgs.getOutRoot()
@@ -563,6 +567,7 @@ public class SimulationCCCommandImpl extends CommandImpl
 			geno = new PrintWriter(new BufferedWriter(new FileWriter(ccArgs.getOutRoot()
 					+ ".add")));
 			eff = new PrintWriter(new BufferedWriter(new FileWriter(ccArgs.getOutRoot() + ".rnd")));
+			breed = new PrintWriter(new BufferedWriter(new FileWriter(ccArgs.getOutRoot() + ".breed")));
 		}
 		catch (IOException e)
 		{
@@ -604,8 +609,9 @@ public class SimulationCCCommandImpl extends CommandImpl
 			}
 			pedout.println();
 
-			phe.print("sample_" + i + " " + 1 + " " + BV[i]);
-			phe.print(" " + phenotype[i]);
+			phe.print("sample_" + i + " " + 1 + " ");			
+			breed.println("sample_" + i + " " + 1 + " " + BV[i]+" " + phenotype[i]);
+
 			if(i < sample_cs)
 			{
 				phe.println(" " + 2);
@@ -639,6 +645,7 @@ public class SimulationCCCommandImpl extends CommandImpl
 		phe.close();
 		geno.close();
 		eff.close();
+		breed.close();
 	}
 	
 
