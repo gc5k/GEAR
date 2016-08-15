@@ -6,6 +6,7 @@ import java.io.FileOutputStream;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.PrintWriter;
+import java.util.Arrays;
 
 import org.apache.commons.math.random.RandomDataImpl;
 import org.apache.commons.math.stat.StatUtils;
@@ -60,6 +61,10 @@ public class LabPopCommandImpl extends CommandImpl
 
 	private void generatePhenotype()
 	{
+		if (lpArgs.getHsq() == 0)
+		{
+			Arrays.fill(polyEffect, 0);
+		}
 		for (int i = 0; i < lpArgs.getSampleSize(); i++)
 		{
 			for (int j = 0; j < lpArgs.getNumberOfMarkers(); j++)
@@ -71,7 +76,7 @@ public class LabPopCommandImpl extends CommandImpl
 		double vb = StatUtils.variance(bv);
 		Logger.printUserLog("Genetic variation is "+vb);
 
-		double ve = vb / lpArgs.getHsq() * (1 - lpArgs.getHsq());
+		double ve = lpArgs.getHsq() == 0? 1: vb / lpArgs.getHsq() * (1 - lpArgs.getHsq());
 		for (int i = 0; i < lpArgs.getSampleSize(); i++)
 		{
 			for (int j = 0; j < lpArgs.getReplication(); j++)

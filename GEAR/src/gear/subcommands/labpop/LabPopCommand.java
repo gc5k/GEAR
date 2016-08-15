@@ -77,7 +77,7 @@ public class LabPopCommand extends Command
 //effect
 		if (cmdLine.hasOption(OPT_HSQ))
 		{
-			lpArgs.setHsq(parseDoubleOptionValueInRange(cmdLine, OPT_HSQ, "0.5", 0.01, 0.99));
+			lpArgs.setHsq(parseDoubleOptionValueInRange(cmdLine, OPT_HSQ, "0.5", 0.0, 0.99));
 		}
 		if (cmdLine.hasOption(OPT_EFFECT_FILE_LONG))
 		{
