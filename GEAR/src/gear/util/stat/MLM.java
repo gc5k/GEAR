@@ -89,6 +89,17 @@ public class MLM
 
 	public void MINQUE()
 	{
+		
+		if (! isMINQUE)
+		{
+			Logger.printUserLog("REML procedure");
+		}
+		else 
+		{
+			Logger.printUserLog("MINQUE procedure");
+		}
+
+		
 		double[] v = new double[A.length];
 		for(int i = 0; i < v.length; i++) v[i] = 1.0/v.length;
 
@@ -96,21 +107,13 @@ public class MLM
 		RealMatrix B = null;
 
 		ArrayList<Double> LOD = NewIt.newArrayList();
-		double lod_diff = 1;
 
 		int cnt = 0;
 		while(true)
 		{
-			if (! isMINQUE)
-			{
-				Logger.printUserLog("REML Iteration " + (cnt+1));
-			}
-			else 
-			{
-				Logger.printUserLog("MINQUE procedure");
-			}
-
 			VAR.add(var.copy());
+			
+			//prepare V matrix
 			RealMatrix V = null;
 			for (int i = 0; i < var.getRowDimension(); i++)
 			{
@@ -121,27 +124,31 @@ public class MLM
 					V=V.add(A[i].scalarMultiply(var.getEntry(i, 0)));
 				}
 			}
-//			System.out.println(V);
-
 			RealMatrix Int_V =  (new LUDecompositionImpl(V)).getSolver().getInverse();
 			RealMatrix t1 = (X.transpose()).multiply(Int_V);
 			RealMatrix t2 = t1.multiply(X);
 			RealMatrix tmp = (new LUDecompositionImpl(t2)).getSolver().getInverse();
 
-		//Cal LOD
 		//Estimate B
 			B = ((tmp.multiply(X.transpose())).multiply(Int_V)).multiply(Y);
 			RealMatrix yB = Y.subtract(X.multiply(B));
 			RealMatrix re = (yB.transpose().multiply(Int_V)).multiply(yB);
-//			double v_det = (new LUDecompositionImpl(V)).getDeterminant();
-//			double v_det = getSumEigenValues(V);
+
+		//Cal LOD, it's approximation, ignor determint(V)
 			double lodProxi = -0.5 * (Y.getRowDimension() * Math.log(2*3.1415) + re.getEntry(0, 0));
 			LOD.add(lodProxi);
+
 			if (isMINQUE && cnt == 1) break;
+
 			if (LOD.size() > 1)
 			{
-				lod_diff = Math.abs(LOD.get(LOD.size() -1) - LOD.get(LOD.size()-2));
-				if(lod_diff < 0.1) break;
+				double lod_diff = Math.abs(LOD.get(LOD.size() -1) - LOD.get(LOD.size()-2));
+				if (lod_diff < converge) break;
+			}
+
+			if (!isMINQUE)
+			{
+				Logger.printUserLog("Iteration " + (cnt+1));
 			}
 
 		//MINQUE
@@ -163,8 +170,6 @@ public class MLM
 			var = (reml_y.transpose().multiply((new LUDecompositionImpl(reml_m)).getSolver().getInverse())).transpose();
 
 			///
-			Logger.printUserLog(var.toString());
-
 			for (int i = 0; i < var.getRowDimension(); i++)
 			{
 				if (var.getEntry(i, 0) < 0)
@@ -177,6 +182,7 @@ public class MLM
 			cnt++;
 		}
 
+		//Summary
 		String s = new String("\n");
 		s += "Iteration\tLog(L)";
 		for (int i = 0; i <var.getRowDimension()-1; i++)
@@ -231,5 +237,5 @@ public class MLM
 	ArrayList<RealMatrix> VAR = NewIt.newArrayList();
 
 	private boolean isMINQUE = false;
-
+	private double converge = 0.1;
 }
