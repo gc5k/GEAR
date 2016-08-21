@@ -34,7 +34,7 @@ public class BlupPcaCommandImpl extends CommandImpl
 		InputDataSet data = new InputDataSet();
 		data.readSubjectIDFile(blupArgs.getGrmID());
 		data.readPhenotypeFile(blupArgs.getPhenotypeFile());
-		
+
 		readGrm(blupArgs, data.getNumberOfSubjects());
 
 		PLINKParser pp = PLINKParser.parse(blupArgs);

@@ -251,6 +251,18 @@ public class SynthFReader
 				continue;
 			}
 
+			if (OATHConst.isNA(tokens[KeyIdx[metaIdx][OATHConst.beta]]))
+			{
+				cntBadBeta++;
+				continue;
+			}
+			
+			if (OATHConst.isNA(tokens[KeyIdx[metaIdx][OATHConst.se]]))
+			{
+				cntBadSe++;
+				continue;
+			}
+
 //			if (KeyIdx[metaIdx][FConstant.BP] != -1 && ConstValues.isNA(tokens[KeyIdx[metaIdx][FConstant.BP]]))
 //			{
 //				cntBadBp++;

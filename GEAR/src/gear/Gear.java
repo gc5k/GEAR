@@ -71,6 +71,7 @@ public enum Gear
 		addCommand(new gear.subcommands.labpop.LabPopCommand());
 		addCommand(new gear.subcommands.oath.nss.NSSCommand());
 		addCommand(new gear.subcommands.oath.synthesize.SynthCommand());
+		addCommand(new gear.subcommands.reml.REMLCommand());
 	}
 
 	private void addCommand(Command cmd)

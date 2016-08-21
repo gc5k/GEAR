@@ -35,7 +35,7 @@ public class EigenGWASImpl extends CommandImpl {
 
 	public void execute(CommandArguments cmdArgs) 
 	{
-		this.eigenArgs = ((EigenGWASArguments) cmdArgs);
+		this.eigenArgs = (EigenGWASArguments) cmdArgs;
 
 		this.traitIdx = this.eigenArgs.getMpheno();
 		this.data.readSubjectIDFile(this.eigenArgs.getFam());
