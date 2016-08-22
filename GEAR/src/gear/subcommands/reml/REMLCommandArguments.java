@@ -146,7 +146,7 @@ public class REMLCommandArguments extends CommandArguments
 	}
 
 	private String covFile = null;
-	private int[] covIdx;
+	private int[] covIdx = {0};
 	private String grmBin;
 	private String grmText;  // root name of the GRM files
 	private String grmGZ;  // root name of the GRM files

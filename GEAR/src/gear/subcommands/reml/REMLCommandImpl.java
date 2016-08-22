@@ -36,7 +36,14 @@ public class REMLCommandImpl extends CommandImpl {
 			Logger.printUserLog(A3.length + " variance components included.");
 			Logger.printUserLog("");
 
-			mlm = new MLM(A3, Y, remlArgs.isMINQUE());
+			if (remlArgs.getCovFile() == null)
+			{
+				mlm = new MLM(A3, Y, remlArgs.isMINQUE());				
+			}
+			else
+			{
+				mlm = new MLM(A3, X, Y, remlArgs.isMINQUE(), remlArgs.getCovNumber());				
+			}
 		}
 		else
 		{
@@ -62,7 +69,7 @@ public class REMLCommandImpl extends CommandImpl {
 			}
 			else
 			{
-				mlm = new MLM(A, X, Y, remlArgs.isMINQUE());
+				mlm = new MLM(A, X, Y, remlArgs.isMINQUE(), remlArgs.getCovNumber());
 			}
 		}
 

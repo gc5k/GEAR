@@ -37,8 +37,10 @@ public class MLM
 		this.isMINQUE = isMINQUE;
 	}
 
-	public MLM(double[][] u2, double[][] x, double[] y, boolean isMINQUE)
+	public MLM(double[][] u2, double[][] x, double[] y, boolean isMINQUE, int[] covIdx)
 	{
+		this.covIdx = new int[covIdx.length];
+		System.arraycopy(covIdx, 0, this.covIdx, 0, covIdx.length);
 		A = new Array2DRowRealMatrix[2];
 		A[0] = new Array2DRowRealMatrix(u2);
 		A[1] = new Array2DRowRealMatrix(y.length, y.length);
@@ -87,8 +89,11 @@ public class MLM
 		X = new Array2DRowRealMatrix(x);
 	}
 
-	public MLM(double[][][] u3, double[][] x, double[] y, boolean isMINQUE)
+	public MLM(double[][][] u3, double[][] x, double[] y, boolean isMINQUE, int[] covIdx)
 	{
+		this.covIdx = new int[covIdx.length];
+		System.arraycopy(covIdx, 0, this.covIdx, 0, covIdx.length);
+
 		A = new Array2DRowRealMatrix[u3.length+1];
 		for (int i = 0; i < u3.length; i++)
 		{
@@ -299,8 +304,7 @@ public class MLM
 			}
 			else 
 			{
-				Logger.printUserLog("Beta" + i +"\t"+ fmt.format(BETA.getEntry(i, 0)) + "\t" + fmt.format(Math.sqrt(V_BETA.getEntry(i, i))));
-
+				Logger.printUserLog("Cov" + (covIdx[i-1]+1) +"\t"+ fmt.format(BETA.getEntry(i, 0)) + "\t" + fmt.format(Math.sqrt(V_BETA.getEntry(i, i))));
 			}
 		}
 		Logger.printUserLog("");
@@ -369,6 +373,7 @@ public class MLM
 	private ArrayList<Double> LOD = NewIt.newArrayList();
 	private ArrayList<RealMatrix> VAR = NewIt.newArrayList();
 
+	private int[] covIdx = null;
 	private boolean isMINQUE = false;
 	private double converge = 0.1;
 	DecimalFormat fmt = new DecimalFormat("0.000");
