@@ -17,47 +17,114 @@ public class REMLCommandImpl extends CommandImpl {
 		remlArgs = (REMLCommandArguments)cmdArgs;
 
 		MLM mlm = null;
+		double[] Y = null;
+		double[][] X = null;
 		if (remlArgs.isGRMList())
 		{
-			InputDataSet data = new InputDataSet();
-			data.readSubjectIDFile(remlArgs.getGrmList()[0] + ".grm.id");
-			data.readPhenotypeFile(remlArgs.getPhenotypeFile());
-
-			double[] Y = new double[data.getNumberOfSubjects()];
-			for(int subjectIdx = 0; subjectIdx < Y.length; subjectIdx++)
+			if (remlArgs.getCovFile() == null)
 			{
-				Y[subjectIdx] = data.isPhenotypeMissing(subjectIdx, remlArgs.getPhenotypeIdx()) ? 0 : data.getPhenotype(subjectIdx, remlArgs.getPhenotypeIdx());
-			}			
+				data = new InputDataSet(remlArgs.getGrmList()[0] + ".grm.id", remlArgs.getPhenotypeFile(), remlArgs.getPhenotypeIdx());
+			}
+			else
+			{
+				data = new InputDataSet(remlArgs.getGrmList()[0] + ".grm.id", remlArgs.getPhenotypeFile(), remlArgs.getCovFile(), remlArgs.getPhenotypeIdx(), remlArgs.getCovNumber());
+				X = readCovar();
+			}
 
-			double[][][] A3 = readGrmList(data.getNumberOfSubjects());
-			Logger.printUserLog("Sample size: " + Y.length);
+			Y = readPhenotype();
+			double[][][] A3 = readGrmList(data.getSubjectFileSampleSize());
 			Logger.printUserLog(A3.length + " variance components included.");
 			Logger.printUserLog("");
-			
+
 			mlm = new MLM(A3, Y, remlArgs.isMINQUE());
 		}
 		else
 		{
-			InputDataSet data = new InputDataSet();
-			data.readSubjectIDFile(remlArgs.getGrmID());
-			data.readPhenotypeFile(remlArgs.getPhenotypeFile());
-
-			double[] Y = new double[data.getNumberOfSubjects()];
-			for(int subjectIdx = 0; subjectIdx < Y.length; subjectIdx++)
+			if (remlArgs.getCovFile() == null)
 			{
-				Y[subjectIdx] = data.isPhenotypeMissing(subjectIdx, remlArgs.getPhenotypeIdx()) ? 0 : data.getPhenotype(subjectIdx, remlArgs.getPhenotypeIdx());
+				data = new InputDataSet(remlArgs.getGrmID(), remlArgs.getPhenotypeFile(), remlArgs.getPhenotypeIdx());				
+			}
+			else
+			{
+				data = new InputDataSet(remlArgs.getGrmID(), remlArgs.getPhenotypeFile(), remlArgs.getCovFile(), remlArgs.getPhenotypeIdx(), remlArgs.getCovNumber());				
+				X = readCovar();
 			}
 
-			readGrm(data.getNumberOfSubjects());
-			Logger.printUserLog("Sample size: " + Y.length);
+			Y = readPhenotype();
+
+			readGrm(data.getSubjectFileSampleSize());
 			Logger.printUserLog("1 variance component included.");
 			Logger.printUserLog("");
 
-			mlm = new MLM(A, Y, remlArgs.isMINQUE());
+			if (remlArgs.getCovFile() == null)
+			{
+				mlm = new MLM(A, Y, remlArgs.isMINQUE());				
+			}
+			else
+			{
+				mlm = new MLM(A, X, Y, remlArgs.isMINQUE());
+			}
 		}
 
 		mlm.MINQUE();
 		mlm.printVC();
+	}
+
+	private double[][] readCovar()
+	{
+		int[] covIdx = data.getMatchedCovSubIdx();
+		double[][] x = new double[covIdx.length][remlArgs.getCovNumber().length];
+		for (int subjectIdx = 0; subjectIdx < covIdx.length; subjectIdx++)
+		{
+			for (int j = 0; j < remlArgs.getCovNumber().length; j++)
+			{
+				x[subjectIdx][j] = data.getCovariate(subjectIdx, remlArgs.getCovNumber()[j]);
+			}
+		}
+		return x;
+	}
+
+	private double[] readPhenotype()
+	{
+		int[] pheIdx = data.getMatchedPheSubIdx();
+		double[] y = new double[pheIdx.length];
+		for(int subjectIdx = 0; subjectIdx < y.length; subjectIdx++)
+		{
+			y[subjectIdx] = data.getPhenotype(pheIdx[subjectIdx], remlArgs.getPhenotypeIdx());
+		}
+		return y;
+	}
+	
+	private double[][][] lineUpGenotype(double[][][] B)
+	{
+		int[] subIdx = data.getMatchedSubIdx();
+		double[][][] b = new double[B.length][subIdx.length][subIdx.length];
+		
+		for (int i = 0; i < b.length; i++)
+		{
+			for (int j = 0; j < subIdx.length; j++)
+			{
+				for (int k = 0; k <= j; k++)
+				{
+					b[i][j][k] = b[i][k][j] = B[i][subIdx[j]][subIdx[k]];
+				}
+			}
+		}
+		return b;
+	}
+
+	private void lineUpGenotype(double[][] B)
+	{
+		int[] subIdx = data.getMatchedSubIdx();
+		A = new double[subIdx.length][subIdx.length];
+		
+		for (int i = 0; i < subIdx.length; i++)
+		{
+			for (int j = 0; j < subIdx.length; j++)
+			{
+				A[i][j] = A[j][i] = B[subIdx[i]][subIdx[j]];
+			}
+		}
 	}
 
 	private double[][][] readGrmList(int numSubjects)
@@ -80,7 +147,7 @@ public class REMLCommandImpl extends CommandImpl {
 			}
 			reader.close();
 		}
-		return B;
+		return lineUpGenotype(B);
 	}
 
 	private void readGrm(int numSubjects)
@@ -101,39 +168,41 @@ public class REMLCommandImpl extends CommandImpl {
 	private void readGrmBin(String fileName, int numSubjects)
 	{
 		BinaryInputFile grmBin = new BinaryInputFile(fileName, "GRM (binary)", /*littleEndian*/true);
-		A = new double[numSubjects][numSubjects];
+		double[][] B = new double[numSubjects][numSubjects];
 		Logger.printUserLog("Constructing A matrix: a " + numSubjects + " X " + numSubjects + " matrix.");
-		for (int i = 0; i < A.length; i++) 
+		for (int i = 0; i < B.length; i++) 
 		{
 			for (int j = 0; j <= i; j++)
 			{
 				if (grmBin.available() >= ConstValues.FLOAT_SIZE)
 				{
-					A[i][j] = A[j][i] = grmBin.readFloat();
+					B[i][j] = B[j][i] = grmBin.readFloat();
 				}
 			}
 		}
 		grmBin.close();
+		lineUpGenotype(B);
 	}
 
 	private void readGrm(BufferedReader reader, int numSubjects)
 	{
-		A = new double[numSubjects][numSubjects];
+		double[][] B = new double[numSubjects][numSubjects];
 		String[] tokens = null;
-		for (int i = 0; i < A.length; i++)
+		for (int i = 0; i < B.length; i++)
 		{
 			for (int j = 0; j <= i; j++)
 			{
 				if ((tokens = reader.readTokens(4)) != null) 
 				{
-					A[i][j] = A[j][i] = Double.parseDouble(tokens[3]);
+					B[i][j] = B[j][i] = Double.parseDouble(tokens[3]);
 				}
 			}
 		}
 		reader.close();
+		lineUpGenotype(B);
 	}
 
 	private double[][] A;
-	REMLCommandArguments remlArgs = null;
-
+	private REMLCommandArguments remlArgs = null;
+	private InputDataSet data = null;
 }

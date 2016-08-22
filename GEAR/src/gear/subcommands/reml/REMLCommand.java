@@ -30,6 +30,8 @@ public class REMLCommand extends Command {
 		options.addOption(OptionBuilder.withDescription(OPT_GRM_TEXT_DESC).withLongOpt(OPT_GRM_TEXT_LONG).hasArg().create());
 		options.addOption(OptionBuilder.withDescription(OPT_GRM_GZ_DESC).withLongOpt(OPT_GRM_GZ_LONG).hasArg().create());
 		options.addOption(OptionBuilder.withDescription(OPT_GRM_LIST_DESC).withLongOpt(OPT_GRM_LIST_LONG).hasArg().create());
+		options.addOption(OptionBuilder.withDescription(OPT_COVAR_DESC).hasArg().create(OPT_COVAR));
+		options.addOption(OptionBuilder.withDescription(OPT_COVAR_NUMBER_DESC).withLongOpt(OPT_COVAR_NUMBER).hasArgs().create());
 		options.addOption(OptionBuilder.withDescription(OPT_PHE_DESC).hasArg().isRequired().create(OPT_PHE));
 		options.addOption(OptionBuilder.withDescription(OPT_MPHE_DESC).hasArg().create(OPT_MPHE));
 		options.addOption(OptionBuilder.withDescription(OPT_MINQUE_DESC).create(OPT_MINQUE));
@@ -49,6 +51,17 @@ public class REMLCommand extends Command {
 		{
 			remlArgs.setMINQUE(true);
 		}
+
+		if (cmdLine.hasOption(OPT_COVAR))
+		{
+			remlArgs.setCovFile(cmdLine.getOptionValue(OPT_COVAR));
+		}
+		
+		if (cmdLine.hasOption(OPT_COVAR_NUMBER))
+		{
+			remlArgs.setCovNumber(cmdLine.getOptionValues(OPT_COVAR_NUMBER));
+		}
+
 		return remlArgs;
 	}
 
@@ -125,5 +138,11 @@ public class REMLCommand extends Command {
 
 	private final static String OPT_MINQUE = "minque";
 	private final static String OPT_MINQUE_DESC = "Minimum norm quadratic unbiased estimation";
-	
+
+	private final static String OPT_COVAR = "covar";
+	private final static String OPT_COVAR_DESC = "Specify the covariate file";
+
+	private final static String OPT_COVAR_NUMBER = "covar-number";
+	private final static String OPT_COVAR_NUMBER_DESC = "Specify the indices for covariate file";
+
 }

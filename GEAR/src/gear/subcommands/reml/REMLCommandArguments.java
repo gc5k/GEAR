@@ -113,6 +113,40 @@ public class REMLCommandArguments extends CommandArguments
 		return isMINQUE;
 	}
 
+	public void setCovFile(String cFile) 
+	{
+		FileUtil.exists(cFile);
+		covFile = cFile;
+	}
+
+	public String getCovFile()
+	{
+		return covFile;
+	}
+
+	public void setCovNumber(String[] cIdx) 
+	{
+		covIdx = new int[cIdx.length];
+		for (int i = 0; i < covIdx.length; i++)
+		{
+			covIdx[i] = Integer.parseInt(cIdx[i]);
+			if (covIdx[i] < 1)
+			{
+				Logger.printUserLog(covIdx[i] +"< 1. Incorrect index for covar-number.");
+				Logger.printUserLog("GEAR quittted.");
+				System.exit(1);
+			}
+			covIdx[i]--;
+		}
+	}
+	
+	public int[] getCovNumber()
+	{
+		return covIdx;
+	}
+
+	private String covFile = null;
+	private int[] covIdx;
 	private String grmBin;
 	private String grmText;  // root name of the GRM files
 	private String grmGZ;  // root name of the GRM files
@@ -122,6 +156,6 @@ public class REMLCommandArguments extends CommandArguments
 	private String[] grmGZList;
 	private boolean isMINQUE;
 
-	private String pheFile;
+	private String pheFile = null;
 	private int pheIdx = 0;
 }

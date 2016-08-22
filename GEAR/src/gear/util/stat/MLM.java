@@ -37,6 +37,33 @@ public class MLM
 		this.isMINQUE = isMINQUE;
 	}
 
+	public MLM(double[][] u2, double[][] x, double[] y, boolean isMINQUE)
+	{
+		A = new Array2DRowRealMatrix[2];
+		A[0] = new Array2DRowRealMatrix(u2);
+		A[1] = new Array2DRowRealMatrix(y.length, y.length);
+		for(int i = 0; i < A[1].getColumnDimension(); i++)
+		{
+			A[1].setEntry(i, i, 1);
+		}
+
+		Y = new Array2DRowRealMatrix(y);
+
+		double[][] x_ = new double[x.length][x[0].length+1];
+		for (int i = 0; i < x_.length; i++)
+		{
+			x_[i][0] = 1;
+		}
+
+		for (int i = 0; i < x.length; i++)
+		{
+			System.arraycopy(x[i], 0, x_[i], 1, x[i].length);
+		}
+		X = new Array2DRowRealMatrix(x_);
+
+		this.isMINQUE = isMINQUE;
+	}
+	
 	public MLM(double[][][] u3, double[] y, boolean isMINQUE)
 	{
 		A = new Array2DRowRealMatrix[u3.length+1];
@@ -75,7 +102,7 @@ public class MLM
 
 		Y = new Array2DRowRealMatrix(y);
 
-		double[][] x_ = new double[x.length+1][x[0].length];
+		double[][] x_ = new double[x.length][x[0].length+1];
 		for (int i = 0; i < x_.length; i++)
 		{
 			x_[i][0] = 1;
@@ -83,7 +110,7 @@ public class MLM
 
 		for (int i = 0; i < x.length; i++)
 		{
-			System.arraycopy(x[i], 0, x_[i+1], 1, x[i].length);
+			System.arraycopy(x[i], 0, x_[i], 1, x[i].length);
 		}
 		X = new Array2DRowRealMatrix(x_);
 	}
@@ -227,8 +254,8 @@ public class MLM
 	{
 		//Summary VC
 		Logger.printUserLog("");
-		Logger.printUserLog("----------------------------------------------------------------------------------------------");
 		Logger.printUserLog("Summary result of VC analysis");
+		Logger.printUserLog("----------------------------------------------------------------------------------------------");
 		Logger.printUserLog("Comp.\tEstimate\tSE\tProp.");
 		RealMatrix v_ = VAR.get(VAR.size()-1);
 
@@ -259,14 +286,10 @@ public class MLM
 		}
 		Logger.printUserLog("----------------------------------------------------------------------------------------------");
 
-		String s = new String();
 		Logger.printUserLog("");
+		Logger.printUserLog("Generalized linear square estimation (GLSE) for fixed effects");
 		Logger.printUserLog("----------------------------------------------------------------------------------------------");
-		Logger.printUserLog("Generalized linear estimation (GLE) for fixed effects");
-		for (int i = 0; i < BETA.getRowDimension(); i++)
-		{
-			Logger.printUserLog("Para.\tEstimate\tSE");
-		}
+		Logger.printUserLog("Para.\tEstimate\tSE");
 
 		for (int i = 0; i < BETA.getRowDimension(); i++)
 		{
@@ -276,17 +299,18 @@ public class MLM
 			}
 			else 
 			{
-				Logger.printUserLog("Beta\t" + i +"\t"+ fmt.format(BETA.getEntry(i, 0)) + "\t" + fmt.format(Math.sqrt(V_BETA.getEntry(i, i))));
+				Logger.printUserLog("Beta" + i +"\t"+ fmt.format(BETA.getEntry(i, 0)) + "\t" + fmt.format(Math.sqrt(V_BETA.getEntry(i, i))));
 
 			}
 		}
 		Logger.printUserLog("");
-		Logger.printUserLog("Covariance structrue for GLE");
+		Logger.printUserLog("Covariance structrue for GLSE");
 		for (int i = 0; i < V_BETA.getRowDimension(); i++)
 		{
+			String s = new String();
 			for (int j = 0; j <= i; j++)
 			{
-				s += fmt.format(Math.sqrt(V_BETA.getEntry(i, j))) + "\t";
+				s += fmt.format(V_BETA.getEntry(i, j)) + "\t";
 			}
 			Logger.printUserLog(s);
 		}
