@@ -18,7 +18,7 @@ public class SubjectIDFile implements SubjectOrder
 				reader.errorPreviousLine("Subject " + id + " is duplicated.");
 			}
 		}
-		
+
 		if (subjectMap.getNumberOfEntries() == 0)
 		{
 			reader.errorPreviousLine("The file is empty.");

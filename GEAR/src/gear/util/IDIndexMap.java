@@ -44,7 +44,7 @@ public class IDIndexMap<E>
 		idArray.set(idx2, id1);
 		idArray.set(idx1, id2);
 	}
-	
+
 	private HashMap<E, Integer> id2idx = new HashMap<E, Integer>();
 	private ArrayList<E> idArray = new ArrayList<E>();
 }
