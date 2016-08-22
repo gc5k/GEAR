@@ -13,7 +13,7 @@ public class PhenotypeFile implements SubjectOrder
 //	{
 //		this(fileName, /*hasHeaders*/false);
 //	}
-	
+
 	public PhenotypeFile(String fileName, boolean hasHeaders)
 	{
 		this.fileName = fileName;
@@ -71,7 +71,7 @@ public class PhenotypeFile implements SubjectOrder
 					}
 				}						
 			}
-			
+
 			phenotypes.add(phenotypesOfThisSubject);
 			isMissing.add(isMissingOfThisSubject);
 		} while ((tokens = reader.readTokens(numCols)) != null);
