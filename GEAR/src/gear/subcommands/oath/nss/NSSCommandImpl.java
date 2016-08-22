@@ -32,7 +32,7 @@ public class NSSCommandImpl extends CommandImpl
 	private SumStatQC ssQC;
 	private GenotypeMatrix gm;
 	private int[] traitIdx;
-	private InputDataSet data = new InputDataSet();
+	private InputDataSet data = null;
 	private ArrayList<NSSGWASResult> nssResult;
 
 	private double lambdaGC = 1;
@@ -43,8 +43,11 @@ public class NSSCommandImpl extends CommandImpl
 		this.nssArgs = ((NSSCommandArguments) cmdArgs);
 
 		this.traitIdx = this.nssArgs.getMpheno();
-		this.data.readSubjectIDFile(this.nssArgs.getFam());
-		this.data.readPhenotypeFile(this.nssArgs.getPhenotypeFile());
+		int[] covIdx = new int[this.traitIdx.length - 1];
+		System.arraycopy(this.traitIdx, 1, covIdx, 0, covIdx.length);
+		this.data = new InputDataSet(this.nssArgs.getFam(), this.nssArgs.getPhenotypeFile(), this.nssArgs.getPhenotypeFile(), this.nssArgs.getMpheno()[0], covIdx);
+//		this.data.readSubjectIDFile(this.nssArgs.getFam());
+//		this.data.readPhenotypeFile(this.nssArgs.getPhenotypeFile());
 
 		PLINKParser pp = PLINKParser.parse(this.nssArgs);
 		this.sf = new SampleFilter(pp.getPedigreeData(), pp.getMapData());
@@ -74,15 +77,16 @@ public class NSSCommandImpl extends CommandImpl
 	private void printCovMat()
 	{
 		ArrayList<ArrayList<Double>> Dat = NewIt.newArrayList();
-		for (int subjectIdx = 0; subjectIdx < this.data.getNumberOfSubjects(); subjectIdx++)
+		int[] pheIdx = data.getMatchedPheSubIdx();
+		for (int subjectIdx = 0; subjectIdx < pheIdx.length; subjectIdx++)
 		{
 			ArrayList<Double> dat = NewIt.newArrayList();
 			boolean isMissing = false;
 			for (int j = 0; j < traitIdx.length; j++)
 			{
-				if (!this.data.isPhenotypeMissing(subjectIdx, this.traitIdx[j]))
+				if (!this.data.isPhenotypeMissing(pheIdx[subjectIdx], this.traitIdx[j]))
 				{
-					dat.add((double) this.data.getPhenotype(subjectIdx, this.traitIdx[j]));
+					dat.add((double) this.data.getPhenotype(pheIdx[subjectIdx], this.traitIdx[j]));
 				}
 				else
 				{
@@ -129,20 +133,17 @@ public class NSSCommandImpl extends CommandImpl
 		ChiSquaredDistributionImpl ci = new ChiSquaredDistributionImpl(1);
 		ArrayList<SNP> snpList = this.mapFile.getMarkerList();
 
-		double[] Y = new double[this.data.getNumberOfSubjects()];
-		ArrayList<Integer> pheIdx = NewIt.newArrayList();
+		int[] pIdx = data.getMatchedPheSubIdx();
+		double[] Y = new double[pIdx.length];
 		ArrayList<Double> pArray = NewIt.newArrayList();
 
 		for (int subjectIdx = 0; subjectIdx < Y.length; subjectIdx++) 
 		{
-			if (!this.data.isPhenotypeMissing(subjectIdx, this.traitIdx[tIdx])) 
-			{
-				pheIdx.add(Integer.valueOf(subjectIdx));
-				Y[subjectIdx] = this.data.getPhenotype(subjectIdx, this.traitIdx[tIdx]);
-			}
+			Y[subjectIdx] = this.data.getPhenotype(pIdx[subjectIdx], this.traitIdx[tIdx]);
 		}
 		Y = StatUtils.normalize(Y);
 
+		int[] subIdx = data.getMatchedSubIdx();
 		for (int i = 0; i < this.gm.getNumMarker(); i++)
 		{
 			SNP snp = (SNP) snpList.get(i);
@@ -155,9 +156,9 @@ public class NSSCommandImpl extends CommandImpl
 				double xx = 0;
 				double mx = 0;
 
-				for (int j = 0; j < pheIdx.size(); j++)
+				for (int j = 0; j < subIdx.length; j++)
 				{
-					int idx = ((Integer) pheIdx.get(j)).intValue();
+					int idx = subIdx[j];
 					int g = this.gm.getAdditiveScoreOnFirstAllele(idx, i);
 					if (g != 3) {
 						sReg.addData(g, Y[idx]);
