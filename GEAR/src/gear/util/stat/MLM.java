@@ -8,6 +8,7 @@ import org.apache.commons.math.linear.EigenDecomposition;
 import org.apache.commons.math.linear.EigenDecompositionImpl;
 import org.apache.commons.math.linear.LUDecompositionImpl;
 import org.apache.commons.math.linear.RealMatrix;
+import org.apache.commons.math.stat.StatUtils;
 
 import gear.util.Logger;
 import gear.util.NewIt;
@@ -72,7 +73,7 @@ public class MLM
 			A[A.length].setEntry(i, i, 1);
 		}
 
-		Y = new Array2DRowRealMatrix(this.y);
+		Y = new Array2DRowRealMatrix(y);
 
 		double[][] x_ = new double[x.length+1][x[0].length];
 		for (int i = 0; i < x_.length; i++)
@@ -89,31 +90,45 @@ public class MLM
 
 	public void MINQUE()
 	{
-		
-		if (! isMINQUE)
+		if (!isMINQUE)
 		{
-			Logger.printUserLog("REML procedure");
+			Logger.printUserLog("REML estimation (may be slow if sample size is big...; negative VC is constrained to zero)");
 		}
 		else 
 		{
-			Logger.printUserLog("MINQUE procedure");
+			Logger.printUserLog("MINQUE estimation (may be slow if sample size is big...)");
 		}
 
-		
 		double[] v = new double[A.length];
-		for(int i = 0; i < v.length; i++) v[i] = 1.0/v.length;
+		double vt = StatUtils.variance(Y.getColumn(0));
+		for(int i = 0; i < v.length; i++) v[i] = vt/v.length;
+
+		Logger.printUserLog("Prior values for variance components are " + fmt.format(vt/v.length)+".");
+		Logger.printUserLog("");
+
+		String ts = new String("Iter.\tLog(L)\t");
+		for(int i = 0; i < A.length-1; i++)
+		{
+			ts += "\t" + "V" + (i+1);
+		}
+		ts +="\tVe";
+		Logger.printUserLog(ts);
 
 		RealMatrix var = new Array2DRowRealMatrix(v);
 		RealMatrix B = null;
 
-		ArrayList<Double> LOD = NewIt.newArrayList();
+		RealMatrix Int_V = null;
+		RealMatrix X_IntV = null;
+		RealMatrix X_IntV_X = null;
+		RealMatrix X_IntV_X__Int = null;
+		RealMatrix reml_m = null;
 
 		int cnt = 0;
 		while(true)
 		{
 			VAR.add(var.copy());
 			
-			//prepare V matrix
+		//prepare V matrix
 			RealMatrix V = null;
 			for (int i = 0; i < var.getRowDimension(); i++)
 			{
@@ -124,13 +139,13 @@ public class MLM
 					V=V.add(A[i].scalarMultiply(var.getEntry(i, 0)));
 				}
 			}
-			RealMatrix Int_V =  (new LUDecompositionImpl(V)).getSolver().getInverse();
-			RealMatrix t1 = (X.transpose()).multiply(Int_V);
-			RealMatrix t2 = t1.multiply(X);
-			RealMatrix tmp = (new LUDecompositionImpl(t2)).getSolver().getInverse();
+			Int_V =  (new LUDecompositionImpl(V)).getSolver().getInverse();
+			X_IntV = (X.transpose()).multiply(Int_V);
+			X_IntV_X = X_IntV.multiply(X);
+			X_IntV_X__Int = (new LUDecompositionImpl(X_IntV_X)).getSolver().getInverse();
 
 		//Estimate B
-			B = ((tmp.multiply(X.transpose())).multiply(Int_V)).multiply(Y);
+			B = ((X_IntV_X__Int.multiply(X.transpose())).multiply(Int_V)).multiply(Y);
 			RealMatrix yB = Y.subtract(X.multiply(B));
 			RealMatrix re = (yB.transpose().multiply(Int_V)).multiply(yB);
 
@@ -138,24 +153,17 @@ public class MLM
 			double lodProxi = -0.5 * (Y.getRowDimension() * Math.log(2*3.1415) + re.getEntry(0, 0));
 			LOD.add(lodProxi);
 
-			if (isMINQUE && cnt == 1) break;
-
 			if (LOD.size() > 1)
 			{
 				double lod_diff = Math.abs(LOD.get(LOD.size() -1) - LOD.get(LOD.size()-2));
 				if (lod_diff < converge) break;
 			}
 
-			if (!isMINQUE)
-			{
-				Logger.printUserLog("Iteration " + (cnt+1));
-			}
-
 		//MINQUE
-			RealMatrix tmp2 = (((Int_V.multiply(X)).multiply(tmp)).multiply(X.transpose())).multiply(Int_V);
+			RealMatrix tmp2 = (((Int_V.multiply(X)).multiply(X_IntV_X__Int)).multiply(X.transpose())).multiply(Int_V);
 			RealMatrix Q = Int_V.subtract(tmp2);
 
-			RealMatrix reml_m = new Array2DRowRealMatrix(A.length, A.length);
+			reml_m = new Array2DRowRealMatrix(A.length, A.length);
 			RealMatrix reml_y = new Array2DRowRealMatrix(A.length, 1);
 
 			for (int i = 0; i < reml_m.getRowDimension(); i++)
@@ -169,46 +177,143 @@ public class MLM
 			}
 			var = (reml_y.transpose().multiply((new LUDecompositionImpl(reml_m)).getSolver().getInverse())).transpose();
 
-			///
-			for (int i = 0; i < var.getRowDimension(); i++)
+			cnt++;
+			if ( isMINQUE )
 			{
-				if (var.getEntry(i, 0) < 0)
+				if (cnt == 1)
 				{
-					Logger.printUserLog(i+1 + " VC was constrained to 0.");
-					var.setEntry(i, 0, 0);
+					break;
 				}
 			}
-
-			cnt++;
-		}
-
-		//Summary
-		String s = new String("\n");
-		s += "Iteration\tLog(L)";
-		for (int i = 0; i <var.getRowDimension()-1; i++)
-		{
-			s += "\t" + "V" + (i+1);
-		}
-		s += "\tVe\n";
-		DecimalFormat fmt = new DecimalFormat("0.000");
-
-		for (int i = 1; i < LOD.size(); i++)
-		{
-			s +=i +"\t" + fmt.format(LOD.get(i)) + "\t";
-			RealMatrix v_ = VAR.get(i);
-			for(int j = 0; j < v_.getRowDimension(); j++)
+			else
 			{
-				s += fmt.format(v_.getEntry(j, 0)) + " ";
+				if (cnt == 1)
+				{
+					continue;
+				}
+
+				printIter(cnt);
 			}
-			s += "\n";
 		}
-		Logger.printUserLog(s);
+
+		printIter(cnt+1);
+
+		BETA = B;
+		V_BETA = X_IntV_X__Int.multiply(X_IntV_X).multiply(X_IntV_X__Int);
+		V_VAR = ((new LUDecompositionImpl(reml_m)).getSolver().getInverse()).scalarMultiply(2);
+	}
+	
+	public void printIter(int cnt)
+	{
+		String its = new String();
+		its +=  (new Integer(cnt-1)).toString() + "\t";
+		its += fmt.format(LOD.get(LOD.size() -1));
+
+		RealMatrix var_ = VAR.get(cnt-1);
+		for (int i = 0; i < var_.getRowDimension(); i++)
+		{
+			its += "\t" + fmt.format(var_.getEntry(i, 0));
+			if (var_.getEntry(i, 0) < 0)
+			{
+				Logger.printUserLog(i+1 + " VC was constrained to 0.");
+				var_.setEntry(i, 0, 0);
+			}
+		}
+		Logger.printUserLog(its);				
+
+	}
+	
+	public void printVC()
+	{
+		//Summary VC
+		Logger.printUserLog("");
+		Logger.printUserLog("----------------------------------------------------------------------------------------------");
+		Logger.printUserLog("Summary result of VC analysis");
+		Logger.printUserLog("Comp.\tEstimate\tSE\tProp.");
+		RealMatrix v_ = VAR.get(VAR.size()-1);
+
+		double Vp = 0;
+		for (int i = 0; i < v_.getRowDimension(); i++)
+		{
+			Vp += v_.getEntry(i, 0);
+		}
+
+		for (int i = 0; i < v_.getRowDimension() -1; i++)
+		{
+			Logger.printUserLog("V" + (i+1) + "\t" + fmt.format(v_.getEntry(i, 0)) + "\t" + fmt.format(Math.sqrt(V_VAR.getEntry(i, i)))+"\t" + fmt.format(v_.getEntry(i, 0)/Vp));
+		}
+		Logger.printUserLog("Ve" + "\t" + fmt.format(v_.getEntry(v_.getRowDimension()-1, 0))+ "\t" + fmt.format(Math.sqrt(V_VAR.getEntry(v_.getRowDimension()-1, v_.getRowDimension()-1))) +"\t" + fmt.format(v_.getEntry(v_.getRowDimension()-1, 0)/Vp) );
+		Logger.printUserLog("Vp\t" + fmt.format(Vp));
+
+		Logger.printUserLog("");
+		Logger.printUserLog("Covariance structure for VC");
+
+		for (int i = 0; i < V_VAR.getRowDimension(); i++)
+		{
+			String s = new String();
+			for (int j = 0; j <=i; j++)
+			{
+				s += fmt.format(V_VAR.getEntry(i, j)) + "\t";
+			}
+			Logger.printUserLog(s);
+		}
+		Logger.printUserLog("----------------------------------------------------------------------------------------------");
+
+		String s = new String();
+		Logger.printUserLog("");
+		Logger.printUserLog("----------------------------------------------------------------------------------------------");
+		Logger.printUserLog("Generalized linear estimation (GLE) for fixed effects");
+		for (int i = 0; i < BETA.getRowDimension(); i++)
+		{
+			Logger.printUserLog("Para.\tEstimate\tSE");
+		}
+
+		for (int i = 0; i < BETA.getRowDimension(); i++)
+		{
+			if (i == 0)
+			{
+				Logger.printUserLog("Mean\t" + fmt.format(BETA.getEntry(i, 0)) + "\t" + fmt.format(Math.sqrt(V_BETA.getEntry(i, i))));
+			}
+			else 
+			{
+				Logger.printUserLog("Beta\t" + i +"\t"+ fmt.format(BETA.getEntry(i, 0)) + "\t" + fmt.format(Math.sqrt(V_BETA.getEntry(i, i))));
+
+			}
+		}
+		Logger.printUserLog("");
+		Logger.printUserLog("Covariance structrue for GLE");
+		for (int i = 0; i < V_BETA.getRowDimension(); i++)
+		{
+			for (int j = 0; j <= i; j++)
+			{
+				s += fmt.format(Math.sqrt(V_BETA.getEntry(i, j))) + "\t";
+			}
+			Logger.printUserLog(s);
+		}
+		Logger.printUserLog("----------------------------------------------------------------------------------------------");
+
 	}
 
-	public RealMatrix getVar()
+	public RealMatrix getVC()
 	{
 		return VAR.get(VAR.size() - 1);
 	}
+
+	public RealMatrix getVarVC()
+	{
+		return V_VAR;
+	}
+
+	public RealMatrix getBeta()
+	{
+		return BETA;
+	}
+
+	public RealMatrix getVarBeta()
+	{
+		return V_BETA;
+	}
+
 	
 	private double getSumEigenValues(RealMatrix V)
 	{//det = sum(EigenValue)
@@ -230,12 +335,18 @@ public class MLM
 		return v_det;
 	}
 	
-	private double[] y = null;
 	private RealMatrix[] A = null;
 	private RealMatrix Y = null;
 	private RealMatrix X = null;
-	ArrayList<RealMatrix> VAR = NewIt.newArrayList();
+	private RealMatrix BETA = null;
+	private RealMatrix V_BETA = null;
+	private RealMatrix V_VAR = null;
+
+	private ArrayList<Double> LOD = NewIt.newArrayList();
+	private ArrayList<RealMatrix> VAR = NewIt.newArrayList();
 
 	private boolean isMINQUE = false;
 	private double converge = 0.1;
+	DecimalFormat fmt = new DecimalFormat("0.000");
+
 }

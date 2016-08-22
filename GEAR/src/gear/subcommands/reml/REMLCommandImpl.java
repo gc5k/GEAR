@@ -30,6 +30,10 @@ public class REMLCommandImpl extends CommandImpl {
 			}			
 
 			double[][][] A3 = readGrmList(data.getNumberOfSubjects());
+			Logger.printUserLog("Sample size: " + Y.length);
+			Logger.printUserLog(A3.length + " variance components included.");
+			Logger.printUserLog("");
+			
 			mlm = new MLM(A3, Y, remlArgs.isMINQUE());
 		}
 		else
@@ -44,10 +48,16 @@ public class REMLCommandImpl extends CommandImpl {
 				Y[subjectIdx] = data.isPhenotypeMissing(subjectIdx, remlArgs.getPhenotypeIdx()) ? 0 : data.getPhenotype(subjectIdx, remlArgs.getPhenotypeIdx());
 			}
 
-			readGrm(data.getNumberOfSubjects());			
+			readGrm(data.getNumberOfSubjects());
+			Logger.printUserLog("Sample size: " + Y.length);
+			Logger.printUserLog("1 variance component included.");
+			Logger.printUserLog("");
+
 			mlm = new MLM(A, Y, remlArgs.isMINQUE());
 		}
+
 		mlm.MINQUE();
+		mlm.printVC();
 	}
 
 	private double[][][] readGrmList(int numSubjects)
