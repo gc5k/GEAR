@@ -34,6 +34,7 @@ public class REMLCommand extends Command {
 		options.addOption(OptionBuilder.withDescription(OPT_COVAR_NUMBER_DESC).withLongOpt(OPT_COVAR_NUMBER).hasArgs().create());
 		options.addOption(OptionBuilder.withDescription(OPT_PHE_DESC).hasArg().isRequired().create(OPT_PHE));
 		options.addOption(OptionBuilder.withDescription(OPT_MPHE_DESC).hasArg().create(OPT_MPHE));
+		options.addOption(OptionBuilder.withDescription(OPT_KEEP_DESC).hasArg().create(OPT_KEEP));
 		options.addOption(OptionBuilder.withDescription(OPT_MINQUE_DESC).create(OPT_MINQUE));
 	}
 
@@ -60,6 +61,11 @@ public class REMLCommand extends Command {
 		if (cmdLine.hasOption(OPT_COVAR_NUMBER))
 		{
 			remlArgs.setCovNumber(cmdLine.getOptionValues(OPT_COVAR_NUMBER));
+		}
+		
+		if (cmdLine.hasOption(OPT_KEEP))
+		{
+			remlArgs.setKeepFile(cmdLine.getOptionValue(OPT_KEEP));
 		}
 
 		return remlArgs;
@@ -144,5 +150,8 @@ public class REMLCommand extends Command {
 
 	private final static String OPT_COVAR_NUMBER = "covar-number";
 	private final static String OPT_COVAR_NUMBER_DESC = "Specify the indices for covariate file";
+	
+	private final static String OPT_KEEP = "keep";
+	private final static String OPT_KEEP_DESC = "Specify the individuals to be used in the analysis";
 
 }

@@ -87,6 +87,8 @@ public class MLM
 			x[i][0] = 1;
 		}
 		X = new Array2DRowRealMatrix(x);
+		this.isMINQUE = isMINQUE;
+
 	}
 
 	public MLM(double[][][] u3, double[][] x, double[] y, boolean isMINQUE, int[] covIdx)
@@ -99,10 +101,10 @@ public class MLM
 		{
 			A[i] = new Array2DRowRealMatrix(u3[i]);
 		}
-		A[A.length] = new Array2DRowRealMatrix(y.length, y.length);
+		A[A.length-1] = new Array2DRowRealMatrix(y.length, y.length);
 		for (int i = 0; i < A[1].getColumnDimension(); i++)
 		{
-			A[A.length].setEntry(i, i, 1);
+			A[A.length-1].setEntry(i, i, 1);
 		}
 
 		Y = new Array2DRowRealMatrix(y);
@@ -118,6 +120,8 @@ public class MLM
 			System.arraycopy(x[i], 0, x_[i], 1, x[i].length);
 		}
 		X = new Array2DRowRealMatrix(x_);
+		this.isMINQUE = isMINQUE;
+
 	}
 
 	public void MINQUE()
@@ -144,7 +148,8 @@ public class MLM
 			ts += "\t" + "V" + (i+1);
 		}
 		ts +="\tVe";
-		Logger.printUserLog(ts);
+		
+		if (!isMINQUE) Logger.printUserLog(ts);
 
 		RealMatrix var = new Array2DRowRealMatrix(v);
 		RealMatrix B = null;
@@ -176,7 +181,7 @@ public class MLM
 			X_IntV_X = X_IntV.multiply(X);
 			X_IntV_X__Int = (new LUDecompositionImpl(X_IntV_X)).getSolver().getInverse();
 
-		//Estimate B
+		//Estimate B using current value
 			B = ((X_IntV_X__Int.multiply(X.transpose())).multiply(Int_V)).multiply(Y);
 			RealMatrix yB = Y.subtract(X.multiply(B));
 			RealMatrix re = (yB.transpose().multiply(Int_V)).multiply(yB);
@@ -191,7 +196,7 @@ public class MLM
 				if (lod_diff < converge) break;
 			}
 
-		//MINQUE
+		//iteration
 			RealMatrix tmp2 = (((Int_V.multiply(X)).multiply(X_IntV_X__Int)).multiply(X.transpose())).multiply(Int_V);
 			RealMatrix Q = Int_V.subtract(tmp2);
 
@@ -208,11 +213,16 @@ public class MLM
 				reml_y.setEntry(i, 0, (((((Y.transpose()).multiply(Q)).multiply(A[i])).multiply(Q)).multiply(Y)).getEntry(0, 0));
 			}
 			var = (reml_y.transpose().multiply((new LUDecompositionImpl(reml_m)).getSolver().getInverse())).transpose();
+			
+			for (int i = 0; i < var.getRowDimension(); i++)
+			{
+				if (var.getEntry(i, 0) < 0) var.setEntry(i, 0, 0);
+			}
 
 			cnt++;
-			if ( isMINQUE )
+			if (isMINQUE)
 			{
-				if (cnt == 1)
+				if (cnt == 2)
 				{
 					break;
 				}
@@ -223,12 +233,11 @@ public class MLM
 				{
 					continue;
 				}
-
 				printIter(cnt);
 			}
 		}
 
-		printIter(cnt+1);
+		if (!isMINQUE) printIter(cnt+1);
 
 		BETA = B;
 		V_BETA = X_IntV_X__Int.multiply(X_IntV_X).multiply(X_IntV_X__Int);
@@ -247,11 +256,10 @@ public class MLM
 			its += "\t" + fmt.format(var_.getEntry(i, 0));
 			if (var_.getEntry(i, 0) < 0)
 			{
-				Logger.printUserLog(i+1 + " VC was constrained to 0.");
 				var_.setEntry(i, 0, 0);
 			}
 		}
-		Logger.printUserLog(its);				
+		Logger.printUserLog(its);
 
 	}
 	

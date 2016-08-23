@@ -63,16 +63,16 @@ public class REMLCommandArguments extends CommandArguments
 
 	public void setPhenotypeIdx(String pIdx)
 	{
-		this.pheIdx = Integer.parseInt(pIdx);
-		if (pheIdx < 1)
+		this.pheIdx[0] = Integer.parseInt(pIdx);
+		if (this.pheIdx[0] < 1)
 		{
 			Logger.printUserLog("Phenotype index should be greater than 1.\nGEAR quitted");
 			System.exit(1);
 		}
-		this.pheIdx--;
+		this.pheIdx[0]--;
 	}
 
-	public int getPhenotypeIdx()
+	public int[] getPhenotypeIdx()
 	{
 		return pheIdx;
 	}
@@ -145,6 +145,17 @@ public class REMLCommandArguments extends CommandArguments
 		return covIdx;
 	}
 
+	public void setKeepFile(String kFile) 
+	{
+		FileUtil.exists(kFile);
+		keepFile = kFile;
+	}
+	
+	public String getKeepFile()
+	{
+		return keepFile;
+	}
+
 	private String covFile = null;
 	private int[] covIdx = {0};
 	private String grmBin;
@@ -157,5 +168,7 @@ public class REMLCommandArguments extends CommandArguments
 	private boolean isMINQUE;
 
 	private String pheFile = null;
-	private int pheIdx = 0;
+	private int[] pheIdx = {0};
+	private String keepFile = null;
+
 }
