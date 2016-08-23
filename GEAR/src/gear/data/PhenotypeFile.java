@@ -82,6 +82,43 @@ public class PhenotypeFile implements SubjectOrder
 		this.isMissing = isMissing.toArray(new boolean[0][]);
 	}
 	
+	public PhenotypeFile(String fileName)
+	{
+		this.fileName = fileName;
+		
+		BufferedReader reader = BufferedReader.openTextFile(fileName, "phenotype");
+
+		String[] tokens = reader.readTokensAtLeast(2);
+
+		if (tokens == null)
+		{
+			Logger.printUserError("The phenotype file '" + fileName + "' is empty.");
+			System.exit(1);
+		}
+
+		int numCols = tokens.length;
+
+		do
+		{
+			SubjectID subjectID = new SubjectID(/*famID*/tokens[0], /*indID*/tokens[1]);
+
+			if (!subjectMap.add(subjectID))
+			{
+				reader.errorPreviousLine("Subject " + subjectID + " is duplicated.");
+			}
+
+		} while ((tokens = reader.readTokens(numCols)) != null);
+		
+		reader.close();
+
+		this.isMissing = new boolean[subjectMap.getNumberOfEntries()][1];
+		for (int i = 0; i < this.isMissing.length; i++)
+		{
+			this.isMissing[i][0] = false;
+		}
+		this.phenotypes = new float[subjectMap.getNumberOfEntries()][1];
+	}
+	
 	public String getFileName()
 	{
 		return fileName;
