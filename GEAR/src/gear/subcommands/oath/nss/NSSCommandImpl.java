@@ -1,6 +1,7 @@
 package gear.subcommands.oath.nss;
 
 import gear.data.InputDataSet;
+import gear.data.InputDataSet2;
 import gear.family.pedigree.file.MapFile;
 import gear.family.pedigree.file.SNP;
 import gear.family.plink.PLINKParser;
@@ -32,11 +33,14 @@ public class NSSCommandImpl extends CommandImpl
 	private SumStatQC ssQC;
 	private GenotypeMatrix gm;
 	private int[] traitIdx;
-	private InputDataSet data = null;
+	private InputDataSet2 data = null;
 	private ArrayList<NSSGWASResult> nssResult;
 
 	private double lambdaGC = 1;
 	private int monoLoci = 0;
+	
+	private int famFileIdx = 0;
+	private int pheFileIdx = 1;
 
 	public void execute(CommandArguments cmdArgs) 
 	{
@@ -45,9 +49,9 @@ public class NSSCommandImpl extends CommandImpl
 		this.traitIdx = this.nssArgs.getMpheno();
 		int[] covIdx = new int[this.traitIdx.length - 1];
 		System.arraycopy(this.traitIdx, 1, covIdx, 0, covIdx.length);
-		this.data = new InputDataSet(this.nssArgs.getFam(), this.nssArgs.getPhenotypeFile(), this.nssArgs.getPhenotypeFile(), this.nssArgs.getMpheno()[0], covIdx);
-//		this.data.readSubjectIDFile(this.nssArgs.getFam());
-//		this.data.readPhenotypeFile(this.nssArgs.getPhenotypeFile());
+		data = new InputDataSet2();
+		data.addFile(this.nssArgs.getFam());
+		data.addFile(this.nssArgs.getPhenotypeFile(), this.nssArgs.getMpheno());
 
 		PLINKParser pp = PLINKParser.parse(this.nssArgs);
 		this.sf = new SampleFilter(pp.getPedigreeData(), pp.getMapData());
@@ -77,7 +81,7 @@ public class NSSCommandImpl extends CommandImpl
 	private void printCovMat()
 	{
 		ArrayList<ArrayList<Double>> Dat = NewIt.newArrayList();
-		int[] pheIdx = data.getMatchedPheSubIdx();
+		int[] pheIdx = data.getMatchedSubjectIdx(pheFileIdx);
 		for (int subjectIdx = 0; subjectIdx < pheIdx.length; subjectIdx++)
 		{
 			ArrayList<Double> dat = NewIt.newArrayList();
@@ -86,7 +90,7 @@ public class NSSCommandImpl extends CommandImpl
 			{
 				if (!this.data.isPhenotypeMissing(pheIdx[subjectIdx], this.traitIdx[j]))
 				{
-					dat.add((double) this.data.getPhenotype(pheIdx[subjectIdx], this.traitIdx[j]));
+					dat.add((double) this.data.getVariable(pheFileIdx, pheIdx[subjectIdx], this.traitIdx[j]));
 				}
 				else
 				{
@@ -133,17 +137,17 @@ public class NSSCommandImpl extends CommandImpl
 		ChiSquaredDistributionImpl ci = new ChiSquaredDistributionImpl(1);
 		ArrayList<SNP> snpList = this.mapFile.getMarkerList();
 
-		int[] pIdx = data.getMatchedPheSubIdx();
+		int[] pIdx = data.getMatchedSubjectIdx(pheFileIdx);
 		double[] Y = new double[pIdx.length];
 		ArrayList<Double> pArray = NewIt.newArrayList();
 
 		for (int subjectIdx = 0; subjectIdx < Y.length; subjectIdx++) 
 		{
-			Y[subjectIdx] = this.data.getPhenotype(pIdx[subjectIdx], this.traitIdx[tIdx]);
+			Y[subjectIdx] = this.data.getVariable(pheFileIdx, pIdx[subjectIdx], this.traitIdx[tIdx]);
 		}
 		Y = StatUtils.normalize(Y);
 
-		int[] subIdx = data.getMatchedSubIdx();
+		int[] subIdx = data.getMatchedSubjectIdx(famFileIdx);
 		for (int i = 0; i < this.gm.getNumMarker(); i++)
 		{
 			SNP snp = (SNP) snpList.get(i);
