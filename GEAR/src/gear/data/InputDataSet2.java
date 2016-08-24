@@ -33,6 +33,17 @@ public class InputDataSet2 implements SubjectOrder
 		makeSubjectOrderConsistent1(subjectIDFile);
 	}
 
+	public void addFile(String subFile, boolean flag)
+	{
+		PhenotypeFile subjectIDFile = new PhenotypeFile(subFile, ConstValues.NO_HEADER);
+		Logger.printUserLog("Read " + subjectIDFile.getNumberOfSubjects() + " samples from '" + subjectIDFile.getFileName() + "'.");
+		fileList.add(subjectIDFile);
+		fileNameList.add(subFile);
+		int[] tIdx = new int[subjectIDFile.getNumberOfTraits()];
+		for (int i = 0; i < tIdx.length; i++) tIdx[i] = i;
+		makeSubjectOrderConsistent1(subjectIDFile, tIdx);
+	}
+	
 	public void addFile(String subFile, int[] tIdx)
 	{
 		PhenotypeFile subjectIDFile = new PhenotypeFile(subFile, ConstValues.NO_HEADER);
@@ -49,13 +60,16 @@ public class InputDataSet2 implements SubjectOrder
 		{
 			PhenotypeFile pf = fileList.get(i);
 			int[] idx = new int[deepSubList.size()];
+			ArrayList<SubjectID> SID = NewIt.newArrayList();
 			for (int j = 0; j < deepSubList.size(); j++)
 			{
 				SubjectID sid = deepSubList.get(j);
 				int subidx = pf.getSubjectIndex(sid);
 				idx[j] = subidx;
+				SID.add(sid);
 			}
 			sampleIdx.add(idx);
+			sampleID.add(SID);
 		}
 
 		Logger.printUserLog(deepSubList.size() + " samples were matched up in " + fileList.size() + " files.");
@@ -114,23 +128,14 @@ public class InputDataSet2 implements SubjectOrder
 		return sharedSubjectOrder.getSubjectID(subjectIdx);
 	}
 
+	public ArrayList<SubjectID> getMatchedSubjectID(int fileIdx)
+	{
+		return sampleID.get(fileIdx);
+	}
+
 	@Override
 	public void swapSubjects(int subjectIdx1, int subjectIdx2)
 	{
-		if (subjectIDFile != null)
-		{
-			subjectIDFile.swapSubjects(subjectIdx1, subjectIdx2);
-		}
-		
-		if (phenotypeFile != null)
-		{
-			phenotypeFile.swapSubjects(subjectIdx1, subjectIdx2);
-		}
-	}
-
-	public int getNumberOfTraits()
-	{
-		return phenotypeFile.getNumberOfTraits();
 	}
 
 	public double[] getVariable(int fileIndex, int subjectIdx, int[] covIdx)
@@ -165,10 +170,6 @@ public class InputDataSet2 implements SubjectOrder
 	{
 		PhenotypeFile pf = fileList.get(fileIndex);
 		return pf.isMissing(subjectIdx, covIdx);
-	}
-	public boolean isPhenotypeMissing(int subjectIdx, int traitIdx)
-	{
-		return phenotypeFile.isMissing(subjectIdx, traitIdx);
 	}
 
 	private void makeSubjectOrderConsistent1(SubjectOrder order)
@@ -215,6 +216,11 @@ public class InputDataSet2 implements SubjectOrder
 		}
 	}
 
+	public int getNumberOfTraits()
+	{
+		return fileList.get(1).getNumberOfTraits();
+	}
+
 	public int getFileSampleSize(int idx)
 	{
 		PhenotypeFile pf = fileList.get(idx);
@@ -231,17 +237,9 @@ public class InputDataSet2 implements SubjectOrder
 	private ArrayList<SubjectID> deepSubList = NewIt.newArrayList();
 	private SubjectOrder sharedSubjectOrder;
 
-	private PhenotypeFile subjectIDFile;
-	private int[] subIdx = null;
-
-	private PhenotypeFile phenotypeFile;
-	private int[] pheSubIdx = null;
-
-	private PhenotypeFile covFile;
-	private int[] covSubIdx = null;
-
 	private HashMap<SubjectID, Integer> id2Idx = new HashMap<SubjectID, Integer>();
 	private ArrayList<PhenotypeFile> fileList = NewIt.newArrayList();
 	private ArrayList<int[]> sampleIdx = NewIt.newArrayList();
+	private ArrayList<ArrayList<SubjectID>> sampleID = NewIt.newArrayList();
 	private ArrayList<String> fileNameList = NewIt.newArrayList();
 }
