@@ -1,6 +1,7 @@
 package gear.subcommands.qpca;
 
 import gear.subcommands.CommandArguments;
+import gear.util.FileUtil;
 
 public class QPCACommandArguments extends CommandArguments
 {
@@ -58,7 +59,19 @@ public class QPCACommandArguments extends CommandArguments
 		return ev;
 	}
 
+	public void setKeepFile(String kFile) 
+	{
+		FileUtil.exists(kFile);
+		keepFile = kFile;
+	}
+	
+	public String getKeepFile()
+	{
+		return keepFile;
+	}
+
 	private String grmBin;
 	private String grmID;
 	private int ev = 10;
+	private String keepFile = null;
 }

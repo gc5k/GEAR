@@ -28,9 +28,10 @@ public class QPCACommand extends Command
 	public void prepareOptions(Options options)
 	{
 		options.addOption(OptionBuilder.withDescription(OPT_GRM_BIN_DESC).withLongOpt(OPT_GRM_BIN_LONG).hasArg().create());
-		options.addOption(OptionBuilder.withDescription(OPT_GRM_TEXT_DESC).withLongOpt(OPT_GRM_TEXT_LONG).hasArg().create());
-		options.addOption(OptionBuilder.withDescription(OPT_GRM_DESC).withLongOpt(OPT_GRM_LONG).hasArg().create());
-		options.addOption(OptionBuilder.withDescription(OPT_EV_DESC).withLongOpt(OPT_EV_LONG).hasArg().create());
+		options.addOption(OptionBuilder.withDescription(OPT_GRM_TXT_DESC).withLongOpt(OPT_GRM_TXT_LONG).hasArg().create());
+		options.addOption(OptionBuilder.withDescription(OPT_GRM_DESC).hasArg().create(OPT_GRM));
+		options.addOption(OptionBuilder.withDescription(OPT_EV_DESC).hasArg().create(OPT_EV));
+		options.addOption(OptionBuilder.withDescription(OPT_KEEP_DESC).hasArg().create(OPT_KEEP));
 	}
 
 	@Override
@@ -38,15 +39,22 @@ public class QPCACommand extends Command
 	{
 		QPCACommandArguments qpcaArgs = new QPCACommandArguments();
 		parseGRMArguments(qpcaArgs, cmdLine);
-		qpcaArgs.setEV(cmdLine.getOptionValue(OPT_EV_LONG));
+		if (cmdLine.hasOption(OPT_EV))
+		{
+			qpcaArgs.setEV(cmdLine.getOptionValue(OPT_EV));
+		}
+		if (cmdLine.hasOption(OPT_KEEP))
+		{
+			qpcaArgs.setKeepFile(cmdLine.getOptionValue(OPT_KEEP));
+		}
 		return qpcaArgs;
 	}
 
 	private void parseGRMArguments(QPCACommandArguments qpcaArgs, CommandLine cmdLine) throws CommandArgumentException
 	{
 		String grmBin = cmdLine.getOptionValue(OPT_GRM_BIN_LONG);
-		String grmText = cmdLine.getOptionValue(OPT_GRM_TEXT_LONG);
-		String grmGZ = cmdLine.getOptionValue(OPT_GRM_LONG);
+		String grmText = cmdLine.getOptionValue(OPT_GRM_TXT_LONG);
+		String grmGZ = cmdLine.getOptionValue(OPT_GRM);
 		
 		int numFiles = 0;
 		
@@ -73,12 +81,12 @@ public class QPCACommand extends Command
 
 		if (numFiles == 0)
 		{
-			throw new CommandArgumentException("No GRM is provided. One of --" + OPT_GRM_BIN_LONG + ", " + OPT_GRM_TEXT_LONG + " or --" + OPT_GRM_LONG + " must be set.");
+			throw new CommandArgumentException("No GRM is provided. One of --" + OPT_GRM_BIN_LONG + ", " + OPT_GRM_TXT_LONG + " or --" + OPT_GRM + " must be set.");
 		}
 		
 		if (numFiles > 1)
 		{
-			throw new CommandArgumentException("At most one of --" + OPT_GRM_BIN_LONG + ", --" + OPT_GRM_TEXT_LONG + " and --" + OPT_GRM_LONG + " can be set.");
+			throw new CommandArgumentException("At most one of --" + OPT_GRM_BIN_LONG + ", --" + OPT_GRM_TXT_LONG + " and --" + OPT_GRM + " can be set.");
 		}
 	}
 
@@ -91,12 +99,16 @@ public class QPCACommand extends Command
 	private final static String OPT_GRM_BIN_LONG = "grm-bin";
 	private final static String OPT_GRM_BIN_DESC = "Specify the .grm.bin and .grm.id files";
 	
-	private final static String OPT_GRM_TEXT_LONG = "grm-text";
-	private final static String OPT_GRM_TEXT_DESC = "Specify the .grm and .grm.id files";
+	private final static String OPT_GRM_TXT_LONG = "grm-txt";
+	private final static String OPT_GRM_TXT_DESC = "Specify the .grm and .grm.id files";
 	
-	private final static String OPT_GRM_LONG = "grm";
+	private final static String OPT_GRM = "grm";
 	private final static String OPT_GRM_DESC = "Specify the .grm.gz and .grm.id files";
 	
-	private final static String OPT_EV_LONG = "ev";
+	private final static String OPT_EV = "ev";
 	private final static String OPT_EV_DESC = "Specify the eigenvector numbers";
+	
+	private final static String OPT_KEEP = "keep";
+	private final static String OPT_KEEP_DESC = "Specify the samples for analysis";
+	
 }
