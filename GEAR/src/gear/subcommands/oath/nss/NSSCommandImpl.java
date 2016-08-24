@@ -1,6 +1,5 @@
 package gear.subcommands.oath.nss;
 
-import gear.data.InputDataSet;
 import gear.data.InputDataSet2;
 import gear.family.pedigree.file.MapFile;
 import gear.family.pedigree.file.SNP;
@@ -20,6 +19,7 @@ import java.util.Collections;
 
 import org.apache.commons.math.MathException;
 import org.apache.commons.math.distribution.ChiSquaredDistributionImpl;
+import org.apache.commons.math.linear.Array2DRowRealMatrix;
 import org.apache.commons.math.linear.RealMatrix;
 import org.apache.commons.math.stat.regression.SimpleRegression;
 import org.apache.commons.math.stat.StatUtils;
@@ -52,6 +52,8 @@ public class NSSCommandImpl extends CommandImpl
 		data = new InputDataSet2();
 		data.addFile(this.nssArgs.getFam());
 		data.addFile(this.nssArgs.getPhenotypeFile(), this.nssArgs.getMpheno());
+		if(this.nssArgs.getKeepFile() != null) data.addFile(this.nssArgs.getKeepFile());
+		data.LineUpFiles();
 
 		PLINKParser pp = PLINKParser.parse(this.nssArgs);
 		this.sf = new SampleFilter(pp.getPedigreeData(), pp.getMapData());
@@ -88,7 +90,7 @@ public class NSSCommandImpl extends CommandImpl
 			boolean isMissing = false;
 			for (int j = 0; j < traitIdx.length; j++)
 			{
-				if (!this.data.isPhenotypeMissing(pheIdx[subjectIdx], this.traitIdx[j]))
+				if (!this.data.isVariableMissing(pheFileIdx, pheIdx[subjectIdx], this.traitIdx[j]))
 				{
 					dat.add((double) this.data.getVariable(pheFileIdx, pheIdx[subjectIdx], this.traitIdx[j]));
 				}
@@ -113,8 +115,19 @@ public class NSSCommandImpl extends CommandImpl
 			}
 		}
 
-		PearsonsCorrelation pc = new PearsonsCorrelation(pheVec);
-		RealMatrix mc = pc.getCorrelationMatrix();
+		PearsonsCorrelation pc; 
+		RealMatrix mc;
+
+		if (traitIdx.length > 1)
+		{
+			pc = new PearsonsCorrelation(pheVec);
+			mc = pc.getCorrelationMatrix();
+		}
+		else
+		{
+			double[][] cor={{1}};
+			mc = new Array2DRowRealMatrix(cor);
+		}
 
 		String Fout = nssArgs.getOutRoot()  + ".m.nss";
 		PrintStream nssGWAS = FileUtil.CreatePrintStream(Fout);

@@ -1,6 +1,7 @@
 package gear.subcommands.oath.nss;
 
 import gear.subcommands.CommandArguments;
+import gear.util.FileUtil;
 import gear.util.Logger;
 
 public class NSSCommandArguments extends CommandArguments 
@@ -9,6 +10,7 @@ public class NSSCommandArguments extends CommandArguments
 	private int chr;
 	private boolean chrFlag = false;
 	private int[] mPheno;
+	private String keepFile;
 
 	public String getPhenotypeFile()
 	{
@@ -58,5 +60,16 @@ public class NSSCommandArguments extends CommandArguments
 	public boolean isChrFlagOn()
 	{
 		return this.chrFlag;
+	}
+
+	public void setKeeFile(String kFile) 
+	{
+		FileUtil.exists(kFile);
+		keepFile = kFile;
+	}
+	
+	public String getKeepFile()
+	{
+		return keepFile;
 	}
 }
