@@ -125,29 +125,23 @@ public class REMLCommandImpl extends CommandImpl {
 		
 		for (int i = 0; i < b.length; i++)
 		{
-			for (int j = 0; j < subIdx.length; j++)
-			{
-				for (int k = 0; k <= j; k++)
-				{
-					b[i][j][k] = b[i][k][j] = B[i][subIdx[j]][subIdx[k]];
-				}
-			}
+			b[i] = lineUpMatrix(B[i], subIdx);
 		}
 		return b;
 	}
 
-	private void lineUpGenotype(double[][] B)
+	private double[][] lineUpMatrix(double[][] B, int[] subIdx)
 	{
-		int[] subIdx = data.getMatchedSubjectIdx(grmFileIdx);
-		A = new double[subIdx.length][subIdx.length];
+		double[][] a = new double[subIdx.length][subIdx.length];
 
 		for (int i = 0; i < subIdx.length; i++)
 		{
 			for (int j = 0; j < subIdx.length; j++)
 			{
-				A[i][j] = A[j][i] = B[subIdx[i]][subIdx[j]];
+				a[i][j] = a[j][i] = B[subIdx[i]][subIdx[j]];
 			}
 		}
+		return a;
 	}
 
 	private double[][][] readGrmList(int numSubjects)
@@ -204,7 +198,7 @@ public class REMLCommandImpl extends CommandImpl {
 			}
 		}
 		grmBin.close();
-		lineUpGenotype(B);
+		A = lineUpMatrix(B, data.getMatchedSubjectIdx(grmFileIdx));
 	}
 
 	private void readGrm(BufferedReader reader, int numSubjects)
@@ -222,7 +216,7 @@ public class REMLCommandImpl extends CommandImpl {
 			}
 		}
 		reader.close();
-		lineUpGenotype(B);
+		A = lineUpMatrix(B, data.getMatchedSubjectIdx(grmFileIdx));
 	}
 
 	private int grmFileIdx = 0;

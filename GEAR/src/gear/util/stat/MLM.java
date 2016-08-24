@@ -4,8 +4,6 @@ import java.text.DecimalFormat;
 import java.util.ArrayList;
 
 import org.apache.commons.math.linear.Array2DRowRealMatrix;
-import org.apache.commons.math.linear.EigenDecomposition;
-import org.apache.commons.math.linear.EigenDecompositionImpl;
 import org.apache.commons.math.linear.LUDecompositionImpl;
 import org.apache.commons.math.linear.RealMatrix;
 import org.apache.commons.math.stat.StatUtils;
@@ -350,27 +348,6 @@ public class MLM
 		return V_BETA;
 	}
 
-	
-	private double getSumEigenValues(RealMatrix V)
-	{//det = sum(EigenValue)
-		EigenDecomposition Ed = new EigenDecompositionImpl(V, 1e-5);
-		double[] ev = Ed.getRealEigenvalues();
-		double v_det = 0;
-
-		for(int i = 0; i < ev.length; i++)
-		{
-			if(ev[i] > 0)
-			{
-				v_det += ev[i];
-			}
-			else
-			{
-				break;
-			}
-		}
-		return v_det;
-	}
-	
 	private RealMatrix[] A = null;
 	private RealMatrix Y = null;
 	private RealMatrix X = null;
