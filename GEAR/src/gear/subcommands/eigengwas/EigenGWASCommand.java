@@ -10,12 +10,14 @@ import org.apache.commons.cli.Options;
 
 public class EigenGWASCommand extends Command
 {
-	private static final String OPT_PHE_LONG = "pheno";
+	private static final String OPT_PHE = "pheno";
 	private static final String OPT_PHE_DESC = "Specify the phenotype file (individual eigenvector)";
-	private static final String OPT_MPHE_LONG = "mpheno";
+	private static final String OPT_MPHE = "mpheno";
 	private static final String OPT_MPHE_DESC = "Specify the phenotype index";
 	private static final String OPT_CHR = "chr";
 	private static final String OPT_CHR_DESC = "Specify the chromosomes for analysis";
+	private static final String OPT_KEEP = "keep";
+	private static final String OPT_KEEP_DESC = "Specify the samples for analysis";
 
 	public EigenGWASCommand()
 	{
@@ -35,17 +37,22 @@ public class EigenGWASCommand extends Command
 	public void prepareOptions(Options options)
 	{
 		options.addOption(OptionBuilder.withDescription(OPT_BFILE_DESC).withLongOpt(OPT_BFILE_LONG).hasArg().isRequired().create());
-		options.addOption(OptionBuilder.withDescription(OPT_PHE_DESC).withLongOpt(OPT_PHE_LONG).hasArg().isRequired().create());
-		options.addOption(OptionBuilder.withDescription(OPT_MPHE_DESC).withLongOpt(OPT_MPHE_LONG).hasArg().create());
+		options.addOption(OptionBuilder.withDescription(OPT_PHE_DESC).hasArg().isRequired().create(OPT_PHE));
+		options.addOption(OptionBuilder.withDescription(OPT_MPHE_DESC).hasArg().create(OPT_MPHE));
 		options.addOption(OptionBuilder.withDescription(OPT_CHR_DESC).hasArg().create(OPT_CHR));
+		options.addOption(OptionBuilder.withDescription(OPT_KEEP_DESC).hasArg().create(OPT_KEEP));
 	}
 
 	public CommandArguments parse(CommandLine cmdLine) throws CommandArgumentException
 	{
 		EigenGWASArguments eigenArgs = new EigenGWASArguments();
 		parseFileArguments(eigenArgs, cmdLine);
-		eigenArgs.setPhentypeIndex(parseIntOptionValue(cmdLine, "mpheno", "1"));
-		eigenArgs.setPhenotypeFile(cmdLine.getOptionValue("pheno"));
+		eigenArgs.setPhentypeIndex(parseIntOptionValue(cmdLine, OPT_MPHE, "1"));
+		eigenArgs.setPhenotypeFile(cmdLine.getOptionValue(OPT_PHE));
+		if (cmdLine.hasOption(OPT_KEEP))
+		{
+			eigenArgs.setKeepFile(cmdLine.getOptionValue(OPT_KEEP));
+		}
 		return eigenArgs;
 	}
 

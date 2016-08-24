@@ -1,6 +1,6 @@
 package gear.subcommands.eigengwas;
 
-import gear.data.InputDataSet;
+import gear.data.InputDataSet2;
 import gear.family.pedigree.file.MapFile;
 import gear.family.pedigree.file.SNP;
 import gear.family.plink.PLINKParser;
@@ -27,7 +27,7 @@ public class EigenGWASImpl extends CommandImpl {
 	private SumStatQC ssQC;
 	private GenotypeMatrix gm;
 	private int traitIdx;
-	private InputDataSet data = new InputDataSet();
+	private InputDataSet2 data = new InputDataSet2();
 	private ArrayList<EigenGWASResult> eGWASResult = NewIt.newArrayList();
 
 	private double lambdaGC = 1;
@@ -37,46 +37,46 @@ public class EigenGWASImpl extends CommandImpl {
 	{
 		this.eigenArgs = (EigenGWASArguments) cmdArgs;
 
-		this.traitIdx = this.eigenArgs.getMpheno();
-		this.data.readSubjectIDFile(this.eigenArgs.getFam());
-		this.data.readPhenotypeFile(this.eigenArgs.getPhenotypeFile());
-
 		PLINKParser pp = PLINKParser.parse(this.eigenArgs);
 		this.sf = new SampleFilter(pp.getPedigreeData(), pp.getMapData());
 		this.ssQC = new SumStatQC(pp.getPedigreeData(), pp.getMapData(), this.sf);
 		this.mapFile = this.ssQC.getMapFile();
 		this.gm = new GenotypeMatrix(this.ssQC.getSample());
+		
+		this.traitIdx = this.eigenArgs.getMpheno()[0];
+		this.data.addFile(this.eigenArgs.getFam());
+		this.data.addFile(this.eigenArgs.getPhenotypeFile(), this.eigenArgs.getMpheno());
+		if (this.eigenArgs.getKeepFile() != null)
+		{
+			this.data.addFile(this.eigenArgs.getKeepFile());
+		}
+		data.LineUpFiles();
+
 
 		eigenGWAS();
 		printResult();
 	}
 
-	private void eigenGWAS() 
+	private void eigenGWAS()
 	{
 		ChiSquaredDistributionImpl ci = new ChiSquaredDistributionImpl(1);
 		ArrayList<SNP> snpList = this.mapFile.getMarkerList();
-
-		double[] Y = new double[this.data.getNumberOfSubjects()];
-		ArrayList<Integer> pheIdx = NewIt.newArrayList();
+		
+		int[] gIdx = this.data.getMatchedSubjectIdx(0);
+		int[] pIdx = this.data.getMatchedSubjectIdx(1);
+		
+		double[] Y = new double[pIdx.length];
 		ArrayList<Double> pArray = NewIt.newArrayList();
 		double threshold = 0.0D;
 
 		for (int subjectIdx = 0; subjectIdx < Y.length; subjectIdx++) 
 		{
-			if (!this.data.isPhenotypeMissing(subjectIdx, this.traitIdx)) 
-			{
-				pheIdx.add(Integer.valueOf(subjectIdx));
-				Y[subjectIdx] = this.data.getPhenotype(subjectIdx, this.traitIdx);
-				threshold += Y[subjectIdx];
-			}
+			Y[subjectIdx] = this.data.getVariable(1, pIdx[subjectIdx], this.traitIdx);
+			threshold += Y[subjectIdx];
 		}
-		threshold /= pheIdx.size();
+		threshold /= Y.length;
 
-		// PrintStream eGWAS =
-		// FileUtil.CreatePrintStream(this.eigenArgs.getOutRoot() + ".egwas");
-		// eGWAS.println("SNP\tCHR\tBP\tRefAllele\tAltAllele\tfreq\tBeta\tSE\tChi\tP\tPGC\tn1\tfreq1\tn2\tfreq2\tFst");
-
-		for (int i = 0; i < this.gm.getNumMarker(); i++) 
+		for (int i = 0; i < this.gm.getNumMarker(); i++)
 		{
 			SNP snp = (SNP) snpList.get(i);
 
@@ -89,17 +89,18 @@ public class EigenGWASImpl extends CommandImpl {
 				double freq1 = 0.0D;
 				double freq2 = 0.0D;
 				double freq = 0.0D;
-				for (int j = 0; j < pheIdx.size(); j++) 
+
+				for (int j = 0; j < pIdx.length; j++)
 				{
-					int idx = ((Integer) pheIdx.get(j)).intValue();
-					int g = this.gm.getAdditiveScoreOnFirstAllele(idx, i);
+					int g = this.gm.getAdditiveScoreOnFirstAllele(gIdx[j], i);
 					if (g != 3) {
-						sReg.addData(g, Y[idx]);
-						if (Y[idx] < threshold) 
+						sReg.addData(g, Y[j]);
+						if (Y[j] < threshold) 
 						{
 							n1 += 1.0D;
 							freq1 += g;
-						} else 
+						}
+						else
 						{
 							n2 += 1.0D;
 							freq2 += g;
@@ -108,7 +109,6 @@ public class EigenGWASImpl extends CommandImpl {
 						freq += g;
 					}
 				}
-
 				if(snp.isMonopolic() && N <=1) 
 				{
 					monoLoci++;
@@ -123,7 +123,6 @@ public class EigenGWASImpl extends CommandImpl {
 
 				double b = sReg.getSlope();
 				double b_se = sReg.getSlopeStdErr();
-
 				EigenGWASResult e1 = new EigenGWASResult(snp, freq, b, b_se, n1, freq1, n2, freq2, fst);
 				eGWASResult.add(e1);
 				pArray.add(e1.GetP());
@@ -154,7 +153,6 @@ public class EigenGWASImpl extends CommandImpl {
 		}
 
 		Logger.printUserLog("Lambda GC is : " + lambdaGC);
-
 	}
 
 	public void printResult() 

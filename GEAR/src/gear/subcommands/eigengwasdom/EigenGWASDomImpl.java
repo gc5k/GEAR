@@ -1,6 +1,6 @@
 package gear.subcommands.eigengwasdom;
 
-import gear.data.InputDataSet;
+import gear.data.InputDataSet2;
 import gear.family.pedigree.file.MapFile;
 import gear.family.pedigree.file.SNP;
 import gear.family.plink.PLINKParser;
@@ -32,7 +32,7 @@ public class EigenGWASDomImpl extends CommandImpl
 	private SumStatQC ssQC;
 	private GenotypeMatrix gm;
 	private int traitIdx;
-	private InputDataSet data = new InputDataSet();
+	private InputDataSet2 data = new InputDataSet2();
 	private ArrayList<EigenGWASDomResult> eGWASResult = NewIt.newArrayList();
 
 	private double lambdaGC = 1;
@@ -43,9 +43,14 @@ public class EigenGWASDomImpl extends CommandImpl
 	{
 		this.eigenArgs = ((EigenGWASDomCommandArguments) cmdArgs);
 
-		this.traitIdx = this.eigenArgs.getMpheno();
-		this.data.readSubjectIDFile(this.eigenArgs.getFam());
-		this.data.readPhenotypeFile(this.eigenArgs.getPhenotypeFile());
+		this.traitIdx = this.eigenArgs.getMpheno()[0];
+		data.addFile(this.eigenArgs.getFam());
+		data.addFile(this.eigenArgs.getPhenotypeFile(), this.eigenArgs.getMpheno());
+		if (eigenArgs.getKeepFile() != null)
+		{
+			data.addFile(this.eigenArgs.getKeepFile());
+		}
+		data.LineUpFiles();
 
 		PLINKParser pp = PLINKParser.parse(this.eigenArgs);
 		this.sf = new SampleFilter(pp.getPedigreeData(), pp.getMapData());
@@ -62,21 +67,20 @@ public class EigenGWASDomImpl extends CommandImpl
 		ChiSquaredDistributionImpl ci = new ChiSquaredDistributionImpl(1);
 		ArrayList<SNP> snpList = this.mapFile.getMarkerList();
 
-		double[] Y = new double[this.data.getNumberOfSubjects()];
-		ArrayList<Integer> pheIdx = NewIt.newArrayList();
+		int[] gIdx = this.data.getMatchedSubjectIdx(0);
+		int[] pIdx = this.data.getMatchedSubjectIdx(1);
+
+		double[] Y = new double[pIdx.length];
+
 		ArrayList<Double> pArray = NewIt.newArrayList();
 		double threshold = 0.0D;
 
 		for (int subjectIdx = 0; subjectIdx < Y.length; subjectIdx++) 
 		{
-			if (!this.data.isPhenotypeMissing(subjectIdx, this.traitIdx))
-			{
-				pheIdx.add(Integer.valueOf(subjectIdx));
-				Y[subjectIdx] = this.data.getPhenotype(subjectIdx, this.traitIdx);
-				threshold += Y[subjectIdx];
-			}
+			Y[subjectIdx] = this.data.getVariable(1, pIdx[subjectIdx], this.traitIdx);
+			threshold += Y[subjectIdx];
 		}
-		threshold /= pheIdx.size();
+		threshold /= Y.length;
 
 		// PrintStream eGWAS =
 		// FileUtil.CreatePrintStream(this.eigenArgs.getOutRoot() + ".egwas");
@@ -92,7 +96,7 @@ public class EigenGWASDomImpl extends CommandImpl
 				continue;
 			}
 
-			double[][] x= new double[this.gm.getNumIndivdial()][2];
+			double[][] x= new double[gIdx.length][2];
 			if ((!this.eigenArgs.isChrFlagOn()) || (Integer.parseInt(snp.getChromosome()) == this.eigenArgs.getChr())) 
 			{
 				double n1 = 0.0D;
@@ -101,10 +105,9 @@ public class EigenGWASDomImpl extends CommandImpl
 				double freq1 = 0.0D;
 				double freq2 = 0.0D;
 				double freq = 0.0D;
-				for (int j = 0; j < pheIdx.size(); j++)
+				for (int j = 0; j < gIdx.length; j++)
 				{
-					int idx = ((Integer) pheIdx.get(j)).intValue();
-					int g = this.gm.getAdditiveScoreOnFirstAllele(idx, i);
+					int g = this.gm.getAdditiveScoreOnFirstAllele(gIdx[j], i);
 					if (g != 3)
 					{
 						if (g == 0)
@@ -123,7 +126,7 @@ public class EigenGWASDomImpl extends CommandImpl
 							x[j][1] = -1 / (8 * gfreq[i][2]);			
 						}
 
-						if (Y[idx] < threshold)
+						if (Y[j] < threshold)
 						{
 							n1 += 1.0D;
 							freq1 += g;
@@ -145,7 +148,7 @@ public class EigenGWASDomImpl extends CommandImpl
 				double fst = 2 * (n1 / N * (freq1 - freq) * (freq1 - freq) + n2 / N * (freq2 - freq) * (freq2 - freq))
 						/ (freq * (1.0D - freq));
 
-				double[][] x1= new double[this.gm.getNumIndivdial()][3];
+				double[][] x1= new double[gIdx.length][3];
 				for(int k1 = 0; k1 < x1.length; k1++)
 				{
 					x1[k1][0] = 1;
@@ -166,22 +169,16 @@ public class EigenGWASDomImpl extends CommandImpl
 				}
 				else
 				{
-					System.out.println(XtX);
 					RealMatrix XtX_inv = (new LUDecompositionImpl(XtX)).getSolver().getInverse();
-					System.out.println(XtX_inv);
 
 					RealMatrix g1_tran=g1.transpose();
 					RealMatrix y = new Array2DRowRealMatrix(Y);
 					RealMatrix B = XtX_inv.multiply(g1_tran).multiply(y);
-					System.out.println(B);
 					RealMatrix SST = y.transpose().multiply(y);
-					System.out.println(SST);
 					RealMatrix SSR = B.transpose().multiply(g1_tran).multiply(y);
-					System.out.println(SSR);
 					double sse = (SST.getEntry(0, 0) - SSR.getEntry(0, 0))/(y.getRowDimension() - B.getRowDimension());
 
 					RealMatrix BV = XtX_inv.scalarMultiply(sse);
-					System.out.println(BV);
 					if(BV.getEntry(1, 1) > 0 && BV.getEntry(2, 2) > 0)
 					{
 						EigenGWASDomResult e1 = new EigenGWASDomResult(snp, freq, B.getEntry(1, 0), Math.sqrt(BV.getEntry(1, 1)), B.getEntry(2, 0), Math.sqrt(BV.getEntry(2, 2)), n1, freq1, n2, freq2, fst);
@@ -189,19 +186,6 @@ public class EigenGWASDomImpl extends CommandImpl
 						pArray.add(e1.GetP());
 					}
 				}
-
-//				mReg.newSampleData(Y, x);
-//				double[] beta = mReg.estimateRegressionParameters();
-//				double[] bV = mReg.estimateRegressionParametersStandardErrors();
-
-//				System.out.println(fst + " " + gfreq[i][0] + " " + gfreq[i][1] + " " + gfreq[i][2]);
-//				for(int k = 0; k < x.length; k++)
-//				{
-//					System.out.println(x[k][0] + " " + x[k][1]);
-//				}
-//
-
-//				System.exit(1);
 
 			}
 		}
