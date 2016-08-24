@@ -28,11 +28,12 @@ public class BlupPcaCommand extends Command
 	public void prepareOptions(Options options)
 	{
 		options.addOption(OptionBuilder.withDescription(OPT_GRM_BIN_DESC).withLongOpt(OPT_GRM_BIN_LONG).hasArg().create());
-		options.addOption(OptionBuilder.withDescription(OPT_GRM_TEXT_DESC).withLongOpt(OPT_GRM_TEXT_LONG).hasArg().create());
-		options.addOption(OptionBuilder.withDescription(OPT_GRM_GZ_DESC).withLongOpt(OPT_GRM_GZ_LONG).hasArg().create());
+		options.addOption(OptionBuilder.withDescription(OPT_GRM_TXT_DESC).withLongOpt(OPT_GRM_TXT_LONG).hasArg().create());
+		options.addOption(OptionBuilder.withDescription(OPT_GRM_DESC).hasArg().create(OPT_GRM));
 		options.addOption(OptionBuilder.withDescription(OPT_FILE_DESC).withLongOpt(OPT_FILE_LONG).hasArg().create());
 		options.addOption(OptionBuilder.withDescription(OPT_BFILE_DESC).withLongOpt(OPT_BFILE_LONG).hasArg().create());
-		options.addOption(OptionBuilder.withDescription(OPT_PHE_DESC).withLongOpt(OPT_PHE_LONG).hasArg().isRequired().create());
+		options.addOption(OptionBuilder.withDescription(OPT_PHE_DESC).hasArg().isRequired().create(OPT_PHE));
+		options.addOption(OptionBuilder.withDescription(OPT_MPHE_DESC).hasArg().create(OPT_MPHE));
 	}
 
 	@Override
@@ -41,15 +42,19 @@ public class BlupPcaCommand extends Command
 		BlupPcaCommandArguments blupArgs = new BlupPcaCommandArguments();
 		parseGRMArguments(blupArgs, cmdLine);
 		parseFileArguments(blupArgs, cmdLine);
-		blupArgs.setPhenotypeFile(cmdLine.getOptionValue(OPT_PHE_LONG));
+		blupArgs.setPhenotypeFile(cmdLine.getOptionValue(OPT_PHE));
+		if (cmdLine.hasOption(OPT_MPHE))
+		{
+			blupArgs.setPhenotypeIndex(cmdLine.getOptionValue(OPT_MPHE));
+		}
 		return blupArgs;
 	}
 
 	private void parseGRMArguments(BlupPcaCommandArguments blupArgs, CommandLine cmdLine) throws CommandArgumentException
 	{
 		String grmBin = cmdLine.getOptionValue(OPT_GRM_BIN_LONG);
-		String grmText = cmdLine.getOptionValue(OPT_GRM_TEXT_LONG);
-		String grmGZ = cmdLine.getOptionValue(OPT_GRM_GZ_LONG);
+		String grmText = cmdLine.getOptionValue(OPT_GRM_TXT_LONG);
+		String grmGZ = cmdLine.getOptionValue(OPT_GRM);
 		
 		int numFiles = 0;
 		
@@ -76,15 +81,15 @@ public class BlupPcaCommand extends Command
 		
 		if (numFiles == 0)
 		{
-			throw new CommandArgumentException("No GRM is provided. One of --" + OPT_GRM_BIN_LONG + ", " + OPT_GRM_TEXT_LONG + " or --" + OPT_GRM_GZ_LONG + " must be set.");
+			throw new CommandArgumentException("No GRM is provided. One of --" + OPT_GRM_BIN_LONG + ", " + OPT_GRM_TXT_LONG + " or --" + OPT_GRM + " must be set.");
 		}
 		
 		if (numFiles > 1)
 		{
-			throw new CommandArgumentException("At most one of --" + OPT_GRM_BIN_LONG + ", --" + OPT_GRM_TEXT_LONG + " and --" + OPT_GRM_GZ_LONG + " can be set.");
+			throw new CommandArgumentException("At most one of --" + OPT_GRM_BIN_LONG + ", --" + OPT_GRM_TXT_LONG + " and --" + OPT_GRM + " can be set.");
 		}
 	}
-	
+
 	private void parseFileArguments(BlupPcaCommandArguments blupArgs, CommandLine cmdLine) throws CommandArgumentException
 	{
 		String bfile = cmdLine.getOptionValue(OPT_BFILE_LONG);
@@ -109,16 +114,19 @@ public class BlupPcaCommand extends Command
 	{
 		return new BlupPcaCommandImpl();
 	}
-	
+
 	private final static String OPT_GRM_BIN_LONG = "grm-bin";
 	private final static String OPT_GRM_BIN_DESC = "Specify the .grm.bin and .grm.id files";
 	
-	private final static String OPT_GRM_TEXT_LONG = "grm";
-	private final static String OPT_GRM_TEXT_DESC = "Specify the .grm and .grm.id files";
+	private final static String OPT_GRM = "grm";
+	private final static String OPT_GRM_DESC = "Specify the .grm and .grm.id files";
 	
-	private final static String OPT_GRM_GZ_LONG = "grm-gz";
-	private final static String OPT_GRM_GZ_DESC = "Specify the .grm.gz and .grm.id files";
+	private final static String OPT_GRM_TXT_LONG = "grm-txt";
+	private final static String OPT_GRM_TXT_DESC = "Specify the .grm.txt and .grm.id files";
 	
-	private final static String OPT_PHE_LONG = "pheno";
+	private final static String OPT_PHE = "pheno";
 	private final static String OPT_PHE_DESC = "Specify the phenotype file (individual eigenvector)";
+	
+	private final static String OPT_MPHE = "mpheno";
+	private final static String OPT_MPHE_DESC = "Specify the index for phenotype file (individual eigenvector)";
 }

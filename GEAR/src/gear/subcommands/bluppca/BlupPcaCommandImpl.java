@@ -1,7 +1,7 @@
 package gear.subcommands.bluppca;
 
 import gear.ConstValues;
-import gear.data.InputDataSet;
+import gear.data.InputDataSet2;
 import gear.family.pedigree.file.MapFile;
 import gear.family.pedigree.file.SNP;
 import gear.family.plink.PLINKParser;
@@ -31,9 +31,17 @@ public class BlupPcaCommandImpl extends CommandImpl
 	{
 		BlupPcaCommandArguments blupArgs = (BlupPcaCommandArguments)cmdArgs;
 
-		InputDataSet data = new InputDataSet();
-		data.readSubjectIDFile(blupArgs.getGrmID());
-		data.readPhenotypeFile(blupArgs.getPhenotypeFile());
+		InputDataSet2 data = new InputDataSet2();
+		data.addFile(blupArgs.getGrmID());
+		if (blupArgs.getPhenotypeIndex()[0] == -1)
+		{
+			data.addFile(blupArgs.getPhenotypeFile(), true);			
+		}
+		else
+		{
+			data.addFile(blupArgs.getPhenotypeFile(), blupArgs.getPhenotypeIndex());			
+		}
+		data.LineUpFiles();
 
 		readGrm(blupArgs, data.getNumberOfSubjects());
 
@@ -99,15 +107,17 @@ public class BlupPcaCommandImpl extends CommandImpl
 			}
 		}
 
-		for(int traitIdx = 0; traitIdx < data.getNumberOfTraits(); traitIdx++)
+		for(int traitIdx = 0; traitIdx < 1; traitIdx++)
 		{
 			Logger.printUserLog("Calculating blup vector[" + (traitIdx+1) + "].");
 
 			double[] Y = new double[data.getNumberOfSubjects()];
+			int[] pIdx = data.getMatchedSubjectIdx(1);
 			for(int subjectIdx = 0; subjectIdx < Y.length; subjectIdx++)
 			{
-				Y[subjectIdx] = data.isPhenotypeMissing(subjectIdx, traitIdx) ? 0 : data.getPhenotype(subjectIdx, traitIdx);
+				Y[subjectIdx] = data.getVariable(1, pIdx[subjectIdx], traitIdx);
 			}
+
 			RealMatrix B = tmp.multiply(new Array2DRowRealMatrix(Y));
 
 //			Logger.printUserLog("Rescaling the snp effects...");
@@ -123,15 +133,16 @@ public class BlupPcaCommandImpl extends CommandImpl
 		ArrayList<SNP> snpList = mapFile.getMarkerList();
 
 		predictorFile.print("SNP\tRefAllele");
-		for(int traitIdx = 0; traitIdx < data.getNumberOfTraits(); traitIdx++)
+		
+		for(int i = 0; i < blupArgs.getPhenotypeIndex().length; i++)
 		{
-			if (traitIdx == (data.getNumberOfTraits() - 1)) 
+			if (blupArgs.getPhenotypeIndex()[0] == -1)
 			{
-				predictorFile.println("\tBLUP" + (traitIdx+1));				
+				predictorFile.print("\tblup_trait" + (i+1));				
 			}
 			else
 			{
-				predictorFile.print("\tBLUP" + (traitIdx+1));
+				predictorFile.print("\tblup_trait" + (blupArgs.getPhenotypeIndex()[i] + 1));
 			}
 		}
 

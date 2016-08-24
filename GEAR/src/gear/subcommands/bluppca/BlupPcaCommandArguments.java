@@ -61,6 +61,18 @@ public class BlupPcaCommandArguments extends CommandArguments
 	{
 		this.pheFile = pheFile;
 	}
-	
+
+	public void setPhenotypeIndex(String pIdx) 
+	{
+		this.mphe[0] = Integer.parseInt(pIdx) -1;
+	}
+
+	public int[] getPhenotypeIndex()
+	{
+		return mphe;
+	}
+
 	private String pheFile;
+	private int[] mphe = {-1};
+
 }
