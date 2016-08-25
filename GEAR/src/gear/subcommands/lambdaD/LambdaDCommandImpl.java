@@ -3,7 +3,6 @@ package gear.subcommands.lambdaD;
 import java.io.BufferedWriter;
 import java.io.IOException;
 import java.io.PrintStream;
-import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -42,7 +41,7 @@ public class LambdaDCommandImpl extends CommandImpl
 		initial();
 
 		// generating matrix
-		DecimalFormat fmt = new DecimalFormat("0.0000");
+//		DecimalFormat fmt = new DecimalFormat("0.0000");
 		String[] MetaFile = gReader.getMetaFile();
 		int FileSize = lamArgs.getTop() > 0 ? lamArgs.getTop()
 				: (MetaFile.length - 1);

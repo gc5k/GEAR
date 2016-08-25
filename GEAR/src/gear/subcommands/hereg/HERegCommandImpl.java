@@ -2,7 +2,6 @@ package gear.subcommands.hereg;
 
 import java.io.PrintStream;
 import java.text.DecimalFormat;
-import java.text.Format;
 
 import org.apache.commons.math.stat.StatUtils;
 import org.apache.commons.math.stat.regression.OLSMultipleLinearRegression;

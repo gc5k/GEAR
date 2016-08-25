@@ -107,6 +107,11 @@ public class LabPopCommandArguments extends CommandArguments
 		}
 		rec[0] = 0.5;
 	}
+	
+	public String getRecFile()
+	{
+		return RecFile;
+	}
 
 //heritability	
 	public void setHsq(double h2)

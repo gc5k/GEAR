@@ -7,7 +7,6 @@ import java.util.Collections;
 import java.util.HashMap;
 
 import gear.ConstValues;
-import gear.family.pedigree.file.MapFile;
 import gear.family.pedigree.file.SNP;
 import gear.family.plink.PLINKParser;
 import gear.family.popstat.GenotypeMatrix;
@@ -36,7 +35,7 @@ public class ArchCommandImpl extends CommandImpl
 
 		this.sf = new SampleFilter(pp.getPedigreeData(), pp.getMapData());
 		this.ssQC = new SumStatQC(pp.getPedigreeData(), pp.getMapData(), this.sf);
-		this.mapFile = this.ssQC.getMapFile();
+//		this.mapFile = this.ssQC.getMapFile();
 		this.gm = new GenotypeMatrix(this.ssQC.getSample());
 		
 		readExtract();
@@ -383,7 +382,7 @@ public class ArchCommandImpl extends CommandImpl
 	private ArrayList<SNP> snpListAdj = null;
 	private ArrayList<String> snpListAdjName = null;
 	
-	private MapFile mapFile;
+//	private MapFile mapFile;
 	private SampleFilter sf;
 	private SumStatQC ssQC;
 	private GenotypeMatrix gm;

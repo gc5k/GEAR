@@ -24,6 +24,7 @@ public class SynthCommand extends Command
 		return "Open GWAS algorithm (OATH).";
 	}
 
+	@SuppressWarnings("static-access")
 	@Override
 	public void prepareOptions(Options options)
 	{

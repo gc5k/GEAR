@@ -16,7 +16,6 @@ import gear.subcommands.oath.synthesize.freader.SynthFReader;
 import gear.subcommands.oath.synthesize.freader.SynthFStat;
 import gear.subcommands.oath.synthesize.freader.SynthMatrix;
 import gear.subcommands.oath.synthesize.freader.SynthRes;
-import gear.subcommands.weightedmeta.util.GMRes;
 import gear.util.BufferedReader;
 import gear.util.Logger;
 import gear.util.NewIt;
@@ -40,7 +39,7 @@ public class SynthCommandImpl extends CommandImpl
 		int totalCnt = 0;
 		int cnt = 0;
 		int singularCnt = 0;
-		int atgcCnt = 0;
+//		int atgcCnt = 0;
 		
 		Set<String> snps = fReader.getMetaSNPTable().keySet();
 		for (Iterator<String> e=snps.iterator(); e.hasNext();)

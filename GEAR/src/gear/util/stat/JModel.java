@@ -13,7 +13,7 @@ public class JModel
 		if (b.length > 1)
 		{
 			RealMatrix Mat_XX = new Array2DRowRealMatrix(XX);
-			if (!Mat_XX.isSingular() )
+			if ( (new LUDecompositionImpl (Mat_XX).getSolver().isNonSingular()) )
 			{
 				RealMatrix Dxx = new Array2DRowRealMatrix(Mat_XX.getRowDimension(), Mat_XX.getColumnDimension());
 				for(int i = 0; i < Dxx.getColumnDimension(); i++)

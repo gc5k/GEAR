@@ -21,8 +21,6 @@ import gear.realcheck.RealCheck;
 import gear.realcheck.RealCheckOne;
 import gear.simulation.RealDataSimulation;
 import gear.simulation.RealDataSimulationQT;
-import gear.simulation.SimuPolyCC;
-import gear.simulation.SimuPolyQT;
 import gear.subcommands.Command;
 import gear.sumstat.FrequencyCalculator;
 import gear.sumstat.Inbreeding;
@@ -156,14 +154,6 @@ public enum Gear
 					RealDataSimulationQT rdSimuQT = new RealDataSimulationQT();
 					rdSimuQT.GenerateSample();
 				}
-			}
-			else if (CmdArgs.INSTANCE.simupolyCCFlag)
-			{
-				SimuPolyCC polyCC = new SimuPolyCC();	
-			}
-			else if (CmdArgs.INSTANCE.simupolyQTFlag)
-			{
-				SimuPolyQT polyQT = new SimuPolyQT();	
 			}
 			else if (CmdArgs.INSTANCE.sumStatFlag)
 			{

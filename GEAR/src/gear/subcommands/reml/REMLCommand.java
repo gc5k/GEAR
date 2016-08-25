@@ -23,6 +23,7 @@ public class REMLCommand extends Command {
 		return "reml";
 	}
 
+	@SuppressWarnings("static-access")
 	@Override
 	public void prepareOptions(Options options) 
 	{

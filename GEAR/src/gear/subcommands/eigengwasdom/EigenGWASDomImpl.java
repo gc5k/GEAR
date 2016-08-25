@@ -201,6 +201,14 @@ public class EigenGWASDomImpl extends CommandImpl
 			Logger.printUserLog("Removed " + monoLoci + " monomorphic locus.");
 		}
 
+		if (singularLoci > 1)
+		{
+			Logger.printUserLog("Removed " + singularLoci + " singular loci.");
+		}
+		else if (singularLoci == 1)
+		{
+			Logger.printUserLog("Removed " + singularLoci + " singular locus.");			
+		}
 		Logger.printUserLog("Median of p values is " + pArray.get(idx));
 
 		try 

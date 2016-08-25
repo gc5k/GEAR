@@ -24,6 +24,7 @@ public class LabPopCommand extends Command
 		return "Generating laborotary populations.";
 	}
 
+	@SuppressWarnings("static-access")
 	@Override
 	public void prepareOptions(Options options)
 	{

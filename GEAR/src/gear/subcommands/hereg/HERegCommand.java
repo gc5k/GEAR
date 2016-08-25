@@ -8,7 +8,6 @@ import gear.subcommands.Command;
 import gear.subcommands.CommandArgumentException;
 import gear.subcommands.CommandArguments;
 import gear.subcommands.CommandImpl;
-import gear.subcommands.reml.REMLCommandArguments;
 
 public class HERegCommand extends Command 
 {
@@ -25,6 +24,7 @@ public class HERegCommand extends Command
 		return "Haseman-Elston regression";
 	}
 
+	@SuppressWarnings("static-access")
 	@Override
 	public void prepareOptions(Options options) 
 	{

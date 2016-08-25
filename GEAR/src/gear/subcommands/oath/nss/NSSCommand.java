@@ -24,6 +24,7 @@ public class NSSCommand extends Command
 		return "Generates naive summary statistics.";
 	}
 
+	@SuppressWarnings("static-access")
 	@Override
 	public void prepareOptions(Options options)
 	{
