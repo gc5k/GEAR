@@ -192,6 +192,22 @@ public class HERegCommandArguments extends CommandArguments
 		return keepFile;
 	}
 
+	public void setGRMcutoff(String gc) 
+	{
+		this.isGRMCut = true;
+		this.grmCutoff = Double.parseDouble(gc);
+	}
+
+	public double getGRMcutoff()
+	{
+		return grmCutoff;
+	}
+
+	public boolean isGRMcut()
+	{
+		return isGRMCut;
+	}
+
 	private String covFile = null;
 	private int[] covIdx = {0};
 	private String grmBin;
@@ -210,4 +226,7 @@ public class HERegCommandArguments extends CommandArguments
 	private boolean isSD = true;
 	private boolean isSS = false;
 	private boolean isCP = false;
+	
+	private boolean isGRMCut = false;
+	private double grmCutoff = 0;
 }

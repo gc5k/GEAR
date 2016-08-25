@@ -42,6 +42,7 @@ public class HERegCommand extends Command
 		options.addOption(OptionBuilder.withDescription(OPT_MPHE_DESC).hasArg().create(OPT_MPHE));
 		options.addOption(OptionBuilder.withDescription(OPT_KEEP_DESC).hasArg().create(OPT_KEEP));
 		options.addOption(OptionBuilder.withDescription(OPT_SCALE_DESC).create(OPT_SCALE));
+		options.addOption(OptionBuilder.withDescription(OPT_GRM_CUTOFF_DESC).withLongOpt(OPT_GRM_CUTOFF_LONG).hasArg().create());
 
 	}
 
@@ -88,6 +89,11 @@ public class HERegCommand extends Command
 		if (cmdLine.hasOption(OPT_SS))
 		{
 			heArgs.setSS();
+		}
+		
+		if (cmdLine.hasOption(OPT_GRM_CUTOFF_LONG))
+		{
+			heArgs.setGRMcutoff(cmdLine.getOptionValue(OPT_GRM_CUTOFF_LONG));
 		}
 		return heArgs;
 	}
@@ -182,5 +188,7 @@ public class HERegCommand extends Command
 	private final static String OPT_KEEP = "keep";
 	private final static String OPT_KEEP_DESC = "Specify the individuals to be used in the analysis";
 
+	private final static String OPT_GRM_CUTOFF_LONG = "grm-cutoff";
+	private final static String OPT_GRM_CUTOFF_DESC = "Specify the grm cutfoo for the analysis";
 
 }

@@ -276,6 +276,7 @@ public class HERegCommandImpl extends CommandImpl {
 	{
 		SimpleRegression sReg = new SimpleRegression();
 
+		int cnt = 0;
 		for (int i = 0; i < Y.length; i++)
 		{
 			for (int j = 0; j < i; j++)
@@ -293,10 +294,13 @@ public class HERegCommandImpl extends CommandImpl {
 				{
 					yy = (Y[i] + Y[j]) * (Y[i] + Y[j]);
 				}
+				if (heArgs.isGRMcut() && A3[0][i][j] > heArgs.getGRMcutoff()) continue;
 				sReg.addData(A3[0][i][j], yy);
+				cnt++;
 			}
 		}
 
+		Logger.printUserLog(cnt + " observations for HE regression.");
 		beta = new double[2];
 		beta_v = new double[2][2];
 
