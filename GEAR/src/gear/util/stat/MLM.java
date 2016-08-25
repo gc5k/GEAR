@@ -333,6 +333,11 @@ public class MLM
 		return VAR.get(VAR.size() - 1);
 	}
 
+	public ArrayList<RealMatrix> getVCList()
+	{
+		return VAR;
+	}
+
 	public RealMatrix getVarVC()
 	{
 		return V_VAR;

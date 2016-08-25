@@ -1,11 +1,18 @@
 package gear.subcommands.reml;
 
+import java.io.PrintStream;
+import java.text.DecimalFormat;
+import java.util.ArrayList;
+
+import org.apache.commons.math.linear.RealMatrix;
+
 import gear.ConstValues;
 import gear.data.InputDataSet2;
 import gear.subcommands.CommandArguments;
 import gear.subcommands.CommandImpl;
 import gear.util.BinaryInputFile;
 import gear.util.BufferedReader;
+import gear.util.FileUtil;
 import gear.util.Logger;
 import gear.util.stat.MLM;
 
@@ -16,7 +23,6 @@ public class REMLCommandImpl extends CommandImpl {
 	{
 		remlArgs = (REMLCommandArguments)cmdArgs;
 
-		MLM mlm = null;
 		double[] Y = null;
 		double[][] X = null;
 		data = new InputDataSet2();
@@ -93,7 +99,109 @@ public class REMLCommandImpl extends CommandImpl {
 		}
 
 		mlm.MINQUE();
-		mlm.printVC();
+		printVC();
+//		mlm.printVC();
+	}
+
+	private void printVC()
+	{
+		ArrayList<RealMatrix> VAR = mlm.getVCList();
+		RealMatrix v_ = VAR.get(VAR.size() - 1);
+		RealMatrix V_VAR = mlm.getVarVC();
+		RealMatrix BETA = mlm.getBeta();
+		RealMatrix V_BETA = mlm.getVarBeta();
+
+		String Fout = remlArgs.getOutRoot() + ".reml";
+		PrintStream REMLout = FileUtil.CreatePrintStream(Fout);
+
+		REMLout.println("");
+		REMLout.println("Summary result of VC analysis");
+		REMLout.println("----------------------------------------------------------------------------------------------");
+		REMLout.println("Comp.\tEstimate\tSE\tProp.");
+
+		Logger.printUserLog("");
+		Logger.printUserLog("Summary result of VC analysis");
+		Logger.printUserLog("----------------------------------------------------------------------------------------------");
+		Logger.printUserLog("Comp.\tEstimate\tSE\tProp.");
+
+		double Vp = 0;
+		for (int i = 0; i < v_.getRowDimension(); i++)
+		{
+			Vp += v_.getEntry(i, 0);
+		}
+
+		for (int i = 0; i < v_.getRowDimension() -1; i++)
+		{
+			REMLout.println("V" + (i+1) + "\t" + fmt.format(v_.getEntry(i, 0)) + "\t" + fmt.format(Math.sqrt(V_VAR.getEntry(i, i)))+"\t" + fmt.format(v_.getEntry(i, 0)/Vp));
+			Logger.printUserLog("V" + (i+1) + "\t" + fmt.format(v_.getEntry(i, 0)) + "\t" + fmt.format(Math.sqrt(V_VAR.getEntry(i, i)))+"\t" + fmt.format(v_.getEntry(i, 0)/Vp));
+		}
+		
+		REMLout.println("Ve" + "\t" + fmt.format(v_.getEntry(v_.getRowDimension()-1, 0))+ "\t" + fmt.format(Math.sqrt(V_VAR.getEntry(v_.getRowDimension()-1, v_.getRowDimension()-1))) +"\t" + fmt.format(v_.getEntry(v_.getRowDimension()-1, 0)/Vp) );
+		REMLout.println("Vp\t" + fmt.format(Vp));
+
+		REMLout.println();
+		REMLout.println("Covariance structure for VC");
+		
+		Logger.printUserLog("Ve" + "\t" + fmt.format(v_.getEntry(v_.getRowDimension()-1, 0))+ "\t" + fmt.format(Math.sqrt(V_VAR.getEntry(v_.getRowDimension()-1, v_.getRowDimension()-1))) +"\t" + fmt.format(v_.getEntry(v_.getRowDimension()-1, 0)/Vp) );
+		Logger.printUserLog("Vp\t" + fmt.format(Vp));
+
+		Logger.printUserLog("");
+		Logger.printUserLog("Covariance structure for VC");
+
+		for (int i = 0; i < V_VAR.getRowDimension(); i++)
+		{
+			String s = new String();
+			for (int j = 0; j <=i; j++)
+			{
+				s += fmt.format(V_VAR.getEntry(i, j)) + "\t";
+			}
+			REMLout.println(s);
+			Logger.printUserLog(s);
+		}
+		REMLout.println("----------------------------------------------------------------------------------------------");
+		REMLout.println();
+		REMLout.println("Generalized linear square estimation (GLSE) for fixed effects");
+		REMLout.println("----------------------------------------------------------------------------------------------");
+		REMLout.println("Para.\tEstimate\tSE");
+
+		Logger.printUserLog("----------------------------------------------------------------------------------------------");
+		Logger.printUserLog("");
+		Logger.printUserLog("Generalized linear square estimation (GLSE) for fixed effects");
+		Logger.printUserLog("----------------------------------------------------------------------------------------------");
+		Logger.printUserLog("Para.\tEstimate\tSE");
+
+		for (int i = 0; i < BETA.getRowDimension(); i++)
+		{
+			if (i == 0)
+			{
+				REMLout.println("Mean\t" + fmt.format(BETA.getEntry(i, 0)) + "\t" + fmt.format(Math.sqrt(V_BETA.getEntry(i, i))));
+				Logger.printUserLog("Mean\t" + fmt.format(BETA.getEntry(i, 0)) + "\t" + fmt.format(Math.sqrt(V_BETA.getEntry(i, i))));
+			}
+			else 
+			{
+				REMLout.println("Cov" + (remlArgs.getCovNumber()[i-1]+1) +"\t"+ fmt.format(BETA.getEntry(i, 0)) + "\t" + fmt.format(Math.sqrt(V_BETA.getEntry(i, i))));
+				Logger.printUserLog("Cov" + (remlArgs.getCovNumber()[i-1]+1) +"\t"+ fmt.format(BETA.getEntry(i, 0)) + "\t" + fmt.format(Math.sqrt(V_BETA.getEntry(i, i))));
+			}
+		}
+
+		REMLout.println("Covariance structrue for GLSE");
+
+		Logger.printUserLog("");
+		Logger.printUserLog("Covariance structrue for GLSE");
+		for (int i = 0; i < V_BETA.getRowDimension(); i++)
+		{
+			String s = new String();
+			for (int j = 0; j <= i; j++)
+			{
+				s += fmt.format(V_BETA.getEntry(i, j)) + "\t";
+			}
+			REMLout.println(s);
+			Logger.printUserLog(s);
+		}
+		REMLout.println("----------------------------------------------------------------------------------------------");
+		Logger.printUserLog("----------------------------------------------------------------------------------------------");
+
+		REMLout.close();
 	}
 
 	private double[][] readCovar()
@@ -224,7 +332,10 @@ public class REMLCommandImpl extends CommandImpl {
 	private int covFileIdx = 2;
 	private int keepFileIdx = 3;
 
+	MLM mlm = null;
 	private double[][] A;
 	private REMLCommandArguments remlArgs = null;
 	private InputDataSet2 data = null;
+	DecimalFormat fmt = new DecimalFormat("0.000");
+
 }
