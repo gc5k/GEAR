@@ -43,7 +43,6 @@ public class REMLCommandImpl extends CommandImpl {
 			{
 				data.addFile(remlArgs.getKeepFile());
 				fidx++;
-				keepFileIdx = fidx;
 			}
 			data.LineUpFiles();
 
@@ -70,14 +69,10 @@ public class REMLCommandImpl extends CommandImpl {
 			if (remlArgs.getCovFile() != null)
 			{
 				data.addFile(remlArgs.getCovFile(), remlArgs.getCovNumber());
-				fidx++;
-				covFileIdx = fidx;
 			}
 			if (remlArgs.getKeepFile() != null)
 			{
 				data.addFile(remlArgs.getKeepFile());
-				fidx++;
-				keepFileIdx = fidx;
 			}
 			data.LineUpFiles();
 
@@ -330,7 +325,6 @@ public class REMLCommandImpl extends CommandImpl {
 	private int grmFileIdx = 0;
 	private int pheFileIdx = 1;
 	private int covFileIdx = 2;
-	private int keepFileIdx = 3;
 
 	MLM mlm = null;
 	private double[][] A;
