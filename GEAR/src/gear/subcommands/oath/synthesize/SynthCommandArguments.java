@@ -12,7 +12,7 @@ import gear.util.NewIt;
 public class SynthCommandArguments extends CommandArguments 
 {
 
-	public void setMetaBatch(String batch)
+	public void setNSSBatch(String batch)
 	{
 		FileUtil.exists(batch);
 		md = NewIt.newArrayList();
@@ -38,7 +38,7 @@ public class SynthCommandArguments extends CommandArguments
 		return isGZ;
 	}
 
-	public String[] getMetaFile() 
+	public String[] getNSSFile() 
 	{
 		return md.toArray(new String[0]);
 	}
@@ -89,7 +89,29 @@ public class SynthCommandArguments extends CommandArguments
 	{
 		return N;
 	}
+
+	public void setKeepBatch(String[] kbidx) 
+	{
+		keepBatchIdx = new int[kbidx.length];
+		for (int i = 0; i < kbidx.length; i++)
+		{
+			keepBatchIdx[i] = Integer.parseInt(kbidx[i]);
+			if (keepBatchIdx[i] < 0)
+			{
+				Logger.printUserLog("--keep-nss index is small than 0.");
+				Logger.printUserLog("GEAR quitted.");
+				System.exit(1);
+			}
+			keepBatchIdx[i]--;
+		}
+	}
 	
+	public int[] getKeepBatchIdx()
+	{
+		return keepBatchIdx;
+	}
+
+	private int[] keepBatchIdx = null;
 	private String cmFile;
 	private ArrayList<String> md;
 	private int chr = 1;

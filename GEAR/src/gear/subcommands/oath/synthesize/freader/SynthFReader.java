@@ -37,7 +37,7 @@ public class SynthFReader
 		}
 		else
 		{
-			Logger.printUserLog(workingMetaFile.size() + " cohorts are remained for analysis.\n");
+			Logger.printUserLog(workingMetaFile.size() + " cohorts are remained for analysis.");
 		}
 
 		KeyIdx = new int[workingMetaFile.size()][OATHConst.num_key];
@@ -448,12 +448,12 @@ public class SynthFReader
 		MetaSNPArray.add(snpArray);
 		if (cnt == 0)
 		{
-			Logger.printUserLog("Did not find any summary statistics from '" + workingMetaFile.get(metaIdx)+ ".'");
+			Logger.printUserLog("Did not find any summary statistics from '" + workingMetaFile.get(metaIdx)+ "'.");
 			System.exit(0);
 		}
 		else
 		{
-			Logger.printUserLog("Read " + cnt +" (of " + total + ") summary statistics from '" + workingMetaFile.get(metaIdx) + ".'\n");
+			Logger.printUserLog("Read " + cnt +" (of " + total + ") summary statistics from '" + workingMetaFile.get(metaIdx) + "'.");
 		}
 
 		return sumstat;

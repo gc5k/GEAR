@@ -28,13 +28,55 @@ public class SynthCommandImpl extends CommandImpl
 	{
 		synArgs = (SynthCommandArguments) cmdArgs;
 		readCM();
+		readKeep();
+		if (synArgs.getKeepBatchIdx() == null && corMat.length != synArgs.getNSSFile().length)
+		{
+			Logger.printUserLog("The size of correlation matrix ("+ corMat.length +"X"+corMat.length+")does not fit to the nss files.");
+			System.exit(1);
+		}
 		readNSS();
-		
 		oath();
 	}
 	
+	private void readKeep()
+	{
+		keepBatch = new boolean[corMat.length];
+		int[] kp = synArgs.getKeepBatchIdx();
+		if (kp != null)
+		{
+			Arrays.sort(kp);
+			Arrays.fill(keepBatch, false);
+			for(int i = 0; i < kp.length; i++)
+			{
+				if (kp[i] > keepBatch.length) 
+				{
+					Logger.printUserLog("--keep-nss index is greater than " + keepBatch.length + ".");
+					Logger.printUserLog("GEAR quitted.");
+					System.exit(1);
+				}
+				keepBatch[kp[i]] = true;
+			}
+
+			double[][] cm = new double[kp.length][kp.length];
+			for(int i = 0; i < kp.length; i++)
+			{
+				for(int j = 0; j < kp.length; j++)
+				{
+					cm[i][j] = corMat[kp[i]][kp[j]];
+				}
+			}
+			corMat = cm;
+			Logger.printUserLog(kp.length + " nss files are kept for analysis.");
+		}
+		else
+		{
+			Arrays.fill(keepBatch, true);
+		}
+	}
+
 	private void oath()
 	{
+		Logger.printUserLog("");
 		Logger.printUserLog("Starting OATH-analysis...");
 		int totalCnt = 0;
 		int cnt = 0;
@@ -88,14 +130,13 @@ public class SynthCommandImpl extends CommandImpl
 
 	private void readCM()
 	{
-		Logger.printUserLog("Reading correlation matrix from '" + synArgs.getCMFile() + "'.");
 		BufferedReader reader = null;
 		reader = BufferedReader.openTextFile(synArgs.getCMFile(), "Correlation matrix file.");
 
 		String[] tokens = reader.readTokens();
 		int tokenLen = tokens.length;
 
-		if (tokenLen != synArgs.getMetaFile().length)
+		if (tokenLen != synArgs.getNSSFile().length)
 		{
 			Logger.printUserError("The dimension of the matrix does not match the number of nss files.");
 			Logger.printUserError("Gear quitted.");
@@ -112,19 +153,18 @@ public class SynthCommandImpl extends CommandImpl
 			}
 			cnt++;
 		} while ((tokens = reader.readTokens()) != null);
+		Logger.printUserLog("Reading " +tokenLen +"X" +tokenLen +" correlation matrix from '" + synArgs.getCMFile() + "'.");
 	}
 
 	private void readNSS() 
 	{
-		boolean[] FileKeep = new boolean[synArgs.getMetaFile().length];
-		Arrays.fill(FileKeep, true);
-		fReader = new SynthFReader(synArgs.getMetaFile(), FileKeep,
+		fReader = new SynthFReader(synArgs.getNSSFile(), keepBatch,
 				synArgs.getKeys(), true, synArgs.isGZ(),
 				synArgs.isChr(), synArgs.getChr());
 
 		fReader.Start();
 
-		int NumMetaFile = synArgs.getMetaFile().length;
+		int NumMetaFile = synArgs.getNSSFile().length;
 
 		if (NumMetaFile < 2)
 		{
@@ -144,7 +184,7 @@ public class SynthCommandImpl extends CommandImpl
         }
 		catch (IOException e)
 		{
-			Logger.handleException(e, "An I/O exception occurred when writing '" + synArgs.getOutRoot() + ".gmeta" + "'.\n");
+			Logger.handleException(e, "An I/O exception occurred when writing '" + synArgs.getOutRoot() + ".oath'.\n");
 		}
 
 		for(int i = 0; i < grArray.size(); i++)
@@ -159,9 +199,10 @@ public class SynthCommandImpl extends CommandImpl
 		writer.close();
 	}
 
+	private boolean[] keepBatch = null;
 	private SynthCommandArguments synArgs;
 	private SynthFReader fReader;
-	private double[][] corMat;
+	private double[][] corMat = null;
 	private ArrayList<SynthRes> grArray = NewIt.newArrayList();
 
 }

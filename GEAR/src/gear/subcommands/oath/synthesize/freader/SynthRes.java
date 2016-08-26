@@ -100,7 +100,7 @@ public class SynthRes implements Comparable<SynthRes>
 	public String printTitle()
 	{
 		StringBuffer sb = new StringBuffer();
-		sb.append("SNP CHR BP A1 A2 BETA SE Z P COV");
+		sb.append("SNP\tCHR\tBP\tA1\tA2\tBETA\tSE\tZ\tP\tCOV");
 		return sb.toString();
 	}
 
@@ -110,32 +110,32 @@ public class SynthRes implements Comparable<SynthRes>
 		DecimalFormat fmtp = new DecimalFormat("0.000E000");
 
 		StringBuffer sb = new StringBuffer();
-		sb.append(snp + " " + chr + " " + bp + " " + A1 + " " + A2 + " " );
+		sb.append(snp + "\t" + chr + "\t" + bp + "\t" + A1 + "\t" + A2 + "\t" );
 		if (Math.abs(b) >= 0.0001)
 		{
-			sb.append(fmt.format(b) + " ");
+			sb.append(fmt.format(b) + "\t");
 		}
 		else
 		{
-			sb.append(fmtp.format(b) + " ");
+			sb.append(fmtp.format(b) + "\t");
 		}
 
 		if (Math.abs(se) >= 0.0001)
 		{
-			sb.append(fmt.format(se) + " ");
+			sb.append(fmt.format(se) + "\t");
 		}
 		else
 		{
-			sb.append(fmtp.format(se) + " ");
+			sb.append(fmtp.format(se) + "\t");
 		}
 
 		if (Math.abs(z) >= 0.001)
 		{
-			sb.append(fmt.format(z) + " ");
+			sb.append(fmt.format(z) + "\t");
 		}
 		else
 		{
-			sb.append(fmtp.format(z) + " ");
+			sb.append(fmtp.format(z) + "\t");
 		}
 		sb.append("1\t" +cohort);
 		return sb.toString();

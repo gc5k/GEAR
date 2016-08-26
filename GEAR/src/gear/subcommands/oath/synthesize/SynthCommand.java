@@ -1,4 +1,4 @@
-package gear.subcommands.oath.synthesize;
+ package gear.subcommands.oath.synthesize;
 
 import org.apache.commons.cli.CommandLine;
 import org.apache.commons.cli.OptionBuilder;
@@ -28,12 +28,13 @@ public class SynthCommand extends Command
 	@Override
 	public void prepareOptions(Options options)
 	{
-		options.addOption(OptionBuilder.withDescription(OPT_META_BATCH_DESC).withLongOpt(OPT_META_BATCH_LONG).hasArg().create(OPT_META_BATCH));
-		options.addOption(OptionBuilder.withDescription(OPT_META_GZ_BATCH_DESC).withLongOpt(OPT_META_GZ_BATCH_LONG).hasArg().create(OPT_META_GZ_BATCH));
+		options.addOption(OptionBuilder.withDescription(OPT_NSS_BATCH_DESC).withLongOpt(OPT_NSS_BATCH_LONG).hasArg().create(OPT_NSS_BATCH));
+		options.addOption(OptionBuilder.withDescription(OPT_NSS_GZ_BATCH_DESC).withLongOpt(OPT_NSS_GZ_BATCH_LONG).hasArg().create(OPT_NSS_GZ_BATCH));
 		options.addOption(OptionBuilder.withDescription(OPT_KEEP_ATGC_DESC).withLongOpt(OPT_KEEP_ATGC_LONG).create(OPT_KEEP_ATGC));
 		options.addOption(OptionBuilder.withDescription(OPT_CM_DESC).hasArg().isRequired().create(OPT_CM));
 		options.addOption(OptionBuilder.withDescription(OPT_CHR_DESC).hasArg().create(OPT_CHR));
 		options.addOption(OptionBuilder.withDescription(OPT_N_DESC).hasArg().create(OPT_N));
+		options.addOption(OptionBuilder.withDescription(OPT_KEEP_BATCH_DESC).withLongOpt(OPT_KEEP_BATCH_LONG).hasArgs().create());
 	}
 
 	@Override
@@ -41,15 +42,15 @@ public class SynthCommand extends Command
 	{
 		SynthCommandArguments synArgs = new SynthCommandArguments();
 
-		if (cmdLine.hasOption(OPT_META_BATCH))
+		if (cmdLine.hasOption(OPT_NSS_BATCH))
 		{
-			synArgs.setMetaBatch(cmdLine.getOptionValue(OPT_META_BATCH));
+			synArgs.setNSSBatch(cmdLine.getOptionValue(OPT_NSS_BATCH));
 			synArgs.setGZ(false);
 		}
 
-		if (cmdLine.hasOption(OPT_META_GZ_BATCH))
+		if (cmdLine.hasOption(OPT_NSS_GZ_BATCH))
 		{
-			synArgs.setMetaBatch(cmdLine.getOptionValue(OPT_META_GZ_BATCH));
+			synArgs.setNSSBatch(cmdLine.getOptionValue(OPT_NSS_GZ_BATCH));
 			synArgs.setGZ(true);
 		}
 
@@ -64,6 +65,10 @@ public class SynthCommand extends Command
 			synArgs.setN(cmdLine.getOptionValue(OPT_N));
 		}
 
+		if (cmdLine.hasOption(OPT_KEEP_BATCH_LONG))
+		{
+			synArgs.setKeepBatch(cmdLine.getOptionValues(OPT_KEEP_BATCH_LONG));
+		}
 		return synArgs;
 	}
 
@@ -74,13 +79,13 @@ public class SynthCommand extends Command
 		return synImpl;
 	}
 
-	private final static String OPT_META_BATCH = "mb";
-	private final static String OPT_META_BATCH_LONG = "meta-batch";
-	private final static String OPT_META_BATCH_DESC = "The summary statistic batch";
+	private final static String OPT_NSS_BATCH = "nb";
+	private final static String OPT_NSS_BATCH_LONG = "nss-batch";
+	private final static String OPT_NSS_BATCH_DESC = "The summary statistic batch";
 
-	private final static String OPT_META_GZ_BATCH = "mgb";
-	private final static String OPT_META_GZ_BATCH_LONG = "meta-gz-batch";
-	private final static String OPT_META_GZ_BATCH_DESC = "The summary statistic files in gz format";
+	private final static String OPT_NSS_GZ_BATCH = "mgb";
+	private final static String OPT_NSS_GZ_BATCH_LONG = "nss-gz-batch";
+	private final static String OPT_NSS_GZ_BATCH_DESC = "The summary statistic files in gz format";
 
 	private final static String OPT_CHR = "chr";
 	private final static String OPT_CHR_DESC = "Choose chromosome for analysis";
@@ -94,5 +99,8 @@ public class SynthCommand extends Command
 	
 	private final static String OPT_N = "n";
 	private final static String OPT_N_DESC = "Sample size";
+
+	private final static String OPT_KEEP_BATCH_LONG = "keep-nss";
+	private final static String OPT_KEEP_BATCH_DESC = "Specify the indexes of nss files.";
 
 }
