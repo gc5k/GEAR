@@ -30,19 +30,42 @@ public class NSSCommand extends Command
 	{
 		options.addOption(OptionBuilder.withDescription(OPT_BFILE_DESC).withLongOpt(OPT_BFILE_LONG).hasArg().isRequired().create());
 		options.addOption(OptionBuilder.withDescription(OPT_PHE_DESC).hasArg().isRequired().create(OPT_PHE));
-		options.addOption(OptionBuilder.withDescription(OPT_MPHE_DESC).hasArgs().isRequired().create(OPT_MPHE));
+		options.addOption(OptionBuilder.withDescription(OPT_MPHE_DESC).hasArg().isRequired().create(OPT_MPHE));
+		options.addOption(OptionBuilder.withDescription(OPT_COVAR_DESC).hasArg().isRequired().create(OPT_COVAR));
+		options.addOption(OptionBuilder.withDescription(OPT_COVAR_NUMBER_DESC).withLongOpt(OPT_COVAR_NUMBER).hasArgs().create());
 		options.addOption(OptionBuilder.withDescription(OPT_CHR_DESC).hasArg().create(OPT_CHR));
 		options.addOption(OptionBuilder.withDescription(OPT_KEEP_DESC).hasArg().create(OPT_KEEP));
 	}
 
 	@Override
-	public CommandArguments parse(CommandLine cmdLine) throws CommandArgumentException 
+	public CommandArguments parse(CommandLine cmdLine) throws CommandArgumentException
 	{
 		NSSCommandArguments nssArgs = new NSSCommandArguments();
 		parseFileArguments(nssArgs, cmdLine);
-		nssArgs.setPhentypeIndex(cmdLine.getOptionValues(OPT_MPHE));
 		nssArgs.setPhenotypeFile(cmdLine.getOptionValue(OPT_PHE));
-		nssArgs.setKeeFile(cmdLine.getOptionValue(OPT_KEEP));
+
+		if (cmdLine.hasOption(OPT_MPHE))
+		{
+			nssArgs.setPhentypeIndex(cmdLine.getOptionValue(OPT_MPHE));
+		}
+
+		nssArgs.setCovFile(cmdLine.getOptionValue(OPT_COVAR));
+
+		if (cmdLine.hasOption(OPT_COVAR_NUMBER))
+		{
+			nssArgs.setCovNumber(cmdLine.getOptionValues(OPT_COVAR_NUMBER));
+		}
+
+		if (cmdLine.hasOption(OPT_KEEP))
+		{
+			nssArgs.setKeeFile(cmdLine.getOptionValue(OPT_KEEP));
+		}
+		
+		if (cmdLine.hasOption(OPT_CHR))
+		{
+			nssArgs.setChr(cmdLine.getOptionValue(OPT_CHR));
+		}
+
 		return nssArgs;
 	}
 
@@ -78,10 +101,19 @@ public class NSSCommand extends Command
 
 	private static final String OPT_PHE = "pheno";
 	private static final String OPT_PHE_DESC = "Specify the phenotype file (individual eigenvector)";
+
 	private static final String OPT_MPHE = "mpheno";
 	private static final String OPT_MPHE_DESC = "Specify the phenotype indicex";
+
+	private final static String OPT_COVAR = "covar";
+	private final static String OPT_COVAR_DESC = "Specify the covariate file";
+
+	private final static String OPT_COVAR_NUMBER = "covar-number";
+	private final static String OPT_COVAR_NUMBER_DESC = "Specify the indices for covariate file";
+
 	private static final String OPT_CHR = "chr";
 	private static final String OPT_CHR_DESC = "Specify the chromosomes for analysis";
+
 	private static final String OPT_KEEP = "keep";
 	private static final String OPT_KEEP_DESC = "Specify the samples for the analysis";
 

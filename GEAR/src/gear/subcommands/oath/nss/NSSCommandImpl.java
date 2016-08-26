@@ -19,7 +19,6 @@ import java.util.Collections;
 
 import org.apache.commons.math.MathException;
 import org.apache.commons.math.distribution.ChiSquaredDistributionImpl;
-import org.apache.commons.math.linear.Array2DRowRealMatrix;
 import org.apache.commons.math.linear.RealMatrix;
 import org.apache.commons.math.stat.regression.SimpleRegression;
 import org.apache.commons.math.stat.StatUtils;
@@ -33,6 +32,8 @@ public class NSSCommandImpl extends CommandImpl
 	private SumStatQC ssQC;
 	private GenotypeMatrix gm;
 	private int[] traitIdx;
+	private int[] covIdx;
+	private int N;
 	private InputDataSet2 data = null;
 	private ArrayList<NSSGWASResult> nssResult;
 
@@ -41,19 +42,23 @@ public class NSSCommandImpl extends CommandImpl
 	
 	private int famFileIdx = 0;
 	private int pheFileIdx = 1;
+	private int covFileIdx = 2;
 
 	public void execute(CommandArguments cmdArgs) 
 	{
 		this.nssArgs = ((NSSCommandArguments) cmdArgs);
 
 		this.traitIdx = this.nssArgs.getMpheno();
-		int[] covIdx = new int[this.traitIdx.length - 1];
-		System.arraycopy(this.traitIdx, 1, covIdx, 0, covIdx.length);
+		this.covIdx = this.nssArgs.getCovNumber();
+
 		data = new InputDataSet2();
 		data.addFile(this.nssArgs.getFam());
 		data.addFile(this.nssArgs.getPhenotypeFile(), this.nssArgs.getMpheno());
+		data.addFile(this.nssArgs.getCovFile(), this.nssArgs.getCovNumber());
 		if(this.nssArgs.getKeepFile() != null) data.addFile(this.nssArgs.getKeepFile());
 		data.LineUpFiles();
+
+		this.N = data.getNumberOfSubjects();
 
 		PLINKParser pp = PLINKParser.parse(this.nssArgs);
 		this.sf = new SampleFilter(pp.getPedigreeData(), pp.getMapData());
@@ -64,70 +69,57 @@ public class NSSCommandImpl extends CommandImpl
 		for (int i = 0; i < traitIdx.length; i++)
 		{
 			Logger.printUserLog("");
-			Logger.printUserLog("Generating naive summary statistics (NSS) for "+ (traitIdx[i] + 1) + "th variable.");
+			Logger.printUserLog("Generating naive summary statistics (NSS) for "+ (traitIdx[i] + 1) + "th variable in file '" + nssArgs.getPhenotypeFile() + "'.");
 			nssResult = NewIt.newArrayList();
-			naiveGWAS(i);
-			printResult(i);
+			naiveGWAS(pheFileIdx, traitIdx, i);
+			printResult(traitIdx, i, pheFileIdx);
+		}
+		
+		for (int i = 0; i < covIdx.length; i++)
+		{
+			Logger.printUserLog("");
+			Logger.printUserLog("Generating naive summary statistics (NSS) for "+ (covIdx[i] + 1) + "th variable in file '" + nssArgs.getCovFile() + "'.");
+			nssResult = NewIt.newArrayList();
+			naiveGWAS(covFileIdx, covIdx, i);
+			printResult(covIdx, i, covFileIdx);
 		}
 
 		String Fout = nssArgs.getOutRoot()  + ".list.nss";
 		PrintStream nssList = FileUtil.CreatePrintStream(Fout);
 		for (int i = 0; i < traitIdx.length; i++)
 		{
-			nssList.println(nssArgs.getOutRoot() + "." + (traitIdx[i] + 1) + ".nss");
+			nssList.println(nssArgs.getOutRoot() + ".p." + (traitIdx[i] + 1) + ".nss");
 		}
+		for (int i = 0; i < covIdx.length; i++)
+		{
+			nssList.println(nssArgs.getOutRoot() + ".c." + (covIdx[i] + 1) + ".nss");
+		}
+
 		nssList.close();
 		printCovMat();
 	}
 
 	private void printCovMat()
 	{
-		ArrayList<ArrayList<Double>> Dat = NewIt.newArrayList();
-		int[] pheIdx = data.getMatchedSubjectIdx(pheFileIdx);
-		for (int subjectIdx = 0; subjectIdx < pheIdx.length; subjectIdx++)
-		{
-			ArrayList<Double> dat = NewIt.newArrayList();
-			boolean isMissing = false;
-			for (int j = 0; j < traitIdx.length; j++)
-			{
-				if (!this.data.isVariableMissing(pheFileIdx, pheIdx[subjectIdx], this.traitIdx[j]))
-				{
-					dat.add((double) this.data.getVariable(pheFileIdx, pheIdx[subjectIdx], this.traitIdx[j]));
-				}
-				else
-				{
-					isMissing = true;
-				}
-			}
-			if (!isMissing)
-			{
-				Dat.add(dat);
-			}
-		}
+		int[] pIdx = data.getMatchedSubjectIdx(pheFileIdx);
+		int[] cIdx = data.getMatchedSubjectIdx(covFileIdx);
 
-		double[][] pheVec = new double[Dat.size()][traitIdx.length];
-		for (int i = 0; i < Dat.size(); i++)
+		double[][] pheVec = new double[data.getNumberOfSubjects()][traitIdx.length + covIdx.length];
+
+		for (int subjectIdx = 0; subjectIdx < pIdx.length; subjectIdx++)
 		{
-			ArrayList<Double> D = Dat.get(i);
-			for (int j = 0; j < D.size(); j++)
+			pheVec[subjectIdx][0]= this.data.getVariable(pheFileIdx, pIdx[subjectIdx], this.traitIdx[0]);
+			for (int j = 0; j < covIdx.length; j++)
 			{
-				pheVec[i][j] = D.get(j);
+				pheVec[subjectIdx][j+1] = this.data.getVariable(covFileIdx, cIdx[subjectIdx], this.covIdx[j]);
 			}
 		}
 
 		PearsonsCorrelation pc; 
 		RealMatrix mc;
 
-		if (traitIdx.length > 1)
-		{
-			pc = new PearsonsCorrelation(pheVec);
-			mc = pc.getCorrelationMatrix();
-		}
-		else
-		{
-			double[][] cor={{1}};
-			mc = new Array2DRowRealMatrix(cor);
-		}
+		pc = new PearsonsCorrelation(pheVec);
+		mc = pc.getCorrelationMatrix();
 
 		String Fout = nssArgs.getOutRoot()  + ".m.nss";
 		PrintStream nssGWAS = FileUtil.CreatePrintStream(Fout);
@@ -145,18 +137,18 @@ public class NSSCommandImpl extends CommandImpl
 		Logger.printUserLog("Write the " + mc.getColumnDimension() + "X" + mc.getRowDimension() + " correlation matrix into '" + Fout + "'.");
 	}
 
-	private void naiveGWAS(int tIdx) 
+	private void naiveGWAS(int fileIdx, int[] variable,int tIdx) 
 	{
 		ChiSquaredDistributionImpl ci = new ChiSquaredDistributionImpl(1);
 		ArrayList<SNP> snpList = this.mapFile.getMarkerList();
 
-		int[] pIdx = data.getMatchedSubjectIdx(pheFileIdx);
+		int[] pIdx = data.getMatchedSubjectIdx(fileIdx);
 		double[] Y = new double[pIdx.length];
 		ArrayList<Double> pArray = NewIt.newArrayList();
 
 		for (int subjectIdx = 0; subjectIdx < Y.length; subjectIdx++) 
 		{
-			Y[subjectIdx] = this.data.getVariable(pheFileIdx, pIdx[subjectIdx], this.traitIdx[tIdx]);
+			Y[subjectIdx] = this.data.getVariable(fileIdx, pIdx[subjectIdx], variable[tIdx]);
 		}
 		Y = StatUtils.normalize(Y);
 
@@ -176,9 +168,9 @@ public class NSSCommandImpl extends CommandImpl
 				for (int j = 0; j < subIdx.length; j++)
 				{
 					int idx = subIdx[j];
-					int g = this.gm.getAdditiveScoreOnFirstAllele(idx, i);
+					int g = this.gm.getAdditiveScoreOnFirstAllele(subIdx[idx], i);
 					if (g != 3) {
-						sReg.addData(g, Y[idx]);
+						sReg.addData(g, Y[j]);
 						N += 1.0D;
 						freq += g;
 						mx += g;
@@ -229,10 +221,18 @@ public class NSSCommandImpl extends CommandImpl
 		Logger.printUserLog("Lambda GC is: " + lambdaGC);
 	}
 
-	public void printResult(int tIdx)
+	public void printResult(int[] variable, int tIdx, int fileIdx)
 	{
-		int fidx = this.traitIdx[tIdx] + 1;
-		String Fout = nssArgs.getOutRoot()  + "." + fidx + ".nss";
+		int fidx = variable[tIdx] + 1;
+		String Fout=null;
+		if (fileIdx == pheFileIdx)
+		{
+			Fout = nssArgs.getOutRoot()  + ".p." + fidx + ".nss";
+		}
+		else
+		{
+			Fout = nssArgs.getOutRoot()  + ".c." + fidx + ".nss";
+		}
 		PrintStream nssGWAS = FileUtil.CreatePrintStream(Fout);
 		nssGWAS.println(OATHConst.SNP +"\t" + OATHConst.CHR + "\t" + OATHConst.BP+ "\t" + OATHConst.RefAle + "\t" + OATHConst.AltAle +"\t" + OATHConst.Freq + "\t" + OATHConst.Vg + "\t" + OATHConst.BETA +"\t" + OATHConst.SE + "\t" + OATHConst.CHI + "\t" + OATHConst.P);
 
@@ -244,5 +244,10 @@ public class NSSCommandImpl extends CommandImpl
 		nssGWAS.close();
 		
 		Logger.printUserLog("Write the NSS into '" + Fout + "'.");
+	}
+	
+	public int getN()
+	{
+		return N;
 	}
 }

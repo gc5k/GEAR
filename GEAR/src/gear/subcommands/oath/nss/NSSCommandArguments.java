@@ -6,10 +6,15 @@ import gear.util.Logger;
 
 public class NSSCommandArguments extends CommandArguments 
 {
-	private String pheFile;
+	private String covFile = null;
+	private int[] covIdx = {0};
+
 	private int chr;
 	private boolean chrFlag = false;
+
+	private String pheFile;
 	private int[] mPheno;
+
 	private String keepFile;
 
 	public String getPhenotypeFile()
@@ -22,18 +27,21 @@ public class NSSCommandArguments extends CommandArguments
 		this.pheFile = pheFile;
 	}
 
-	public void setPhentypeIndex(String[] mPhe)
+	public void setPhentypeIndex(String mPhe)
 	{
-		this.mPheno = new int[mPhe.length];
-		for (int i = 0; i < mPhe.length; i++)
+		this.mPheno = new int[1];
+		mPheno[0] = Integer.parseInt(mPhe) - 1;
+		if (mPheno[0] < 0)
 		{
-			mPheno[i] = Integer.parseInt(mPhe[i]) - 1;
-			if (mPheno[i] < 0)
-			{
-				Logger.printUserLog("Phenotype index should be greater than 0.\nGEAR quitted.");
-				System.exit(1);
-			}
+			Logger.printUserLog("Phenotype index should be greater than 0.\nGEAR quitted.");
+			System.exit(1);
 		}
+	}
+	
+	public void setPhenotypeIndex(int mPhe)
+	{
+		this.mPheno = new int[1];
+		mPheno[0] = mPhe;
 	}
 
 	public int[] getMpheno()
@@ -72,4 +80,43 @@ public class NSSCommandArguments extends CommandArguments
 	{
 		return keepFile;
 	}
+	
+	public void setCovFile(String cFile) 
+	{
+		FileUtil.exists(cFile);
+		covFile = cFile;
+	}
+
+	public String getCovFile()
+	{
+		return covFile;
+	}
+
+	public void setCovNumber(String[] cIdx) 
+	{
+		covIdx = new int[cIdx.length];
+		for (int i = 0; i < covIdx.length; i++)
+		{
+			covIdx[i] = Integer.parseInt(cIdx[i]);
+			if (covIdx[i] < 1)
+			{
+				Logger.printUserLog(covIdx[i] +"< 1. Incorrect index for covar-number.");
+				Logger.printUserLog("GEAR quittted.");
+				System.exit(1);
+			}
+			covIdx[i]--;
+		}
+	}
+	
+	public void setCovNumber(int[] cIdx)
+	{
+		covIdx = new int[cIdx.length];
+		System.arraycopy(cIdx, 0, covIdx, 0, cIdx.length);
+	}
+
+	public int[] getCovNumber()
+	{
+		return covIdx;
+	}
+
 }
