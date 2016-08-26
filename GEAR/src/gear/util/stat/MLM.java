@@ -194,6 +194,8 @@ public class MLM
 				if (lod_diff < converge) break;
 			}
 
+			if (cnt ==iteration) break;
+			
 		//iteration
 			RealMatrix tmp2 = (((Int_V.multiply(X)).multiply(X_IntV_X__Int)).multiply(X.transpose())).multiply(Int_V);
 			RealMatrix Q = Int_V.subtract(tmp2);
@@ -367,5 +369,5 @@ public class MLM
 	private boolean isMINQUE = false;
 	private double converge = 0.1;
 	DecimalFormat fmt = new DecimalFormat("0.000");
-
+	private int iteration = 10;
 }
