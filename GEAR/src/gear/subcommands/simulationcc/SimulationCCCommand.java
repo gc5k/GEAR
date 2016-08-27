@@ -75,11 +75,11 @@ public class SimulationCCCommand extends Command
 			simuCCArgs.setNullMarkerNum(cmdLine.getOptionValue(OPT_NULL_MARKER_LONG));
 		}
 
-		simuCCArgs.setPolyEffect(parseDoubleOptionValue(cmdLine, OPT_EFFECT, "0.5"));
+		simuCCArgs.setPolyEffect();
 
-		if(cmdLine.hasOption(OPT_POLY_EFFECT_LONG))
+		if(cmdLine.hasOption(OPT_EFFECT))
 		{
-			simuCCArgs.setPolyEffect();
+			simuCCArgs.setPolyEffect(parseDoubleOptionValue(cmdLine, OPT_EFFECT, "0.5"));
 		}
 
 		if(cmdLine.hasOption(OPT_POLY_EFFECT_SORT_LONG))

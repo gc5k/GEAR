@@ -81,11 +81,11 @@ public class SimulationQTCommand extends Command
 			simuQTArgs.setNullMarkerNum(cmdLine.getOptionValue(OPT_NULL_MARKER_LONG));
 		}
 
-		simuQTArgs.setPolyEffect(parseDoubleOptionValue(cmdLine, OPT_EFFECT, "0.5"));
+		simuQTArgs.setPolyEffect();
 
-		if(cmdLine.hasOption(OPT_POLY_EFFECT_LONG))
+		if(cmdLine.hasOption(OPT_EFFECT))
 		{
-			simuQTArgs.setPolyEffect();
+			simuQTArgs.setPolyEffect(parseDoubleOptionValue(cmdLine, OPT_EFFECT, "0.5"));
 		}
 
 		if(cmdLine.hasOption(OPT_POLY_EFFECT_SORT_LONG))
