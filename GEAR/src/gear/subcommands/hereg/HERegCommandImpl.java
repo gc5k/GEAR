@@ -24,7 +24,6 @@ public class HERegCommandImpl extends CommandImpl {
 		heArgs = (HERegCommandArguments) cmdArgs;
 
 		data = new InputDataSet2();
-		int fidx = 1;
 
 		if (heArgs.isGRMList())
 		{
@@ -34,14 +33,10 @@ public class HERegCommandImpl extends CommandImpl {
 			if (heArgs.getCovFile() != null)
 			{
 				data.addFile(heArgs.getCovFile(), heArgs.getCovNumber());
-				fidx++;
-				covFileIdx = fidx;
 			}
 			if (heArgs.getKeepFile() != null)
 			{
 				data.addFile(heArgs.getKeepFile());
-				fidx++;
-				keepFileIdx = fidx;
 			}
 			data.LineUpFiles();
 
@@ -70,14 +65,10 @@ public class HERegCommandImpl extends CommandImpl {
 			if (heArgs.getCovFile() != null)
 			{
 				data.addFile(heArgs.getCovFile(), heArgs.getCovNumber());
-				fidx++;
-				covFileIdx = fidx;
 			}
 			if (heArgs.getKeepFile() != null)
 			{
 				data.addFile(heArgs.getKeepFile());
-				fidx++;
-				keepFileIdx = fidx;
 			}
 			data.LineUpFiles();
 
@@ -446,7 +437,6 @@ public class HERegCommandImpl extends CommandImpl {
 	private int grmFileIdx = 0;
 	private int pheFileIdx = 1;
 	private int covFileIdx = 2;
-	private int keepFileIdx = 3;
 
 	private double[][][] A3;
 	
