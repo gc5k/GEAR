@@ -88,9 +88,9 @@ public class InputDataSet2 implements SubjectOrder
 				subList.add(sid);
 			}
 		}
-		if (subList.size() < 5)
+		if (subList.size() < 1)
 		{
-			Logger.printUserLog("Only " + deepSubList.size() + " samples lined up. Too few samples!");
+			Logger.printUserLog("No samples were lined up!");
 			Logger.printUserLog("GEAR quitted.\n");
 			System.exit(1);
 		}

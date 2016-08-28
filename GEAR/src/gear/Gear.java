@@ -72,6 +72,7 @@ public enum Gear
 		addCommand(new gear.subcommands.oath.oathbus.OATHBusCommand());
 		addCommand(new gear.subcommands.reml.REMLCommand());
 		addCommand(new gear.subcommands.hereg.HERegCommand());
+		addCommand(new gear.subcommands.simuqtreal.SimulationQTRealCommand());
 	}
 
 	private void addCommand(Command cmd)

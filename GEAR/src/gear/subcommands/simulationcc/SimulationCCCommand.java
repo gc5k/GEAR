@@ -79,7 +79,7 @@ public class SimulationCCCommand extends Command
 
 		if(cmdLine.hasOption(OPT_EFFECT))
 		{
-			simuCCArgs.setPolyEffect(parseDoubleOptionValue(cmdLine, OPT_EFFECT, "0.5"));
+			simuCCArgs.setPlainEffect(parseDoubleOptionValue(cmdLine, OPT_EFFECT, "0.5"));
 		}
 
 		if(cmdLine.hasOption(OPT_POLY_EFFECT_SORT_LONG))
