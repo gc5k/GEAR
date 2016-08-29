@@ -47,64 +47,14 @@ public class SimulationQTRealCommandArguments extends CommandArguments
 		return this.rep;
 	}
 
-//	public void setSampleSize(String n)
-//	{
-//		N = Integer.parseInt(n);
-//		if (N < 1)
-//		{
-//			Logger.printUserLog("Sample size " + N +" is too small.\n GEAR quitted.");
-//			System.exit(0);
-//		}
-//	}
-//
-//	public int getSampleSize()
-//	{
-//		return N;
-//	}
-
-//	public void setMarkerNum(String m)
-//	{
-//		M = Integer.parseInt(m);
-//		if (M < 1)
-//		{
-//			Logger.printUserLog("Marker number " + M + " is too small.\n GEAR quitted.");
-//			System.exit(0);
-//		}
-//	}
-//	
-//	public int getMarkerNum()
-//	{
-//		return M;
-//	}
-//
-//	public void setNullMarkerNum(String nm)
-//	{
-//		nullM = Integer.parseInt(nm);
-//		if (nullM < 0)
-//		{
-//			Logger.printUserLog("Null marker number " + nullM + " is negative. It is set to zero.");
-//			nullM = 0;
-//		}
-//		if (nullM >= M)
-//		{
-//			Logger.printUserLog("Null marker number " + nullM + " should less than the number of merkers (" + M +").\n GEAR quittte.");
-//			System.exit(0);
-//		}
-//		
-//	}
-//	
-//	public int getNullMarkerNum()
-//	{
-//		return nullM;
-//	}
-
-	public void setPolyEffect(double e)
+	public void setPlainEffect(double e)
 	{
 		polyEffect = e;
 		isPlainEffect = true;
 		isPolyEffect = false;
 		isPolyEffectSort = false;
 		isPolyEffectFile = false;
+		isRefEffectFile = false;
 	}
 	
 	public boolean isPlainEffect()
@@ -123,6 +73,7 @@ public class SimulationQTRealCommandArguments extends CommandArguments
 		isPolyEffect = true;
 		isPolyEffectSort = false;
 		isPolyEffectFile = false;
+		isRefEffectFile = false;
 	}
 
 	public boolean isPolyEffect()
@@ -136,6 +87,7 @@ public class SimulationQTRealCommandArguments extends CommandArguments
 		isPolyEffect = false;
 		isPolyEffectSort = true;
 		isPolyEffectFile = false;
+		isRefEffectFile = false;
 	}
 
 	public boolean isPolyEffectSort()
@@ -152,6 +104,7 @@ public class SimulationQTRealCommandArguments extends CommandArguments
 		isPolyEffect = false;
 		isPolyEffectSort = false;
 		isPolyEffectFile = true;
+		isRefEffectFile = false;
 	}
 	
 	public boolean isPolyEffectFile()
@@ -164,148 +117,6 @@ public class SimulationQTRealCommandArguments extends CommandArguments
 		return polyEffectFile;
 	}
 	
-	public void setFreq(double freq)
-	{
-		this.freq = freq;
-		if(this.freq < 0.01)
-		{
-			Logger.printUserLog("Frequecy " + this.freq + " is too small. Should be greater than 0.01.\n GEAR quitted.");
-			System.exit(0);
-		}
-		isPlainFreq = true;
-		isUnifFreq = false;
-		isFreqFile = false;
-	}
-
-	public boolean isPlainFreq()
-	{
-		return isPlainFreq;
-	}
-
-	public double getFreq()
-	{
-		return freq;
-	}
-
-	public void setUnifFreq()
-	{
-		isPlainFreq = false;
-		isUnifFreq = true;
-		isFreqFile = false;
-	}
-	
-	public boolean isUnifFreq()
-	{
-		return isUnifFreq;
-	}
-
-	public void setFreqRange(String[] rf)
-	{
-		FreqRangeLow = Double.parseDouble(rf[0]);
-		FreqRangeHigh = Double.parseDouble(rf[1]);
-		if (FreqRangeLow <= 0 || FreqRangeHigh >= 1)
-		{
-			Logger.printUserError("Allele frequency is out of range: " + FreqRangeLow + "--" + FreqRangeHigh);
-		}
-		if (FreqRangeLow > FreqRangeHigh)
-		{
-			double t = FreqRangeLow;
-			FreqRangeLow = FreqRangeHigh;
-			FreqRangeLow = t;
-		}
-		setUnifFreq();
-	}
-
-	public double getFreqRangeLow()
-	{
-		return FreqRangeLow;
-	}
-	
-	public double getFreqRangeHigh()
-	{
-		return FreqRangeHigh;
-	}
-
-	public void setFreqFile(String ff)
-	{
-		FileUtil.exists(ff);
-		freqFile = ff;
-		isPlainFreq = false;
-		isUnifFreq = false;
-		isFreqFile = true;
-	}
-	
-	public boolean isFreqFile()
-	{
-		return isFreqFile;
-	}
-
-	public String getFreqFile()
-	{
-		return freqFile;
-	}
-
-	public void setLD(double ld)
-	{
-		this.ld = ld;
-		if(this.ld < -1 || this.ld > 1)
-		{
-			Logger.printUserLog("LD should be between -1 and 1.\n GEAR quitted.");
-		}
-		isPlainLD = true;
-		isRandLD = false;
-	}
-
-	public void setLDRange(String[] ld)
-	{
-		ldRangeLow = Double.parseDouble(ld[0]);
-		ldRangeHigh = Double.parseDouble(ld[1]);
-		if (ldRangeLow <= -1 || ldRangeHigh >= 1)
-		{
-			Logger.printUserError("LD (Lewontin's) frequency is out of range: " + ldRangeLow + "--" + ldRangeHigh);
-		}
-		if (ldRangeLow > ldRangeHigh)
-		{
-			double t = FreqRangeLow;
-			FreqRangeLow = FreqRangeHigh;
-			FreqRangeLow = t;
-		}
-		setUnifFreq();
-		isPlainLD = false;
-		isRandLD = true;
-	}
-	
-	public double getLDRangeLow()
-	{
-		return ldRangeLow;
-	}
-	
-	public double getLDRangeHigh()
-	{
-		return ldRangeHigh;
-	}
-
-	public boolean isPlainLD()
-	{
-		return isPlainLD;
-	}
-
-	public double getLD()
-	{
-		return ld;
-	}
-
-	public void setRandLD()
-	{
-		isPlainLD = false;
-		isRandLD = true;
-	}
-
-	public boolean isRandLD()
-	{
-		return isRandLD;
-	}
-
 	public void setHsq(double h)
 	{
 		hsq = h;
@@ -330,6 +141,26 @@ public class SimulationQTRealCommandArguments extends CommandArguments
 		return isMakeBed;
 	}
 
+	public void setRefEffectFile(String pFile) 
+	{
+		FileUtil.exists(pFile);
+		polyRefEffectFile = pFile;
+		isPlainEffect = false;
+		isPolyEffect = false;
+		isPolyEffectSort = false;
+		isPolyEffectFile = false;
+		isRefEffectFile = true;
+	}
+
+	public String getRefEffectFile()
+	{
+		return polyRefEffectFile;
+	}
+
+	public boolean isRefEffectFile()
+	{
+		return isRefEffectFile;
+	}
 //	private int N = 100;
 //	private int M = 100;
 //	private int nullM = 0;
@@ -339,23 +170,9 @@ public class SimulationQTRealCommandArguments extends CommandArguments
 	private boolean isPolyEffect = true;
 	private boolean isPolyEffectSort = false;
 	private boolean isPolyEffectFile = false;
+	private boolean isRefEffectFile = false;
 	private String polyEffectFile = null;
-
-	private double freq = 0.5;
-	private boolean isPlainFreq = true;
-	private boolean isUnifFreq = false;
-	private boolean isFreqFile = false;
-	private String freqFile = null;
-
-	private double FreqRangeLow = 0.01;
-	private double FreqRangeHigh = 0.5;
-
-	private double ld = 0;
-	private boolean isPlainLD = true;
-	private boolean isRandLD = true;
-
-	private double ldRangeLow = -1;
-	private double ldRangeHigh = 1;
+	private String polyRefEffectFile = null;
 
 	private double hsq = 0.5;
 	private boolean isMakeBed = false;

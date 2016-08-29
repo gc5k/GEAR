@@ -8,6 +8,7 @@ import java.io.PrintWriter;
 import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashMap;
 
 import org.apache.commons.math.MathException;
 import org.apache.commons.math.distribution.NormalDistributionImpl;
@@ -19,6 +20,7 @@ import org.apache.commons.math.stat.StatUtils;
 import gear.ConstValues;
 import gear.family.pedigree.Hukou;
 import gear.family.pedigree.file.MapFile;
+import gear.family.pedigree.file.SNP;
 import gear.family.plink.PLINKParser;
 import gear.family.popstat.GenotypeMatrix;
 import gear.family.qc.rowqc.SampleFilter;
@@ -27,6 +29,7 @@ import gear.subcommands.CommandImpl;
 import gear.sumstat.qc.rowqc.SumStatQC;
 import gear.util.FileUtil;
 import gear.util.Logger;
+import gear.util.NewIt;
 import gear.util.Sample;
 
 public class SimulationQTRealCommandImpl extends CommandImpl
@@ -40,7 +43,7 @@ public class SimulationQTRealCommandImpl extends CommandImpl
 		pp = PLINKParser.parse(this.qtArgs);
 		this.sf = new SampleFilter(pp.getPedigreeData(), pp.getMapData());
 		this.ssQC = new SumStatQC(pp.getPedigreeData(), pp.getMapData(), this.sf);
-//		this.mapFile = this.ssQC.getMapFile();
+		this.mapFile = this.ssQC.getMapFile();
 		this.gm = new GenotypeMatrix(this.ssQC.getSample());
 
 		sample = gm.getNumIndivdial();
@@ -152,7 +155,7 @@ public class SimulationQTRealCommandImpl extends CommandImpl
 				{
 					if(c >= M)
 					{
-						Logger.printUserLog("Have already read " + M + " allelic effects.  Ignore the rest of the content in '" + qtArgs.getFreqFile() + "'.");
+						Logger.printUserLog("Have already read " + M + " allelic effects.  Ignore the rest of the content in '" + qtArgs.getPolyEffectFile() + "'.");
 						break;
 					}
 
@@ -170,7 +173,56 @@ public class SimulationQTRealCommandImpl extends CommandImpl
 								+ qtArgs.getPolyEffectFile() + "'.");
 			}
 		}
-		
+		else if (qtArgs.isRefEffectFile())
+		{
+			RefEffectMap = NewIt.newHashMap();
+
+			BufferedReader reader = FileUtil.FileOpen(qtArgs.getRefEffectFile());
+			int c = 0;
+			String line = null;
+			try
+			{
+				while ((line = reader.readLine()) != null)
+				{
+					if(c >= M)
+					{
+						Logger.printUserLog("Have already read " + M + " allelic effects.  Ignore the rest of the content in '" + qtArgs.getRefEffectFile() + "'.");
+						break;
+					}
+
+					line.trim();
+					String[] l = line.split(ConstValues.WHITESPACE_DELIMITER);
+					if (l.length < 3) continue;
+					RefEffectMap.put(l[0]+"_"+l[1], Double.parseDouble(l[2]));
+				}
+				reader.close();
+			}
+			catch (IOException e)
+			{
+				Logger.handleException(e,
+						"An exception occurred when reading the frequency file '"
+								+ qtArgs.getPolyEffectFile() + "'.");
+			}
+
+			Logger.printUserLog("Reading " + RefEffectMap.size() + " referenced effects from '" + qtArgs.getRefEffectFile() + "'.");
+			ArrayList<SNP> snps =mapFile.getMarkerList();
+			for(int i = 0; i < mapFile.getMarkerNumber(); i++)
+			{
+				SNP snp = snps.get(i);
+				String snp1 = snp.getName() + "_" + snp.getFirstAllele();
+				String snp2 = snp.getName() + "_" + snp.getSecAllele();
+				if (RefEffectMap.containsKey(snp1))
+				{
+					effect[i] = RefEffectMap.get(snp1);
+					continue;
+				}
+				if (RefEffectMap.containsKey(snp2))
+				{
+					effect[i] = -1 * RefEffectMap.get(snp2);
+				}
+			}
+		}
+
 		if (h2 == 0)
 		{
 			Arrays.fill(effect, 0);
@@ -222,7 +274,7 @@ public class SimulationQTRealCommandImpl extends CommandImpl
 	}
 
 	private SimulationQTRealCommandArguments qtArgs;
-//	private MapFile mapFile;
+	private MapFile mapFile;
 	private SampleFilter sf;
 	private SumStatQC ssQC;
 	private GenotypeMatrix gm;
@@ -242,5 +294,7 @@ public class SimulationQTRealCommandImpl extends CommandImpl
 
 	private double[] effect;
 	private double h2;
+	
+	private HashMap<String, Double> RefEffectMap = null;
 
 }

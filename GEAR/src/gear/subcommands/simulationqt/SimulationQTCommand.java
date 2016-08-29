@@ -85,7 +85,7 @@ public class SimulationQTCommand extends Command
 
 		if(cmdLine.hasOption(OPT_EFFECT))
 		{
-			simuQTArgs.setPolyEffect(parseDoubleOptionValue(cmdLine, OPT_EFFECT, "0.5"));
+			simuQTArgs.setPlainEffect(parseDoubleOptionValue(cmdLine, OPT_EFFECT, "0.5"));
 		}
 
 		if(cmdLine.hasOption(OPT_POLY_EFFECT_SORT_LONG))

@@ -73,7 +73,7 @@ public class SimulationQTCommandArguments extends CommandArguments
 		return nullM;
 	}
 
-	public void setPolyEffect(double e)
+	public void setPlainEffect(double e)
 	{
 		polyEffect = e;
 		isPlainEffect = true;
