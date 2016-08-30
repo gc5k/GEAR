@@ -13,6 +13,8 @@ import gear.sumstat.qc.rowqc.SumStatQC;
 import gear.util.FileUtil;
 import gear.util.Logger;
 import gear.util.NewIt;
+import gear.util.pop.PopStat;
+
 import java.io.PrintStream;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -33,12 +35,13 @@ public class NSSCommandImpl extends CommandImpl
 	private GenotypeMatrix gm;
 	private int[] traitIdx;
 	private int[] covIdx;
+	private double[][] frq;
 	private int N;
 	private InputDataSet2 data = null;
 	private ArrayList<NSSGWASResult> nssResult;
 
 	private double lambdaGC = 1;
-	private int monoLoci = 0;
+//	private int monoLoci = 0;
 	
 	private int famFileIdx = 0;
 	private int pheFileIdx = 1;
@@ -66,6 +69,7 @@ public class NSSCommandImpl extends CommandImpl
 		this.mapFile = this.ssQC.getMapFile();
 		this.gm = new GenotypeMatrix(this.ssQC.getSample());
 
+		frq = PopStat.calAlleleFrequency(this.gm, this.gm.getNumMarker());
 		for (int i = 0; i < traitIdx.length; i++)
 		{
 			Logger.printUserLog("");
@@ -139,6 +143,7 @@ public class NSSCommandImpl extends CommandImpl
 
 	private void naiveGWAS(int fileIdx, int[] variable,int tIdx) 
 	{
+		int monoLoci = 0;
 		ChiSquaredDistributionImpl ci = new ChiSquaredDistributionImpl(1);
 		ArrayList<SNP> snpList = this.mapFile.getMarkerList();
 
@@ -156,6 +161,12 @@ public class NSSCommandImpl extends CommandImpl
 		for (int i = 0; i < this.gm.getNumMarker(); i++)
 		{
 			SNP snp = (SNP) snpList.get(i);
+			
+			if (frq[i][0] < nssArgs.getMAF() || frq[i][1] < nssArgs.getMAF() )
+			{
+				monoLoci++;
+				continue;
+			}
 
 			if ((!this.nssArgs.isChrFlagOn()) || (Integer.parseInt(snp.getChromosome()) == this.nssArgs.getChr()))
 			{
@@ -178,7 +189,7 @@ public class NSSCommandImpl extends CommandImpl
 					}
 				}
 
-				if (snp.isMonopolic() && N <= 1) 
+				if (N <= 1) 
 				{
 					monoLoci++;
 					continue;
@@ -200,11 +211,11 @@ public class NSSCommandImpl extends CommandImpl
 
 		if (monoLoci > 1)
 		{
-			Logger.printUserLog("Removed " + monoLoci + " monomorphic loci.");			
+			Logger.printUserLog("Removed " + monoLoci + " loci [MAF < " + nssArgs.getMAF() + "]." );			
 		}
 		else if (monoLoci == 1)
 		{
-			Logger.printUserLog("Removed " + monoLoci + " monomorphic locus.");
+			Logger.printUserLog("Removed " + monoLoci + " locus [MAF < " + nssArgs.getMAF() + "]." );			
 		}
 
 		Logger.printUserLog("Median of p values is " + pArray.get(idx));
@@ -234,7 +245,7 @@ public class NSSCommandImpl extends CommandImpl
 			Fout = nssArgs.getOutRoot()  + ".c." + fidx + ".nss";
 		}
 		PrintStream nssGWAS = FileUtil.CreatePrintStream(Fout);
-		nssGWAS.println(OATHConst.SNP +"\t" + OATHConst.CHR + "\t" + OATHConst.BP+ "\t" + OATHConst.RefAle + "\t" + OATHConst.AltAle +"\t" + OATHConst.Freq + "\t" + OATHConst.Vg + "\t" + OATHConst.BETA +"\t" + OATHConst.SE + "\t" + OATHConst.CHI + "\t" + OATHConst.P);
+		nssGWAS.println(OATHConst.SNP +"\t" + OATHConst.CHR + "\t" + OATHConst.BP+ "\t" + OATHConst.RefAle + "\t" + OATHConst.AltAle +"\t" + OATHConst.RAF + "\t" + OATHConst.Vg + "\t" + OATHConst.BETA +"\t" + OATHConst.SE + "\t" + OATHConst.CHI + "\t" + OATHConst.P);
 
 		for (int i = 0; i < nssResult.size(); i++)
 		{

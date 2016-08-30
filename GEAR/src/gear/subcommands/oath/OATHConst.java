@@ -19,8 +19,8 @@ public class OATHConst
 	public static final String AltAle = "A2";
 	public static int altale = 4;
 
-	public static final String Freq = "FREQ";
-	public static int freq = 5;
+	public static final String RAF = "RAF";
+	public static int raf = 5;
 
 	public static final String Vg = "VG";
 	public static int vg = 6;

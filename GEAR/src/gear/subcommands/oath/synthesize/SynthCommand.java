@@ -69,6 +69,7 @@ public class SynthCommand extends Command
 		{
 			synArgs.setKeepBatch(cmdLine.getOptionValues(OPT_KEEP_BATCH_LONG));
 		}
+		
 		return synArgs;
 	}
 
@@ -102,5 +103,6 @@ public class SynthCommand extends Command
 
 	private final static String OPT_KEEP_BATCH_LONG = "keep-nss";
 	private final static String OPT_KEEP_BATCH_DESC = "Specify the indexes of nss files.";
+	
 
 }

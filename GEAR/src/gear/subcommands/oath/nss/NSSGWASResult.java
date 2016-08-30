@@ -1,6 +1,5 @@
 package gear.subcommands.oath.nss;
 
-
 import java.text.DecimalFormat;
 
 import org.apache.commons.math.MathException;

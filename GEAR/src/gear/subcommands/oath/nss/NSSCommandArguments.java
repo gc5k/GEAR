@@ -16,6 +16,7 @@ public class NSSCommandArguments extends CommandArguments
 	private int[] mPheno;
 
 	private String keepFile;
+	private double maf = 0;
 
 	public String getPhenotypeFile()
 	{
@@ -117,6 +118,16 @@ public class NSSCommandArguments extends CommandArguments
 	public int[] getCovNumber()
 	{
 		return covIdx;
+	}
+
+	public void setMAF(String mf) 
+	{
+		maf = Double.parseDouble(mf);
+	}
+	
+	public double getMAF()
+	{
+		return maf;
 	}
 
 }

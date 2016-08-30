@@ -79,7 +79,6 @@ public class SynthCommandImpl extends CommandImpl
 		Logger.printUserLog("");
 		Logger.printUserLog("Starting OATH-analysis...");
 		int totalCnt = 0;
-		int cnt = 0;
 		int singularCnt = 0;
 //		int atgcCnt = 0;
 		
@@ -120,7 +119,7 @@ public class SynthCommandImpl extends CommandImpl
 		Collections.sort(grArray);
 
 		Logger.printUserLog("In total "+ totalCnt + " loci have been read.");
-		Logger.printUserLog("In total "+ cnt + " loci have been used for meta-analysis.");
+		Logger.printUserLog("In total "+ grArray.size() + " loci have been used for OATH analysis.");
 		if (singularCnt > 0)
 		{
 			Logger.printUserLog(singularCnt + " loci were excluded from analyais because of singular matrix.");

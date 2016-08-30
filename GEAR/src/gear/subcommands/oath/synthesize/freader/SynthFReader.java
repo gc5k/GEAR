@@ -128,9 +128,9 @@ public class SynthFReader
             {
 				KeyIdx[metaIdx][OATHConst.altale] = i;
 			}
-			if (tokens[i].equalsIgnoreCase(field[OATHConst.freq]))
+			if (tokens[i].equalsIgnoreCase(field[OATHConst.raf]))
 			{
-				KeyIdx[metaIdx][OATHConst.freq] = i;
+				KeyIdx[metaIdx][OATHConst.raf] = i;
 			}
 			if (tokens[i].equalsIgnoreCase(field[OATHConst.vg]))
 			{
@@ -191,7 +191,7 @@ public class SynthFReader
 			qFlag = true;
 		}
 
-		if (KeyIdx[metaIdx][OATHConst.freq] == -1)
+		if (KeyIdx[metaIdx][OATHConst.raf] == -1)
 		{
 			Logger.printUserLog("Cannot find the allele frequency column in " + workingMetaFile.get(metaIdx));
 			qFlag = true;
@@ -281,7 +281,7 @@ public class SynthFReader
 				continue;
 			}
 
-			if (ConstValues.isNA(tokens[KeyIdx[metaIdx][OATHConst.freq]]))
+			if (ConstValues.isNA(tokens[KeyIdx[metaIdx][OATHConst.raf]]))
 			{
 				cntBadFreq++;
 				continue;

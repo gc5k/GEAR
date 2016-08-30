@@ -17,6 +17,7 @@ public class OATHBusCommandArguments extends CommandArguments
 
 	private String keepFile;
 
+	private double maf = 0;
 	public String getPhenotypeFile()
 	{
 		return this.pheFile;
@@ -106,4 +107,15 @@ public class OATHBusCommandArguments extends CommandArguments
 	{
 		return covIdx;
 	}
+	
+	public void setMAF(String mf) 
+	{
+		maf = Double.parseDouble(mf);
+	}
+	
+	public double getMAF()
+	{
+		return maf;
+	}
+
 }

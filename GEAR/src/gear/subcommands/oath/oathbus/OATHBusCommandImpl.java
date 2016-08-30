@@ -29,6 +29,7 @@ public class OATHBusCommandImpl extends CommandImpl
 		nssArgs.setPhenotypeIndex(obArgs.getMpheno()[0]);
 		nssArgs.setCovFile(obArgs.getCovFile());
 		nssArgs.setCovNumber(obArgs.getCovNumber());
+		nssArgs.setMAF((new Double(obArgs.getMAF())).toString());
 		if (obArgs.getKeepFile() != null)
 		{
 			nssArgs.setKeeFile(obArgs.getKeepFile());
@@ -86,8 +87,16 @@ public class OATHBusCommandImpl extends CommandImpl
         		OBout.print(obArgs.getOutRoot() + "-" + (new Integer(cnt).toString()) + ".oath: #1" );
         		for (int k = 0; k < rs.get(i).length; k++)
         		{
-        			OBout.print("+#" + rs.get(i)[k]);
-        			s += "+#" + rs.get(i)[k];
+        			if (k == 0)
+        			{
+            			OBout.print("=#" + rs.get(i)[k]);
+            			s += "=#" + rs.get(i)[k];
+        			}
+        			else
+        			{
+            			OBout.print("+#" + rs.get(i)[k]);
+            			s += "+#" + rs.get(i)[k];        				
+        			}
         		}
         		Logger.printUserLog(s+']');
         		OBout.println();
