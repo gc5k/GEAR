@@ -130,7 +130,7 @@ public class SimulationQTRealCommand extends Command
 	private static final String OPT_EFFECT_FILE_LONG = "effect-file";
 	private static final String OPT_EFFECT_FILE_LONG_DESC = "Read effect from the file specified.";
 
-	private static final String OPT_REF_EFFECT_FILE_LONG = "refallele-effect-file";
+	private static final String OPT_REF_EFFECT_FILE_LONG = "rafallele-effect-file";
 	private static final String OPT_REF_EFFECT_FILE_LONG_DESC = "Read effect from the file specified.";
 
 	//hsq

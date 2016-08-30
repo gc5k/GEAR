@@ -80,8 +80,12 @@ public class SimulationQTRealCommandImpl extends CommandImpl
 		}
 
 		double vg = StatUtils.variance(BV);
+		if (vg == 0)
+		{
+			Logger.printUserLog("Vg=0, heritability is scale to zero." );
+		}
 		//rescale the phenotype to get the heritability and residual
-		double ve = h2 == 0 ? 1:vg * (1 - h2) / h2;
+		double ve = (h2 == 0 || vg == 0) ? 1:vg * (1 - h2) / h2;
 		double E = Math.sqrt(ve);
 		Logger.printUserLog("Vg=" + fmt.format(vg));
 		for (int i = 0; i < rep; i++)
