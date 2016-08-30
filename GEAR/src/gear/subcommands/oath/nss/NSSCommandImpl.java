@@ -188,7 +188,13 @@ public class NSSCommandImpl extends CommandImpl
 						xx += g*g;
 					}
 				}
+				double vg = (xx - (mx/N) * (mx/N) * N)/(N-1);
 
+				if (vg == 0)
+				{
+					monoLoci++;
+					continue;
+				}
 				if (N <= 1) 
 				{
 					monoLoci++;
@@ -196,7 +202,6 @@ public class NSSCommandImpl extends CommandImpl
 				}
 
 				freq /= 2.0D * N;
-				double vg = (xx - (mx/N) * (mx/N) * N)/(N-1);
 
 				double b = sReg.getSlope();
 				double b_se = sReg.getSlopeStdErr();

@@ -17,7 +17,7 @@ public class OATHBusCommandArguments extends CommandArguments
 
 	private String keepFile;
 
-	private double maf = 0;
+	private double maf = 0.05;
 	public String getPhenotypeFile()
 	{
 		return this.pheFile;

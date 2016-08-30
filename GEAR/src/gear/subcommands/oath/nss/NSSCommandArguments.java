@@ -16,7 +16,7 @@ public class NSSCommandArguments extends CommandArguments
 	private int[] mPheno;
 
 	private String keepFile;
-	private double maf = 0;
+	private double maf = 0.05;
 
 	public String getPhenotypeFile()
 	{
