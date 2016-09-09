@@ -29,7 +29,7 @@ public class MetaPCCommandImpl extends CommandImpl
 		mpcArgs = (MetaPCCommandArguments) cmdArgs;
 
 		Logger.printUserLog("Principal component analysis for summary statistics.\n");
-
+		
 		Logger.printUserLog(mpcArgs.toString());
 
 		initial();
@@ -206,18 +206,7 @@ public class MetaPCCommandImpl extends CommandImpl
 
 	private void EigenAnalysis()
 	{
-		PrintStream grmWriter = FileUtil.CreatePrintStream(new String(mpcArgs.getOutRoot() + ".crm"));
 		Array2DRowRealMatrix rm = new Array2DRowRealMatrix(mGRM);
-
-		for (int i = 0; i < rm.getRowDimension(); i++)
-		{
-			for (int j = 0; j < rm.getColumnDimension(); j++)
-			{
-				grmWriter.print(rm.getEntry(i, j) + " ");
-			}
-			grmWriter.println();
-		}
-		grmWriter.close();
 
 		EigenDecompositionImpl ed = new EigenDecompositionImpl(rm.copy(), 1e-6);
 
@@ -230,6 +219,18 @@ public class MetaPCCommandImpl extends CommandImpl
 		Array2DRowRealMatrix evM = new Array2DRowRealMatrix(ev);
 		Array2DRowRealMatrix evMat = (Array2DRowRealMatrix) evM.transpose();
 
+		PrintStream emWriter = FileUtil.CreatePrintStream(new String(mpcArgs.getOutRoot() + ".crm"));
+
+		for (int i = 0; i < mGRM.length; i++)
+		{
+			for (int j = 0; j < mGRM[i].length; j++)
+			{
+				emWriter.print(mGRM[i][j] + " ");
+			}
+			emWriter.println();
+		}
+		emWriter.close();
+		Logger.printUserLog("Writing correlation matrix into '"+ mpcArgs.getOutRoot() + ".crm'.");
 
 		PrintStream evaWriter = FileUtil.CreatePrintStream(new String(mpcArgs.getOutRoot() + ".mval"));
 		double[] eR=ed.getRealEigenvalues();
@@ -240,6 +241,7 @@ public class MetaPCCommandImpl extends CommandImpl
 			evaWriter.println();
 		}
 		evaWriter.close();
+		Logger.printUserLog("Writing eigenvalues into '"+ mpcArgs.getOutRoot() + ".mval'.");
 
 		PrintStream eveWriter = FileUtil.CreatePrintStream(new String(mpcArgs.getOutRoot() + ".mvec"));
 
@@ -252,6 +254,8 @@ public class MetaPCCommandImpl extends CommandImpl
 			eveWriter.println();
 		}
 		eveWriter.close();
+		Logger.printUserLog("Writing eigenvectors into '"+ mpcArgs.getOutRoot() + ".mvec'.");
+		
 	}
 
 	private MetaPCCommandArguments mpcArgs;

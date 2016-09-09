@@ -24,6 +24,7 @@ public class MetaPCCommandArguments extends CommandArguments
 			FileUtil.exists(tokens[0]);
 			md.add(tokens[0]);
 		}
+		reader.close();
 //		Logger.printUserLog("Found all of " + md.size() + " files.");
 	}
 
@@ -54,6 +55,7 @@ public class MetaPCCommandArguments extends CommandArguments
 			s.add(tokens[0]);
 			s.add(tokens[1]);
 		}
+		reader.close();
 
 		String[] cc = s.toArray(new String[0]);
 		setCC(cc);
@@ -96,6 +98,7 @@ public class MetaPCCommandArguments extends CommandArguments
 		{
 			s.add(tokens[0]);
 		}
+		reader.close();
 
 		String[] qt = s.toArray(new String[0]);
 		setQT(qt);
@@ -142,11 +145,6 @@ public class MetaPCCommandArguments extends CommandArguments
 		field[FConstant.A2] = k[3];
 		field[FConstant.Fvalue] = k[4];
 	
-		Logger.printUserLog("[INFO] The keyword 'SNP' is set to " + field[FConstant.SNP]);
-		Logger.printUserLog("[INFO] The keyword 'CHR' is set to " + field[FConstant.CHR]);
-		Logger.printUserLog("[INFO] The keyword 'A1' (reference allele) is set to " + field[FConstant.A1]);
-		Logger.printUserLog("[INFO] The keyword 'A2' (the other allele) is set to " + field[FConstant.A2]);
-		Logger.printUserLog("[INFO] The keyword 'RAF' (reference allele frequency for A1) is set to " + field[FConstant.Fvalue]);
 
 //		if(k.length > 5)
 //		{
