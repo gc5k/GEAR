@@ -78,6 +78,10 @@ public class SimulationQTRealCommandImpl extends CommandImpl
 			BV[i] = bv;
 			genotype[i] = chr.getColumn(0);
 		}
+		if (h2 == 0)
+		{
+			Arrays.fill(BV, 0);
+		}
 
 		double vg = StatUtils.variance(BV);
 		if (vg == 0)

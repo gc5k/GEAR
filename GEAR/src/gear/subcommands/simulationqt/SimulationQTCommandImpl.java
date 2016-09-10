@@ -77,6 +77,11 @@ public class SimulationQTCommandImpl extends CommandImpl
 			genotype[i] = chr.getColumn(0);
 		}
 
+		if (h2 == 0)
+		{
+			Arrays.fill(BV, 0);
+		}
+
 		double vg = StatUtils.variance(BV);
 		//rescale the phenotype to get the heritability and residual
 		double ve = h2 == 0 ? 1:vg * (1 - h2) / h2;

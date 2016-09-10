@@ -78,6 +78,11 @@ public class SimulationCCCommandImpl extends CommandImpl
 			bv[i] = genoEff.getEntry(0, 0);
 		}
 
+		if (h2 == 0)
+		{
+			Arrays.fill(bv, 0);
+		}
+
 		double vg = StatUtils.variance(bv);
 		double m = StatUtils.mean(bv);
 		double ve = vg*(1-h2)/h2;
