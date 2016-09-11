@@ -8,6 +8,7 @@ public class SynthFStat
 		this.snp = snp;
 		this.vg = vg;
 		this.effect = effect;
+		this.se = se;
 		if (A1 >=97 && A1 <= 122)
 		{
 			this.A1 = (char) (A1 - 32);
@@ -80,6 +81,11 @@ public class SynthFStat
 	public float getN()
 	{
 		return n;
+	}
+	
+	public float getSE()
+	{
+		return se;
 	}
 
 	private String snp;

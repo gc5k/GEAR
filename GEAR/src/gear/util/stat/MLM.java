@@ -11,7 +11,7 @@ import org.apache.commons.math.stat.StatUtils;
 import gear.util.Logger;
 import gear.util.NewIt;
 
-public class MLM 
+public class MLM
 {
 	public MLM(double[][] u2, double[] y, boolean isMINQUE)
 	{
@@ -35,6 +35,32 @@ public class MLM
 		this.isMINQUE = isMINQUE;
 	}
 
+	public MLM(double[][] e, double[][] u2, double[] y, boolean isMINQUE)
+	{
+		A = new Array2DRowRealMatrix[2];
+		A[0] = new Array2DRowRealMatrix(u2);
+		A[1] = new Array2DRowRealMatrix(y.length, y.length);
+		for(int i = 0; i < A[1].getColumnDimension(); i++)
+		{
+			for(int j = 0; j < A[1].getRowDimension(); j++)
+			{
+				A[1].setEntry(i, j, e[i][j]);				
+			}
+		}
+
+		Y = new Array2DRowRealMatrix(y);
+
+		double[][] x = new double[y.length][1];
+		for(int i = 0; i < y.length; i++)
+		{
+			x[i][0] = 1;
+		}
+		X = new Array2DRowRealMatrix(x);
+
+		this.isMINQUE = isMINQUE;
+	}
+
+	
 	public MLM(double[][] u2, double[][] x, double[] y, boolean isMINQUE, int[] covIdx)
 	{
 		this.covIdx = new int[covIdx.length];
@@ -124,21 +150,27 @@ public class MLM
 
 	public void MINQUE()
 	{
-		if (!isMINQUE)
+		if (!isSilent())
 		{
-			Logger.printUserLog("REML estimation (may be slow if sample size is big...; negative VC is constrained to zero)");
-		}
-		else 
-		{
-			Logger.printUserLog("MINQUE estimation (may be slow if sample size is big...)");
+			if (!isMINQUE)
+			{
+				Logger.printUserLog("REML estimation (may be slow if sample size is big...; negative VC is constrained to zero)");
+			}
+			else 
+			{
+				Logger.printUserLog("MINQUE estimation (may be slow if sample size is big...)");
+			}			
 		}
 
 		double[] v = new double[A.length];
 		double vt = StatUtils.variance(Y.getColumn(0));
 		for(int i = 0; i < v.length; i++) v[i] = vt/v.length;
 
-		Logger.printUserLog("Prior values for variance components are " + fmt.format(vt/v.length)+".");
-		Logger.printUserLog("");
+		if (!isSilent())
+		{
+			Logger.printUserLog("Prior values for variance components are " + fmt.format(vt/v.length)+".");
+			Logger.printUserLog("");			
+		}
 
 		String ts = new String("Iter.\tLog(L)\t");
 		for(int i = 0; i < A.length-1; i++)
@@ -146,8 +178,11 @@ public class MLM
 			ts += "\t" + "V" + (i+1);
 		}
 		ts +="\tVe";
-		
-		if (!isMINQUE) Logger.printUserLog(ts);
+
+		if (!isSilent())
+		{
+			if (!isMINQUE) Logger.printUserLog(ts);			
+		}
 
 		RealMatrix var = new Array2DRowRealMatrix(v);
 		RealMatrix B = null;
@@ -173,7 +208,7 @@ public class MLM
 				else {
 					V=V.add(A[i].scalarMultiply(var.getEntry(i, 0)));
 				}
-			}
+			}				
 			Int_V =  (new LUDecompositionImpl(V)).getSolver().getInverse();
 			X_IntV = (X.transpose()).multiply(Int_V);
 			X_IntV_X = X_IntV.multiply(X);
@@ -213,7 +248,7 @@ public class MLM
 				reml_y.setEntry(i, 0, (((((Y.transpose()).multiply(Q)).multiply(A[i])).multiply(Q)).multiply(Y)).getEntry(0, 0));
 			}
 			var = (reml_y.transpose().multiply((new LUDecompositionImpl(reml_m)).getSolver().getInverse())).transpose();
-			
+
 			for (int i = 0; i < var.getRowDimension(); i++)
 			{
 				if (var.getEntry(i, 0) < 0) var.setEntry(i, 0, 0);
@@ -233,7 +268,10 @@ public class MLM
 				{
 					continue;
 				}
-				printIter(cnt);
+				if (!isSilent())
+				{
+					printIter(cnt);
+				}
 			}
 		}
 
@@ -355,13 +393,22 @@ public class MLM
 		return V_BETA;
 	}
 
+	public void setSilent(boolean sil)
+	{
+		silent = sil;
+	}
+	
+	public boolean isSilent()
+	{
+		return silent;
+	}
+
 	private RealMatrix[] A = null;
 	private RealMatrix Y = null;
 	private RealMatrix X = null;
 	private RealMatrix BETA = null;
 	private RealMatrix V_BETA = null;
 	private RealMatrix V_VAR = null;
-
 	private ArrayList<Double> LOD = NewIt.newArrayList();
 	private ArrayList<RealMatrix> VAR = NewIt.newArrayList();
 
@@ -370,4 +417,6 @@ public class MLM
 	private double converge = 0.1;
 	DecimalFormat fmt = new DecimalFormat("0.000");
 	private int iteration = 10;
+	
+	private boolean silent = false;
 }

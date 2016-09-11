@@ -1,8 +1,14 @@
-package gear.subcommands.weightedmeta.util;
+package gear.subcommands.mlmmeta.util;
 
 import java.text.DecimalFormat;
 
-public class GMRes implements Comparable<GMRes>
+import org.apache.commons.math.MathException;
+import org.apache.commons.math.distribution.NormalDistributionImpl;
+
+import gear.util.Logger;
+import gear.util.stat.PrecisePvalue;
+
+public class MLMRes implements Comparable<MLMRes>
 {
 	private String snp;
 	private int chr;
@@ -15,9 +21,12 @@ public class GMRes implements Comparable<GMRes>
 	private String direct;
 	private double b;
 	private double se;
+	private double vc;
 	private boolean isAmbiguous;
+	private double[] beta;
+	private static NormalDistributionImpl unitNormal = new NormalDistributionImpl(0, 1);
 
-	public GMRes(int cohort)
+	public MLMRes(int cohort)
 	{
 		this.cohort = cohort;
 	}
@@ -105,7 +114,7 @@ public class GMRes implements Comparable<GMRes>
 	public String printTitle()
 	{
 		StringBuffer sb = new StringBuffer();
-		sb.append("SNP CHR BP A1 A2 COHORT B SE Z P Direction");
+		sb.append("SNP\tCHR\tBP\tA1\tA2\tCOHORT\tB\tSE\tZ\tP\tVC\tDirection");
 		return sb.toString();
 	}
 
@@ -133,7 +142,7 @@ public class GMRes implements Comparable<GMRes>
 		{
 			sb.append(fmtp.format(se) + " ");
 		}
-		
+		z = b/se;
 		if (Math.abs(z) >= 0.001)
 		{
 			sb.append(fmt.format(z) + " ");
@@ -143,20 +152,38 @@ public class GMRes implements Comparable<GMRes>
 			sb.append(fmtp.format(z) + " ");
 		}
 		
+		try
+		{
+			if (Math.abs(z) < 8)
+			{
+
+				p = (1-unitNormal.cumulativeProbability(Math.abs(z)))*2;
+			}
+			else
+			{
+				p = PrecisePvalue.TwoTailZcumulativeProbability(Math.abs(z));
+			}
+		}
+		catch (MathException e)
+		{
+			Logger.printUserError(e.toString());
+		}
 		if (p > 0.001)
 		{
-			sb.append(fmt.format(p) + " ");
+			sb.append(fmt.format(p) + " ");			
 		}
 		else
 		{
 			sb.append(fmtp.format(p) + " ");
 		}
+
+		sb.append(vc + " ");
 		sb.append(direct);
 		return sb.toString();
 	}
 
 	@Override
-	public int compareTo(GMRes o)
+	public int compareTo(MLMRes o)
 	{
 		int c = this.chr - o.getChr();
 		if (c != 0)
@@ -164,5 +191,25 @@ public class GMRes implements Comparable<GMRes>
 			return c;
 		}
 		return (new Long (this.bp - o.getBp())).intValue();
+	}
+
+	public void SetRawBeta(double[] beta2) 
+	{
+		beta = beta2;
+	}
+	
+	public double[] getRawBeta()
+	{
+		return beta;
+	}
+
+	public void SetVC(double vc)
+	{
+		this.vc = vc;
+	}
+	
+	public double getVC()
+	{
+		return vc;
 	}
 }

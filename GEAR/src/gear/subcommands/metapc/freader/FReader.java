@@ -36,7 +36,7 @@ public class FReader
 		}
 		else
 		{
-			Logger.printUserLog(workingMetaFile.size() + " cohorts are remained for analysis.\n");
+			Logger.printUserLog(workingMetaFile.size() + " cohorts are remained for analysis.");
 		}
 
 		KeyIdx = new int[workingMetaFile.size()][FConstant.num_key];
@@ -379,7 +379,7 @@ public class FReader
 		}
 		else
 		{
-			Logger.printUserLog("Read " + cnt +" (of " + total + ") summary statistics from '" + workingMetaFile.get(metaIdx) + ".'\n");
+			Logger.printUserLog("Read " + cnt +" (of " + total + ") summary statistics from '" + workingMetaFile.get(metaIdx) + ".'");
 		}
 
 		return sumstat;

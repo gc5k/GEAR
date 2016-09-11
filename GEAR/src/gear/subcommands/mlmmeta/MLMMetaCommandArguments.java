@@ -1,4 +1,4 @@
-package gear.subcommands.weightedmeta;
+package gear.subcommands.mlmmeta;
 
 import java.util.ArrayList;
 
@@ -9,7 +9,7 @@ import gear.util.FileUtil;
 import gear.util.Logger;
 import gear.util.NewIt;
 
-public class WeightedMetaArguments  extends CommandArguments
+public class MLMMetaCommandArguments  extends CommandArguments
 {
 	public void setKeepCohortFile(String KFile)
 	{
@@ -48,7 +48,7 @@ public class WeightedMetaArguments  extends CommandArguments
 		{
 			RevFile.add(tokens[0]);
 		}
-
+		reader.close();
 		isKeepFile = false;
 		isRevFile = true;
 	}
@@ -295,6 +295,27 @@ public class WeightedMetaArguments  extends CommandArguments
 		return isCM;
 	}
 
+	
+	
+	public void setMLM(String mF)
+	{
+		FileUtil.exists(mF);
+		mlmFile = mF;
+		isMLM = true;
+	}
+
+	public String getMLMFile()
+	{
+		return mlmFile;
+	}
+
+	public boolean isMLM()
+	{
+		return isMLM;
+	}
+
+	
+	
 	public void setFullSNPOnly()
 	{
 		isFullSNPOnly = true;
@@ -365,6 +386,9 @@ public class WeightedMetaArguments  extends CommandArguments
 	private double[] ccSize;
 	private String[] field = {"snp", "chr", "bp", "beta", "or", "se", "p", "a1", "a2"};
 	
+	private String mlmFile = null;
+	private boolean isMLM = false;
+
 	private String cmFile = null;
 	private boolean isCM = false;
 	private boolean isFullSNPOnly = false;
