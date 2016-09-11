@@ -73,6 +73,11 @@ public class LabPopCommandImpl extends CommandImpl
 			}
 		}
 		
+		if (lpArgs.getHsq() == 0)
+		{
+			Arrays.fill(bv, 0);
+		}
+
 		double vb = StatUtils.variance(bv);
 		Logger.printUserLog("Genetic variation is "+vb);
 
