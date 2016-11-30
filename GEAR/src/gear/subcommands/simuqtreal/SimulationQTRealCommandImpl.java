@@ -275,7 +275,6 @@ public class SimulationQTRealCommandImpl extends CommandImpl
 		ArrayList<SNP> snpList = mf.getMarkerList();
 		for (int i = 0; i < mf.getMarkerNumber(); i++)
 		{
-			
 			eff.println(mf.getMarkerName(i) + "\t" +  String.valueOf(snpList.get(i).getFirstAllele())  + "\t" + effect[i]);
 		}
 		phe.close();
