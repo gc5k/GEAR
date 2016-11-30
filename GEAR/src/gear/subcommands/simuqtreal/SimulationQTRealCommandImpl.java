@@ -272,9 +272,10 @@ public class SimulationQTRealCommandImpl extends CommandImpl
 		}
 
 		MapFile mf = pp.getMapData();
+		ArrayList<SNP> snpList = mf.getMarkerList();
 		for (int i = 0; i < mf.getMarkerNumber(); i++)
 		{
-			eff.println(mf.getMarkerName(i) + "\t" +  + mf.getMarkerList().get(i).getFirstAllele() + "\t" + effect[i]);
+			eff.println(mf.getMarkerName(i) + "\t" +  String.valueOf(snpList.get(i).getFirstAllele())  + "\t" + effect[i]);
 		}
 		phe.close();
 		eff.close();
