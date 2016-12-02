@@ -39,7 +39,10 @@ public class SynthMatrix
 		OATHB = lMat_Inv.multiply(tmp);
 
 		RealMatrix OATHB_t = OATHB.transpose();
+		OATHBSEMat = lMat_Inv.scalarMultiply( (1 - (OATHB_t.multiply(tmp)).getEntry(0, 0))/(N - lMat.getColumnDimension() ) );
+
 		OATHBse = Math.sqrt(lMat_Inv.scalarMultiply( (1 - (OATHB_t.multiply(tmp)).getEntry(0, 0))/(N - lMat.getColumnDimension() ) ).getEntry(0, 0));
+
 	}
 
 	private void initial(ArrayList<Integer> Int, double[][] corMat, SynthFReader fReader)
@@ -114,14 +117,14 @@ public class SynthMatrix
 		return isNonSingular;
 	}
 
-	public double getOATHB()
+	public double getOATHB(int idx)
 	{
-		return OATHB.getEntry(0, 0);
+		return OATHB.getEntry(idx, 0);
 	}
-	
-	public double getOATHse()
+
+	public double getOATHse(int idx)
 	{
-		return OATHBse;
+		return Math.sqrt(OATHBSEMat.getEntry(idx, idx));
 	}
 
 	private String snp;
@@ -135,5 +138,7 @@ public class SynthMatrix
 	private int N;
 	private boolean isNonSingular;
 	private RealMatrix OATHB;
+	private RealMatrix OATHBSEMat;
 	private double OATHBse;
+	
 }

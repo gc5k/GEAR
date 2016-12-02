@@ -100,7 +100,7 @@ public class SynthRes implements Comparable<SynthRes>
 	public String printTitle()
 	{
 		StringBuffer sb = new StringBuffer();
-		sb.append("SNP\tCHR\tBP\tA1\tA2\tBETA\tSE\tZ\tP\tCOV");
+		sb.append("SNP\tCHR\tBP\tA1\tA2\tBETA\tSE\tZ\tP\tTEST");
 		return sb.toString();
 	}
 
@@ -137,7 +137,7 @@ public class SynthRes implements Comparable<SynthRes>
 		{
 			sb.append(fmtp.format(z) + "\t");
 		}
-		sb.append("1\t" +cohort);
+		sb.append("1\t");
 		return sb.toString();
 	}
 
