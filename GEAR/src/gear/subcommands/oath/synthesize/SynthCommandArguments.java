@@ -121,6 +121,16 @@ public class SynthCommandArguments extends CommandArguments
 		return maf;
 	}
 
+	public void setVerbose()
+	{
+		verbose = true;
+	}
+
+	public boolean isVerbose()
+	{
+		return verbose;
+	}
+
 	private int[] keepBatchIdx = null;
 	private String cmFile;
 	private ArrayList<String> md;
@@ -130,4 +140,5 @@ public class SynthCommandArguments extends CommandArguments
 	private int N = 1000;
 	private String[] field = {OATHConst.SNP, OATHConst.CHR, OATHConst.BP, OATHConst.RefAle, OATHConst.AltAle, OATHConst.RAF, OATHConst.Vg, OATHConst.BETA, OATHConst.SE, OATHConst.CHI, OATHConst.P};
 	private double maf = 0;
+	private boolean verbose = false;
 }

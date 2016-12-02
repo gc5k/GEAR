@@ -58,19 +58,30 @@ public class SynthCommandImpl extends CommandImpl
 			}
 
 			double[][] cm = new double[kp.length][kp.length];
-			for(int i = 0; i < kp.length; i++)
+			for (int i = 0; i < kp.length; i++)
 			{
-				for(int j = 0; j < kp.length; j++)
+				for (int j = 0; j < kp.length; j++)
 				{
 					cm[i][j] = corMat[kp[i]][kp[j]];
 				}
 			}
 			corMat = cm;
 			Logger.printUserLog(kp.length + " nss files are kept for analysis.");
+
+			for (int i = 0; i < kp.length - 1; i++)
+			{
+				ArrayList<SynthRes> sr = NewIt.newArrayList();
+				covArray.add(sr);
+			}
 		}
 		else
 		{
 			Arrays.fill(keepBatch, true);
+			for (int i = 0; i < keepBatch.length - 1; i++)
+			{
+				ArrayList<SynthRes> sr = NewIt.newArrayList();
+				covArray.add(sr);
+			}
 		}
 	}
 
@@ -110,13 +121,40 @@ public class SynthCommandImpl extends CommandImpl
 			sRes.SetA1(ms.getA1());
 			sRes.SetA2(ms.getA2());
 
-			sRes.SetB(SynMat.getOATHB());
-			sRes.SetSE(SynMat.getOATHse());
-			sRes.SetZ(SynMat.getOATHB()/SynMat.getOATHse());
+			sRes.SetB(SynMat.getOATHB(0));
+			sRes.SetSE(SynMat.getOATHse(0));
+			sRes.SetZ(SynMat.getOATHB(0)/SynMat.getOATHse(0));
 			totalCnt++;
 			grArray.add(sRes);
+			
+			if (synArgs.isVerbose() && covArray.size() > 0)
+			{
+				for (int i = 0; i < covArray.size(); i++)
+				{
+					SynthRes cRes = new SynthRes(Int.get(Int.size() - 1).intValue());
+					cRes.SetSNP(snp);
+					cRes.SetChr(ms.getChr());
+					cRes.SetBP(ms.getBP());
+					cRes.SetA1(ms.getA1());
+					cRes.SetA2(ms.getA2());
+
+					cRes.SetB(SynMat.getOATHB(i+1));
+					cRes.SetSE(SynMat.getOATHse(i+1));
+					cRes.SetZ(SynMat.getOATHB(i+1)/SynMat.getOATHse(i+1));
+					ArrayList<SynthRes> sr = covArray.get(i);
+					sr.add(cRes);
+				}
+			}
 		}
 		Collections.sort(grArray);
+		if (synArgs.isVerbose() && covArray.size() > 0)
+		{
+			for (int i = 0; i < covArray.size(); i++)
+			{
+				ArrayList<SynthRes> sr = covArray.get(i);
+				Collections.sort(sr);
+			}
+		}
 
 		Logger.printUserLog("In total "+ totalCnt + " loci have been read.");
 		Logger.printUserLog("In total "+ grArray.size() + " loci have been used for OATH analysis.");
@@ -186,14 +224,23 @@ public class SynthCommandImpl extends CommandImpl
 			Logger.handleException(e, "An I/O exception occurred when writing '" + synArgs.getOutRoot() + ".oath'.\n");
 		}
 
-		for(int i = 0; i < grArray.size(); i++)
+		for (int i = 0; i < grArray.size(); i++)
 		{
 			SynthRes gr = grArray.get(i);
-			if(i == 0)
+			if (i == 0)
 			{
 				writer.write(gr.printTitle() + "\n");
 			}
-			writer.write(gr.toString()+ "\n");
+			writer.write(gr.toString()+ "ADD\n");
+
+			if (synArgs.isVerbose() && covArray.size() > 0)
+			{
+				for (int j = 0; j < covArray.size(); j++)
+				{
+					SynthRes cov = covArray.get(j).get(i);
+					writer.write(cov.toString() + "COV" + synArgs.getKeepBatchIdx()[j+1]+ "\n");
+				}
+			}
 		}
 		writer.close();
 	}
@@ -203,5 +250,6 @@ public class SynthCommandImpl extends CommandImpl
 	private SynthFReader fReader;
 	private double[][] corMat = null;
 	private ArrayList<SynthRes> grArray = NewIt.newArrayList();
+	private ArrayList<ArrayList<SynthRes>> covArray = NewIt.newArrayList();
 
 }

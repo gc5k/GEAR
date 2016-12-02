@@ -35,6 +35,7 @@ public class SynthCommand extends Command
 		options.addOption(OptionBuilder.withDescription(OPT_CHR_DESC).hasArg().create(OPT_CHR));
 		options.addOption(OptionBuilder.withDescription(OPT_N_DESC).hasArg().create(OPT_N));
 		options.addOption(OptionBuilder.withDescription(OPT_KEEP_BATCH_DESC).withLongOpt(OPT_KEEP_BATCH_LONG).hasArgs().create());
+		options.addOption(OptionBuilder.withDescription(OPT_VERBOSE_LONG_DESC).withLongOpt(OPT_VERBOSE_LONG).create(OPT_VERBOSE));
 	}
 
 	@Override
@@ -70,6 +71,10 @@ public class SynthCommand extends Command
 			synArgs.setKeepBatch(cmdLine.getOptionValues(OPT_KEEP_BATCH_LONG));
 		}
 		
+		if (cmdLine.hasOption(OPT_VERBOSE_LONG))
+		{
+			synArgs.setVerbose();
+		}
 		return synArgs;
 	}
 
@@ -103,6 +108,8 @@ public class SynthCommand extends Command
 
 	private final static String OPT_KEEP_BATCH_LONG = "keep-nss";
 	private final static String OPT_KEEP_BATCH_DESC = "Specify the indexes of nss files.";
-	
 
+	private final static String OPT_VERBOSE = "v";
+	private final static String OPT_VERBOSE_LONG  = "verbose";
+	private final static String OPT_VERBOSE_LONG_DESC  = "verbose";
 }
