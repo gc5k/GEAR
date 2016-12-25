@@ -69,6 +69,7 @@ public enum Gear
 		addCommand(new gear.subcommands.eigengwasdom.EigenGWASDomCommand());
 		addCommand(new gear.subcommands.labpop.LabPopCommand());
 		addCommand(new gear.subcommands.oath.nss.NSSCommand());
+		addCommand(new gear.subcommands.oath.oathx.OATHXCommand());
 		addCommand(new gear.subcommands.oath.synthesize.SynthCommand());
 		addCommand(new gear.subcommands.oath.oathbus.OATHBusCommand());
 		addCommand(new gear.subcommands.reml.REMLCommand());

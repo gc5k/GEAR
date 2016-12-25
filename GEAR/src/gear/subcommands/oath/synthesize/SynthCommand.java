@@ -30,7 +30,7 @@ public class SynthCommand extends Command
 	{
 		options.addOption(OptionBuilder.withDescription(OPT_NSS_BATCH_DESC).withLongOpt(OPT_NSS_BATCH_LONG).hasArg().create(OPT_NSS_BATCH));
 		options.addOption(OptionBuilder.withDescription(OPT_NSS_GZ_BATCH_DESC).withLongOpt(OPT_NSS_GZ_BATCH_LONG).hasArg().create(OPT_NSS_GZ_BATCH));
-		options.addOption(OptionBuilder.withDescription(OPT_KEEP_ATGC_DESC).withLongOpt(OPT_KEEP_ATGC_LONG).create(OPT_KEEP_ATGC));
+//		options.addOption(OptionBuilder.withDescription(OPT_KEEP_ATGC_DESC).withLongOpt(OPT_KEEP_ATGC_LONG).create(OPT_KEEP_ATGC));
 		options.addOption(OptionBuilder.withDescription(OPT_CM_DESC).hasArg().isRequired().create(OPT_CM));
 		options.addOption(OptionBuilder.withDescription(OPT_CHR_DESC).hasArg().create(OPT_CHR));
 		options.addOption(OptionBuilder.withDescription(OPT_N_DESC).hasArg().create(OPT_N));
@@ -96,9 +96,9 @@ public class SynthCommand extends Command
 	private final static String OPT_CHR = "chr";
 	private final static String OPT_CHR_DESC = "Choose chromosome for analysis";
 
-	private final static String OPT_KEEP_ATGC = "k";
-	private final static String OPT_KEEP_ATGC_LONG = "keep-atgc";
-	private final static String OPT_KEEP_ATGC_DESC = "Keep parlindormic loci.";
+//	private final static String OPT_KEEP_ATGC = "k";
+//	private final static String OPT_KEEP_ATGC_LONG = "keep-atgc";
+//	private final static String OPT_KEEP_ATGC_DESC = "Keep parlindormic loci.";
 
 	private final static String OPT_CM = "cm";
 	private final static String OPT_CM_DESC = "Correlation matrix";
