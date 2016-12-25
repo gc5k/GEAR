@@ -18,7 +18,7 @@ public class MLM
 		A = new Array2DRowRealMatrix[2];
 		A[0] = new Array2DRowRealMatrix(u2);
 		A[1] = new Array2DRowRealMatrix(y.length, y.length);
-		for(int i = 0; i < A[1].getColumnDimension(); i++)
+		for (int i = 0; i < A[1].getColumnDimension(); i++)
 		{
 			A[1].setEntry(i, i, 1);
 		}
@@ -26,7 +26,7 @@ public class MLM
 		Y = new Array2DRowRealMatrix(y);
 
 		double[][] x = new double[y.length][1];
-		for(int i = 0; i < y.length; i++)
+		for (int i = 0; i < y.length; i++)
 		{
 			x[i][0] = 1;
 		}
@@ -159,7 +159,7 @@ public class MLM
 			else 
 			{
 				Logger.printUserLog("MINQUE estimation (may be slow if sample size is big...)");
-			}			
+			}
 		}
 
 		double[] v = new double[A.length];
@@ -208,7 +208,7 @@ public class MLM
 				else {
 					V=V.add(A[i].scalarMultiply(var.getEntry(i, 0)));
 				}
-			}				
+			}
 			Int_V =  (new LUDecompositionImpl(V)).getSolver().getInverse();
 			X_IntV = (X.transpose()).multiply(Int_V);
 			X_IntV_X = X_IntV.multiply(X);
@@ -233,7 +233,7 @@ public class MLM
 			
 		//iteration
 			RealMatrix tmp2 = (((Int_V.multiply(X)).multiply(X_IntV_X__Int)).multiply(X.transpose())).multiply(Int_V);
-			RealMatrix Q = Int_V.subtract(tmp2);
+			Q = Int_V.subtract(tmp2);
 
 			reml_m = new Array2DRowRealMatrix(A.length, A.length);
 			RealMatrix reml_y = new Array2DRowRealMatrix(A.length, 1);
@@ -280,8 +280,9 @@ public class MLM
 		BETA = B;
 		V_BETA = X_IntV_X__Int.multiply(X_IntV_X).multiply(X_IntV_X__Int);
 		V_VAR = ((new LUDecompositionImpl(reml_m)).getSolver().getInverse()).scalarMultiply(2);
+		
 	}
-	
+
 	public void printIter(int cnt)
 	{
 		String its = new String();
@@ -403,9 +404,21 @@ public class MLM
 		return silent;
 	}
 
+	public double[][] BLUP()
+	{
+		double[][] blup = new double[getVC().getRowDimension()-1][Y.getRowDimension()];
+		for(int i = 0; i < blup.length; i++)
+		{
+			blup[i] = Q.multiply(Y).scalarMultiply(getVC().getEntry(0, 0)).getColumn(0);
+		}
+		return blup;
+	}
+
 	private RealMatrix[] A = null;
 	private RealMatrix Y = null;
 	private RealMatrix X = null;
+	
+	RealMatrix Q = null;
 	private RealMatrix BETA = null;
 	private RealMatrix V_BETA = null;
 	private RealMatrix V_VAR = null;

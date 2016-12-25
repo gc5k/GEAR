@@ -37,6 +37,8 @@ public class REMLCommand extends Command {
 		options.addOption(OptionBuilder.withDescription(OPT_MPHE_DESC).hasArg().create(OPT_MPHE));
 		options.addOption(OptionBuilder.withDescription(OPT_KEEP_DESC).hasArg().create(OPT_KEEP));
 		options.addOption(OptionBuilder.withDescription(OPT_MINQUE_DESC).create(OPT_MINQUE));
+		options.addOption(OptionBuilder.withDescription(OPT_ITERATION_DESC).hasArg().create(OPT_ITERATION));
+		options.addOption(OptionBuilder.withDescription(OPT_BLUP_DESC).create(OPT_BLUP));
 	}
 
 	@Override
@@ -52,6 +54,16 @@ public class REMLCommand extends Command {
 		if (cmdLine.hasOption(OPT_MINQUE))
 		{
 			remlArgs.setMINQUE(true);
+		}
+
+		if (cmdLine.hasOption(OPT_BLUP))
+		{
+			remlArgs.setBLUP(true);
+		}
+
+		if (cmdLine.hasOption(OPT_ITERATION))
+		{
+			remlArgs.setIter(cmdLine.getOptionValue(OPT_ITERATION));
 		}
 
 		if (cmdLine.hasOption(OPT_COVAR))
@@ -155,4 +167,10 @@ public class REMLCommand extends Command {
 	private final static String OPT_KEEP = "keep";
 	private final static String OPT_KEEP_DESC = "Specify the individuals to be used in the analysis";
 
+	private final static String OPT_BLUP = "blup";
+	private final static String OPT_BLUP_DESC = "BLUP";
+	
+	private final static String OPT_ITERATION = "iter";
+	private final static String OPT_ITERATION_DESC = "Specify iteration";
+	
 }

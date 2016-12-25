@@ -91,11 +91,14 @@ public class HEMRead
 
 		readPhenotypes(id2Idx);
 
-		if (CmdArgs.INSTANCE.covar_file != null & CmdArgs.INSTANCE.qcovar_file != null) 
+		if (CmdArgs.INSTANCE.covar_file != null || CmdArgs.INSTANCE.qcovar_file != null) 
 		{
 			HeCov hecov = new HeCov(y, flag, id2Idx, CmdArgs.INSTANCE.qcovar_file, CmdArgs.INSTANCE.qcovar_num, CmdArgs.INSTANCE.covar_file, CmdArgs.INSTANCE.covar_num);
 			hecov.generate_Res();
+//			System.out.println(y[1]);
 			y = hecov.getAdjustedPhe();
+//			System.out.println(y[1]);
+
 			flag = hecov.getFlag();
 		}
 

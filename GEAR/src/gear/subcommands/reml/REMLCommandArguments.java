@@ -156,6 +156,31 @@ public class REMLCommandArguments extends CommandArguments
 		return keepFile;
 	}
 
+	public void setBLUP(boolean blup) 
+	{
+		isBLUP = blup;
+	}
+
+	public boolean isBLUP()
+	{
+		return isBLUP;
+	}
+
+	public void setIter(String iter) 
+	{
+		Iter = Integer.parseInt(iter);
+		if (Iter < 0) 
+		{
+			Logger.printUserError("Iteration '" + Iter + "' is small than 0.");
+			System.exit(1);
+		}
+	}
+
+	public int getIter()
+	{
+		return Iter;
+	}
+
 	private String covFile = null;
 	private int[] covIdx = {0};
 	private String grmBin;
@@ -166,6 +191,8 @@ public class REMLCommandArguments extends CommandArguments
 	private boolean isGRMList;
 	private String[] grmGZList;
 	private boolean isMINQUE;
+	private boolean isBLUP = false;
+	private int Iter = 10;
 
 	private String pheFile = null;
 	private int[] pheIdx = {0};
