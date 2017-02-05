@@ -75,6 +75,7 @@ public enum Gear
 		addCommand(new gear.subcommands.reml.REMLCommand());
 		addCommand(new gear.subcommands.hereg.HERegCommand());
 		addCommand(new gear.subcommands.simuqtreal.SimulationQTRealCommand());
+		addCommand(new gear.subcommands.fastpca.FastPCACommand());
 	}
 
 	private void addCommand(Command cmd)
