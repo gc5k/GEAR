@@ -76,6 +76,7 @@ public enum Gear
 		addCommand(new gear.subcommands.hereg.HERegCommand());
 		addCommand(new gear.subcommands.simuqtreal.SimulationQTRealCommand());
 		addCommand(new gear.subcommands.fastpca.FastPCACommand());
+		addCommand(new gear.subcommands.simulationmpheno.SimulationMPCommand());
 	}
 
 	private void addCommand(Command cmd)

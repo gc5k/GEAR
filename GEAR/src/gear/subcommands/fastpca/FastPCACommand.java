@@ -65,7 +65,6 @@ public class FastPCACommand extends Command
 			fpcaArgs.setVar();
 		}
 		fpcaArgs.setSeed(parseLongOptionValueInRange(cmdLine, OPT_SEED_LONG, OPT_SEED_DEFAULT, 0, Long.MAX_VALUE));
-
 		return fpcaArgs;
 	}
 
