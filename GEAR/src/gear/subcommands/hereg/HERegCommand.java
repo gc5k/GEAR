@@ -42,6 +42,7 @@ public class HERegCommand extends Command
 		options.addOption(OptionBuilder.withDescription(OPT_MPHE_DESC).hasArg().create(OPT_MPHE));
 		options.addOption(OptionBuilder.withDescription(OPT_KEEP_DESC).hasArg().create(OPT_KEEP));
 		options.addOption(OptionBuilder.withDescription(OPT_SCALE_DESC).create(OPT_SCALE));
+		options.addOption(OptionBuilder.withDescription(OPT_JACKKNIFE_DESC).withLongOpt(OPT_JACKKNIFE_LONG).create(OPT_JACKKNIFE));
 		options.addOption(OptionBuilder.withDescription(OPT_GRM_CUTOFF_DESC).withLongOpt(OPT_GRM_CUTOFF_LONG).hasArg().create());
 
 	}
@@ -94,6 +95,11 @@ public class HERegCommand extends Command
 		if (cmdLine.hasOption(OPT_GRM_CUTOFF_LONG))
 		{
 			heArgs.setGRMcutoff(cmdLine.getOptionValue(OPT_GRM_CUTOFF_LONG));
+		}
+		
+		if (cmdLine.hasOption(OPT_JACKKNIFE_LONG))
+		{
+			heArgs.setJackknife();
 		}
 		return heArgs;
 	}
@@ -190,5 +196,9 @@ public class HERegCommand extends Command
 
 	private final static String OPT_GRM_CUTOFF_LONG = "grm-cutoff";
 	private final static String OPT_GRM_CUTOFF_DESC = "Specify the grm cutfoo for the analysis";
+	
+	private final static String OPT_JACKKNIFE_LONG = "jackknife";
+	private final static String OPT_JACKKNIFE = "jk";
+	private final static String OPT_JACKKNIFE_DESC = "Jackknife";
 
 }

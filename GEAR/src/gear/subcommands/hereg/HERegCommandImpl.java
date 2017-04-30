@@ -89,8 +89,13 @@ public class HERegCommandImpl extends CommandImpl {
 				Y = StatUtils.normalize(Y);
 			}
 			HESingle();
+			
+			if (heArgs.isJackknife())
+			{
+				HESingleJackknife();
+			}
 		}
-		
+
 		SummaryA3();
 		
 		printout();
@@ -299,8 +304,77 @@ public class HERegCommandImpl extends CommandImpl {
 		beta_v[0][0] = sReg.getInterceptStdErr();
 		beta_v[1][1] = sReg.getSlopeStdErr();
 	}
-	
-	
+
+	private void HESingleJackknife()
+	{
+		double[][] jBeta_ = new double[Y.length][2];
+		double[] jBeta = new double[2];
+		double[] jBetaSe = new double[2];
+		for (int jk = 0; jk < Y.length; jk++)
+		{
+			SimpleRegression sReg = new SimpleRegression();
+
+			int cnt = 0;
+			for (int i = 0; i < Y.length; i++)
+			{
+				if (i == jk)
+				{
+					continue;
+				}
+				for (int j = 0; j < i; j++)
+				{
+					double yy = 0;
+					if (j == jk)
+					{
+						continue;
+					}
+					if (heArgs.isSD())
+					{
+						yy = (Y[i] - Y[j]) * (Y[i] - Y[j]);
+					}
+					else if (heArgs.isCP())
+					{
+						yy = Y[i]*Y[j];
+					}
+					else
+					{
+						yy = (Y[i] + Y[j]) * (Y[i] + Y[j]);
+					}
+					if (heArgs.isGRMcut() && A3[0][i][j] > heArgs.getGRMcutoff()) continue;
+					sReg.addData(A3[0][i][j], yy);
+					cnt++;
+				}
+			}
+//			Logger.printUserLog(cnt + " observations for HE regression -> Jackknife " + (jk+1) + " " + sReg.getSlope());
+			jBeta_[jk][0] = Y.length * beta[0] - (Y.length-1) * sReg.getIntercept();
+			jBeta_[jk][1] = Y.length * beta[1] - (Y.length-1) * sReg.getSlope();
+		}
+
+		double s1 = 0, s2 = 0;
+		for (int jk = 0; jk < jBeta_.length; jk++)
+		{
+			s1 += jBeta_[jk][0];
+			s2 += jBeta_[jk][1];
+		}
+		jBeta[0] = s1/jBeta_.length;
+		jBeta[1] = s2/jBeta_.length;
+		double ss1 = 0, ss2 = 0;
+		for (int jk = 0; jk < jBeta_.length; jk++)
+		{
+			ss1 += (jBeta_[jk][0] - jBeta[0]) * (jBeta_[jk][0] - jBeta[0]);
+			ss2 += (jBeta_[jk][1] - jBeta[1]) * (jBeta_[jk][1] - jBeta[1]);
+		}
+		jBetaSe[0] = Math.sqrt(ss1/(jBeta_.length * (jBeta_.length - 1)));
+		jBetaSe[1] = Math.sqrt(ss2/(jBeta_.length * (jBeta_.length - 1)));
+
+		Logger.printUserLog("-------------------------------------------------------------------");
+		Logger.printUserLog("Jackknife results: ");
+		Logger.printUserLog("Mean\t"+jBeta[0] + "\t" + jBetaSe[0]);
+		Logger.printUserLog("Beta1\t"+jBeta[1] + "\t" + jBetaSe[1]);
+		Logger.printUserLog("-------------------------------------------------------------------");
+
+	}
+
 	private double[][] readCovar()
 	{
 		int[] covIdx = data.getMatchedSubjectIdx(covFileIdx);
@@ -444,6 +518,9 @@ public class HERegCommandImpl extends CommandImpl {
 	private double[][] X = null;
 	private double[] beta = null;
 	private double[][] beta_v = null;
+//	private double[] jbeta = null;
+	private double[] jBeta = null;
+	private double[] jBetaSe = null;
 
 	private HERegCommandArguments heArgs = null;
 	private InputDataSet2 data = null;

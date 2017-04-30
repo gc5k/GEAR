@@ -208,6 +208,17 @@ public class HERegCommandArguments extends CommandArguments
 		return isGRMCut;
 	}
 
+	public void setJackknife() 
+	{
+		isJackknife = true;
+	}
+
+	public boolean isJackknife()
+	{
+		return isJackknife;
+	}
+
+	private boolean isJackknife = false;
 	private String covFile = null;
 	private int[] covIdx = {0};
 	private String grmBin;
