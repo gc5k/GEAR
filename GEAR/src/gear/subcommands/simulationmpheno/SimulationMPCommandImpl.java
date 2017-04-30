@@ -6,7 +6,6 @@ import java.io.FileOutputStream;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.PrintWriter;
-import java.text.DecimalFormat;
 import java.util.Arrays;
 
 import org.apache.commons.math.linear.Array2DRowRealMatrix;
@@ -354,7 +353,7 @@ public class SimulationMPCommandImpl extends CommandImpl
 			String line = null;
 			while ((line = reader.readLine()) != null)
 			{
-				if(c >= M)
+				if (c >= M)
 				{
 					Logger.printUserLog("Have already read " + M + " allelic effects.  Ignore the rest of the content in '" + mpArgs.getFreqFile() + "'.");
 					break;
@@ -363,10 +362,11 @@ public class SimulationMPCommandImpl extends CommandImpl
 				line.trim();
 				String[] l = line.split(ConstValues.WHITESPACE_DELIMITER);
 				if (l.length < h2.length) continue;
-				for(int i = 0; i < h2.length; i++)
+				for (int i = 0; i < h2.length; i++)
 				{
-					effect[c++][i] = Double.parseDouble(l[i]);						
+					effect[c][i] = Double.parseDouble(l[i]);						
 				}
+				c++;
 			}
 			reader.close();
 		}

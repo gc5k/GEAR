@@ -29,6 +29,7 @@ public class SimulationMPCommand extends Command {
 	{
 		options.addOption(OptionBuilder.withDescription(OPT_SAMPLE_SIZE_LONG_DESC).withLongOpt(OPT_SAMPLE_SIZE_LONG).hasArg().isRequired().create(OPT_SAMPLE_SIZE));
 		options.addOption(OptionBuilder.withDescription(OPT_MARKER_LONG_DESC).withLongOpt(OPT_MARKER_LONG).hasArg().isRequired().create(OPT_MARKER));
+		options.addOption(OptionBuilder.withDescription(OPT_NULL_MARKER_LONG_DESC).withLongOpt(OPT_NULL_MARKER_LONG).hasArg().create());
 
 		options.addOption(OptionBuilder.withDescription(OPT_EFFECT_DESC).hasArg().create(OPT_EFFECT));
 		options.addOption(OptionBuilder.withDescription(OPT_POLY_EFFECT_LONG_DESC).withLongOpt(OPT_POLY_EFFECT_LONG).create());
@@ -73,6 +74,11 @@ public class SimulationMPCommand extends Command {
 		if(cmdLine.hasOption(OPT_MARKER_LONG))
 		{
 			simuMPArgs.setMarkerNum(cmdLine.getOptionValue(OPT_MARKER_LONG));
+		}
+
+		if(cmdLine.hasOption(OPT_NULL_MARKER_LONG))
+		{
+			simuMPArgs.setNullMarkerNum(cmdLine.getOptionValue(OPT_NULL_MARKER_LONG));
 		}
 
 		simuMPArgs.setPolyEffect();
@@ -159,6 +165,9 @@ public class SimulationMPCommand extends Command {
 	private static final String OPT_MARKER = "m";
 	private static final String OPT_MARKER_LONG = "marker";
 	private static final String OPT_MARKER_LONG_DESC = "Number of markers.";
+
+	private static final String OPT_NULL_MARKER_LONG = "null-marker";
+	private static final String OPT_NULL_MARKER_LONG_DESC = "Number of null markers.";
 
 	//effect
 	private static final String OPT_EFFECT = "effect";
