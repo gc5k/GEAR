@@ -33,6 +33,9 @@ public class GRMCommand extends Command
 	    options.addOption(OptionBuilder.withDescription("Specify the chromosomes for analysis").hasArg().create(OPT_CHR));
 	    options.addOption(OptionBuilder.withDescription("Make gz format").create(OPT_GZ));
 	    options.addOption(OptionBuilder.withDescription("Make txt format").create(OPT_TXT));
+	    options.addOption(OptionBuilder.withDescription("Dominance").create(OPT_DOM));
+	    options.addOption(OptionBuilder.withDescription("MAF").hasArg().create(OPT_MAF));
+
 	    options.addOption(OptionBuilder.withDescription("Adjustment for variance").withLongOpt(OPT_VAR_LONG).create());
 	}
 
@@ -56,6 +59,14 @@ public class GRMCommand extends Command
 		if (cmdLine.hasOption(OPT_CHR))
 		{
 			grmArgs.setChr(cmdLine.getOptionValue(OPT_CHR));
+		}
+		if (cmdLine.hasOption(OPT_DOM))
+		{
+			grmArgs.setDom();
+		}
+		if (cmdLine.hasOption(OPT_MAF))
+		{
+			grmArgs.setMAF(cmdLine.getOptionValue(OPT_MAF));
 		}
 		return grmArgs;
 	}
@@ -96,5 +107,7 @@ public class GRMCommand extends Command
 	private static final String OPT_GZ = "gz";
 	private static final String OPT_TXT = "txt";
 	private static final String OPT_VAR_LONG = "adj-var";
+	private static final String OPT_DOM = "dom";
+	private static final String OPT_MAF = "maf";
 
 }

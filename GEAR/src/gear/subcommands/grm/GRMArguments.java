@@ -5,15 +5,18 @@ import gear.util.Logger;
 
 public class GRMArguments extends CommandArguments
 {
-	private int chr;
+	private String chr;
 	private boolean chrFlag = false;
 	private boolean isGZ = true;
 	private boolean isVar = false;
+	private boolean isDom = true;
+	private double maf = 1e-5;
 
 	public void setChr(String c)
 	{
-		this.chr = Integer.parseInt(c);
-		if (this.chr < 1)
+		this.chr = c;
+		int chr1 = Integer.parseInt(c);
+		if (chr1 < 1)
 		{
 			Logger.printUserLog("Chromosome should be greater than 0.\n GEAR quitted");
 			System.exit(1);
@@ -46,7 +49,7 @@ public class GRMArguments extends CommandArguments
 		return isVar;
 	}
 
-	public int getChr()
+	public String getChr()
 	{
 		return this.chr;
 	}
@@ -56,4 +59,23 @@ public class GRMArguments extends CommandArguments
 		return this.chrFlag;
 	}
 
+	public void setDom() 
+	{
+		isDom = true;
+	}
+
+	public boolean isDom()
+	{
+		return isDom;
+	}
+
+	public void setMAF(String m) 
+	{
+		maf = Double.parseDouble(m);
+	}
+	
+	public double getMAF()
+	{
+		return maf;
+	}
 }
