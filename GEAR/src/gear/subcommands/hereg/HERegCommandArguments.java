@@ -218,6 +218,26 @@ public class HERegCommandArguments extends CommandArguments
 		return isJackknife;
 	}
 
+	public void setGrmDom()
+	{
+		isDom = true;
+	}
+	
+	public boolean isDom()
+	{
+		return isDom;
+	}
+
+	public void setFam()
+	{
+		isFam = true;
+	}
+	
+	public boolean isFam()
+	{
+		return isFam;
+	}
+
 	private boolean isJackknife = false;
 	private String covFile = null;
 	private int[] covIdx = {0};
@@ -238,6 +258,10 @@ public class HERegCommandArguments extends CommandArguments
 	private boolean isSS = false;
 	private boolean isCP = false;
 	
+	private boolean isDom = false;
+
 	private boolean isGRMCut = false;
 	private double grmCutoff = 0;
+
+	private boolean isFam = false;
 }

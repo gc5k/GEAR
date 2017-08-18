@@ -89,7 +89,7 @@ public class HERegCommandImpl extends CommandImpl {
 				Y = StatUtils.normalize(Y);
 			}
 			HESingle();
-			
+
 			if (heArgs.isJackknife())
 			{
 				HESingleJackknife();
@@ -97,7 +97,6 @@ public class HERegCommandImpl extends CommandImpl {
 		}
 
 		SummaryA3();
-		
 		printout();
 	}
 
@@ -301,8 +300,8 @@ public class HERegCommandImpl extends CommandImpl {
 
 		beta[0] = sReg.getIntercept();
 		beta[1] = sReg.getSlope();
-		beta_v[0][0] = sReg.getInterceptStdErr();
-		beta_v[1][1] = sReg.getSlopeStdErr();
+		beta_v[0][0] = sReg.getInterceptStdErr() * sReg.getInterceptStdErr();
+		beta_v[1][1] = sReg.getSlopeStdErr() * sReg.getSlopeStdErr();
 	}
 
 	private void HESingleJackknife()
@@ -369,8 +368,8 @@ public class HERegCommandImpl extends CommandImpl {
 
 		Logger.printUserLog("-------------------------------------------------------------------");
 		Logger.printUserLog("Jackknife results: ");
-		Logger.printUserLog("Mean\t"+jBeta[0] + "\t" + jBetaSe[0]);
-		Logger.printUserLog("Beta1\t"+jBeta[1] + "\t" + jBetaSe[1]);
+		Logger.printUserLog("JK_Mean\t"+jBeta[0] + "\t" + jBetaSe[0]);
+		Logger.printUserLog("JK_Beta1\t"+jBeta[1] + "\t" + jBetaSe[1]);
 		Logger.printUserLog("-------------------------------------------------------------------");
 
 	}
@@ -390,7 +389,7 @@ public class HERegCommandImpl extends CommandImpl {
 	{
 		int[] pheIdx = data.getMatchedSubjectIdx(pheFileIdx);
 		double[] y = new double[pheIdx.length];
-		for(int subjectIdx = 0; subjectIdx < y.length; subjectIdx++)
+		for (int subjectIdx = 0; subjectIdx < y.length; subjectIdx++)
 		{
 			y[subjectIdx] = data.getVariable(pheFileIdx, pheIdx[subjectIdx], heArgs.getPhenotypeIdx()[0]);
 		}
@@ -513,7 +512,7 @@ public class HERegCommandImpl extends CommandImpl {
 	private int covFileIdx = 2;
 
 	private double[][][] A3;
-	
+
 	private double[] Y = null;
 	private double[][] X = null;
 	private double[] beta = null;
@@ -524,11 +523,11 @@ public class HERegCommandImpl extends CommandImpl {
 
 	private HERegCommandArguments heArgs = null;
 	private InputDataSet2 data = null;
-	
+
 	private double[] mA;
 	private double[][] vA;
-	
+
 	private DecimalFormat fmt = new DecimalFormat("0.0000");
 	private DecimalFormat fmtE = new DecimalFormat("0.00E0");
-	
+
 }

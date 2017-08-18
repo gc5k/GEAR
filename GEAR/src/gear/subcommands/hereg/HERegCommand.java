@@ -32,6 +32,7 @@ public class HERegCommand extends Command
 		options.addOption(OptionBuilder.withDescription(OPT_SS_DESC).create(OPT_SS));
 		options.addOption(OptionBuilder.withDescription(OPT_CP_DESC).create(OPT_CP));
 
+		options.addOption(OptionBuilder.withDescription(OPT_DOM_DESC).create(OPT_DOM));
 		options.addOption(OptionBuilder.withDescription(OPT_GRM_BIN_DESC).withLongOpt(OPT_GRM_BIN_LONG).hasArg().create());
 		options.addOption(OptionBuilder.withDescription(OPT_GRM_TEXT_DESC).withLongOpt(OPT_GRM_TEXT_LONG).hasArg().create());
 		options.addOption(OptionBuilder.withDescription(OPT_GRM_GZ_DESC).withLongOpt(OPT_GRM_GZ_LONG).hasArg().create());
@@ -44,7 +45,6 @@ public class HERegCommand extends Command
 		options.addOption(OptionBuilder.withDescription(OPT_SCALE_DESC).create(OPT_SCALE));
 		options.addOption(OptionBuilder.withDescription(OPT_JACKKNIFE_DESC).withLongOpt(OPT_JACKKNIFE_LONG).create(OPT_JACKKNIFE));
 		options.addOption(OptionBuilder.withDescription(OPT_GRM_CUTOFF_DESC).withLongOpt(OPT_GRM_CUTOFF_LONG).hasArg().create());
-
 	}
 
 	@Override
@@ -53,7 +53,12 @@ public class HERegCommand extends Command
 		HERegCommandArguments heArgs = new HERegCommandArguments();
 		parseGRMArguments(heArgs, cmdLine);
 		heArgs.setPhenotypeFile(cmdLine.getOptionValue(OPT_PHE));
-		if(cmdLine.hasOption(OPT_MPHE))
+
+		if (cmdLine.hasOption(OPT_DOM))
+		{
+			heArgs.setGrmDom();
+		}
+		if (cmdLine.hasOption(OPT_MPHE))
 		{
 			heArgs.setPhenotypeIdx(cmdLine.getOptionValue(OPT_MPHE));			
 		}
@@ -81,22 +86,22 @@ public class HERegCommand extends Command
 		{
 			heArgs.setSD();
 		}
-		
+
 		if (cmdLine.hasOption(OPT_CP))
 		{
 			heArgs.setCP();
 		}
-		
+
 		if (cmdLine.hasOption(OPT_SS))
 		{
 			heArgs.setSS();
 		}
-		
+
 		if (cmdLine.hasOption(OPT_GRM_CUTOFF_LONG))
 		{
 			heArgs.setGRMcutoff(cmdLine.getOptionValue(OPT_GRM_CUTOFF_LONG));
 		}
-		
+
 		if (cmdLine.hasOption(OPT_JACKKNIFE_LONG))
 		{
 			heArgs.setJackknife();
@@ -112,7 +117,7 @@ public class HERegCommand extends Command
 		String grmList = cmdLine.getOptionValue(OPT_GRM_LIST_LONG);
 
 		int numFiles = 0;
-		
+
 		if (grmBin != null)
 		{
 			heArgs.setGrmBin(grmBin + ".grm.bin");
@@ -157,12 +162,15 @@ public class HERegCommand extends Command
 		return new HERegCommandImpl();
 	}
 
-	private static String OPT_SD = "sd";
-	private static String OPT_SD_DESC = "Squared difference for a pair of phenotypes";
-	private static String OPT_CP = "cp";
-	private static String OPT_CP_DESC = "Cross-product for a pair for phenotypes";
-	private static String OPT_SS = "ss";
-	private static String OPT_SS_DESC = "Sum of square for a pair for phenotypes";
+	private final static String OPT_SD = "sd";
+	private final static String OPT_SD_DESC = "Squared difference for a pair of phenotypes";
+	private final static String OPT_CP = "cp";
+	private final static String OPT_CP_DESC = "Cross-product for a pair for phenotypes";
+	private final static String OPT_SS = "ss";
+	private final static String OPT_SS_DESC = "Sum of square for a pair for phenotypes";
+
+	private final static String OPT_DOM = "dom";
+	private final static String OPT_DOM_DESC = "Specify the dominance files";
 
 	private final static String OPT_GRM_LIST_LONG = "grm-list";
 	private final static String OPT_GRM_LIST_DESC = "Specify the .grm files";
@@ -200,5 +208,4 @@ public class HERegCommand extends Command
 	private final static String OPT_JACKKNIFE_LONG = "jackknife";
 	private final static String OPT_JACKKNIFE = "jk";
 	private final static String OPT_JACKKNIFE_DESC = "Jackknife";
-
-}
+	}
