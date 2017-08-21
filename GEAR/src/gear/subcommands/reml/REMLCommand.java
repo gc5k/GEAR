@@ -39,6 +39,7 @@ public class REMLCommand extends Command {
 		options.addOption(OptionBuilder.withDescription(OPT_MINQUE_DESC).create(OPT_MINQUE));
 		options.addOption(OptionBuilder.withDescription(OPT_ITERATION_DESC).hasArg().create(OPT_ITERATION));
 		options.addOption(OptionBuilder.withDescription(OPT_BLUP_DESC).create(OPT_BLUP));
+		options.addOption(OptionBuilder.withDescription(OPT_SCALE_DESC).create(OPT_SCALE));
 	}
 
 	@Override
@@ -79,6 +80,11 @@ public class REMLCommand extends Command {
 		if (cmdLine.hasOption(OPT_KEEP))
 		{
 			remlArgs.setKeepFile(cmdLine.getOptionValue(OPT_KEEP));
+		}
+		
+		if (cmdLine.hasOption(OPT_SCALE))
+		{
+			remlArgs.setScale();
 		}
 
 		return remlArgs;
@@ -172,5 +178,8 @@ public class REMLCommand extends Command {
 	
 	private final static String OPT_ITERATION = "iter";
 	private final static String OPT_ITERATION_DESC = "Specify iteration";
+	
+	private final static String OPT_SCALE = "scale";
+	private final static String OPT_SCALE_DESC = "Standardize the phenotype";
 	
 }

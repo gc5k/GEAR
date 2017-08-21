@@ -5,6 +5,7 @@ import java.text.DecimalFormat;
 import java.util.ArrayList;
 
 import org.apache.commons.math.linear.RealMatrix;
+import org.apache.commons.math.stat.StatUtils;
 
 import gear.ConstValues;
 import gear.data.InputDataSet2;
@@ -51,6 +52,11 @@ public class REMLCommandImpl extends CommandImpl {
 			Logger.printUserLog(A3.length + " variance components included.");
 			Logger.printUserLog("");
 
+			if (remlArgs.isScale())
+			{
+				Y = StatUtils.normalize(Y);
+			}
+
 			if (remlArgs.getCovFile() == null)
 			{
 				mlm = new MLM(A3, Y, remlArgs.isMINQUE());
@@ -82,6 +88,11 @@ public class REMLCommandImpl extends CommandImpl {
 			Logger.printUserLog("1 variance component included.");
 			Logger.printUserLog("");
 
+			if (remlArgs.isScale())
+			{
+				Y = StatUtils.normalize(Y);
+			}
+
 			if (remlArgs.getCovFile() == null)
 			{
 				mlm = new MLM(A, Y, remlArgs.isMINQUE());				
@@ -91,6 +102,7 @@ public class REMLCommandImpl extends CommandImpl {
 				X = readCovar();
 				mlm = new MLM(A, X, Y, remlArgs.isMINQUE(), remlArgs.getCovNumber());
 			}
+
 		}
 
 		mlm.MINQUE();

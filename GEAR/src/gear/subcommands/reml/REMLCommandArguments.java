@@ -181,6 +181,16 @@ public class REMLCommandArguments extends CommandArguments
 		return Iter;
 	}
 
+	public void setScale()
+	{
+		isScale = true;
+	}
+
+	public boolean isScale()
+	{
+		return isScale;
+	}
+
 	private String covFile = null;
 	private int[] covIdx = {0};
 	private String grmBin;
@@ -197,5 +207,6 @@ public class REMLCommandArguments extends CommandArguments
 	private String pheFile = null;
 	private int[] pheIdx = {0};
 	private String keepFile = null;
+	private boolean isScale = false;
 
 }
