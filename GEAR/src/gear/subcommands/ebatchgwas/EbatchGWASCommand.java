@@ -30,6 +30,8 @@ public class EbatchGWASCommand extends Command
 	{
 		options.addOption(OptionBuilder.withDescription(OPT_BFILE_DESC).withLongOpt(OPT_BFILE_LONG).hasArg().isRequired().create());
 		options.addOption(OptionBuilder.withDescription(OPT_EV_DESC).withLongOpt(OPT_EV_LONG).hasArg().create());
+		options.addOption(OptionBuilder.withDescription(OPT_DOM_DESC).create(OPT_DOM));
+
 	}
 
 	@Override
@@ -38,7 +40,7 @@ public class EbatchGWASCommand extends Command
 		EbatchGWASArguments EArgs = new EbatchGWASArguments();
 		parseFileArguments(EArgs, cmdLine);
 		EArgs.setEV(cmdLine.getOptionValue(OPT_EV_LONG));
-
+		EArgs.setDom(cmdLine.hasOption(OPT_DOM));
 		return EArgs;
 	}
 
@@ -62,5 +64,6 @@ public class EbatchGWASCommand extends Command
 
 	private final static String OPT_EV_LONG = "ev";
 	private final static String OPT_EV_DESC = "Specify the eigenvector numbers";
-
+	private final static String OPT_DOM = "dom";
+	private final static String OPT_DOM_DESC = "Specify the eigenvector numbers";
 }

@@ -4,6 +4,8 @@ import gear.subcommands.CommandArguments;
 import gear.subcommands.CommandImpl;
 import gear.subcommands.eigengwas.EigenGWASArguments;
 import gear.subcommands.eigengwas.EigenGWASImpl;
+import gear.subcommands.eigengwasdom.EigenGWASDomCommandArguments;
+import gear.subcommands.eigengwasdom.EigenGWASDomImpl;
 import gear.subcommands.grm.GRMArguments;
 import gear.subcommands.grm.GRMImpl;
 import gear.subcommands.qpca.QPCACommandArguments;
@@ -35,18 +37,37 @@ public class EbatchGWASImpl extends CommandImpl
 		qpcaImpl.execute(qpcaArgs);
 		Logger.printUserLog("Saving the top "+ eArgs.getEV() + " eigenvectors in '" + eArgs.getOutRoot() + ".eigenvec'.");
 
-		for(int i = 1; i <= eArgs.getEV(); i++)
+		if (eArgs.isDom())
 		{
-			Logger.printUserLog("\n---------Running EigenGWAS for the "+i+"th eigenvector.");
-			EigenGWASArguments eigenArgs = new EigenGWASArguments();
-			eigenArgs.setBFile(eArgs.getBFile());
-			eigenArgs.setPhenotypeFile(eArgs.getOutRoot()+".eigenvec");
-			eigenArgs.setPhentypeIndex(i);
-			eigenArgs.setOutRoot(eArgs.getOutRoot() + "." + i);
-			
-			EigenGWASImpl eigenImpl = new EigenGWASImpl();
-			eigenImpl.execute(eigenArgs);
-			Logger.printUserLog("Saved EigenGWAS results in '"+eigenArgs.getOutRoot() + ".egwas'.");
+			for(int i = 1; i <= eArgs.getEV(); i++)
+			{
+				Logger.printUserLog("\n---------Running EigenGWAS (Additive+Dominance model) for the "+i+"th eigenvector.");
+				EigenGWASDomCommandArguments eigenDomArgs = new EigenGWASDomCommandArguments();
+				eigenDomArgs.setBFile(eArgs.getBFile());
+				eigenDomArgs.setPhenotypeFile(eArgs.getOutRoot()+".eigenvec");
+				eigenDomArgs.setPhentypeIndex(i);
+				eigenDomArgs.setOutRoot(eArgs.getOutRoot() + "." + i);
+				
+				EigenGWASDomImpl eigenDomImpl = new EigenGWASDomImpl();
+				eigenDomImpl.execute(eigenDomArgs);
+				Logger.printUserLog("Saved EigenGWAS results in '"+eigenDomArgs.getOutRoot() + ".egwasd'.");
+			}
+		}
+		else 
+		{
+			for(int i = 1; i <= eArgs.getEV(); i++)
+			{
+				Logger.printUserLog("\n---------Running EigenGWAS (Additive model) for the "+i+"th eigenvector.");
+				EigenGWASArguments eigenArgs = new EigenGWASArguments();
+				eigenArgs.setBFile(eArgs.getBFile());
+				eigenArgs.setPhenotypeFile(eArgs.getOutRoot()+".eigenvec");
+				eigenArgs.setPhentypeIndex(i);
+				eigenArgs.setOutRoot(eArgs.getOutRoot() + "." + i);
+				
+				EigenGWASImpl eigenImpl = new EigenGWASImpl();
+				eigenImpl.execute(eigenArgs);
+				Logger.printUserLog("Saved EigenGWAS results in '"+eigenArgs.getOutRoot() + ".egwas'.");
+			}			
 		}
 		
 	}

@@ -36,6 +36,7 @@ public class EigenGWASDomImpl extends CommandImpl
 	private ArrayList<EigenGWASDomResult> eGWASResult = NewIt.newArrayList();
 
 	private double lambdaGC = 1;
+	private double lambdaGCDom = 1;
 	private int monoLoci = 0;
 	private int singularLoci = 0;
 
@@ -73,6 +74,8 @@ public class EigenGWASDomImpl extends CommandImpl
 		double[] Y = new double[pIdx.length];
 
 		ArrayList<Double> pArray = NewIt.newArrayList();
+		ArrayList<Double> pDomArray = NewIt.newArrayList();
+
 		double threshold = 0.0D;
 
 		for (int subjectIdx = 0; subjectIdx < Y.length; subjectIdx++) 
@@ -175,7 +178,7 @@ public class EigenGWASDomImpl extends CommandImpl
 
 				if (!isNonSingular)
 				{
-					Logger.printUserLog("Model is singular for " + snp.getName() + ".");
+					Logger.printUserLog("Model is singular for '" + snp.getName() + "'; skipped.");
 					singularLoci++;
 					continue;
 				}
@@ -196,13 +199,16 @@ public class EigenGWASDomImpl extends CommandImpl
 						EigenGWASDomResult e1 = new EigenGWASDomResult(snp, freq, B.getEntry(1, 0), Math.sqrt(BV.getEntry(1, 1)), B.getEntry(2, 0), Math.sqrt(BV.getEntry(2, 2)), n1, freq1, n2, freq2, fst);
 						eGWASResult.add(e1);
 						pArray.add(e1.GetP());
+						pDomArray.add(e1.GetDomP());
 					}
 				}
-
 			}
 		}
 		Collections.sort(pArray);
 		int idx = (int) Math.ceil(pArray.size() / 2);
+
+		Collections.sort(pDomArray);
+		int idxDom = (int) Math.ceil(pDomArray.size() / 2);
 
 		if (monoLoci > 1)
 		{
@@ -221,20 +227,24 @@ public class EigenGWASDomImpl extends CommandImpl
 		{
 			Logger.printUserLog("Removed " + singularLoci + " singular locus.");			
 		}
-		Logger.printUserLog("Median of p values is " + pArray.get(idx));
+		Logger.printUserLog("Median of p values (additive) is " + pArray.get(idx));
+		Logger.printUserLog("Median of p values (dominance) is " + pDomArray.get(idx));
 
 		try 
 		{
 			double chisq = ci.inverseCumulativeProbability(1 - pArray.get(idx).doubleValue());
 			lambdaGC = chisq / 0.4549;
+			
+			double chisqDom = ci.inverseCumulativeProbability(1 - pDomArray.get(idxDom).doubleValue());
+			lambdaGCDom = chisqDom / 0.4549;
 		} 
 		catch (MathException e) 
 		{
 			e.printStackTrace();
 		}
 
-		Logger.printUserLog("Lambda GC is: " + lambdaGC);
-
+		Logger.printUserLog("Lambda GC (additive) is: " + lambdaGC);
+		Logger.printUserLog("Lambda GC (dominance) is: " + lambdaGCDom);
 	}
 
 	public void printResult() 

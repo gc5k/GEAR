@@ -43,6 +43,7 @@ public class EigenGWASDomResult
 	   this.d = d;
 	   this.d_se = d_se;
 	   this.d_p = getP(d/d_se);
+
 	   this.n1 = n1;
 	   this.freq1 = freq1;
 	   this.n2 = n2;
@@ -53,6 +54,11 @@ public class EigenGWASDomResult
    public double GetP()
    {
 	   return this.P;
+   }
+
+   public double GetDomP()
+   {
+	   return this.d_p;
    }
 
    public String printEGWASResult(double gc)

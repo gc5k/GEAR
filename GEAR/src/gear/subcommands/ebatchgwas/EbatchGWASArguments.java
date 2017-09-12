@@ -14,6 +14,17 @@ public class EbatchGWASArguments extends CommandArguments
 		return ev;
 	}
 
+	public void setDom(boolean isdom)
+	{
+		isDom = isdom;
+	}
+
+	public boolean isDom()
+	{
+		return isDom;
+	}
+
 	private int ev = 1;
+	private boolean isDom = false;
 
 }
