@@ -20,6 +20,7 @@ public class EbatchGWASImpl extends CommandImpl
 		GRMArguments gArgs = new GRMArguments();
 		gArgs.setBFile(eArgs.getBFile());
 		gArgs.setGZ();
+		gArgs.setOutRoot(eArgs.getOutRoot());
 		GRMImpl gImpl = new GRMImpl();
 		gImpl.execute(gArgs);
 

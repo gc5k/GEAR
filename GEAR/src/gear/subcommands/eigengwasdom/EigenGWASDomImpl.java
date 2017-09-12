@@ -112,18 +112,30 @@ public class EigenGWASDomImpl extends CommandImpl
 					{
 						if (g == 0)
 						{
+							/*
 							x[j][0] = -1 * (2 * gfreq[i][2] + gfreq[i][1]);
 							x[j][1] = 1/ (8 * gfreq[i][0]);
+							*/
+							x[j][0] = -gfreq[i][1] - 2*gfreq[i][2];
+							x[j][1] = (2 * gfreq[i][1] * gfreq[i][2])/(gfreq[i][0]+gfreq[i][2]-(gfreq[i][0]-gfreq[i][2])*(gfreq[i][0]-gfreq[i][2]));
 						}
 						else if (g == 1)
 						{
+							/*
 							x[j][0] = gfreq[i][0] - gfreq[i][2];
-							x[j][1] = -1 / (4 * gfreq[i][1]);	
+							x[j][1] = -1 / (4 * gfreq[i][1]);
+							*/
+							x[j][0] = 1 - gfreq[i][1] - 2*gfreq[i][2];
+							x[j][1] = -1 * (4*gfreq[i][0]*gfreq[i][2])/(gfreq[i][0]+gfreq[i][2]-(gfreq[i][0]-gfreq[i][2])*(gfreq[i][0]-gfreq[i][2]));
 						}
 						else
 						{
-							x[j][0] = (2 * gfreq[i][0] + gfreq[i][1]);
-							x[j][1] = -1 / (8 * gfreq[i][2]);			
+							/*
+							x[j][0] = -1 * (2 - 1*gfreq[i][1] - 2*gfreq[i][2]);
+							x[j][1] = -1 / (8 * gfreq[i][2]);
+							*/
+							x[j][0] = 2 - gfreq[i][1] - 2*gfreq[i][2];
+							x[j][1] = (2*gfreq[i][0]*gfreq[i][1])/(gfreq[i][0]+gfreq[i][2]-(gfreq[i][0]-gfreq[i][2])*(gfreq[i][0]-gfreq[i][2]));
 						}
 
 						if (Y[j] < threshold)
@@ -228,7 +240,7 @@ public class EigenGWASDomImpl extends CommandImpl
 	public void printResult() 
 	{
 
-		PrintStream eGWAS = FileUtil.CreatePrintStream(this.eigenArgs.getOutRoot() + ".egwas");
+		PrintStream eGWAS = FileUtil.CreatePrintStream(this.eigenArgs.getOutRoot() + ".egwasd");
 		eGWAS.println("SNP\tCHR\tBP\tRefAllele\tAltAllele\tfreq\tBeta\tSE\tChi\tP\tPGC\tDom\tDomSE\tpDom\tn1\tfreq1\tn2\tfreq2\tFst");
 
 		for (int i = 0; i < eGWASResult.size(); i++) 
