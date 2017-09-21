@@ -134,13 +134,10 @@ public class SimulationMPCommandImpl extends CommandImpl
 			e.printStackTrace();
 		}
 		RealMatrix L = cholCImpl.getL();
-		System.out.println(L);
 		cholC = L.getData();
 
 		RealMatrix L1 = cholCEImpl.getL();
-		System.out.println(L1);
 		cholCE = L1.getData();
-
 	}
 
 	private void generateSampleNoSelection()
@@ -174,7 +171,7 @@ public class SimulationMPCommandImpl extends CommandImpl
 
 					RealMatrix genoEff = chr.transpose().multiply(Meffect);
 					double bv = genoEff.getEntry(0, 0);
-					BV[i][t] = bv;					
+					BV[i][t] = bv;
 				}
 			}
 		}
@@ -218,28 +215,6 @@ public class SimulationMPCommandImpl extends CommandImpl
 
 			}
 		}
-
-//		
-//		for (int t = 0; t < h2.length; t++)
-//		{
-//
-//			double vg = StatUtils.variance((new Array2DRowRealMatrix(BV)).getColumn(t));
-//			//rescale the phenotype to get the heritability and residual
-//			double ve = h2[t] == 0 ? 1:vg * (1 - h2[t]) / h2[t];
-//			double E = Math.sqrt(ve);
-//			Logger.printUserLog("Vg=" + vg);
-//			for (int i = 0; i < rep; i++)
-//			{
-//				double[] pv=new double[sample];
-//				for (int j = 0; j < sample; j++)
-//				{
-//					phenotype[j][t][i] = BV[j][t] + rnd.nextGaussian(0, E);
-//					pv[j] = phenotype[j][t][i];
-//				}
-//				double Vp=StatUtils.variance(pv);
-//				Logger.printUserLog("Vp=" + Vp + "; hsq=" + vg/Vp + " for replicate " + (i+1));
-//			}
-//		}
 	}
 
 	public RealMatrix SampleChromosome()
@@ -394,7 +369,7 @@ public class SimulationMPCommandImpl extends CommandImpl
 		{
 			for(int i = 0; i < dprime.length; i++)
 			{
-				dprime[i] = rnd.nextUniform(mpArgs.getFreqRangeLow(), mpArgs.getFreqRangeHigh());
+				dprime[i] = rnd.nextUniform(-1, 1);
 			}
 		}
 	}
@@ -402,21 +377,6 @@ public class SimulationMPCommandImpl extends CommandImpl
 	public void calLD()
 	{
 		LD = PopStat.CalcLDfromDPrime(freq, dprime);
-//		LD = new double[M-1];
-//
-//		for (int i = 0; i < LD.length; i++)
-//		{
-//			if (dprime[i] > 0)
-//			{
-//				LD[i] = dprime[i]
-//						* Math.min(freq[i] * (1 - freq[i + 1]), freq[i + 1] * (1 - freq[i]));
-//			} 
-//			else
-//			{
-//				LD[i] = dprime[i]
-//						* Math.min(freq[i] * freq[i + 1], (1 - freq[i]) * (1 - freq[i + 1]));
-//			}
-//		}
 	}
 
 	public void writeBFile()
@@ -530,7 +490,6 @@ public class SimulationMPCommandImpl extends CommandImpl
 		geno.close();
 		bim.close();
 		fam.close();
-
 
 		for (int t = 0; t < h2.length; t++)
 		{

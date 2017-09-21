@@ -38,6 +38,11 @@ public class SimulationQTCommand extends Command
 		options.addOption(OptionBuilder.withDescription(OPT_POLY_EFFECT_SORT_LONG_DESC).withLongOpt(OPT_POLY_EFFECT_SORT_LONG).create());
 		options.addOption(OptionBuilder.withDescription(OPT_EFFECT_FILE_LONG_DESC).withLongOpt(OPT_EFFECT_FILE_LONG).hasArg().create());
 
+		options.addOption(OptionBuilder.withDescription(OPT_DOM_EFFECT_DESC).hasArg().withLongOpt(OPT_DOM_EFFECT).create());
+		options.addOption(OptionBuilder.withDescription(OPT_POLY_DOM_EFFECT_LONG_DESC).withLongOpt(OPT_POLY_DOM_EFFECT_LONG).create());
+		options.addOption(OptionBuilder.withDescription(OPT_POLY_DOM_EFFECT_SORT_LONG_DESC).withLongOpt(OPT_POLY_DOM_EFFECT_SORT_LONG).create());
+		options.addOption(OptionBuilder.withDescription(OPT_DOM_EFFECT_FILE_LONG_DESC).withLongOpt(OPT_DOM_EFFECT_FILE_LONG).hasArg().create());
+
 		options.addOption(OptionBuilder.withDescription(OPT_FREQ_DESC).hasArg().create(OPT_FREQ));
 		options.addOption(OptionBuilder.withDescription(OPT_UNIF_FREQ_LONG_DESC).withLongOpt(OPT_UNIF_FREQ_LONG).create());
 		options.addOption(OptionBuilder.withDescription(OPT_FREQ_RANGE_LONG_DESC).withLongOpt(OPT_FREQ_RANGE_LONG).hasArgs(2).create());
@@ -49,7 +54,13 @@ public class SimulationQTCommand extends Command
 		options.addOption(OptionBuilder.withDescription(OPT_RAND_LD_LONG_DESC).withLongOpt(OPT_RAND_LD_LONG).create());
 		options.addOption(OptionBuilder.withDescription(OPT_LD_RANGE_LONG_DESC).withLongOpt(OPT_RAND_LD_LONG).create());
 
+		options.addOption(OptionBuilder.withDescription(OPT_LD_FILE_LONG_DESC).withLongOpt(OPT_LD_FILE_LONG).hasArg().create());
+
+		options.addOption(OptionBuilder.withDescription(OPT_REP_DESC).hasArg().create(OPT_REP));
+
 		options.addOption(OptionBuilder.withDescription(OPT_HSQ_DESC).hasArg().create(OPT_HSQ));
+		options.addOption(OptionBuilder.withDescription(OPT_HSQ_DOM_DESC).hasArg().withLongOpt(OPT_HSQ_DOM).create());
+
 		options.addOption(OptionBuilder.withDescription(OPT_MAKE_BED_LONG_DESC).withLongOpt(OPT_MAKE_BED_LONG).create());
 
 		options.addOption(OptionBuilder.withDescription(OPT_SEED_DESC).withLongOpt(OPT_SEED_LONG).hasArg().create());
@@ -61,76 +72,104 @@ public class SimulationQTCommand extends Command
 	{
 		SimulationQTCommandArguments simuQTArgs = new SimulationQTCommandArguments();
 
-		if(cmdLine.hasOption(OPT_SAMPLE_SIZE_LONG))
+		if (cmdLine.hasOption(OPT_SAMPLE_SIZE_LONG))
 		{
 			simuQTArgs.setSampleSize(cmdLine.getOptionValue(OPT_SAMPLE_SIZE_LONG));
 		}
 		
-		if(cmdLine.hasOption(OPT_REP))
+		if (cmdLine.hasOption(OPT_REP))
 		{
 			simuQTArgs.setRep(cmdLine.getOptionValue(OPT_REP));
 		}
 
-		if(cmdLine.hasOption(OPT_MARKER_LONG))
+		if (cmdLine.hasOption(OPT_MARKER_LONG))
 		{
 			simuQTArgs.setMarkerNum(cmdLine.getOptionValue(OPT_MARKER_LONG));
 		}
 
-		if(cmdLine.hasOption(OPT_NULL_MARKER_LONG))
+		if (cmdLine.hasOption(OPT_NULL_MARKER_LONG))
 		{
 			simuQTArgs.setNullMarkerNum(cmdLine.getOptionValue(OPT_NULL_MARKER_LONG));
 		}
 
+		//add eff
 		simuQTArgs.setPolyEffect();
 
-		if(cmdLine.hasOption(OPT_EFFECT))
+		if (cmdLine.hasOption(OPT_EFFECT))
 		{
 			simuQTArgs.setPlainEffect(parseDoubleOptionValue(cmdLine, OPT_EFFECT, "0.5"));
 		}
 
-		if(cmdLine.hasOption(OPT_POLY_EFFECT_SORT_LONG))
+		if (cmdLine.hasOption(OPT_POLY_EFFECT_SORT_LONG))
 		{
 			simuQTArgs.setPolyEffectSort();
 		}
 
-		if(cmdLine.hasOption(OPT_EFFECT_FILE_LONG))
+		if (cmdLine.hasOption(OPT_EFFECT_FILE_LONG))
 		{
 			simuQTArgs.setPolyEffectFile(cmdLine.getOptionValue(OPT_EFFECT_FILE_LONG));
 		}
 
+		//dom eff
+		simuQTArgs.setPolyDomEffect();
+
+		if (cmdLine.hasOption(OPT_DOM_EFFECT))
+		{
+			simuQTArgs.setPlainDomEffect(parseDoubleOptionValue(cmdLine, OPT_DOM_EFFECT, "0.5"));
+		}
+
+		if (cmdLine.hasOption(OPT_POLY_DOM_EFFECT_SORT_LONG))
+		{
+			simuQTArgs.setPolyDomEffectSort();
+		}
+
+		if (cmdLine.hasOption(OPT_DOM_EFFECT_FILE_LONG))
+		{
+			simuQTArgs.setPolyDomEffectFile(cmdLine.getOptionValue(OPT_DOM_EFFECT_FILE_LONG));
+		}
+		
+		if (cmdLine.hasOption(OPT_HSQ_DOM))
+		{
+			simuQTArgs.setHsqDom(cmdLine.getOptionValue(OPT_HSQ_DOM));
+		}
+
 		simuQTArgs.setFreq(parseDoubleOptionValue(cmdLine, OPT_FREQ, "0.5"));
 		
-		if(cmdLine.hasOption(OPT_UNIF_FREQ_LONG))
+		if (cmdLine.hasOption(OPT_UNIF_FREQ_LONG))
 		{
 			simuQTArgs.setUnifFreq();
 		}
 
-		if(cmdLine.hasOption(OPT_FREQ_RANGE_LONG))
+		if (cmdLine.hasOption(OPT_FREQ_RANGE_LONG))
 		{
 			simuQTArgs.setFreqRange(cmdLine.getOptionValues(OPT_FREQ_RANGE_LONG));
 		}
 
-		if(cmdLine.hasOption(OPT_FREQ_FILE_LONG))
+		if (cmdLine.hasOption(OPT_FREQ_FILE_LONG))
 		{
 			simuQTArgs.setFreqFile(cmdLine.getOptionValue(OPT_FREQ_FILE_LONG));
 		}
 		
 		simuQTArgs.setLD(parseDoubleOptionValue(cmdLine, OPT_LD, "0.0"));
 
-		if(cmdLine.hasOption(OPT_RAND_LD_LONG))
+		if (cmdLine.hasOption(OPT_RAND_LD_LONG))
 		{
 			simuQTArgs.setRandLD();
 		}
 
-		if(cmdLine.hasOption(OPT_LD_RANGE_LONG))
+		if (cmdLine.hasOption(OPT_LD_RANGE_LONG))
 		{
 			simuQTArgs.setLDRange(cmdLine.getOptionValues(OPT_LD_RANGE_LONG));
 		}
 
+		if (cmdLine.hasOption(OPT_LD_FILE_LONG))
+		{
+			simuQTArgs.setLDFile(cmdLine.getOptionValue(OPT_LD_FILE_LONG));
+		}
+
 		simuQTArgs.setHsq(parseDoubleOptionValue(cmdLine, OPT_HSQ, "0.5"));
 
-		
-		if(cmdLine.hasOption(OPT_MAKE_BED_LONG))
+		if (cmdLine.hasOption(OPT_MAKE_BED_LONG))
 		{
 			simuQTArgs.setMakeBed();
 		}
@@ -169,36 +208,54 @@ public class SimulationQTCommand extends Command
 	private static final String OPT_EFFECT_FILE_LONG = "effect-file";
 	private static final String OPT_EFFECT_FILE_LONG_DESC = "Read effect from the file specified.";
 
+	//dom-effect
+	private static final String OPT_HSQ_DOM = "hsq-dom";
+	private static final String OPT_HSQ_DOM_DESC = "heritability for dominance variance";
+	private static final String OPT_DOM_EFFECT = "dom-effect";
+	private static final String OPT_DOM_EFFECT_DESC = "Equal dominant effects, 1 by default.";
+
+	private static final String OPT_POLY_DOM_EFFECT_LONG = "poly-dom-effect";
+	private static final String OPT_POLY_DOM_EFFECT_LONG_DESC = "Polygenic dominance (normal distribution) model.";
+
+	private static final String OPT_POLY_DOM_EFFECT_SORT_LONG = "poly-effect-sort";
+	private static final String OPT_POLY_DOM_EFFECT_SORT_LONG_DESC = "Sorted polygenic (normal distribution) model.";
+
+	private static final String OPT_DOM_EFFECT_FILE_LONG = "dom-effect-file";
+	private static final String OPT_DOM_EFFECT_FILE_LONG_DESC = "Read dominance effect from the file specified.";
+
 	//freq
 	private static final String OPT_FREQ = "freq";
 	private static final String OPT_FREQ_DESC = "Equal frequency, 0.5 by default.";
 
 	private static final String OPT_UNIF_FREQ_LONG = "unif-freq";
-	private static final String OPT_UNIF_FREQ_LONG_DESC = "Uniform distriubted frequency between 0.01~0.5";
+	private static final String OPT_UNIF_FREQ_LONG_DESC = "Uniform distriubted frequency between 0.01~0.5.";
 
 	private static final String OPT_FREQ_RANGE_LONG = "freq-range";
-	private static final String OPT_FREQ_RANGE_LONG_DESC = "Uniform distriubted frequency between a~b";
+	private static final String OPT_FREQ_RANGE_LONG_DESC = "Uniform distriubted frequency between a~b.";
 
 	private static final String OPT_FREQ_FILE_LONG = "freq-file";
 	private static final String OPT_FREQ_FILE_LONG_DESC = "Read frequency from the file specified.";
-	
+
 	//ld
 	private static final String OPT_LD = "ld";
 	private static final String OPT_LD_DESC = "LD (Lewontin's D prime), zero by default.";
 
 	private static final String OPT_RAND_LD_LONG = "rand-ld";
-	private static final String OPT_RAND_LD_LONG_DESC = "LD (Lewontin's D prime) follows uniform distribution between 0~1"; 
+	private static final String OPT_RAND_LD_LONG_DESC = "LD (Lewontin's D prime) follows uniform distribution between 0~1."; 
 
 	private static final String OPT_LD_RANGE_LONG = "ld-range";
-	private static final String OPT_LD_RANGE_LONG_DESC = "LD (Lewontin's D prime) follows uniform distribution between a~b"; 
+	private static final String OPT_LD_RANGE_LONG_DESC = "LD (Lewontin's D prime) follows uniform distribution between a~b.";
+
+	private static final String OPT_LD_FILE_LONG = "ld-file";
+	private static final String OPT_LD_FILE_LONG_DESC = "LD (Lewontin's D prime) file."; 
 
 	//hsq
 	private static final String OPT_HSQ = "hsq";
-	private static final String OPT_HSQ_DESC = "Heritability.";
+	private static final String OPT_HSQ_DESC = "Heritability for additive.";
 
 	private static final String OPT_MAKE_BED_LONG = "make-bed";
 	private static final String OPT_MAKE_BED_LONG_DESC = "make-bed";
-	
+
 	private static final String OPT_REP = "rep";
 	private static final String OPT_REP_DESC = "Replication for simulation. New error will be added to the same breeding values.";
 }

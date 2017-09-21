@@ -73,6 +73,7 @@ public class SimulationQTCommandArguments extends CommandArguments
 		return nullM;
 	}
 
+	//add effect
 	public void setPlainEffect(double e)
 	{
 		polyEffect = e;
@@ -81,7 +82,7 @@ public class SimulationQTCommandArguments extends CommandArguments
 		isPolyEffectSort = false;
 		isPolyEffectFile = false;
 	}
-	
+
 	public boolean isPlainEffect()
 	{
 		return isPlainEffect;
@@ -138,7 +139,75 @@ public class SimulationQTCommandArguments extends CommandArguments
 	{
 		return polyEffectFile;
 	}
-	
+
+	//dom effect
+	public void setPlainDomEffect(double e)
+	{
+		polyDomEffect = e;
+		isPlainDomEffect = true;
+		isPolyDomEffect = false;
+		isPolyDomEffectSort = false;
+		isPolyDomEffectFile = false;
+	}
+
+	public boolean isPlainDomEffect()
+	{
+		return isPlainDomEffect;
+	}
+
+	public double getPolyDomEffect()
+	{
+		return polyDomEffect;
+	}
+
+	public void setPolyDomEffect()
+	{
+		isPlainDomEffect = false;
+		isPolyDomEffect = true;
+		isPolyDomEffectSort = false;
+		isPolyDomEffectFile = false;
+	}
+
+	public boolean isPolyDomEffect()
+	{
+		return isPolyDomEffect;
+	}
+
+	public void setPolyDomEffectSort()
+	{
+		isPlainDomEffect = false;
+		isPolyDomEffect = false;
+		isPolyDomEffectSort = true;
+		isPolyDomEffectFile = false;
+	}
+
+	public boolean isPolyDomEffectSort()
+	{
+		return isPolyDomEffectSort;
+	}
+
+	public void setPolyDomEffectFile(String f)
+	{
+		FileUtil.exists(f);
+		polyDomEffectFile = f;
+
+		isPlainDomEffect = false;
+		isPolyDomEffect = false;
+		isPolyDomEffectSort = false;
+		isPolyDomEffectFile = true;
+	}
+
+	public boolean isPolyDomEffectFile()
+	{
+		return isPolyDomEffectFile;
+	}
+
+	public String getPolyDomEffectFile()
+	{
+		return polyDomEffectFile;
+	}
+
+	//Freq
 	public void setFreq(double freq)
 	{
 		this.freq = freq;
@@ -295,6 +364,29 @@ public class SimulationQTCommandArguments extends CommandArguments
 		return hsq;
 	}
 
+	public void setHsqDom(String hsqD) 
+	{
+		double hd = Double.parseDouble(hsqD);
+		if(hd < 0 || hd > 0.99)
+		{
+			{
+				Logger.printUserLog("hsq should be between 0 ~ 1.\n GEAR quitted.");
+			}
+		}
+		if ((hd+hsq) > 1)
+		{
+			{
+				Logger.printUserLog("The total heritability (hsq+hsq_dom) should be between 0 ~ 1.\n GEAR quitted.");
+			}
+		}
+		hsqDom = hd;
+	}
+
+	public double getHsqDom()
+	{
+		return hsqDom;
+	}
+
 	public void setMakeBed()
 	{
 		isMakeBed = true;
@@ -305,17 +397,35 @@ public class SimulationQTCommandArguments extends CommandArguments
 		return isMakeBed;
 	}
 
+	public void setLDFile(String file)
+	{
+		FileUtil.exists(file);
+		ldFile = file;
+	}
+
+	public String getLDFile()
+	{
+		return ldFile;
+	}
+
 	private int N = 100;
 	private int M = 100;
 	private int nullM = 0;
-	
-	private double polyEffect = 1;
+
+	private double polyEffect = 0.5;
 	private boolean isPlainEffect = true;
 	private boolean isPolyEffect = false;
 	private boolean isPolyEffectSort = false;
 	private boolean isPolyEffectFile = false;
 	private String polyEffectFile = null;
-	
+
+	private double polyDomEffect = 0.5 * polyEffect;
+	private boolean isPlainDomEffect = true;
+	private boolean isPolyDomEffect = false;
+	private boolean isPolyDomEffectSort = false;
+	private boolean isPolyDomEffectFile = false;
+	private String polyDomEffectFile = null;
+
 	private double freq = 0.5;
 	private boolean isPlainFreq = true;
 	private boolean isUnifFreq = false;
@@ -332,8 +442,12 @@ public class SimulationQTCommandArguments extends CommandArguments
 	private double ldRangeLow = -1;
 	private double ldRangeHigh = 1;
 
+	private String ldFile = null;
+
 	private double hsq = 0.5;
+	private double hsqDom = 0;
 	private boolean isMakeBed = false;
 
 	private int rep = 1;
+
 }

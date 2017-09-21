@@ -43,18 +43,20 @@ public class SimulationQTCommandImpl extends CommandImpl
 
 		getFreq();
 		getEffect();
+		getDomEffect();
 		getDPrime();
 		calLD();
 		generateSampleNoSelection();
-		
+
 		if (qtArgs.isMakeBed())
 		{
 			writeBFile();
-		} 
+		}
 		else
 		{
 			writeFile();
 		}
+		writeEffFile();
 
 	}
 
@@ -67,24 +69,30 @@ public class SimulationQTCommandImpl extends CommandImpl
 		phenotype = new double[sample][rep];
 		BV = new double[sample];
 
-		for(int i = 0; i < sample; i++)
+		for (int i = 0; i < sample; i++)
 		{
 			RealMatrix chr = SampleChromosome();
 			RealMatrix genoEff = chr.transpose().multiply(Meffect);
 
 			double bv = genoEff.getEntry(0, 0);
+
+			for (int j = 0; j < deffect.length; j++)
+			{
+				bv += chr.getEntry(j, 0) == 0 ? deffect[j]:0;
+			}
 			BV[i] = bv;
 			genotype[i] = chr.getColumn(0);
 		}
 
-		if (h2 == 0)
+		double H2=qtArgs.getHsq() + qtArgs.getHsqDom();
+		if (H2 == 0)
 		{
 			Arrays.fill(BV, 0);
 		}
 
 		double vg = StatUtils.variance(BV);
 		//rescale the phenotype to get the heritability and residual
-		double ve = h2 == 0 ? 1:vg * (1 - h2) / h2;
+		double ve = H2 == 0 ? 1:vg * (1 - H2) / H2;
 		double E = Math.sqrt(ve);
 		Logger.printUserLog("Vg=" + fmt.format(vg));
 		for (int i = 0; i < rep; i++)
@@ -133,7 +141,6 @@ public class SimulationQTCommandImpl extends CommandImpl
 		return chr;
 	}
 
-	
 	private void getFreq()
 	{
 		freq = new double[M];
@@ -250,6 +257,98 @@ public class SimulationQTCommandImpl extends CommandImpl
 		}
 	}
 
+	private void getDomEffect()
+	{
+		deffect = new double[M];
+		if (qtArgs.getHsqDom() == 0)
+		{
+			Arrays.fill(deffect, 0);
+			return;
+		}
+
+		Sample.setSeed(seed+1);
+
+		int[] idx = Sample.SampleIndex(0, M-1, M-nullM);
+		Arrays.sort(idx);
+
+		if (qtArgs.isPlainDomEffect())
+		{
+			for (int i = 0; i < idx.length; i++) deffect[idx[i]] = qtArgs.getPolyDomEffect();
+		}
+		else if (qtArgs.isPolyDomEffect())
+		{
+			double t = 0;
+			double adj=1;
+			if (qtArgs.isPolyDomEffect())
+			{
+				if (qtArgs.getHsq() > 0)
+				{
+					t = qtArgs.getHsq()/qtArgs.getHsqDom();
+					if (t < 2)
+					{
+						Logger.printUserError("Impossible heritability: hsq_add = " + qtArgs.getHsq() + " hsq_dom = " + qtArgs.getHsqDom());
+						System.exit(0);
+					}
+					else 
+					{
+						adj = Math.sqrt(5/(2*t-1));
+					}
+				}
+			}
+
+			for (int i = 0; i < idx.length; i++)
+			{
+				deffect[idx[i]] = rnd.nextGaussian(0, adj);
+			}
+		}
+		else if (qtArgs.isPolyDomEffectSort())
+		{
+			NormalDistributionImpl ndImpl = new NormalDistributionImpl();
+			ndImpl.reseedRandomGenerator(qtArgs.getSeed());
+			for (int i = 0; i < idx.length; i++)
+			{
+				try
+				{
+					deffect[idx[i]] = ndImpl.inverseCumulativeProbability((i+0.5)/(idx.length));
+				}
+				catch (MathException e)
+				{
+					e.printStackTrace();
+				}
+			}
+		}
+		else if (qtArgs.isPolyDomEffectFile())
+		{
+			BufferedReader reader = FileUtil.FileOpen(qtArgs.getPolyDomEffectFile());
+			int c = 0;
+			String line = null;
+			try
+			{
+				while ((line = reader.readLine()) != null)
+				{
+					if(c >= M)
+					{
+						Logger.printUserLog("Have already read " + M + " allelic effects.  Ignore the rest of the content in '" + qtArgs.getFreqFile() + "'.");
+						break;
+					}
+
+					line.trim();
+					String[] l = line.split(ConstValues.WHITESPACE_DELIMITER);
+					if (l.length < 1) continue;
+					deffect[c++] = Double.parseDouble(l[0]);
+				}
+				reader.close();
+			}
+			catch (IOException e)
+			{
+				Logger.handleException(e,
+						"An exception occurred when reading the frequency file '"
+								+ qtArgs.getPolyDomEffectFile() + "'.");
+			}
+		}
+
+	}
+
 	private void getDPrime()
 	{
 		dprime = new double[M-1];
@@ -261,7 +360,35 @@ public class SimulationQTCommandImpl extends CommandImpl
 		{
 			for(int i = 0; i < dprime.length; i++)
 			{
-				dprime[i] = rnd.nextUniform(qtArgs.getFreqRangeLow(), qtArgs.getFreqRangeHigh());
+				dprime[i] = rnd.nextUniform(-1, 1);
+			}
+		} else if (qtArgs.getLDFile() != null)
+		{
+			BufferedReader reader = FileUtil.FileOpen(qtArgs.getLDFile());
+			int c = 0;
+			String line = null;
+			try
+			{
+				while ((line = reader.readLine()) != null)
+				{
+					if(c >= M)
+					{
+						Logger.printUserLog("Have already read " + M + " allelic effects.  Ignore the rest of the content in '" + qtArgs.getFreqFile() + "'.");
+						break;
+					}
+
+					line.trim();
+					String[] l = line.split(ConstValues.WHITESPACE_DELIMITER);
+					if (l.length < 1) continue;
+					deffect[c++] = Double.parseDouble(l[0]);
+				}
+				reader.close();
+			}
+			catch (IOException e)
+			{
+				Logger.handleException(e,
+						"An exception occurred when reading the ld file '"
+								+ qtArgs.getLDFile() + "'.");
 			}
 		}
 	}
@@ -293,26 +420,18 @@ public class SimulationQTCommandImpl extends CommandImpl
 		PrintWriter bim = null;
 		PrintWriter phe = null;
 		PrintWriter geno = null;
-		PrintWriter eff = null;
 		PrintWriter breed = null;
 
 		try
 		{
 			bedout = new DataOutputStream(new FileOutputStream(qtArgs.getOutRoot() + ".bed"));
 
-			fam = new PrintWriter(new BufferedWriter(new FileWriter(qtArgs.getOutRoot()
-					+ ".fam")));
-			bim = new PrintWriter(new BufferedWriter(new FileWriter(qtArgs.getOutRoot()
-					+ ".bim")));
-
-			phe = new PrintWriter(new BufferedWriter(new FileWriter(qtArgs.getOutRoot()
-					+ ".phe")));
-			geno = new PrintWriter(new BufferedWriter(new FileWriter(qtArgs.getOutRoot()
-					+ ".add")));
-			eff = new PrintWriter(new BufferedWriter(new FileWriter(qtArgs.getOutRoot() + ".rnd")));
+			fam = new PrintWriter(new BufferedWriter(new FileWriter(qtArgs.getOutRoot() + ".fam")));
+			bim = new PrintWriter(new BufferedWriter(new FileWriter(qtArgs.getOutRoot() + ".bim")));
+			phe = new PrintWriter(new BufferedWriter(new FileWriter(qtArgs.getOutRoot() + ".phe")));
+			geno = new PrintWriter(new BufferedWriter(new FileWriter(qtArgs.getOutRoot() + ".add")));
 			breed = new PrintWriter(new BufferedWriter(new FileWriter(qtArgs.getOutRoot() + ".breed")));
-
-		} 
+		}
 		catch (IOException e)
 		{
 			e.printStackTrace();
@@ -408,14 +527,12 @@ public class SimulationQTCommandImpl extends CommandImpl
 			bim.print(i / (M * 1.0) + " ");
 			bim.print(i * 100 + " ");
 			bim.println(A1 + " " + A2);
-			eff.println("rs" + i + " " + A1 + " " + effect[i]);
 		}
 
 		geno.close();
 		phe.close();
 		bim.close();
 		fam.close();
-		eff.close();
 		breed.close();
 	}
 
@@ -425,19 +542,13 @@ public class SimulationQTCommandImpl extends CommandImpl
 		PrintWriter map = null;
 		PrintWriter phe = null;
 		PrintWriter geno = null;
-		PrintWriter eff = null;
 		PrintWriter breed = null;
 		try
 		{
-			pedout = new PrintWriter(new BufferedWriter(new FileWriter(qtArgs.getOutRoot()
-					+ ".ped")));
-			map = new PrintWriter(new BufferedWriter(new FileWriter(qtArgs.getOutRoot()
-					+ ".map")));
-			phe = new PrintWriter(new BufferedWriter(new FileWriter(qtArgs.getOutRoot()
-					+ ".phe")));
-			geno = new PrintWriter(new BufferedWriter(new FileWriter(qtArgs.getOutRoot()
-					+ ".add")));
-			eff = new PrintWriter(new BufferedWriter(new FileWriter(qtArgs.getOutRoot() + ".rnd")));
+			pedout = new PrintWriter(new BufferedWriter(new FileWriter(qtArgs.getOutRoot() + ".ped")));
+			map = new PrintWriter(new BufferedWriter(new FileWriter(qtArgs.getOutRoot() + ".map")));
+			phe = new PrintWriter(new BufferedWriter(new FileWriter(qtArgs.getOutRoot() + ".phe")));
+			geno = new PrintWriter(new BufferedWriter(new FileWriter(qtArgs.getOutRoot() + ".add")));
 			breed = new PrintWriter(new BufferedWriter(new FileWriter(qtArgs.getOutRoot() + ".breed")));
 		}
 		catch (IOException e)
@@ -445,10 +556,9 @@ public class SimulationQTCommandImpl extends CommandImpl
 			Logger.handleException(e,
 					"An exception occurred when writing files.");
 		}
-		
+
 		for (int i = 0; i < genotype.length; i++)
 		{
-
 			pedout.print("sample_" + i + " ");
 			pedout.print(1 + " ");
 			pedout.print(0 + " ");
@@ -487,7 +597,6 @@ public class SimulationQTCommandImpl extends CommandImpl
 			map.print("rs" + i + " ");
 			map.print(i / (M * 1.0) + " ");
 			map.println(i * 100);
-			eff.println("rs" + i + " " + A1 + " " + effect[i]);
 		}
 
 		for (int i = 0; i < genotype.length; i++)
@@ -503,13 +612,35 @@ public class SimulationQTCommandImpl extends CommandImpl
 		map.close();
 		phe.close();
 		geno.close();
-		eff.close();
 		breed.close();
 	}
-	
 
-	private SimulationQTCommandArguments qtArgs;
+	private void writeEffFile()
+	{
+		PrintWriter eff = null;
+		PrintWriter deff = null;
+		try
+		{
+			eff = new PrintWriter(new BufferedWriter(new FileWriter(qtArgs.getOutRoot() + ".rnd")));
+			deff = new PrintWriter(new BufferedWriter(new FileWriter(qtArgs.getOutRoot() + ".drnd")));
+		}
+		catch (IOException e)
+		{
+			Logger.handleException(e,
+					"An exception occurred when writing files.");
+		}
+
+		for (int i = 0; i < M; i++)
+		{
+			eff.println("rs" + i + " " + A1 + " " + effect[i]);
+			deff.println("rs" + i + " " + deffect[i]);
+		}
+		eff.close();
+		deff.close();
+	}
 	
+	private SimulationQTCommandArguments qtArgs;
+
 	private RandomDataImpl rnd = new RandomDataImpl();
 	private long seed;
 
@@ -523,6 +654,7 @@ public class SimulationQTCommandImpl extends CommandImpl
 	private double[][] phenotype;
 
 	private double[] effect;
+	private double[] deffect;
 	private double[] freq;
 
 	private double[] dprime;

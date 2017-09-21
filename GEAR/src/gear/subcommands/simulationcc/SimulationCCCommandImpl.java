@@ -407,7 +407,7 @@ public class SimulationCCCommandImpl extends CommandImpl
 		{
 			for(int i = 0; i < dprime.length; i++)
 			{
-				dprime[i] = rnd.nextUniform(ccArgs.getFreqRangeLow(), ccArgs.getFreqRangeHigh());
+				dprime[i] = rnd.nextUniform(-1, 1);
 			}
 		}
 	}
