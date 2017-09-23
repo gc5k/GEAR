@@ -167,7 +167,8 @@ public class SimulationQTCommandImpl extends CommandImpl
 				{
 					if(c >= M)
 					{
-						Logger.printUserLog("Have already read " + M + " allelic frequencies.  Ignore the rest of the content in '" + qtArgs.getFreqFile() + "'.");
+						Logger.printUserLog("Have already read " + M + " allelic frequencies. Ignore the rest of the content in '" + qtArgs.getFreqFile() + "'.");
+						break;
 					}
 					line.trim();
 					String[] l = line.split(ConstValues.WHITESPACE_DELIMITER);
@@ -232,7 +233,7 @@ public class SimulationQTCommandImpl extends CommandImpl
 				{
 					if(c >= M)
 					{
-						Logger.printUserLog("Have already read " + M + " allelic effects.  Ignore the rest of the content in '" + qtArgs.getFreqFile() + "'.");
+						Logger.printUserLog("Have already read " + M + " allelic effects. Ignore the rest of the content in '" + qtArgs.getPolyEffectFile() + "'.");
 						break;
 					}
 
@@ -328,7 +329,7 @@ public class SimulationQTCommandImpl extends CommandImpl
 				{
 					if(c >= M)
 					{
-						Logger.printUserLog("Have already read " + M + " allelic effects.  Ignore the rest of the content in '" + qtArgs.getFreqFile() + "'.");
+						Logger.printUserLog("Have already read " + M + " allelic effects. Ignore the rest of the content in '" + qtArgs.getPolyDomEffectFile() + "'.");
 						break;
 					}
 
@@ -362,7 +363,8 @@ public class SimulationQTCommandImpl extends CommandImpl
 			{
 				dprime[i] = rnd.nextUniform(-1, 1);
 			}
-		} else if (qtArgs.getLDFile() != null)
+		}
+		else if (qtArgs.isLDFile())
 		{
 			BufferedReader reader = FileUtil.FileOpen(qtArgs.getLDFile());
 			int c = 0;
@@ -371,16 +373,16 @@ public class SimulationQTCommandImpl extends CommandImpl
 			{
 				while ((line = reader.readLine()) != null)
 				{
-					if(c >= M)
+					if (c >= dprime.length)
 					{
-						Logger.printUserLog("Have already read " + M + " allelic effects.  Ignore the rest of the content in '" + qtArgs.getFreqFile() + "'.");
+						Logger.printUserLog("Have already read " + dprime.length + " LD. Ignore the rest of the content in '" + qtArgs.getLDFile() + "'.");
 						break;
 					}
 
 					line.trim();
 					String[] l = line.split(ConstValues.WHITESPACE_DELIMITER);
 					if (l.length < 1) continue;
-					deffect[c++] = Double.parseDouble(l[0]);
+					dprime[c++] = Double.parseDouble(l[0]);
 				}
 				reader.close();
 			}
@@ -439,7 +441,14 @@ public class SimulationQTCommandImpl extends CommandImpl
 
 		for (int i = 0; i < genotype.length; i++)
 		{
-			fam.print("sample_" + i + " ");
+			if (qtArgs.isFID())
+			{
+				fam.print(qtArgs.getFamIDPrefix() + "sample_" + i + " ");
+			}
+			else
+			{
+				fam.print("sample_" + i + " ");				
+			}
 			fam.print(1 + " ");
 			fam.print(0 + " ");
 			fam.print(0 + " ");
@@ -447,8 +456,16 @@ public class SimulationQTCommandImpl extends CommandImpl
 
 			fam.println(phenotype[i][0] + " ");
 
-			phe.print("sample_" + i + " " + 1);
-			breed.println("sample_" + i + " " + 1 + " " + BV[i]);
+			if (qtArgs.isFID())
+			{
+				phe.print("sample_" + i + " " + 1);
+				breed.println("sample_" + i + " " + 1 + " " + BV[i]);				
+			}
+			else
+			{
+				phe.print(qtArgs.getFamIDPrefix() + "sample_" + i + " " + 1);
+				breed.println(qtArgs.getFamIDPrefix() + "sample_" + i + " " + 1 + " " + BV[i]);				
+			}
 
 			for (int j = 0; j < rep; j++)
 			{
@@ -559,7 +576,14 @@ public class SimulationQTCommandImpl extends CommandImpl
 
 		for (int i = 0; i < genotype.length; i++)
 		{
-			pedout.print("sample_" + i + " ");
+			if (qtArgs.isFID())
+			{
+				pedout.print(qtArgs.getFamIDPrefix() + "sample_" + i + " ");				
+			}
+			else 
+			{
+				pedout.print("sample_" + i + " ");
+			}
 			pedout.print(1 + " ");
 			pedout.print(0 + " ");
 			pedout.print(0 + " ");
@@ -582,8 +606,16 @@ public class SimulationQTCommandImpl extends CommandImpl
 			}
 			pedout.println();
 
-			phe.print("sample_" + i + " " + 1);
-			breed.println("sample_" + i + " " + 1 + " " + BV[i]);
+			if (qtArgs.isFID())
+			{
+				phe.print(qtArgs.getFamIDPrefix() + "sample_" + i + " " + 1);
+				breed.println(qtArgs.getFamIDPrefix() + "sample_" + i + " " + 1 + " " + BV[i]);				
+			}
+			else
+			{
+				phe.print("sample_" + i + " " + 1);
+				breed.println("sample_" + i + " " + 1 + " " + BV[i]);				
+			}
 			for (int j = 0; j < rep; j++)
 			{
 				phe.print(" " + phenotype[i][j]);

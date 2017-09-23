@@ -298,6 +298,7 @@ public class SimulationQTCommandArguments extends CommandArguments
 		}
 		isPlainLD = true;
 		isRandLD = false;
+		isLDfile = false;
 	}
 
 	public void setLDRange(String[] ld)
@@ -317,6 +318,7 @@ public class SimulationQTCommandArguments extends CommandArguments
 		setUnifFreq();
 		isPlainLD = false;
 		isRandLD = true;
+		isLDfile = false;
 	}
 	
 	public double getLDRangeLow()
@@ -343,6 +345,7 @@ public class SimulationQTCommandArguments extends CommandArguments
 	{
 		isPlainLD = false;
 		isRandLD = true;
+		isLDfile = false;
 	}
 
 	public boolean isRandLD()
@@ -401,6 +404,9 @@ public class SimulationQTCommandArguments extends CommandArguments
 	{
 		FileUtil.exists(file);
 		ldFile = file;
+		isPlainLD = false;
+		isRandLD = false;
+		isLDfile = true;
 	}
 
 	public String getLDFile()
@@ -408,6 +414,26 @@ public class SimulationQTCommandArguments extends CommandArguments
 		return ldFile;
 	}
 
+	public boolean isLDFile()
+	{
+		return isLDfile;
+	}
+
+	public void setFamIDPrefix(String fid) 
+	{
+		FID_Prefix = fid;
+		isFID = true;
+	}
+
+	public String getFamIDPrefix()
+	{
+		return FID_Prefix;
+	}
+
+	public boolean isFID()
+	{
+		return isFID;
+	}
 	private int N = 100;
 	private int M = 100;
 	private int nullM = 0;
@@ -437,7 +463,8 @@ public class SimulationQTCommandArguments extends CommandArguments
 
 	private double ld = 0;
 	private boolean isPlainLD = true;
-	private boolean isRandLD = true;
+	private boolean isRandLD = false;
+	private boolean isLDfile = false;
 
 	private double ldRangeLow = -1;
 	private double ldRangeHigh = 1;
@@ -448,6 +475,9 @@ public class SimulationQTCommandArguments extends CommandArguments
 	private double hsqDom = 0;
 	private boolean isMakeBed = false;
 
+	private String FID_Prefix = "";
+	private boolean isFID = false;
+	
 	private int rep = 1;
 
 }

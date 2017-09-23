@@ -169,6 +169,7 @@ public final class SimuFamilyCommandImpl extends CommandImpl
 					if(c >= M)
 					{
 						Logger.printUserLog("Have already read " + M + " allelic frequencies.  Ignore the rest of the content in '" + famArgs.getFreqFile() + "'.");
+						break;
 					}
 					line.trim();
 					String[] l = line.split(ConstValues.WHITESPACE_DELIMITER);
@@ -204,7 +205,7 @@ public final class SimuFamilyCommandImpl extends CommandImpl
 				{
 					if (c >= M)
 					{
-						Logger.printUserLog("Have already read " + M + " allelic effects.  Ignore the rest of the content in '" + famArgs.getPolyEffectFile() + "'.");
+						Logger.printUserLog("Have already read " + M + " allelic effects. Ignore the rest of the content in '" + famArgs.getPolyEffectFile() + "'.");
 						break;
 					}
 

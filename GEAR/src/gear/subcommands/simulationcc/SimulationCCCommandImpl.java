@@ -312,6 +312,7 @@ public class SimulationCCCommandImpl extends CommandImpl
 					if(c >= M)
 					{
 						Logger.printUserLog("Have already read " + M + " allelic frequencies.  Ignore the rest of the content in '" + ccArgs.getFreqFile() + "'.");
+						break;
 					}
 					line.trim();
 					String[] l = line.split(ConstValues.WHITESPACE_DELIMITER);

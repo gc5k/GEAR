@@ -64,6 +64,9 @@ public class SimulationQTCommand extends Command
 		options.addOption(OptionBuilder.withDescription(OPT_MAKE_BED_LONG_DESC).withLongOpt(OPT_MAKE_BED_LONG).create());
 
 		options.addOption(OptionBuilder.withDescription(OPT_SEED_DESC).withLongOpt(OPT_SEED_LONG).hasArg().create());
+		
+		options.addOption(OptionBuilder.withDescription(OPT_FAM_ID_PREFIX_LONG_DESC).withLongOpt(OPT_FAM_ID_PREFIX_LONG).hasArg().create());
+
 	}
 
 	@Override
@@ -175,6 +178,11 @@ public class SimulationQTCommand extends Command
 		}
 
 		simuQTArgs.setSeed(parseLongOptionValue(cmdLine, OPT_SEED_LONG, "2014"));
+		
+		if (cmdLine.hasOption(OPT_FAM_ID_PREFIX_LONG))
+		{
+			simuQTArgs.setFamIDPrefix(cmdLine.getOptionValue(OPT_FAM_ID_PREFIX_LONG));			
+		}
 		return simuQTArgs;
 	}
 
@@ -255,6 +263,9 @@ public class SimulationQTCommand extends Command
 
 	private static final String OPT_MAKE_BED_LONG = "make-bed";
 	private static final String OPT_MAKE_BED_LONG_DESC = "make-bed";
+
+	private static final String OPT_FAM_ID_PREFIX_LONG = "fam-prefix";
+	private static final String OPT_FAM_ID_PREFIX_LONG_DESC = "fam-prefix.";
 
 	private static final String OPT_REP = "rep";
 	private static final String OPT_REP_DESC = "Replication for simulation. New error will be added to the same breeding values.";
