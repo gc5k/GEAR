@@ -32,6 +32,7 @@ public class QPCACommand extends Command
 		options.addOption(OptionBuilder.withDescription(OPT_GRM_DESC).hasArg().create(OPT_GRM));
 		options.addOption(OptionBuilder.withDescription(OPT_EV_DESC).hasArg().create(OPT_EV));
 		options.addOption(OptionBuilder.withDescription(OPT_KEEP_DESC).hasArg().create(OPT_KEEP));
+//		options.addOption(OptionBuilder.withDescription(OPT_VAR_LONG_DESC).withLongOpt(OPT_VAR_LONG).create());
 	}
 
 	@Override
@@ -47,6 +48,10 @@ public class QPCACommand extends Command
 		{
 			qpcaArgs.setKeepFile(cmdLine.getOptionValue(OPT_KEEP));
 		}
+//		if (cmdLine.hasOption(OPT_VAR_LONG))
+//		{
+//			qpcaArgs.setAdjVar();
+//		}
 		return qpcaArgs;
 	}
 
@@ -110,5 +115,7 @@ public class QPCACommand extends Command
 	
 	private final static String OPT_KEEP = "keep";
 	private final static String OPT_KEEP_DESC = "Specify the samples for analysis";
-	
+//	
+//	private static final String OPT_VAR_LONG = "adj-var";
+//	private static final String OPT_VAR_LONG_DESC = "Adjust the grm with variance.";
 }

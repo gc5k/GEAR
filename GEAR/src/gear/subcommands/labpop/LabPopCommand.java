@@ -44,6 +44,7 @@ public class LabPopCommand extends Command
 		options.addOption(OptionBuilder.withDescription(OPT_F2_DESC).create(OPT_F2));
 		options.addOption(OptionBuilder.withDescription(OPT_DH_DESC).create(OPT_DH));
 		options.addOption(OptionBuilder.withDescription(OPT_RIL_DESC).create(OPT_RIL));
+		options.addOption(OptionBuilder.withDescription(OPT_IF2_DESC).create(OPT_IF2));
 		
 		options.addOption(OptionBuilder.withDescription(OPT_REP_DESC).hasArg().create(OPT_REP));
 		
@@ -104,6 +105,11 @@ public class LabPopCommand extends Command
 		if (cmdLine.hasOption(OPT_RIL))
 		{
 			lpArgs.setRIL();
+		}
+		
+		if (cmdLine.hasOption(OPT_IF2))
+		{
+			lpArgs.setIF2();
 		}
 
 //bed		
@@ -174,6 +180,9 @@ public class LabPopCommand extends Command
 	private static final String OPT_RIL = "ril";
 	private static final String OPT_RIL_DESC = "Generate a recombination inbred line population.";
 	
+	private static final String OPT_IF2 = "if2";
+	private static final String OPT_IF2_DESC = "Generate an immortalized F2.";
+
 	private static final String OPT_REP = "rep";
 	private static final String OPT_REP_DESC = "Replication.";
 

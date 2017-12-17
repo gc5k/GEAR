@@ -12,6 +12,12 @@ import gear.sumstat.qc.rowqc.SumStatQC;
 import gear.util.FileUtil;
 import gear.util.Logger;
 import gear.util.NewIt;
+
+import java.io.BufferedWriter;
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.OutputStreamWriter;
 import java.io.PrintStream;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -33,7 +39,7 @@ public class EigenGWASImpl extends CommandImpl {
 	private double lambdaGC = 1;
 	private int monoLoci = 0;
 
-	public void execute(CommandArguments cmdArgs) 
+	public void execute(CommandArguments cmdArgs)
 	{
 		this.eigenArgs = (EigenGWASArguments) cmdArgs;
 
@@ -42,7 +48,7 @@ public class EigenGWASImpl extends CommandImpl {
 		this.ssQC = new SumStatQC(pp.getPedigreeData(), pp.getMapData(), this.sf);
 		this.mapFile = this.ssQC.getMapFile();
 		this.gm = new GenotypeMatrix(this.ssQC.getSample());
-		
+
 		this.traitIdx = this.eigenArgs.getMpheno()[0];
 		this.data.addFile(this.eigenArgs.getFam());
 		this.data.addFile(this.eigenArgs.getPhenotypeFile(), this.eigenArgs.getMpheno());
@@ -52,13 +58,26 @@ public class EigenGWASImpl extends CommandImpl {
 		}
 		data.LineUpFiles();
 
-
 		eigenGWAS();
 		printResult();
 	}
 
 	private void eigenGWAS()
 	{
+		////TEST
+		File f = new File(this.eigenArgs.getOutRoot() + ".egwas_t");
+		BufferedWriter bw = null;
+		OutputStreamWriter write = null;
+		try {
+			f.createNewFile();
+			write = new OutputStreamWriter(new FileOutputStream(f));
+			bw = new BufferedWriter(write);
+		} catch (IOException e2) {
+			// TODO Auto-generated catch block
+			e2.printStackTrace();
+		}
+		////TEST
+
 		ChiSquaredDistributionImpl ci = new ChiSquaredDistributionImpl(1);
 		ArrayList<SNP> snpList = this.mapFile.getMarkerList();
 		
@@ -126,6 +145,19 @@ public class EigenGWASImpl extends CommandImpl {
 				EigenGWASResult e1 = new EigenGWASResult(snp, freq, b, b_se, n1, freq1, n2, freq2, fst);
 				eGWASResult.add(e1);
 				pArray.add(e1.GetP());
+				
+				///TEST
+				try {
+					bw.write(e1.printEGWASResult(1) + "\n");
+					if (i > 10000)
+					{
+						bw.flush();
+					}
+
+				} catch (IOException e) {
+					e.printStackTrace();
+				}
+				///TEST
 			}
 		}
 		Collections.sort(pArray);
@@ -152,7 +184,18 @@ public class EigenGWASImpl extends CommandImpl {
 			e.printStackTrace();
 		}
 
-		Logger.printUserLog("Lambda GC is : " + lambdaGC);
+		Logger.printUserLog("Lambda GC is: " + lambdaGC);
+
+		////TEST
+		try {
+			write.close();
+			bw.close();
+
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		////TEST
 	}
 
 	public void printResult() 

@@ -100,6 +100,7 @@ public class EigenGWASDomImpl extends CommandImpl
 			}
 
 			double[][] x= new double[gIdx.length][2];
+			ArrayList<Integer> IDX = NewIt.newArrayList();
 			if ((!this.eigenArgs.isChrFlagOn()) || (Integer.parseInt(snp.getChromosome()) == this.eigenArgs.getChr())) 
 			{
 				double n1 = 0.0D;
@@ -113,6 +114,7 @@ public class EigenGWASDomImpl extends CommandImpl
 					int g = this.gm.getAdditiveScoreOnFirstAllele(gIdx[j], i);
 					if (g != 3)
 					{
+						IDX.add(j);
 						if (g == 0)
 						{
 							/*
@@ -163,12 +165,14 @@ public class EigenGWASDomImpl extends CommandImpl
 				double fst = 2 * (n1 / N * (freq1 - freq) * (freq1 - freq) + n2 / N * (freq2 - freq) * (freq2 - freq))
 						/ (freq * (1.0D - freq));
 
-				double[][] x1= new double[gIdx.length][3];
+				double[][] x1= new double[IDX.size()][3];
+				double[] y1 = new double[IDX.size()];
 				for(int k1 = 0; k1 < x1.length; k1++)
 				{
 					x1[k1][0] = 1;
-					x1[k1][1] = x[k1][0];
-					x1[k1][2] = x[k1][1];
+					x1[k1][1] = x[IDX.get(k1)][0];
+					x1[k1][2] = x[IDX.get(k1)][1];
+					y1[k1] = Y[IDX.get(k1)];
 				}
 
 				RealMatrix g1 = new Array2DRowRealMatrix(x1);
@@ -187,7 +191,7 @@ public class EigenGWASDomImpl extends CommandImpl
 					RealMatrix XtX_inv = (new LUDecompositionImpl(XtX)).getSolver().getInverse();
 
 					RealMatrix g1_tran=g1.transpose();
-					RealMatrix y = new Array2DRowRealMatrix(Y);
+					RealMatrix y = new Array2DRowRealMatrix(y1);
 					RealMatrix B = XtX_inv.multiply(g1_tran).multiply(y);
 					RealMatrix SST = y.transpose().multiply(y);
 					RealMatrix SSR = B.transpose().multiply(g1_tran).multiply(y);

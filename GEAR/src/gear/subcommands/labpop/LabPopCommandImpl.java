@@ -150,9 +150,37 @@ public class LabPopCommandImpl extends CommandImpl
 				{
 					gm[i][j] = hp[j] * 2;
 				}
-			}			
+			}
 		}
-		
+		else if (lpArgs.isIF2())
+		{
+			for (int i = 0; i < gm.length; i++)
+			{
+				int[][] hp2 = new int[2][lpArgs.getNumberOfMarkers()];
+
+				for (int h = 0; h < 2; h++)
+				{
+					for (int j = 0; j < lpArgs.getNumberOfMarkers(); j++)
+					{
+						double r = rnd.nextUniform(0, 1);
+
+						if (j == 0)
+						{
+							hp2[h][j] = r < rec[j] ? 0 : 1;
+						}
+						else
+						{
+							hp2[h][j] = r < ( 1 / (1 + 2*rec[j]) ) ? hp2[h][j-1] : (1 - hp2[h][j-1]);
+						}
+					}
+				}
+
+				for (int j = 0; j < lpArgs.getNumberOfMarkers(); j++)
+				{
+					gm[i][j] = hp2[0][j] + hp2[1][j];
+				}
+			}
+		}
 	}
 
 	private int[] sampleHaploid()

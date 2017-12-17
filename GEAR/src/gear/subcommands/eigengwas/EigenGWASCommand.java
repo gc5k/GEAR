@@ -10,15 +10,6 @@ import org.apache.commons.cli.Options;
 
 public class EigenGWASCommand extends Command
 {
-	private static final String OPT_PHE = "pheno";
-	private static final String OPT_PHE_DESC = "Specify the phenotype file (individual eigenvector)";
-	private static final String OPT_MPHE = "mpheno";
-	private static final String OPT_MPHE_DESC = "Specify the phenotype index";
-	private static final String OPT_CHR = "chr";
-	private static final String OPT_CHR_DESC = "Specify the chromosomes for analysis";
-	private static final String OPT_KEEP = "keep";
-	private static final String OPT_KEEP_DESC = "Specify the samples for analysis";
-
 	public EigenGWASCommand()
 	{
 	}
@@ -78,10 +69,20 @@ public class EigenGWASCommand extends Command
 		{
 			eigenArgs.setChr(cmdLine.getOptionValue(OPT_CHR));
 		}
+		
 	}
 
 	protected CommandImpl createCommandImpl()
 	{
 		return new EigenGWASImpl();
 	}
+	
+	private static final String OPT_PHE = "pheno";
+	private static final String OPT_PHE_DESC = "Specify the phenotype file (individual eigenvector)";
+	private static final String OPT_MPHE = "mpheno";
+	private static final String OPT_MPHE_DESC = "Specify the phenotype index";
+	private static final String OPT_CHR = "chr";
+	private static final String OPT_CHR_DESC = "Specify the chromosomes for analysis";
+	private static final String OPT_KEEP = "keep";
+	private static final String OPT_KEEP_DESC = "Specify the samples for analysis";
 }

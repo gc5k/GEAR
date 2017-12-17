@@ -50,23 +50,22 @@ public enum Gear
 		addCommand(new gear.subcommands.metawatchdog.decrypt.MetaWatchdog2Command());
 		addCommand(new gear.subcommands.metawatchdog.encrypt.EnigmaCommand());
 		addCommand(new gear.subcommands.profile.ProfileCommand());
-		addCommand(new gear.subcommands.simulationfam.SimuFamilyCommand());
-		addCommand(new gear.subcommands.simulationqt.SimulationQTCommand());
-		addCommand(new gear.subcommands.simulationcc.SimulationCCCommand());
 		addCommand(new gear.subcommands.exsnp.ExSNPCommand());
 		addCommand(new gear.subcommands.lmdr.LMDRCommand());
 		addCommand(new gear.subcommands.ppcbatch.PPCBatchCommand());
 		addCommand(new gear.subcommands.sfst.SFstCommand());
 		addCommand(new gear.subcommands.fpc.FPCCommand());
 		addCommand(new gear.subcommands.metapc.MetaPCCommand());
-		addCommand(new gear.subcommands.eigengwas.EigenGWASCommand());
 		addCommand(new gear.subcommands.grm.GRMCommand());
 		addCommand(new gear.subcommands.qpca.QPCACommand());
 		addCommand(new gear.subcommands.locus.LocusCommand());
 		addCommand(new gear.subcommands.at.AtCommand());
 		addCommand(new gear.subcommands.arch.ArchCommand());
 		addCommand(new gear.subcommands.ebatchgwas.EbatchGWASCommand());
+		addCommand(new gear.subcommands.eigengwas.EigenGWASCommand());
 		addCommand(new gear.subcommands.eigengwasdom.EigenGWASDomCommand());
+		addCommand(new gear.subcommands.eigengwasepi.EigenGWASEpiCommand());
+
 		addCommand(new gear.subcommands.labpop.LabPopCommand());
 		addCommand(new gear.subcommands.oath.nss.NSSCommand());
 		addCommand(new gear.subcommands.oath.oathx.OATHXCommand());
@@ -74,9 +73,20 @@ public enum Gear
 		addCommand(new gear.subcommands.oath.oathbus.OATHBusCommand());
 		addCommand(new gear.subcommands.reml.REMLCommand());
 		addCommand(new gear.subcommands.hereg.HERegCommand());
-		addCommand(new gear.subcommands.simuqtreal.SimulationQTRealCommand());
+		addCommand(new gear.subcommands.hefam.HEFamCommand());
+		addCommand(new gear.subcommands.heregb.HERegBCommand());
+
 		addCommand(new gear.subcommands.fastpca.FastPCACommand());
+
+		addCommand(new gear.subcommands.simuqtreal.SimulationQTRealCommand());
 		addCommand(new gear.subcommands.simulationmpheno.SimulationMPCommand());
+		addCommand(new gear.subcommands.simulationfammpheno.SimuFamilyMPCommand());
+		addCommand(new gear.subcommands.simulationfam.SimuFamilyCommand());
+		addCommand(new gear.subcommands.simulationqt.SimulationQTCommand());
+		addCommand(new gear.subcommands.simulationcc.SimulationCCCommand());
+		addCommand(new gear.subcommands.simulationinbred.SimulationInbredCommand());
+
+		addCommand(new gear.subcommands.ibd.IBDCommand());
 	}
 
 	private void addCommand(Command cmd)

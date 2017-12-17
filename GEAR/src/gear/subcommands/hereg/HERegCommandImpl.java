@@ -217,17 +217,32 @@ public class HERegCommandImpl extends CommandImpl {
 				{
 					yy[cnt] = (Y[i] + Y[j]) * (Y[i] + Y[j]);
 				}
+				if (heArgs.isGRMcut() && A3[0][i][j] > heArgs.getGRMcutoff()) continue;
 				for (int k = 0; k < A3.length; k++)
 				{
-					xx[cnt][k] = A3[k][i][j];				
+					xx[cnt][k] = A3[k][i][j];
 				}
 				cnt++;
 			}
 		}
 
-		mod.newSampleData(yy, xx);
+		double[] y = new double[cnt];
+		double[][] x = new double[cnt][A3.length];
+		System.arraycopy(yy, 0, y, 0, cnt);
+		for (int i = 0; i < cnt; i++)
+		{
+			System.arraycopy(xx[i], 0, x[i], 0, A3.length);
+		}
+		mod.newSampleData(y, x);
 		beta = mod.estimateRegressionParameters();
 		beta_v = mod.estimateRegressionParametersVariance();
+		for(int i = 0; i < beta_v.length; i++)
+		{
+			for (int j = 0; j < beta_v[i].length; j++)
+			{
+				beta_v[i][j] *= mod.estimateErrorVariance();
+			}
+		}
 	}
 
 	private void SummaryA3()
@@ -268,40 +283,55 @@ public class HERegCommandImpl extends CommandImpl {
 
 	private void HESingle()
 	{
-		SimpleRegression sReg = new SimpleRegression();
+		OLSMultipleLinearRegression mod = new OLSMultipleLinearRegression();
 
+		double[] yy = new double[Y.length * (Y.length-1)/2];
+		double[][] xx = new double[Y.length * (Y.length -1)/2][A3.length];
 		int cnt = 0;
 		for (int i = 0; i < Y.length; i++)
 		{
 			for (int j = 0; j < i; j++)
 			{
-				double yy = 0;
 				if (heArgs.isSD())
 				{
-					yy = (Y[i] - Y[j]) * (Y[i] - Y[j]);
+					yy[cnt] = (Y[i] - Y[j]) * (Y[i] - Y[j]);
 				}
 				else if (heArgs.isCP())
 				{
-					yy = Y[i]*Y[j];
+					yy[cnt] = Y[i]*Y[j];
 				}
 				else
 				{
-					yy = (Y[i] + Y[j]) * (Y[i] + Y[j]);
+					yy[cnt] = (Y[i] + Y[j]) * (Y[i] + Y[j]);
 				}
 				if (heArgs.isGRMcut() && A3[0][i][j] > heArgs.getGRMcutoff()) continue;
-				sReg.addData(A3[0][i][j], yy);
+				for (int k = 0; k < A3.length; k++)
+				{
+					xx[cnt][k] = A3[k][i][j];				
+				}
 				cnt++;
 			}
 		}
 
 		Logger.printUserLog(cnt + " observations for HE regression.");
-		beta = new double[2];
-		beta_v = new double[2][2];
 
-		beta[0] = sReg.getIntercept();
-		beta[1] = sReg.getSlope();
-		beta_v[0][0] = sReg.getInterceptStdErr() * sReg.getInterceptStdErr();
-		beta_v[1][1] = sReg.getSlopeStdErr() * sReg.getSlopeStdErr();
+		double[] y = new double[cnt];
+		double[][] x = new double[cnt][A3.length];
+		System.arraycopy(yy, 0, y, 0, cnt);
+		for (int i = 0; i < cnt; i++)
+		{
+			System.arraycopy(xx[i], 0, x[i], 0, A3.length);
+		}
+		mod.newSampleData(y, x);
+		beta = mod.estimateRegressionParameters();
+		beta_v = mod.estimateRegressionParametersVariance();
+		for(int i = 0; i < beta_v.length; i++)
+		{
+			for (int j = 0; j < beta_v[i].length; j++)
+			{
+				beta_v[i][j] *= mod.estimateErrorVariance();
+			}
+		}
 	}
 
 	private void HESingleJackknife()

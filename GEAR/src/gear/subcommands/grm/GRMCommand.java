@@ -54,7 +54,7 @@ public class GRMCommand extends Command
 	    }
 	    if(cmdLine.hasOption(OPT_VAR_LONG))
 	    {
-	    	grmArgs.setVar();
+	    	grmArgs.setAdjVar();
 	    }
 		if (cmdLine.hasOption(OPT_CHR))
 		{

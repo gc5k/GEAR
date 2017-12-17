@@ -9,7 +9,7 @@ public class GRMArguments extends CommandArguments
 	private boolean chrFlag = false;
 	private boolean isGZ = true;
 	private boolean isVar = false;
-	private boolean isDom = true;
+	private boolean isDom = false;
 	private double maf = 1e-5;
 
 	public void setChr(String c)
@@ -39,12 +39,12 @@ public class GRMArguments extends CommandArguments
 		return isGZ;
 	}
 
-	public void setVar()
+	public void setAdjVar()
 	{
 		isVar = true;
 	}
 
-	public boolean isVar()
+	public boolean isAdjVar()
 	{
 		return isVar;
 	}

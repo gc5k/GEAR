@@ -375,6 +375,8 @@ public class WeightedMetaImpl extends CommandImpl
 
 		MetaStat ms = null;
 		boolean isAmbiguousLocus = false;
+		ArrayList<Double> beta = NewIt.newArrayList();
+		ArrayList<Double> wt = NewIt.newArrayList();
 		for (int i = 0; i < idx.length; i++)
 		{
 			char sign = '+';
@@ -419,14 +421,14 @@ public class WeightedMetaImpl extends CommandImpl
 				}
 			}
 
-			if(match)
+			if (match)
 			{
 				gb += b * Weight[i];
-				if(b == 0)
+				if (b == 0)
 				{
 					sign = '0';
 				}
-				else if(b > 0)
+				else if (b > 0)
 				{
 					sign = '+';
 				}
@@ -434,6 +436,8 @@ public class WeightedMetaImpl extends CommandImpl
 				{
 					sign = '-';
 				}
+				beta.add((double) b);
+				wt.add(1.0/(ms.getSE() * ms.getSE()));
 			}
 			direction.setCharAt(idx[i], sign);
 		}
@@ -454,12 +458,15 @@ public class WeightedMetaImpl extends CommandImpl
 		{
 			Logger.printUserError(e.toString());
 		}
+		
+		//cal
 		gr.SetAmbi(isAmbiguousLocus);
 		gr.SetB(gb);
 		gr.SetSE(gse);
 		gr.SetZ(z);
 		gr.SetP(p);
 		gr.SetDirect(direction.toString());
+		gr.SetQ(beta, wt);
 		return gr;
 	}
 
@@ -523,7 +530,6 @@ public class WeightedMetaImpl extends CommandImpl
 				}
 			}
 		}
-
 	}
 
 	private WeightedMetaArguments wMetaArgs;

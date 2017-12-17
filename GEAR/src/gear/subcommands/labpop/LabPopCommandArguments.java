@@ -216,6 +216,7 @@ public class LabPopCommandArguments extends CommandArguments
 		isF2 = false;
 		isDH = false;
 		isRIL = false;
+		isIF2 = false;
 	}
 	public boolean isBC()
 	{
@@ -228,6 +229,7 @@ public class LabPopCommandArguments extends CommandArguments
 		isF2 = true;
 		isDH = false;
 		isRIL = false;
+		isIF2 = false;
 	}
 	public boolean isF2()
 	{
@@ -240,6 +242,7 @@ public class LabPopCommandArguments extends CommandArguments
 		isF2 = false;
 		isDH = true;
 		isRIL = false;
+		isIF2 = false;
 	}
 	public boolean isDH()
 	{
@@ -252,10 +255,25 @@ public class LabPopCommandArguments extends CommandArguments
 		isF2 = false;
 		isDH = false;
 		isRIL = true;
+		isIF2 = false;
 	}
 	public boolean isRIL()
 	{
 		return isRIL;
+	}
+
+	public void setIF2()
+	{
+		isBC = false;
+		isF2 = false;
+		isDH = false;
+		isRIL = false;
+		isIF2 = true;
+	}
+
+	public boolean isIF2()
+	{
+		return isIF2;
 	}
 
 	public void setReplication(String rep)
@@ -297,6 +315,7 @@ public class LabPopCommandArguments extends CommandArguments
 	private boolean isF2 = true;
 	private boolean isDH = false;
 	private boolean isRIL = false;
+	private boolean isIF2 = false;
 
 	private boolean isPolyEffectFile = false;
 	private String polyEffectFile = null;

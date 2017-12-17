@@ -63,4 +63,5 @@ public class EigenGWASArguments extends CommandArguments
 	{
 		return keepFile;
 	}
+
 }

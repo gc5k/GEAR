@@ -64,31 +64,32 @@ public class CovMatrix
 				covMat[i][j] = adjcor * ms1.getSE() * ms2.getSE() * Math.sqrt(gc[i]) *  Math.sqrt(gc[j]);
 			}
 		}
-		
+
 		RealMatrix gg = new Array2DRowRealMatrix(covMat);
 
 		isNonSingular = (new LUDecompositionImpl(gg)).getSolver().isNonSingular();
-		
-		if(isNonSingular)
+
+		if (isNonSingular)
 		{
+			//see Lin & Sullivan, 2009, AJHG, 85:862-72
 			RealMatrix gg_Inv = (new LUDecompositionImpl(gg)).getSolver().getInverse();
 			RealMatrix Unit = new Array2DRowRealMatrix(covMat.length, 1);
-			for(int i = 0; i < Unit.getRowDimension(); i++)
+			for (int i = 0; i < Unit.getRowDimension(); i++)
 			{
 				Unit.setEntry(i, 0, 1);
 			}
 			RealMatrix tmp = Unit.transpose().multiply(gg_Inv);
 			RealMatrix tmp1 = tmp.multiply(Unit);
-			
+
 			RealMatrix W = tmp.scalarMultiply(1/tmp1.getEntry(0, 0));
-			
+
 			gse = 1/tmp1.getEntry(0, 0);
-			if(gse < 0)
+			if (gse < 0)
 			{
 				Logger.printUserLog("This locus has negative variance: " + gse);
 			}
 			gse = Math.sqrt(gse);
-			Weight = W.getRow(0);			
+			Weight = W.getRow(0);
 		}
 	}
 

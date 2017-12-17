@@ -14,9 +14,10 @@ public class EbatchGWASArguments extends CommandArguments
 		return ev;
 	}
 
-	public void setDom(boolean isdom)
+	public void setDom()
 	{
-		isDom = isdom;
+		isDom = true;
+		isEpi = false;
 	}
 
 	public boolean isDom()
@@ -24,7 +25,30 @@ public class EbatchGWASArguments extends CommandArguments
 		return isDom;
 	}
 
+	public void setEpi()
+	{
+		isEpi = true;
+		isDom = false;
+	}
+
+	public boolean isEpi()
+	{
+		return isEpi;
+	}
+
+	public void setInbred()
+	{
+		adjvar = true;
+	}
+	
+	public boolean isInbred()
+	{
+		return adjvar;
+	}
+
 	private int ev = 1;
 	private boolean isDom = false;
+	private boolean isEpi = false;
+	private boolean adjvar = false;
 
 }

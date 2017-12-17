@@ -163,11 +163,11 @@ public class GRMImpl extends CommandImpl
 		DecimalFormat dfE = new DecimalFormat("0.00E0");
 		if (Math.abs(grmDomMean) > 0.0001)
 		{
-			Logger.printUserLog("Mean of dominance genetic relatedness is : " + df.format(grmDomMean));
+			Logger.printUserLog("Mean of dominance genetic relatedness is: " + df.format(grmDomMean));
 		}
 		else
 		{
-			Logger.printUserLog("Mean of dominance genetic relatedness is : " + dfE.format(grmDomMean));
+			Logger.printUserLog("Mean of dominance genetic relatedness is: " + dfE.format(grmDomMean));
 		}
 
 		if (Math.abs(grmDomSD) > 0.0001)
@@ -366,7 +366,7 @@ public class GRMImpl extends CommandImpl
 				else
 				{
 					s[0]++;
-					if (grmArgs.isVar())
+					if (grmArgs.isAdjVar())
 					{
 						s[1] += (g1 - 2 * m) * (g2 - 2 * m) / (allelevar[i]);						
 						

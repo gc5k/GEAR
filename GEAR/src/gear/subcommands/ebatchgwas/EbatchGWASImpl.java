@@ -6,6 +6,7 @@ import gear.subcommands.eigengwas.EigenGWASArguments;
 import gear.subcommands.eigengwas.EigenGWASImpl;
 import gear.subcommands.eigengwasdom.EigenGWASDomCommandArguments;
 import gear.subcommands.eigengwasdom.EigenGWASDomImpl;
+import gear.subcommands.eigengwasepi.EigenGWASEpiCommandArguments;
 import gear.subcommands.grm.GRMArguments;
 import gear.subcommands.grm.GRMImpl;
 import gear.subcommands.qpca.QPCACommandArguments;
@@ -23,6 +24,11 @@ public class EbatchGWASImpl extends CommandImpl
 		gArgs.setBFile(eArgs.getBFile());
 		gArgs.setGZ();
 		gArgs.setOutRoot(eArgs.getOutRoot());
+		if (eArgs.isInbred())
+		{
+			gArgs.setAdjVar();
+		}
+
 		GRMImpl gImpl = new GRMImpl();
 		gImpl.execute(gArgs);
 
@@ -37,7 +43,27 @@ public class EbatchGWASImpl extends CommandImpl
 		qpcaImpl.execute(qpcaArgs);
 		Logger.printUserLog("Saving the top "+ eArgs.getEV() + " eigenvectors in '" + eArgs.getOutRoot() + ".eigenvec'.");
 
-		if (eArgs.isDom())
+		if (eArgs.isEpi())
+		{
+			for(int i = 1; i <= eArgs.getEV(); i++)
+			{
+				Logger.printUserLog("\n---------Running EigenGWAS (Add+Dom+AA model) for the "+i+"th eigenvector.");
+				EigenGWASEpiCommandArguments eigenEpiArgs = new EigenGWASEpiCommandArguments();
+				eigenEpiArgs.setBFile(eArgs.getBFile());
+				eigenEpiArgs.setPhenotypeFile(eArgs.getOutRoot()+".eigenvec");
+				eigenEpiArgs.setPhentypeIndex(i);
+				eigenEpiArgs.setOutRoot(eArgs.getOutRoot() + "." + i);
+				if (eArgs.isInbred())
+				{
+					eigenEpiArgs.setInbred();
+				}
+
+				EigenGWASDomImpl eigenDomImpl = new EigenGWASDomImpl();
+				eigenDomImpl.execute(eigenEpiArgs);
+				Logger.printUserLog("Saved EigenGWAS results in '"+eigenEpiArgs.getOutRoot() + ".egwasepi'.");
+			}			
+		}
+		else if (eArgs.isDom())
 		{
 			for(int i = 1; i <= eArgs.getEV(); i++)
 			{

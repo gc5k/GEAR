@@ -1,6 +1,10 @@
 package gear.subcommands.weightedmeta.util;
 
 import java.text.DecimalFormat;
+import java.util.ArrayList;
+
+import org.apache.commons.math.MathException;
+import org.apache.commons.math.distribution.ChiSquaredDistributionImpl;
 
 public class GMRes implements Comparable<GMRes>
 {
@@ -16,6 +20,10 @@ public class GMRes implements Comparable<GMRes>
 	private double b;
 	private double se;
 	private boolean isAmbiguous;
+	private double Q;
+	private double pQchisq;
+	private double H2;
+	private double I2 = 0;
 
 	public GMRes(int cohort)
 	{
@@ -87,6 +95,30 @@ public class GMRes implements Comparable<GMRes>
 		this.direct = direct;
 	}
 
+	public void SetQ(ArrayList<Double> beta, ArrayList<Double> wt)
+	{
+		//see Guido Schwarzer et al [Meta-Analysis with R, Springer], page 34, 40
+		
+		for (int i = 0; i < beta.size(); i++)
+		{
+			Q += wt.get(i) * (beta.get(i) - b) * (beta.get(i) - b);
+		}
+		ChiSquaredDistributionImpl chi = new ChiSquaredDistributionImpl(wt.size()-1);
+		try
+		{
+			pQchisq = 1-chi.cumulativeProbability(Q);
+		}
+		catch (MathException e)
+		{
+			e.printStackTrace();
+		}
+		H2 = Q/(wt.size() - 1);
+		if (Q > (wt.size() - 1))
+		{
+			I2 = (H2 - 1)/H2;
+		}
+	}
+
 	public int getChr()
 	{
 		return chr;
@@ -105,7 +137,7 @@ public class GMRes implements Comparable<GMRes>
 	public String printTitle()
 	{
 		StringBuffer sb = new StringBuffer();
-		sb.append("SNP CHR BP A1 A2 COHORT B SE Z P Direction");
+		sb.append("SNP CHR BP A1 A2 COHORT B SE Z P Direction Q p[Q] H2 I2");
 		return sb.toString();
 	}
 
@@ -151,7 +183,44 @@ public class GMRes implements Comparable<GMRes>
 		{
 			sb.append(fmtp.format(p) + " ");
 		}
-		sb.append(direct);
+		sb.append(direct + " ");
+
+		if (Q > 0.001)
+		{
+			sb.append(fmt.format(Q) + " ");
+		}
+		else
+		{
+			sb.append(fmtp.format(Q) + " ");
+		}
+
+		if (pQchisq > 0.001)
+		{
+			sb.append(fmt.format(pQchisq) + " ");
+		}
+		else
+		{
+			sb.append(fmtp.format(pQchisq) + " ");
+		}
+		
+		if (H2 > 0.001)
+		{
+			sb.append(fmt.format(H2) + " ");
+		}
+		else
+		{
+			sb.append(fmtp.format(H2) + " ");
+		}
+
+		if (I2 > 0.001)
+		{
+			sb.append(fmt.format(I2));
+		}
+		else
+		{
+			sb.append(fmtp.format(I2));
+		}
+
 		return sb.toString();
 	}
 

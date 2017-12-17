@@ -87,18 +87,18 @@ public class FastPCACommandArguments extends CommandArguments
 		return prop;
 	}
 
-	public void setVar()
+	public void setAdjVar()
 	{
-		isVar = true;
+		isAdjVar = true;
 	}
 
-	public boolean isVar()
+	public boolean isAdjVar()
 	{
-		return isVar;
+		return isAdjVar;
 	}
 
 	private int ev = 10;
 	private String keepFile = null;
 	private double prop = 1;
-	private boolean isVar = false;
+	private boolean isAdjVar = false;
 }

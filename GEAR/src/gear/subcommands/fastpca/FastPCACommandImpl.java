@@ -43,9 +43,9 @@ public class FastPCACommandImpl extends CommandImpl
 		grmArgs.setBFile(fpcaArgs.getBFile());
 		grmArgs.setOutRoot(fpcaArgs.getOutRoot());
 		grmArgs.setGZ();
-		if (fpcaArgs.isVar())
+		if (fpcaArgs.isAdjVar())
 		{
-			grmArgs.setVar();
+			grmArgs.setAdjVar();
 		}
 
 		GRMImpl grmImpl = new GRMImpl();
@@ -60,7 +60,7 @@ public class FastPCACommandImpl extends CommandImpl
 		data.LineUpFiles();
 
 		readGrm();
-		
+
 		PLINKParser pp = PLINKParser.parse(fpcaArgs);
 		SampleFilter sf = new SampleFilter(pp.getPedigreeData(), pp.getMapData());
 		SumStatQC ssQC = new SumStatQC(pp.getPedigreeData(), pp.getMapData(), sf);

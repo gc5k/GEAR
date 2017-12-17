@@ -143,7 +143,7 @@ public class BufferedReader
 		{
 			String msg = "";
 			msg += "The format of the " + fileType + " file '" + fileName + "' is incorrect: ";
-			msg += "The file should consists of " + expectedNumCols + " column(s) at line " + (curLineNum - 1);
+			msg += "The file should be consisted of " + expectedNumCols + " column(s) at line " + (curLineNum - 1);
 			msg += ", but this line actually contains " + tokens.length + " column(s).";
 			Logger.printUserError(msg);
 			System.exit(1);

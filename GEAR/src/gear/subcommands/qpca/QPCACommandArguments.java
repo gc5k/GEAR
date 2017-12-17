@@ -70,8 +70,20 @@ public class QPCACommandArguments extends CommandArguments
 		return keepFile;
 	}
 
-	private String grmBin;
-	private String grmID;
-	private int ev = 10;
-	private String keepFile = null;
+//	public void setAdjVar()
+//	{
+//		isVar=true;
+//	}
+//
+//	public boolean isAdjVar()
+//	{
+//		return isVar;
+//	}
+
+//	private static boolean isVar = false;
+	private static String grmBin;
+	private static String grmID;
+	private static int ev = 10;
+	private static String keepFile = null;
+
 }
