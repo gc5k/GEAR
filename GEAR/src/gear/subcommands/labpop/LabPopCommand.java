@@ -36,9 +36,17 @@ public class LabPopCommand extends Command
 		options.addOption(OptionBuilder.withDescription(OPT_REC_DESC).withLongOpt(OPT_REC_LONG).hasArg().create());
 		options.addOption(OptionBuilder.withDescription(OPT_RAND_REC_LONG_DESC).withLongOpt(OPT_RAND_REC_LONG).create());
 		options.addOption(OptionBuilder.withDescription(OPT_REC_FILE_LONG_DESC).withLongOpt(OPT_REC_FILE_LONG).hasArg().create());
-		
-		options.addOption(OptionBuilder.withDescription(OPT_HSQ_DESC).hasArg().create(OPT_HSQ));		
+
+		options.addOption(OptionBuilder.withDescription(OPT_HSQ_DESC).hasArg().create(OPT_HSQ));
+		options.addOption(OptionBuilder.withDescription(OPT_HSQ_DOM_DESC).hasArg().withLongOpt(OPT_HSQ_DOM).create());
+		options.addOption(OptionBuilder.withDescription(OPT_HSQ_B_DESC).hasArg().withLongOpt(OPT_HSQ_B).create());
+
 		options.addOption(OptionBuilder.withDescription(OPT_EFFECT_FILE_LONG_DESC).withLongOpt(OPT_EFFECT_FILE_LONG).hasArg().create());
+
+		options.addOption(OptionBuilder.withDescription(OPT_DOM_EFFECT_DESC).hasArg().withLongOpt(OPT_DOM_EFFECT).create());
+		options.addOption(OptionBuilder.withDescription(OPT_POLY_DOM_EFFECT_LONG_DESC).withLongOpt(OPT_POLY_DOM_EFFECT_LONG).create());
+		options.addOption(OptionBuilder.withDescription(OPT_POLY_DOM_EFFECT_SORT_LONG_DESC).withLongOpt(OPT_POLY_DOM_EFFECT_SORT_LONG).create());
+		options.addOption(OptionBuilder.withDescription(OPT_DOM_EFFECT_FILE_LONG_DESC).withLongOpt(OPT_DOM_EFFECT_FILE_LONG).hasArg().create());
 
 		options.addOption(OptionBuilder.withDescription(OPT_BC_DESC).create(OPT_BC));
 		options.addOption(OptionBuilder.withDescription(OPT_F2_DESC).create(OPT_F2));
@@ -47,7 +55,8 @@ public class LabPopCommand extends Command
 		options.addOption(OptionBuilder.withDescription(OPT_IF2_DESC).create(OPT_IF2));
 		
 		options.addOption(OptionBuilder.withDescription(OPT_REP_DESC).hasArg().create(OPT_REP));
-		
+		options.addOption(OptionBuilder.withDescription(OPT_EXCLUDE_DESC).hasArg().create(OPT_EXCLUDE));
+
 		options.addOption(OptionBuilder.withDescription(OPT_ATGC_DESC).withLongOpt(OPT_ATGC_LONG).create());
 		options.addOption(OptionBuilder.withDescription(OPT_1234_DESC).withLongOpt(OPT_1234_LONG).create());
 	}
@@ -75,7 +84,12 @@ public class LabPopCommand extends Command
 		{
 			lpArgs.setRecFile(cmdLine.getOptionValue(OPT_REC_FILE_LONG));
 		}
-
+//ve
+		if (cmdLine.hasOption(OPT_HSQ_B))
+		{
+			lpArgs.setHSQB(parseDoubleOptionValueInRange(cmdLine, OPT_HSQ_B, "0.5", 0.0, 0.99));
+		}
+		
 //effect
 		if (cmdLine.hasOption(OPT_HSQ))
 		{
@@ -86,6 +100,30 @@ public class LabPopCommand extends Command
 			lpArgs.setPolyEffectFile(cmdLine.getOptionValue(OPT_EFFECT_FILE_LONG));
 		}
 
+		//dom eff
+		lpArgs.setPolyDomEffect();
+
+		if (cmdLine.hasOption(OPT_DOM_EFFECT))
+		{
+			lpArgs.setPlainDomEffect(parseDoubleOptionValue(cmdLine, OPT_DOM_EFFECT, "0.5"));
+		}
+
+		if (cmdLine.hasOption(OPT_POLY_DOM_EFFECT_SORT_LONG))
+		{
+			lpArgs.setPolyDomEffectSort();
+		}
+
+		if (cmdLine.hasOption(OPT_DOM_EFFECT_FILE_LONG))
+		{
+			lpArgs.setPolyDomEffectFile(cmdLine.getOptionValue(OPT_DOM_EFFECT_FILE_LONG));
+		}
+		
+		if (cmdLine.hasOption(OPT_HSQ_DOM))
+		{
+			lpArgs.setHsqDom(cmdLine.getOptionValue(OPT_HSQ_DOM));
+		}
+
+		
 //pop
 		if (cmdLine.hasOption(OPT_BC))
 		{
@@ -132,6 +170,10 @@ public class LabPopCommand extends Command
 			lpArgs.setATGCmode();
 		}
 
+		if (cmdLine.hasOption(OPT_EXCLUDE))
+		{
+			lpArgs.setExclude(cmdLine.getOptionValue(OPT_EXCLUDE));
+		}
 		return lpArgs;
 	}
 
@@ -164,6 +206,21 @@ public class LabPopCommand extends Command
 	private static final String OPT_EFFECT_FILE_LONG = "effect-file";
 	private static final String OPT_EFFECT_FILE_LONG_DESC = "Read effect from the file specified.";
 
+	//dom-effect
+	private static final String OPT_HSQ_DOM = "hsq-dom";
+	private static final String OPT_HSQ_DOM_DESC = "heritability for dominance variance";
+	private static final String OPT_DOM_EFFECT = "dom-effect";
+	private static final String OPT_DOM_EFFECT_DESC = "Equal dominant effects, 1 by default.";
+
+	private static final String OPT_POLY_DOM_EFFECT_LONG = "poly-dom-effect";
+	private static final String OPT_POLY_DOM_EFFECT_LONG_DESC = "Polygenic dominance (normal distribution) model.";
+
+	private static final String OPT_POLY_DOM_EFFECT_SORT_LONG = "poly-effect-sort";
+	private static final String OPT_POLY_DOM_EFFECT_SORT_LONG_DESC = "Sorted polygenic (normal distribution) model.";
+
+	private static final String OPT_DOM_EFFECT_FILE_LONG = "dom-effect-file";
+	private static final String OPT_DOM_EFFECT_FILE_LONG_DESC = "Read dominance effect from the file specified.";
+
 	private static final char OPT_MAKE_BED = 'b';
 	private static final String OPT_MAKE_BED_LONG = "make-bed";
 	private static final String OPT_MAKE_BED_DESC = "Make .bed, .bim and .fam files.";
@@ -183,6 +240,9 @@ public class LabPopCommand extends Command
 	private static final String OPT_IF2 = "if2";
 	private static final String OPT_IF2_DESC = "Generate an immortalized F2.";
 
+	private static final String OPT_HSQ_B = "hsq-b";
+	private static final String OPT_HSQ_B_DESC = "Broad-sense heritability";
+
 	private static final String OPT_REP = "rep";
 	private static final String OPT_REP_DESC = "Replication.";
 
@@ -192,4 +252,6 @@ public class LabPopCommand extends Command
 	private static final String OPT_1234_LONG = "1234-mode";
 	private static final String OPT_1234_DESC = "Using 1234 coding.";
 
+	private static final String OPT_EXCLUDE = "exclude";
+	private static final String OPT_EXCLUDE_DESC = "Exclude loci";
 }

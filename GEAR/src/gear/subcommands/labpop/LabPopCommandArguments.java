@@ -125,6 +125,29 @@ public class LabPopCommandArguments extends CommandArguments
 		return hsq;
 	}
 
+	public void setHsqDom(String hsqD) 
+	{
+		double hd = Double.parseDouble(hsqD);
+		if (hd < 0 || hd > 0.99)
+		{
+			{
+				Logger.printUserLog("hsq should be between 0 ~ 1.\n GEAR quitted.");
+			}
+		}
+		if ((hd+hsq) > 1)
+		{
+			{
+				Logger.printUserLog("The total heritability (hsq+hsq_dom) should be between 0 ~ 1.\n GEAR quitted.");
+			}
+		}
+		hsqDom = hd;
+	}
+
+	public double getHsqDom()
+	{
+		return hsqDom;
+	}
+
 //	public boolean isHsq()
 //	{
 //		return isHsqFlag;
@@ -197,6 +220,74 @@ public class LabPopCommandArguments extends CommandArguments
 	{
 		return polyEffect;
 	}
+	
+	//dom effect
+	public void setPlainDomEffect(double e)
+	{
+		polyDomEffect = e;
+		isPlainDomEffect = true;
+		isPolyDomEffect = false;
+		isPolyDomEffectSort = false;
+		isPolyDomEffectFile = false;
+	}
+
+	public boolean isPlainDomEffect()
+	{
+		return isPlainDomEffect;
+	}
+
+	public double getPolyDomEffect()
+	{
+		return polyDomEffect;
+	}
+
+	public void setPolyDomEffect()
+	{
+		isPlainDomEffect = false;
+		isPolyDomEffect = true;
+		isPolyDomEffectSort = false;
+		isPolyDomEffectFile = false;
+	}
+
+	public boolean isPolyDomEffect()
+	{
+		return isPolyDomEffect;
+	}
+
+	public void setPolyDomEffectSort()
+	{
+		isPlainDomEffect = false;
+		isPolyDomEffect = false;
+		isPolyDomEffectSort = true;
+		isPolyDomEffectFile = false;
+	}
+
+	public boolean isPolyDomEffectSort()
+	{
+		return isPolyDomEffectSort;
+	}
+
+	public void setPolyDomEffectFile(String f)
+	{
+		FileUtil.exists(f);
+		polyDomEffectFile = f;
+
+		isPlainDomEffect = false;
+		isPolyDomEffect = false;
+		isPolyDomEffectSort = false;
+		isPolyDomEffectFile = true;
+	}
+
+	public boolean isPolyDomEffectFile()
+	{
+		return isPolyDomEffectFile;
+	}
+
+	public String getPolyDomEffectFile()
+	{
+		return polyDomEffectFile;
+	}
+
 
 //bed	
 	public boolean getMakeBed()
@@ -218,6 +309,7 @@ public class LabPopCommandArguments extends CommandArguments
 		isRIL = false;
 		isIF2 = false;
 	}
+
 	public boolean isBC()
 	{
 		return isBC;
@@ -311,6 +403,27 @@ public class LabPopCommandArguments extends CommandArguments
 		return isATGCmode;
 	}
 
+	public void setHSQB(double e)
+	{
+		hsqB = e;
+	}
+
+	public double getHSQB()
+	{
+		return hsqB;
+	}
+
+	public void setExclude(String exF)
+	{
+		FileUtil.exists(exF);
+		excludeFile = exF;
+	}
+	
+	public String getExcludeFile()
+	{
+		return excludeFile;
+	}
+
 	private boolean isBC = false;
 	private boolean isF2 = true;
 	private boolean isDH = false;
@@ -321,6 +434,15 @@ public class LabPopCommandArguments extends CommandArguments
 	private String polyEffectFile = null;
 	private double polyEffect[];
 
+	private double polyDomEffect = 0;
+	private boolean isPlainDomEffect = true;
+	private boolean isPolyDomEffect = false;
+	private boolean isPolyDomEffectSort = false;
+	private boolean isPolyDomEffectFile = false;
+	private String polyDomEffectFile = null;
+
+	private String excludeFile = null;	
+
 	private int sampleSize = 100;
 	private int numMarkers = 100;
 	private boolean makeBed = false;
@@ -329,6 +451,9 @@ public class LabPopCommandArguments extends CommandArguments
 	private String RecFile = null;
 
 	private double hsq = 0.5;
+	private double hsqDom = 0;
+	private double hsqB = -1;
+
 //	private boolean isHsqFlag = true;
 	
 	private int replication = 1;
