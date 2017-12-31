@@ -10,8 +10,6 @@ import java.io.PrintWriter;
 import java.util.ArrayList;
 import java.util.Arrays;
 
-import org.apache.commons.math.MathException;
-import org.apache.commons.math.distribution.NormalDistributionImpl;
 import org.apache.commons.math.random.RandomDataImpl;
 import org.apache.commons.math.stat.StatUtils;
 
@@ -30,12 +28,16 @@ public class LabPopCommandImpl extends CommandImpl
 	public void execute(CommandArguments cmdArgs) 
 	{
 		lpArgs = (LabPopCommandArguments) cmdArgs;
-		polyEffect = lpArgs.getPolyEffect();
-		M = polyEffect.length;
+		
+		M = lpArgs.getNumberOfMarkers();
+		nullM = lpArgs.getNullMarkerNum();
 		rec = lpArgs.getRec();
 		gm = new int[lpArgs.getSampleSize()][lpArgs.getNumberOfMarkers()];
 		bv = new double[lpArgs.getSampleSize()];
 		phe = new double[lpArgs.getSampleSize()][lpArgs.getReplication()];
+
+		idx = Sample.SampleIndex(0, M-1, M-nullM);
+		Arrays.sort(idx);
 
 		if (lpArgs.is1234mode())
 		{
@@ -52,10 +54,13 @@ public class LabPopCommandImpl extends CommandImpl
 		rnd = new RandomDataImpl();
 		rnd.reSeed(lpArgs.getSeed());
 
+		getAddEffect();
 		getDomEffect();
 
 		generateGenotype();
 		generatePhenotype();
+		
+		writeEffFile();
 		writePheno();
 
 		if (lpArgs.getExcludeFile() != null)
@@ -158,7 +163,7 @@ public class LabPopCommandImpl extends CommandImpl
 		{
 			H2 = lpArgs.getHSQB();
 		}
-		
+
 		if (H2 == 0)
 		{
 			Arrays.fill(bv, 0);
@@ -178,59 +183,73 @@ public class LabPopCommandImpl extends CommandImpl
 		}
 	}
 
+	private void getAddEffect()
+	{
+		polyEffect = new double[M];
+
+		Sample.setSeed(lpArgs.getSeed()+1);
+
+		for (int i = 0; i < idx.length; i++)
+		{
+			polyEffect[idx[i]] = rnd.nextGaussian(0, 1);
+		}
+		
+		if (lpArgs.isPolyEffectFile())
+		{
+			BufferedReader reader = FileUtil.FileOpen(lpArgs.getPolyEffectFile());
+			int c = 0;
+			String line = null;
+			try
+			{
+				while ((line = reader.readLine()) != null)
+				{
+					if(c >= M)
+					{
+						Logger.printUserLog("Have already read " + M + " allelic effects. Ignore the rest of the content in '" + lpArgs.getPolyEffectFile() + "'.");
+						break;
+					}
+
+					line.trim();
+					String[] l = line.split(ConstValues.WHITESPACE_DELIMITER);
+					if (l.length < 1) continue;
+					polyEffect[c++] = Double.parseDouble(l[0]);
+				}
+				reader.close();
+			}
+			catch (IOException e)
+			{
+				Logger.handleException(e,
+						"An exception occurred when reading the frequency file '"
+								+ lpArgs.getPolyEffectFile() + "'.");
+			}
+		}
+		else if (lpArgs.getHsq() == 0)
+		{
+			Arrays.fill(polyEffect, 0);
+		}
+		return;
+	}
+	
 	private void getDomEffect()
 	{
 		deffect = new double[M];
 
 		Sample.setSeed(lpArgs.getSeed()+1);
 
-		int[] idx = Sample.SampleIndex(0, M-1, M);
-		Arrays.sort(idx);
-
-		if (lpArgs.isPlainDomEffect())
+		for (int i = 0; i < idx.length; i++)
 		{
-			for (int i = 0; i < idx.length; i++) deffect[idx[i]] = lpArgs.getPolyDomEffect();
+			deffect[idx[i]] = rnd.nextGaussian(0, 1);
 		}
-		else if (lpArgs.isPolyDomEffect())
-		{
-			double t = 0;
-			double adj=1;
-			if (lpArgs.isPolyDomEffect())
-			{
-				if (lpArgs.getHsq() > 0)
-				{
-					t = lpArgs.getHsq()/lpArgs.getHsqDom();
-					if (t < 2)
-					{
-						Logger.printUserError("Impossible heritability: hsq_add = " + lpArgs.getHsq() + " hsq_dom = " + lpArgs.getHsqDom());
-						System.exit(0);
-					}
-					else 
-					{
-						adj = Math.sqrt(5/(2*t-1));
-					}
-				}
-			}
 
+		double t = 0;
+		double adj=1;
+		if (lpArgs.getHsq() > 0)
+		{
+			t = lpArgs.getHsq()/lpArgs.getHsqDom();
+			adj = Math.sqrt(1/(0.5*t));
 			for (int i = 0; i < idx.length; i++)
 			{
 				deffect[idx[i]] = rnd.nextGaussian(0, adj);
-			}
-		}
-		else if (lpArgs.isPolyDomEffectSort())
-		{
-			NormalDistributionImpl ndImpl = new NormalDistributionImpl();
-			ndImpl.reseedRandomGenerator(lpArgs.getSeed());
-			for (int i = 0; i < idx.length; i++)
-			{
-				try
-				{
-					deffect[idx[i]] = ndImpl.inverseCumulativeProbability((i+0.5)/(idx.length));
-				}
-				catch (MathException e)
-				{
-					e.printStackTrace();
-				}
 			}
 		}
 		else if (lpArgs.isPolyDomEffectFile())
@@ -379,7 +398,52 @@ public class LabPopCommandImpl extends CommandImpl
 		return hp;
 	}
 
-	
+	private void writeEffFile()
+	{
+		PrintWriter eff = null;
+		try
+		{
+			eff = new PrintWriter(new BufferedWriter(new FileWriter(lpArgs.getOutRoot() + ".rnd")));
+		}
+		catch (IOException e)
+		{
+			Logger.handleException(e,
+					"An exception occurred when writing files.");
+		}
+
+		for (int i = 0; i < M; i++)
+		{
+			eff.println("rs" + i + " " + A[0] + " " + polyEffect[i] + " " + deffect[i]);
+		}
+		eff.close();
+		
+		if (nullM > 0)
+		{
+			PrintWriter nullMFile = null;
+			try
+			{
+				nullMFile = new PrintWriter(new BufferedWriter(new FileWriter(lpArgs.getOutRoot() + ".exclude")));
+			}
+			catch (IOException e)
+			{
+				Logger.handleException(e,
+						"An exception occurred when writing files.");
+			}
+
+			int cnt=0;
+			for (int i = 0; i < M; i++)
+			{
+				if(i == idx[cnt])
+				{
+					cnt++;
+					continue;
+				}
+				nullMFile.println("rs" + i);
+			}
+			nullMFile.close();
+		}
+	}
+
 	public void writePheno()
 	{
 		PrintWriter pheno = null;
@@ -426,10 +490,9 @@ public class LabPopCommandImpl extends CommandImpl
 		
 		for (int i = 0; i < lpArgs.getNumberOfMarkers(); i++)
 		{
-			add.println("rs" + i + " " + lpArgs.getPolyEffect()[i]);
+			add.println("rs" + i + " " + polyEffect[i]);
 		}
 		add.close();
-
 	}
 
 	public void writeFile()
@@ -597,6 +660,8 @@ public class LabPopCommandImpl extends CommandImpl
 	}
 
 	private int M;
+	private int nullM;
+	private int[] idx;
 	private LabPopCommandArguments lpArgs;
 	private RandomDataImpl rnd = new RandomDataImpl();
 

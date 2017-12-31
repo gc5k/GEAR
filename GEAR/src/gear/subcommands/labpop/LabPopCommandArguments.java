@@ -31,7 +31,27 @@ public class LabPopCommandArguments extends CommandArguments
 	public void setNumberOfMarkers(int numMarkers)
 	{
 		this.numMarkers = numMarkers;
-		setEffect();
+	}
+
+	public void setNullMarkerNum(String nm)
+	{
+		nullM = Integer.parseInt(nm);
+		if (nullM < 0)
+		{
+			Logger.printUserLog("Null marker number " + nullM + " is negative. It is set to zero.");
+			nullM = 0;
+		}
+		if (nullM >= numMarkers)
+		{
+			Logger.printUserLog("Null marker number " + nullM + " should less than the number of merkers (" + numMarkers +").\n GEAR quittte.");
+			System.exit(0);
+		}
+		
+	}
+	
+	public int getNullMarkerNum()
+	{
+		return nullM;
 	}
 
 // start rec
@@ -154,56 +174,12 @@ public class LabPopCommandArguments extends CommandArguments
 //	}
 
 //polygenic effects
-	public void setEffect()
-	{
-		polyEffect = new double[getNumberOfMarkers()];
-		rnd.reSeed(getSeed());
-		for (int i = 0; i < polyEffect.length; i++)
-		{
-			polyEffect[i] = rnd.nextGaussian(0, 1);
-		}
-	}
 
 	public void setPolyEffectFile(String f)
 	{
 		FileUtil.exists(f);
 		polyEffectFile = f;
 		isPolyEffectFile = true;
-		
-		BufferedReader reader = FileUtil.FileOpen(f);
-		polyEffect = new double[getNumberOfMarkers()];
-
-		int c = 0;
-		String line = null;
-		try
-		{
-			while ((line = reader.readLine()) != null)
-			{
-				if(c >= getNumberOfMarkers())
-				{
-					Logger.printUserLog("Have already read " + getNumberOfMarkers() + " allelic effects. Ignore the rest of the content in '" + getPolyEffectFile() + "'.");
-					break;
-				}
-
-				line.trim();
-				String[] l = line.split(ConstValues.WHITESPACE_DELIMITER);
-				if (l.length < 1) continue;
-				polyEffect[c++] = Double.parseDouble(l[0]);
-			}
-			reader.close();
-		}
-		catch (IOException e)
-		{
-			Logger.handleException(e,
-						"An exception occurred when reading the effect file '"
-								+ getPolyEffectFile() + "'.");
-		}
-		
-		if (polyEffect.length < getNumberOfMarkers())
-		{
-			Logger.printUserError("The number of effect is fewer than the number of markers.\nGEAR quitted.");
-			System.exit(0);
-		}
 	}
 
 	public boolean isPolyEffectFile()
@@ -216,65 +192,12 @@ public class LabPopCommandArguments extends CommandArguments
 		return polyEffectFile;
 	}
 	
-	public double[] getPolyEffect()
-	{
-		return polyEffect;
-	}
-	
-	//dom effect
-	public void setPlainDomEffect(double e)
-	{
-		polyDomEffect = e;
-		isPlainDomEffect = true;
-		isPolyDomEffect = false;
-		isPolyDomEffectSort = false;
-		isPolyDomEffectFile = false;
-	}
-
-	public boolean isPlainDomEffect()
-	{
-		return isPlainDomEffect;
-	}
-
-	public double getPolyDomEffect()
-	{
-		return polyDomEffect;
-	}
-
-	public void setPolyDomEffect()
-	{
-		isPlainDomEffect = false;
-		isPolyDomEffect = true;
-		isPolyDomEffectSort = false;
-		isPolyDomEffectFile = false;
-	}
-
-	public boolean isPolyDomEffect()
-	{
-		return isPolyDomEffect;
-	}
-
-	public void setPolyDomEffectSort()
-	{
-		isPlainDomEffect = false;
-		isPolyDomEffect = false;
-		isPolyDomEffectSort = true;
-		isPolyDomEffectFile = false;
-	}
-
-	public boolean isPolyDomEffectSort()
-	{
-		return isPolyDomEffectSort;
-	}
+//dom effect
 
 	public void setPolyDomEffectFile(String f)
 	{
 		FileUtil.exists(f);
 		polyDomEffectFile = f;
-
-		isPlainDomEffect = false;
-		isPolyDomEffect = false;
-		isPolyDomEffectSort = false;
 		isPolyDomEffectFile = true;
 	}
 
@@ -336,6 +259,7 @@ public class LabPopCommandArguments extends CommandArguments
 		isRIL = false;
 		isIF2 = false;
 	}
+
 	public boolean isDH()
 	{
 		return isDH;
@@ -432,12 +356,7 @@ public class LabPopCommandArguments extends CommandArguments
 
 	private boolean isPolyEffectFile = false;
 	private String polyEffectFile = null;
-	private double polyEffect[];
 
-	private double polyDomEffect = 0;
-	private boolean isPlainDomEffect = true;
-	private boolean isPolyDomEffect = false;
-	private boolean isPolyDomEffectSort = false;
 	private boolean isPolyDomEffectFile = false;
 	private String polyDomEffectFile = null;
 
@@ -445,6 +364,7 @@ public class LabPopCommandArguments extends CommandArguments
 
 	private int sampleSize = 100;
 	private int numMarkers = 100;
+	private int nullM = 0;
 	private boolean makeBed = false;
 
 	private double[] rec;
@@ -457,7 +377,7 @@ public class LabPopCommandArguments extends CommandArguments
 //	private boolean isHsqFlag = true;
 	
 	private int replication = 1;
-	
+
 	private RandomDataImpl rnd = new RandomDataImpl();		
 
 	private boolean is1234mode = false;

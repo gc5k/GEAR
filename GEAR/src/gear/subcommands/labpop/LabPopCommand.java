@@ -30,6 +30,8 @@ public class LabPopCommand extends Command
 	{
 		options.addOption(OptionBuilder.withDescription(OPT_SIZE_DESC).withLongOpt(OPT_SIZE_LONG).hasArg().create(OPT_SIZE));
 		options.addOption(OptionBuilder.withDescription(OPT_NUM_MARKERS_DESC).withLongOpt(OPT_NUM_MARKERS_LONG).hasArg().create(OPT_NUM_MARKERS));
+		options.addOption(OptionBuilder.withDescription(OPT_NULL_MARKER_LONG_DESC).withLongOpt(OPT_NULL_MARKER_LONG).hasArg().create());
+
 		options.addOption(OptionBuilder.withDescription(OPT_SEED_DESC).withLongOpt(OPT_SEED_LONG).hasArg().create());
 		options.addOption(OptionBuilder.withDescription(OPT_MAKE_BED_DESC).withLongOpt(OPT_MAKE_BED_LONG).create(OPT_MAKE_BED));
 
@@ -43,9 +45,6 @@ public class LabPopCommand extends Command
 
 		options.addOption(OptionBuilder.withDescription(OPT_EFFECT_FILE_LONG_DESC).withLongOpt(OPT_EFFECT_FILE_LONG).hasArg().create());
 
-		options.addOption(OptionBuilder.withDescription(OPT_DOM_EFFECT_DESC).hasArg().withLongOpt(OPT_DOM_EFFECT).create());
-		options.addOption(OptionBuilder.withDescription(OPT_POLY_DOM_EFFECT_LONG_DESC).withLongOpt(OPT_POLY_DOM_EFFECT_LONG).create());
-		options.addOption(OptionBuilder.withDescription(OPT_POLY_DOM_EFFECT_SORT_LONG_DESC).withLongOpt(OPT_POLY_DOM_EFFECT_SORT_LONG).create());
 		options.addOption(OptionBuilder.withDescription(OPT_DOM_EFFECT_FILE_LONG_DESC).withLongOpt(OPT_DOM_EFFECT_FILE_LONG).hasArg().create());
 
 		options.addOption(OptionBuilder.withDescription(OPT_BC_DESC).create(OPT_BC));
@@ -70,6 +69,11 @@ public class LabPopCommand extends Command
 		lpArgs.setSampleSize(parseIntOptionValue(cmdLine, OPT_SIZE_LONG, "100"));
 		lpArgs.setNumberOfMarkers(parseIntOptionValue(cmdLine, OPT_NUM_MARKERS_LONG, "100"));
 		lpArgs.setRec(parseDoubleOptionValueInRange(cmdLine, OPT_REC_LONG, "0.5", 0.0, 0.5));
+
+		if (cmdLine.hasOption(OPT_NULL_MARKER_LONG))
+		{
+			lpArgs.setNullMarkerNum(cmdLine.getOptionValue(OPT_NULL_MARKER_LONG));
+		}
 
 //rec
 		if (cmdLine.hasOption(OPT_REC_LONG))
@@ -100,19 +104,7 @@ public class LabPopCommand extends Command
 			lpArgs.setPolyEffectFile(cmdLine.getOptionValue(OPT_EFFECT_FILE_LONG));
 		}
 
-		//dom eff
-		lpArgs.setPolyDomEffect();
-
-		if (cmdLine.hasOption(OPT_DOM_EFFECT))
-		{
-			lpArgs.setPlainDomEffect(parseDoubleOptionValue(cmdLine, OPT_DOM_EFFECT, "0.5"));
-		}
-
-		if (cmdLine.hasOption(OPT_POLY_DOM_EFFECT_SORT_LONG))
-		{
-			lpArgs.setPolyDomEffectSort();
-		}
-
+//dom eff
 		if (cmdLine.hasOption(OPT_DOM_EFFECT_FILE_LONG))
 		{
 			lpArgs.setPolyDomEffectFile(cmdLine.getOptionValue(OPT_DOM_EFFECT_FILE_LONG));
@@ -122,7 +114,6 @@ public class LabPopCommand extends Command
 		{
 			lpArgs.setHsqDom(cmdLine.getOptionValue(OPT_HSQ_DOM));
 		}
-
 		
 //pop
 		if (cmdLine.hasOption(OPT_BC))
@@ -191,6 +182,9 @@ public class LabPopCommand extends Command
 	private static final String OPT_NUM_MARKERS_LONG = "marker";
 	private static final String OPT_NUM_MARKERS_DESC = "Specify the number of markers.";
 
+	private static final String OPT_NULL_MARKER_LONG = "null-marker";
+	private static final String OPT_NULL_MARKER_LONG_DESC = "Number of null markers.";
+
 	private static final String OPT_REC_LONG = "rec";
 	private static final String OPT_REC_DESC = "Specify the recombination fraction.";
 
@@ -200,6 +194,8 @@ public class LabPopCommand extends Command
 	private static final String OPT_REC_FILE_LONG = "rec-file";
 	private static final String OPT_REC_FILE_LONG_DESC = "Read recombination from the file specified. The first locus will converted to 0.5 regardless of value being specified.";
 
+	
+	//add-effect
 	private static final String OPT_HSQ = "hsq";
 	private static final String OPT_HSQ_DESC = "Heritability for polygenic model, 0.5 by default.";
 
@@ -208,15 +204,7 @@ public class LabPopCommand extends Command
 
 	//dom-effect
 	private static final String OPT_HSQ_DOM = "hsq-dom";
-	private static final String OPT_HSQ_DOM_DESC = "heritability for dominance variance";
-	private static final String OPT_DOM_EFFECT = "dom-effect";
-	private static final String OPT_DOM_EFFECT_DESC = "Equal dominant effects, 1 by default.";
-
-	private static final String OPT_POLY_DOM_EFFECT_LONG = "poly-dom-effect";
-	private static final String OPT_POLY_DOM_EFFECT_LONG_DESC = "Polygenic dominance (normal distribution) model.";
-
-	private static final String OPT_POLY_DOM_EFFECT_SORT_LONG = "poly-effect-sort";
-	private static final String OPT_POLY_DOM_EFFECT_SORT_LONG_DESC = "Sorted polygenic (normal distribution) model.";
+	private static final String OPT_HSQ_DOM_DESC = "heritability for dominance variance, 0 by default";
 
 	private static final String OPT_DOM_EFFECT_FILE_LONG = "dom-effect-file";
 	private static final String OPT_DOM_EFFECT_FILE_LONG_DESC = "Read dominance effect from the file specified.";

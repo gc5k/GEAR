@@ -41,6 +41,9 @@ public class SimulationQTCommandImpl extends CommandImpl
 		rnd.reSeed(seed);
 		rep = qtArgs.getRep();
 
+		idx = Sample.SampleIndex(0, M-1, M-nullM);
+		Arrays.sort(idx);
+
 		getFreq();
 		getEffect();
 		getDomEffect();
@@ -191,9 +194,6 @@ public class SimulationQTCommandImpl extends CommandImpl
 		effect = new double[M];
 		
 		Sample.setSeed(seed);
-		
-		int[] idx = Sample.SampleIndex(0, M-1, M-nullM);
-		Arrays.sort(idx);
 
 		if(qtArgs.isPlainEffect())
 		{
@@ -268,9 +268,6 @@ public class SimulationQTCommandImpl extends CommandImpl
 		}
 
 		Sample.setSeed(seed+1);
-
-		int[] idx = Sample.SampleIndex(0, M-1, M-nullM);
-		Arrays.sort(idx);
 
 		if (qtArgs.isPlainDomEffect())
 		{
@@ -650,11 +647,9 @@ public class SimulationQTCommandImpl extends CommandImpl
 	private void writeEffFile()
 	{
 		PrintWriter eff = null;
-		PrintWriter deff = null;
 		try
 		{
 			eff = new PrintWriter(new BufferedWriter(new FileWriter(qtArgs.getOutRoot() + ".rnd")));
-			deff = new PrintWriter(new BufferedWriter(new FileWriter(qtArgs.getOutRoot() + ".drnd")));
 		}
 		catch (IOException e)
 		{
@@ -664,11 +659,36 @@ public class SimulationQTCommandImpl extends CommandImpl
 
 		for (int i = 0; i < M; i++)
 		{
-			eff.println("rs" + i + " " + A1 + " " + effect[i]);
-			deff.println("rs" + i + " " + deffect[i]);
+			eff.println("rs" + i + " " + A1 + " " + effect[i] + " " + deffect[i]);
 		}
 		eff.close();
-		deff.close();
+		
+		if (nullM > 0)
+		{
+			PrintWriter nullMFile = null;
+			try
+			{
+				nullMFile = new PrintWriter(new BufferedWriter(new FileWriter(qtArgs.getOutRoot() + ".exclude")));
+			}
+			catch (IOException e)
+			{
+				Logger.handleException(e,
+						"An exception occurred when writing files.");
+			}
+
+			int cnt=0;
+			for (int i = 0; i < M; i++)
+			{
+				if(i == idx[cnt])
+				{
+					cnt++;
+					continue;
+				}
+				nullMFile.println("rs" + i);
+			}
+			nullMFile.close();
+		}
+
 	}
 	
 	private SimulationQTCommandArguments qtArgs;
@@ -678,6 +698,8 @@ public class SimulationQTCommandImpl extends CommandImpl
 
 	private int M;
 	private int nullM;
+	private int[] idx;
+
 	private int sample;
 	private int rep;
 
@@ -688,7 +710,7 @@ public class SimulationQTCommandImpl extends CommandImpl
 	private double[] effect;
 	private double[] deffect;
 	private double[] freq;
-
+	
 	private double[] dprime;
 	private double[] LD;
 

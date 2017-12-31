@@ -1,9 +1,10 @@
-package gear.subcommands.grm;
+package gear.subcommands.wgrm;
 
 import gear.subcommands.CommandArguments;
+import gear.util.FileUtil;
 import gear.util.Logger;
 
-public class GRMArguments extends CommandArguments
+public class WGRMCommandArguments extends CommandArguments
 {
 	private String chr;
 	private boolean chrFlag = false;
@@ -11,6 +12,9 @@ public class GRMArguments extends CommandArguments
 	private boolean isVar = false;
 	private boolean isDom = false;
 	private double maf = 1e-5;
+	private boolean isVanRaden = false;
+	private boolean isWeight = false;
+	private String wFile = null;
 
 	public void setChr(String c)
 	{
@@ -33,7 +37,7 @@ public class GRMArguments extends CommandArguments
 	{
 		isGZ = false;
 	}
-	
+
 	public boolean isGZ()
 	{
 		return isGZ;
@@ -69,7 +73,7 @@ public class GRMArguments extends CommandArguments
 		return isDom;
 	}
 
-	public void setMAF(String m) 
+	public void setMAF(String m)
 	{
 		maf = Double.parseDouble(m);
 	}
@@ -77,5 +81,32 @@ public class GRMArguments extends CommandArguments
 	public double getMAF()
 	{
 		return maf;
+	}
+
+	public void setVanRaden()
+	{
+		isVanRaden = true;
+		isWeight = false;
+	}
+
+	public boolean isWeight()
+	{
+		return isWeight;
+	}
+
+	public boolean isVanRaden()
+	{
+		return isVanRaden;
+	}
+
+	public void setWeightFile(String wF)
+	{
+		FileUtil.exists(wF);
+		wFile = wF;
+	}
+	
+	public String getWeightFile()
+	{
+		return wFile;
 	}
 }
