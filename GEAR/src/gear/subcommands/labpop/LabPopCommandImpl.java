@@ -7,7 +7,6 @@ import java.io.FileOutputStream;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.PrintWriter;
-import java.util.ArrayList;
 import java.util.Arrays;
 
 import org.apache.commons.math.random.RandomDataImpl;
@@ -18,7 +17,6 @@ import gear.subcommands.CommandArguments;
 import gear.subcommands.CommandImpl;
 import gear.util.FileUtil;
 import gear.util.Logger;
-import gear.util.NewIt;
 import gear.util.Sample;
 
 public class LabPopCommandImpl extends CommandImpl
@@ -28,7 +26,7 @@ public class LabPopCommandImpl extends CommandImpl
 	public void execute(CommandArguments cmdArgs) 
 	{
 		lpArgs = (LabPopCommandArguments) cmdArgs;
-		
+
 		M = lpArgs.getNumberOfMarkers();
 		nullM = lpArgs.getNullMarkerNum();
 		rec = lpArgs.getRec();
@@ -60,14 +58,11 @@ public class LabPopCommandImpl extends CommandImpl
 		generateGenotype();
 		generatePhenotype();
 		
-		writeEffFile();
-		writePheno();
-
-		if (lpArgs.getExcludeFile() != null)
+		if (lpArgs.isVerbose())
 		{
-			exclude();
-			writeExList();
+			writeEffFile();			
 		}
+		writePheno();
 
 		if (lpArgs.getMakeBed())
 		{
@@ -76,62 +71,6 @@ public class LabPopCommandImpl extends CommandImpl
 		else
 		{
 			writeFile();
-		}
-	}
-
-	private void writeExList()
-	{
-		if (exList == null)
-		{
-			return;
-		}
-		
-		PrintWriter exF = null;
-
-		try
-		{
-			exF = new PrintWriter(new BufferedWriter(new FileWriter(lpArgs.getOutRoot() + ".exclude")));
-		}
-		catch (IOException e)
-		{
-			Logger.handleException(e, "An I/O exception occurred when creating the .exclude file.");
-		}
-
-		for (int i = 0; i < exList.size(); i++)
-		{
-			exF.println("rs" + (exList.get(i) - 1));
-		}
-		exF.close();
-	}
-
-	private void exclude()
-	{
-		BufferedReader reader = FileUtil.FileOpen(lpArgs.getExcludeFile());
-		int c = 0;
-		String line = null;
-		exList = NewIt.newArrayList();
-		try
-		{
-			while ((line = reader.readLine()) != null)
-			{
-				if(c >= M)
-				{
-					Logger.printUserLog("Have already read " + M + " allelic effects. Ignore the rest of the content in '" + lpArgs.getExcludeFile() + "'.");
-					break;
-				}
-
-				line.trim();
-				String[] l = line.split(ConstValues.WHITESPACE_DELIMITER);
-				if (l.length < 1) continue;
-				exList.add(Integer.parseInt(l[0]));
-			}
-			reader.close();
-		}
-		catch (IOException e)
-		{
-			Logger.handleException(e,
-					"An exception occurred when reading the frequency file '"
-							+ lpArgs.getExcludeFile() + "'.");
 		}
 	}
 
@@ -417,31 +356,33 @@ public class LabPopCommandImpl extends CommandImpl
 		}
 		eff.close();
 		
-		if (nullM > 0)
-		{
-			PrintWriter nullMFile = null;
-			try
-			{
-				nullMFile = new PrintWriter(new BufferedWriter(new FileWriter(lpArgs.getOutRoot() + ".exclude")));
-			}
-			catch (IOException e)
-			{
-				Logger.handleException(e,
-						"An exception occurred when writing files.");
-			}
+		PrintWriter nullMFile = null;
+		PrintWriter QTLFile = null;
 
-			int cnt=0;
-			for (int i = 0; i < M; i++)
-			{
-				if(i == idx[cnt])
-				{
-					cnt++;
-					continue;
-				}
-				nullMFile.println("rs" + i);
-			}
-			nullMFile.close();
+		try
+		{
+			nullMFile = new PrintWriter(new BufferedWriter(new FileWriter(lpArgs.getOutRoot() + ".nqtl")));
+			QTLFile = new PrintWriter(new BufferedWriter(new FileWriter(lpArgs.getOutRoot() + ".qtl")));
 		}
+		catch (IOException e)
+		{
+			Logger.handleException(e,
+					"An exception occurred when writing files.");
+		}
+
+		int cnt=0;
+		for (int i = 0; i < M; i++)
+		{
+			if(i == idx[cnt])
+			{
+				QTLFile.println("rs" + i);
+				cnt++;
+				continue;
+			}
+			nullMFile.println("rs" + i);
+		}
+		nullMFile.close();
+		QTLFile.close();
 	}
 
 	public void writePheno()
@@ -675,7 +616,6 @@ public class LabPopCommandImpl extends CommandImpl
 	private double[] deffect;
 	private double[] rec;
 
-	ArrayList<Integer> exList = null;
 	PrintWriter ibdF = null;
 	PrintWriter ibdSibF = null;
 

@@ -337,17 +337,17 @@ public class LabPopCommandArguments extends CommandArguments
 		return hsqB;
 	}
 
-	public void setExclude(String exF)
+	public void setVerbose()
 	{
-		FileUtil.exists(exF);
-		excludeFile = exF;
+		isVerbose = true;
 	}
 	
-	public String getExcludeFile()
+	public boolean isVerbose()
 	{
-		return excludeFile;
+		return isVerbose;
 	}
 
+	private boolean isVerbose = false;
 	private boolean isBC = false;
 	private boolean isF2 = true;
 	private boolean isDH = false;
@@ -359,8 +359,6 @@ public class LabPopCommandArguments extends CommandArguments
 
 	private boolean isPolyDomEffectFile = false;
 	private String polyDomEffectFile = null;
-
-	private String excludeFile = null;	
 
 	private int sampleSize = 100;
 	private int numMarkers = 100;

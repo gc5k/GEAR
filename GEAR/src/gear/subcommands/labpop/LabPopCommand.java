@@ -54,10 +54,10 @@ public class LabPopCommand extends Command
 		options.addOption(OptionBuilder.withDescription(OPT_IF2_DESC).create(OPT_IF2));
 		
 		options.addOption(OptionBuilder.withDescription(OPT_REP_DESC).hasArg().create(OPT_REP));
-		options.addOption(OptionBuilder.withDescription(OPT_EXCLUDE_DESC).hasArg().create(OPT_EXCLUDE));
 
 		options.addOption(OptionBuilder.withDescription(OPT_ATGC_DESC).withLongOpt(OPT_ATGC_LONG).create());
 		options.addOption(OptionBuilder.withDescription(OPT_1234_DESC).withLongOpt(OPT_1234_LONG).create());
+		options.addOption(OptionBuilder.withDescription(OPT_VERBOSE_DESC).create(OPT_VERBOSE));
 	}
 
 	@Override
@@ -160,10 +160,10 @@ public class LabPopCommand extends Command
 		{
 			lpArgs.setATGCmode();
 		}
-
-		if (cmdLine.hasOption(OPT_EXCLUDE))
+		
+		if (cmdLine.hasOption(OPT_VERBOSE))
 		{
-			lpArgs.setExclude(cmdLine.getOptionValue(OPT_EXCLUDE));
+			lpArgs.setVerbose();
 		}
 		return lpArgs;
 	}
@@ -240,6 +240,7 @@ public class LabPopCommand extends Command
 	private static final String OPT_1234_LONG = "1234-mode";
 	private static final String OPT_1234_DESC = "Using 1234 coding.";
 
-	private static final String OPT_EXCLUDE = "exclude";
-	private static final String OPT_EXCLUDE_DESC = "Exclude loci";
+	
+	private static final String OPT_VERBOSE = "verbose";
+	private static final String OPT_VERBOSE_DESC = "verbose";
 }
