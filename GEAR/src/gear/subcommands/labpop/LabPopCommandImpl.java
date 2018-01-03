@@ -373,7 +373,7 @@ public class LabPopCommandImpl extends CommandImpl
 		int cnt=0;
 		for (int i = 0; i < M; i++)
 		{
-			if(i == idx[cnt])
+			if (cnt < idx.length && i == idx[cnt])
 			{
 				QTLFile.println("rs" + i);
 				cnt++;
