@@ -21,7 +21,7 @@ public class WGRMCommand extends Command
 	@Override
 	public String getDescription()
 	{
-		return "GRM with weights";
+		return "GRM with weights.";
 	}
 
 	@SuppressWarnings("static-access")
