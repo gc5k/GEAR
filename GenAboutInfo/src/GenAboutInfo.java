@@ -1,64 +1,48 @@
 import java.io.*;
 import java.util.Calendar;
 
-public class GenAboutInfo {
-	private static String genWelcomeMessage(String svnRev) 
-	{
-		int width = 66; // No. of characters of each line of the welcome message
-		String line;
-		String welcomeMessage = "\\n" + "******************************************************************\\n"
-				+ "| GEAR [GEnetic Analysis Repository] version 0.7.7               |\\n"
-				+ "| (C) 2013 Guo-Bo Chen, Zhi-Xiang Zhu                            |\\n";
-		line = "| Git r" + svnRev + ", built on ";
-		line += Calendar.getInstance().getTime();
-		for (int i = width - line.length() - 1; i > 0; --i) {
-			line += " ";
-		}
-		line += "|\\n";
-		welcomeMessage += line;
-		welcomeMessage += "| GNU General Public License, v2                                 |\\n"
-				+ "******************************************************************\\n";
-		return welcomeMessage;
-	}
-
-	/**
-	 * @param args
-	 *            [package-name]
-	 */
+public class GenAboutInfo
+{
 	public static void main(String[] args) throws Exception 
 	{
-		String packageName = null;
-		if (args.length >= 1) {
-			packageName = args[0];
-		}
-		String packageDeclaration = "", folder = "src/";
-		if (packageName != null) {
-			packageDeclaration = "package" + ";\n";
-			folder += packageName.replace('.', '/') + "/";
-		}
-		// Read the SVN revision number
-		// Process proc = Runtime.getRuntime().exec("svnversion -version");
-		Process proc = Runtime.getRuntime().exec("git rev-list head");
-		// Process proc = Runtime.getRuntime().exec("which svnversion");
+		String packageName = args.length > 0 ?  args[0] : "gear";
+		String packageDeclaration = "package " + packageName + ";\n";
+		String folder = "src/" + packageName.replace('.', '/') + "/";
 
-		// Process proc = Runtime.getRuntime().exec("date");
+		Process proc;
+		BufferedReader reader;
 
-		BufferedReader reader = new BufferedReader(new InputStreamReader(proc.getInputStream()));
-		int cnt = 0;
-		while (reader.readLine() != null) 
-		{
-			cnt++;
-		}
-		// Welcome message
-		String svnRev = (new Integer(cnt)).toString();
-		String welcomeMessage = genWelcomeMessage(svnRev);
-		// Write the revision number to a java source file
-		String writeContent = packageDeclaration + "\n" + "public class AboutInfo {\n"
-				+ "    public static final String WELCOME_MESSAGE = \"" + welcomeMessage + "\";\n"
-				+ "    public static final String SVN_REVISION = \"" + svnRev + "\";\n" + "}";
+		// Get branch name.
+		proc = Runtime.getRuntime().exec("git rev-parse --abbrev-ref HEAD");
+		reader = new BufferedReader(new InputStreamReader(proc.getInputStream()));
+		String branch = reader.readLine();
+
+		// Get commit SHA1 revision.
+		proc = Runtime.getRuntime().exec("git rev-list head --max-count 1");
+		reader = new BufferedReader(new InputStreamReader(proc.getInputStream()));
+		String commit = reader.readLine();
+		
+		// Has uncommitted changes?
+		proc = Runtime.getRuntime().exec("git status --porcelain");
+		reader = new BufferedReader(new InputStreamReader(proc.getInputStream()));
+		boolean hasUncommittedChanges = reader.readLine() != null;
+
+		// Write AboutInfo.java.
 		FileWriter writer = new FileWriter(folder + "AboutInfo.java");
-		writer.write(writeContent);
+		writer.write(packageDeclaration);
+		writer.write("\n");
+		writer.write("public class AboutInfo\n");
+		writer.write("{\n");
+		writer.write("\tpublic static final String WELCOME_MESSAGE =\n");
+		writer.write("\t\t\"****************************************************************\\n\" +\n");
+		writer.write("\t\t\" GEAR [GEnetic Analysis Repository]\\n\" +\n");
+		writer.write("\t\t\" (C) 2013 Guo-Bo Chen, Zhi-Xiang Zhu\\n\" +\n");
+		writer.write("\t\t\" Branch " + branch + "\\n\" +\n");
+		writer.write("\t\t\" Commit " + commit + "\\n\" +\n");
+		writer.write("\t\t\" Built on " + Calendar.getInstance().getTime() +
+				(hasUncommittedChanges ? " with uncommitted changes" : "") + "\\n\" +\n");
+		writer.write("\t\t\"*****************************************************************\\n\";\n");
+		writer.write("}");
 		writer.close();
-		System.out.println("Git Revision: " + svnRev);
 	}
 }

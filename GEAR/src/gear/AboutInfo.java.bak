@@ -1,0 +1,13 @@
+package gear;
+
+public class AboutInfo
+{
+	public static final String WELCOME_MESSAGE =
+		"**************************************************************\n" +
+		" GEAR [GEnetic Analysis Repository]\n" +
+		" (C) 2013 Guo-Bo Chen, Zhi-Xiang Zhu\n" +
+		" Branch zzxiang\n" +
+		" Commit 88a33e5c6dd17ff8f439ef511acc39e5e90ac305\n" +
+		" Built on Mon Jan 15 00:26:04 JST 2018 with uncommitted changes\n" +
+		"***************************************************************\n";
+}
