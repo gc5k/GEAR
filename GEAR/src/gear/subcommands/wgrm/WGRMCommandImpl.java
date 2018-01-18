@@ -516,8 +516,7 @@ public class WGRMCommandImpl extends CommandImpl
 //					}
 //					else
 //					{
-						s[1] += (s1 - 2 * m * m) * (s2 - 2 * m * m) / (4 * m * m * (1 - m) * (1 - m));
-						s[1] *= weight[i] * weight[i] * weight[i] * weight[i];
+						s[1] += weight[i] * weight[i] * weight[i] * weight[i] * (s1 - 2 * m * m) * (s2 - 2 * m * m) / (4 * m * m * (1 - m) * (1 - m));
 						DW += weight[i] * weight[i] * weight[i] * weight[i];
 //					}
 				}
