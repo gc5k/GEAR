@@ -287,7 +287,7 @@ public class GRMImpl extends CommandImpl
 		
 		grmMean /= cnt;
 		grmSq /=cnt;
-		double Effective_sample = -1/grmMean;
+		double Effective_sample = -1/grmMean + 1;
 		double grmSD = (grmSq - grmMean * grmMean) * cnt / (cnt-1);
 		double Effeictive_marker = 1/grmSD;
 		
