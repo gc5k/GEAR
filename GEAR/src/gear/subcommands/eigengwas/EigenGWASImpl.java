@@ -59,19 +59,20 @@ public class EigenGWASImpl extends CommandImpl {
 		data.LineUpFiles();
 
 		eigenGWAS();
-		printResult();
+//		printResult();
 	}
 
 	private void eigenGWAS()
 	{
 		////TEST
-		File f = new File(this.eigenArgs.getOutRoot() + ".egwas_t");
+		File f = new File(this.eigenArgs.getOutRoot() + ".egwas");
 		BufferedWriter bw = null;
 		OutputStreamWriter write = null;
 		try {
 			f.createNewFile();
 			write = new OutputStreamWriter(new FileOutputStream(f));
 			bw = new BufferedWriter(write);
+			bw.write("SNP\tCHR\tBP\tRefAllele\tAltAllele\tfreq\tBeta\tSE\tChi\tP\tPGC\tn1\tfreq1\tn2\tfreq2\tFst\n");
 		} catch (IOException e2) {
 			// TODO Auto-generated catch block
 			e2.printStackTrace();
