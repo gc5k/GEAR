@@ -59,25 +59,25 @@ public class EigenGWASImpl extends CommandImpl {
 		data.LineUpFiles();
 
 		eigenGWAS();
-//		printResult();
+		printResult();
 	}
 
 	private void eigenGWAS()
 	{
-		////TEST
-		File f = new File(this.eigenArgs.getOutRoot() + ".egwas");
-		BufferedWriter bw = null;
-		OutputStreamWriter write = null;
-		try {
-			f.createNewFile();
-			write = new OutputStreamWriter(new FileOutputStream(f));
-			bw = new BufferedWriter(write);
-			bw.write("SNP\tCHR\tBP\tRefAllele\tAltAllele\tfreq\tBeta\tSE\tChi\tP\tPGC\tn1\tfreq1\tn2\tfreq2\tFst\n");
-		} catch (IOException e2) {
-			// TODO Auto-generated catch block
-			e2.printStackTrace();
-		}
-		////TEST
+//		////TEST
+//		File f = new File(this.eigenArgs.getOutRoot() + ".egwas");
+//		BufferedWriter bw = null;
+//		OutputStreamWriter write = null;
+//		try {
+//			f.createNewFile();
+//			write = new OutputStreamWriter(new FileOutputStream(f));
+//			bw = new BufferedWriter(write);
+//			bw.write("SNP\tCHR\tBP\tRefAllele\tAltAllele\tfreq\tBeta\tSE\tChi\tP\tPGC\tn1\tfreq1\tn2\tfreq2\tFst\n");
+//		} catch (IOException e2) {
+//			// TODO Auto-generated catch block
+//			e2.printStackTrace();
+//		}
+//		////TEST
 
 		ChiSquaredDistributionImpl ci = new ChiSquaredDistributionImpl(1);
 		ArrayList<SNP> snpList = this.mapFile.getMarkerList();
@@ -147,18 +147,18 @@ public class EigenGWASImpl extends CommandImpl {
 				eGWASResult.add(e1);
 				pArray.add(e1.GetP());
 				
-				///TEST
-				try {
-					bw.write(e1.printEGWASResult(1) + "\n");
-					if (i > 10000)
-					{
-						bw.flush();
-					}
-
-				} catch (IOException e) {
-					e.printStackTrace();
-				}
-				///TEST
+//				///TEST
+//				try {
+//					bw.write(e1.printEGWASResult(1) + "\n");
+//					if (i > 10000)
+//					{
+//						bw.flush();
+//					}
+//
+//				} catch (IOException e) {
+//					e.printStackTrace();
+//				}
+//				///TEST
 			}
 		}
 		Collections.sort(pArray);
@@ -187,16 +187,16 @@ public class EigenGWASImpl extends CommandImpl {
 
 		Logger.printUserLog("Lambda GC is: " + lambdaGC);
 
-		////TEST
-		try {
-			write.close();
-			bw.close();
-
-		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-		////TEST
+//		////TEST
+//		try {
+//			write.close();
+//			bw.close();
+//
+//		} catch (IOException e) {
+//			// TODO Auto-generated catch block
+//			e.printStackTrace();
+//		}
+//		////TEST
 	}
 
 	public void printResult() 
