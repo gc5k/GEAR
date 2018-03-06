@@ -679,7 +679,7 @@ public class SimulationQTCommandImpl extends CommandImpl
 			int cnt=0;
 			for (int i = 0; i < M; i++)
 			{
-				if(i == idx[cnt])
+				if (cnt < idx.length && i == idx[cnt])
 				{
 					cnt++;
 					continue;
