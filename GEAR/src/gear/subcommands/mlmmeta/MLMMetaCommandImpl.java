@@ -529,7 +529,7 @@ public class MLMMetaCommandImpl extends CommandImpl
 		if(mlmMetaArgs.IsKeepFile())
 		{
 			Arrays.fill(FileKeep, false);
-			String[] kf = mlmMetaArgs.getKeepFile();
+			String[] kf = mlmMetaArgs.getKeepCohortFile();
 			for(int i = 0; i < metaF.length; i++)
 			{
 				for(int j = 0; j < kf.length; j++ )
@@ -545,7 +545,7 @@ public class MLMMetaCommandImpl extends CommandImpl
 		if(mlmMetaArgs.IsRevFile())
 		{
 			Arrays.fill(FileKeep, true);
-			String[] kf = mlmMetaArgs.getRemoveFile();
+			String[] kf = mlmMetaArgs.getRemoveCohortFile();
 			for(int i = 0; i < metaF.length; i++)
 			{
 				for(int j = 0; j < kf.length; j++ )

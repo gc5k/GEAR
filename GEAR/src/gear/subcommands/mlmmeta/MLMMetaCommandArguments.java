@@ -32,7 +32,7 @@ public class MLMMetaCommandArguments  extends CommandArguments
 		return isKeepFile;
 	}
 
-	public String[] getKeepFile()
+	public String[] getKeepCohortFile()
 	{
 		return KeepFile.toArray(new String[0]);
 	}
@@ -58,7 +58,7 @@ public class MLMMetaCommandArguments  extends CommandArguments
 		return isRevFile;
 	}
 	
-	public String[] getRemoveFile()
+	public String[] getRemoveCohortFile()
 	{
 		return RevFile.toArray(new String[0]);
 	}
