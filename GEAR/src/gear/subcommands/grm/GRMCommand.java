@@ -30,36 +30,43 @@ public class GRMCommand extends Command
 	{
 	    options.addOption(OptionBuilder.withDescription(OPT_FILE_DESC).withLongOpt(OPT_FILE_LONG).hasArg().create());
 	    options.addOption(OptionBuilder.withDescription(OPT_BFILE_DESC).withLongOpt(OPT_BFILE_LONG).hasArg().create());
-	    options.addOption(OptionBuilder.withDescription("Specify the chromosomes for analysis").hasArg().create(OPT_CHR));
 	    options.addOption(OptionBuilder.withDescription("Make gz format").create(OPT_GZ));
 	    options.addOption(OptionBuilder.withDescription("Make txt format").create(OPT_TXT));
 	    options.addOption(OptionBuilder.withDescription("Dominance").create(OPT_DOM));
 	    options.addOption(OptionBuilder.withDescription("MAF").hasArg().create(OPT_MAF));
 
 	    options.addOption(OptionBuilder.withDescription("Adjustment for variance").withLongOpt(OPT_VAR_LONG).create());
+
+	    options.addOption(OptionBuilder.withDescription(OPT_KEEP_DESC).withLongOpt(OPT_KEEP_LONG).hasArg().create());
+	    options.addOption(OptionBuilder.withDescription(OPT_REMOVE_DESC).withLongOpt(OPT_REMOVE_LONG).hasArg().create());
+
+	    options.addOption(OptionBuilder.withDescription(OPT_EXTRACT_DESC).withLongOpt(OPT_EXTRACT_LONG).hasArg().create());
+	    options.addOption(OptionBuilder.withDescription(OPT_EXCLUDE_DESC).withLongOpt(OPT_EXCLUDE_LONG).hasArg().create());
+
+	    options.addOption(OptionBuilder.withDescription(OPT_CHR_DESC).withLongOpt(OPT_CHR_LONG).hasArgs().create());
+	    options.addOption(OptionBuilder.withDescription(OPT_NOT_CHR_DESC).withLongOpt(OPT_NOT_CHR_LONG).hasArgs().create());
 	}
 
 	@Override
 	public CommandArguments parse(CommandLine cmdLine) throws CommandArgumentException 
 	{
 		GRMArguments grmArgs = new GRMArguments();
-	    parseFileArguments(grmArgs, cmdLine);
+	    parseFileArguments((CommandArguments) grmArgs, cmdLine);
+	    parseSampleFilterArguments((CommandArguments) grmArgs, cmdLine);
+	    parseSNPFilterArguments((CommandArguments) grmArgs, cmdLine);
+
 	    if(cmdLine.hasOption(OPT_GZ))
 	    {
-	    	grmArgs.setGZ();
+	    		grmArgs.setGZ();
 	    }
 	    if(cmdLine.hasOption(OPT_TXT))
 	    {
-	    	grmArgs.setTxt();
+	    		grmArgs.setTxt();
 	    }
 	    if(cmdLine.hasOption(OPT_VAR_LONG))
 	    {
-	    	grmArgs.setAdjVar();
+	    		grmArgs.setAdjVar();
 	    }
-		if (cmdLine.hasOption(OPT_CHR))
-		{
-			grmArgs.setChr(cmdLine.getOptionValue(OPT_CHR));
-		}
 		if (cmdLine.hasOption(OPT_DOM))
 		{
 			grmArgs.setDom();
@@ -71,39 +78,12 @@ public class GRMCommand extends Command
 		return grmArgs;
 	}
 
-	private void parseFileArguments(GRMArguments grmArgs, CommandLine cmdLine) throws CommandArgumentException 
-	{
-		String bfile = cmdLine.getOptionValue("bfile");
-		String file = cmdLine.getOptionValue("file");
-
-		if ((bfile == null) && (file == null))
-		{
-			throw new CommandArgumentException("No genotypes are provided. Either --bfile or --file must be set.");
-		}
-
-		if ((bfile != null) && (file != null))
-		{
-			throw new CommandArgumentException("--bfile and --file cannot be set together.");
-		}
-
-		if (bfile != null)
-		{
-			grmArgs.setBFile(bfile);			
-		}
-		if (file != null)
-		{
-			grmArgs.setFile(file);			
-		}
-
-	}
-
 	@Override
 	protected CommandImpl createCommandImpl()
 	{
 		return new GRMImpl();
 	}
 
-	private static final String OPT_CHR = "chr";
 	private static final String OPT_GZ = "gz";
 	private static final String OPT_TXT = "txt";
 	private static final String OPT_VAR_LONG = "adj-var";

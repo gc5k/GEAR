@@ -48,7 +48,7 @@ public class LambdaDCommand extends Command
 		options.addOption(OptionBuilder.withDescription(OPT_KEY_DESC).hasArgs().create(OPT_KEY));
 		options.addOption(OptionBuilder.withDescription(OPT_VERBOSE_DESC).withLongOpt(OPT_VERBOSE_LONG).create(OPT_VERBOSE));
 
-		options.addOption(OptionBuilder.withDescription(OPT_CHR_DESC).hasArg().create(OPT_CHR));
+		options.addOption(OptionBuilder.withDescription(OPT_CHR_DESC).withLongOpt(OPT_CHR_LONG).hasArgs().create());
 //		options.addOption(OptionBuilder.withDescription(OPT_FST_DESC).create(OPT_FST));
 		options.addOption(OptionBuilder.withDescription(OPT_TOP_DESC).hasArg().create(OPT_TOP));
 		options.addOption(OptionBuilder.withDescription(OPT_RAPID_DESC).create(OPT_RAPID));
@@ -146,9 +146,9 @@ public class LambdaDCommand extends Command
 //			lamD.setVerboseGZ();
 //		}
 
-		if (cmdLine.hasOption(OPT_CHR))
+		if (cmdLine.hasOption(OPT_CHR_LONG))
 		{
-			lamD.setChr(cmdLine.getOptionValue(OPT_CHR));
+			lamD.setChr(cmdLine.getOptionValues(OPT_CHR_LONG));
 		}
 
 //		if (cmdLine.hasOption(OPT_FST))
@@ -236,9 +236,6 @@ public class LambdaDCommand extends Command
 	private final static String OPT_ME_FRAC_LONG_DEFAULT = "0.05";
 	private final static String OPT_ME_FRAC_LONG_DESC = "Fraction of minumal markers required, at least 5% by default.";
 
-	private final static String OPT_CHR = "chr";
-	private final static String OPT_CHR_DESC = "Choose chromosome for analysis";
-	
 	private final static String OPT_TOP = "top";
 	private final static String OPT_TOP_DESC = "Top x files as the reference.";
 		
@@ -251,6 +248,4 @@ public class LambdaDCommand extends Command
 	private final static String OPT_TRIM = "trim";
 	private final static String OPT_TRIM_DEFAULT = "0.001";
 	private final static String OPT_TRIM_DESC = "trim off the top and the bottom 5% of markers in calculating lambda_meta and its derived statistics.";
-
-
 }

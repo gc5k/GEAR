@@ -393,14 +393,6 @@ public class WGRMCommandImpl extends CommandImpl
 			{
 				continue;
 			}
-			if (wgrmArgs.isChrFlagOn())
-			{
-				SNP snp = snpList.get(i);
-				if (snp.getChromosome().compareTo(wgrmArgs.getChr()) != 0)
-				{
-					continue;
-				}
-			}
 			int g1 = G.getAdditiveScore(idx1, i);
 			int g2 = G.getAdditiveScore(idx2, i);
 			double m = allelefreq[i][1];
@@ -455,14 +447,6 @@ public class WGRMCommandImpl extends CommandImpl
 			if(allelefreq[i][1] == Double.NaN)
 			{
 				continue;
-			}
-			if(wgrmArgs.isChrFlagOn())
-			{
-				SNP snp = snpList.get(i);
-				if (snp.getChromosome().compareTo(wgrmArgs.getChr()) != 0)
-				{
-					continue;
-				}
 			}
 			double m = allelefreq[i][1];
 			int g1 = G.getAdditiveScore(idx1, i) ;

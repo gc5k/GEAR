@@ -97,7 +97,8 @@ public class LambdaDCommandImpl extends CommandImpl
 		Arrays.fill(FileKeep, true);
 		gReader = new GWASReader(lamArgs.getMetaFile(), FileKeep,
 				lamArgs.getKeys(), lamArgs.isQT(), lamArgs.isGZ(),
-				lamArgs.isChr(), lamArgs.getChr());
+				lamArgs.getChr() != null?true:false,
+			    lamArgs.getChr() != null?lamArgs.getChr():lamArgs.getNotChr());
 		gReader.Start(false);
 
 		Me = lamArgs.getMe();

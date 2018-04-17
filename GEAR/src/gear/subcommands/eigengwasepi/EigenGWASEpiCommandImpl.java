@@ -104,8 +104,6 @@ public class EigenGWASEpiCommandImpl extends CommandImpl
 			SNP snp1 = (SNP) snpList.get(i);
 
 			double[][] x= new double[gIdx.length][4]; //a1+d1+a2+d2
-			if ((!this.eigenArgs.isChrFlagOn()) || (Integer.parseInt(snp1.getChromosome()) == this.eigenArgs.getChr())) 
-			{
 				if (snp1.isMonopolic())
 				{
 					monoLoci++;
@@ -152,7 +150,6 @@ public class EigenGWASEpiCommandImpl extends CommandImpl
 				for (int i2 = i+1; i2 < this.gm.getNumMarker(); i2++)
 				{
 					SNP snp2 = (SNP) snpList.get(i2);
-					if ((!this.eigenArgs.isChrFlagOn()) || (Integer.parseInt(snp2.getChromosome()) == this.eigenArgs.getChr())) 
 
 					if (snp2.isMonopolic())
 					{
@@ -273,7 +270,6 @@ public class EigenGWASEpiCommandImpl extends CommandImpl
 								pAAArray.add(e1.GetAAP());
 							}
 						}
-					}
 				}
 			}
 		}

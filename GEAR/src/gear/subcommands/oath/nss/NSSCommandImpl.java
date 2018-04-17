@@ -168,8 +168,6 @@ public class NSSCommandImpl extends CommandImpl
 				continue;
 			}
 
-			if ((!this.nssArgs.isChrFlagOn()) || (Integer.parseInt(snp.getChromosome()) == this.nssArgs.getChr()))
-			{
 				SimpleRegression sReg = new SimpleRegression();
 				double N = 0.0D;
 				double freq = 0.0D;
@@ -209,7 +207,7 @@ public class NSSCommandImpl extends CommandImpl
 				NSSGWASResult e1 = new NSSGWASResult(snp, freq, vg, b, b_se);
 				nssResult.add(e1);
 				pArray.add(e1.GetP());
-			}
+			
 		}
 		Collections.sort(pArray);
 		int idx = (int) Math.ceil(pArray.size() / 2);

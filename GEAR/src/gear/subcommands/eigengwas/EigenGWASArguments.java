@@ -2,13 +2,10 @@ package gear.subcommands.eigengwas;
 
 import gear.subcommands.CommandArguments;
 import gear.util.FileUtil;
-import gear.util.Logger;
 
 public class EigenGWASArguments extends CommandArguments 
 {
 	private String pheFile;
-	private int chr;
-	private boolean chrFlag = false;
 	private int[] mPheno = {0};
 	private String keepFile = null;
 
@@ -32,26 +29,6 @@ public class EigenGWASArguments extends CommandArguments
 		return this.mPheno;
 	}
 
-	public void setChr(String c)
-	{
-		this.chr = Integer.parseInt(c);
-		if (this.chr < 1)
-		{
-			Logger.printUserLog("Chromosome should be greater than 0.\n GEAR quitted");
-			System.exit(1);
-		}
-		this.chrFlag = true;
-	}
-
-	public int getChr()
-	{
-		return this.chr;
-	}
-
-	public boolean isChrFlagOn()
-	{
-		return this.chrFlag;
-	}
 
 	public void setKeepFile(String kFile) 
 	{

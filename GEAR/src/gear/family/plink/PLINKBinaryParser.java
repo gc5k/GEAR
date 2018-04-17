@@ -2,7 +2,7 @@ package gear.family.plink;
 
 import gear.family.pedigree.file.BEDReader;
 import gear.family.pedigree.file.BIMReader;
-import gear.util.Logger;
+import gear.subcommands.CommandArguments;
 
 public class PLINKBinaryParser extends PLINKParser
 {
@@ -39,23 +39,29 @@ public class PLINKBinaryParser extends PLINKParser
 	}
 
 	@Override
+	public void Parse(CommandArguments cmdArgs)
+	{
+		mapData = new BIMReader(mapFile);
+		ParseMapFile(cmdArgs);
+
+		pedData = new BEDReader(FamFile, snpFilter.getWorkingSNP().length,
+					mapData);
+		pedData.setHeader(false);
+		ParsePedFile();
+
+		pedData.cleanup();
+	}
+
+	@Override
 	public void Parse()
 	{
 		mapData = new BIMReader(mapFile);
-		if (mapFile != null)
-		{
-			ParseMapFile();
-			Logger.printUserLog("Reading '" + mapFile + "'.");
-			Logger.printUserLog("Marker Number: "
-					+ mapData.getMarkerNumberOriginal());
-			pedData = new BEDReader(FamFile, snpFilter.getWorkingSNP().length,
+		ParseMapFile();
+
+		pedData = new BEDReader(FamFile, snpFilter.getWorkingSNP().length,
 					mapData);
-			pedData.setHeader(false);
-			ParsePedFile();
-			Logger.printUserLog("Reading '" + pedigreeFile + "'.");
-			Logger.printUserLog("Individual Number: "
-					+ pedData.getNumIndividuals());
-		}
+		pedData.setHeader(false);
+		ParsePedFile();
 		pedData.cleanup();
 	}
 

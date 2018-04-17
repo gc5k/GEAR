@@ -30,9 +30,10 @@ public class OATHXCommand extends Command
 	{
 		options.addOption(OptionBuilder.withDescription(OPT_NSS_BATCH_DESC).withLongOpt(OPT_NSS_BATCH_LONG).hasArg().isRequired().create(OPT_NSS_BATCH));
 		options.addOption(OptionBuilder.withDescription(OPT_CM_DESC).hasArg().isRequired().create(OPT_CM));
-		options.addOption(OptionBuilder.withDescription(OPT_CHR_DESC).hasArg().create(OPT_CHR));
 		options.addOption(OptionBuilder.withDescription(OPT_N_DESC).hasArg().isRequired().create(OPT_N));
 		options.addOption(OptionBuilder.withDescription(OPT_VERBOSE_LONG_DESC).withLongOpt(OPT_VERBOSE_LONG).create(OPT_VERBOSE));
+		
+		options.addOption(OptionBuilder.withDescription(OPT_CHR_DESC).withLongOpt(OPT_CHR_LONG).hasArgs().create());
 	}
 
 	@Override
@@ -44,9 +45,9 @@ public class OATHXCommand extends Command
 		obArgs.setCMFile(cmdLine.getOptionValue(OPT_CM));
 		obArgs.setN(cmdLine.getOptionValue(OPT_N));
 
-		if (cmdLine.hasOption(OPT_CHR))
+		if (cmdLine.hasOption(OPT_CHR_LONG))
 		{
-			obArgs.setChr(cmdLine.getOptionValue(OPT_CHR));
+			obArgs.setChr(cmdLine.getOptionValues(OPT_CHR_LONG));
 		}
 		if (cmdLine.hasOption(OPT_VERBOSE_LONG))
 		{
@@ -71,9 +72,6 @@ public class OATHXCommand extends Command
 
 	private static final String OPT_N = "n";
 	private static final String OPT_N_DESC = "Specify the sample size";
-	
-	private static final String OPT_CHR = "chr";
-	private static final String OPT_CHR_DESC = "Specify the chromosomes for analysis";
 
 	private final static String OPT_VERBOSE = "v";
 	private final static String OPT_VERBOSE_LONG  = "verbose";

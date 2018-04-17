@@ -197,7 +197,8 @@ public class SynthCommandImpl extends CommandImpl
 	{
 		fReader = new SynthFReader(synArgs.getNSSFile(), keepBatch,
 				synArgs.getKeys(), true, synArgs.isGZ(),
-				synArgs.isChr(), synArgs.getChr());
+				synArgs.getChr() != null? true:false, 
+				synArgs.getChr() != null? synArgs.getChr():synArgs.getNotChr());
 
 		fReader.Start();
 

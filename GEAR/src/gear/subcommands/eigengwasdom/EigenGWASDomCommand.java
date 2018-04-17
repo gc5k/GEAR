@@ -76,9 +76,9 @@ public class EigenGWASDomCommand extends Command
 		eigenArgs.setBFile(bfile);
 		eigenArgs.setFile(file);
 
-		if (cmdLine.hasOption(OPT_CHR))
+		if (cmdLine.hasOption(OPT_CHR_LONG))
 		{
-			eigenArgs.setChr(cmdLine.getOptionValue(OPT_CHR));
+			eigenArgs.setChr(cmdLine.getOptionValues(OPT_CHR_LONG));
 		}
 	}
 

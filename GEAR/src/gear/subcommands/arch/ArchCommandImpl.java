@@ -243,7 +243,9 @@ public class ArchCommandImpl extends CommandImpl
 		boolean[] FileKeep = new boolean[archArgs.getMetaFile().length];
 		Arrays.fill(FileKeep, true);
 
-		gReader = new GWASReader(archArgs.getMetaFile(), FileKeep, archArgs.getKeys(), archArgs.isQT(), archArgs.isGZ(), archArgs.isChr(), archArgs.getChr());
+		gReader = new GWASReader(archArgs.getMetaFile(), FileKeep, archArgs.getKeys(), archArgs.isQT(), archArgs.isGZ(), 
+				archArgs.getChr() != null? true:false,
+				archArgs.getChr() != null? archArgs.getChr():archArgs.getNotChr());
 		gReader.Start(false);
 
 		HashMap<String, MetaStat> mStat = gReader.getMetaStat().get(0);

@@ -125,22 +125,6 @@ public class ArchCommandArguments extends CommandArguments
 		return isGZ;
 	}
 
-	public void setChr(String chr)
-	{
-		this.chr = Integer.parseInt(chr); 
-		chrFlag = true;
-	}
-
-	public int getChr()
-	{
-		return chr;
-	}
-	
-	public boolean isChr()
-	{
-		return chrFlag;
-	}
-
 	public void setExtract(String extract)
 	{
 		this.extract = extract;
@@ -153,8 +137,6 @@ public class ArchCommandArguments extends CommandArguments
 	}
 
 	private String extract;
-	private boolean chrFlag = false;
-	private int chr = 0;
 
 	private boolean isGZ = false;
 	private boolean isQT = true;

@@ -29,13 +29,17 @@ public class NSSCommand extends Command
 	public void prepareOptions(Options options)
 	{
 		options.addOption(OptionBuilder.withDescription(OPT_BFILE_DESC).withLongOpt(OPT_BFILE_LONG).hasArg().isRequired().create());
+		options.addOption(OptionBuilder.withDescription(OPT_FILE_DESC).withLongOpt(OPT_FILE_LONG).hasArg().isRequired().create());
+
 		options.addOption(OptionBuilder.withDescription(OPT_PHE_DESC).hasArg().isRequired().create(OPT_PHE));
 		options.addOption(OptionBuilder.withDescription(OPT_MPHE_DESC).hasArg().isRequired().create(OPT_MPHE));
 		options.addOption(OptionBuilder.withDescription(OPT_COVAR_DESC).hasArg().isRequired().create(OPT_COVAR));
 		options.addOption(OptionBuilder.withDescription(OPT_COVAR_NUMBER_DESC).withLongOpt(OPT_COVAR_NUMBER).hasArgs().create());
-		options.addOption(OptionBuilder.withDescription(OPT_CHR_DESC).hasArg().create(OPT_CHR));
+		options.addOption(OptionBuilder.withDescription(OPT_CHR_DESC).withLongOpt(OPT_CHR_LONG).hasArgs().create());
+		
 		options.addOption(OptionBuilder.withDescription(OPT_MAF_DESC).hasArg().create(OPT_MAF));
-		options.addOption(OptionBuilder.withDescription(OPT_KEEP_DESC).hasArg().create(OPT_KEEP));
+		options.addOption(OptionBuilder.withDescription(OPT_KEEP_DESC).withLongOpt(OPT_KEEP_LONG).hasArg().create());
+		
 	}
 
 	@Override
@@ -43,6 +47,10 @@ public class NSSCommand extends Command
 	{
 		NSSCommandArguments nssArgs = new NSSCommandArguments();
 		parseFileArguments(nssArgs, cmdLine);
+
+	    parseSampleFilterArguments((CommandArguments) nssArgs, cmdLine);
+	    parseSNPFilterArguments((CommandArguments) nssArgs, cmdLine);
+
 		nssArgs.setPhenotypeFile(cmdLine.getOptionValue(OPT_PHE));
 
 		if (cmdLine.hasOption(OPT_MPHE))
@@ -57,14 +65,14 @@ public class NSSCommand extends Command
 			nssArgs.setCovNumber(cmdLine.getOptionValues(OPT_COVAR_NUMBER));
 		}
 
-		if (cmdLine.hasOption(OPT_KEEP))
+		if (cmdLine.hasOption(OPT_KEEP_LONG))
 		{
-			nssArgs.setKeeFile(cmdLine.getOptionValue(OPT_KEEP));
+			nssArgs.setKeeFile(cmdLine.getOptionValue(OPT_KEEP_LONG));
 		}
 		
-		if (cmdLine.hasOption(OPT_CHR))
+		if (cmdLine.hasOption(OPT_CHR_LONG))
 		{
-			nssArgs.setChr(cmdLine.getOptionValue(OPT_CHR));
+			nssArgs.setChr(cmdLine.getOptionValues(OPT_CHR_LONG));
 		}
 
 		return nssArgs;
@@ -88,9 +96,9 @@ public class NSSCommand extends Command
 		nssArgs.setBFile(bfile);
 		nssArgs.setFile(file);
 
-		if (cmdLine.hasOption(OPT_CHR))
+		if (cmdLine.hasOption(OPT_CHR_LONG))
 		{
-			nssArgs.setChr(cmdLine.getOptionValue(OPT_CHR));
+			nssArgs.setChr(cmdLine.getOptionValues(OPT_CHR_LONG));
 		}
 		
 		if (cmdLine.hasOption(OPT_MAF))
@@ -116,12 +124,6 @@ public class NSSCommand extends Command
 
 	private final static String OPT_COVAR_NUMBER = "covar-number";
 	private final static String OPT_COVAR_NUMBER_DESC = "Specify the indices for covariate file";
-
-	private static final String OPT_CHR = "chr";
-	private static final String OPT_CHR_DESC = "Specify the chromosomes for analysis";
-
-	private static final String OPT_KEEP = "keep";
-	private static final String OPT_KEEP_DESC = "Specify the samples for the analysis";
 	
 	private static final String OPT_MAF = "maf";
 	private static final String OPT_MAF_DESC = "Specify the maf cutoff.";

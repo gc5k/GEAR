@@ -101,8 +101,6 @@ public class EigenGWASDomImpl extends CommandImpl
 
 			double[][] x= new double[gIdx.length][2];
 			ArrayList<Integer> IDX = NewIt.newArrayList();
-			if ((!this.eigenArgs.isChrFlagOn()) || (Integer.parseInt(snp.getChromosome()) == this.eigenArgs.getChr())) 
-			{
 				double n1 = 0.0D;
 				double n2 = 0.0D;
 				double N = 0.0D;
@@ -155,7 +153,6 @@ public class EigenGWASDomImpl extends CommandImpl
 						}
 						N += 1.0D;
 						freq += g;
-					}
 				}
 
 				freq1 /= 2.0D * n1;

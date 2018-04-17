@@ -36,9 +36,9 @@ public class OATHBusCommandImpl extends CommandImpl
 			nssArgs.setKeeFile(obArgs.getKeepFile());
 		}
 		
-		if (obArgs.isChrFlagOn())
+		if (obArgs.getChr()!= null)
 		{
-			nssArgs.setChr((new Integer(obArgs.getChr())).toString());
+			nssArgs.setChr(obArgs.getChr().toArray(new String[0]));
 		}
 
 		nssArgs.setOutRoot(obArgs.getOutRoot());

@@ -30,7 +30,7 @@ public class WGRMCommand extends Command
 	{
 	    options.addOption(OptionBuilder.withDescription(OPT_FILE_DESC).withLongOpt(OPT_FILE_LONG).hasArg().create());
 	    options.addOption(OptionBuilder.withDescription(OPT_BFILE_DESC).withLongOpt(OPT_BFILE_LONG).hasArg().create());
-	    options.addOption(OptionBuilder.withDescription(OPT_CHR_DESC).hasArg().create(OPT_CHR));
+	    options.addOption(OptionBuilder.withDescription(OPT_CHR_DESC).withLongOpt(OPT_CHR_LONG).hasArgs().create());
 	    options.addOption(OptionBuilder.withDescription(OPT_GZ_DESC).create(OPT_GZ));
 	    options.addOption(OptionBuilder.withDescription(OPT_TXT_DESC).create(OPT_TXT));
 	    options.addOption(OptionBuilder.withDescription(OPT_DOM_DESC).create(OPT_DOM));
@@ -61,9 +61,9 @@ public class WGRMCommand extends Command
 	    	wgrmArgs.setAdjVar();
 	    }
 
-		if (cmdLine.hasOption(OPT_CHR))
+		if (cmdLine.hasOption(OPT_CHR_LONG))
 		{
-			wgrmArgs.setChr(cmdLine.getOptionValue(OPT_CHR));
+			wgrmArgs.setChr(cmdLine.getOptionValues(OPT_CHR_LONG));
 		}
 
 		if (cmdLine.hasOption(OPT_DOM))
@@ -119,9 +119,6 @@ public class WGRMCommand extends Command
 	{
 		return new WGRMCommandImpl();
 	}
-
-	private static final String OPT_CHR = "chr";
-	private static final String OPT_CHR_DESC = "Specify the chromosomes for analysis";
 
 	private static final String OPT_GZ = "gz";
 	private static final String OPT_GZ_DESC = "Make gz format";

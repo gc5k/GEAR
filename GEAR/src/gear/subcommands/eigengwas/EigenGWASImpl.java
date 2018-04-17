@@ -13,11 +13,6 @@ import gear.util.FileUtil;
 import gear.util.Logger;
 import gear.util.NewIt;
 
-import java.io.BufferedWriter;
-import java.io.File;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.OutputStreamWriter;
 import java.io.PrintStream;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -100,8 +95,6 @@ public class EigenGWASImpl extends CommandImpl {
 		{
 			SNP snp = (SNP) snpList.get(i);
 
-			if ((!this.eigenArgs.isChrFlagOn()) || (Integer.parseInt(snp.getChromosome()) == this.eigenArgs.getChr())) 
-			{
 				SimpleRegression sReg = new SimpleRegression();
 				double n1 = 0.0D;
 				double n2 = 0.0D;
@@ -159,7 +152,6 @@ public class EigenGWASImpl extends CommandImpl {
 //					e.printStackTrace();
 //				}
 //				///TEST
-			}
 		}
 		Collections.sort(pArray);
 		int idx = (int) Math.ceil(pArray.size() / 2);

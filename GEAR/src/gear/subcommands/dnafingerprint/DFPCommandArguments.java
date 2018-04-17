@@ -12,6 +12,7 @@ public class DFPCommandArguments extends CommandArguments
 		FileUtil.exists(new String(this.bfile2 + ".bed"));
 		FileUtil.exists(new String(this.bfile2 + ".bim"));
 		FileUtil.exists(new String(this.bfile2 + ".fam"));
+
 		this.bfile2Flag = true;
 	}
 
@@ -38,16 +39,6 @@ public class DFPCommandArguments extends CommandArguments
 	public String getFam2()
 	{
 		return new String(bfile2 + ".fam");
-	}
-
-	public void setSNPFile(String snpFile)
-	{
-		this.snpFile = snpFile;
-	}
-	
-	public String getSNPFile()
-	{
-		return snpFile;
 	}
 
 	public void setLowCutoff(double lowCutoff)
@@ -89,7 +80,6 @@ public class DFPCommandArguments extends CommandArguments
 	private String bfile2 = null;
 	private boolean bfile2Flag;
 
-	private String snpFile = null;
 	private double lowCutoff;
 	private double highCutoff;
 	private long numMarker;

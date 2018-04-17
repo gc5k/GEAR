@@ -34,7 +34,6 @@ public class GenotypeMatrix
 			}
 		}
 		numMarker = pidx.get(0).getPerson().getNumMarkers();
-
 	}
 
 	public int getNumIndivdial() 

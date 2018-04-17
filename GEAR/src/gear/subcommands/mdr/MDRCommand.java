@@ -18,8 +18,6 @@ public class MDRCommand extends Command
 	
 	private static final String OPT_COV = "cov";
 	private static final String OPT_COV_DESC = "Specify the covariates index";
-	private static final String OPT_CHR = "chr";
-	private static final String OPT_CHR_DESC = "Specify the chromosomes for analysis";
 	
 	private static final String OPT_CC = "cc";
 	private static final String OPT_CC_DESC = "Case-control design";
@@ -42,11 +40,9 @@ public class MDRCommand extends Command
 		options.addOption(OptionBuilder.withDescription(OPT_PHE_DESC).withLongOpt(OPT_PHE_LONG).hasArg().isRequired().create());
 		options.addOption(OptionBuilder.withDescription(OPT_MPHE_DESC).withLongOpt(OPT_MPHE_LONG).hasArg().create());
 		options.addOption(OptionBuilder.withDescription(OPT_COV_DESC).hasArgs().create(OPT_COV));		
-		options.addOption(OptionBuilder.withDescription(OPT_CHR_DESC).hasArg().create(OPT_CHR));
+		options.addOption(OptionBuilder.withDescription(OPT_CHR_DESC).withLongOpt(OPT_CHR_LONG).hasArgs().create());
 		options.addOption(OptionBuilder.withDescription(OPT_SEED_DESC).withLongOpt(OPT_SEED_LONG).hasArg().create());
 		options.addOption(OptionBuilder.withDescription(OPT_CC_DESC).create(OPT_CC));
-		
-
 	}
 
 	public CommandArguments parse(CommandLine cmdLine) throws CommandArgumentException
@@ -65,9 +61,9 @@ public class MDRCommand extends Command
 		String bfile = cmdLine.getOptionValue("bfile");
 		mdrArgs.setBFile(bfile);
 
-		if (cmdLine.hasOption(OPT_CHR))
+		if (cmdLine.hasOption(OPT_CHR_LONG))
 		{
-			mdrArgs.setChr(cmdLine.getOptionValue(OPT_CHR));
+			mdrArgs.setChr(cmdLine.getOptionValues(OPT_CHR_LONG));
 		}
 	}
 

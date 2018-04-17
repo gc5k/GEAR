@@ -10,9 +10,9 @@ import java.util.ArrayList;
 
 public class PlinkData extends Data
 {	
-	public PlinkData(PLINKParser parser)
+	public PlinkData(PLINKParser parser, String keepFile, String removeFile)
 	{
-		sampleFilter = new SampleFilter(parser.getPedigreeData(), parser.getMapData());
+		sampleFilter = new SampleFilter(parser.getPedigreeData(), parser.getMapData(), keepFile, removeFile);
 		genoMatrix = new GenotypeMatrix(sampleFilter.getSample());
 		snpList = sampleFilter.getMapFile().getMarkerList();
 		calcAllele1Frequencies();

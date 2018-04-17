@@ -33,9 +33,9 @@ public class OATHBusCommand extends Command
 		options.addOption(OptionBuilder.withDescription(OPT_MPHE_DESC).hasArg().isRequired().create(OPT_MPHE));
 		options.addOption(OptionBuilder.withDescription(OPT_COVAR_DESC).hasArg().isRequired().create(OPT_COVAR));
 		options.addOption(OptionBuilder.withDescription(OPT_COVAR_NUMBER_DESC).withLongOpt(OPT_COVAR_NUMBER).hasArgs().create());
-		options.addOption(OptionBuilder.withDescription(OPT_CHR_DESC).hasArg().create(OPT_CHR));
+		options.addOption(OptionBuilder.withDescription(OPT_CHR_DESC).withLongOpt(OPT_CHR_LONG).hasArgs().create());
 		options.addOption(OptionBuilder.withDescription(OPT_MAF_DESC).hasArg().create(OPT_MAF));
-		options.addOption(OptionBuilder.withDescription(OPT_KEEP_DESC).hasArg().create(OPT_KEEP));
+		options.addOption(OptionBuilder.withDescription(OPT_KEEP_DESC).withLongOpt(OPT_KEEP_LONG).hasArg().create());
 	}
 
 	@Override
@@ -57,9 +57,9 @@ public class OATHBusCommand extends Command
 			obArgs.setCovNumber(cmdLine.getOptionValues(OPT_COVAR_NUMBER));
 		}
 
-		if (cmdLine.hasOption(OPT_KEEP))
+		if (cmdLine.hasOption(OPT_KEEP_LONG))
 		{
-			obArgs.setKeeFile(cmdLine.getOptionValue(OPT_KEEP));
+			obArgs.setKeepFile(cmdLine.getOptionValue(OPT_KEEP_LONG));
 		}
 
 		if (cmdLine.hasOption(OPT_MAF))
@@ -87,9 +87,9 @@ public class OATHBusCommand extends Command
 		obArgs.setBFile(bfile);
 		obArgs.setFile(file);
 
-		if (cmdLine.hasOption(OPT_CHR))
+		if (cmdLine.hasOption(OPT_CHR_LONG))
 		{
-			obArgs.setChr(cmdLine.getOptionValue(OPT_CHR));
+			obArgs.setChr(cmdLine.getOptionValues(OPT_CHR_LONG));
 		}
 	}
 
@@ -111,12 +111,6 @@ public class OATHBusCommand extends Command
 
 	private final static String OPT_COVAR_NUMBER = "covar-number";
 	private final static String OPT_COVAR_NUMBER_DESC = "Specify the indices for covariate file";
-
-	private static final String OPT_CHR = "chr";
-	private static final String OPT_CHR_DESC = "Specify the chromosomes for analysis";
-
-	private static final String OPT_KEEP = "keep";
-	private static final String OPT_KEEP_DESC = "Specify the samples for the analysis";
 
 	private static final String OPT_MAF = "maf";
 	private static final String OPT_MAF_DESC = "Specify the maf cutoff.";

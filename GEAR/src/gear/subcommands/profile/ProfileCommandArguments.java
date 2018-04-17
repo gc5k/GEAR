@@ -175,26 +175,26 @@ public final class ProfileCommandArguments extends CommandArguments
 		this.isKeepATGC = isKeepATGC;
 	}
 
-	public void setIsExtract(String extractFile)
+	public void setIsExtractScore(String extractSFile)
 	{
-		FileUtil.exists(extractFile);
-		this.extractFile = extractFile;
+		FileUtil.exists(extractSFile);
+		this.extractScoreFile = extractSFile;
 	}
 
-	public String getExtractFile()
+	public String getExtractScoreFile()
 	{
-		return extractFile;
+		return extractScoreFile;
 	}
 
-	public void setIsRemove(String removeFile)
+	public void setIsRemoveScore(String removeSFile)
 	{
-		FileUtil.exists(removeFile);
-		this.removeFile = removeFile;
+		FileUtil.exists(removeSFile);
+		this.removeScoreFile = removeSFile;
 	}
 
-	public String getRemoveFile()
+	public String getRemoveScoreFile()
 	{
-		return removeFile;	
+		return removeScoreFile;
 	}
 
 	public void setScale(String scaleFile)
@@ -223,8 +223,8 @@ public final class ProfileCommandArguments extends CommandArguments
 		return scaleFile;
 	}
 
-	private String extractFile;
-	private String removeFile;
+	private String extractScoreFile;
+	private String removeScoreFile;
 	private String scoreFile;
 	private String scoreFileGZ;
 	private boolean hasScoreHeader;

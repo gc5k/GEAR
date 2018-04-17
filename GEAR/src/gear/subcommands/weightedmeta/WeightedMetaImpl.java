@@ -61,7 +61,9 @@ public class WeightedMetaImpl extends CommandImpl
 		}
 		generateCorMatrix();
 
-		gReader = new GWASReader(wMetaArgs.getMetaFile(), FileKeep, wMetaArgs.getKeys(), wMetaArgs.isQT(), wMetaArgs.isGZ(), wMetaArgs.isChr(), wMetaArgs.getChr());
+		gReader = new GWASReader(wMetaArgs.getMetaFile(), FileKeep, wMetaArgs.getKeys(), wMetaArgs.isQT(), wMetaArgs.isGZ(), 
+				wMetaArgs.getChr()!=null?true:false,
+				wMetaArgs.getChr()!=null?wMetaArgs.getChr():wMetaArgs.getNotChr());
 		gReader.Start(false);
 
 		if (gReader.getNumMetaFile() < 2)

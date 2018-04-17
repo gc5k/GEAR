@@ -1,6 +1,7 @@
 package gear.subcommands;
 
 import gear.AboutInfo;
+import gear.util.FileUtil;
 import gear.util.Logger;
 
 import java.util.Collections;
@@ -89,6 +90,88 @@ public abstract class Command implements Comparable<Command>
 	public abstract CommandArguments parse(CommandLine cmdLine) throws CommandArgumentException;
 	protected abstract CommandImpl createCommandImpl();
 	
+	
+	protected void parseFileArguments(CommandArguments cmdArgs, CommandLine cmdLine) throws CommandArgumentException 
+	{
+		String bfile = cmdLine.getOptionValue(OPT_BFILE_LONG);
+		String file = cmdLine.getOptionValue(OPT_FILE_LONG);
+
+		if ((bfile == null) && (file == null))
+		{
+			throw new CommandArgumentException("No genotypes are provided. Either --bfile or --file must be set.");
+		}
+
+		if ((bfile != null) && (file != null))
+		{
+			throw new CommandArgumentException("--bfile and --file cannot be set together.");
+		}
+
+		if (bfile != null)
+		{
+			FileUtil.exists(new String(bfile + ".bed"));
+			FileUtil.exists(new String(bfile + ".bim"));
+			FileUtil.exists(new String(bfile + ".fam"));
+			cmdArgs.setBFile(bfile);			
+		}
+		if (file != null)
+		{
+			FileUtil.exists(new String(bfile + ".ped"));
+			FileUtil.exists(new String(bfile + ".map"));
+			cmdArgs.setFile(file);			
+		}
+	}
+
+	protected void parseSampleFilterArguments(CommandArguments cmdArgs, CommandLine cmdLine) throws CommandArgumentException
+	{
+		String keepFile = cmdLine.getOptionValue(OPT_KEEP_LONG);
+		String removeFile = cmdLine.getOptionValue(OPT_REMOVE_LONG);
+
+		if ((keepFile != null) && (removeFile != null))
+		{
+			throw new CommandArgumentException("--keep and --remove cannot be set together.");
+		}
+		if (keepFile != null)
+		{
+			FileUtil.exists(keepFile);
+			cmdArgs.setKeepFile(keepFile);
+		}
+		if (removeFile != null)
+		{
+			FileUtil.exists(removeFile);
+			cmdArgs.setRemoveFile(removeFile);
+		}
+	}
+
+	protected void parseSNPFilterArguments(CommandArguments cmdArgs, CommandLine cmdLine) throws CommandArgumentException
+	{
+		String extractF = cmdLine.getOptionValue(OPT_EXTRACT_LONG);
+		String excludeF = cmdLine.getOptionValue(OPT_EXCLUDE_LONG);
+
+		if ((extractF != null) && (excludeF != null) && cmdLine.hasOption(OPT_CHR_LONG) && cmdLine.hasOption(OPT_NOT_CHR_LONG))
+		{
+			throw new CommandArgumentException("--extract, --exclude, --chr and --not-chr, any of them cannot be set together.");
+		}
+
+		if (extractF != null)
+		{
+			FileUtil.exists(extractF);
+			cmdArgs.setExtractFile(extractF);
+		}
+		else if (excludeF != null)
+		{
+			FileUtil.exists(excludeF);
+			cmdArgs.setExcludeFile(excludeF);
+		}
+		else if (cmdLine.hasOption(OPT_CHR_LONG))
+		{
+			cmdArgs.setChr(cmdLine.getOptionValues(OPT_CHR_LONG));
+		}
+		else if (cmdLine.hasOption(OPT_NOT_CHR_LONG))
+		{
+			cmdArgs.setNotChr(cmdLine.getOptionValues(OPT_NOT_CHR_LONG));
+		}
+	}
+
 	protected void printOptionsInEffect(CommandLine cmdLine, String subcmd)
 	{
 		Logger.printUserLog("Subcommand: " + subcmd);
@@ -242,7 +325,25 @@ public abstract class Command implements Comparable<Command>
 	}
 
 	private boolean stopAtNonOption;
-	
+
+	protected static final String OPT_KEEP_LONG = "keep";
+	protected static final String OPT_KEEP_DESC = "Specify the individuals for analysis";
+
+	protected static final String OPT_REMOVE_LONG = "remove";
+	protected static final String OPT_REMOVE_DESC = "Specify the individuals removed from analysis";
+
+	protected static final String OPT_CHR_LONG = "chr";
+	protected static final String OPT_CHR_DESC = "Specify the chromosomes for analysis";
+
+	protected static final String OPT_NOT_CHR_LONG = "not-chr";
+	protected static final String OPT_NOT_CHR_DESC = "Specify the chromosomes not for analysis";
+
+	protected static final String OPT_EXTRACT_LONG = "extract";
+	protected static final String OPT_EXTRACT_DESC = "Specify the SNPs for analysis";
+
+	protected static final String OPT_EXCLUDE_LONG = "exclude";
+	protected static final String OPT_EXCLUDE_DESC = "Specify the SNPs excluded from analysis";
+
 	protected static final String OPT_FILE_LONG = "file";
 	protected static final String OPT_FILE_DESC = "Specify PLINK format .ped and .map files";
 	

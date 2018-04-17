@@ -7,26 +7,19 @@ import java.util.TreeMap;
 import java.util.TreeSet;
 
 import gear.epem.GRMStat;
-import gear.grm.MakeGRM;
 import gear.he.HEMCalculate;
 import gear.he.HEMRead;
 import gear.he.h2trans.H2Transformer;
-import gear.ibd.ibd.ParentIBD;
 import gear.ibd.jhe.JointHELinkLS;
 import gear.ibd.jhe.JointHELinkML;
 import gear.imputation.NaiveImputation;
 import gear.impute.ImputeProbabilityBestGuess;
 import gear.pscontrol.NonTransmitted;
-import gear.realcheck.RealCheck;
-import gear.realcheck.RealCheckOne;
 import gear.simulation.RealDataSimulation;
 import gear.simulation.RealDataSimulationQT;
 import gear.subcommands.Command;
-import gear.sumstat.FrequencyCalculator;
-import gear.sumstat.Inbreeding;
 import gear.util.Logger;
 import gear.util.MonitorThread;
-import gear.write.WriteBedSNPMajor;
 
 public enum Gear
 {
@@ -147,20 +140,7 @@ public enum Gear
 	
 			CmdArgs.INSTANCE.printOptionsInEffect();
 	
-			if (CmdArgs.INSTANCE.hasRealCheckOption())
-			{
-				if (CmdArgs.INSTANCE.getBFileArgs(1).isSet())
-				{
-					RealCheck realcheck = new RealCheck();
-					realcheck.Check();
-				}
-				else
-				{
-					RealCheckOne realcheckone = new RealCheckOne();
-					realcheckone.CheckOne();
-				}
-			}
-			else if (CmdArgs.INSTANCE.bsimuFlag)
+			if (CmdArgs.INSTANCE.bsimuFlag)
 			{
 				if (CmdArgs.INSTANCE.simupolyCCFlag) 
 				{
@@ -171,26 +151,6 @@ public enum Gear
 				{
 					RealDataSimulationQT rdSimuQT = new RealDataSimulationQT();
 					rdSimuQT.GenerateSample();
-				}
-			}
-			else if (CmdArgs.INSTANCE.sumStatFlag)
-			{
-				if (CmdArgs.INSTANCE.freqFlag)
-				{
-					FrequencyCalculator fc = new FrequencyCalculator();
-					fc.CalculateAlleleFrequency();
-					fc.PrintOut();
-	
-				} else if (CmdArgs.INSTANCE.genoFreqFlag)
-				{
-					FrequencyCalculator fc = new FrequencyCalculator();
-					fc.CalculateAlleleFrequency();
-					fc.PrintOut();
-	
-				} else if (CmdArgs.INSTANCE.fstFlag)
-				{
-					Inbreeding inb = new Inbreeding();
-					inb.CalculateFst();
 				}
 			}
 			else if (CmdArgs.INSTANCE.calOption)
@@ -229,39 +189,10 @@ public enum Gear
 				gs.GetGRMStats();
 	
 			}
-			else if (CmdArgs.INSTANCE.GRMFlag)
-			{
-				MakeGRM mg = new MakeGRM();
-				if (CmdArgs.INSTANCE.grmRangeFlag)
-				{
-					mg.makeGeneticRelationshipScore(
-							CmdArgs.INSTANCE.grm_range[0],
-							CmdArgs.INSTANCE.grm_range[1]);
-				}
-				else if (CmdArgs.INSTANCE.grmPartitionFlag)
-				{
-					mg.GRMPartitioning(args);
-				}
-				else
-				{
-					mg.makeGeneticRelationshipScore();
-				}
-			}
 			else if (CmdArgs.INSTANCE.naiveImputFlag)
 			{
 				NaiveImputation ni = new NaiveImputation();
 				ni.Imputation();
-			}
-			else if (CmdArgs.INSTANCE.makebedFlag)
-			{
-				WriteBedSNPMajor bedWriter = new WriteBedSNPMajor();
-				bedWriter.WriteFile();
-	
-			}
-			else if (CmdArgs.INSTANCE.quickibdFlag)
-			{
-				ParentIBD ibd = new ParentIBD();
-				ibd.getIBD();
 			}
 			else if (CmdArgs.INSTANCE.helinkFlag)
 			{

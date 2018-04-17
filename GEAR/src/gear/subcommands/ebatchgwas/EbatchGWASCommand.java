@@ -33,14 +33,27 @@ public class EbatchGWASCommand extends Command
 		options.addOption(OptionBuilder.withDescription(OPT_DOM_DESC).create(OPT_DOM));
 		options.addOption(OptionBuilder.withDescription(OPT_EPI_DESC).create(OPT_EPI));
 		options.addOption(OptionBuilder.withDescription(OPT_INBRED_DESC).withLongOpt(OPT_INBRED_LONG).create());
+		
+	    options.addOption(OptionBuilder.withDescription(OPT_KEEP_DESC).withLongOpt(OPT_KEEP_LONG).hasArg().create());
+	    options.addOption(OptionBuilder.withDescription(OPT_REMOVE_DESC).withLongOpt(OPT_REMOVE_LONG).hasArg().create());
+
+	    options.addOption(OptionBuilder.withDescription(OPT_EXTRACT_DESC).withLongOpt(OPT_EXTRACT_LONG).hasArg().create());
+	    options.addOption(OptionBuilder.withDescription(OPT_EXCLUDE_DESC).withLongOpt(OPT_EXCLUDE_LONG).hasArg().create());
+
+	    options.addOption(OptionBuilder.withDescription(OPT_CHR_DESC).withLongOpt(OPT_CHR_LONG).hasArgs().create());
+	    options.addOption(OptionBuilder.withDescription(OPT_NOT_CHR_DESC).withLongOpt(OPT_NOT_CHR_LONG).hasArgs().create());
 	}
 
 	@Override
 	public CommandArguments parse(CommandLine cmdLine) throws CommandArgumentException
 	{
 		EbatchGWASArguments EArgs = new EbatchGWASArguments();
-		parseFileArguments(EArgs, cmdLine);
-		EArgs.setEV(cmdLine.getOptionValue(OPT_EV_LONG));
+		parseFileArguments((CommandArguments)EArgs, cmdLine);
+	    parseSampleFilterArguments((CommandArguments) EArgs, cmdLine);
+	    parseSNPFilterArguments((CommandArguments) EArgs, cmdLine);
+
+		EArgs.setEV(parseStringOptionValue(cmdLine, OPT_EV_LONG, "1"));
+
 		if (cmdLine.hasOption(OPT_DOM))
 		{
 			EArgs.setDom();			
@@ -49,23 +62,12 @@ public class EbatchGWASCommand extends Command
 		{
 			EArgs.setEpi();
 		}
+
 		if (cmdLine.hasOption(OPT_INBRED_LONG))
 		{
 			EArgs.setInbred();			
 		}
 		return EArgs;
-	}
-
-	private void parseFileArguments(EbatchGWASArguments EArgs, CommandLine cmdLine) throws CommandArgumentException
-	{
-		String bfile = cmdLine.getOptionValue("bfile");
-
-		if ((bfile == null) )
-		{
-			throw new CommandArgumentException("No genotypes are provided. Either --bfile or --file must be set.");
-		}
-
-		EArgs.setBFile(bfile);
 	}
 
 	@Override

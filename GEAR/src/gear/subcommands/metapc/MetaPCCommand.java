@@ -116,9 +116,9 @@ public class MetaPCCommand extends Command
 //			metaPC.setVerbose();
 //		}
 
-		if (cmdLine.hasOption(OPT_CHR))
+		if (cmdLine.hasOption(OPT_CHR_LONG))
 		{
-			metaPC.setChr(cmdLine.getOptionValue(OPT_CHR));
+			metaPC.setChr(cmdLine.getOptionValues(OPT_CHR_LONG));
 		}
 
 

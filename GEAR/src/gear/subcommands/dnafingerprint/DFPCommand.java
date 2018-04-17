@@ -35,31 +35,43 @@ public class DFPCommand extends Command
 	{
 		options.addOption(OptionBuilder.withDescription(OPT_BFILE_DESC).withLongOpt(OPT_BFILE_LONG).hasArg().create());
 		options.addOption(OptionBuilder.withDescription(OPT_BFILE2_DESC).withLongOpt(OPT_BFILE2_LONG).hasArg().create());
-		options.addOption(OptionBuilder.withDescription(OPT_EXTRACT_DESC).withLongOpt(OPT_EXTRACT_LONG).hasArg().create());
+
 		options.addOption(OptionBuilder.withDescription(OPT_NUM_MARKER_DESC).withLongOpt(OPT_NUM_MARKER_LONG).hasArg().create(OPT_NUM_MARKER));
 		options.addOption(OptionBuilder.withDescription(OPT_LOW_CUTOFF_DESC).withLongOpt(OPT_LOW_CUTOFF_LONG).hasArg().create(OPT_LOW_CUTOFF));
 		options.addOption(OptionBuilder.withDescription(OPT_HIGH_CUTOFF_DESC).withLongOpt(OPT_HIGH_CUTOFF_LONG).hasArg().create(OPT_HIGH_CUTOFF));
 		options.addOption(OptionBuilder.withDescription(OPT_SEED_DESC).withLongOpt(OPT_SEED_LONG).hasArg().create());
+		
+	    options.addOption(OptionBuilder.withDescription(OPT_KEEP_DESC).withLongOpt(OPT_KEEP_LONG).hasArg().create());
+	    options.addOption(OptionBuilder.withDescription(OPT_REMOVE_DESC).withLongOpt(OPT_REMOVE_LONG).hasArg().create());
+
+	    options.addOption(OptionBuilder.withDescription(OPT_EXTRACT_DESC).withLongOpt(OPT_EXTRACT_LONG).hasArg().create());
+	    options.addOption(OptionBuilder.withDescription(OPT_EXCLUDE_DESC).withLongOpt(OPT_EXCLUDE_LONG).hasArg().create());
+
+	    options.addOption(OptionBuilder.withDescription(OPT_CHR_DESC).withLongOpt(OPT_CHR_LONG).hasArgs().create());
+	    options.addOption(OptionBuilder.withDescription(OPT_NOT_CHR_DESC).withLongOpt(OPT_NOT_CHR_LONG).hasArgs().create());
+
 	}
 
 	@Override
 	public CommandArguments parse(CommandLine cmdLine)
 			throws CommandArgumentException
 	{
-		DFPCommandArguments cmdArgs = new DFPCommandArguments();
-		cmdArgs.setBFile(cmdLine.getOptionValue(OPT_BFILE_LONG));
+		DFPCommandArguments dfpArgs = new DFPCommandArguments();
+
+	    parseFileArguments((CommandArguments) dfpArgs, cmdLine);
+	    parseSampleFilterArguments((CommandArguments) dfpArgs, cmdLine);
+	    parseSNPFilterArguments((CommandArguments) dfpArgs, cmdLine);
 
 		if (cmdLine.hasOption(OPT_BFILE2_LONG))
 		{
-			cmdArgs.setBFile2(cmdLine.getOptionValue(OPT_BFILE2_LONG));
+			dfpArgs.setBFile2(cmdLine.getOptionValue(OPT_BFILE2_LONG));
 		}
-		
-		cmdArgs.setSNPFile(parseStringOptionValue(cmdLine, OPT_EXTRACT_LONG, OPT_EXTRACT_DEFAULT));
-		cmdArgs.setLowCutoff(parseDoubleOptionValueInRange(cmdLine, OPT_LOW_CUTOFF_LONG, OPT_LOW_CUTOFF_DEFAULT, -5, 1));
-		cmdArgs.setHighCutoff(parseDoubleOptionValueInRange(cmdLine, OPT_HIGH_CUTOFF_LONG, OPT_HIGH_CUTOFF_DEFAULT, 0, 1));
-		cmdArgs.setNumMarker(parseLongOptionValueInRange(cmdLine, OPT_NUM_MARKER_LONG, OPT_NUM_MARKER_DEFAULT, 0, Long.MAX_VALUE));
-		cmdArgs.setSeed(parseLongOptionValueInRange(cmdLine, OPT_SEED_LONG, OPT_SEED_DEFAULT, 0, Long.MAX_VALUE));
-		return cmdArgs;
+
+		dfpArgs.setLowCutoff(parseDoubleOptionValueInRange(cmdLine, OPT_LOW_CUTOFF_LONG, OPT_LOW_CUTOFF_DEFAULT, -5, 1));
+		dfpArgs.setHighCutoff(parseDoubleOptionValueInRange(cmdLine, OPT_HIGH_CUTOFF_LONG, OPT_HIGH_CUTOFF_DEFAULT, 0, 1));
+		dfpArgs.setNumMarker(parseLongOptionValueInRange(cmdLine, OPT_NUM_MARKER_LONG, OPT_NUM_MARKER_DEFAULT, -1, Long.MAX_VALUE));
+		dfpArgs.setSeed(parseLongOptionValueInRange(cmdLine, OPT_SEED_LONG, OPT_SEED_DEFAULT, 0, Long.MAX_VALUE));
+		return dfpArgs;
 	}
 
 	@Override
@@ -71,10 +83,6 @@ public class DFPCommand extends Command
 
 	private static final String OPT_BFILE2_LONG = "bfile2";
 	private static final String OPT_BFILE2_DESC = "The second bfile.";
-
-	private static final String OPT_EXTRACT_LONG = "extract";
-	private static final String OPT_EXTRACT_DEFAULT = null;
-	private static final String OPT_EXTRACT_DESC = "SNP list for calculating similarity";
 
 	private static final String OPT_NUM_MARKER = "m";
 	private static final String OPT_NUM_MARKER_LONG = "num-marker";

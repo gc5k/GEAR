@@ -9,13 +9,8 @@ public class OATHBusCommandArguments extends CommandArguments
 	private String covFile = null;
 	private int[] covIdx = {0};
 
-	private int chr;
-	private boolean chrFlag = false;
-
 	private String pheFile;
 	private int[] mPheno;
-
-	private String keepFile;
 
 	private double maf = 0.05;
 	public String getPhenotypeFile()
@@ -42,38 +37,6 @@ public class OATHBusCommandArguments extends CommandArguments
 	public int[] getMpheno()
 	{
 		return this.mPheno;
-	}
-
-	public void setChr(String c)
-	{
-		this.chr = Integer.parseInt(c);
-		if (this.chr < 1)
-		{
-			Logger.printUserLog("Chromosome should be greater than 0.\n GEAR quitted.");
-			System.exit(1);
-		}
-		this.chrFlag = true;
-	}
-
-	public int getChr()
-	{
-		return this.chr;
-	}
-
-	public boolean isChrFlagOn()
-	{
-		return this.chrFlag;
-	}
-
-	public void setKeeFile(String kFile) 
-	{
-		FileUtil.exists(kFile);
-		keepFile = kFile;
-	}
-	
-	public String getKeepFile()
-	{
-		return keepFile;
 	}
 	
 	public void setCovFile(String cFile) 

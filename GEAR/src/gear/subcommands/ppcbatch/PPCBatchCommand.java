@@ -46,6 +46,10 @@ public class PPCBatchCommand extends Command
 //		options.addOption(OptionBuilder.withDescription(OPT_QRANGE_DESC).withLongOpt(OPT_QRANGE_LONG).hasArg().create());
 
 		options.addOption(OptionBuilder.withDescription(OPT_GREEDY_DESC).create(OPT_GREEDY));
+		
+	    options.addOption(OptionBuilder.withDescription(OPT_KEEP_DESC).withLongOpt(OPT_KEEP_LONG).hasArg().create());
+	    options.addOption(OptionBuilder.withDescription(OPT_REMOVE_DESC).withLongOpt(OPT_REMOVE_LONG).hasArg().create());
+
 		exsnpCommand.prepareOptions(options);
 		profileCommand.setIsCalledByEnigma(true);
 		profileCommand.prepareOptions(options);
@@ -55,33 +59,34 @@ public class PPCBatchCommand extends Command
 	public CommandArguments parse(CommandLine cmdLine)
 			throws CommandArgumentException
 	{
-		PPCBatchCommandArguments pbCmdArgs = new PPCBatchCommandArguments();
+		PPCBatchCommandArguments pbArgs = new PPCBatchCommandArguments();
 		
-		pbCmdArgs.setBatch(cmdLine.getOptionValue(OPT_BATCH));
-		
+		pbArgs.setBatch(cmdLine.getOptionValue(OPT_BATCH));
+	    parseSampleFilterArguments((CommandArguments) pbArgs, cmdLine);
+
 		if (cmdLine.hasOption(OPT_NO_SCORE_HEADER_LONG))
 		{
-			pbCmdArgs.setHeader();
+			pbArgs.setHeader();
 		}
 
 		if (cmdLine.hasOption(OPT_SCORE))
 		{
-			pbCmdArgs.setScoreFile(cmdLine.getOptionValue(OPT_SCORE_LONG));
+			pbArgs.setScoreFile(cmdLine.getOptionValue(OPT_SCORE_LONG));
 		}
 		
 		if (cmdLine.hasOption(OPT_SCORE_GZ_LONG))
 		{
-			pbCmdArgs.setScoreFileGZ(cmdLine.getOptionValue(OPT_SCORE_GZ_LONG));			
+			pbArgs.setScoreFileGZ(cmdLine.getOptionValue(OPT_SCORE_GZ_LONG));			
 		}
 		
 		if (cmdLine.hasOption(OPT_GREEDY))
 		{
-			pbCmdArgs.setGreedy();
+			pbArgs.setGreedy();
 		}
 		
-		pbCmdArgs.setExSNPCommandArguments((ExSNPCommandArguments) exsnpCommand.parse(cmdLine));
-		pbCmdArgs.setProfileCommandArguments((ProfileCommandArguments) profileCommand.parse(cmdLine));
-		return pbCmdArgs;
+		pbArgs.setExSNPCommandArguments((ExSNPCommandArguments) exsnpCommand.parse(cmdLine));
+		pbArgs.setProfileCommandArguments((ProfileCommandArguments) profileCommand.parse(cmdLine));
+		return pbArgs;
 	}
 
 	@Override

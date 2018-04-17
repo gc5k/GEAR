@@ -14,29 +14,34 @@ public class PPCBatchCommandImpl extends CommandImpl
 	@Override
 	public void execute(CommandArguments cmdArgs)
 	{
-		PPCBatchCommandArguments pbCmdArgs = (PPCBatchCommandArguments) cmdArgs;
-		if (!pbCmdArgs.isGreedy())
+		PPCBatchCommandArguments pbArgs = (PPCBatchCommandArguments) cmdArgs;
+		if (!pbArgs.isGreedy())
 		{
-			ExSNPCommandArguments exSNPcmdArgs = pbCmdArgs.getExSNPCommandArguments();
-			exSNPcmdArgs.setOutRoot(pbCmdArgs.getOutRoot());
+			ExSNPCommandArguments exSNPcmdArgs = pbArgs.getExSNPCommandArguments();
+			exSNPcmdArgs.setOutRoot(pbArgs.getOutRoot());
 			ExSNPCommandImpl exSNPImpl = new ExSNPCommandImpl();
 			exSNPImpl.execute(exSNPcmdArgs);
 			Logger.printUserLog("");
 		}
 
-		for(int i = 0; i < pbCmdArgs.getBedFiles().size(); i++)
+		for(int i = 0; i < pbArgs.getBedFiles().size(); i++)
 		{
-			ProfileCommandArguments profCommandArguments = pbCmdArgs.getProfileCommandArguments();
-			profCommandArguments.setBFile(pbCmdArgs.getBedFiles().get(i));
-			if(!pbCmdArgs.isGreedy())
+			ProfileCommandArguments profArgs = pbArgs.getProfileCommandArguments();
+			profArgs.setBFile(pbArgs.getBedFiles().get(i));
+			if(!pbArgs.isGreedy())
 			{
-				String scoreExtract = new String(pbCmdArgs.getOutRoot() + ".comsnp");
-				profCommandArguments.setIsExtract(scoreExtract);
+				String scoreExtract = new String(pbArgs.getOutRoot() + ".comsnp");
+				profArgs.setIsExtractScore(scoreExtract);
+				if (pbArgs.getKeepFile() != null) {
+					profArgs.setKeepFile(pbArgs.getKeepFile());
+				} else if (pbArgs.getRemoveFile() != null) {
+					profArgs.setRemoveFile(pbArgs.getRemoveFile());
+				}
 			}
-			profCommandArguments.setResultFile(pbCmdArgs.getOutRoot() + "." + pbCmdArgs.getBedFiles().get(i));
-			profCommandArguments.setIsWeighted(false);
+			profArgs.setResultFile(pbArgs.getOutRoot() + "." + pbArgs.getBedFiles().get(i));
+			profArgs.setIsWeighted(false);
 			ProfileCommandImpl profImpl = new ProfileCommandImpl();
-			profImpl.execute(profCommandArguments);
+			profImpl.execute(profArgs);
 			Logger.printUserLog("");
 
 		}

@@ -1,7 +1,5 @@
 package gear.subcommands.dnafingerprint;
 
-import java.io.BufferedReader;
-import java.io.IOException;
 import java.io.PrintStream;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -10,7 +8,6 @@ import java.util.TreeSet;
 
 import org.apache.commons.math.random.RandomDataImpl;
 
-import gear.ConstValues;
 import gear.data.Person;
 import gear.family.pedigree.PersonIndex;
 import gear.family.pedigree.file.SNP;
@@ -20,6 +17,7 @@ import gear.family.popstat.GenotypeMatrix;
 import gear.family.qc.rowqc.SampleFilter;
 import gear.subcommands.CommandArguments;
 import gear.subcommands.CommandImpl;
+import gear.sumstat.qc.rowqc.SumStatQC;
 import gear.util.FileUtil;
 import gear.util.Logger;
 import gear.util.NewIt;
@@ -28,7 +26,7 @@ import gear.util.pop.PopStat;
 
 public class DFPCommandImpl extends CommandImpl
 {
-	private DFPCommandArguments dfpCmdArgs;
+	private DFPCommandArguments dfpArgs;
 
 	private GenotypeMatrix G1;
 	private GenotypeMatrix G2;
@@ -39,26 +37,28 @@ public class DFPCommandImpl extends CommandImpl
 	private int[][] comSNPIdx;
 	private HashMap<String, Integer> comSNPIdxMap;
 
-	private ArrayList<SNP> snpList;
+	private ArrayList<SNP> refSNPList;
 
 	private ArrayList<PersonIndex> PersonTable1;
 	private ArrayList<PersonIndex> PersonTable2;
 
 	private SampleFilter sf1;
 	private SampleFilter sf2;
+	private SumStatQC ssQC1;
+	private SumStatQC ssQC2;
 
 	private boolean[] snpMatch;
 	
 	@Override
 	public void execute(CommandArguments cmdArgs)
 	{
-		dfpCmdArgs = (DFPCommandArguments) cmdArgs;
-		if (dfpCmdArgs.getBFile2Flag() && dfpCmdArgs.getBFile() != null)
+		dfpArgs = (DFPCommandArguments) cmdArgs;
+		if (dfpArgs.getBFile2Flag() && dfpArgs.getBFile() != null)
 		{
 			RealCheck();
 			Check();
 		}
-		else if (dfpCmdArgs.getBFile() != null)
+		else if (dfpArgs.getBFile() != null)
 		{
 			RealCheckOne();
 			CheckOne();
@@ -72,43 +72,38 @@ public class DFPCommandImpl extends CommandImpl
 
 	private void RealCheck()
 	{
-		PLINKParser pp1 = null;
-		PLINKParser pp2 = null;
-		pp1 = new PLINKBinaryParser(dfpCmdArgs.getBed(), dfpCmdArgs.getBim(), dfpCmdArgs.getFam());
-		pp2 = new PLINKBinaryParser(dfpCmdArgs.getBed2(), dfpCmdArgs.getBim2(), dfpCmdArgs.getFam2());
-		pp1.Parse();
-		pp2.Parse();
+		PLINKParser pp1 = PLINKParser.parse((CommandArguments) dfpArgs);
+		sf1 = new SampleFilter(pp1.getPedigreeData(), pp1.getMapData(), dfpArgs.getKeepFile(), dfpArgs.getRemoveFile());
+		ssQC1 = new SumStatQC(pp1.getPedigreeData(), pp1.getMapData(), sf1);
+		G1 = new GenotypeMatrix(ssQC1.getSample());
+		PersonTable1 = ssQC1.getSample();
 
-		sf1 = new SampleFilter(pp1.getPedigreeData(), pp1.getMapData());
+		Logger.printUserLog("");
+		Logger.printUserLog("Reading bfile2...");
+		PLINKBinaryParser pp2 = new PLINKBinaryParser(dfpArgs.getBed2(), dfpArgs.getBim2(), dfpArgs.getFam2());
+		pp2.Parse();
 		sf2 = new SampleFilter(pp2.getPedigreeData(), pp2.getMapData());
-		G1 = new GenotypeMatrix(sf1.getSample());
-		G2 = new GenotypeMatrix(sf2.getSample());
-		PersonTable1 = sf1.getSample();
-		PersonTable2 = sf2.getSample();
-		snpList = pp1.getMapData().getMarkerList();
+		ssQC2 = new SumStatQC(pp2.getPedigreeData(), pp2.getMapData(), sf2);
+		G2 = new GenotypeMatrix(ssQC2.getSample());
+		PersonTable2 = ssQC2.getSample();
+		Logger.printUserLog("");
+
+		refSNPList = pp1.getMapData().getMarkerList();
 	}
 
 	public void Check()
 	{
-		allelefreq = PopStat.calAlleleFrequency(G1, snpList.size());
+		allelefreq = PopStat.calAlleleFrequency(G1, refSNPList.size());
 
 		StringBuffer sb = new StringBuffer();
-		sb.append(dfpCmdArgs.getOutRoot());
+		sb.append(dfpArgs.getOutRoot());
 		sb.append(".real");
 		PrintStream ps = FileUtil.CreatePrintStream(sb.toString());
 
 		getCommonSNP(sf1.getMapFile().getMarkerList(), sf2.getMapFile()
 				.getMarkerList());
 
-		if (dfpCmdArgs.getSNPFile() != null)
-		{
-			Logger.printUserLog("A similarity matrix is generated with real-check SNPs.");
-			getSelectedMarker();
-		}
-		else
-		{
-			getRandomMarker();
-		}
+		getRandomMarker();
 
 		setSNPFlipFlag();
 
@@ -130,8 +125,8 @@ public class DFPCommandImpl extends CommandImpl
 					ES = s[2]/s[1];
 					OS = (s[0] - s[2]) / (s[1] - s[2]);
 				}
-				if (OS >= dfpCmdArgs.getLowCutoff()
-						&& OS <= dfpCmdArgs.getHighCutoff())
+				if (OS >= dfpArgs.getLowCutoff()
+						&& OS <= dfpArgs.getHighCutoff())
 				{
 					PersonIndex ps1 = PersonTable1.get(i);
 					PersonIndex ps2 = PersonTable2.get(j);
@@ -236,56 +231,23 @@ public class DFPCommandImpl extends CommandImpl
 		return s;
 	}
 
-	public void getSelectedMarker()
-	{
-		ArrayList<String> snps = readRealcheckSNPs();
-		ArrayList<Integer> Idx = NewIt.newArrayList();
-		for (int i = 0; i < snps.size(); i++)
-		{
-			String snp_name = snps.get(i);
-			if (comSNPIdxMap.containsKey(snp_name))
-			{
-				Idx.add(comSNPIdxMap.get(snp_name));
-			}
-		}
-
-		markerIdx = new int[Idx.size()];
-
-		for (int i = 0; i < Idx.size(); i++)
-			markerIdx[i] = Idx.get(i).intValue();
-		Arrays.sort(markerIdx);
-
-		StringBuffer sb = new StringBuffer();
-		sb.append(dfpCmdArgs.getOutRoot());
-		sb.append(".realsnp");
-
-		PrintStream ps = FileUtil.CreatePrintStream(sb.toString());
-		for (int i = 0; i < markerIdx.length; i++)
-		{
-			int idx = markerIdx[i];
-			SNP snp = snpList.get(comSNPIdx[0][idx]);
-			ps.print(snp.getChromosome() + " " + snp.getName() + " "
-					+ snp.getDistance() + " " + snp.getPosition() + " "
-					+ snp.getFirstAllele() + " " + snp.getSecAllele() + "\n");
-		}
-		ps.close();
-	}
-
 	public void getRandomMarker()
 	{
 		int mn = 0;
-		if (dfpCmdArgs.getNumMarkerFlag())
+		if (dfpArgs.getNumMarkerFlag())
 		{
-			if (dfpCmdArgs.getNumMarker() > comSNPIdxMap
+			if (dfpArgs.getNumMarker() > comSNPIdxMap
 				.size())
 			{
 				Logger.printUserLog("Realcheck marker number was reduced to "
 					+ comSNPIdxMap.size() + "\n");
 				mn = comSNPIdxMap.size();
 			} 
-			else
+			else if (dfpArgs.getNumMarker() < 0)
 			{
-				mn = (int) dfpCmdArgs.getNumMarker();
+				mn = comSNPIdxMap.size();
+			} else {
+				mn = (int) dfpArgs.getNumMarker();
 			}
 		}
 		else 
@@ -295,20 +257,20 @@ public class DFPCommandImpl extends CommandImpl
 
 		markerIdx = new int[mn];
 		RandomDataImpl rd = new RandomDataImpl();
-		rd.reSeed(dfpCmdArgs.getSeed());
+		rd.reSeed(dfpArgs.getSeed());
 
 		markerIdx = rd.nextPermutation(comSNPIdxMap.size(), mn);
 
 		Arrays.sort(markerIdx);
 		StringBuffer sb = new StringBuffer();
-		sb.append(dfpCmdArgs.getOutRoot());
+		sb.append(dfpArgs.getOutRoot());
 		sb.append(".realsnp");
 
 		PrintStream ps = FileUtil.CreatePrintStream(sb.toString());
 		for (int i = 0; i < markerIdx.length; i++)
 		{
 			int idx = markerIdx[i];
-			SNP snp = snpList.get(comSNPIdx[0][idx]);
+			SNP snp = refSNPList.get(comSNPIdx[0][idx]);
 			ps.print(snp.getChromosome() + " " + snp.getName() + " "
 					+ snp.getDistance() + " " + snp.getPosition() + " "
 					+ snp.getFirstAllele() + " " + snp.getSecAllele() + "\n");
@@ -456,68 +418,35 @@ public class DFPCommandImpl extends CommandImpl
 		}
 	}
 
-	private ArrayList<String> readRealcheckSNPs()
-	{
-		BufferedReader reader = FileUtil.FileOpen(dfpCmdArgs.getSNPFile());
-		String line = null;
-		ArrayList<String> selectedSNP = NewIt.newArrayList();
-		try
-		{
-			while ((line = reader.readLine()) != null)
-			{
-				String[] l = line.split(ConstValues.WHITESPACE_DELIMITER);
-				for (int i = 0; i < l.length; i++)
-				{
-					selectedSNP.add(l[i]);
-				}
-			}
-		} 
-		catch (IOException e)
-		{
-			Logger.handleException(e,
-					"An exception occurred when reading the real-check SNPs.");
-		}
-		Logger.printUserLog(selectedSNP.size() + " marker(s) is read in "
-				+ dfpCmdArgs.getSNPFile() + ".");
-		return selectedSNP;
-	}
 
 ////////////////////////////////////////////////
 	
 	public void RealCheckOne()
 	{
-		PLINKParser pp1 = null;
-		pp1 = new PLINKBinaryParser(dfpCmdArgs.getBed(), dfpCmdArgs.getBim(), dfpCmdArgs.getFam());
-		pp1.Parse();
-
+		PLINKParser pp1 = PLINKParser.parse((CommandArguments) dfpArgs);
 		sf1 = new SampleFilter(pp1.getPedigreeData(), pp1.getMapData());
-		G1 = new GenotypeMatrix(sf1.getSample());
-		PersonTable1 = sf1.getSample();
-		snpList = pp1.getMapData().getMarkerList();
+		ssQC1 = new SumStatQC(pp1.getPedigreeData(), pp1.getMapData(), sf1);
+		G1 = new GenotypeMatrix(ssQC1.getSample());
+		PersonTable1 = ssQC1.getSample();
+		refSNPList = pp1.getMapData().getMarkerList();
+		Logger.printUserLog("");
 
 	}
 
 	public void CheckOne()
 	{
 
-		allelefreq = PopStat.calAlleleFrequency(G1, snpList.size());
+		allelefreq = PopStat.calAlleleFrequency(G1, refSNPList.size());
 
 		StringBuffer sb = new StringBuffer();
-		sb.append(dfpCmdArgs.getOutRoot());
+		sb.append(dfpArgs.getOutRoot());
 		sb.append(".real");
 		PrintStream ps = FileUtil.CreatePrintStream(sb.toString());
 
-		if (dfpCmdArgs.getSNPFile() != null)
-		{
-			getSelectedMarkerOne();
-		} 
-		else
-		{
-			getRandomMarkerOne();
-		}
+		getRandomMarkerOne();
 
 		StringBuffer sb1 = new StringBuffer();
-		sb1.append(dfpCmdArgs.getOutRoot());
+		sb1.append(dfpArgs.getOutRoot());
 		sb1.append(".realsnp");
 		Logger.printUserLog(markerIdx.length + " realcheck SNPs have been saved into '" + sb1.toString() + "'.");
 
@@ -538,8 +467,8 @@ public class DFPCommandImpl extends CommandImpl
 					ES = s[2]/s[1];
 					OS = (s[0] - s[2]) / (s[1] - s[2]);
 				}
-				if (OS >= dfpCmdArgs.getLowCutoff()
-						&& OS <= dfpCmdArgs.getHighCutoff())
+				if (OS >= dfpArgs.getLowCutoff()
+						&& OS <= dfpArgs.getHighCutoff())
 				{
 					PersonIndex ps1 = PersonTable1.get(i);
 					PersonIndex ps2 = PersonTable1.get(j);
@@ -646,14 +575,14 @@ public class DFPCommandImpl extends CommandImpl
 			markerIdx[i] = i;
 
 		StringBuffer sb = new StringBuffer();
-		sb.append(dfpCmdArgs.getOutRoot());
+		sb.append(dfpArgs.getOutRoot());
 		sb.append(".realsnp");
 
 		PrintStream ps = FileUtil.CreatePrintStream(sb.toString());
 		for (int i = 0; i < markerIdx.length; i++)
 		{
 			int idx = markerIdx[i];
-			SNP snp = snpList.get(idx);
+			SNP snp = refSNPList.get(idx);
 			ps.print(snp.getChromosome() + " " + snp.getName() + " "
 					+ snp.getDistance() + " " + snp.getPosition() + " "
 					+ snp.getFirstAllele() + " " + snp.getSecAllele() + "\n");
@@ -665,9 +594,9 @@ public class DFPCommandImpl extends CommandImpl
 	{
 		int mn = 0;
 		int nMarker = sf1.getMapFile().getMarkerList().size();
-		if (dfpCmdArgs.getNumMarkerFlag())
+		if (dfpArgs.getNumMarkerFlag())
 		{
-			if (dfpCmdArgs.getNumMarker() > nMarker)
+			if (dfpArgs.getNumMarker() > nMarker)
 			{
 				Logger.printUserLog("Real-check marker number is reduced to "
 						+ nMarker + ".");
@@ -675,18 +604,18 @@ public class DFPCommandImpl extends CommandImpl
 			} 
 			else
 			{
-				mn = (int) dfpCmdArgs.getNumMarker();
+				mn = (int) dfpArgs.getNumMarker();
 			}
 			markerIdx = new int[mn];
 			RandomDataImpl rd = new RandomDataImpl();
-			rd.reSeed(dfpCmdArgs.getSeed());
+			rd.reSeed(dfpArgs.getSeed());
 
 			markerIdx = rd.nextPermutation(markerIdx.length, mn);
 			Arrays.sort(markerIdx);
 		} 
 		else
 		{
-			markerIdx = new int[snpList.size()];
+			markerIdx = new int[refSNPList.size()];
 			for (int i = 0; i < markerIdx.length; i++)
 			{
 				markerIdx[i] = i;
@@ -694,14 +623,14 @@ public class DFPCommandImpl extends CommandImpl
 		}
 
 		StringBuffer sb = new StringBuffer();
-		sb.append(dfpCmdArgs.getOutRoot());
+		sb.append(dfpArgs.getOutRoot());
 		sb.append(".realsnp");
 
 		PrintStream ps = FileUtil.CreatePrintStream(sb.toString());
 		for (int i = 0; i < markerIdx.length; i++)
 		{
 			int idx = markerIdx[i];
-			SNP snp = snpList.get(idx);
+			SNP snp = refSNPList.get(idx);
 			ps.print(snp.getChromosome() + " " + snp.getName() + " "
 					+ snp.getDistance() + " " + snp.getPosition() + " "
 					+ snp.getFirstAllele() + " " + snp.getSecAllele() + "\n");

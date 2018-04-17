@@ -487,7 +487,7 @@ public final class ProfileCommandImpl extends CommandImpl
 				}
 			}
 		}
-		return new PlinkData(plinkParser);
+		return new PlinkData(plinkParser, profCmdArgs.getKeepFile(), profCmdArgs.getRemoveFile());
 	}
 
 	private HashMap<String, ScaleMaf> readScaleFile()

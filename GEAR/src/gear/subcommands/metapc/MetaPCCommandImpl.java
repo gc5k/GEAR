@@ -43,7 +43,8 @@ public class MetaPCCommandImpl extends CommandImpl
 		Arrays.fill(FileKeep, true);
 		fReader = new FReader(mpcArgs.getMetaFile(), FileKeep,
 				mpcArgs.getKeys(), mpcArgs.isQT(), mpcArgs.isGZ(),
-				mpcArgs.isChr(), mpcArgs.getChr());
+				mpcArgs.getChr() != null ? true:false, 
+				mpcArgs.getChr() != null ? mpcArgs.getChr():mpcArgs.getNotChr());
 
 		fReader.Start();
 

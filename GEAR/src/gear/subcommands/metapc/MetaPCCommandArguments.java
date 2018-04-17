@@ -201,21 +201,6 @@ public class MetaPCCommandArguments extends CommandArguments
 //		Me = Double.parseDouble(me);
 //	}
 
-	public void setChr(String chr)
-	{
-		this.chr = Integer.parseInt(chr); 
-		chrFlag = true;
-	}
-
-	public int getChr()
-	{
-		return chr;
-	}
-
-	public boolean isChr()
-	{
-		return chrFlag;
-	}
 
 	public void setBeta()
 	{
@@ -317,9 +302,6 @@ public class MetaPCCommandArguments extends CommandArguments
 //	private double Me = 30000;
 //	private double meFrac = 0;
 //	private int Top = 0;
-
-	private int chr = 0;
-	private boolean chrFlag = false;
 
 	private boolean isBeta = false;
 	private boolean isKeepATGC = false;

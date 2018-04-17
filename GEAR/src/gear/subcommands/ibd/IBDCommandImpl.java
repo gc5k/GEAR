@@ -10,6 +10,7 @@ import gear.data.Person;
 import gear.data.UniqueRecordSet;
 import gear.family.pedigree.file.MapFile;
 import gear.family.pedigree.file.PedigreeFile;
+import gear.family.plink.PLINKBinaryParser;
 import gear.family.plink.PLINKParser;
 import gear.subcommands.CommandArguments;
 import gear.subcommands.CommandImpl;
@@ -27,8 +28,11 @@ public class IBDCommandImpl extends CommandImpl
 	public void execute(CommandArguments cmdArgs)
 	{
 		ibdArgs = (IBDCommandArguments) cmdArgs;
-		PLINKParser pp = PLINKParser.parse(ibdArgs);
-		pp.Parse();
+		PLINKParser pp = PLINKBinaryParser.parse(cmdArgs);
+
+//		sf = new SampleFilter(pp.getPedigreeData(), pp.getMapData(), ibdArgs.getKeepFile(), ibdArgs.getRemoveFile());
+//		ssQC = new SumStatQC(pp.getPedigreeData(), pp.getMapData(), sf);
+
 		PedData = pp.getPedigreeData();
 		snpMap = pp.getMapData();
 		getIBD();

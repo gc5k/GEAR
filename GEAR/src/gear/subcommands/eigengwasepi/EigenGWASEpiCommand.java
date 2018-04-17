@@ -49,9 +49,9 @@ public class EigenGWASEpiCommand extends Command
 		{
 			eigenEpiArgs.setKeepFile(cmdLine.getOptionValue(OPT_KEEP));
 		}
-		if (cmdLine.hasOption(OPT_CHR))
+		if (cmdLine.hasOption(OPT_CHR_LONG))
 		{
-			eigenEpiArgs.setChr(cmdLine.getOptionValue(OPT_CHR));
+			eigenEpiArgs.setChr(cmdLine.getOptionValues(OPT_CHR_LONG));
 		}
 
 		if (cmdLine.hasOption(OPT_INBRED))

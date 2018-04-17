@@ -112,9 +112,9 @@ public class SFstCommand extends Command
 			lamD.setVerbose();
 		}
 
-		if (cmdLine.hasOption(OPT_CHR))
+		if (cmdLine.hasOption(OPT_CHR_LONG))
 		{
-			lamD.setChr(cmdLine.getOptionValue(OPT_CHR));
+			lamD.setChr(cmdLine.getOptionValues(OPT_CHR_LONG));
 		}
 
 		if (cmdLine.hasOption(OPT_TOP))

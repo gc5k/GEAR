@@ -327,22 +327,6 @@ public class GLSMetaCommandArguments extends CommandArguments
 		return naive;
 	}
 
-	public void setChr(String chr)
-	{
-		this.chr = Integer.parseInt(chr); 
-		chrFlag = true;
-	}
-
-	public int getChr()
-	{
-		return chr;
-	}
-	
-	public boolean isChr()
-	{
-		return chrFlag;
-	}
-
 	public void setAdjOverlapping()
 	{
 		IsAdjOverlappingOnly = true;
@@ -423,10 +407,7 @@ public class GLSMetaCommandArguments extends CommandArguments
 	
 	private boolean diag = false;
 	private boolean naive = false;
-	
-	private int chr = 0;
-	private boolean chrFlag = false;
-	
+
 	private boolean IsAdjOverlappingOnly = false;
 
 	private String covar = null;

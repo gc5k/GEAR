@@ -7,10 +7,7 @@ import java.text.DecimalFormat;
 import java.util.ArrayList;
 
 import gear.data.Person;
-import gear.family.pedigree.Hukou;
-import gear.family.pedigree.file.MapFile;
-import gear.family.pedigree.file.PedigreeFile;
-import gear.family.pedigree.file.SNP;
+import gear.family.pedigree.PersonIndex;
 import gear.family.plink.PLINKParser;
 import gear.family.popstat.GenotypeMatrix;
 import gear.family.qc.rowqc.SampleFilter;
@@ -26,29 +23,26 @@ public class GRMImpl extends CommandImpl
 	private double maf_threshold = 1e-5;
 
 	private GenotypeMatrix G;
-	private MapFile mapFile;
-	private ArrayList<SNP> snpList;
 
 	private int numMarker;
 	private double[][] allelefreq;
 	private double[] allelevar;
-	private PedigreeFile pf;
 	private GRMArguments grmArgs;
 	
+	private SampleFilter sf;
+	private SumStatQC ssQC;
+
 	@Override
-	public void execute(CommandArguments cmdArgs) 
+	public void execute(CommandArguments cmdArgs)
 	{
 		grmArgs = (GRMArguments) cmdArgs;
 
 		PLINKParser pp = PLINKParser.parse(grmArgs);
-//		pp.Parse();
-		pf = pp.getPedigreeData();
-		SampleFilter sf = new SampleFilter(pp.getPedigreeData(),
-				pp.getMapData());
-		SumStatQC ssQC = new SumStatQC(pp.getPedigreeData(), pp.getMapData(),
+		sf = new SampleFilter(pp.getPedigreeData(),
+				pp.getMapData(), grmArgs.getKeepFile(), grmArgs.getRemoveFile());
+
+		ssQC = new SumStatQC(pp.getPedigreeData(), pp.getMapData(),
 				sf);
-		mapFile = ssQC.getMapFile();
-		snpList = mapFile.getMarkerList();
 
 		GenotypeMatrix gm = new GenotypeMatrix(ssQC.getSample());
 		G = gm;
@@ -143,14 +137,13 @@ public class GRMImpl extends CommandImpl
 		sb_id.append(".dom.grm.id");
 		grm_id = FileUtil.CreatePrintStream(sb_id.toString());
 
-		ArrayList<Hukou> H = pf.getHukouBook();
-		for (int i = 0; i < H.size(); i++)
+		ArrayList<PersonIndex> PI = ssQC.getSample();
+		for(int i = 0; i < PI.size(); i++)
 		{
-			Hukou h = H.get(i);
-			grm_id.println(h.getFamilyID() + "\t" + h.getIndividualID());
+			grm_id.println(PI.get(i).getFamilyID() + "\t" + PI.get(i).getIndividualID());
 		}
 		grm_id.close();
-		Logger.printUserLog("Writing individual information into '"
+		Logger.printUserLog("Writing " + PI.size() +" individuals' information into '"
 				+ sb_id.toString() + "'.");
 		
 		grmDomMean /= cnt;
@@ -181,11 +174,11 @@ public class GRMImpl extends CommandImpl
 
 		if (Math.abs(Effeictive_DomMarker) > 0.0001)
 		{
-			Logger.printUserLog("Effective dominance sample size is : " + df.format(Effective_DomSample));
+			Logger.printUserLog("Effective dominance sample size is: " + df.format(Effective_DomSample));
 		}
 		else
 		{
-			Logger.printUserLog("Effective dominance sample size is : " + dfE.format(Effective_DomSample));			
+			Logger.printUserLog("Effective dominance sample size is: " + dfE.format(Effective_DomSample));			
 		}
 
 		if (Math.abs(Effeictive_DomMarker) > 0.0001)
@@ -275,16 +268,15 @@ public class GRMImpl extends CommandImpl
 		sb_id.append(".grm.id");
 		grm_id = FileUtil.CreatePrintStream(sb_id.toString());
 
-		ArrayList<Hukou> H = pf.getHukouBook();
-		for (int i = 0; i < H.size(); i++)
+		ArrayList<PersonIndex> PI = ssQC.getSample();
+		for (int i = 0; i < PI.size(); i++)
 		{
-			Hukou h = H.get(i);
-			grm_id.println(h.getFamilyID() + "\t" + h.getIndividualID());
+			grm_id.println(PI.get(i).getFamilyID() + "\t" + PI.get(i).getIndividualID());
 		}
 		grm_id.close();
-		Logger.printUserLog("Writing individual information into '"
+		Logger.printUserLog("Writing " + PI.size() + " individuals' information into '"
 				+ sb_id.toString() + "'.");
-		
+
 		grmMean /= cnt;
 		grmSq /=cnt;
 		double Effective_sample = -1/grmMean + 1;
@@ -295,11 +287,11 @@ public class GRMImpl extends CommandImpl
 		DecimalFormat dfE = new DecimalFormat("0.00E0");
 		if (Math.abs(grmMean) > 0.0001)
 		{
-			Logger.printUserLog("Mean of genetic relatedness is : " + df.format(grmMean));
+			Logger.printUserLog("Mean of genetic relatedness is: " + df.format(grmMean));
 		}
 		else
 		{
-			Logger.printUserLog("Mean of genetic relatedness is : " + dfE.format(grmMean));
+			Logger.printUserLog("Mean of genetic relatedness is: " + dfE.format(grmMean));
 		}
 
 		if (Math.abs(grmSD) > 0.0001)
@@ -313,11 +305,11 @@ public class GRMImpl extends CommandImpl
 		
 		if (Math.abs(Effeictive_marker) > 0.0001)
 		{
-			Logger.printUserLog("Effective sample size is : " + df.format(Effective_sample));
+			Logger.printUserLog("Effective sample size is: " + df.format(Effective_sample));
 		}
 		else
 		{
-			Logger.printUserLog("Effective sample size is : " + dfE.format(Effective_sample));			
+			Logger.printUserLog("Effective sample size is: " + dfE.format(Effective_sample));			
 		}
 
 		if (Math.abs(Effeictive_marker) > 0.0001)
@@ -340,14 +332,6 @@ public class GRMImpl extends CommandImpl
 			if(allelefreq[i][1] == Double.NaN)
 			{
 				continue;
-			}
-			if(grmArgs.isChrFlagOn())
-			{
-				SNP snp = snpList.get(i);
-				if (snp.getChromosome().compareTo(grmArgs.getChr()) != 0)
-				{
-					continue;
-				}
 			}
 			int g1 = G.getAdditiveScore(idx1, i);
 			int g2 = G.getAdditiveScore(idx2, i);
@@ -399,20 +383,12 @@ public class GRMImpl extends CommandImpl
 		for (int i = 0; i < allelefreq.length; i++)
 		{
 
-			if(allelefreq[i][1] == Double.NaN)
+			if (allelefreq[i][1] == Double.NaN)
 			{
 				continue;
 			}
-			if(grmArgs.isChrFlagOn())
-			{
-				SNP snp = snpList.get(i);
-				if (snp.getChromosome().compareTo(grmArgs.getChr()) != 0)
-				{
-					continue;
-				}
-			}
 			double m = allelefreq[i][1];
-			int g1 = G.getAdditiveScore(idx1, i) ;
+			int g1 = G.getAdditiveScore(idx1, i);
 			int g2 = G.getAdditiveScore(idx2, i);
 			if (g1 == Person.MissingGenotypeCode
 					|| g2 == Person.MissingGenotypeCode)

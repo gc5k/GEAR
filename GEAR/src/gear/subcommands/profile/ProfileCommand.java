@@ -62,48 +62,62 @@ public final class ProfileCommand extends Command
 		options.addOption(OptionBuilder.withDescription(OPT_AUTO_FLIP_OFF_DESC).withLongOpt(OPT_AUTO_FLIP_OFF_LONG).hasArg(false).create());
 		options.addOption(OptionBuilder.withDescription(OPT_NO_WEIGHT_DESC).withLongOpt(OPT_NO_WEIGHT_LONG).hasArg(false).create());
 		options.addOption(OptionBuilder.withDescription(OPT_KEEP_ATGC_DESC).withLongOpt(OPT_KEEP_ATGC_LONG).hasArg(false).create());
-		options.addOption(OptionBuilder.withDescription(OPT_EXTRACT_DESC).withLongOpt(OPT_EXTRACT_LONG).hasArg().create());
-		options.addOption(OptionBuilder.withDescription(OPT_REMOVE_DESC).withLongOpt(OPT_REMOVE_LONG).hasArg().create());
+		options.addOption(OptionBuilder.withDescription(OPT_EXTRACT_SCORE_DESC).withLongOpt(OPT_EXTRACT_SCORE_LONG).hasArg().create());
+		options.addOption(OptionBuilder.withDescription(OPT_REMOVE_SCORE_DESC).withLongOpt(OPT_REMOVE_SCORE_LONG).hasArg().create());
 		options.addOption(OptionBuilder.withDescription(OPT_SCALE_DESC).withLongOpt(OPT_SCALE_LONG).hasOptionalArg().create());
+
+	    options.addOption(OptionBuilder.withDescription(OPT_KEEP_DESC).withLongOpt(OPT_KEEP_LONG).hasArg().create());
+	    options.addOption(OptionBuilder.withDescription(OPT_REMOVE_DESC).withLongOpt(OPT_REMOVE_LONG).hasArg().create());
+
+	    options.addOption(OptionBuilder.withDescription(OPT_EXTRACT_DESC).withLongOpt(OPT_EXTRACT_LONG).hasArg().create());
+	    options.addOption(OptionBuilder.withDescription(OPT_EXCLUDE_DESC).withLongOpt(OPT_EXCLUDE_LONG).hasArg().create());
+
+	    options.addOption(OptionBuilder.withDescription(OPT_CHR_DESC).withLongOpt(OPT_CHR_LONG).hasArgs().create());
+	    options.addOption(OptionBuilder.withDescription(OPT_NOT_CHR_DESC).withLongOpt(OPT_NOT_CHR_LONG).hasArgs().create());
+
 	}
 
 	@Override
 	public CommandArguments parse(CommandLine cmdLine) throws CommandArgumentException
 	{
-		ProfileCommandArguments profCmdArgs = new ProfileCommandArguments();
-		profCmdArgs.setScoreFile(cmdLine.getOptionValue(OPT_SCORE_LONG));
+		ProfileCommandArguments profArgs = new ProfileCommandArguments();
+//	    parseFileArguments((CommandArguments) profCmdArgs, cmdLine);
+	    parseSampleFilterArguments((CommandArguments) profArgs, cmdLine);
+	    parseSNPFilterArguments((CommandArguments) profArgs, cmdLine);
+		
+		profArgs.setScoreFile(cmdLine.getOptionValue(OPT_SCORE_LONG));
 
-		profCmdArgs.setScoreFileGZ(cmdLine.getOptionValue(OPT_SCORE_GZ_LONG));
-		profCmdArgs.setHasScoreHeader(!cmdLine.hasOption(OPT_NO_SCORE_HEADER_LONG));
-		parseQScoreQRangeArgs(profCmdArgs, cmdLine);
-		parseDataFileArgs(profCmdArgs, cmdLine);
-		parseCoeffModelArgs(profCmdArgs, cmdLine);
-		profCmdArgs.setIsLogit(cmdLine.hasOption(OPT_LOGIT_LONG));
-		profCmdArgs.setIsAutoFlip(!cmdLine.hasOption(OPT_AUTO_FLIP_OFF_LONG));
+		profArgs.setScoreFileGZ(cmdLine.getOptionValue(OPT_SCORE_GZ_LONG));
+		profArgs.setHasScoreHeader(!cmdLine.hasOption(OPT_NO_SCORE_HEADER_LONG));
+		parseQScoreQRangeArgs(profArgs, cmdLine);
+		parseDataFileArgs(profArgs, cmdLine);
+		parseCoeffModelArgs(profArgs, cmdLine);
+		profArgs.setIsLogit(cmdLine.hasOption(OPT_LOGIT_LONG));
+		profArgs.setIsAutoFlip(!cmdLine.hasOption(OPT_AUTO_FLIP_OFF_LONG));
 		if (Gear.subcmdName.compareTo(ProfileCommand.alias) == 0)
 		{// for propc, by default there is no weight.
-			profCmdArgs.setIsWeighted(false);
+			profArgs.setIsWeighted(false);
 		}
 		else
 		{
-			profCmdArgs.setIsWeighted(!cmdLine.hasOption(OPT_NO_WEIGHT_LONG));
+			profArgs.setIsWeighted(!cmdLine.hasOption(OPT_NO_WEIGHT_LONG));
 		}
-		profCmdArgs.setIsKeepATGC(cmdLine.hasOption(OPT_KEEP_ATGC_LONG));
-		if (cmdLine.hasOption(OPT_EXTRACT_LONG))
+		profArgs.setIsKeepATGC(cmdLine.hasOption(OPT_KEEP_ATGC_LONG));
+		if (cmdLine.hasOption(OPT_EXTRACT_SCORE_LONG))
 		{
-			profCmdArgs.setIsExtract(cmdLine.getOptionValue(OPT_EXTRACT_LONG));
+			profArgs.setIsExtractScore(cmdLine.getOptionValue(OPT_EXTRACT_SCORE_LONG));
 		}
 
-		if (cmdLine.hasOption(OPT_REMOVE_LONG))
+		if (cmdLine.hasOption(OPT_REMOVE_SCORE_LONG))
 		{
-			profCmdArgs.setIsRemove(cmdLine.getOptionValue(OPT_REMOVE_LONG));
+			profArgs.setIsRemoveScore(cmdLine.getOptionValue(OPT_REMOVE_SCORE_LONG));
 		}
 
 		if (cmdLine.hasOption(OPT_SCALE_LONG))
 		{
-			profCmdArgs.setScale(parseStringOptionValue(cmdLine, OPT_SCALE_LONG, OPT_SCALE_DEFAULT));		
+			profArgs.setScale(parseStringOptionValue(cmdLine, OPT_SCALE_LONG, OPT_SCALE_DEFAULT));		
 		}
-		return profCmdArgs;
+		return profArgs;
 	}
 
 	private void parseQScoreQRangeArgs(ProfileCommandArguments profCmdArgs, CommandLine cmdLine) throws CommandArgumentException
@@ -318,11 +332,11 @@ public final class ProfileCommand extends Command
 	private static final String OPT_KEEP_ATGC_LONG = "keep-atgc";
 	private static final String OPT_KEEP_ATGC_DESC = "Keep A/T and G/C loci";
 	
-	private static final String OPT_EXTRACT_LONG = "extract-score";
-	private static final String OPT_EXTRACT_DESC = "Extract score snps";
+	private static final String OPT_EXTRACT_SCORE_LONG = "extract-score";
+	private static final String OPT_EXTRACT_SCORE_DESC = "Extract score snps";
 
-	private static final String OPT_REMOVE_LONG = "remove-score";
-	private static final String OPT_REMOVE_DESC = "Remove score snps";
+	private static final String OPT_REMOVE_SCORE_LONG = "remove-score";
+	private static final String OPT_REMOVE_SCORE_DESC = "Remove score snps";
 	
 	private static final String OPT_SCALE_LONG = "scale";
 	private static final String OPT_SCALE_DEFAULT = null;
