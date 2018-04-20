@@ -46,8 +46,7 @@ public class NonTransWriteBedSNPMajor
 			System.exit(1);
 		}
 		pp.Parse();
-		SampleFilter sf = new SampleFilter(pp.getPedigreeData(),
-				pp.getMapData());
+		SampleFilter sf = new SampleFilter(pp.getPedigreeData());
 
 		snpList = pp.getMapData().getMarkerList();
 		PersonTable = sf.getSample();

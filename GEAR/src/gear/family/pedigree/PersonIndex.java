@@ -12,10 +12,10 @@ public class PersonIndex
 	private int group;
 	private double permutatedScore;
 
-	public PersonIndex(String FamilyID, String IndividualID, Person person,
+	public PersonIndex(Person person,
 			boolean pseudo, boolean isFounder)
 	{
-		subID = new SubjectID(FamilyID, IndividualID);
+		subID = new SubjectID(person.getFamilyID(), person.getPersonID());
 		this.person = person;
 
 		this.pseudo = pseudo;

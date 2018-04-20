@@ -13,8 +13,9 @@ import gear.data.Family;
 import gear.data.UniqueRecordSet;
 import gear.family.pedigree.Hukou;
 import gear.family.pedigree.PersonIndex;
-import gear.family.pedigree.file.MapFile;
 import gear.family.pedigree.file.PedigreeFile;
+import gear.family.plink.PLINKParser;
+import gear.subcommands.CommandArguments;
 import gear.util.FileUtil;
 import gear.util.Logger;
 import gear.util.NewIt;
@@ -26,10 +27,9 @@ import gear.util.NewIt;
 
 public class SampleFilter
 {
-
-	protected MapFile MapData;
 	protected PedigreeFile PedData;
-
+	protected PLINKParser plinkParser;
+	
 	protected String kFile;
 	protected String rFile;
 	protected int filterType = 0; //0 for no filter, 1 for keep, 2 for remove
@@ -46,41 +46,49 @@ public class SampleFilter
 
 	private HashSet<SubjectID> subSet;
 
-	public SampleFilter(PedigreeFile ped, MapFile map)
+	public SampleFilter(PedigreeFile ped)
 	{
 		PedData = ped;
-		MapData = map;
 		PersonTable = NewIt.newArrayList();
 
 		QC();
 
 	}
 
-	public SampleFilter(PedigreeFile ped, MapFile map, String keepFile, String removeFile)
+	public SampleFilter(PedigreeFile ped, CommandArguments cmdArgs)
 	{
 		PedData = ped;
-		MapData = map;
 		PersonTable = NewIt.newArrayList();
 
-		if (keepFile != null)
+		if (cmdArgs.isKeepFile())
 		{
-			kFile = keepFile;
+			kFile = cmdArgs.getKeepFile();
 			readKeepFile();
 			filterType = 1;
-		} else if (removeFile != null) {
-			rFile = removeFile;
+		} else if (cmdArgs.isRemoveFile()) {
+			rFile = cmdArgs.getRemoveFile();
 			readRemoveFile();
 			filterType = 2;
 		}
 		QC();
 	}
 
-	public void QC()
+	public SampleFilter(PedigreeFile ped, ArrayList<SubjectID> sID)
 	{
+		PedData = ped;
+		PersonTable = NewIt.newArrayList();
+
+		subSet = NewIt.newHashSet();
+		for(SubjectID sid:sID) {
+			subSet.add(sid);
+		}
+		QC();
+	}
+
+	public void QC() {
 		qualification();
-		if (PersonTable.size() == 0)
-		{
-			Logger.printUserError("No individuals are left for analysis.");
+		if (PersonTable.size() == 0) {
+			Logger.printUserError("No individuals were removed from analysis.");
 			System.exit(1);
 		}
 	}
@@ -91,21 +99,18 @@ public class SampleFilter
 		HukouBook = NewIt.newArrayList();
 		UniqueRecordSet<Family> families = PedData.getFamilies();
 
-		for (Iterator<Hukou> e = hukoubook.iterator(); e.hasNext();)
-		{
+		for (Iterator<Hukou> e = hukoubook.iterator(); e.hasNext();) {
 			Hukou hukou = e.next();
 			Family family = families.get(hukou.getFamilyID());
 			Person per = family.getPerson(hukou.getIndividualID());
 			boolean isKeep = keep(per);
 			hukou.setAvailable(isKeep);
-			if (!isKeep)
-			{
+			if (!isKeep) {
 				continue;
 			}
 			boolean isFounder = family.hasAncestor(per);
 			HukouBook.add(hukou);
-			PersonTable.add(new PersonIndex(per.getFamilyID(), per
-					.getPersonID(), per, false, isFounder));
+			PersonTable.add(new PersonIndex(per, false, isFounder));
 		}
 		Logger.printUserLog(PersonTable.size() + " individuals were remained for analysis.");
 	}
@@ -127,16 +132,6 @@ public class SampleFilter
 			flag = !subSet.contains(new SubjectID(p.getFamilyID(), p.getPersonID()));
 		}
 		return flag;
-	}
-
-	public int getNumberMarker()
-	{
-		return MapData.getMarkerNumber();
-	}
-
-	public MapFile getMapFile()
-	{
-		return MapData;
 	}
 
 	public int SampleSize()

@@ -5,19 +5,20 @@ import gear.family.pedigree.file.SNP;
 import gear.family.plink.PLINKParser;
 import gear.family.popstat.GenotypeMatrix;
 import gear.family.qc.rowqc.SampleFilter;
+import gear.subcommands.CommandArguments;
 
 import java.util.ArrayList;
 
 public class PlinkData extends Data
-{	
-	public PlinkData(PLINKParser parser, String keepFile, String removeFile)
+{
+	public PlinkData(PLINKParser parser, CommandArguments cmdArgs)
 	{
-		sampleFilter = new SampleFilter(parser.getPedigreeData(), parser.getMapData(), keepFile, removeFile);
-		genoMatrix = new GenotypeMatrix(sampleFilter.getSample());
-		snpList = sampleFilter.getMapFile().getMarkerList();
+		sampleFilter = new SampleFilter(parser.getPedigreeData(), cmdArgs);
+		genoMatrix = new GenotypeMatrix(sampleFilter.getSample(), parser.getMapData());
+		snpList = genoMatrix.getSNPList();
 		calcAllele1Frequencies();
 	}
-	
+
 	private void calcAllele1Frequencies()
 	{
 		allele1Freqs = new float[snpList.size()];

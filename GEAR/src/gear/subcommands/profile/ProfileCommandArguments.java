@@ -207,7 +207,7 @@ public final class ProfileCommandArguments extends CommandArguments
 	{
 		this.scale = false;
 	}
-	
+
 	protected void turnonScale()
 	{
 		this.scale = true;

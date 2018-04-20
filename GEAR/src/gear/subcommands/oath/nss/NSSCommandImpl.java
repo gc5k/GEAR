@@ -1,7 +1,6 @@
 package gear.subcommands.oath.nss;
 
 import gear.data.InputDataSet2;
-import gear.family.pedigree.file.MapFile;
 import gear.family.pedigree.file.SNP;
 import gear.family.plink.PLINKParser;
 import gear.family.popstat.GenotypeMatrix;
@@ -9,11 +8,9 @@ import gear.family.qc.rowqc.SampleFilter;
 import gear.subcommands.CommandArguments;
 import gear.subcommands.CommandImpl;
 import gear.subcommands.oath.OATHConst;
-import gear.sumstat.qc.rowqc.SumStatQC;
 import gear.util.FileUtil;
 import gear.util.Logger;
 import gear.util.NewIt;
-import gear.util.pop.PopStat;
 
 import java.io.PrintStream;
 import java.util.ArrayList;
@@ -29,19 +26,17 @@ import org.apache.commons.math.stat.correlation.PearsonsCorrelation;
 public class NSSCommandImpl extends CommandImpl 
 {
 	private NSSCommandArguments nssArgs;
-	private MapFile mapFile;
 	private SampleFilter sf;
-	private SumStatQC ssQC;
-	private GenotypeMatrix gm;
+	private GenotypeMatrix pGM;
+
 	private int[] traitIdx;
 	private int[] covIdx;
-	private double[][] frq;
 	private int N;
 	private InputDataSet2 data = null;
 	private ArrayList<NSSGWASResult> nssResult;
+	ArrayList<SNP> snpList;
 
 	private double lambdaGC = 1;
-//	private int monoLoci = 0;
 	
 	private int famFileIdx = 0;
 	private int pheFileIdx = 1;
@@ -64,12 +59,9 @@ public class NSSCommandImpl extends CommandImpl
 		this.N = data.getNumberOfSubjects();
 
 		PLINKParser pp = PLINKParser.parse(this.nssArgs);
-		this.sf = new SampleFilter(pp.getPedigreeData(), pp.getMapData());
-		this.ssQC = new SumStatQC(pp.getPedigreeData(), pp.getMapData(), this.sf);
-		this.mapFile = this.ssQC.getMapFile();
-		this.gm = new GenotypeMatrix(this.ssQC.getSample());
+		sf = new SampleFilter(pp.getPedigreeData(), cmdArgs);
+		pGM = new GenotypeMatrix(sf.getSample(), pp.getMapData(), cmdArgs);
 
-		frq = PopStat.calAlleleFrequency(this.gm, this.gm.getNumMarker());
 		for (int i = 0; i < traitIdx.length; i++)
 		{
 			Logger.printUserLog("");
@@ -145,7 +137,6 @@ public class NSSCommandImpl extends CommandImpl
 	{
 		int monoLoci = 0;
 		ChiSquaredDistributionImpl ci = new ChiSquaredDistributionImpl(1);
-		ArrayList<SNP> snpList = this.mapFile.getMarkerList();
 
 		int[] pIdx = data.getMatchedSubjectIdx(fileIdx);
 		double[] Y = new double[pIdx.length];
@@ -158,67 +149,55 @@ public class NSSCommandImpl extends CommandImpl
 		Y = StatUtils.normalize(Y);
 
 		int[] subIdx = data.getMatchedSubjectIdx(famFileIdx);
-		for (int i = 0; i < this.gm.getNumMarker(); i++)
+		for (int i = 0; i < pGM.getNumMarker(); i++)
 		{
-			SNP snp = (SNP) snpList.get(i);
-			
-			if (frq[i][0] < nssArgs.getMAF() || frq[i][1] < nssArgs.getMAF() )
+			SNP snp = pGM.getSNPList().get(i);
+
+			SimpleRegression sReg = new SimpleRegression();
+			double N = 0.0D;
+			double freq = 0.0D;
+			double xx = 0;
+			double mx = 0;
+
+			for (int j = 0; j < subIdx.length; j++)
 			{
+				int idx = subIdx[j];
+				int g = pGM.getAdditiveScoreOnFirstAllele(subIdx[idx], i);
+				if (g != 3) {
+					sReg.addData(g, Y[j]);
+					N += 1.0D;
+					freq += g;
+					mx += g;
+					xx += g*g;
+				}
+			}
+
+			if (freq == 0 || freq == 1 || (N < pGM.getNumIndivdial() * nssArgs.getGENO())) {
 				monoLoci++;
 				continue;
 			}
 
-				SimpleRegression sReg = new SimpleRegression();
-				double N = 0.0D;
-				double freq = 0.0D;
-				double xx = 0;
-				double mx = 0;
+			double vg = (xx - (mx/N) * (mx/N) * N)/(N-1);
 
-				for (int j = 0; j < subIdx.length; j++)
-				{
-					int idx = subIdx[j];
-					int g = this.gm.getAdditiveScoreOnFirstAllele(subIdx[idx], i);
-					if (g != 3) {
-						sReg.addData(g, Y[j]);
-						N += 1.0D;
-						freq += g;
-						mx += g;
-						xx += g*g;
-					}
-				}
-				double vg = (xx - (mx/N) * (mx/N) * N)/(N-1);
+			freq /= 2.0D * N;
 
-				if (vg == 0)
-				{
-					monoLoci++;
-					continue;
-				}
-				if (N <= 1) 
-				{
-					monoLoci++;
-					continue;
-				}
+			double b = sReg.getSlope();
+			double b_se = sReg.getSlopeStdErr();
 
-				freq /= 2.0D * N;
-
-				double b = sReg.getSlope();
-				double b_se = sReg.getSlopeStdErr();
-
-				NSSGWASResult e1 = new NSSGWASResult(snp, freq, vg, b, b_se);
-				nssResult.add(e1);
-				pArray.add(e1.GetP());
-			
+			NSSGWASResult e1 = new NSSGWASResult(snp, freq, vg, b, b_se);
+			nssResult.add(e1);
+			pArray.add(e1.GetP());
 		}
 		Collections.sort(pArray);
 		int idx = (int) Math.ceil(pArray.size() / 2);
 
 		if (monoLoci > 1)
 		{
-			Logger.printUserLog("Removed " + monoLoci + " loci [MAF < " + nssArgs.getMAF() + "]." );			
+			Logger.printUserLog("Removed " + monoLoci + " SNP [MAF < " + nssArgs.getMAF() + "]." );			
 		}
 		else if (monoLoci == 1)
 		{
-			Logger.printUserLog("Removed " + monoLoci + " locus [MAF < " + nssArgs.getMAF() + "]." );			
+			Logger.printUserLog("Removed " + monoLoci + " SNPs [MAF < " + nssArgs.getMAF() + "]." );			
 		}
 
 		Logger.printUserLog("Median of p values is " + pArray.get(idx));

@@ -26,10 +26,7 @@ public class QPCACommandImpl extends CommandImpl
 		qpcaArgs = (QPCACommandArguments)cmdArgs;
 		data = new InputDataSet2();
 		data.addFile(qpcaArgs.getGrmID());
-		if (qpcaArgs.getKeepFile() != null)
-		{
-			data.addFile(qpcaArgs.getKeepFile());
-		}
+		if (qpcaArgs.isKeepFile()) data.addFile(qpcaArgs.getKeepFile());
 		data.LineUpFiles();
 
 		readGrm();

@@ -64,7 +64,7 @@ public final class ProfileCommand extends Command
 		options.addOption(OptionBuilder.withDescription(OPT_KEEP_ATGC_DESC).withLongOpt(OPT_KEEP_ATGC_LONG).hasArg(false).create());
 		options.addOption(OptionBuilder.withDescription(OPT_EXTRACT_SCORE_DESC).withLongOpt(OPT_EXTRACT_SCORE_LONG).hasArg().create());
 		options.addOption(OptionBuilder.withDescription(OPT_REMOVE_SCORE_DESC).withLongOpt(OPT_REMOVE_SCORE_LONG).hasArg().create());
-		options.addOption(OptionBuilder.withDescription(OPT_SCALE_DESC).withLongOpt(OPT_SCALE_LONG).hasOptionalArg().create());
+//		options.addOption(OptionBuilder.withDescription(OPT_SCALE_DESC).withLongOpt(OPT_SCALE_LONG).hasOptionalArg().create());
 
 	    options.addOption(OptionBuilder.withDescription(OPT_KEEP_DESC).withLongOpt(OPT_KEEP_LONG).hasArg().create());
 	    options.addOption(OptionBuilder.withDescription(OPT_REMOVE_DESC).withLongOpt(OPT_REMOVE_LONG).hasArg().create());
@@ -83,8 +83,9 @@ public final class ProfileCommand extends Command
 		ProfileCommandArguments profArgs = new ProfileCommandArguments();
 //	    parseFileArguments((CommandArguments) profCmdArgs, cmdLine);
 	    parseSampleFilterArguments((CommandArguments) profArgs, cmdLine);
-	    parseSNPFilterArguments((CommandArguments) profArgs, cmdLine);
-		
+	    parseSNPFilterFileArguments((CommandArguments) profArgs, cmdLine);
+	    parseSNPFilterChromosomeArguments((CommandArguments) profArgs, cmdLine);
+
 		profArgs.setScoreFile(cmdLine.getOptionValue(OPT_SCORE_LONG));
 
 		profArgs.setScoreFileGZ(cmdLine.getOptionValue(OPT_SCORE_GZ_LONG));
@@ -124,7 +125,7 @@ public final class ProfileCommand extends Command
 	{
 		String qScoreFile = cmdLine.getOptionValue(OPT_QSCORE_LONG);
 		String qRangeFile = cmdLine.getOptionValue(OPT_QRANGE_LONG);
-		
+
 		if (qScoreFile == null && qRangeFile != null || qScoreFile != null && qRangeFile == null)
 		{
 			throw new CommandArgumentException("--" + OPT_QSCORE_LONG + " and --" + OPT_QRANGE_LONG + " must be set together.");

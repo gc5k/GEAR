@@ -2,14 +2,12 @@ package gear.subcommands.bluppca;
 
 import gear.ConstValues;
 import gear.data.InputDataSet2;
-import gear.family.pedigree.file.MapFile;
 import gear.family.pedigree.file.SNP;
 import gear.family.plink.PLINKParser;
 import gear.family.popstat.GenotypeMatrix;
 import gear.family.qc.rowqc.SampleFilter;
 import gear.subcommands.CommandArguments;
 import gear.subcommands.CommandImpl;
-import gear.sumstat.qc.rowqc.SumStatQC;
 import gear.util.BinaryInputFile;
 import gear.util.BufferedReader;
 import gear.util.FileUtil;
@@ -18,7 +16,6 @@ import gear.util.pop.PopStat;
 
 import java.io.PrintStream;
 import java.text.DecimalFormat;
-import java.util.ArrayList;
 
 import org.apache.commons.math.linear.Array2DRowRealMatrix;
 import org.apache.commons.math.linear.LUDecompositionImpl;
@@ -26,6 +23,10 @@ import org.apache.commons.math.linear.RealMatrix;
 
 public class BlupPcaCommandImpl extends CommandImpl
 {
+	private double[][] A;
+	private SampleFilter sf;
+	private GenotypeMatrix pGM;
+
 	@Override
 	public void execute(CommandArguments cmdArgs)
 	{
@@ -46,39 +47,30 @@ public class BlupPcaCommandImpl extends CommandImpl
 		readGrm(blupArgs, data.getNumberOfSubjects());
 
 		PLINKParser pp = PLINKParser.parse(blupArgs);
-		sf = new SampleFilter(pp.getPedigreeData(), pp.getMapData());
-		ssQC = new SumStatQC(pp.getPedigreeData(), pp.getMapData(), sf);
-		mapFile = ssQC.getMapFile();
-		gm = new GenotypeMatrix(ssQC.getSample());
+		sf = new SampleFilter(pp.getPedigreeData());
+		pGM = new GenotypeMatrix(sf.getSample(), pp.getMapData());
 
-		double[][] freq=PopStat.calAlleleFrequency(gm, gm.getNumMarker());
+		double[][] freq=PopStat.calAlleleFrequency(pGM);
 //		PopStat.Imputation(gm);
 
 		Logger.printUserLog("Standardizing genotypes...");
-		double[][] genoMat = new double[gm.getNumIndivdial()][gm.getNumMarker()];
+		double[][] genoMat = new double[pGM.getNumIndivdial()][pGM.getNumMarker()];
 		for(int i = 0; i < genoMat.length; i++)
 		{
 			for(int j = 0; j < genoMat[i].length; j++)
 			{
-				if (gm.getAdditiveScore(i, j) == ConstValues.BINARY_MISSING_GENOTYPE)
+				if (pGM.getAdditiveScore(i, j) == ConstValues.BINARY_MISSING_GENOTYPE)
 				{
 					genoMat[i][j] = 0;
 				}
 				else
 				{
-					if (freq[j][1] < 0.001)
-					{
-						genoMat[i][j] = 0;	
-					}
-					else
-					{
-						genoMat[i][j] = (gm.getAdditiveScore(i, j) - 2 * freq[j][1])/Math.sqrt(2*freq[j][1] * (1-freq[j][1]));						
-					}
+					genoMat[i][j] = (pGM.getAdditiveScore(i, j) - 2 * freq[j][1])/Math.sqrt(2*freq[j][1] * (1-freq[j][1]));						
 				}
 			}
 		}
 
-		double[][] blupPC = new double[gm.getNumMarker()][data.getNumberOfTraits()];
+		double[][] blupPC = new double[pGM.getNumMarker()][data.getNumberOfTraits()];
 
 		Logger.printUserLog("Inversing the matrix...");
 		RealMatrix grm = new Array2DRowRealMatrix(A);
@@ -98,7 +90,7 @@ public class BlupPcaCommandImpl extends CommandImpl
 				double f = 0;
 				for(int k = 0; k < tGenoMat.getColumnDimension(); k++)
 				{
-					if (gm.getAdditiveScore(k, i) != ConstValues.BINARY_MISSING_GENOTYPE)
+					if (pGM.getAdditiveScore(k, i) != ConstValues.BINARY_MISSING_GENOTYPE)
 					{
 						f += tGenoMat.getEntry(i, k) * grm_Inv.getEntry(k, j);
 					}
@@ -123,17 +115,16 @@ public class BlupPcaCommandImpl extends CommandImpl
 //			Logger.printUserLog("Rescaling the snp effects...");
 			for(int j = 0; j < B.getRowDimension(); j++)
 			{
-				blupPC[j][traitIdx] = B.getEntry(j, 0) / gm.getNumMarker();
+				blupPC[j][traitIdx] = B.getEntry(j, 0) / pGM.getNumMarker();
 			}
 		}
 
 		PrintStream predictorFile = FileUtil.CreatePrintStream(blupArgs.getOutRoot() + ".blup");
 
 		// Title Line
-		ArrayList<SNP> snpList = mapFile.getMarkerList();
 
 		predictorFile.print("SNP\tRefAllele");
-		
+
 		for(int i = 0; i < blupArgs.getPhenotypeIndex().length; i++)
 		{
 			if (blupArgs.getPhenotypeIndex()[0] == -1)
@@ -148,9 +139,9 @@ public class BlupPcaCommandImpl extends CommandImpl
 
 		DecimalFormat fmt = new DecimalFormat("#.###E00");
 
-		for(int i = 0; i < gm.getNumMarker(); i++)
+		for(int i = 0; i < pGM.getNumMarker(); i++)
 		{
-			SNP snp = snpList.get(i);
+			SNP snp = pGM.getSNPList().get(i);
 			predictorFile.print(snp.getName() + "\t" + snp.getFirstAllele() + "\t");
 			for(int j = 0; j < blupPC[i].length; j++)
 			{
@@ -217,10 +208,4 @@ public class BlupPcaCommandImpl extends CommandImpl
 		reader.close();
 	}
 
-	private double[][] A;
-
-	private MapFile mapFile;
-	private SampleFilter sf;
-	private SumStatQC ssQC;
-	private GenotypeMatrix gm;
 }

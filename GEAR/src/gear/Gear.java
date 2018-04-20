@@ -6,17 +6,12 @@ import java.util.SortedSet;
 import java.util.TreeMap;
 import java.util.TreeSet;
 
-import gear.epem.GRMStat;
-import gear.he.HEMCalculate;
-import gear.he.HEMRead;
 import gear.he.h2trans.H2Transformer;
 import gear.ibd.jhe.JointHELinkLS;
 import gear.ibd.jhe.JointHELinkML;
 import gear.imputation.NaiveImputation;
 import gear.impute.ImputeProbabilityBestGuess;
 import gear.pscontrol.NonTransmitted;
-import gear.simulation.RealDataSimulation;
-import gear.simulation.RealDataSimulationQT;
 import gear.subcommands.Command;
 import gear.util.Logger;
 import gear.util.MonitorThread;
@@ -55,7 +50,6 @@ public enum Gear
 		addCommand(new gear.subcommands.qpca.QPCACommand());
 		addCommand(new gear.subcommands.locus.LocusCommand());
 		addCommand(new gear.subcommands.at.AtCommand());
-		addCommand(new gear.subcommands.arch.ArchCommand());
 		addCommand(new gear.subcommands.ebatchgwas.EbatchGWASCommand());
 		addCommand(new gear.subcommands.eigengwas.EigenGWASCommand());
 		addCommand(new gear.subcommands.eigengwasdom.EigenGWASDomCommand());
@@ -140,20 +134,7 @@ public enum Gear
 	
 			CmdArgs.INSTANCE.printOptionsInEffect();
 	
-			if (CmdArgs.INSTANCE.bsimuFlag)
-			{
-				if (CmdArgs.INSTANCE.simupolyCCFlag) 
-				{
-					RealDataSimulation rdSimu = new RealDataSimulation();
-					rdSimu.GenerateSample();				
-				}
-				else 
-				{
-					RealDataSimulationQT rdSimuQT = new RealDataSimulationQT();
-					rdSimuQT.GenerateSample();
-				}
-			}
-			else if (CmdArgs.INSTANCE.calOption)
+			if (CmdArgs.INSTANCE.calOption)
 			{
 				H2Transformer H2 = new H2Transformer();
 				H2.H2();
@@ -163,30 +144,6 @@ public enum Gear
 			{
 				NonTransmitted nt = new NonTransmitted();
 				nt.GenerateNonTransmitted();
-	
-			}
-			else if (CmdArgs.INSTANCE.hasHEOption())
-			{
-				HEMRead mhr = new HEMRead();
-				HEMCalculate mhc = new HEMCalculate(mhr);
-				mhc.Regression();
-	//			if (CmdArgs.INSTANCE.getHEArgs().isSingleGrm())
-	//			{
-	//				HERead hr = new HERead();
-	//				HECalculate hc = new HECalculate(hr);
-	//				hc.Regression();
-	//
-	//				if (CmdArgs.INSTANCE.permFlag)
-	//				{
-	//					HEPermutation hp = new HEPermutation(hr);
-	//					hp.Permutation();
-	//				}
-	//			}
-			}
-			else if (CmdArgs.INSTANCE.grmstatFlag)
-			{
-				GRMStat gs = new GRMStat();
-				gs.GetGRMStats();
 	
 			}
 			else if (CmdArgs.INSTANCE.naiveImputFlag)

@@ -12,23 +12,18 @@ import gear.CmdArgs;
 import gear.ConstValues;
 import gear.data.Person;
 import gear.family.pedigree.PersonIndex;
-import gear.family.pedigree.file.MapFile;
 import gear.family.pedigree.file.SNP;
 import gear.family.plink.PLINKBinaryParser;
 import gear.family.plink.PLINKParser;
 import gear.family.popstat.GenotypeMatrix;
 import gear.family.qc.rowqc.SampleFilter;
-import gear.sumstat.qc.rowqc.SumStatQC;
 import gear.util.Logger;
 import gear.util.pop.PopStat;
 
 public class NaiveImputation
 {
-
-	private MapFile mapFile;
 	private SampleFilter sf;
-	private SumStatQC ssQC;
-	GenotypeMatrix gm;
+	private GenotypeMatrix pGM;
 
 	public NaiveImputation()
 	{
@@ -58,18 +53,13 @@ public class NaiveImputation
 		}
 		pp.Parse();
 
-		sf = new SampleFilter(pp.getPedigreeData(),
-				pp.getMapData());
-		ssQC = new SumStatQC(pp.getPedigreeData(), pp.getMapData(),
-				sf);
-
-		mapFile = ssQC.getMapFile();
-		gm = new GenotypeMatrix(ssQC.getSample());
+		sf = new SampleFilter(pp.getPedigreeData());
+		pGM = new GenotypeMatrix(sf.getSample(), pp.getMapData());
 	}
 
 	public void Imputation() 
 	{
-		PopStat.Imputation(gm);
+		PopStat.Imputation(pGM);
 		if (CmdArgs.INSTANCE.makebedFlag)
 		{
 			writeBFile();
@@ -95,7 +85,7 @@ public class NaiveImputation
 			e.printStackTrace();
 		}
 
-		ArrayList<PersonIndex> pi = ssQC.getSample();
+		ArrayList<PersonIndex> pi = pGM.getSample();
 
 		for (int i = 0; i < pi.size(); i++)
 		{
@@ -105,7 +95,7 @@ public class NaiveImputation
 		}
 		fam.close();
 
-		ArrayList<SNP> snpList = mapFile.getMarkerList();
+		ArrayList<SNP> snpList = pGM.getSNPList();
 		for (int i = 0; i < snpList.size(); i++)
 		{
 			SNP snp = snpList.get(i);
@@ -119,20 +109,20 @@ public class NaiveImputation
 			bedout.writeByte(ConstValues.PLINK_BED_BYTE2);
 			bedout.writeByte(ConstValues.PLINK_BED_BYTE3);
 
-			for (int i = 0; i < gm.getNumMarker(); i++)
+			for (int i = 0; i < pGM.getNumMarker(); i++)
 			{
 				byte gbyte = 0;
 				int idx = 0;
 
-				for (int j = 0; j < gm.getNumIndivdial(); j++)
+				for (int j = 0; j < pGM.getNumIndivdial(); j++)
 				{
 
-					byte g = gm.getOriginalGenotypeScore(j, i);
+					byte g = pGM.getOriginalGenotypeScore(j, i);
 					g <<= 2 * idx;
 					gbyte |= g;
 					idx++;
 
-					if (j != (gm.getNumIndivdial() - 1))
+					if (j != (pGM.getNumIndivdial() - 1))
 					{
 						if (idx == 4)
 						{

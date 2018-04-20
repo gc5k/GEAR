@@ -50,17 +50,17 @@ public class SNPFilter implements SNPFilterInterface
 
 	public void Select(CommandArguments cmdArgs)
 	{
-		if (cmdArgs.getChr() != null || cmdArgs.getNotChr() != null) {
+		if (cmdArgs.isChr()  || cmdArgs.isNotChr()) {
 			selectChromosome(cmdArgs);
 		}
-		
-		if (cmdArgs.getExtractFile() != null || cmdArgs.getExcludeFile() != null) {
+
+		if (cmdArgs.isExtractFile() || cmdArgs.isExcludeFile()) {
 			chooseSNP(cmdArgs);
 		}
 
 		makeWSNPList();
 		Logger.printUserLog(WSNP.length + " SNPs were included for analysis.");			
-		Logger.printUserLog(excludedSNPSet.size() + " SNPs were removed for analysis.");			
+		Logger.printUserLog(excludedSNPSet.size() + " SNPs were removed from analysis.");			
 		return;
 	}
 
@@ -102,7 +102,7 @@ public class SNPFilter implements SNPFilterInterface
 	private void selectChromosome(CommandArguments cmdArgs)
 	{
 
-		if (cmdArgs.getChr() != null) {
+		if (cmdArgs.isChr()) {
 			Logger.printUserLog("Matching SNPs to the selected chromosome(s)...");
 			HashSet<String> chrSet = cmdArgs.getChr();
 			for (int i = 0; i < snpList.size(); i++)	{
@@ -116,8 +116,8 @@ public class SNPFilter implements SNPFilterInterface
 			}
 		}
 
-		if (cmdArgs.getNotChr() != null) {
-			Logger.printUserLog("Filtering out SNPs from not selected chromosome(s)...");
+		if (cmdArgs.isNotChr()) {
+			Logger.printUserLog("Filtering out SNPs at not selected chromosome(s)...");
 			HashSet<String> chrNotSet = cmdArgs.getNotChr();
 			for (int i = 0; i < snpList.size(); i++) {
 				SNP snp = snpList.get(i);

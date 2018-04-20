@@ -55,15 +55,15 @@ public class InputDataSet2 implements SubjectOrder
 
 	public void LineUpFiles()
 	{
-		matchedID();
+		matchedIDAcrossFiles();
 		for (int i = 0; i < fileList.size(); i++)
 		{
 			PhenotypeFile pf = fileList.get(i);
-			int[] idx = new int[deepSubList.size()];
+			int[] idx = new int[effectiveSubList.size()];
 			ArrayList<SubjectID> SID = NewIt.newArrayList();
-			for (int j = 0; j < deepSubList.size(); j++)
+			for (int j = 0; j < effectiveSubList.size(); j++)
 			{
-				SubjectID sid = deepSubList.get(j);
+				SubjectID sid = effectiveSubList.get(j);
 				int subidx = pf.getSubjectIndex(sid);
 				idx[j] = subidx;
 				SID.add(sid);
@@ -72,23 +72,23 @@ public class InputDataSet2 implements SubjectOrder
 			sampleID.add(SID);
 		}
 
-		Logger.printUserLog(deepSubList.size() + " samples were matched up in " + fileList.size() + " files.");
+		Logger.printUserLog(effectiveSubList.size() + " samples were matched up across " + fileList.size() + " files.");
 		Logger.printUserLog("");
 	}
 
-	private void matchedID()
+	private void matchedIDAcrossFiles()
 	{
-		ArrayList<SubjectID> subList = NewIt.newArrayList();
+		ArrayList<SubjectID> sList = NewIt.newArrayList();
 		Set<SubjectID> keySet = id2Idx.keySet();
 		for(Iterator<SubjectID> e = keySet.iterator(); e.hasNext(); )
 		{
 			SubjectID sid = e.next();
 			if (id2Idx.get(sid) == fileList.size())
 			{
-				subList.add(sid);
+				sList.add(sid);
 			}
 		}
-		if (subList.size() < 1)
+		if (sList.size() < 1)
 		{
 			Logger.printUserLog("No samples were lined up!");
 			Logger.printUserLog("GEAR quitted.\n");
@@ -100,14 +100,14 @@ public class InputDataSet2 implements SubjectOrder
 		for (int i = 0; i < pf.getNumberOfSubjects(); i++)
 		{
 			SubjectID sid = pf.getSubjectID(i);
-			if (subList.contains(sid)) deepSubList.add(sid);
+			if (sList.contains(sid)) effectiveSubList.add(sid);
 		}	
 	}
 
 	@Override
 	public int getNumberOfSubjects()
 	{
-		return deepSubList.size();
+		return effectiveSubList.size();
 	}
 
 	@Override
@@ -233,8 +233,12 @@ public class InputDataSet2 implements SubjectOrder
 		return sid;
 	}
 
-//	private ArrayList<SubjectID> subList = NewIt.newArrayList();
-	private ArrayList<SubjectID> deepSubList = NewIt.newArrayList();
+	public ArrayList<SubjectID> getMatchSubjetList()
+	{
+		return effectiveSubList;
+	}
+
+	private ArrayList<SubjectID> effectiveSubList = NewIt.newArrayList();
 	private SubjectOrder sharedSubjectOrder;
 
 	private HashMap<SubjectID, Integer> id2Idx = new HashMap<SubjectID, Integer>();

@@ -45,8 +45,11 @@ public class EigenGWASCommand extends Command
 	{
 		EigenGWASArguments eigenArgs = new EigenGWASArguments();
 		parseFileArguments(eigenArgs, cmdLine);
+		
 	    parseSampleFilterArguments((CommandArguments) eigenArgs, cmdLine);
-	    parseSNPFilterArguments((CommandArguments) eigenArgs, cmdLine);
+	    parseSNPFilterFileArguments((CommandArguments) eigenArgs, cmdLine);
+	    parseSNPFilterChromosomeArguments((CommandArguments) eigenArgs, cmdLine);
+
 		eigenArgs.setPhentypeIndex(parseIntOptionValue(cmdLine, OPT_MPHE, "1"));
 		eigenArgs.setPhenotypeFile(cmdLine.getOptionValue(OPT_PHE));
 

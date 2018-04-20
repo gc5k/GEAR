@@ -7,7 +7,6 @@ import gear.family.popstat.GenotypeMatrix;
 import gear.family.qc.rowqc.SampleFilter;
 import gear.subcommands.CommandArguments;
 import gear.subcommands.CommandImpl;
-import gear.sumstat.qc.rowqc.SumStatQC;
 import gear.util.BufferedReader;
 import gear.util.FileUtil;
 import gear.util.Logger;
@@ -27,7 +26,7 @@ public final class ProfileCommandImpl extends CommandImpl
 		profCmdArgs = (ProfileCommandArguments)cmdArgs;
 		
 		boolean isKeepSC = true;
-		if(profCmdArgs.getExtractFile() != null)
+		if (profCmdArgs.getExtractFile() != null)
 		{
 			extractSCsnp = NewIt.newHashSet();
 			BufferedReader reader = BufferedReader.openTextFile(profCmdArgs.getExtractFile(), "Profile Extract score");
@@ -43,7 +42,7 @@ public final class ProfileCommandImpl extends CommandImpl
 			Logger.printUserLog("Read " + extractSCsnp.size() + " SNPs in " + profCmdArgs.getExtractFile());
 		}
 
-		if(profCmdArgs.getRemoveFile() != null)
+		if (profCmdArgs.getRemoveFile() != null)
 		{
 			extractSCsnp = NewIt.newHashSet();
 			BufferedReader reader = BufferedReader.openTextFile(profCmdArgs.getRemoveFile(), "Profile Remove score");
@@ -72,7 +71,7 @@ public final class ProfileCommandImpl extends CommandImpl
 
 		HashMap<String, Float> qScoreMap = readQScores();  // LocusName-to-QScore map
 		QRange[] qRanges = readQRanges();
-		
+
 		Data genoData = initData();
 
 		SNP[] snps = genoData.getSNPs();
@@ -128,34 +127,34 @@ public final class ProfileCommandImpl extends CommandImpl
 				case MATCH_ALLELE1:
 				case MATCH_ALLELE1_FLIPPED:
 					scoreAlleleFrac = iter.getAllele1Fraction();
-					if (profCmdArgs.isScale())
-					{
-						if(freq[locIdx][0] != Double.NaN && freq[locIdx][0] != 1.0)
-						{
-							float p = (float) freq[locIdx][0];
-							scoreAlleleFrac = (float) ((scoreAlleleFrac - 2 * p) / Math.sqrt(2 * p * (1-p)));							
-						}
-						else
-						{
-							scoreAlleleFrac = 0.0f;
-						}
-					}
+//					if (profCmdArgs.isScale())
+//					{
+//						if(freq[locIdx][0] != Double.NaN && freq[locIdx][0] != 1.0)
+//						{
+//							float p = (float) freq[locIdx][0];
+//							scoreAlleleFrac = (float) ((scoreAlleleFrac - 2 * p) / Math.sqrt(2 * p * (1-p)));							
+//						}
+//						else
+//						{
+//							scoreAlleleFrac = 0.0f;
+//						}
+//					}
 					break;
 				case MATCH_ALLELE2:
 				case MATCH_ALLELE2_FLIPPED:
 					scoreAlleleFrac = 2.0f - iter.getAllele1Fraction();
-					if (profCmdArgs.isScale())
-					{
-						if (freq[locIdx][1] != Double.NaN && freq[locIdx][1] != 1.0)
-						{
-							float p = (float) freq[locIdx][1];
-							scoreAlleleFrac = (float) ((scoreAlleleFrac - 2*p) / Math.sqrt(2 * p * (1-p)));
-						}
-						else
-						{
-							scoreAlleleFrac = 0.0f;
-						}
-					}
+//					if (profCmdArgs.isScale())
+//					{
+//						if (freq[locIdx][1] != Double.NaN && freq[locIdx][1] != 1.0)
+//						{
+//							float p = (float) freq[locIdx][1];
+//							scoreAlleleFrac = (float) ((scoreAlleleFrac - 2*p) / Math.sqrt(2 * p * (1-p)));
+//						}
+//						else
+//						{
+//							scoreAlleleFrac = 0.0f;
+//						}
+//					}
 					break;
 				default:
 					continue;
@@ -427,11 +426,11 @@ public final class ProfileCommandImpl extends CommandImpl
 
 		return qRanges.toArray(new QRange[0]);
 	}
-	
+
 	private Data initData()
 	{
-		PLINKParser plinkParser = PLINKParser.parse(profCmdArgs);
-		if (plinkParser == null)
+		PLINKParser pp = PLINKParser.parse((CommandArguments) profCmdArgs);
+		if (pp == null)
 		{
 			if (profCmdArgs.isScale()) 
 			{
@@ -445,21 +444,18 @@ public final class ProfileCommandImpl extends CommandImpl
 		}
 		else if (profCmdArgs.isScale())
 		{
+			SampleFilter sf = new SampleFilter(pp.getPedigreeData());
+			GenotypeMatrix pGM = new GenotypeMatrix(sf.getSample(), pp.getMapData(), (CommandArguments) profCmdArgs);
+			freq = PopStat.calAlleleFrequency(pGM);
 
-			SampleFilter sf = new SampleFilter(plinkParser.getPedigreeData(), plinkParser.getMapData());
-			SumStatQC ssQC = new SumStatQC(plinkParser.getPedigreeData(), plinkParser.getMapData(), sf);
-			GenotypeMatrix gm = new GenotypeMatrix(ssQC.getSample());
-			freq = PopStat.calAlleleFrequency(gm, gm.getNumMarker());
-			
 			if (profCmdArgs.getScaleFile() != null)
 			{
 				HashMap<String, ScaleMaf> scaleMaf = readScaleFile();
 				if (scaleMaf.size() > 0)
 				{
-					ArrayList<SNP> snplist = plinkParser.getMapData().getMarkerList();
-					for (int i = 0; i < snplist.size(); i++)
+					for (int i = 0; i < pGM.getSNPList().size(); i++)
 					{
-						SNP snp = snplist.get(i);
+						SNP snp = pGM.getSNPList().get(i);
 						if (scaleMaf.containsKey(snp.getName()))
 						{
 							ScaleMaf sm = scaleMaf.get(snp.getName());
@@ -487,7 +483,7 @@ public final class ProfileCommandImpl extends CommandImpl
 				}
 			}
 		}
-		return new PlinkData(plinkParser, profCmdArgs.getKeepFile(), profCmdArgs.getRemoveFile());
+		return new PlinkData(pp, (CommandArguments) profCmdArgs);
 	}
 
 	private HashMap<String, ScaleMaf> readScaleFile()

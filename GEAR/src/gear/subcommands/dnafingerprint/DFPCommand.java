@@ -60,7 +60,7 @@ public class DFPCommand extends Command
 
 	    parseFileArguments((CommandArguments) dfpArgs, cmdLine);
 	    parseSampleFilterArguments((CommandArguments) dfpArgs, cmdLine);
-	    parseSNPFilterArguments((CommandArguments) dfpArgs, cmdLine);
+	    parseSNPFilterChromosomeArguments((CommandArguments) dfpArgs, cmdLine);
 
 		if (cmdLine.hasOption(OPT_BFILE2_LONG))
 		{

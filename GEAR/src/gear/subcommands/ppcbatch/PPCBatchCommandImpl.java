@@ -32,7 +32,7 @@ public class PPCBatchCommandImpl extends CommandImpl
 			{
 				String scoreExtract = new String(pbArgs.getOutRoot() + ".comsnp");
 				profArgs.setIsExtractScore(scoreExtract);
-				if (pbArgs.getKeepFile() != null) {
+				if (pbArgs.isKeepFile()) {
 					profArgs.setKeepFile(pbArgs.getKeepFile());
 				} else if (pbArgs.getRemoveFile() != null) {
 					profArgs.setRemoveFile(pbArgs.getRemoveFile());
@@ -43,7 +43,6 @@ public class PPCBatchCommandImpl extends CommandImpl
 			ProfileCommandImpl profImpl = new ProfileCommandImpl();
 			profImpl.execute(profArgs);
 			Logger.printUserLog("");
-
 		}
 	}
 }

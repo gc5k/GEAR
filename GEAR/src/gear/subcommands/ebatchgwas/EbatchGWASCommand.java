@@ -50,7 +50,8 @@ public class EbatchGWASCommand extends Command
 		EbatchGWASArguments EArgs = new EbatchGWASArguments();
 		parseFileArguments((CommandArguments)EArgs, cmdLine);
 	    parseSampleFilterArguments((CommandArguments) EArgs, cmdLine);
-	    parseSNPFilterArguments((CommandArguments) EArgs, cmdLine);
+	    parseSNPFilterFileArguments((CommandArguments) EArgs, cmdLine);	    
+	    parseSNPFilterChromosomeArguments((CommandArguments) EArgs, cmdLine);
 
 		EArgs.setEV(parseStringOptionValue(cmdLine, OPT_EV_LONG, "1"));
 

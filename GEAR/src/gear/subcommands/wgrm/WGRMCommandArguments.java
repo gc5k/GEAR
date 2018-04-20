@@ -2,7 +2,6 @@ package gear.subcommands.wgrm;
 
 import gear.subcommands.CommandArguments;
 import gear.util.FileUtil;
-import gear.util.Logger;
 
 public class WGRMCommandArguments extends CommandArguments
 {

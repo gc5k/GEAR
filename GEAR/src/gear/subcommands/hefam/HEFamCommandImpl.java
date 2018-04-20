@@ -319,7 +319,6 @@ public class HEFamCommandImpl extends CommandImpl
 		{
 			SimpleRegression sReg = new SimpleRegression();
 
-			int cnt = 0;
 			for (int i = 0; i < Y.length; i++)
 			{
 				if (i == jk)
@@ -347,7 +346,6 @@ public class HEFamCommandImpl extends CommandImpl
 					}
 					if ( (heArgs.isIBDcut() && A3[0][i][j] > heArgs.getIBDcutoff()) || (A3[0][i][j] == ibd_default)) continue;
 					sReg.addData(A3[0][i][j], yy);
-					cnt++;
 				}
 			}
 //			Logger.printUserLog(cnt + " observations for HE regression -> Jackknife " + (jk+1) + " " + sReg.getSlope());

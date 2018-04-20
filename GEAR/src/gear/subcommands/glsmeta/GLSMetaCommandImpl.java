@@ -67,8 +67,8 @@ public class GLSMetaCommandImpl extends CommandImpl
 		generateCorMatrix();
 
 		gReader = new GWASReader(gMetaArgs.getMetaFile(), FileKeep, gMetaArgs.getKeys(), gMetaArgs.isQT(), gMetaArgs.isGZ(), 
-				gMetaArgs.getChr() != null? true:false,
-				gMetaArgs.getChr() != null? gMetaArgs.getChr():gMetaArgs.getNotChr());
+				gMetaArgs.isChr() ? true:false,
+				gMetaArgs.isChr()? gMetaArgs.getChr():gMetaArgs.getNotChr());
 		gReader.Start(false);
 
 		if (gReader.getNumMetaFile() < 2)

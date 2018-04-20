@@ -127,7 +127,7 @@ public class EnigmaCommandImpl extends CommandImpl
 		while ((tokens = reader.readTokensAtLeast(2)) != null)
 		{
 			ref.add(tokens[0] + "\t" + tokens[1]);
-			if(tokens.length == 3)
+			if (tokens.length == 3)
 			{
 				userFreq = true;
 			}

@@ -11,14 +11,14 @@ import gear.util.Logger;
 
 public class PopStat
 {
-	public static double[][] calAlleleFrequency(GenotypeMatrix G, int numMarker)
+	public static double[][] calAlleleFrequency(GenotypeMatrix G)
 	{
 		//[][0]a1 freq; [][1]a2 freq; [][2] missing rate
 		//it calculates second allele frequency (so, likely the major one)
-		double[][] allelefreq = new double[numMarker][3];
+		double[][] allelefreq = new double[G.getNumMarker()][3];
 		for (int i = 0; i < G.getGRow(); i++)
 		{
-			for (int j = 0; j < numMarker; j++)
+			for (int j = 0; j < G.getNumMarker(); j++)
 			{
 				int[] c = G.getBiAlleleGenotype(i, j);
 				allelefreq[j][c[0]]++;
@@ -26,7 +26,7 @@ public class PopStat
 			}
 		}
 
-		for (int i = 0; i < numMarker; i++)
+		for (int i = 0; i < G.getNumMarker(); i++)
 		{
 			double wa = allelefreq[i][0] + allelefreq[i][1];
 			double a = allelefreq[i][0] + allelefreq[i][1] + allelefreq[i][2];
@@ -49,13 +49,13 @@ public class PopStat
 		return allelefreq;
 	}
 
-	public static double[] calGenoVariance(GenotypeMatrix G, int numMarker)
+	public static double[] calGenoVariance(GenotypeMatrix G)
 	{
 		//[][0]a1 freq; [][1]a2 freq; [][2] missing rate
 		//it calculates second allele frequency (so, likely the major one)
-		double[] axsq = new double[numMarker];
+		double[] axsq = new double[G.getNumMarker()];
 
-		for (int i = 0; i < numMarker; i++)
+		for (int i = 0; i < G.getNumMarker(); i++)
 		{
 			int cnt = 0;
 			double sq = 0;
@@ -80,12 +80,12 @@ public class PopStat
 		return axsq;
 	}
 
-	public static double[][] calGenoFrequency(GenotypeMatrix G, int numMarker)
+	public static double[][] calGenoFrequency(GenotypeMatrix G)
 	{
-		double[][] gfreq = new double[numMarker][3];
+		double[][] gfreq = new double[G.getNumMarker()][3];
 		for (int i = 0; i < G.getGRow(); i++)
 		{
-			for (int j = 0; j < numMarker; j++)
+			for (int j = 0; j < G.getNumMarker(); j++)
 			{
 				int g = G.getAdditiveScoreOnFirstAllele(i, j);
 				if(g != ConstValues.BINARY_MISSING_GENOTYPE)
@@ -95,7 +95,7 @@ public class PopStat
 			}
 		}
 
-		for (int i = 0; i < numMarker; i++)
+		for (int i = 0; i < G.getNumMarker(); i++)
 		{
 			double wa = gfreq[i][0] + gfreq[i][1] + gfreq[i][2];
 			if (wa > 0)
@@ -111,7 +111,7 @@ public class PopStat
 	public static void Imputation (GenotypeMatrix G)
 	{
 		Logger.printUserLog("Implementing naive imputatation......");
-		double[][] f = calAlleleFrequency(G, G.getNumMarker());
+		double[][] f = calAlleleFrequency(G);
 		Logger.printUserLog("Missing genotypes will be imputed according to Hardy-Weinberg proportion for each locus with its estimated allele frequency.");
 
 		RandomDataImpl rnd = new RandomDataImpl();

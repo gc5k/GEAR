@@ -17,7 +17,6 @@ import gear.family.popstat.GenotypeMatrix;
 import gear.family.qc.rowqc.SampleFilter;
 import gear.subcommands.CommandArguments;
 import gear.subcommands.CommandImpl;
-import gear.sumstat.qc.rowqc.SumStatQC;
 import gear.util.FileUtil;
 import gear.util.Logger;
 import gear.util.NewIt;
@@ -28,8 +27,8 @@ public class DFPCommandImpl extends CommandImpl
 {
 	private DFPCommandArguments dfpArgs;
 
-	private GenotypeMatrix G1;
-	private GenotypeMatrix G2;
+	private GenotypeMatrix pGM1;
+	private GenotypeMatrix pGM2;
 
 	private double[][] allelefreq;
 	private int[] markerIdx;
@@ -44,8 +43,6 @@ public class DFPCommandImpl extends CommandImpl
 
 	private SampleFilter sf1;
 	private SampleFilter sf2;
-	private SumStatQC ssQC1;
-	private SumStatQC ssQC2;
 
 	private boolean[] snpMatch;
 	
@@ -73,35 +70,32 @@ public class DFPCommandImpl extends CommandImpl
 	private void RealCheck()
 	{
 		PLINKParser pp1 = PLINKParser.parse((CommandArguments) dfpArgs);
-		sf1 = new SampleFilter(pp1.getPedigreeData(), pp1.getMapData(), dfpArgs.getKeepFile(), dfpArgs.getRemoveFile());
-		ssQC1 = new SumStatQC(pp1.getPedigreeData(), pp1.getMapData(), sf1);
-		G1 = new GenotypeMatrix(ssQC1.getSample());
-		PersonTable1 = ssQC1.getSample();
+		sf1 = new SampleFilter(pp1.getPedigreeData(), (CommandArguments) dfpArgs);
+		pGM1 = new GenotypeMatrix(sf1.getSample(), pp1.getMapData(), (CommandArguments) dfpArgs);
+		PersonTable1 = sf1.getSample();
 
 		Logger.printUserLog("");
 		Logger.printUserLog("Reading bfile2...");
 		PLINKBinaryParser pp2 = new PLINKBinaryParser(dfpArgs.getBed2(), dfpArgs.getBim2(), dfpArgs.getFam2());
 		pp2.Parse();
-		sf2 = new SampleFilter(pp2.getPedigreeData(), pp2.getMapData());
-		ssQC2 = new SumStatQC(pp2.getPedigreeData(), pp2.getMapData(), sf2);
-		G2 = new GenotypeMatrix(ssQC2.getSample());
-		PersonTable2 = ssQC2.getSample();
+		sf2 = new SampleFilter(pp2.getPedigreeData());
+		pGM2 = new GenotypeMatrix(sf2.getSample(), pp2.getMapData());
+		PersonTable2 = sf2.getSample();
 		Logger.printUserLog("");
 
-		refSNPList = pp1.getMapData().getMarkerList();
+		refSNPList = pGM1.getSNPList();
 	}
 
 	public void Check()
 	{
-		allelefreq = PopStat.calAlleleFrequency(G1, refSNPList.size());
+		allelefreq = PopStat.calAlleleFrequency(pGM1);
 
 		StringBuffer sb = new StringBuffer();
 		sb.append(dfpArgs.getOutRoot());
 		sb.append(".real");
 		PrintStream ps = FileUtil.CreatePrintStream(sb.toString());
 
-		getCommonSNP(sf1.getMapFile().getMarkerList(), sf2.getMapFile()
-				.getMarkerList());
+		getCommonSNP(pGM1.getSNPList(), pGM2.getSNPList());
 
 		getRandomMarker();
 
@@ -113,9 +107,9 @@ public class DFPCommandImpl extends CommandImpl
 		int identical = 0;
 
 		ps.print("FID1 ID1 FID2 ID2 Match ExpMatch Score nmiss\n");
-		for (int i = 0; i < G1.getGRow(); i++)
+		for (int i = 0; i < pGM1.getGRow(); i++)
 		{
-			for (int j = 0; j < G2.getGRow(); j++)
+			for (int j = 0; j < pGM2.getGRow(); j++)
 			{
 				double[] s = similarityScore(i, j);
 				double ES = 0;
@@ -158,7 +152,7 @@ public class DFPCommandImpl extends CommandImpl
 			v = 0;
 		}
 
-		long N = G1.getGRow() * G2.getGRow();
+		long N = pGM1.getGRow() * pGM2.getGRow();
 		Logger.printUserLog("In total " + N + " individual pairs were compared.\n");
 		Logger.printUserLog("Mean is: " + E);
 		Logger.printUserLog("Standard deviation is: " + v);
@@ -204,8 +198,8 @@ public class DFPCommandImpl extends CommandImpl
 
 			int idx = markerIdx[i];
 
-			int g1 = G1.getAdditiveScore(idx1, comSNPIdx[0][idx]);
-			int g2 = G2.getAdditiveScore(idx2, comSNPIdx[1][idx]);
+			int g1 = pGM1.getAdditiveScore(idx1, comSNPIdx[0][idx]);
+			int g2 = pGM2.getAdditiveScore(idx2, comSNPIdx[1][idx]);
 			if (g1 == Person.MissingGenotypeCode
 					|| g2 == Person.MissingGenotypeCode)
 				continue;
@@ -394,8 +388,8 @@ public class DFPCommandImpl extends CommandImpl
 	private void setSNPFlipFlag() 
 	{
 		snpMatch = new boolean[markerIdx.length];
-		ArrayList<SNP> l1 = sf1.getMapFile().getMarkerList();
-		ArrayList<SNP> l2 = sf2.getMapFile().getMarkerList();
+		ArrayList<SNP> l1 = pGM1.getSNPList();
+		ArrayList<SNP> l2 = pGM2.getSNPList();
 
 		for (int i = 0; i < markerIdx.length; i++)
 		{
@@ -424,19 +418,17 @@ public class DFPCommandImpl extends CommandImpl
 	public void RealCheckOne()
 	{
 		PLINKParser pp1 = PLINKParser.parse((CommandArguments) dfpArgs);
-		sf1 = new SampleFilter(pp1.getPedigreeData(), pp1.getMapData());
-		ssQC1 = new SumStatQC(pp1.getPedigreeData(), pp1.getMapData(), sf1);
-		G1 = new GenotypeMatrix(ssQC1.getSample());
-		PersonTable1 = ssQC1.getSample();
-		refSNPList = pp1.getMapData().getMarkerList();
+		sf1 = new SampleFilter(pp1.getPedigreeData(), (CommandArguments) dfpArgs);
+		pGM1 = new GenotypeMatrix(sf1.getSample(), pp1.getMapData(), (CommandArguments) dfpArgs);
+		PersonTable1 = sf1.getSample();
+		refSNPList = pGM1.getSNPList();
 		Logger.printUserLog("");
-
 	}
 
 	public void CheckOne()
 	{
 
-		allelefreq = PopStat.calAlleleFrequency(G1, refSNPList.size());
+		allelefreq = PopStat.calAlleleFrequency(pGM1);
 
 		StringBuffer sb = new StringBuffer();
 		sb.append(dfpArgs.getOutRoot());
@@ -455,7 +447,7 @@ public class DFPCommandImpl extends CommandImpl
 		int n = 0;
 		int identical = 0;
 		ps.print("FID1 ID1 FID2 ID2 Match ExpMatch Score nmiss\n");
-		for (int i = 0; i < G1.getGRow(); i++)
+		for (int i = 0; i < pGM1.getGRow(); i++)
 		{
 			for (int j = 0; j < i; j++)
 			{
@@ -501,7 +493,7 @@ public class DFPCommandImpl extends CommandImpl
 			v = 0;
 		}
 		
-		long N = G1.getGRow() * (G1.getGRow() + 1)/2;
+		long N = pGM1.getGRow() * (pGM1.getGRow() + 1)/2;
 		Logger.printUserLog("In total " + N + " individual pairs were compared.\n");
 		Logger.printUserLog("Mean is: " + E);
 		Logger.printUserLog("Standard deviation is: " + v);
@@ -549,8 +541,8 @@ public class DFPCommandImpl extends CommandImpl
 
 			int idx = markerIdx[i];
 
-			int g1 = G1.getAdditiveScore(idx1, idx);
-			int g2 = G1.getAdditiveScore(idx2, idx);
+			int g1 = pGM1.getAdditiveScore(idx1, idx);
+			int g2 = pGM1.getAdditiveScore(idx2, idx);
 			if (g1 == Person.MissingGenotypeCode
 					|| g2 == Person.MissingGenotypeCode)
 				continue;
@@ -569,7 +561,7 @@ public class DFPCommandImpl extends CommandImpl
 	public void getSelectedMarkerOne()
 	{
 
-		markerIdx = new int[sf1.getMapFile().getMarkerList().size()];
+		markerIdx = new int[pGM1.getSNPList().size()];
 
 		for (int i = 0; i < markerIdx.length; i++)
 			markerIdx[i] = i;
@@ -593,7 +585,7 @@ public class DFPCommandImpl extends CommandImpl
 	public void getRandomMarkerOne()
 	{
 		int mn = 0;
-		int nMarker = sf1.getMapFile().getMarkerList().size();
+		int nMarker = pGM1.getSNPList().size();
 		if (dfpArgs.getNumMarkerFlag())
 		{
 			if (dfpArgs.getNumMarker() > nMarker)

@@ -59,7 +59,9 @@ public class MLMMetaCommand extends Command
 
 		options.addOption(OptionBuilder.withDescription(OPT_DIAG_COHORT_DESC).create(OPT_DIAG_COHORT));
 		options.addOption(OptionBuilder.withDescription(OPT_NAIVE_DESC).create(OPT_NAIVE));
+
 		options.addOption(OptionBuilder.withDescription(OPT_CHR_DESC).withLongOpt(OPT_CHR_LONG).hasArgs().create());
+		options.addOption(OptionBuilder.withDescription(OPT_NOT_CHR_DESC).withLongOpt(OPT_NOT_CHR_LONG).hasArgs().create());
 
 		options.addOption(OptionBuilder.withDescription(OPT_ADJUST_OVERLAPPING_LONG_DESC).withLongOpt(OPT_ADJUST_OVERLAPPING_LONG).create());
 	}

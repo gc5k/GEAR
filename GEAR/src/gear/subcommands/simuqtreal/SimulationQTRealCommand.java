@@ -42,6 +42,16 @@ public class SimulationQTRealCommand extends Command
 		options.addOption(OptionBuilder.withDescription(OPT_MAKE_BED_LONG_DESC).withLongOpt(OPT_MAKE_BED_LONG).create());
 
 		options.addOption(OptionBuilder.withDescription(OPT_SEED_DESC).withLongOpt(OPT_SEED_LONG).hasArg().create());
+		
+		options.addOption(OptionBuilder.withDescription(OPT_KEEP_DESC).withLongOpt(OPT_KEEP_LONG).hasArg().create());
+	    options.addOption(OptionBuilder.withDescription(OPT_REMOVE_DESC).withLongOpt(OPT_REMOVE_LONG).hasArg().create());
+
+	    options.addOption(OptionBuilder.withDescription(OPT_EXTRACT_DESC).withLongOpt(OPT_EXTRACT_LONG).hasArg().create());
+	    options.addOption(OptionBuilder.withDescription(OPT_EXCLUDE_DESC).withLongOpt(OPT_EXCLUDE_LONG).hasArg().create());
+
+	    options.addOption(OptionBuilder.withDescription(OPT_CHR_DESC).withLongOpt(OPT_CHR_LONG).hasArgs().create());
+	    options.addOption(OptionBuilder.withDescription(OPT_NOT_CHR_DESC).withLongOpt(OPT_NOT_CHR_LONG).hasArgs().create());
+
 	}
 
 	@Override
@@ -50,7 +60,10 @@ public class SimulationQTRealCommand extends Command
 	{
 		SimulationQTRealCommandArguments simuQTRealArgs = new SimulationQTRealCommandArguments();
 		parseFileArguments(simuQTRealArgs, cmdLine);
-		
+	    parseSampleFilterArguments((CommandArguments) simuQTRealArgs, cmdLine);
+	    parseSNPFilterFileArguments((CommandArguments) simuQTRealArgs, cmdLine);
+	    parseSNPFilterChromosomeArguments((CommandArguments) simuQTRealArgs, cmdLine);
+
 		if(cmdLine.hasOption(OPT_REP))
 		{
 			simuQTRealArgs.setRep(cmdLine.getOptionValue(OPT_REP));

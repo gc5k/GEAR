@@ -5,19 +5,21 @@ import java.io.IOException;
 import java.io.PrintStream;
 
 import gear.ConstValues;
-import gear.family.pedigree.file.MapFile;
 import gear.family.pedigree.file.SNP;
 import gear.family.plink.PLINKParser;
 import gear.family.popstat.GenotypeMatrix;
 import gear.family.qc.rowqc.SampleFilter;
 import gear.subcommands.CommandArguments;
 import gear.subcommands.CommandImpl;
-import gear.sumstat.qc.rowqc.SumStatQC;
 import gear.util.FileUtil;
 import gear.util.Logger;
 
 public class AtCommandImpl extends CommandImpl
 {
+	private AtCommandArguments atArgs = null;
+
+	private SampleFilter sf;
+	private GenotypeMatrix pGM;
 
 	@Override
 	public void execute(CommandArguments cmdArgs) 
@@ -26,10 +28,8 @@ public class AtCommandImpl extends CommandImpl
 		
 		PLINKParser pp = PLINKParser.parse(this.atArgs);
 
-		this.sf = new SampleFilter(pp.getPedigreeData(), pp.getMapData());
-		this.ssQC = new SumStatQC(pp.getPedigreeData(), pp.getMapData(), this.sf);
-		this.mapFile = this.ssQC.getMapFile();
-		this.gm = new GenotypeMatrix(this.ssQC.getSample());
+		sf = new SampleFilter(pp.getPedigreeData());
+		pGM = new GenotypeMatrix(sf.getSample(), pp.getMapData(), cmdArgs);
 		CalLDMat();
 	}
 
@@ -64,12 +64,12 @@ public class AtCommandImpl extends CommandImpl
 		BufferedWriter mkGZ = FileUtil.ZipFileWriter(ldOut);
 
 		long MkCnt=0;
-		for(int i = 0; i < gm.getNumMarker(); i++)
+		for(int i = 0; i < pGM.getNumMarker(); i++)
 		{
-			SNP snp1 = mapFile.getSNP(i);
+			SNP snp1 = pGM.getSNPList().get(i);
 			for(int j = 0; j <= i; j++)
 			{
-				SNP snp2 = mapFile.getSNP(j);
+				SNP snp2 = pGM.getSNPList().get(j);
 				
 				if(atArgs.isWindow())
 				{
@@ -85,10 +85,10 @@ public class AtCommandImpl extends CommandImpl
 				double ssg2 = 0;
 				double crs = 0;
 				float ldscore = 0;
-				for(int k = 0; k < gm.getNumIndivdial(); k++)
+				for(int k = 0; k < pGM.getNumIndivdial(); k++)
 				{
-					int g1 = gm.getAdditiveScoreOnFirstAllele(k, i);
-					int g2 = gm.getAdditiveScoreOnFirstAllele(k, j);
+					int g1 = pGM.getAdditiveScoreOnFirstAllele(k, i);
+					int g2 = pGM.getAdditiveScoreOnFirstAllele(k, j);
 					if(g1 == ConstValues.BINARY_MISSING_GENOTYPE || g2 == ConstValues.BINARY_MISSING_GENOTYPE)
 					{
 						continue;
@@ -156,20 +156,13 @@ public class AtCommandImpl extends CommandImpl
 
 		PrintStream ld_mk = FileUtil.CreatePrintStream(sb_id);
 
-		for(int i = 0; i < mapFile.getMarkerNumber(); i++)
+		for(int i = 0; i < pGM.getNumMarker(); i++)
 		{
-			SNP snp = mapFile.getSNP(i);
+			SNP snp = pGM.getSNPList().get(i);
 			ld_mk.println(snp.getName() + " " + snp.getChromosome() + " " + snp.getDistance() + " " + snp.getPosition() + " " + snp.getFirstAllele() + " " + snp.getSecAllele());
 		}
 		ld_mk.close();
-		Logger.printUserLog("Saved " + mapFile.getMarkerNumber() + " marker information in '" + sb_id + "'.");
+		Logger.printUserLog("Saved " + pGM.getNumMarker() + " SNP information in '" + sb_id + "'.");
 	}
-
-	private AtCommandArguments atArgs = null;
-
-	private MapFile mapFile;
-	private SampleFilter sf;
-	private SumStatQC ssQC;
-	private GenotypeMatrix gm;
 
 }

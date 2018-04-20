@@ -1,14 +1,11 @@
 package gear.subcommands.eigengwasdom;
 
 import gear.subcommands.CommandArguments;
-import gear.util.FileUtil;
-import gear.util.Logger;
 
 public class EigenGWASDomCommandArguments extends CommandArguments 
 {
 	private String pheFile;
 	private int[] mPheno = {0};
-	private String keepFile = null;
 
 	public String getPhenotypeFile()
 	{
@@ -29,16 +26,4 @@ public class EigenGWASDomCommandArguments extends CommandArguments
 	{
 		return this.mPheno;
 	}
-	
-	public void setKeepFile(String kFile) 
-	{
-		FileUtil.exists(kFile);
-		keepFile = kFile;
-	}
-	
-	public String getKeepFile()
-	{
-		return keepFile;
-	}
-
 }

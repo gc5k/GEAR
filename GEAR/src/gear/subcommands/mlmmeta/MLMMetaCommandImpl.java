@@ -67,8 +67,8 @@ public class MLMMetaCommandImpl extends CommandImpl
 		generateCorMatrix();
 
 		gReader = new GWASReader(mlmMetaArgs.getMetaFile(), FileKeep, mlmMetaArgs.getKeys(), mlmMetaArgs.isQT(), mlmMetaArgs.isGZ(), 
-				mlmMetaArgs.getChr() != null? true:false,
-			    mlmMetaArgs.getChr() != null? mlmMetaArgs.getChr():mlmMetaArgs.getNotChr());
+				mlmMetaArgs.isChr(),
+			    mlmMetaArgs.isChr()? mlmMetaArgs.getChr():mlmMetaArgs.getNotChr());
 		gReader.Start(false);
 
 		if (gReader.getNumMetaFile() < 2)

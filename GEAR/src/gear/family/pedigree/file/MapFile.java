@@ -12,7 +12,6 @@ import java.util.HashMap;
 
 public class MapFile
 {
-
 	protected static final String DELIMITER = "\\s+";
 	protected ArrayList<SNP> snpList = NewIt.newArrayList();
 	protected HashMap<String, Integer> chrSNPCount = NewIt.newHashMap();

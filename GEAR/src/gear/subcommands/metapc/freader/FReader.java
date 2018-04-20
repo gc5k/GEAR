@@ -396,7 +396,6 @@ public class FReader
 		return workingMetaFile;
 	}
 
-	private boolean isChr;
 	private boolean isChrKeep=true;
 	private HashSet<String> chrSet = null;
 	private String[] field;

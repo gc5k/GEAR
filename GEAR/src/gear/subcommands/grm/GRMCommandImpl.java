@@ -1,17 +1,13 @@
-package gear.subcommands.wgrm;
+package gear.subcommands.grm;
 
 import java.io.BufferedWriter;
 import java.io.IOException;
 import java.io.PrintStream;
 import java.text.DecimalFormat;
 import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.HashMap;
 
 import gear.data.Person;
-import gear.family.pedigree.Hukou;
-import gear.family.pedigree.file.PedigreeFile;
-import gear.family.pedigree.file.SNP;
+import gear.family.pedigree.PersonIndex;
 import gear.family.plink.PLINKParser;
 import gear.family.popstat.GenotypeMatrix;
 import gear.family.qc.rowqc.SampleFilter;
@@ -19,76 +15,31 @@ import gear.subcommands.CommandArguments;
 import gear.subcommands.CommandImpl;
 import gear.util.FileUtil;
 import gear.util.Logger;
-import gear.util.NewIt;
 import gear.util.pop.PopStat;
-import gear.util.BufferedReader;
 
-public class WGRMCommandImpl extends CommandImpl {
-	private HashMap<String, Double> scores = NewIt.newHashMap(); // name-to-score
-
+public class GRMCommandImpl extends CommandImpl {
 	private GenotypeMatrix pGM;
-	private ArrayList<SNP> snpList;
 
 	private double[][] allelefreq;
 	private double[] allelevar;
-	private double[] weight;
-
-	private PedigreeFile pf;
-	private WGRMCommandArguments wgrmArgs;
+	private GRMCommandArguments grmArgs;
+	private SampleFilter sf;
 
 	@Override
 	public void execute(CommandArguments cmdArgs) {
-		wgrmArgs = (WGRMCommandArguments) cmdArgs;
+		grmArgs = (GRMCommandArguments) cmdArgs;
 
-		PLINKParser pp = PLINKParser.parse(wgrmArgs);
-		pf = pp.getPedigreeData();
-		SampleFilter sf = new SampleFilter(pp.getPedigreeData(), cmdArgs);
+		PLINKParser pp = PLINKParser.parse(grmArgs);
+		sf = new SampleFilter(pp.getPedigreeData(), cmdArgs);
+
 		pGM = new GenotypeMatrix(sf.getSample(), pp.getMapData(), cmdArgs);
-		snpList = pGM.getSNPList();
 
 		prepareMAF();
-		prepareWeight();
 
-		makeGeneticRelationshipScore();
+		makeAddScore();
 
-		if (wgrmArgs.isDom()) {
+		if (grmArgs.isDom()) {
 			makeDomScore();
-		}
-	}
-
-	private void prepareWeight() {
-		weight = new double[pGM.getNumMarker()];
-		Arrays.fill(weight, 1);
-
-		if (wgrmArgs.isWeight()) {
-			BufferedReader reader = BufferedReader.openTextFile(wgrmArgs.getWeightFile(), "weight");
-
-			String[] tokens = reader.readTokens(2);
-			int cnt = 0;
-			while (tokens != null) {
-				Double.parseDouble(tokens[1]);
-				scores.put(tokens[0], Double.parseDouble(tokens[1]));
-				cnt++;
-				tokens = reader.readTokens(2);
-			}
-			reader.close();
-			Logger.printUserLog(cnt + " scores have been read.");
-
-			int scnt = 0;
-			for (int i = 0; i < snpList.size(); i++) {
-				double s = 0;
-				if (scores.containsKey(snpList.get(i).getName())) {
-					s = scores.get(snpList.get(i).getName());
-					scnt++;
-				}
-				weight[i] = s;
-			}
-			Logger.printUserLog(scnt + " scores have been mapped.");
-		} else if (wgrmArgs.isVanRaden()) {
-			for (int i = 0; i < snpList.size(); i++) {
-				weight[i] = wgrmArgs.isAdjVar() ? Math.sqrt(allelevar[i])
-						: Math.sqrt(2 * allelefreq[i][1] * (1 - allelefreq[i][1]));
-			}
 		}
 	}
 
@@ -97,10 +48,10 @@ public class WGRMCommandImpl extends CommandImpl {
 		double grmDomSq = 0;
 
 		StringBuffer sb = new StringBuffer();
-		sb.append(wgrmArgs.getOutRoot());
+		sb.append(grmArgs.getOutRoot());
 		PrintStream grm = null;
 		BufferedWriter grmGZ = null;
-		if (wgrmArgs.isGZ()) {
+		if (grmArgs.isGZ()) {
 			sb.append(".dom.grm.gz");
 			grmGZ = FileUtil.ZipFileWriter(sb.toString());
 		} else {
@@ -109,7 +60,7 @@ public class WGRMCommandImpl extends CommandImpl {
 		}
 
 		int cnt = 0;
-		for (int i = 0; i < pGM.getNumIndivdial(); i++) {
+		for (int i = 0; i < pGM.getGRow(); i++) {
 			for (int j = 0; j <= i; j++) {
 				double[] d = GRMDomScore(i, j);
 				if (i != j) {
@@ -117,7 +68,7 @@ public class WGRMCommandImpl extends CommandImpl {
 					grmDomSq += d[1] * d[1];
 					cnt++;
 				}
-				if (wgrmArgs.isGZ()) {
+				if (grmArgs.isGZ()) {
 					try {
 						grmGZ.append((i + 1) + "\t" + (j + 1) + "\t" + d[0] + "\t" + d[1] + "\n");
 					} catch (IOException e) {
@@ -130,7 +81,7 @@ public class WGRMCommandImpl extends CommandImpl {
 			}
 		}
 
-		if (wgrmArgs.isGZ()) {
+		if (grmArgs.isGZ()) {
 			try {
 				grmGZ.close();
 			} catch (IOException e) {
@@ -141,18 +92,17 @@ public class WGRMCommandImpl extends CommandImpl {
 		}
 		Logger.printUserLog("Writing GRM dominance scores into '" + sb.toString() + "'.");
 		StringBuffer sb_id = new StringBuffer();
-		sb_id.append(wgrmArgs.getOutRoot());
+		sb_id.append(grmArgs.getOutRoot());
 		PrintStream grm_id = null;
 		sb_id.append(".dom.grm.id");
 		grm_id = FileUtil.CreatePrintStream(sb_id.toString());
 
-		ArrayList<Hukou> H = pf.getHukouBook();
-		for (int i = 0; i < H.size(); i++) {
-			Hukou h = H.get(i);
-			grm_id.println(h.getFamilyID() + "\t" + h.getIndividualID());
+		ArrayList<PersonIndex> PI = sf.getSample();
+		for (int i = 0; i < PI.size(); i++) {
+			grm_id.println(PI.get(i).getFamilyID() + "\t" + PI.get(i).getIndividualID());
 		}
 		grm_id.close();
-		Logger.printUserLog("Writing individual information into '" + sb_id.toString() + "'.");
+		Logger.printUserLog("Writing " + PI.size() + " individuals' information into '" + sb_id.toString() + "'.");
 
 		grmDomMean /= cnt;
 		grmDomSq /= cnt;
@@ -175,9 +125,9 @@ public class WGRMCommandImpl extends CommandImpl {
 		}
 
 		if (Math.abs(Effeictive_DomMarker) > 0.0001) {
-			Logger.printUserLog("Effective dominance sample size is : " + df.format(Effective_DomSample));
+			Logger.printUserLog("Effective dominance sample size is: " + df.format(Effective_DomSample));
 		} else {
-			Logger.printUserLog("Effective dominance sample size is : " + dfE.format(Effective_DomSample));
+			Logger.printUserLog("Effective dominance sample size is: " + dfE.format(Effective_DomSample));
 		}
 
 		if (Math.abs(Effeictive_DomMarker) > 0.0001) {
@@ -188,15 +138,15 @@ public class WGRMCommandImpl extends CommandImpl {
 		}
 	}
 
-	public void makeGeneticRelationshipScore() {
+	public void makeAddScore() {
 		double grmMean = 0;
 		double grmSq = 0;
 
 		StringBuffer sb = new StringBuffer();
-		sb.append(wgrmArgs.getOutRoot());
+		sb.append(grmArgs.getOutRoot());
 		PrintStream grm = null;
 		BufferedWriter grmGZ = null;
-		if (wgrmArgs.isGZ()) {
+		if (grmArgs.isGZ()) {
 			sb.append(".grm.gz");
 			grmGZ = FileUtil.ZipFileWriter(sb.toString());
 		} else {
@@ -205,7 +155,7 @@ public class WGRMCommandImpl extends CommandImpl {
 		}
 
 		int cnt = 0;
-		for (int i = 0; i < pGM.getNumIndivdial(); i++) {
+		for (int i = 0; i < pGM.getGRow(); i++) {
 			for (int j = 0; j <= i; j++) {
 				double[] s = GRMScore(i, j);
 				if (i != j) {
@@ -213,7 +163,7 @@ public class WGRMCommandImpl extends CommandImpl {
 					grmSq += s[1] * s[1];
 					cnt++;
 				}
-				if (wgrmArgs.isGZ()) {
+				if (grmArgs.isGZ()) {
 					try {
 						grmGZ.append((i + 1) + "\t" + (j + 1) + "\t" + s[0] + "\t" + s[1] + "\n");
 					} catch (IOException e) {
@@ -226,7 +176,7 @@ public class WGRMCommandImpl extends CommandImpl {
 			}
 		}
 
-		if (wgrmArgs.isGZ()) {
+		if (grmArgs.isGZ()) {
 			try {
 				grmGZ.close();
 			} catch (IOException e) {
@@ -237,18 +187,17 @@ public class WGRMCommandImpl extends CommandImpl {
 		}
 		Logger.printUserLog("Writing GRM scores into '" + sb.toString() + "'.");
 		StringBuffer sb_id = new StringBuffer();
-		sb_id.append(wgrmArgs.getOutRoot());
+		sb_id.append(grmArgs.getOutRoot());
 		PrintStream grm_id = null;
 		sb_id.append(".grm.id");
 		grm_id = FileUtil.CreatePrintStream(sb_id.toString());
 
-		ArrayList<Hukou> H = pf.getHukouBook();
-		for (int i = 0; i < H.size(); i++) {
-			Hukou h = H.get(i);
-			grm_id.println(h.getFamilyID() + "\t" + h.getIndividualID());
+		ArrayList<PersonIndex> PI = pGM.getSample();
+		for (int i = 0; i < PI.size(); i++) {
+			grm_id.println(PI.get(i).getFamilyID() + "\t" + PI.get(i).getIndividualID());
 		}
 		grm_id.close();
-		Logger.printUserLog("Writing individual information into '" + sb_id.toString() + "'.");
+		Logger.printUserLog("Writing " + PI.size() + " individuals' information into '" + sb_id.toString() + "'.");
 
 		grmMean /= cnt;
 		grmSq /= cnt;
@@ -259,9 +208,9 @@ public class WGRMCommandImpl extends CommandImpl {
 		DecimalFormat df = new DecimalFormat("0.0000");
 		DecimalFormat dfE = new DecimalFormat("0.00E0");
 		if (Math.abs(grmMean) > 0.0001) {
-			Logger.printUserLog("Mean of genetic relatedness is : " + df.format(grmMean));
+			Logger.printUserLog("Mean of genetic relatedness is: " + df.format(grmMean));
 		} else {
-			Logger.printUserLog("Mean of genetic relatedness is : " + dfE.format(grmMean));
+			Logger.printUserLog("Mean of genetic relatedness is: " + dfE.format(grmMean));
 		}
 
 		if (Math.abs(grmSD) > 0.0001) {
@@ -271,9 +220,9 @@ public class WGRMCommandImpl extends CommandImpl {
 		}
 
 		if (Math.abs(Effeictive_marker) > 0.0001) {
-			Logger.printUserLog("Effective sample size is : " + df.format(Effective_sample));
+			Logger.printUserLog("Effective sample size is: " + df.format(Effective_sample));
 		} else {
-			Logger.printUserLog("Effective sample size is : " + dfE.format(Effective_sample));
+			Logger.printUserLog("Effective sample size is: " + dfE.format(Effective_sample));
 		}
 
 		if (Math.abs(Effeictive_marker) > 0.0001) {
@@ -285,11 +234,9 @@ public class WGRMCommandImpl extends CommandImpl {
 
 	private double[] GRMScore(int idx1, int idx2) {
 		double[] s = { 0, 0 };
-		double W = 0;
 
 		for (int i = 0; i < allelefreq.length; i++) {
-
-			if (allelefreq[i][1] == Double.NaN) {
+			if (allelefreq[i][1] == Double.NaN || allelefreq[i][0] == 0 || allelevar[i] == 0) {
 				continue;
 			}
 			int g1 = pGM.getAdditiveScore(idx1, i);
@@ -298,30 +245,26 @@ public class WGRMCommandImpl extends CommandImpl {
 			if (g1 == Person.MissingGenotypeCode || g2 == Person.MissingGenotypeCode) {
 				continue;
 			} else {
-				double de = 2 * m * (1-m);
-				if (wgrmArgs.isAdjVar()) {
+				double de = grmArgs.isInbred()? 4 * allelefreq[i][0] * allelefreq[i][1] : 2 * allelefreq[i][0] * allelefreq[i][1];
+				if (grmArgs.isAdjVar()) {
 					if (allelevar[i] == 0) continue;
-					de = allelevar[i];
 				}
 				s[0]++;
-				s[1] += weight[i] * weight[i] * (g1 - 2 * m) * (g2 - 2 * m) / de;
-				W += weight[i] * weight[i];
+				s[1] += (g1 - 2 * m) * (g2 - 2 * m) / de;
 			}
 		}
 
-		if (W > 0) {
-			s[1] /= W;
+		if (s[0] > 0) {
+			s[1] /= s[0];
 		} else {
 			s[0] = 0;
 			s[1] = 0;
 		}
-
 		return s;
 	}
 
 	private double[] GRMDomScore(int idx1, int idx2) {
 		double[] s = { 0, 0 };
-		double DW = 0;
 
 		for (int i = 0; i < allelefreq.length; i++) {
 
@@ -353,14 +296,12 @@ public class WGRMCommandImpl extends CommandImpl {
 					s2 = (4 * m - 2);
 				}
 
-				s[1] += weight[i] * weight[i] * weight[i] * weight[i] * (s1 - 2 * m * m) * (s2 - 2 * m * m)
-						/ (4 * m * m * (1 - m) * (1 - m));
-				DW += weight[i] * weight[i] * weight[i] * weight[i];
+				s[1] += (s1 - 2 * m * m) * (s2 - 2 * m * m) / (4 * m * m * (1 - m) * (1 - m));
 			}
 		}
 
-		if (DW > 0) {
-			s[1] /= DW;
+		if (s[0] > 0) {
+			s[1] /= s[0];
 		} else {
 			s[0] = 0;
 			s[1] = 0;
@@ -373,4 +314,5 @@ public class WGRMCommandImpl extends CommandImpl {
 		allelefreq = PopStat.calAlleleFrequency(pGM);
 		allelevar = PopStat.calGenoVariance(pGM);
 	}
+
 }
