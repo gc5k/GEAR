@@ -228,7 +228,7 @@ public final class ProfileCommand extends Command {
 	private void parseCoeffModelArgs(ProfileCommandArguments profCmdArgs, CommandLine cmdLine)
 			throws CommandArgumentException {
 		String coeffModel = cmdLine.getOptionValue(OPT_MODEL_LONG);
-		String resultFile = cmdLine.getOptionValue(OPT_OUT, OPT_OUT_DEFAULT);
+		String resultFile = cmdLine.getOptionValue(OPT_OUT_LONG, OPT_OUT_DEFAULT);
 
 		profCmdArgs.setIsSameAsPlink(false);
 

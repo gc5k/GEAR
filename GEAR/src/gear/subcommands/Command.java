@@ -70,7 +70,7 @@ public abstract class Command implements Comparable<Command> {
 	public Options getOptions() {
 		Options options = new Options();
 		options.addOption(
-				OptionBuilder.withDescription(OPT_OUT_DESC).withLongOpt(OPT_OUT_LONG).hasArg().create(OPT_OUT));
+				OptionBuilder.withDescription(OPT_OUT_DESC).withLongOpt(OPT_OUT_LONG).hasArg().create());
 		prepareOptions(options);
 		return options;
 	}
@@ -234,7 +234,7 @@ public abstract class Command implements Comparable<Command> {
 		try {
 			CommandLine cmdLine = cmdLineParser.parse(options, args, stopAtNonOption);
 			CommandArguments cmdArgs = parse(cmdLine);
-			cmdArgs.setOutRoot(cmdLine.getOptionValue(OPT_OUT, OPT_OUT_DEFAULT));
+			cmdArgs.setOutRoot(cmdLine.getOptionValue(OPT_OUT_LONG, OPT_OUT_DEFAULT));
 
 			Logger.setLogFiles(cmdArgs.getOutRoot());
 			Logger.hasUserLogTag(false);
