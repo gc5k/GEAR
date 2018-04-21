@@ -22,22 +22,17 @@ public class SNPFilter implements SNPFilterInterface {
 
 	protected int[] wseq = null;
 	protected int[] bgseq = null;
-	ArrayList<SNP> snpList;
-	HashSet<String> snpChosenSet;
+	private ArrayList<SNP> snpList;
+	private HashSet<String> snpChosenSet;
 
 	protected HashSet<Integer> selectedSNPSet;
 	protected HashSet<Integer> excludedSNPSet;
-	protected HashSet<Integer> bgSNPSet;
-
-	protected int[][] in_range = null;
-	protected int[][] ex_range = null;
 
 	public SNPFilter(MapFile mapData) {
 		this.mapData = mapData;
 		snpList = mapData.getMarkerList();
 		selectedSNPSet = NewIt.newHashSet();
 		excludedSNPSet = NewIt.newHashSet();
-		bgSNPSet = NewIt.newHashSet();
 	}
 
 	public void SelectSNP() {
@@ -73,7 +68,7 @@ public class SNPFilter implements SNPFilterInterface {
 		try {
 			while ((line = eFile.readLine()) != null) {
 				String[] s = line.split(ConstValues.WHITESPACE_DELIMITER);
-				snpChosenSet.add(s[0]);
+				for(int i = 0; i < s.length; i++) snpChosenSet.add(s[i]);
 			}
 		} catch (IOException e) {
 			Logger.handleException(e, "An exception occurred when reading '"
@@ -101,7 +96,7 @@ public class SNPFilter implements SNPFilterInterface {
 		try {
 			while ((line = eFile.readLine()) != null) {
 				String[] s = line.split(ConstValues.WHITESPACE_DELIMITER);
-				snpChosenSet.add(s[0]);
+				for (int i = 0; i < s.length; i++) snpChosenSet.add(s[i]);
 			}
 		} catch (IOException e) {
 			Logger.handleException(e, "An exception occurred when reading '"
