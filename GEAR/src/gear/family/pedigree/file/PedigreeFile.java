@@ -190,7 +190,7 @@ public class PedigreeFile
 			{
 				if (c.compareTo("1") != 0
 						&& c.compareTo("0") != 0
-						&& c.compareTo(CmdArgs.INSTANCE.missing_phenotype) != 0)
+						&& c.compareTo(ConstValues.MISSING_PHENOTYPE) != 0)
 				{
 					IsSixthColBinary = false;
 					break;
@@ -200,7 +200,7 @@ public class PedigreeFile
 				if (c.compareTo("2") != 0
 						&& c.compareTo("1") != 0
 						&& c.compareTo("0") != 0
-						&& c.compareTo(CmdArgs.INSTANCE.missing_phenotype) != 0)
+						&& c.compareTo(ConstValues.MISSING_PHENOTYPE) != 0)
 				{
 					IsSixthColBinary = false;
 					break;

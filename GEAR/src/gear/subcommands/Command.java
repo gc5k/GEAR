@@ -91,9 +91,28 @@ public abstract class Command implements Comparable<Command> {
 		}
 	}
 
+	protected void parseMAFRangeArguments(CommandArguments cmdArgs, CommandLine cmdLine) throws CommandArgumentException {
+		if (cmdLine.hasOption(OPT_MAF_RANGE_LONG)) {
+			String[] mafR = cmdLine.getOptionValues(OPT_MAF_RANGE_LONG);
+			for (int i = 0; i < mafR.length; i++) {
+				if(!mafR[i].contains("-")) {
+					Logger.printUserLog("The value of " + mafR[i] + " is incorrect for option --" + OPT_MAF_RANGE_LONG + ". GEAR quit.");
+					System.exit(1);
+				}
+			}
+			cmdArgs.setMAFRange(cmdLine.getOptionValues(OPT_MAF_RANGE_LONG));
+		}
+	}
+
 	protected void parseGENOArguments(CommandArguments cmdArgs, CommandLine cmdLine) throws CommandArgumentException {
 		if (cmdLine.hasOption(OPT_GENO_LONG)) {
 			cmdArgs.setMaxMAF(cmdLine.getOptionValue(OPT_GENO_LONG));
+		}
+	}
+
+	protected void parseZeroVarArguments(CommandArguments cmdArgs, CommandLine cmdLine) throws CommandArgumentException {
+		if (cmdLine.hasOption(OPT_ZERO_VAR_LONG)) {
+			cmdArgs.setZeroVar();
 		}
 	}
 
@@ -122,13 +141,28 @@ public abstract class Command implements Comparable<Command> {
 		}
 	}
 
+	protected void parsePhenoFileArguments(CommandArguments cmdArgs, CommandLine cmdLine) 
+			throws CommandArgumentException {
+		if (cmdLine.hasOption(OPT_PHE)) {
+			FileUtil.exists(cmdLine.getOptionValue(OPT_PHE));
+			cmdArgs.setPhenotypeFile(cmdLine.getOptionValue(OPT_PHE));
+		}
+	}
+
+	protected void parsePhenoIndexArguments(CommandArguments cmdArgs, CommandLine cmdLine) 
+			throws CommandArgumentException {
+		if (cmdLine.hasOption(OPT_MPHE)) {
+			cmdArgs.setPhenotypeIndex(cmdLine.getOptionValues(OPT_MPHE));
+		}
+	}
+
 	protected void parseSampleFilterArguments(CommandArguments cmdArgs, CommandLine cmdLine)
 			throws CommandArgumentException {
 		String keepFile = cmdLine.getOptionValue(OPT_KEEP_LONG);
 		String removeFile = cmdLine.getOptionValue(OPT_REMOVE_LONG);
 
-		if ((keepFile != null) && (removeFile != null)) {
-			throw new CommandArgumentException("--keep and --remove cannot be set together.");
+		if (cmdLine.hasOption(OPT_KEEP_LONG) && cmdLine.hasOption(OPT_REMOVE_LONG)) {
+			throw new CommandArgumentException("--" + OPT_KEEP_LONG +" and --" + OPT_KEEP_LONG +" cannot be set together.");
 		}
 		if (keepFile != null) {
 			FileUtil.exists(keepFile);
@@ -162,7 +196,7 @@ public abstract class Command implements Comparable<Command> {
 		if (cmdLine.hasOption(OPT_CHR_LONG)
 				&& cmdLine.hasOption(OPT_NOT_CHR_LONG)) {
 			throw new CommandArgumentException(
-					"--extract, --exclude, --chr and --not-chr, any of them cannot be set together.");
+					"--chr and --not-chr cannot be set together.");
 		}
 
 		if (cmdLine.hasOption(OPT_CHR_LONG)) {
@@ -310,8 +344,14 @@ public abstract class Command implements Comparable<Command> {
 	protected static final String OPT_MAX_MAF_LONG = "max-maf";
 	protected static final String OPT_MAX_MAF_DESC = "Upper bound for minimal allele frequency cutoff. By dafault 0.5.";
 
+	protected static final String OPT_MAF_RANGE_LONG = "maf-range";
+	protected static final String OPT_MAF_RANGE_DESC = "maf ranges.";
+
 	protected static final String OPT_GENO_LONG = "genotyping missing rate";
 	protected static final String OPT_GENO_DESC = "Genotyping missing rate cutoff. By default 0.1";
+
+	protected static final String OPT_ZERO_VAR_LONG = "zero-var";
+	protected static final String OPT_ZERO_VAR_DESC = "Zero variance loci.";
 
 	protected static final String OPT_KEEP_LONG = "keep";
 	protected static final String OPT_KEEP_DESC = "Specify the individuals for analysis";
@@ -336,6 +376,12 @@ public abstract class Command implements Comparable<Command> {
 
 	protected static final String OPT_BFILE_LONG = "bfile";
 	protected static final String OPT_BFILE_DESC = "Specify PLINK format .bed, .bim and .fam files";
+
+	protected static final String OPT_PHE = "pheno";
+	protected static final String OPT_PHE_DESC = "Specify the phenotype file (individual eigenvector)";
+
+	protected static final String OPT_MPHE = "mpheno";
+	protected static final String OPT_MPHE_DESC = "Specify the phenotype index";
 
 	protected static final char OPT_OUT = 'o';
 	protected static final String OPT_OUT_LONG = "out";

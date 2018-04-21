@@ -12,6 +12,7 @@ public class WGRMCommandArguments extends CommandArguments
 	private boolean isVanRaden = false;
 	private boolean isWeight = false;
 	private String wFile = null;
+	private boolean isInbred = false;
 
 	public void setGZ()
 	{
@@ -84,4 +85,13 @@ public class WGRMCommandArguments extends CommandArguments
 	{
 		return wFile;
 	}
+
+	public void setInbred() {
+		isInbred = true;
+	}
+
+	public boolean isInbred() {
+		return isInbred;
+	}
+
 }

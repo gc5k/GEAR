@@ -24,6 +24,7 @@ public class LocusCommand extends Command {
 	@SuppressWarnings("static-access")
 	@Override
 	public void prepareOptions(Options options) {
+
 		options.addOption(OptionBuilder.withDescription(OPT_BFILE_DESC).withLongOpt(OPT_BFILE_LONG).hasArg()
 				.isRequired().create());
 
@@ -40,17 +41,33 @@ public class LocusCommand extends Command {
 		options.addOption(
 				OptionBuilder.withDescription(OPT_NOT_CHR_DESC).withLongOpt(OPT_NOT_CHR_LONG).hasArgs().create());
 
+		options.addOption(OptionBuilder.withDescription(OPT_MAF_DESC).withLongOpt(OPT_MAF_LONG).hasArg().create());
 		options.addOption(
-				OptionBuilder.withDescription(OPT_INBRED_DESC).withLongOpt(OPT_INBRED_LONG).hasArg().create());
+				OptionBuilder.withDescription(OPT_MAX_MAF_DESC).withLongOpt(OPT_MAX_MAF_LONG).hasArg().create());
+		options.addOption(OptionBuilder.withDescription(OPT_GENO_DESC).withLongOpt(OPT_GENO_LONG).hasArg().create());
+		options.addOption(
+				OptionBuilder.withDescription(OPT_ZERO_VAR_DESC).withLongOpt(OPT_ZERO_VAR_LONG).create());
+		options.addOption(
+				OptionBuilder.withDescription(OPT_MAF_RANGE_DESC).withLongOpt(OPT_MAF_RANGE_LONG).hasArgs().create());
+
+		options.addOption(
+				OptionBuilder.withDescription(OPT_INBRED_DESC).withLongOpt(OPT_INBRED_LONG).create());
 	}
 
 	@Override
 	public CommandArguments parse(CommandLine cmdLine) throws CommandArgumentException {
-		LocusArguments locArgs = new LocusArguments();
+		LocusCommandArguments locArgs = new LocusCommandArguments();
 		parseFileArguments(locArgs, cmdLine);
 		parseSampleFilterArguments((CommandArguments) locArgs, cmdLine);
 		parseSNPFilterFileArguments((CommandArguments) locArgs, cmdLine);
 		parseSNPFilterChromosomeArguments((CommandArguments) locArgs, cmdLine);
+
+		parseMAFArguments((CommandArguments) locArgs, cmdLine);
+		parseMAXMAFArguments((CommandArguments) locArgs, cmdLine);
+		parseGENOArguments((CommandArguments) locArgs, cmdLine);
+		parseZeroVarArguments((CommandArguments) locArgs, cmdLine);
+		
+		parseMAFRangeArguments((CommandArguments) locArgs, cmdLine);
 
 		if (cmdLine.hasOption(OPT_INBRED_LONG)) {
 			locArgs.setInbred();
@@ -58,19 +75,9 @@ public class LocusCommand extends Command {
 		return locArgs;
 	}
 
-	private void parseFileArguments(LocusArguments locusArgs, CommandLine cmdLine) throws CommandArgumentException {
-		String bfile = cmdLine.getOptionValue("bfile");
-
-		if ((bfile == null)) {
-			throw new CommandArgumentException("No genotypes are provided.");
-		}
-
-		locusArgs.setBFile(bfile);
-	}
-
 	@Override
 	protected CommandImpl createCommandImpl() {
-		return new LocusImpl();
+		return new LocusCommandImpl();
 	}
 
 	private static final String OPT_INBRED_LONG = "inbred";

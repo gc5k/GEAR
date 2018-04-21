@@ -9,11 +9,10 @@ import java.util.Arrays;
 import java.util.HashMap;
 
 import gear.data.Person;
+import gear.family.GenoMatrix.GenotypeMatrix;
 import gear.family.pedigree.Hukou;
 import gear.family.pedigree.file.PedigreeFile;
-import gear.family.pedigree.file.SNP;
 import gear.family.plink.PLINKParser;
-import gear.family.popstat.GenotypeMatrix;
 import gear.family.qc.rowqc.SampleFilter;
 import gear.subcommands.CommandArguments;
 import gear.subcommands.CommandImpl;
@@ -27,7 +26,6 @@ public class WGRMCommandImpl extends CommandImpl {
 	private HashMap<String, Double> scores = NewIt.newHashMap(); // name-to-score
 
 	private GenotypeMatrix pGM;
-	private ArrayList<SNP> snpList;
 
 	private double[][] allelefreq;
 	private double[] allelevar;
@@ -44,9 +42,10 @@ public class WGRMCommandImpl extends CommandImpl {
 		pf = pp.getPedigreeData();
 		SampleFilter sf = new SampleFilter(pp.getPedigreeData(), cmdArgs);
 		pGM = new GenotypeMatrix(sf.getSample(), pp.getMapData(), cmdArgs);
-		snpList = pGM.getSNPList();
 
-		prepareMAF();
+		allelefreq = PopStat.calAlleleFrequency(pGM);
+		allelevar = PopStat.calGenoVariance(pGM);
+
 		prepareWeight();
 
 		makeGeneticRelationshipScore();
@@ -75,19 +74,22 @@ public class WGRMCommandImpl extends CommandImpl {
 			Logger.printUserLog(cnt + " scores have been read.");
 
 			int scnt = 0;
-			for (int i = 0; i < snpList.size(); i++) {
+			for (int i = 0; i < pGM.getSNPList().size(); i++) {
 				double s = 0;
-				if (scores.containsKey(snpList.get(i).getName())) {
-					s = scores.get(snpList.get(i).getName());
+				if (scores.containsKey(pGM.getSNPList().get(i).getName())) {
+					s = scores.get(pGM.getSNPList().get(i).getName());
 					scnt++;
 				}
 				weight[i] = s;
 			}
 			Logger.printUserLog(scnt + " scores have been mapped.");
 		} else if (wgrmArgs.isVanRaden()) {
-			for (int i = 0; i < snpList.size(); i++) {
-				weight[i] = wgrmArgs.isAdjVar() ? Math.sqrt(allelevar[i])
-						: Math.sqrt(2 * allelefreq[i][1] * (1 - allelefreq[i][1]));
+			for (int i = 0; i < pGM.getSNPList().size(); i++) {
+
+				if (allelefreq[i][1] == Double.NaN || allelefreq[i][0] == 0 || allelefreq[i][1] == 0 || allelevar[i] == 0) continue;
+
+				weight[i] = wgrmArgs.isInbred()? Math.sqrt(4 * allelefreq[i][1] * (1 - allelefreq[i][1])):Math.sqrt(2 * allelefreq[i][1] * (1 - allelefreq[i][1]));
+				if (wgrmArgs.isAdjVar()) weight[i] = Math.sqrt(allelevar[i]);
 			}
 		}
 	}
@@ -207,7 +209,7 @@ public class WGRMCommandImpl extends CommandImpl {
 		int cnt = 0;
 		for (int i = 0; i < pGM.getNumIndivdial(); i++) {
 			for (int j = 0; j <= i; j++) {
-				double[] s = GRMScore(i, j);
+				double[] s = GRMAddScore(i, j);
 				if (i != j) {
 					grmMean += s[1];
 					grmSq += s[1] * s[1];
@@ -283,26 +285,23 @@ public class WGRMCommandImpl extends CommandImpl {
 		}
 	}
 
-	private double[] GRMScore(int idx1, int idx2) {
+	private double[] GRMAddScore(int idx1, int idx2) {
 		double[] s = { 0, 0 };
 		double W = 0;
 
 		for (int i = 0; i < allelefreq.length; i++) {
 
-			if (allelefreq[i][1] == Double.NaN) {
-				continue;
-			}
+			//inside controls
+			if (allelefreq[i][1] == Double.NaN || allelefreq[i][0] == 0 || allelefreq[i][1] == 0 || allelevar[i] == 0) continue;
+
 			int g1 = pGM.getAdditiveScore(idx1, i);
 			int g2 = pGM.getAdditiveScore(idx2, i);
 			double m = allelefreq[i][1];
 			if (g1 == Person.MissingGenotypeCode || g2 == Person.MissingGenotypeCode) {
 				continue;
 			} else {
-				double de = 2 * m * (1-m);
-				if (wgrmArgs.isAdjVar()) {
-					if (allelevar[i] == 0) continue;
-					de = allelevar[i];
-				}
+				double de = wgrmArgs.isInbred()? 4 * m * (1-m) : 2* m * (1-m);
+				if (wgrmArgs.isAdjVar()) de = allelevar[i];
 				s[0]++;
 				s[1] += weight[i] * weight[i] * (g1 - 2 * m) * (g2 - 2 * m) / de;
 				W += weight[i] * weight[i];
@@ -324,10 +323,9 @@ public class WGRMCommandImpl extends CommandImpl {
 		double DW = 0;
 
 		for (int i = 0; i < allelefreq.length; i++) {
+			//inside controls
+			if (allelefreq[i][1] == Double.NaN || allelefreq[i][0] == 0 || allelefreq[i][1] == 0 || allelevar[i] == 0) continue;
 
-			if (allelefreq[i][1] == Double.NaN) {
-				continue;
-			}
 			double m = allelefreq[i][1];
 			int g1 = pGM.getAdditiveScore(idx1, i);
 			int g2 = pGM.getAdditiveScore(idx2, i);
@@ -369,8 +367,4 @@ public class WGRMCommandImpl extends CommandImpl {
 		return s;
 	}
 
-	private void prepareMAF() {
-		allelefreq = PopStat.calAlleleFrequency(pGM);
-		allelevar = PopStat.calGenoVariance(pGM);
-	}
 }

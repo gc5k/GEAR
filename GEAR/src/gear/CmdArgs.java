@@ -1156,8 +1156,6 @@ public enum CmdArgs
 
 	public boolean status_shiftFlag = false;
 
-	public String missing_phenotype = "-9";
-
 	public double status_shift = -1;
 
 	public String missingGenotype = "22";

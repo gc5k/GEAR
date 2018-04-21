@@ -109,7 +109,7 @@ public class PLINKParser
 		mapData.parseMap();
 		Logger.printUserLog("Reading " + mapData.getMarkerNumberOriginal()+ " SNPs from '" + mapFile + "'.");
 		snpFilter = new SNPFilter(mapData);
-		snpFilter.Select();
+		snpFilter.SelectSNP();
 		int[] WSNP = snpFilter.getWorkingSNP();
 		mapData.setWSNP(WSNP);
 	}
@@ -119,7 +119,7 @@ public class PLINKParser
 		mapData.parseMap();
 		Logger.printUserLog("Reading " + mapData.getMarkerNumberOriginal()+ " SNPs from '" + cmdArgs.getBim() + "'.");
 		snpFilter = new SNPFilter(mapData);
-		snpFilter.Select(cmdArgs);
+		snpFilter.SelectSNP(cmdArgs);
 		int[] WSNP = snpFilter.getWorkingSNP();
 		mapData.setWSNP(WSNP);
 	}

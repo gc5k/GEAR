@@ -26,14 +26,13 @@ public class NSSCommand extends Command {
 	public void prepareOptions(Options options) {
 		options.addOption(OptionBuilder.withDescription(OPT_BFILE_DESC).withLongOpt(OPT_BFILE_LONG).hasArg()
 				.isRequired().create());
-		options.addOption(
-				OptionBuilder.withDescription(OPT_FILE_DESC).withLongOpt(OPT_FILE_LONG).hasArg().isRequired().create());
-
+//		options.addOption(
+//				OptionBuilder.withDescription(OPT_FILE_DESC).withLongOpt(OPT_FILE_LONG).hasArg().create());
 		options.addOption(OptionBuilder.withDescription(OPT_PHE_DESC).hasArg().isRequired().create(OPT_PHE));
-		options.addOption(OptionBuilder.withDescription(OPT_MPHE_DESC).hasArg().isRequired().create(OPT_MPHE));
+		options.addOption(OptionBuilder.withDescription(OPT_MPHE_DESC).hasArgs().isRequired().create(OPT_MPHE));
 		options.addOption(OptionBuilder.withDescription(OPT_COVAR_DESC).hasArg().isRequired().create(OPT_COVAR));
 		options.addOption(
-				OptionBuilder.withDescription(OPT_COVAR_NUMBER_DESC).withLongOpt(OPT_COVAR_NUMBER).hasArgs().create());
+				OptionBuilder.withDescription(OPT_COVAR_NUMBER_DESC).withLongOpt(OPT_COVAR_NUMBER).hasArgs().isRequired().create());
 
 		options.addOption(OptionBuilder.withDescription(OPT_KEEP_DESC).withLongOpt(OPT_KEEP_LONG).hasArg().create());
 		options.addOption(
@@ -48,6 +47,12 @@ public class NSSCommand extends Command {
 		options.addOption(
 				OptionBuilder.withDescription(OPT_NOT_CHR_DESC).withLongOpt(OPT_NOT_CHR_LONG).hasArgs().create());
 
+		options.addOption(OptionBuilder.withDescription(OPT_MAF_DESC).withLongOpt(OPT_MAF_LONG).hasArg().create());
+		options.addOption(
+				OptionBuilder.withDescription(OPT_MAX_MAF_DESC).withLongOpt(OPT_MAX_MAF_LONG).hasArg().create());
+		options.addOption(OptionBuilder.withDescription(OPT_GENO_DESC).withLongOpt(OPT_GENO_LONG).hasArg().create());
+		options.addOption(
+				OptionBuilder.withDescription(OPT_ZERO_VAR_DESC).withLongOpt(OPT_ZERO_VAR_LONG).create());
 	}
 
 	@Override
@@ -58,16 +63,17 @@ public class NSSCommand extends Command {
 		parseSNPFilterFileArguments((CommandArguments) nssArgs, cmdLine);
 		parseSNPFilterChromosomeArguments((CommandArguments) nssArgs, cmdLine);
 
-		nssArgs.setPhenotypeFile(cmdLine.getOptionValue(OPT_PHE));
+		parseMAFArguments((CommandArguments) nssArgs, cmdLine);
+		parseMAXMAFArguments((CommandArguments) nssArgs, cmdLine);
+		parseGENOArguments((CommandArguments) nssArgs, cmdLine);
+		parseZeroVarArguments((CommandArguments) nssArgs, cmdLine);
 
-		if (cmdLine.hasOption(OPT_MPHE)) {
-			nssArgs.setPhentypeIndex(cmdLine.getOptionValue(OPT_MPHE));
-		}
+		parsePhenoFileArguments((CommandArguments) nssArgs, cmdLine);
+		parsePhenoIndexArguments((CommandArguments) nssArgs, cmdLine);
 
 		nssArgs.setCovFile(cmdLine.getOptionValue(OPT_COVAR));
-
 		if (cmdLine.hasOption(OPT_COVAR_NUMBER)) {
-			nssArgs.setCovNumber(cmdLine.getOptionValues(OPT_COVAR_NUMBER));
+			nssArgs.setCovarIndex(cmdLine.getOptionValues(OPT_COVAR_NUMBER));
 		}
 
 		return nssArgs;
@@ -78,18 +84,10 @@ public class NSSCommand extends Command {
 		return new NSSCommandImpl();
 	}
 
-	private static final String OPT_PHE = "pheno";
-	private static final String OPT_PHE_DESC = "Specify the phenotype file (individual eigenvector)";
+	protected final static String OPT_COVAR = "covar";
+	protected final static String OPT_COVAR_DESC = "Specify the covariate file";
 
-	private static final String OPT_MPHE = "mpheno";
-	private static final String OPT_MPHE_DESC = "Specify the phenotype indicex";
+	protected final static String OPT_COVAR_NUMBER = "covar-number";
+	protected final static String OPT_COVAR_NUMBER_DESC = "Specify the indices for covariate file";
 
-	private final static String OPT_COVAR = "covar";
-	private final static String OPT_COVAR_DESC = "Specify the covariate file";
-
-	private final static String OPT_COVAR_NUMBER = "covar-number";
-	private final static String OPT_COVAR_NUMBER_DESC = "Specify the indices for covariate file";
-
-	private static final String OPT_MAF = "maf";
-	private static final String OPT_MAF_DESC = "Specify the maf cutoff.";
 }

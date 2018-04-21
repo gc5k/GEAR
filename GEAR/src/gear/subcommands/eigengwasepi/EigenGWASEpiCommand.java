@@ -43,6 +43,15 @@ public class EigenGWASEpiCommand extends Command
 	    options.addOption(OptionBuilder.withDescription(OPT_CHR_DESC).withLongOpt(OPT_CHR_LONG).hasArgs().create());
 	    options.addOption(OptionBuilder.withDescription(OPT_NOT_CHR_DESC).withLongOpt(OPT_NOT_CHR_LONG).hasArgs().create());
 
+		options.addOption(OptionBuilder.withDescription(OPT_MAF_DESC).withLongOpt(OPT_MAF_LONG).hasArg().create());
+		options.addOption(
+				OptionBuilder.withDescription(OPT_MAX_MAF_DESC).withLongOpt(OPT_MAX_MAF_LONG).hasArg().create());
+		options.addOption(OptionBuilder.withDescription(OPT_GENO_DESC).withLongOpt(OPT_GENO_LONG).hasArg().create());
+		options.addOption(
+				OptionBuilder.withDescription(OPT_ZERO_VAR_DESC).withLongOpt(OPT_ZERO_VAR_LONG).create());
+	    options.addOption(
+				OptionBuilder.withDescription(OPT_MAF_RANGE_DESC).withLongOpt(OPT_MAF_RANGE_LONG).hasArgs().create());
+
 	    options.addOption(OptionBuilder.withDescription(OPT_INBRED_DESC).create(OPT_INBRED));
 	}
 
@@ -56,13 +65,16 @@ public class EigenGWASEpiCommand extends Command
 	    parseSNPFilterFileArguments((CommandArguments) eigenEpiArgs, cmdLine);
 	    parseSNPFilterChromosomeArguments((CommandArguments) eigenEpiArgs, cmdLine);
 
-		eigenEpiArgs.setPhenotypeFile(cmdLine.getOptionValue(OPT_PHE));
-		eigenEpiArgs.setPhentypeIndex(parseIntOptionValue(cmdLine, OPT_MPHE, "1"));
+		parseMAFArguments((CommandArguments) eigenEpiArgs, cmdLine);
+		parseMAXMAFArguments((CommandArguments) eigenEpiArgs, cmdLine);
+		parseGENOArguments((CommandArguments) eigenEpiArgs, cmdLine);
+		parseZeroVarArguments((CommandArguments) eigenEpiArgs, cmdLine);
+		parseMAFRangeArguments((CommandArguments) eigenEpiArgs, cmdLine);
 
-		if (cmdLine.hasOption(OPT_INBRED))
-		{
-			eigenEpiArgs.setInbred();
-		}
+		parsePhenoFileArguments((CommandArguments) eigenEpiArgs, cmdLine);
+		parsePhenoIndexArguments((CommandArguments) eigenEpiArgs, cmdLine);
+
+		if (cmdLine.hasOption(OPT_INBRED)) eigenEpiArgs.setInbred();
 		return eigenEpiArgs;
 	}
 

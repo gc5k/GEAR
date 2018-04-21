@@ -37,7 +37,7 @@ public class GRMCommandArguments extends CommandArguments {
 	}
 
 	public void setInbred() {
-		isInbred = false;
+		isInbred = true;
 	}
 
 	public boolean isInbred() {

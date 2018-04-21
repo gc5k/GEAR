@@ -24,8 +24,9 @@ public class GRMCommand extends Command {
 	@SuppressWarnings("static-access")
 	@Override
 	public void prepareOptions(Options options) {
-		options.addOption(OptionBuilder.withDescription(OPT_FILE_DESC).withLongOpt(OPT_FILE_LONG).hasArg().create());
-		options.addOption(OptionBuilder.withDescription(OPT_BFILE_DESC).withLongOpt(OPT_BFILE_LONG).hasArg().create());
+		options.addOption(OptionBuilder.withDescription(OPT_BFILE_DESC).withLongOpt(OPT_BFILE_LONG).hasArg().isRequired().create());
+//		options.addOption(OptionBuilder.withDescription(OPT_FILE_DESC).withLongOpt(OPT_FILE_LONG).hasArg().create());
+
 		options.addOption(OptionBuilder.withDescription(OPT_GZ_DESC).create(OPT_GZ));
 		options.addOption(OptionBuilder.withDescription(OPT_TXT_DESC).create(OPT_TXT));
 		options.addOption(OptionBuilder.withDescription(OPT_DOM_DESC).create(OPT_DOM));
@@ -50,6 +51,11 @@ public class GRMCommand extends Command {
 		options.addOption(
 				OptionBuilder.withDescription(OPT_MAX_MAF_DESC).withLongOpt(OPT_MAX_MAF_LONG).hasArg().create());
 		options.addOption(OptionBuilder.withDescription(OPT_GENO_DESC).withLongOpt(OPT_GENO_LONG).hasArg().create());
+		options.addOption(
+				OptionBuilder.withDescription(OPT_ZERO_VAR_DESC).withLongOpt(OPT_ZERO_VAR_LONG).create());
+		options.addOption(
+				OptionBuilder.withDescription(OPT_MAF_RANGE_DESC).withLongOpt(OPT_MAF_RANGE_LONG).hasArgs().create());
+
 	}
 
 	@Override
@@ -63,6 +69,9 @@ public class GRMCommand extends Command {
 		parseMAFArguments((CommandArguments) grmArgs, cmdLine);
 		parseMAXMAFArguments((CommandArguments) grmArgs, cmdLine);
 		parseGENOArguments((CommandArguments) grmArgs, cmdLine);
+		parseZeroVarArguments((CommandArguments) grmArgs, cmdLine);
+
+		parseMAFRangeArguments((CommandArguments) grmArgs, cmdLine);
 
 		if (cmdLine.hasOption(OPT_GZ)) {
 			grmArgs.setGZ();
@@ -73,11 +82,12 @@ public class GRMCommand extends Command {
 		if (cmdLine.hasOption(OPT_ADJ_VAR_LONG)) {
 			grmArgs.setAdjVar();
 		}
-		if (cmdLine.hasOption(OPT_DOM)) {
-			grmArgs.setDom();
-		}
 		if (cmdLine.hasOption(OPT_INBRED_LONG)) {
 			grmArgs.setInbred();
+		} else {
+			if (cmdLine.hasOption(OPT_DOM)) {
+				grmArgs.setDom();
+			}
 		}
 		return grmArgs;
 	}
@@ -97,8 +107,8 @@ public class GRMCommand extends Command {
 	private static final String OPT_ADJ_VAR_DESC = "denominator is real variance of the locus";
 
 	private static final String OPT_INBRED_LONG = "inbred";
-	private static final String OPT_INBRED_DESC = "denominator is 4pq.";
+	private static final String OPT_INBRED_DESC = "denominator is 4pq";
 
 	private static final String OPT_DOM = "dom";
-	private static final String OPT_DOM_DESC = "dominance relationship.";
+	private static final String OPT_DOM_DESC = "dominance relationship";
 }

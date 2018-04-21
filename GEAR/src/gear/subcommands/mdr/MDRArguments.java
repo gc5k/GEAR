@@ -4,30 +4,8 @@ import gear.subcommands.CommandArguments;
 
 public class MDRArguments extends CommandArguments
 {
-	private String pheFile;
-	private int mPheno;
 	private int[] covIdx;
 	private boolean isCC;
-
-	public String getPhenotypeFile()
-	{
-		return this.pheFile;
-	}
-
-	public void setPhenotypeFile(String pheFile)
-	{
-		this.pheFile = pheFile;
-	}
-
-	public void setPhentypeIndex(int i)
-	{
-		this.mPheno = (i - 1);
-	}
-
-	public int getMpheno()
-	{
-		return this.mPheno;
-	}
 
 	public void setCovIndexes(String[] s)
 	{

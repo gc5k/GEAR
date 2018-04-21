@@ -5,9 +5,9 @@ import java.io.IOException;
 import java.io.PrintStream;
 
 import gear.ConstValues;
+import gear.family.GenoMatrix.GenotypeMatrix;
 import gear.family.pedigree.file.SNP;
 import gear.family.plink.PLINKParser;
-import gear.family.popstat.GenotypeMatrix;
 import gear.family.qc.rowqc.SampleFilter;
 import gear.subcommands.CommandArguments;
 import gear.subcommands.CommandImpl;

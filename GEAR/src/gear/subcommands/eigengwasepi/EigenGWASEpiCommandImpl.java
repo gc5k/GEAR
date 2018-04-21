@@ -11,9 +11,9 @@ import org.apache.commons.math.linear.LUDecompositionImpl;
 import org.apache.commons.math.linear.RealMatrix;
 
 import gear.data.InputDataSet2;
+import gear.family.GenoMatrix.GenotypeMatrix;
 import gear.family.pedigree.file.SNP;
 import gear.family.plink.PLINKParser;
-import gear.family.popstat.GenotypeMatrix;
 import gear.family.qc.rowqc.SampleFilter;
 import gear.subcommands.CommandArguments;
 import gear.subcommands.CommandImpl;
@@ -45,9 +45,9 @@ public class EigenGWASEpiCommandImpl extends CommandImpl {
 	public void execute(CommandArguments cmdArgs) {
 		this.eigenArgs = (EigenGWASEpiCommandArguments) cmdArgs;
 
-		this.traitIdx = this.eigenArgs.getMpheno()[0];
+		this.traitIdx = this.eigenArgs.getSelectedPhenotype(0);
 		data.addFile(this.eigenArgs.getFam());
-		data.addFile(this.eigenArgs.getPhenotypeFile(), this.eigenArgs.getMpheno());
+		data.addFile(this.eigenArgs.getPhenotypeFile(), this.eigenArgs.getSelectedPhenotype());
 		if (eigenArgs.isKeepFile())
 			data.addFile(this.eigenArgs.getKeepFile());
 		data.LineUpFiles();
@@ -63,7 +63,7 @@ public class EigenGWASEpiCommandImpl extends CommandImpl {
 	private void eigenEpiGWAS() {
 		ChiSquaredDistributionImpl ci = new ChiSquaredDistributionImpl(1);
 
-		int[] gIdx = this.data.getMatchedSubjectIdx(0);
+//		int[] gIdx = this.data.getMatchedSubjectIdx(0);
 		int[] pIdx = this.data.getMatchedSubjectIdx(1);
 
 		double[] Y = new double[pIdx.length];
@@ -89,7 +89,7 @@ public class EigenGWASEpiCommandImpl extends CommandImpl {
 		gfreq = PopStat.calGenoFrequency(pGM);
 		for (int i = 0; i < pGM.getNumMarker(); i++) {
 			SNP snp1 = pGM.getSNPList().get(i);
-			double[][] x = new double[gIdx.length][4]; // a1+d1+a2+d2
+			double[][] x = new double[pGM.getNumIndivdial()][4]; // a1+d1+a2+d2
 			if (snp1.isMonopolic()) {
 				monoLoci++;
 				continue;
@@ -101,10 +101,10 @@ public class EigenGWASEpiCommandImpl extends CommandImpl {
 			double Freq1_1 = 0.0D;
 			double Freq1_2 = 0.0D;
 			double Freq1 = 0.0D;
-			for (int j = 0; j < gIdx.length; j++) {
-				double[] cd1 = getCoding(gIdx[j], i);
+			for (int j = 0; j < pGM.getNumIndivdial(); j++) {
+				double[] cd1 = getCoding(j, i);
 				if (cd1[2] == 1) {
-					int g = pGM.getAdditiveScoreOnFirstAllele(gIdx[j], i);
+					int g = pGM.getAdditiveScoreOnFirstAllele(j, i);
 					x[j][0] = cd1[0];
 					x[j][1] = cd1[1];
 
@@ -142,11 +142,11 @@ public class EigenGWASEpiCommandImpl extends CommandImpl {
 				double Freq2_2 = 0.0D;
 				double Freq2 = 0.0D;
 
-				for (int j2 = 0; j2 < gIdx.length; j2++) {
-					double[] cd2 = getCoding(gIdx[j2], i2);
+				for (int j2 = 0; j2 < pGM.getNumIndivdial(); j2++) {
+					double[] cd2 = getCoding(j2, i2);
 
 					if (cd2[2] == 1) {
-						int g2 = pGM.getAdditiveScoreOnFirstAllele(gIdx[j2], i);
+						int g2 = pGM.getAdditiveScoreOnFirstAllele(j2, i);
 
 						x[j2][2] = cd2[0];
 						x[j2][3] = cd2[1];
@@ -170,7 +170,7 @@ public class EigenGWASEpiCommandImpl extends CommandImpl {
 				double fst2 = 2 * (N2_1 / N2 * (Freq2_1 - Freq2) * (Freq2_1 - Freq2)
 						+ N2_2 / N2 * (Freq2_2 - Freq2) * (Freq2_2 - Freq2)) / (Freq2 * (1.0D - Freq2));
 
-				double[][] x1 = new double[gIdx.length][6];// u + a1 + d1 + a2 + d2 + aa
+				double[][] x1 = new double[pGM.getNumIndivdial()][6];// u + a1 + d1 + a2 + d2 + aa
 				for (int k1 = 0; k1 < x1.length; k1++) {
 					x1[k1][0] = 1;
 					x1[k1][1] = x[k1][0];

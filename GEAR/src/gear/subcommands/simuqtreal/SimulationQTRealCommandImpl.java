@@ -18,10 +18,10 @@ import org.apache.commons.math.random.RandomDataImpl;
 import org.apache.commons.math.stat.StatUtils;
 
 import gear.ConstValues;
+import gear.family.GenoMatrix.GenotypeMatrix;
 import gear.family.pedigree.Hukou;
 import gear.family.pedigree.file.SNP;
 import gear.family.plink.PLINKParser;
-import gear.family.popstat.GenotypeMatrix;
 import gear.family.qc.rowqc.SampleFilter;
 import gear.subcommands.CommandArguments;
 import gear.subcommands.CommandImpl;

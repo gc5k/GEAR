@@ -26,6 +26,8 @@ public class ConstValues
 	public static final String MISSING_ALLELE_STRING = "0";
 	public static byte MISSING_GENOTYPE = 3;
 	
+	public static String MISSING_PHENOTYPE = "-9";
+	
 	public static final boolean HAS_HEADER = true;
 	public static final boolean NO_HEADER = false;
 	

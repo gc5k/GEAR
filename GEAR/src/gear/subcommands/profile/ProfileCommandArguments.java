@@ -3,223 +3,179 @@ package gear.subcommands.profile;
 import gear.subcommands.CommandArguments;
 import gear.util.FileUtil;
 
-public final class ProfileCommandArguments extends CommandArguments
-{
-	public String getScoreFile()
-	{
+public final class ProfileCommandArguments extends CommandArguments {
+	public String getScoreFile() {
 		return scoreFile;
 	}
-	
-	public void setScoreFile(String scoreFile)
-	{
+
+	public void setScoreFile(String scoreFile) {
 		this.scoreFile = scoreFile;
 	}
-	
-	public String getScoreFileGZ()
-	{
+
+	public String getScoreFileGZ() {
 		return scoreFileGZ;
 	}
 
-	public void setScoreFileGZ(String scoreFileGZ)
-	{
+	public void setScoreFileGZ(String scoreFileGZ) {
 		this.scoreFileGZ = scoreFileGZ;
 	}
-	
-	public boolean getHasScoreHeader()
-	{
+
+	public boolean getHasScoreHeader() {
 		return hasScoreHeader;
 	}
 
-	public void setHasScoreHeader(boolean hasScoreHeader)
-	{
+	public void setHasScoreHeader(boolean hasScoreHeader) {
 		this.hasScoreHeader = hasScoreHeader;
 	}
-	
-	public String getQScoreFile()
-	{
+
+	public String getQScoreFile() {
 		return qScoreFile;
 	}
-	
-	public void setQScoreFile(String qScoreFile)
-	{
+
+	public void setQScoreFile(String qScoreFile) {
 		this.qScoreFile = qScoreFile;
 	}
-	
-	public String getQRangeFile()
-	{
+
+	public String getQRangeFile() {
 		return qRangeFile;
 	}
-	
-	public void setQRangeFile(String qRangeFile)
-	{
+
+	public void setQRangeFile(String qRangeFile) {
 		this.qRangeFile = qRangeFile;
 	}
-	
-	public String getMachDosageFile()
-	{
+
+	public String getMachDosageFile() {
 		return machDosageFile;
 	}
-	
-	public void setMachDosageFile(String machDosageFile)
-	{
+
+	public void setMachDosageFile(String machDosageFile) {
 		this.machDosageFile = machDosageFile;
 	}
-	
-	public String getMachInfoFile()
-	{
+
+	public String getMachInfoFile() {
 		return machInfoFile;
 	}
-	
-	public void setMachInfoFile(String machInfoFile)
-	{
+
+	public void setMachInfoFile(String machInfoFile) {
 		this.machInfoFile = machInfoFile;
 	}
-	
-	public String getMachDosageBatch()
-	{
+
+	public String getMachDosageBatch() {
 		return machDosageBatch;
 	}
-	
-	public void setMachDosageBatch(String machDosageBatch)
-	{
+
+	public void setMachDosageBatch(String machDosageBatch) {
 		this.machDosageBatch = machDosageBatch;
 	}
-	
-	public String getMachInfoBatch()
-	{
+
+	public String getMachInfoBatch() {
 		return machInfoBatch;
 	}
-	
-	public void setMachInfoBatch(String machInfoBatch)
-	{
+
+	public void setMachInfoBatch(String machInfoBatch) {
 		this.machInfoBatch = machInfoBatch;
 	}
-	
-	public CoeffModelType getCoeffModelType()
-	{
+
+	public CoeffModelType getCoeffModelType() {
 		return coeffModelType;
 	}
-	
-	public void setCoeffModelType(CoeffModelType coeffModelType)
-	{
+
+	public void setCoeffModelType(CoeffModelType coeffModelType) {
 		this.coeffModelType = coeffModelType;
 	}
-	
-	public String getCoeffModelFile()
-	{
+
+	public String getCoeffModelFile() {
 		return coeffModelFile;
 	}
-	
-	public void setCoeffModelFile(String coeffModelFile)
-	{
+
+	public void setCoeffModelFile(String coeffModelFile) {
 		this.coeffModelFile = coeffModelFile;
 	}
-	
-	public boolean getIsSameAsPlink()
-	{
+
+	public boolean getIsSameAsPlink() {
 		return isSameAsPlink;
 	}
-	
-	public void setIsSameAsPlink(boolean isSameAsPlink)
-	{
+
+	public void setIsSameAsPlink(boolean isSameAsPlink) {
 		this.isSameAsPlink = isSameAsPlink;
 	}
 
-	public String getResultFile()
-	{
+	public String getResultFile() {
 		return resultFile;
 	}
-	
-	public void setResultFile(String resultFile)
-	{
+
+	public void setResultFile(String resultFile) {
 		this.resultFile = resultFile;
 	}
-	
-	public boolean getIsLogit()
-	{
+
+	public boolean getIsLogit() {
 		return isLogit;
 	}
-	
-	public void setIsLogit(boolean isLogit)
-	{
+
+	public void setIsLogit(boolean isLogit) {
 		this.isLogit = isLogit;
 	}
-	
-	public boolean getIsAutoFlip()
-	{
+
+	public boolean getIsAutoFlip() {
 		return isAutoFlip;
 	}
-	
-	public void setIsAutoFlip(boolean isAutoFlip)
-	{
+
+	public void setIsAutoFlip(boolean isAutoFlip) {
 		this.isAutoFlip = isAutoFlip;
 	}
-	
-	public boolean getIsWeighted()
-	{
+
+	public boolean getIsWeighted() {
 		return isWeighted;
 	}
-	
-	public void setIsWeighted(boolean isWeighted)
-	{
+
+	public void setIsWeighted(boolean isWeighted) {
 		this.isWeighted = isWeighted;
 	}
-	
-	public boolean getIsKeepATGC()
-	{
+
+	public boolean getIsKeepATGC() {
 		return isKeepATGC;
 	}
-	
-	public void setIsKeepATGC(boolean isKeepATGC)
-	{
+
+	public void setIsKeepATGC(boolean isKeepATGC) {
 		this.isKeepATGC = isKeepATGC;
 	}
 
-	public void setIsExtractScore(String extractSFile)
-	{
+	public void setIsExtractScore(String extractSFile) {
 		FileUtil.exists(extractSFile);
 		this.extractScoreFile = extractSFile;
 	}
 
-	public String getExtractScoreFile()
-	{
+	public String getExtractScoreFile() {
 		return extractScoreFile;
 	}
 
-	public void setIsRemoveScore(String removeSFile)
-	{
+	public void setIsRemoveScore(String removeSFile) {
 		FileUtil.exists(removeSFile);
 		this.removeScoreFile = removeSFile;
 	}
 
-	public String getRemoveScoreFile()
-	{
+	public String getRemoveScoreFile() {
 		return removeScoreFile;
 	}
 
-	public void setScale(String scaleFile)
-	{
+	public void setScale(String scaleFile) {
 		this.scale = true;
 		this.scaleFile = scaleFile;
 	}
 
-	protected void turneoffScale()
-	{
+	protected void turneoffScale() {
 		this.scale = false;
 	}
 
-	protected void turnonScale()
-	{
+	protected void turnonScale() {
 		this.scale = true;
 	}
 
-	public boolean isScale()
-	{
+	public boolean isScale() {
 		return scale;
 	}
-	
-	public String getScaleFile()
-	{
+
+	public String getScaleFile() {
 		return scaleFile;
 	}
 

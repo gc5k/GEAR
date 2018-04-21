@@ -2,47 +2,38 @@ package gear.subcommands.ebatchgwas;
 
 import gear.subcommands.CommandArguments;
 
-public class EbatchGWASArguments extends CommandArguments
-{
-	public void setEV(String ev)
-	{
+public class EbatchGWASCommandArguments extends CommandArguments {
+	public void setEV(String ev) {
 		this.ev = Integer.parseInt(ev);
 	}
-	
-	public int getEV()
-	{
+
+	public int getEV() {
 		return ev;
 	}
 
-	public void setDom()
-	{
+	public void setDom() {
 		isDom = true;
 		isEpi = false;
 	}
 
-	public boolean isDom()
-	{
+	public boolean isDom() {
 		return isDom;
 	}
 
-	public void setEpi()
-	{
+	public void setEpi() {
 		isEpi = true;
 		isDom = false;
 	}
 
-	public boolean isEpi()
-	{
+	public boolean isEpi() {
 		return isEpi;
 	}
 
-	public void setInbred()
-	{
+	public void setInbred() {
 		adjvar = true;
 	}
-	
-	public boolean isInbred()
-	{
+
+	public boolean isInbred() {
 		return adjvar;
 	}
 

@@ -1,4 +1,4 @@
-package gear.family.popstat;
+package gear.family.GenoMatrix;
 
 import java.util.ArrayList;
 
@@ -32,6 +32,11 @@ public class GenotypeMatrix {
 		genotypeMat = new int[pidx.size()][];
 
 		initial();
+		
+		if (this.getNumMarker() == 0) {
+			Logger.printUserLog("No SNPs were remained for analysis. GEAR quit.");
+			System.exit(1);
+		}
 	}
 
 	public GenotypeMatrix(ArrayList<PersonIndex> pi, MapFile mapF, CommandArguments cmdArgs) {
@@ -49,6 +54,12 @@ public class GenotypeMatrix {
 		for (int i = 0; i < QCedSnpIndex.size(); i++) {
 			snpList.add(mapF.getMarkerList().get(QCedSnpIndex.get(i)));
 		}
+
+		if (this.getNumMarker() == 0) {
+			Logger.printUserLog("No SNPs were remained for analysis. GEAR quit.");
+			System.exit(1);
+		}
+
 	}
 
 	protected void initial(CommandArguments cmdArgs) {
@@ -63,7 +74,7 @@ public class GenotypeMatrix {
 		allelefreq = PopStat.calAlleleFrequency(this);
 		allelevar = PopStat.calGenoVariance(this);
 
-		if (cmdArgs.isMAF() || cmdArgs.isMaxMAF() || cmdArgs.isGENO()) {
+		if (cmdArgs.isMAF() || cmdArgs.isMaxMAF() || cmdArgs.isGENO() || cmdArgs.isZeroVar() || cmdArgs.isMAFRange()) {
 			Logger.printUserLog("");
 			Logger.printUserLog("Quality control for SNPs...");
 
@@ -71,13 +82,29 @@ public class GenotypeMatrix {
 			int mafFail = 0;
 			int maxmafFail = 0;
 			int genoFail = 0;
+			int zeroVarFail = 0;
+			int mafRangeFail = 0;
 			for (int i = 0; i < numMarker; i++) {
 				double m = allelefreq[i][0] < 0.5 ? allelefreq[i][0] : (1 - allelefreq[i][0]);
+				if (cmdArgs.isMAFRange()) {
+					double[][] mafR = cmdArgs.getMAFRange();
+					boolean mafFlag = false;
+					for (int j = 0; j < mafR.length; j++) {
+						if (m >= mafR[j][0] && m <= mafR[j][1]) {
+							mafFlag = true;
+						}
+					}
+					if (!mafFlag) {
+						mafRangeFail++;
+						continue;
+					}
+				}
+
 				if (cmdArgs.isMAF() && m < cmdArgs.getMAF()) {
 					mafFail++;
 					continue;
 				}
-				if (cmdArgs.isMaxMAF() && m < cmdArgs.getMaxMAF()) {
+				if (cmdArgs.isMaxMAF() && m > cmdArgs.getMaxMAF()) {
 					maxmafFail++;
 					continue;
 				}
@@ -85,16 +112,27 @@ public class GenotypeMatrix {
 					genoFail++;
 					continue;
 				}
+				if (cmdArgs.isZeroVar() && allelevar[i] == 0) {
+					zeroVarFail++;
+					continue;
+				}
 				QCedSnpIndex.add(i);
 			}
-			if (cmdArgs.isMAF()) {
-				Logger.printUserLog(mafFail + " SNPs did not pass maf threshold " + cmdArgs.getMAF());
+
+			if (cmdArgs.isMAFRange() && mafRangeFail > 0) {
+				Logger.printUserLog(mafRangeFail + " SNPs were excluded because not within maf-range.");				
 			}
-			if (cmdArgs.isMaxMAF()) {
-				Logger.printUserLog(maxmafFail + " SNPs did not pass max-maf threshold " + cmdArgs.getMaxMAF());
+			if (cmdArgs.isMAF() && mafFail > 0) {
+				Logger.printUserLog(mafFail + " SNPs were excluded because did not pass maf threshold " + cmdArgs.getMAF() + ".");
 			}
-			if (cmdArgs.isGENO()) {
-				Logger.printUserLog(genoFail + " SNPs did not pass geno missing threshold " + cmdArgs.getMAF());
+			if (cmdArgs.isMaxMAF() && maxmafFail > 0) {
+				Logger.printUserLog(maxmafFail + " SNPs were excluded because did not pass max-maf threshold " + cmdArgs.getMaxMAF() + ".");
+			}
+			if (cmdArgs.isGENO() && genoFail > 0) {
+				Logger.printUserLog(genoFail + " SNPs were excluded because did not pass geno missing threshold " + cmdArgs.getMAF() + ".");
+			}
+			if (cmdArgs.isZeroVar() && zeroVarFail > 0) {
+				Logger.printUserLog(zeroVarFail + " SNPs were excluded because did not pass zero variance threshold.");
 			}
 
 			Logger.printUserLog(QCedSnpIndex.size() + " SNPs were remained for analysis.");
@@ -111,7 +149,6 @@ public class GenotypeMatrix {
 		numMarker = pidx.get(0).getPerson().getNumMarkers();
 		allelefreq = PopStat.calAlleleFrequency(this);
 		allelevar = PopStat.calGenoVariance(this);
-
 	}
 
 	public int getNumIndivdial() {
@@ -251,4 +288,21 @@ public class GenotypeMatrix {
 	public double getAlleleVar(int i) {
 		return allelevar[QCedSnpIndex.get(i)];
 	}
+
+	public double getMAF(int i) {
+		return allelefreq[QCedSnpIndex.get(i)][0] < 0.5 ? allelefreq[QCedSnpIndex.get(i)][0]:allelefreq[QCedSnpIndex.get(i)][1];
+	}
+
+	public double getA1Freq(int i) {
+		return allelefreq[QCedSnpIndex.get(i)][0];
+	}
+
+	public double getA2Freq(int i) {
+		return allelefreq[QCedSnpIndex.get(i)][1];
+	}
+
+	public double getGenoMissing(int i) {
+		return allelefreq[QCedSnpIndex.get(i)][2];
+	}
+
 }

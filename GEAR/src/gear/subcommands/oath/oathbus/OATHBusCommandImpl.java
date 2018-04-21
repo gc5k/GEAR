@@ -25,12 +25,12 @@ public class OATHBusCommandImpl extends CommandImpl {
 		NSSCommandArguments nssArgs = new NSSCommandArguments();
 		nssArgs.setBFile(obArgs.getBFile());
 		nssArgs.setPhenotypeFile(obArgs.getPhenotypeFile());
-		nssArgs.setPhenotypeIndex(obArgs.getMpheno()[0]);
+		nssArgs.setPhenotypeIndex(obArgs.getSelectedPhenotype(0));
 		nssArgs.setCovFile(obArgs.getCovFile());
 		nssArgs.setCovNumber(obArgs.getCovNumber());
 		nssArgs.setMAF((new Double(obArgs.getMAF())).toString());
 		if (obArgs.isKeepFile())
-			nssArgs.setKeeFile(obArgs.getKeepFile());
+			nssArgs.setKeepFile(obArgs.getKeepFile());
 
 		if (obArgs.isChr())
 			nssArgs.setChr(obArgs.getChr().toArray(new String[0]));

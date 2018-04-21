@@ -1,9 +1,9 @@
 package gear.subcommands.profile;
 
 import gear.ConstValues;
+import gear.family.GenoMatrix.GenotypeMatrix;
 import gear.family.pedigree.file.SNP;
 import gear.family.plink.PLINKParser;
-import gear.family.popstat.GenotypeMatrix;
 import gear.family.qc.rowqc.SampleFilter;
 import gear.subcommands.CommandArguments;
 
@@ -14,7 +14,7 @@ public class PlinkData extends Data
 	public PlinkData(PLINKParser parser, CommandArguments cmdArgs)
 	{
 		sampleFilter = new SampleFilter(parser.getPedigreeData(), cmdArgs);
-		genoMatrix = new GenotypeMatrix(sampleFilter.getSample(), parser.getMapData());
+		genoMatrix = new GenotypeMatrix(sampleFilter.getSample(), parser.getMapData(), cmdArgs);
 		snpList = genoMatrix.getSNPList();
 		calcAllele1Frequencies();
 	}

@@ -2,21 +2,21 @@ package gear.subcommands.ebatchgwas;
 
 import gear.subcommands.CommandArguments;
 import gear.subcommands.CommandImpl;
-import gear.subcommands.eigengwas.EigenGWASArguments;
-import gear.subcommands.eigengwas.EigenGWASImpl;
-import gear.subcommands.eigengwasdom.EigenGWASDomCommandArguments;
-import gear.subcommands.eigengwasdom.EigenGWASDomImpl;
-import gear.subcommands.eigengwasepi.EigenGWASEpiCommandArguments;
+import gear.subcommands.eigengwas.EigenGWASCommandArguments;
+import gear.subcommands.eigengwas.EigenGWASCommandImpl;
+//import gear.subcommands.eigengwasdom.EigenGWASDomCommandArguments;
+//import gear.subcommands.eigengwasdom.EigenGWASDomCommandImpl;
+//import gear.subcommands.eigengwasepi.EigenGWASEpiCommandArguments;
 import gear.subcommands.grm.GRMCommandArguments;
 import gear.subcommands.grm.GRMCommandImpl;
 import gear.subcommands.qpca.QPCACommandArguments;
 import gear.subcommands.qpca.QPCACommandImpl;
 import gear.util.Logger;
 
-public class EbatchGWASImpl extends CommandImpl {
+public class EbatchGWASCommandImpl extends CommandImpl {
 	@Override
 	public void execute(CommandArguments cmdArgs) {
-		EbatchGWASArguments eArgs = (EbatchGWASArguments) cmdArgs;
+		EbatchGWASCommandArguments eArgs = (EbatchGWASCommandArguments) cmdArgs;
 
 		GRMCommandArguments gArgs = new GRMCommandArguments();
 		gArgs.setBFile(eArgs.getBFile());
@@ -34,12 +34,22 @@ public class EbatchGWASImpl extends CommandImpl {
 			gArgs.setChr(eArgs.getChr().toArray(new String[0]));
 		} else if (eArgs.isNotChr()) {
 			gArgs.setNotChr(eArgs.getNotChr().toArray(new String[0]));
-		} else if (eArgs.isMAF()) {
+		}
+		
+		if (eArgs.isMAF()) {
 			gArgs.setMAF((new Double(eArgs.getMAF())).toString());
-		} else if (eArgs.isMaxMAF()) {
+		}
+		if (eArgs.isMaxMAF()) {
 			gArgs.setMaxMAF((new Double(eArgs.getMaxMAF())).toString());
-		} else if (eArgs.isGENO()) {
+		} 
+		if (eArgs.isGENO()) {
 			gArgs.setGENO((new Double(eArgs.getGENO())).toString());
+		}
+		if (eArgs.isZeroVar()) {
+			gArgs.setZeroVar();
+		}
+		if (eArgs.isMAFRange()) {
+			gArgs.setMAFRange2(eArgs.getMAFRange());
 		}
 
 		if (eArgs.isKeepFile()) {
@@ -58,6 +68,12 @@ public class EbatchGWASImpl extends CommandImpl {
 		qpcaArgs.setGrmID(eArgs.getOutRoot() + ".grm.id");
 		qpcaArgs.setEV(Integer.toString(eArgs.getEV()));
 		qpcaArgs.setOutRoot(eArgs.getOutRoot());
+		if (eArgs.isKeepFile()) {
+			qpcaArgs.setKeepFile(eArgs.getKeepFile());
+		} else if (eArgs.isRemoveFile()) {
+			qpcaArgs.setRemoveFile(eArgs.getRemoveFile());
+		}
+		
 		QPCACommandImpl qpcaImpl = new QPCACommandImpl();
 		qpcaImpl.execute(qpcaArgs);
 		Logger.printUserLog(
@@ -66,10 +82,10 @@ public class EbatchGWASImpl extends CommandImpl {
 		if (!eArgs.isDom() && !eArgs.isEpi()) {
 			for (int i = 1; i <= eArgs.getEV(); i++) {
 				Logger.printUserLog("\n---------Running EigenGWAS (Additive model) for the " + i + "th eigenvector.");
-				EigenGWASArguments eigenArgs = new EigenGWASArguments();
+				EigenGWASCommandArguments eigenArgs = new EigenGWASCommandArguments();
 				eigenArgs.setBFile(eArgs.getBFile());
 				eigenArgs.setPhenotypeFile(eArgs.getOutRoot() + ".eigenvec");
-				eigenArgs.setPhentypeIndex(i);
+				eigenArgs.setPhenotypeIndex(i);
 				eigenArgs.setOutRoot(eArgs.getOutRoot() + "." + i);
 
 				if (eArgs.isExtractFile()) {
@@ -80,21 +96,31 @@ public class EbatchGWASImpl extends CommandImpl {
 					eigenArgs.setChr(eArgs.getChr().toArray(new String[0]));
 				} else if (eArgs.isNotChr()) {
 					eigenArgs.setNotChr(eArgs.getNotChr().toArray(new String[0]));
-				} else if (eArgs.isMAF()) {
-					eigenArgs.setMAF((new Double(eArgs.getMAF())).toString());
-				} else if (eArgs.isMaxMAF()) {
-					eigenArgs.setMaxMAF((new Double(eArgs.getMaxMAF())).toString());
-				} else if (eArgs.isGENO()) {
-					eigenArgs.setGENO((new Double(eArgs.getGENO())).toString());
 				}
 
-				if (eArgs.getKeepFile() != null) {
+				if (eArgs.isMAF()) {
+					eigenArgs.setMAF((new Double(eArgs.getMAF())).toString());
+				}
+				if (eArgs.isMaxMAF()) {
+					eigenArgs.setMaxMAF((new Double(eArgs.getMaxMAF())).toString());
+				}
+				if (eArgs.isGENO()) {
+					eigenArgs.setGENO((new Double(eArgs.getGENO())).toString());
+				}
+				if (eArgs.isZeroVar()) {
+					eigenArgs.setZeroVar();
+				}
+				if (eArgs.isMAFRange()) {
+					eigenArgs.setMAFRange2(eArgs.getMAFRange());
+				}
+
+				if (eArgs.isKeepFile()) {
 					eigenArgs.setKeepFile(eArgs.getKeepFile());
-				} else if (eArgs.getRemoveFile() != null) {
+				} else if (eArgs.isRemoveFile()) {
 					eigenArgs.setRemoveFile(eArgs.getRemoveFile());
 				}
 
-				EigenGWASImpl eigenImpl = new EigenGWASImpl();
+				EigenGWASCommandImpl eigenImpl = new EigenGWASCommandImpl();
 				eigenImpl.execute(eigenArgs);
 				Logger.printUserLog("Saved EigenGWAS results in '" + eigenArgs.getOutRoot() + ".egwas'.");
 			}

@@ -24,8 +24,8 @@ public class IBDCommand extends Command {
 	@SuppressWarnings("static-access")
 	@Override
 	public void prepareOptions(Options options) {
-		options.addOption(OptionBuilder.withDescription(OPT_FILE_DESC).withLongOpt(OPT_FILE_LONG).hasArg().create());
-		options.addOption(OptionBuilder.withDescription(OPT_BFILE_DESC).withLongOpt(OPT_BFILE_LONG).hasArg().create());
+		options.addOption(OptionBuilder.withDescription(OPT_BFILE_DESC).withLongOpt(OPT_BFILE_LONG).hasArg().isRequired().create());
+//		options.addOption(OptionBuilder.withDescription(OPT_FILE_DESC).withLongOpt(OPT_FILE_LONG).hasArg().create());
 
 		options.addOption(OptionBuilder.withDescription("Make gz format").create(OPT_GZ));
 		options.addOption(OptionBuilder.withDescription("Make txt format").create(OPT_TXT));

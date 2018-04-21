@@ -112,9 +112,8 @@ public abstract class CommandArguments {
 
 	public void setChr(String[] c) {
 		chr = NewIt.newHashSet();
-		for (int i = 0; i < c.length; i++) {
-			chr.add(c[i]);
-		}
+		CommandSplitter CS = new CommandSplitter.Builder(c).OPT("--chr").create();
+		chr.addAll(CS.ParseToStr());
 		isChr = true;
 	}
 
@@ -128,9 +127,8 @@ public abstract class CommandArguments {
 
 	public void setNotChr(String[] c) {
 		not_chr = NewIt.newHashSet();
-		for (int i = 0; i < c.length; i++) {
-			not_chr.add(c[i]);
-		}
+		CommandSplitter CS = new CommandSplitter.Builder(c).OPT("--not-chr").create();
+		not_chr.addAll(CS.ParseToStr());
 		isNotChr = true;
 	}
 
@@ -141,6 +139,33 @@ public abstract class CommandArguments {
 	public boolean isNotChr() {
 		return isNotChr;
 	}
+
+//	public static ArrayList<String> splitter(String[] cmd, String opt) {
+//		ArrayList<String> S = NewIt.newArrayList();
+//		for(int i = 0; i < cmd.length; i++) {
+//			if (cmd[i].contains("-")) {
+//				String[] s = cmd[i].split("-");
+//				try {
+//					int s0 = Integer.parseInt(s[0]); int s1 = Integer.parseInt(s[1]);
+//					for(int j = Math.min(s0, s1); j <= Math.max(s0, s1); j++) {
+//						S.add( (new Integer(j)).toString());
+//					}
+//				} catch (NumberFormatException e) {
+//					Logger.printUserLog("The value of " + cmd[i] + " is invalid for " + opt);
+//					System.exit(1);
+//				}
+//			} else {
+//				try {
+//					Integer.parseInt(cmd[i]);
+//					S.add(cmd[i]);
+//				} catch (NumberFormatException e) {
+//					Logger.printUserLog("The value of " + cmd[i] + " is invalid for " + opt);
+//					System.exit(1);
+//				}
+//			}
+//		}
+//		return S;
+//	}
 
 	public void setMAF(String m) {
 		maf = Double.parseDouble(m);
@@ -156,6 +181,25 @@ public abstract class CommandArguments {
 
 	public boolean isMAF() {
 		return isMAF;
+	}
+
+	public void setMAFRange(String[] mafRg) {
+		CommandSplitter CS = new CommandSplitter.Builder(mafRg).DoubleMin(0).DoubleMax(0.5).OPT(Command.OPT_MAF_RANGE_LONG).create();
+		maf_range = CS.ParseToDouble();
+		isMafRange = true;
+	}
+
+	public void setMAFRange2(double[][] mafRg2) {
+		maf_range = mafRg2;
+		isMafRange = true;
+	}
+
+	public boolean isMAFRange() {
+		return isMafRange;
+	}
+	
+	public double[][] getMAFRange() {
+		return maf_range;
 	}
 
 	public void setMaxMAF(String m) {
@@ -190,6 +234,42 @@ public abstract class CommandArguments {
 		return isGENO;
 	}
 
+	public void setZeroVar() {
+		isZeroVar = true;
+	}
+
+	public boolean isZeroVar() {
+		return isZeroVar;
+	}
+
+	public String getPhenotypeFile() {
+		return this.pheFile;
+	}
+
+	public void setPhenotypeFile(String pheFile) {
+		this.pheFile = pheFile;
+	}
+
+	public void setPhenotypeIndex(String[] pheIndex) {
+		CommandSplitter CS = new CommandSplitter.Builder(pheIndex).OPT(Command.OPT_MPHE).IntMin(1).create();
+		this.mPheno = CS.ParseToInt();
+	}
+
+	public void setPhenotypeIndex(int pheIndex) {
+		this.mPheno[0] = pheIndex - 1;
+	}
+
+	public int getSelectedPhenotype(int i) {
+		return this.mPheno[i];
+	}
+
+	public int[] getSelectedPhenotype() {
+		return this.mPheno;
+	}
+
+	private String pheFile;
+	private int[] mPheno = { 0 };	
+	
 	private String file;
 	private String bfile;
 	private String outRoot;
@@ -213,9 +293,16 @@ public abstract class CommandArguments {
 
 	private double maf = 0.01;
 	private boolean isMAF = false;
+
 	private double max_maf = 0.51;
 	private boolean isMaxMAF = false;
+
+	private double[][] maf_range;
+	private boolean isMafRange = false;
+
 	private double geno = 0.1;
 	private boolean isGENO = false;
+
+	private boolean isZeroVar = false;
 	private long seed;
 }

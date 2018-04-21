@@ -9,11 +9,11 @@ import java.util.TreeSet;
 import org.apache.commons.math.random.RandomDataImpl;
 
 import gear.data.Person;
+import gear.family.GenoMatrix.GenotypeMatrix;
 import gear.family.pedigree.PersonIndex;
 import gear.family.pedigree.file.SNP;
 import gear.family.plink.PLINKBinaryParser;
 import gear.family.plink.PLINKParser;
-import gear.family.popstat.GenotypeMatrix;
 import gear.family.qc.rowqc.SampleFilter;
 import gear.subcommands.CommandArguments;
 import gear.subcommands.CommandImpl;

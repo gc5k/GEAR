@@ -25,14 +25,13 @@ import gear.util.NewIt;
  * @author Guo-Bo Chen, chenguobo@gmail.com
  */
 
-public class SampleFilter
-{
+public class SampleFilter {
 	protected PedigreeFile PedData;
 	protected PLINKParser plinkParser;
-	
+
 	protected String kFile;
 	protected String rFile;
-	protected int filterType = 0; //0 for no filter, 1 for keep, 2 for remove
+	protected int filterType = 0; // 0 for no filter, 1 for keep, 2 for remove
 
 	protected double[] status;
 	protected double[] score;
@@ -46,22 +45,19 @@ public class SampleFilter
 
 	private HashSet<SubjectID> subSet;
 
-	public SampleFilter(PedigreeFile ped)
-	{
+	public SampleFilter(PedigreeFile ped) {
 		PedData = ped;
 		PersonTable = NewIt.newArrayList();
 
-		QC();
+		qualification();
 
 	}
 
-	public SampleFilter(PedigreeFile ped, CommandArguments cmdArgs)
-	{
+	public SampleFilter(PedigreeFile ped, CommandArguments cmdArgs) {
 		PedData = ped;
 		PersonTable = NewIt.newArrayList();
 
-		if (cmdArgs.isKeepFile())
-		{
+		if (cmdArgs.isKeepFile()) {
 			kFile = cmdArgs.getKeepFile();
 			readKeepFile();
 			filterType = 1;
@@ -70,31 +66,22 @@ public class SampleFilter
 			readRemoveFile();
 			filterType = 2;
 		}
-		QC();
+		
+		qualification();
 	}
 
-	public SampleFilter(PedigreeFile ped, ArrayList<SubjectID> sID)
-	{
+	public SampleFilter(PedigreeFile ped, ArrayList<SubjectID> sID) {
 		PedData = ped;
 		PersonTable = NewIt.newArrayList();
-
+		filterType = 1;
 		subSet = NewIt.newHashSet();
-		for(SubjectID sid:sID) {
+		for (SubjectID sid : sID) {
 			subSet.add(sid);
 		}
-		QC();
-	}
-
-	public void QC() {
 		qualification();
-		if (PersonTable.size() == 0) {
-			Logger.printUserError("No individuals were removed from analysis.");
-			System.exit(1);
-		}
 	}
 
-	private void qualification()
-	{
+	private void qualification() {
 		ArrayList<Hukou> hukoubook = PedData.getHukouBook();
 		HukouBook = NewIt.newArrayList();
 		UniqueRecordSet<Family> families = PedData.getFamilies();
@@ -112,88 +99,73 @@ public class SampleFilter
 			HukouBook.add(hukou);
 			PersonTable.add(new PersonIndex(per, false, isFounder));
 		}
-		Logger.printUserLog(PersonTable.size() + " individuals were remained for analysis.");
+		if (PersonTable.size() == 0) {
+			Logger.printUserLog("No individuals were remained for analysis. GEAR quit.");
+			System.exit(1);
+		}
+
+		Logger.printUserLog(PersonTable.size() + " individuals were matched for analysis.");
 	}
 
-	protected boolean keep(Person p)
-	{
+	protected boolean keep(Person p) {
 		boolean flag = true;
 
-		if (filterType == 0)
-		{
+		if (filterType == 0) {
 			return flag;
-		}
-		else if (filterType == 1)
-		{
+		} else if (filterType == 1) {
 			flag = subSet.contains(new SubjectID(p.getFamilyID(), p.getPersonID()));
-		}
-		else if (filterType == 2)
-		{
+		} else if (filterType == 2) {
 			flag = !subSet.contains(new SubjectID(p.getFamilyID(), p.getPersonID()));
 		}
 		return flag;
 	}
 
-	public int SampleSize()
-	{
+	public int SampleSize() {
 		return PersonTable.size();
 	}
 
-	public ArrayList<PersonIndex> getSample()
-	{
+	public ArrayList<PersonIndex> getSample() {
 		return PersonTable;
 	}
 
-	public ArrayList<Hukou> getHukouBook()
-	{
+	public ArrayList<Hukou> getHukouBook() {
 		return HukouBook;
 	}
 
-	private void readKeepFile()
-	{
+	private void readKeepFile() {
 		BufferedReader reader = FileUtil.FileOpen(kFile);
 		String line = null;
 		subSet = NewIt.newHashSet();
 
-		try
-		{
-			while ((line = reader.readLine()) != null)
-			{
+		try {
+			while ((line = reader.readLine()) != null) {
 				String[] l = line.split(ConstValues.WHITESPACE_DELIMITER);
 				if (l.length < 2)
 					continue;
 				subSet.add(new SubjectID(l[0], l[1]));
 			}
-		} catch (IOException e)
-		{
-			Logger.handleException(e,
-					"An exception occurred when reading the keep file '"
-							+ kFile + "'.");
+		} catch (IOException e) {
+			Logger.handleException(e, "An exception occurred when reading the keep file '" + kFile + "'.");
 		}
-		Logger.printUserLog("Reading " + subSet.size() + " individuals from keep-individual file '"+ kFile + "'.");
+		Logger.printUserLog("Reading " + subSet.size() + " individuals from keep-individual file '" + kFile + "'.");
 	}
 
-	private void readRemoveFile()
-	{
+	private void readRemoveFile() {
 		BufferedReader reader = FileUtil.FileOpen(rFile);
 		String line = null;
 		subSet = NewIt.newHashSet();
 
-		try
-		{
-			while ((line = reader.readLine()) != null)
-			{
+		try {
+			while ((line = reader.readLine()) != null) {
 				String[] l = line.split(ConstValues.WHITESPACE_DELIMITER);
 				if (l.length < 2)
 					continue;
 				subSet.add(new SubjectID(l[0], l[1]));
 			}
-		} catch (IOException e)
-		{
+		} catch (IOException e) {
 			Logger.handleException(e,
-					"An exception occurred when reading the removed-individual file '"
-							+ rFile + "'.");
+					"An exception occurred when reading the removed-individual file '" + rFile + "'.");
 		}
-		Logger.printUserLog("Reading " + subSet.size() + " individuals from remove-individal file '"+ rFile + "'.");
+		Logger.printUserLog("Reading " + subSet.size() + " individuals from remove-individal file '" + rFile + "'.");
 	}
 }

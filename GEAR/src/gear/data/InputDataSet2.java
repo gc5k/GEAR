@@ -72,7 +72,13 @@ public class InputDataSet2 implements SubjectOrder
 			sampleID.add(SID);
 		}
 
-		Logger.printUserLog(effectiveSubList.size() + " samples were matched up across " + fileList.size() + " files.");
+		if (effectiveSubList.size() == 0) {
+			Logger.printUserLog("No individuals were remained for analysis. GEAR quit.");
+			System.exit(1);
+		}
+		if (fileList.size() > 0) {
+			Logger.printUserLog(effectiveSubList.size() + " samples were matched across " + fileList.size() + " files.");			
+		}
 		Logger.printUserLog("");
 	}
 

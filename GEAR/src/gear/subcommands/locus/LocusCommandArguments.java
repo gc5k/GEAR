@@ -2,8 +2,7 @@ package gear.subcommands.locus;
 
 import gear.subcommands.CommandArguments;
 
-public class LocusArguments extends CommandArguments
-{
+public class LocusCommandArguments extends CommandArguments {
 
 	public void setInbred() {
 		isInbred = true;
@@ -14,4 +13,5 @@ public class LocusArguments extends CommandArguments
 	}
 
 	private boolean isInbred = false;
+
 }

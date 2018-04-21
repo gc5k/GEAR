@@ -2,77 +2,46 @@ package gear.subcommands.bluppca;
 
 import gear.subcommands.CommandArguments;
 
-public class BlupPcaCommandArguments extends CommandArguments
-{
-	public String getGrmBin()
-	{
+public class BlupPcaCommandArguments extends CommandArguments {
+	public String getGrmBin() {
 		return grmBin;
 	}
-	
-	public void setGrmBin(String grmBin)
-	{
+
+	public void setGrmBin(String grmBin) {
 		this.grmBin = grmBin;
 	}
-	
+
 	private String grmBin;
-	
-	public String getGrmText()
-	{
+
+	public String getGrmText() {
 		return grmText;
 	}
-	
-	public void setGrmText(String grmText)
-	{
+
+	public void setGrmText(String grmText) {
 		this.grmText = grmText;
 	}
-	
-	private String grmText;  // root name of the GRM files
-	
-	public String getGrmGZ()
-	{
+
+	private String grmText; // root name of the GRM files
+
+	public String getGrmGZ() {
 		return grmGZ;
 	}
-	
-	public void setGrmGZ(String grmGZ)
-	{
+
+	public void setGrmGZ(String grmGZ) {
 		this.grmGZ = grmGZ;
 	}
-	
-	private String grmGZ;  // root name of the GRM files
-	
-	public String getGrmID()
-	{
+
+	private String grmGZ; // root name of the GRM files
+
+	public String getGrmID() {
 		return grmID;
 	}
-	
-	public void setGrmID(String grmID)
-	{
+
+	public void setGrmID(String grmID) {
 		this.grmID = grmID;
 	}
-	
+
 	private String grmID;
-	
-	public String getPhenotypeFile()
-	{
-		return pheFile;
-	}
-	
-	public void setPhenotypeFile(String pheFile)
-	{
-		this.pheFile = pheFile;
-	}
 
-	public void setPhenotypeIndex(String pIdx) 
-	{
-		this.mphe[0] = Integer.parseInt(pIdx) -1;
-	}
-
-	public int[] getPhenotypeIndex()
-	{
-		return mphe;
-	}
-
-	private String pheFile;
-	private int[] mphe = {-1};
 
 }

@@ -50,7 +50,7 @@ public class MDRCommand extends Command
 		MDRArguments mdrArgs = new MDRArguments();
 		parseFileArguments(mdrArgs, cmdLine);
 		mdrArgs.setCovIndexes(cmdLine.getOptionValues(OPT_COV));
-		mdrArgs.setPhentypeIndex(parseIntOptionValue(cmdLine, "mpheno", "1"));
+		mdrArgs.setPhenotypeIndex(parseIntOptionValue(cmdLine, "mpheno", "1"));
 		mdrArgs.setPhenotypeFile(cmdLine.getOptionValue("pheno"));
 		mdrArgs.setCC(cmdLine.hasOption(OPT_CC));
 		return mdrArgs;

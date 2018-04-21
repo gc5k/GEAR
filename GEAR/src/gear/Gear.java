@@ -1,28 +1,24 @@
 package gear;
 
-import java.util.Calendar;
+//import java.util.Calendar;
 import java.util.Iterator;
 import java.util.SortedSet;
 import java.util.TreeMap;
 import java.util.TreeSet;
 
-import gear.he.h2trans.H2Transformer;
-import gear.ibd.jhe.JointHELinkLS;
-import gear.ibd.jhe.JointHELinkML;
-import gear.imputation.NaiveImputation;
-import gear.impute.ImputeProbabilityBestGuess;
-import gear.pscontrol.NonTransmitted;
+//import gear.he.h2trans.H2Transformer;
+//import gear.ibd.jhe.JointHELinkLS;
+//import gear.ibd.jhe.JointHELinkML;
+//import gear.pscontrol.NonTransmitted;
 import gear.subcommands.Command;
-import gear.util.Logger;
-import gear.util.MonitorThread;
+//import gear.util.Logger;
+//import gear.util.MonitorThread;
 
-public enum Gear
-{
+public enum Gear {
 	INSTANCE;
 	public static String subcmdName;
-	
-	private Gear()
-	{
+
+	private Gear() {
 		// hello, git!
 		addCommand(new gear.subcommands.bluppca.BlupPcaCommand());
 		addCommand(new gear.subcommands.dnafingerprint.DFPCommand());
@@ -78,32 +74,26 @@ public enum Gear
 		addCommand(new gear.subcommands.ibd.IBDCommand());
 	}
 
-	private void addCommand(Command cmd)
-	{
+	private void addCommand(Command cmd) {
 		cmdMap.put(cmd.getName(), cmd);
 		Iterator<String> aliasIter = cmd.getAliases().iterator();
-		while (aliasIter.hasNext())
-		{
+		while (aliasIter.hasNext()) {
 			cmdMap.put(aliasIter.next(), cmd);
 		}
 	}
-	
-	public Command getCommand(String sNameOrAlias)
-	{
+
+	public Command getCommand(String sNameOrAlias) {
 		return cmdMap.get(sNameOrAlias);
 	}
-	
-	public SortedSet<Command> getCommandSet()
-	{
-		 return new TreeSet<Command>(cmdMap.values());
+
+	public SortedSet<Command> getCommandSet() {
+		return new TreeSet<Command>(cmdMap.values());
 	}
-	
+
 	private TreeMap<String, Command> cmdMap = new TreeMap<String, Command>();
-	
-	public static void main(String[] args)
-	{
-		if (args.length == 0)
-		{
+
+	public static void main(String[] args) {
+		if (args.length == 0) {
 			System.out.println("Type 'gear help' or 'java -jar gear.jar help' for usage.");
 			System.exit(1);
 		}
@@ -114,67 +104,52 @@ public enum Gear
 
 		Command subcmd = INSTANCE.getCommand(subcmdName);
 
-		if (subcmd != null)
-		{
+		if (subcmd != null) {
 			subcmd.execute(subcmdArgs, subcmdName);
 		}
-		else
-		{
-	
-			CmdArgs.INSTANCE.parse(args);
-			
-			Logger.setLogFiles(CmdArgs.INSTANCE.out);
-			Logger.hasUserLogTag(false);
-			Logger.printUserLog(AboutInfo.WELCOME_MESSAGE);
-			Logger.hasUserLogTag(true);
-			Logger.printUserLog("Analysis started: " + Calendar.getInstance().getTime() + "\n");
-
-			MonitorThread monitor = new MonitorThread();
-			monitor.start();
-	
-			CmdArgs.INSTANCE.printOptionsInEffect();
-	
-			if (CmdArgs.INSTANCE.calOption)
-			{
-				H2Transformer H2 = new H2Transformer();
-				H2.H2();
-	
-			}
-			else if (CmdArgs.INSTANCE.nontransFlag)
-			{
-				NonTransmitted nt = new NonTransmitted();
-				nt.GenerateNonTransmitted();
-	
-			}
-			else if (CmdArgs.INSTANCE.naiveImputFlag)
-			{
-				NaiveImputation ni = new NaiveImputation();
-				ni.Imputation();
-			}
-			else if (CmdArgs.INSTANCE.helinkFlag)
-			{
-				if (CmdArgs.INSTANCE.remlFlag)
-				{
-					JointHELinkML heReml = new JointHELinkML();
-				}
-				else
-				{
-					JointHELinkLS heLS = new JointHELinkLS();
-					heLS.JHE();
-				}
-			}
-			else if (CmdArgs.INSTANCE.imputeFlag)
-			{
-				ImputeProbabilityBestGuess bestGuess = new ImputeProbabilityBestGuess();
-				bestGuess.convert();
-			}
-
-			monitor.stopMonitoring();
-
-			Logger.printUserLog("");
-			Logger.printUserLog("Analysis finished: " + Calendar.getInstance().getTime());
-			Logger.printUserLog("Peak memory consumption: " + monitor.getPeakMemoryFormatString());
-		}
+//		} else {
+//
+//			CmdArgs.INSTANCE.parse(args);
+//
+//			Logger.setLogFiles(CmdArgs.INSTANCE.out);
+//			Logger.hasUserLogTag(false);
+//			Logger.printUserLog(AboutInfo.WELCOME_MESSAGE);
+//			Logger.hasUserLogTag(true);
+//			Logger.printUserLog("Analysis started: " + Calendar.getInstance().getTime() + "\n");
+//
+//			MonitorThread monitor = new MonitorThread();
+//			monitor.start();
+//
+//			CmdArgs.INSTANCE.printOptionsInEffect();
+//
+//			if (CmdArgs.INSTANCE.calOption) {
+//				H2Transformer H2 = new H2Transformer();
+//				H2.H2();
+//
+//			} else if (CmdArgs.INSTANCE.nontransFlag) {
+//				NonTransmitted nt = new NonTransmitted();
+//				nt.GenerateNonTransmitted();
+//
+//			} else if (CmdArgs.INSTANCE.naiveImputFlag) {
+//				NaiveImputation ni = new NaiveImputation();
+//				ni.Imputation();
+//			} else if (CmdArgs.INSTANCE.helinkFlag) {
+//				if (CmdArgs.INSTANCE.remlFlag) {
+//					JointHELinkML heReml = new JointHELinkML();
+//				} else {
+//					JointHELinkLS heLS = new JointHELinkLS();
+//					heLS.JHE();
+//				}
+//			} else if (CmdArgs.INSTANCE.imputeFlag) {
+//				ImputeProbabilityBestGuess bestGuess = new ImputeProbabilityBestGuess();
+//				bestGuess.convert();
+//			}
+//
+//			monitor.stopMonitoring();
+//
+//			Logger.printUserLog("");
+//			Logger.printUserLog("Analysis finished: " + Calendar.getInstance().getTime());
+//			Logger.printUserLog("Peak memory consumption: " + monitor.getPeakMemoryFormatString());
 	}
-	
+
 }

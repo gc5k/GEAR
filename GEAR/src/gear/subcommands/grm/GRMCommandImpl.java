@@ -7,9 +7,9 @@ import java.text.DecimalFormat;
 import java.util.ArrayList;
 
 import gear.data.Person;
+import gear.family.GenoMatrix.GenotypeMatrix;
 import gear.family.pedigree.PersonIndex;
 import gear.family.plink.PLINKParser;
-import gear.family.popstat.GenotypeMatrix;
 import gear.family.qc.rowqc.SampleFilter;
 import gear.subcommands.CommandArguments;
 import gear.subcommands.CommandImpl;
@@ -31,10 +31,10 @@ public class GRMCommandImpl extends CommandImpl {
 
 		PLINKParser pp = PLINKParser.parse(grmArgs);
 		sf = new SampleFilter(pp.getPedigreeData(), cmdArgs);
-
 		pGM = new GenotypeMatrix(sf.getSample(), pp.getMapData(), cmdArgs);
 
-		prepareMAF();
+		allelefreq = PopStat.calAlleleFrequency(pGM);
+		allelevar = PopStat.calGenoVariance(pGM);
 
 		makeAddScore();
 
@@ -236,9 +236,10 @@ public class GRMCommandImpl extends CommandImpl {
 		double[] s = { 0, 0 };
 
 		for (int i = 0; i < allelefreq.length; i++) {
-			if (allelefreq[i][1] == Double.NaN || allelefreq[i][0] == 0 || allelevar[i] == 0) {
-				continue;
-			}
+			
+			//inside control
+			if (allelefreq[i][1] == Double.NaN || allelefreq[i][0] == 0 || allelefreq[i][1] == 0 || allelevar[i] == 0) continue;
+
 			int g1 = pGM.getAdditiveScore(idx1, i);
 			int g2 = pGM.getAdditiveScore(idx2, i);
 			double m = allelefreq[i][1];
@@ -246,9 +247,7 @@ public class GRMCommandImpl extends CommandImpl {
 				continue;
 			} else {
 				double de = grmArgs.isInbred()? 4 * allelefreq[i][0] * allelefreq[i][1] : 2 * allelefreq[i][0] * allelefreq[i][1];
-				if (grmArgs.isAdjVar()) {
-					if (allelevar[i] == 0) continue;
-				}
+				if (grmArgs.isAdjVar()) de = allelevar[i];
 				s[0]++;
 				s[1] += (g1 - 2 * m) * (g2 - 2 * m) / de;
 			}
@@ -267,10 +266,9 @@ public class GRMCommandImpl extends CommandImpl {
 		double[] s = { 0, 0 };
 
 		for (int i = 0; i < allelefreq.length; i++) {
+			//inside control
+			if (allelefreq[i][1] == Double.NaN || allelefreq[i][0] == 0 || allelefreq[i][1] == 0 || allelevar[i] == 0) continue;
 
-			if (allelefreq[i][1] == Double.NaN) {
-				continue;
-			}
 			double m = allelefreq[i][1];
 			int g1 = pGM.getAdditiveScore(idx1, i);
 			int g2 = pGM.getAdditiveScore(idx2, i);
@@ -309,10 +307,4 @@ public class GRMCommandImpl extends CommandImpl {
 
 		return s;
 	}
-
-	private void prepareMAF() {
-		allelefreq = PopStat.calAlleleFrequency(pGM);
-		allelevar = PopStat.calGenoVariance(pGM);
-	}
-
 }
