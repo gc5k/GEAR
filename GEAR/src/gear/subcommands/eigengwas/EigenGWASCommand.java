@@ -30,6 +30,9 @@ public class EigenGWASCommand extends Command {
 		options.addOption(OptionBuilder.withDescription(OPT_KEEP_DESC).withLongOpt(OPT_KEEP_LONG).hasArg().create());
 		options.addOption(
 				OptionBuilder.withDescription(OPT_REMOVE_DESC).withLongOpt(OPT_REMOVE_LONG).hasArg().create());
+		options.addOption(OptionBuilder.withDescription(OPT_KEEP_FAM_DESC).withLongOpt(OPT_KEEP_FAM_LONG).hasArg().create());
+		options.addOption(
+				OptionBuilder.withDescription(OPT_REMOVE_FAM_DESC).withLongOpt(OPT_REMOVE_FAM_LONG).hasArg().create());
 
 		options.addOption(
 				OptionBuilder.withDescription(OPT_EXTRACT_DESC).withLongOpt(OPT_EXTRACT_LONG).hasArg().create());
@@ -48,7 +51,6 @@ public class EigenGWASCommand extends Command {
 				OptionBuilder.withDescription(OPT_ZERO_VAR_DESC).withLongOpt(OPT_ZERO_VAR_LONG).create());
 		options.addOption(
 				OptionBuilder.withDescription(OPT_MAF_RANGE_DESC).withLongOpt(OPT_MAF_RANGE_LONG).hasArgs().create());
-
 	}
 
 	public CommandArguments parse(CommandLine cmdLine) throws CommandArgumentException {
@@ -56,6 +58,8 @@ public class EigenGWASCommand extends Command {
 		parseFileArguments((CommandArguments) eigenArgs, cmdLine);
 
 		parseSampleFilterArguments((CommandArguments) eigenArgs, cmdLine);
+		parseFamilyFilterArguments((CommandArguments) eigenArgs, cmdLine);
+
 		parseSNPFilterFileArguments((CommandArguments) eigenArgs, cmdLine);
 		parseSNPFilterChromosomeArguments((CommandArguments) eigenArgs, cmdLine);
 

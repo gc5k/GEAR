@@ -10,6 +10,7 @@ import org.apache.commons.math.linear.Array2DRowRealMatrix;
 import org.apache.commons.math.linear.LUDecompositionImpl;
 import org.apache.commons.math.linear.RealMatrix;
 
+import gear.ConstValues;
 import gear.data.InputDataSet2;
 import gear.family.GenoMatrix.GenotypeMatrix;
 import gear.family.pedigree.file.SNP;
@@ -124,9 +125,7 @@ public class EigenGWASEpiCommandImpl extends CommandImpl {
 			Freq1_2 /= 2.0D * N1_2;
 			Freq1 /= 2.0D * N1;
 
-			double fst1 = 2 * (N1_1 / N1 * (Freq1_1 - Freq1) * (Freq1_1 - Freq1)
-					+ N1_2 / N1 * (Freq1_2 - Freq1) * (Freq1_2 - Freq1)) / (Freq1 * (1.0D - Freq1));
-
+			double fst1 = PopStat.Fst(Freq1, (int) N1_1, (int) N1_2, Freq1_1, Freq1_2);
 			for (int i2 = i + 1; i2 < pGM.getNumMarker(); i2++) {
 				SNP snp2 = pGM.getSNPList().get(i2);
 
@@ -167,8 +166,7 @@ public class EigenGWASEpiCommandImpl extends CommandImpl {
 				Freq2_2 /= 2.0D * N2_2;
 				Freq2 /= 2.0D * N2;
 
-				double fst2 = 2 * (N2_1 / N2 * (Freq2_1 - Freq2) * (Freq2_1 - Freq2)
-						+ N2_2 / N2 * (Freq2_2 - Freq2) * (Freq2_2 - Freq2)) / (Freq2 * (1.0D - Freq2));
+				double fst2 = PopStat.Fst(Freq2, (int) N2_1, (int) N2_2, Freq2_1, Freq2_2);
 
 				double[][] x1 = new double[pGM.getNumIndivdial()][6];// u + a1 + d1 + a2 + d2 + aa
 				for (int k1 = 0; k1 < x1.length; k1++) {
@@ -305,7 +303,7 @@ public class EigenGWASEpiCommandImpl extends CommandImpl {
 	private double[] getCoding(int ind, int locus) {
 		double[] cd = new double[3];
 		int g = pGM.getAdditiveScoreOnFirstAllele(ind, locus);
-		if (g != 3) {
+		if (g != ConstValues.MISSING_GENOTYPE) {
 			cd[2] = 1;
 			if (g == 0) {
 				/*

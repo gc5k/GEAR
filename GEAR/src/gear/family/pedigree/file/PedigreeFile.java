@@ -178,7 +178,7 @@ public class PedigreeFile
 			k++;
 		} while ((tokens = reader.readTokens(numCols)) != null);
 		Is6ColBinary();
-		Logger.printUserLog("Reading " + HukouBook.size() + " individuals from '" + infile + "'.");
+		Logger.printUserLog("Read " + HukouBook.size() + " individuals from '" + infile + "'.");
 
 	}
 

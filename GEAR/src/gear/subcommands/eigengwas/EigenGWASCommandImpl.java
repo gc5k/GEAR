@@ -1,5 +1,6 @@
 package gear.subcommands.eigengwas;
 
+import gear.ConstValues;
 import gear.data.InputDataSet2;
 import gear.family.GenoMatrix.GenotypeMatrix;
 import gear.family.pedigree.file.SNP;
@@ -95,7 +96,7 @@ public class EigenGWASCommandImpl extends CommandImpl {
 				
 //				int g = pGM.getAdditiveScoreOnFirstAllele(gIdx[j], i);
 				int g = pGM.getAdditiveScoreOnFirstAllele(j, i);
-				if (g != 3) {
+				if (g != ConstValues.MISSING_GENOTYPE) {
 					sReg.addData(g, Y[j]);
 					if (Y[j] < threshold) {
 						n1 += 1.0D;
@@ -113,23 +114,19 @@ public class EigenGWASCommandImpl extends CommandImpl {
 			freq2 /= 2.0D * n2;
 			freq /= 2.0D * N;
 
-			double fst, b, b_se;
+			double b, b_se;
 			boolean isGood;
 			if (freq == 0 || freq == 1 || (N < pGM.getNumIndivdial() * eigenArgs.getGENO())
 					|| pGM.getAlleleVar(i) == 0) {
-				fst = Double.NaN;
 				b = Double.NaN;
 				b_se = Double.NaN;
 				isGood = false;
-				// continue;
 			} else {
-				fst = 2 * (n1 / N * (freq1 - freq) * (freq1 - freq) + n2 / N * (freq2 - freq) * (freq2 - freq))
-						/ (freq * (1.0D - freq));
 				b = sReg.getSlope();
 				b_se = sReg.getSlopeStdErr();
 				isGood = true;
 			}
-			EigenGWASResult e1 = new EigenGWASResult(snp, freq, b, b_se, n1, freq1, n2, freq2, fst, isGood);
+			EigenGWASResult e1 = new EigenGWASResult(snp, freq, b, b_se, n1, freq1, n2, freq2, isGood);
 			eGWASResult.add(e1);
 			pArray.add(e1.GetP());
 

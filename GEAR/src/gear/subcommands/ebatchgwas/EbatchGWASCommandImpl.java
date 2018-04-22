@@ -56,6 +56,10 @@ public class EbatchGWASCommandImpl extends CommandImpl {
 			gArgs.setKeepFile(eArgs.getKeepFile());
 		} else if (eArgs.isRemoveFile()) {
 			gArgs.setRemoveFile(eArgs.getRemoveFile());
+		} else if (eArgs.isKeepFamFile()) {
+			gArgs.setKeepFamFile(eArgs.getKeepFamFile());
+		} else if (eArgs.isRemoveFamFile()) {
+			gArgs.setRemoveFamFile(eArgs.getRemoveFamFile());
 		}
 
 		GRMCommandImpl gImpl = new GRMCommandImpl();
@@ -73,11 +77,9 @@ public class EbatchGWASCommandImpl extends CommandImpl {
 		} else if (eArgs.isRemoveFile()) {
 			qpcaArgs.setRemoveFile(eArgs.getRemoveFile());
 		}
-		
+
 		QPCACommandImpl qpcaImpl = new QPCACommandImpl();
 		qpcaImpl.execute(qpcaArgs);
-		Logger.printUserLog(
-				"Saving the top " + eArgs.getEV() + " eigenvectors in '" + eArgs.getOutRoot() + ".eigenvec'.");
 
 		if (!eArgs.isDom() && !eArgs.isEpi()) {
 			for (int i = 1; i <= eArgs.getEV(); i++) {
@@ -118,6 +120,10 @@ public class EbatchGWASCommandImpl extends CommandImpl {
 					eigenArgs.setKeepFile(eArgs.getKeepFile());
 				} else if (eArgs.isRemoveFile()) {
 					eigenArgs.setRemoveFile(eArgs.getRemoveFile());
+				}else if (eArgs.isKeepFamFile()) {
+					eigenArgs.setKeepFamFile(eArgs.getKeepFamFile());
+				} else if (eArgs.isRemoveFamFile()) {
+					eigenArgs.setRemoveFamFile(eArgs.getRemoveFamFile());
 				}
 
 				EigenGWASCommandImpl eigenImpl = new EigenGWASCommandImpl();

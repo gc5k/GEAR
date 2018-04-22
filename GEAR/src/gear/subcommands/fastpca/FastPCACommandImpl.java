@@ -12,7 +12,6 @@ import org.apache.commons.math.linear.QRDecomposition;
 import org.apache.commons.math.linear.QRDecompositionImpl;
 import org.apache.commons.math.linear.RealMatrix;
 
-import gear.ConstValues;
 import gear.data.InputDataSet2;
 import gear.data.SubjectID;
 import gear.family.GenoMatrix.GenotypeMatrix;
@@ -22,7 +21,6 @@ import gear.subcommands.CommandArguments;
 import gear.subcommands.CommandImpl;
 import gear.subcommands.grm.GRMCommandArguments;
 import gear.subcommands.grm.GRMCommandImpl;
-import gear.util.BinaryInputFile;
 import gear.util.BufferedReader;
 import gear.util.FileUtil;
 import gear.util.Logger;
@@ -122,23 +120,6 @@ public class FastPCACommandImpl extends CommandImpl {
 	private void readGrm() {
 		BufferedReader reader = BufferedReader.openGZipFile(fpcaArgs.getOutRoot() + ".grm.gz", "GRM (gzip)");
 		readGrm(reader);
-	}
-
-	private void readGrmBin(String fileName) {
-		BinaryInputFile grmBin = new BinaryInputFile(fileName, "GRM (binary)", /* littleEndian */true);
-		double[][] grmMat = new double[data.getFileSampleSize(0)][data.getFileSampleSize(0)];
-		Logger.printUserLog("Constructing A matrix: a " + data.getFileSampleSize(0) + " X " + data.getFileSampleSize(0)
-				+ " matrix.");
-		for (int i = 0; i < grmMat.length; i++) {
-			for (int j = 0; j <= i; j++) {
-				if (grmBin.available() >= ConstValues.FLOAT_SIZE) {
-					grmMat[i][j] = grmMat[j][i] = grmBin.readFloat();
-				}
-			}
-		}
-		grmBin.close();
-
-		A = lineUpMatrix(grmMat, data.getMatchedSubjectIdx(0));
 	}
 
 	private void readGrm(BufferedReader reader) {

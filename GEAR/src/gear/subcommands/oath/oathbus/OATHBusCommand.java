@@ -57,8 +57,8 @@ public class OATHBusCommand extends Command {
 	@Override
 	public CommandArguments parse(CommandLine cmdLine) throws CommandArgumentException {
 		OATHBusCommandArguments obArgs = new OATHBusCommandArguments();
+
 		parseFileArguments(obArgs, cmdLine);
-		obArgs.setPhenotypeFile(cmdLine.getOptionValue(OPT_PHE));
 
 		parseMAFArguments((CommandArguments) obArgs, cmdLine);
 		parseMAXMAFArguments((CommandArguments) obArgs, cmdLine);
@@ -76,27 +76,6 @@ public class OATHBusCommand extends Command {
 		}
 
 		return obArgs;
-	}
-
-	private void parseFileArguments(OATHBusCommandArguments obArgs, CommandLine cmdLine)
-			throws CommandArgumentException {
-		String bfile = cmdLine.getOptionValue("bfile");
-		String file = cmdLine.getOptionValue("file");
-
-		if ((bfile == null) && (file == null)) {
-			throw new CommandArgumentException("No genotypes are provided. Either --bfile or --file must be set.");
-		}
-
-		if ((bfile != null) && (file != null)) {
-			throw new CommandArgumentException("--bfile and --file cannot be set together.");
-		}
-
-		obArgs.setBFile(bfile);
-		obArgs.setFile(file);
-
-		if (cmdLine.hasOption(OPT_CHR_LONG)) {
-			obArgs.setChr(cmdLine.getOptionValues(OPT_CHR_LONG));
-		}
 	}
 
 	@Override

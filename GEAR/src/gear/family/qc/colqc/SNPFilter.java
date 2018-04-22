@@ -2,7 +2,6 @@ package gear.family.qc.colqc;
 
 import java.io.BufferedReader;
 import java.io.IOException;
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashSet;
 import java.util.Iterator;
@@ -15,14 +14,12 @@ import gear.util.FileUtil;
 import gear.util.Logger;
 import gear.util.NewIt;
 
-public class SNPFilter implements SNPFilterInterface {
+public class SNPFilter {
 
 	protected MapFile mapData;
 	protected int[] WSNP;
 
 	protected int[] wseq = null;
-	protected int[] bgseq = null;
-	private ArrayList<SNP> snpList;
 	private HashSet<String> snpChosenSet;
 
 	protected HashSet<Integer> selectedSNPSet;
@@ -30,7 +27,6 @@ public class SNPFilter implements SNPFilterInterface {
 
 	public SNPFilter(MapFile mapData) {
 		this.mapData = mapData;
-		snpList = mapData.getMarkerList();
 		selectedSNPSet = NewIt.newHashSet();
 		excludedSNPSet = NewIt.newHashSet();
 	}
@@ -78,8 +74,8 @@ public class SNPFilter implements SNPFilterInterface {
 		if (snpChosenSet.size() > 0) {
 			Logger.printUserLog("Read " + snpChosenSet.size() + " SNPs from '"
 					+ cmdArgs.getExtractFile()+ "'.");
-			for (int i = 0; i < snpList.size(); i++) {
-				SNP snp = snpList.get(i);
+			for (int i = 0; i < mapData.getMarkerList().size(); i++) {
+				SNP snp = mapData.getMarkerList().get(i);
 				String snpName = snp.getName();
 				if (snpChosenSet.contains(snpName)) {
 					includeSNP(i);
@@ -106,8 +102,8 @@ public class SNPFilter implements SNPFilterInterface {
 		if (snpChosenSet.size() > 0) {
 			Logger.printUserLog("Read " + snpChosenSet.size() + " SNPs from '"
 					+ cmdArgs.getExcludeFile() + "'.");
-			for (int i = 0; i < snpList.size(); i++) {
-				SNP snp = snpList.get(i);
+			for (int i = 0; i < mapData.getMarkerList().size(); i++) {
+				SNP snp = mapData.getMarkerList().get(i);
 				String snpName = snp.getName();
 				if (snpChosenSet.contains(snpName)) {
 					excludeSNP(i);
@@ -120,8 +116,8 @@ public class SNPFilter implements SNPFilterInterface {
 
 		Logger.printUserLog("Filtering out SNPs not at the selected chromosome(s)...");
 		HashSet<String> chrNotSet = cmdArgs.getNotChr();
-		for (int i = 0; i < snpList.size(); i++) {
-			SNP snp = snpList.get(i);
+		for (int i = 0; i < mapData.getMarkerList().size(); i++) {
+			SNP snp = mapData.getMarkerList().get(i);
 			String chr = snp.getChromosome();
 			if (chrNotSet.contains(chr)) {
 				excludeSNP(i);
@@ -135,8 +131,8 @@ public class SNPFilter implements SNPFilterInterface {
 
 		Logger.printUserLog("Choosing SNPs from the selected chromosome(s)...");
 		HashSet<String> chrSet = cmdArgs.getChr();
-		for (int i = 0; i < snpList.size(); i++) {
-			SNP snp = snpList.get(i);
+		for (int i = 0; i < mapData.getMarkerList().size(); i++) {
+			SNP snp = mapData.getMarkerList().get(i);
 			String chr = snp.getChromosome();
 			if (chrSet.contains(chr)) {
 				includeSNP(i);
@@ -157,16 +153,16 @@ public class SNPFilter implements SNPFilterInterface {
 			}
 			Arrays.sort(WSNP);
 		} else if (excludedSNPSet.size() > 0) {
-			WSNP = new int[snpList.size() - excludedSNPSet.size()];
+			WSNP = new int[mapData.getMarkerList().size() - excludedSNPSet.size()];
 			int c = 0;
-			for (int i = 0; i < snpList.size(); i++) {
+			for (int i = 0; i < mapData.getMarkerList().size(); i++) {
 				if (!excludedSNPSet.contains(i)) {
 					WSNP[c++] = i;
 				}
 			}
 		} else {
-			WSNP = new int[snpList.size()];
-			for (int i = 0; i < snpList.size(); i++) {
+			WSNP = new int[mapData.getMarkerList().size()];
+			for (int i = 0; i < mapData.getMarkerList().size(); i++) {
 				WSNP[i] = i;
 			}
 		}
@@ -200,18 +196,4 @@ public class SNPFilter implements SNPFilterInterface {
 		return WSNP;
 	}
 
-	@Override
-	public int[] getWSeq() {
-		return wseq;
-	}
-
-	@Override
-	public int[] getBgSeq() {
-		return bgseq;
-	}
-
-	@Override
-	public int[][] getWSeq2() {
-		return null;
-	}
 }

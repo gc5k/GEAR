@@ -114,10 +114,12 @@ public class QPCACommandImpl extends CommandImpl {
 			}
 
 			if ((i + 1) <= qpcaArgs.getEV()) {
-				Logger.printUserLog("The " + (i + 1) + "th eigenvalue is " + eR[i] + ".");
+				Logger.printUserLog("The #" + (i+1) + " eigenvalue is " + eR[i] + ".");
 			}
 		}
 		evaWriter.close();
+
+		Logger.printUserLog("Saved the eigenvalues in '" + qpcaArgs.getOutRoot() + ".eigenval'.");
 
 		PrintStream eveWriter = FileUtil.CreatePrintStream(new String(qpcaArgs.getOutRoot() + ".eigenvec"));
 
@@ -135,6 +137,8 @@ public class QPCACommandImpl extends CommandImpl {
 			eveWriter.println();
 		}
 		eveWriter.close();
+		Logger.printUserLog(
+				"Saved the top " + qpcaArgs.getEV() + " eigenvectors in '" + qpcaArgs.getOutRoot() + ".eigenvec'.");
 
 		///write id file
 		PrintStream grmWriter = FileUtil.CreatePrintStream(new String(qpcaArgs.getOutRoot() + ".crm"));
@@ -145,6 +149,8 @@ public class QPCACommandImpl extends CommandImpl {
 			grmWriter.println();
 		}
 		grmWriter.close();
+		Logger.printUserLog(
+				"Saved the correlation matrix in '" + qpcaArgs.getOutRoot()+ ".crm'.");
 
 	}
 

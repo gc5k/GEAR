@@ -1,5 +1,6 @@
 package gear.subcommands.oath.nss;
 
+import gear.ConstValues;
 import gear.data.InputDataSet2;
 import gear.family.GenoMatrix.GenotypeMatrix;
 import gear.family.pedigree.file.SNP;
@@ -37,7 +38,7 @@ public class NSSCommandImpl extends CommandImpl {
 
 	private double lambdaGC = 1;
 
-	private int famFileIdx = 0;
+//	private int famFileIdx = 0;
 	private int pheFileIdx = 1;
 	private int covFileIdx = 2;
 
@@ -151,7 +152,7 @@ public class NSSCommandImpl extends CommandImpl {
 
 			for (int j = 0; j < pGM.getNumIndivdial(); j++) {
 				int g = pGM.getAdditiveScoreOnFirstAllele(j, i);
-				if (g != 3) {
+				if (g != ConstValues.MISSING_GENOTYPE) {
 					sReg.addData(g, Y[j]);
 					N += 1.0D;
 					freq += g;

@@ -70,7 +70,7 @@ public class PopStat {
 		for (int i = 0; i < G.getGRow(); i++) {
 			for (int j = 0; j < G.getNumMarker(); j++) {
 				int g = G.getAdditiveScoreOnFirstAllele(i, j);
-				if (g != ConstValues.BINARY_MISSING_GENOTYPE) {
+				if (g != ConstValues.MISSING_GENOTYPE) {
 					gfreq[j][g]++;
 				}
 			}
@@ -101,7 +101,7 @@ public class PopStat {
 
 			for (int j = 0; j < G.getNumIndivdial(); j++) {
 				int genoValue = G.getAdditiveScore(j, i);
-				if (genoValue == ConstValues.BINARY_MISSING_GENOTYPE) {
+				if (genoValue == ConstValues.MISSING_GENOTYPE) {
 					cn++;
 					int v;
 					try {
@@ -129,5 +129,12 @@ public class PopStat {
 
 		return D;
 
+	}
+
+	public static double Fst(double F, int n1, int n2, double f1, double f2) {
+		double N = n1 + n2;
+		double fst = 2 * (n1 / N * (f1 - F) * (f1 - F) + n2 / N * (f2 - F) * (f2 - F))
+		/ (F * (1.0D - F));
+		return fst;
 	}
 }

@@ -72,7 +72,7 @@ public class SFstCommandImpl extends CommandImpl
 		}
 		WriteFstMat();
 		Logger.printUserLog("=========================================================");
-		Logger.printUserLog("Results has been saved in '" + sfstArgs
+		Logger.printUserLog("Results have been saved in '" + sfstArgs
 				.getOutRoot() + ".lmat'.");
 	}
 

@@ -37,6 +37,9 @@ public class GRMCommand extends Command {
 		options.addOption(OptionBuilder.withDescription(OPT_KEEP_DESC).withLongOpt(OPT_KEEP_LONG).hasArg().create());
 		options.addOption(
 				OptionBuilder.withDescription(OPT_REMOVE_DESC).withLongOpt(OPT_REMOVE_LONG).hasArg().create());
+		options.addOption(OptionBuilder.withDescription(OPT_KEEP_FAM_DESC).withLongOpt(OPT_KEEP_FAM_LONG).hasArg().create());
+		options.addOption(
+				OptionBuilder.withDescription(OPT_REMOVE_FAM_DESC).withLongOpt(OPT_REMOVE_FAM_LONG).hasArg().create());
 
 		options.addOption(
 				OptionBuilder.withDescription(OPT_EXTRACT_DESC).withLongOpt(OPT_EXTRACT_LONG).hasArg().create());
@@ -61,8 +64,12 @@ public class GRMCommand extends Command {
 	@Override
 	public CommandArguments parse(CommandLine cmdLine) throws CommandArgumentException {
 		GRMCommandArguments grmArgs = new GRMCommandArguments();
+		
 		parseFileArguments((CommandArguments) grmArgs, cmdLine);
+
 		parseSampleFilterArguments((CommandArguments) grmArgs, cmdLine);
+		parseFamilyFilterArguments((CommandArguments) grmArgs, cmdLine);
+
 		parseSNPFilterFileArguments((CommandArguments) grmArgs, cmdLine);
 		parseSNPFilterChromosomeArguments((CommandArguments) grmArgs, cmdLine);
 

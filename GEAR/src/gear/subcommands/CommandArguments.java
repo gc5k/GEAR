@@ -8,6 +8,7 @@ import gear.util.NewIt;
 public abstract class CommandArguments {
 	public void setFile(String file) {
 		this.file = file;
+		this.isFile = true;
 	}
 
 	public String getFile() {
@@ -26,8 +27,13 @@ public abstract class CommandArguments {
 		return bfile;
 	}
 
+	public boolean isFile() {
+		return isFile;
+	}
+
 	public void setBFile(String bfile) {
 		this.bfile = bfile;
+		this.isbFile = true;
 	}
 
 	public String getBed() {
@@ -40,6 +46,10 @@ public abstract class CommandArguments {
 
 	public String getFam() {
 		return getBFile() + ".fam";
+	}
+
+	public boolean isbFile() {
+		return isbFile;
 	}
 
 	public String getOutRoot() {
@@ -71,6 +81,20 @@ public abstract class CommandArguments {
 		return isKeepFile;
 	}
 
+	
+	public void setKeepFamFile(String kFamF) {
+		this.keepFamFile = kFamF;
+		isKeepFamFile = true;
+	}
+
+	public String getKeepFamFile() {
+		return keepFamFile;
+	}
+
+	public boolean isKeepFamFile() {
+		return isKeepFamFile;
+	}
+
 	public void setRemoveFile(String rF) {
 		this.removeFile = rF;
 		isRemoveFile = true;
@@ -82,6 +106,19 @@ public abstract class CommandArguments {
 	
 	public boolean isRemoveFile() {
 		return isRemoveFile;
+	}
+
+	public void setRemoveFamFile(String rFamF) {
+		this.removeFamFile = rFamF;
+		isRemoveFamFile = true;
+	}
+
+	public String getRemoveFamFile() {
+		return removeFamFile;
+	}
+	
+	public boolean isRemoveFamFile() {
+		return isRemoveFamFile;
 	}
 
 	public void setExtractFile(String eF) {
@@ -267,12 +304,23 @@ public abstract class CommandArguments {
 		return this.mPheno;
 	}
 
+	private String outRoot;
+
 	private String pheFile;
 	private int[] mPheno = { 0 };	
 	
 	private String file;
+	private boolean isFile = false;
+
 	private String bfile;
-	private String outRoot;
+	private boolean isbFile = false;
+
+
+	private String keepFamFile = null;
+	private boolean isKeepFamFile = false;
+
+	private String removeFamFile = null;
+	private boolean isRemoveFamFile = false;
 
 	private String keepFile = null;
 	private boolean isKeepFile = false;

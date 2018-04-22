@@ -29,8 +29,6 @@ public class SampleFilter {
 	protected PedigreeFile PedData;
 	protected PLINKParser plinkParser;
 
-	protected String kFile;
-	protected String rFile;
 	protected int filterType = 0; // 0 for no filter, 1 for keep, 2 for remove
 
 	protected double[] status;
@@ -44,6 +42,7 @@ public class SampleFilter {
 	protected boolean[][] filter;
 
 	private HashSet<SubjectID> subSet;
+	private HashSet<String> famSet;
 
 	public SampleFilter(PedigreeFile ped) {
 		PedData = ped;
@@ -58,13 +57,17 @@ public class SampleFilter {
 		PersonTable = NewIt.newArrayList();
 
 		if (cmdArgs.isKeepFile()) {
-			kFile = cmdArgs.getKeepFile();
-			readKeepFile();
+			readIndividualFile(cmdArgs.getKeepFile(), "keep-individual");
 			filterType = 1;
 		} else if (cmdArgs.isRemoveFile()) {
-			rFile = cmdArgs.getRemoveFile();
-			readRemoveFile();
+			readIndividualFile(cmdArgs.getRemoveFile(), "remove-individual");
 			filterType = 2;
+		} else if (cmdArgs.isKeepFamFile()) {
+			readFamilyFile(cmdArgs.getKeepFamFile(), "keep-family");
+			filterType = 3;
+		} else if (cmdArgs.isRemoveFamFile()) {
+			readFamilyFile(cmdArgs.getRemoveFamFile(), "remove-family");
+			filterType = 4;
 		}
 		
 		qualification();
@@ -116,6 +119,10 @@ public class SampleFilter {
 			flag = subSet.contains(new SubjectID(p.getFamilyID(), p.getPersonID()));
 		} else if (filterType == 2) {
 			flag = !subSet.contains(new SubjectID(p.getFamilyID(), p.getPersonID()));
+		} else if (filterType == 3) {
+			flag = famSet.contains(p.getFamilyID());
+		} else if (filterType == 4) {
+			flag = !famSet.contains(p.getFamilyID());
 		}
 		return flag;
 	}
@@ -132,7 +139,7 @@ public class SampleFilter {
 		return HukouBook;
 	}
 
-	private void readKeepFile() {
+	private void readIndividualFile(String kFile, String opt) {
 		BufferedReader reader = FileUtil.FileOpen(kFile);
 		String line = null;
 		subSet = NewIt.newHashSet();
@@ -145,27 +152,24 @@ public class SampleFilter {
 				subSet.add(new SubjectID(l[0], l[1]));
 			}
 		} catch (IOException e) {
-			Logger.handleException(e, "An exception occurred when reading the keep file '" + kFile + "'.");
+			Logger.handleException(e, "An exception occurred when reading the " + opt + " file '" + kFile + "'.");
 		}
-		Logger.printUserLog("Reading " + subSet.size() + " individuals from keep-individual file '" + kFile + "'.");
+		Logger.printUserLog("Read " + subSet.size() + " individuals from the " + opt + " file '" + kFile + "'.");
 	}
 
-	private void readRemoveFile() {
-		BufferedReader reader = FileUtil.FileOpen(rFile);
+	private void readFamilyFile(String kFamFile, String opt) {
+		BufferedReader reader = FileUtil.FileOpen(kFamFile);
 		String line = null;
-		subSet = NewIt.newHashSet();
+		famSet = NewIt.newHashSet();
 
 		try {
 			while ((line = reader.readLine()) != null) {
 				String[] l = line.split(ConstValues.WHITESPACE_DELIMITER);
-				if (l.length < 2)
-					continue;
-				subSet.add(new SubjectID(l[0], l[1]));
+				famSet.add(l[0]);
 			}
 		} catch (IOException e) {
-			Logger.handleException(e,
-					"An exception occurred when reading the removed-individual file '" + rFile + "'.");
+			Logger.handleException(e, "An exception occurred when reading the " + opt + " file '" + kFamFile + "'.");
 		}
-		Logger.printUserLog("Reading " + subSet.size() + " individuals from remove-individal file '" + rFile + "'.");
+		Logger.printUserLog("Read " + famSet.size() + " family ID(s) from the " + opt + " file '" + kFamFile + "'.");
 	}
 }

@@ -48,7 +48,7 @@ public class BlupPcaCommandImpl extends CommandImpl {
 		double[][] genoMat = new double[pGM.getNumIndivdial()][pGM.getNumMarker()];
 		for (int i = 0; i < genoMat.length; i++) {
 			for (int j = 0; j < genoMat[i].length; j++) {
-				if (pGM.getAdditiveScore(i, j) == ConstValues.BINARY_MISSING_GENOTYPE) {
+				if (pGM.getAdditiveScore(i, j) == ConstValues.MISSING_GENOTYPE) {
 					genoMat[i][j] = 0;
 				} else {
 					genoMat[i][j] = (pGM.getAdditiveScore(i, j) - 2 * freq[j][1])
@@ -75,7 +75,7 @@ public class BlupPcaCommandImpl extends CommandImpl {
 			for (int j = 0; j < grm_Inv.getColumnDimension(); j++) {
 				double f = 0;
 				for (int k = 0; k < tGenoMat.getColumnDimension(); k++) {
-					if (pGM.getAdditiveScore(k, i) != ConstValues.BINARY_MISSING_GENOTYPE) {
+					if (pGM.getAdditiveScore(k, i) != ConstValues.MISSING_GENOTYPE) {
 						f += tGenoMat.getEntry(i, k) * grm_Inv.getEntry(k, j);
 					}
 				}

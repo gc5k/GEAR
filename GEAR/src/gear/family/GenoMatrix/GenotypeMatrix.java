@@ -3,6 +3,7 @@ package gear.family.GenoMatrix;
 import java.util.ArrayList;
 
 import gear.CmdArgs;
+import gear.ConstValues;
 import gear.data.Person;
 import gear.family.pedigree.PersonIndex;
 import gear.family.pedigree.file.MapFile;
@@ -194,7 +195,7 @@ public class GenotypeMatrix {
 		int posByte = QCedSnpIndex.get(i) >> shift;
 		int posBit = (QCedSnpIndex.get(i) & 0xf) << 1;
 		int g = (genotypeMat[idx][posByte] >> (posBit)) & 3;
-		return g == 3 ? g : (2 - g);
+		return g == ConstValues.MISSING_GENOTYPE ? g : (2 - g);
 		// if (g == 1) {// 01
 		// return 3;
 		// } else if (g == 0) {

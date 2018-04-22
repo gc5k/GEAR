@@ -26,6 +26,7 @@ public class EbatchGWASCommand extends Command {
 	public void prepareOptions(Options options) {
 		options.addOption(OptionBuilder.withDescription(OPT_BFILE_DESC).withLongOpt(OPT_BFILE_LONG).hasArg()
 				.isRequired().create());
+
 		options.addOption(OptionBuilder.withDescription(OPT_EV_DESC).withLongOpt(OPT_EV_LONG).hasArg().create());
 		options.addOption(OptionBuilder.withDescription(OPT_DOM_DESC).create(OPT_DOM));
 		options.addOption(OptionBuilder.withDescription(OPT_EPI_DESC).create(OPT_EPI));
@@ -34,6 +35,9 @@ public class EbatchGWASCommand extends Command {
 		options.addOption(OptionBuilder.withDescription(OPT_KEEP_DESC).withLongOpt(OPT_KEEP_LONG).hasArg().create());
 		options.addOption(
 				OptionBuilder.withDescription(OPT_REMOVE_DESC).withLongOpt(OPT_REMOVE_LONG).hasArg().create());
+		options.addOption(OptionBuilder.withDescription(OPT_KEEP_FAM_DESC).withLongOpt(OPT_KEEP_FAM_LONG).hasArg().create());
+		options.addOption(
+				OptionBuilder.withDescription(OPT_REMOVE_FAM_DESC).withLongOpt(OPT_REMOVE_FAM_LONG).hasArg().create());
 
 		options.addOption(
 				OptionBuilder.withDescription(OPT_EXTRACT_DESC).withLongOpt(OPT_EXTRACT_LONG).hasArg().create());
@@ -58,8 +62,12 @@ public class EbatchGWASCommand extends Command {
 	@Override
 	public CommandArguments parse(CommandLine cmdLine) throws CommandArgumentException {
 		EbatchGWASCommandArguments EbatArgs = new EbatchGWASCommandArguments();
+
 		parseFileArguments((CommandArguments) EbatArgs, cmdLine);
+
 		parseSampleFilterArguments((CommandArguments) EbatArgs, cmdLine);
+		parseFamilyFilterArguments((CommandArguments) EbatArgs, cmdLine);
+
 		parseSNPFilterFileArguments((CommandArguments) EbatArgs, cmdLine);
 		parseSNPFilterChromosomeArguments((CommandArguments) EbatArgs, cmdLine);
 

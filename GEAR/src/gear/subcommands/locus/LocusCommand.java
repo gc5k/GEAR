@@ -31,7 +31,10 @@ public class LocusCommand extends Command {
 		options.addOption(OptionBuilder.withDescription(OPT_KEEP_DESC).withLongOpt(OPT_KEEP_LONG).hasArg().create());
 		options.addOption(
 				OptionBuilder.withDescription(OPT_REMOVE_DESC).withLongOpt(OPT_REMOVE_LONG).hasArg().create());
-
+		options.addOption(OptionBuilder.withDescription(OPT_KEEP_FAM_DESC).withLongOpt(OPT_KEEP_FAM_LONG).hasArg().create());
+		options.addOption(
+				OptionBuilder.withDescription(OPT_REMOVE_FAM_DESC).withLongOpt(OPT_REMOVE_FAM_LONG).hasArg().create());
+		
 		options.addOption(
 				OptionBuilder.withDescription(OPT_EXTRACT_DESC).withLongOpt(OPT_EXTRACT_LONG).hasArg().create());
 		options.addOption(
@@ -57,8 +60,12 @@ public class LocusCommand extends Command {
 	@Override
 	public CommandArguments parse(CommandLine cmdLine) throws CommandArgumentException {
 		LocusCommandArguments locArgs = new LocusCommandArguments();
+
 		parseFileArguments(locArgs, cmdLine);
+
 		parseSampleFilterArguments((CommandArguments) locArgs, cmdLine);
+		parseFamilyFilterArguments((CommandArguments) locArgs, cmdLine);
+		
 		parseSNPFilterFileArguments((CommandArguments) locArgs, cmdLine);
 		parseSNPFilterChromosomeArguments((CommandArguments) locArgs, cmdLine);
 

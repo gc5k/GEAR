@@ -13,12 +13,12 @@ public class DFPCommandArguments extends CommandArguments
 		FileUtil.exists(new String(this.bfile2 + ".bim"));
 		FileUtil.exists(new String(this.bfile2 + ".fam"));
 
-		this.bfile2Flag = true;
+		this.isbFile2 = true;
 	}
 
-	public boolean getBFile2Flag()
+	public boolean isbFile2()
 	{
-		return bfile2Flag;
+		return isbFile2;
 	}
 
 	public String getBFile2()
@@ -78,7 +78,7 @@ public class DFPCommandArguments extends CommandArguments
 	}
 
 	private String bfile2 = null;
-	private boolean bfile2Flag;
+	private boolean isbFile2;
 
 	private double lowCutoff;
 	private double highCutoff;

@@ -3,25 +3,17 @@ package gear.family.plink;
 import gear.family.pedigree.file.MapFile;
 import gear.family.pedigree.file.PedigreeFile;
 import gear.family.qc.colqc.SNPFilter;
-import gear.family.qc.colqc.SNPFilterInterface;
 import gear.subcommands.CommandArguments;
 import gear.util.Logger;
 
-public class PLINKParser
-{
-	public static PLINKParser parse(CommandArguments cmdArgs)
-	{
+public class PLINKParser {
+	public static PLINKParser parse(CommandArguments cmdArgs) {
 		PLINKParser pp = null;
-		if (cmdArgs.getBFile() != null)
-		{
+		if (cmdArgs.isbFile()) {
 			pp = new PLINKBinaryParser(cmdArgs.getBed(), cmdArgs.getBim(), cmdArgs.getFam());
-		}
-		else if (cmdArgs.getFile() != null)
-		{
+		} else if (cmdArgs.getFile() != null) {
 			pp = new PLINKParser(cmdArgs.getPed(), cmdArgs.getMap());
-		}
-		else
-		{
+		} else {
 			return null;
 		}
 		pp.Parse(cmdArgs);
@@ -31,39 +23,32 @@ public class PLINKParser
 	protected MapFile mapData = null;
 	protected PedigreeFile pedData = null;
 	// protected PhenotypeFile phenoData = null;
-	protected SNPFilterInterface snpFilter;
+	protected SNPFilter snpFilter;
 	protected String pedigreeFile;
 	protected String phenotypeFile;
 	protected String mapFile;
 
-	public PLINKParser(String ped, String map)
-	{
+	public PLINKParser(String ped, String map) {
 		pedigreeFile = ped;
 		mapFile = map;
 	}
 
-	public void Parse()
-	{
+	public void Parse() {
 		mapData = new MapFile(mapFile);
 
 		pedData = new PedigreeFile();
 		pedData.setHeader(false);
 
-		if (mapFile != null)
-		{// bim
+		if (mapFile != null) {// bim
 			ParseMapFile();
 			Logger.printUserLog("Reading '" + mapFile + "'.");
-			Logger.printUserLog("Marker number: "
-					+ mapData.getMarkerNumberOriginal());
-			Logger.printUserLog("Selected marker number: "
-					+ mapData.getMarkerNumber());
+			Logger.printUserLog("Marker number: " + mapData.getMarkerNumberOriginal());
+			Logger.printUserLog("Selected marker number: " + mapData.getMarkerNumber());
 			pedData.setHeader(false);
 			ParsePedFile();
 			Logger.printUserLog("Reading '" + pedigreeFile + "'.");
-			Logger.printUserLog("Individual number: "
-					+ pedData.getNumIndividuals());
-		} else
-		{
+			Logger.printUserLog("Individual number: " + pedData.getNumIndividuals());
+		} else {
 			pedData.setHeader(true);
 			ParsePedFile();
 			mapData.setMarker(pedData.getNumMarker());
@@ -73,28 +58,22 @@ public class PLINKParser
 
 	}
 
-	public void Parse(CommandArguments cmdArgs)
-	{
+	public void Parse(CommandArguments cmdArgs) {
 		mapData = new MapFile(mapFile);
 
 		pedData = new PedigreeFile();
 		pedData.setHeader(false);
 
-		if (mapFile != null)
-		{// bim
+		if (mapFile != null) {// bim
 			ParseMapFile(cmdArgs);
 			Logger.printUserLog("Reading '" + mapFile + "'.");
-			Logger.printUserLog("Marker number: "
-					+ mapData.getMarkerNumberOriginal());
-			Logger.printUserLog("Selected marker number: "
-					+ mapData.getMarkerNumber());
+			Logger.printUserLog("Marker number: " + mapData.getMarkerNumberOriginal());
+			Logger.printUserLog("Selected marker number: " + mapData.getMarkerNumber());
 			pedData.setHeader(false);
 			ParsePedFile();
 			Logger.printUserLog("Reading '" + pedigreeFile + "'.");
-			Logger.printUserLog("Individual number: "
-					+ pedData.getNumIndividuals());
-		} else
-		{
+			Logger.printUserLog("Individual number: " + pedData.getNumIndividuals());
+		} else {
 			pedData.setHeader(true);
 			ParsePedFile();
 			mapData.setMarker(pedData.getNumMarker());
@@ -104,20 +83,18 @@ public class PLINKParser
 
 	}
 
-	public void ParseMapFile()
-	{
+	public void ParseMapFile() {
 		mapData.parseMap();
-		Logger.printUserLog("Reading " + mapData.getMarkerNumberOriginal()+ " SNPs from '" + mapFile + "'.");
+		Logger.printUserLog("Read " + mapData.getMarkerNumberOriginal() + " SNPs from '" + mapFile + "'.");
 		snpFilter = new SNPFilter(mapData);
 		snpFilter.SelectSNP();
 		int[] WSNP = snpFilter.getWorkingSNP();
 		mapData.setWSNP(WSNP);
 	}
 
-	public void ParseMapFile(CommandArguments cmdArgs)
-	{
+	public void ParseMapFile(CommandArguments cmdArgs) {
 		mapData.parseMap();
-		Logger.printUserLog("Reading " + mapData.getMarkerNumberOriginal()+ " SNPs from '" + cmdArgs.getBim() + "'.");
+		Logger.printUserLog("Read " + mapData.getMarkerNumberOriginal() + " SNPs from '" + cmdArgs.getBim() + "'.");
 		snpFilter = new SNPFilter(mapData);
 		snpFilter.SelectSNP(cmdArgs);
 		int[] WSNP = snpFilter.getWorkingSNP();
@@ -130,28 +107,23 @@ public class PLINKParser
 	 * @param Ped
 	 *            the name of the pedigree file
 	 */
-	public void ParsePedFile()
-	{
+	public void ParsePedFile() {
 		pedData.parseLinkage(pedigreeFile, mapData.getMarkerNumberOriginal(), snpFilter.getWorkingSNP());
 	}
 
-	public PedigreeFile getPedigreeData()
-	{
+	public PedigreeFile getPedigreeData() {
 		return pedData;
 	}
 
-	public MapFile getMapData()
-	{
+	public MapFile getMapData() {
 		return mapData;
 	}
 
-	public SNPFilterInterface getSNPFilter()
-	{
+	public SNPFilter getSNPFilter() {
 		return snpFilter;
 	}
 
-	public void setAlleleFrequency(double[][] freq)
-	{
+	public void setAlleleFrequency(double[][] freq) {
 		mapData.setAlleleFrequency(freq);
 	}
 }

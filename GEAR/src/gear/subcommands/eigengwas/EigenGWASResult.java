@@ -6,6 +6,7 @@ import org.apache.commons.math.MathException;
 import org.apache.commons.math.distribution.NormalDistributionImpl;
 
 import gear.util.Logger;
+import gear.util.pop.PopStat;
 import gear.util.stat.PrecisePvalue;
 import gear.family.pedigree.file.SNP;
 
@@ -29,7 +30,7 @@ public class EigenGWASResult {
 	private static NormalDistributionImpl unitNormal = new NormalDistributionImpl(0.0D, 1.0D);
 
 	public EigenGWASResult(SNP snp, double freq, double b, double b_se, double n1, double freq1, double n2,
-			double freq2, double fst, boolean failed) {
+			double freq2, boolean isGood) {
 		this.snp = snp;
 		this.freq = freq;
 		this.b = b;
@@ -41,8 +42,13 @@ public class EigenGWASResult {
 		this.freq1 = freq1;
 		this.n2 = n2;
 		this.freq2 = freq2;
-		this.fst = fst;
-		isGoodLocus = failed;
+		isGoodLocus = isGood;
+		if (isGood) {
+			this.fst = PopStat.Fst(freq, (int) n1, (int) n2, freq1, freq2); 
+		} else {
+			this.fst = Double.NaN;
+		}
+
 	}
 
 	public double GetP() {

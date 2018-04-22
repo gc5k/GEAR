@@ -78,6 +78,9 @@ public final class ProfileCommand extends Command {
 		options.addOption(OptionBuilder.withDescription(OPT_KEEP_DESC).withLongOpt(OPT_KEEP_LONG).hasArg().create());
 		options.addOption(
 				OptionBuilder.withDescription(OPT_REMOVE_DESC).withLongOpt(OPT_REMOVE_LONG).hasArg().create());
+		options.addOption(OptionBuilder.withDescription(OPT_KEEP_FAM_DESC).withLongOpt(OPT_KEEP_FAM_LONG).hasArg().create());
+		options.addOption(
+				OptionBuilder.withDescription(OPT_REMOVE_FAM_DESC).withLongOpt(OPT_REMOVE_FAM_LONG).hasArg().create());
 
 		options.addOption(
 				OptionBuilder.withDescription(OPT_EXTRACT_DESC).withLongOpt(OPT_EXTRACT_LONG).hasArg().create());
@@ -94,6 +97,8 @@ public final class ProfileCommand extends Command {
 		options.addOption(OptionBuilder.withDescription(OPT_GENO_DESC).withLongOpt(OPT_GENO_LONG).hasArg().create());
 		options.addOption(
 				OptionBuilder.withDescription(OPT_ZERO_VAR_DESC).withLongOpt(OPT_ZERO_VAR_LONG).create());
+		options.addOption(
+				OptionBuilder.withDescription(OPT_MAF_RANGE_DESC).withLongOpt(OPT_MAF_RANGE_LONG).hasArgs().create());
 
 	}
 
@@ -102,6 +107,8 @@ public final class ProfileCommand extends Command {
 		ProfileCommandArguments profArgs = new ProfileCommandArguments();
 		// parseFileArguments((CommandArguments) profCmdArgs, cmdLine);
 		parseSampleFilterArguments((CommandArguments) profArgs, cmdLine);
+		parseFamilyFilterArguments((CommandArguments) profArgs, cmdLine);
+
 		parseSNPFilterFileArguments((CommandArguments) profArgs, cmdLine);
 		parseSNPFilterChromosomeArguments((CommandArguments) profArgs, cmdLine);
 
@@ -109,6 +116,7 @@ public final class ProfileCommand extends Command {
 		parseMAXMAFArguments((CommandArguments) profArgs, cmdLine);
 		parseGENOArguments((CommandArguments) profArgs, cmdLine);
 		parseZeroVarArguments((CommandArguments) profArgs, cmdLine);
+		parseMAFRangeArguments((CommandArguments) profArgs, cmdLine);
 
 		profArgs.setScoreFile(cmdLine.getOptionValue(OPT_SCORE_LONG));
 

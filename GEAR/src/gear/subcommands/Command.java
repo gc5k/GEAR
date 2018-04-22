@@ -120,21 +120,21 @@ public abstract class Command implements Comparable<Command> {
 		String bfile = cmdLine.getOptionValue(OPT_BFILE_LONG);
 		String file = cmdLine.getOptionValue(OPT_FILE_LONG);
 
-		if ((bfile == null) && (file == null)) {
-			throw new CommandArgumentException("No genotypes are provided. Either --bfile or --file must be set.");
+		if (!cmdLine.hasOption(OPT_BFILE_LONG) && !cmdLine.hasOption(OPT_FILE_LONG)) {
+			throw new CommandArgumentException("No genotypes are provided. Either --" + OPT_BFILE_LONG + " or --" + OPT_FILE_LONG + " file must be set.");
 		}
 
-		if ((bfile != null) && (file != null)) {
-			throw new CommandArgumentException("--bfile and --file cannot be set together.");
+		if (cmdLine.hasOption(OPT_BFILE_LONG) && cmdLine.hasOption(OPT_FILE_LONG)) {
+			throw new CommandArgumentException("--" + OPT_BFILE_LONG + " and --" + OPT_FILE_LONG + " cannot be set together.");
 		}
 
-		if (bfile != null) {
+		if (cmdLine.hasOption(OPT_BFILE_LONG)) {
 			FileUtil.exists(new String(bfile + ".bed"));
 			FileUtil.exists(new String(bfile + ".bim"));
 			FileUtil.exists(new String(bfile + ".fam"));
 			cmdArgs.setBFile(bfile);
 		}
-		if (file != null) {
+		if (cmdLine.hasOption(OPT_FILE_LONG)) {
 			FileUtil.exists(new String(bfile + ".ped"));
 			FileUtil.exists(new String(bfile + ".map"));
 			cmdArgs.setFile(file);
@@ -158,19 +158,33 @@ public abstract class Command implements Comparable<Command> {
 
 	protected void parseSampleFilterArguments(CommandArguments cmdArgs, CommandLine cmdLine)
 			throws CommandArgumentException {
-		String keepFile = cmdLine.getOptionValue(OPT_KEEP_LONG);
-		String removeFile = cmdLine.getOptionValue(OPT_REMOVE_LONG);
 
 		if (cmdLine.hasOption(OPT_KEEP_LONG) && cmdLine.hasOption(OPT_REMOVE_LONG)) {
-			throw new CommandArgumentException("--" + OPT_KEEP_LONG +" and --" + OPT_KEEP_LONG +" cannot be set together.");
+			throw new CommandArgumentException("--" + OPT_KEEP_LONG +" and --" + OPT_REMOVE_LONG +" cannot be set together.");
 		}
-		if (keepFile != null) {
-			FileUtil.exists(keepFile);
-			cmdArgs.setKeepFile(keepFile);
+		if (cmdLine.hasOption(OPT_KEEP_LONG)) {
+			FileUtil.exists(cmdLine.getOptionValue(OPT_KEEP_LONG));
+			cmdArgs.setKeepFile(cmdLine.getOptionValue(OPT_KEEP_LONG));
 		}
-		if (removeFile != null) {
-			FileUtil.exists(removeFile);
-			cmdArgs.setRemoveFile(removeFile);
+		if (cmdLine.hasOption(OPT_REMOVE_LONG)) {
+			FileUtil.exists(cmdLine.getOptionValue(OPT_REMOVE_LONG));
+			cmdArgs.setRemoveFile(cmdLine.getOptionValue(OPT_REMOVE_LONG));
+		}
+	}
+
+	protected void parseFamilyFilterArguments(CommandArguments cmdArgs, CommandLine cmdLine)
+			throws CommandArgumentException {
+
+		if (cmdLine.hasOption(OPT_KEEP_FAM_LONG) && cmdLine.hasOption(OPT_REMOVE_FAM_LONG)) {
+			throw new CommandArgumentException("--" + OPT_KEEP_FAM_LONG +" and --" + OPT_REMOVE_FAM_LONG +" cannot be set together.");
+		}
+		if (cmdLine.hasOption(OPT_KEEP_FAM_LONG)) {
+			FileUtil.exists(cmdLine.getOptionValue(OPT_KEEP_FAM_LONG));
+			cmdArgs.setKeepFamFile(cmdLine.getOptionValue(OPT_KEEP_FAM_LONG));
+		}
+		if (cmdLine.hasOption(OPT_REMOVE_FAM_LONG)) {
+			FileUtil.exists(cmdLine.getOptionValue(OPT_REMOVE_FAM_LONG));
+			cmdArgs.setRemoveFamFile(cmdLine.getOptionValue(OPT_REMOVE_FAM_LONG));
 		}
 	}
 
@@ -356,8 +370,14 @@ public abstract class Command implements Comparable<Command> {
 	protected static final String OPT_KEEP_LONG = "keep";
 	protected static final String OPT_KEEP_DESC = "Specify the individuals for analysis";
 
+	protected static final String OPT_KEEP_FAM_LONG = "keep-fam";
+	protected static final String OPT_KEEP_FAM_DESC = "Specify the families for analysis";
+
 	protected static final String OPT_REMOVE_LONG = "remove";
 	protected static final String OPT_REMOVE_DESC = "Specify the individuals removed from analysis";
+
+	protected static final String OPT_REMOVE_FAM_LONG = "remove-fam";
+	protected static final String OPT_REMOVE_FAM_DESC = "Specify the families removed from analysis";
 
 	protected static final String OPT_CHR_LONG = "chr";
 	protected static final String OPT_CHR_DESC = "Specify the chromosomes for analysis";

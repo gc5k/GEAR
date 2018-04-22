@@ -190,7 +190,7 @@ public class SynthCommandImpl extends CommandImpl
 			}
 			cnt++;
 		} while ((tokens = reader.readTokens()) != null);
-		Logger.printUserLog("Reading " +tokenLen +"X" +tokenLen +" correlation matrix from '" + synArgs.getCMFile() + "'.");
+		Logger.printUserLog("Read " +tokenLen +"X" +tokenLen +" correlation matrix from '" + synArgs.getCMFile() + "'.");
 	}
 
 	private void readNSS() 

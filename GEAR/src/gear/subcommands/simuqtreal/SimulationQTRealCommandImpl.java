@@ -124,7 +124,7 @@ public class SimulationQTRealCommandImpl extends CommandImpl
 		for (int i = 0; i < gn.length; i++)
 		{
 			int g = pGM.getAdditiveScoreOnFirstAllele(sIdx, i);
-			gn[i] = (g == 3)? 0:g;
+			gn[i] = (g == ConstValues.MISSING_GENOTYPE)? 0:g;
 		}
 		return new Array2DRowRealMatrix(gn);
 	}
@@ -223,7 +223,7 @@ public class SimulationQTRealCommandImpl extends CommandImpl
 								+ qtArgs.getPolyEffectFile() + "'.");
 			}
 
-			Logger.printUserLog("Reading " + RefEffectMap.size() + " referenced effects from '" + qtArgs.getRefEffectFile() + "'.");
+			Logger.printUserLog("Read " + RefEffectMap.size() + " referenced effects from '" + qtArgs.getRefEffectFile() + "'.");
 			for(int i = 0; i < pGM.getSNPList().size(); i++)
 			{
 				SNP snp = pGM.getSNPList().get(i);

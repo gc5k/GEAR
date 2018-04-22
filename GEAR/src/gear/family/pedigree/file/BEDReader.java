@@ -77,7 +77,7 @@ public class BEDReader extends PedigreeFile {
 			n_individual++;
 		}
 		Is6ColBinary();
-		Logger.printUserLog("Reading " + HukouBook.size() + " individuals from '" + famFile + "'.");
+		Logger.printUserLog("Read " + HukouBook.size() + " individuals from '" + famFile + "'.");
 	}
 
 	@Override

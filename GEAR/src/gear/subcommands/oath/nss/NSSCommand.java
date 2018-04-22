@@ -37,6 +37,9 @@ public class NSSCommand extends Command {
 		options.addOption(OptionBuilder.withDescription(OPT_KEEP_DESC).withLongOpt(OPT_KEEP_LONG).hasArg().create());
 		options.addOption(
 				OptionBuilder.withDescription(OPT_REMOVE_DESC).withLongOpt(OPT_REMOVE_LONG).hasArg().create());
+		options.addOption(OptionBuilder.withDescription(OPT_KEEP_FAM_DESC).withLongOpt(OPT_KEEP_FAM_LONG).hasArg().create());
+		options.addOption(
+				OptionBuilder.withDescription(OPT_REMOVE_FAM_DESC).withLongOpt(OPT_REMOVE_FAM_LONG).hasArg().create());
 
 		options.addOption(
 				OptionBuilder.withDescription(OPT_EXTRACT_DESC).withLongOpt(OPT_EXTRACT_LONG).hasArg().create());
@@ -53,13 +56,19 @@ public class NSSCommand extends Command {
 		options.addOption(OptionBuilder.withDescription(OPT_GENO_DESC).withLongOpt(OPT_GENO_LONG).hasArg().create());
 		options.addOption(
 				OptionBuilder.withDescription(OPT_ZERO_VAR_DESC).withLongOpt(OPT_ZERO_VAR_LONG).create());
+		options.addOption(
+				OptionBuilder.withDescription(OPT_MAF_RANGE_DESC).withLongOpt(OPT_MAF_RANGE_LONG).hasArgs().create());
 	}
 
 	@Override
 	public CommandArguments parse(CommandLine cmdLine) throws CommandArgumentException {
 		NSSCommandArguments nssArgs = new NSSCommandArguments();
+
 		parseFileArguments(nssArgs, cmdLine);
+
 		parseSampleFilterArguments((CommandArguments) nssArgs, cmdLine);
+		parseFamilyFilterArguments((CommandArguments) nssArgs, cmdLine);
+
 		parseSNPFilterFileArguments((CommandArguments) nssArgs, cmdLine);
 		parseSNPFilterChromosomeArguments((CommandArguments) nssArgs, cmdLine);
 
@@ -67,6 +76,7 @@ public class NSSCommand extends Command {
 		parseMAXMAFArguments((CommandArguments) nssArgs, cmdLine);
 		parseGENOArguments((CommandArguments) nssArgs, cmdLine);
 		parseZeroVarArguments((CommandArguments) nssArgs, cmdLine);
+		parseMAFRangeArguments((CommandArguments) nssArgs, cmdLine);
 
 		parsePhenoFileArguments((CommandArguments) nssArgs, cmdLine);
 		parsePhenoIndexArguments((CommandArguments) nssArgs, cmdLine);
