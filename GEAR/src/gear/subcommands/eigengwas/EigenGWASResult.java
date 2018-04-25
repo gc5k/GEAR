@@ -8,6 +8,7 @@ import org.apache.commons.math.distribution.NormalDistributionImpl;
 import gear.util.Logger;
 import gear.util.pop.PopStat;
 import gear.util.stat.PrecisePvalue;
+import gear.ConstValues;
 import gear.family.pedigree.file.SNP;
 
 public class EigenGWASResult {
@@ -63,7 +64,7 @@ public class EigenGWASResult {
 				+ "\t" + snp.getSecAllele() + "\t" + df.format(freq) + "\t");
 
 		if (!isGoodLocus) {
-			sb.append("NA" + "\t");
+			sb.append(ConstValues.NA_String + "\t");
 		} else {
 			if (Math.abs(b) > 0.0001) {
 				sb.append(df.format(b) + "\t");
@@ -73,7 +74,7 @@ public class EigenGWASResult {
 		}
 
 		if (!isGoodLocus) {
-			sb.append("NA" + "\t");
+			sb.append(ConstValues.NA_String + "\t");
 		} else {
 			if (Math.abs(b_se) > 0.0001) {
 				sb.append(df.format(b_se) + "\t");
@@ -83,7 +84,7 @@ public class EigenGWASResult {
 		}
 
 		if (!isGoodLocus) {
-			sb.append("NA" + "\t");
+			sb.append(ConstValues.NA_String + "\t");
 		} else {
 			double chi = b * b / (b_se * b_se);
 
@@ -95,7 +96,7 @@ public class EigenGWASResult {
 		}
 
 		if (!isGoodLocus) {
-			sb.append("NA" + "\t");
+			sb.append(ConstValues.NA_String + "\t");
 		} else {
 			if (P > 0.0001) {
 			sb.append(df.format(P) + "\t");
@@ -105,7 +106,7 @@ public class EigenGWASResult {
 		}
 
 		if (!isGoodLocus) {
-			sb.append("NA" + "\t");			
+			sb.append(ConstValues.NA_String + "\t");			
 		} else {
 			if (PGC > 0.0001) {
 				sb.append(df.format(PGC) + "\t");
@@ -131,7 +132,7 @@ public class EigenGWASResult {
 		}
 
 		if (!isGoodLocus) {
-			sb.append("NA" + "\t");			
+			sb.append(ConstValues.NA_String + "\t");			
 		} else {
 			if (Math.abs(fst) > 0.0001) {
 				sb.append(df.format(fst) + "\t");
