@@ -49,7 +49,11 @@ public final class ProfileCommand extends Command {
 					OptionBuilder.withDescription(OPT_QRANGE_DESC).withLongOpt(OPT_QRANGE_LONG).hasArg().create());
 		}
 //		options.addOption(OptionBuilder.withDescription(OPT_FILE_DESC).withLongOpt(OPT_FILE_LONG).hasArg().create());
-		options.addOption(OptionBuilder.withDescription(OPT_BFILE_DESC).withLongOpt(OPT_BFILE_LONG).hasArg().isRequired().create());
+		if (!isCalledByEnigma) {
+			options.addOption(OptionBuilder.withDescription(OPT_BFILE_DESC).withLongOpt(OPT_BFILE_LONG).hasArg().isRequired().create());			
+		} else {
+			options.addOption(OptionBuilder.withDescription(OPT_BFILE_DESC).withLongOpt(OPT_BFILE_LONG).hasArg().create());
+		}
 		options.addOption(OptionBuilder.withDescription(OPT_MACH_DOSAGE_DESC).withLongOpt(OPT_MACH_DOSAGE_LONG).hasArg()
 				.create());
 		options.addOption(
