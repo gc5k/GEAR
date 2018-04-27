@@ -106,7 +106,7 @@ public abstract class Command implements Comparable<Command> {
 
 	protected void parseGENOArguments(CommandArguments cmdArgs, CommandLine cmdLine) throws CommandArgumentException {
 		if (cmdLine.hasOption(OPT_GENO_LONG)) {
-			cmdArgs.setMaxMAF(cmdLine.getOptionValue(OPT_GENO_LONG));
+			cmdArgs.setGENO(cmdLine.getOptionValue(OPT_GENO_LONG));
 		}
 	}
 
@@ -361,7 +361,7 @@ public abstract class Command implements Comparable<Command> {
 	protected static final String OPT_MAF_RANGE_LONG = "maf-range";
 	protected static final String OPT_MAF_RANGE_DESC = "maf ranges.";
 
-	protected static final String OPT_GENO_LONG = "genotyping missing rate";
+	protected static final String OPT_GENO_LONG = "geno";
 	protected static final String OPT_GENO_DESC = "Genotyping missing rate cutoff. By default 0.1";
 
 	protected static final String OPT_ZERO_VAR_LONG = "zero-var";

@@ -130,7 +130,7 @@ public class GenotypeMatrix {
 				Logger.printUserLog(maxmafFail + " SNPs were excluded because did not pass max-maf threshold " + cmdArgs.getMaxMAF() + ".");
 			}
 			if (cmdArgs.isGENO() && genoFail > 0) {
-				Logger.printUserLog(genoFail + " SNPs were excluded because did not pass geno missing threshold " + cmdArgs.getMAF() + ".");
+				Logger.printUserLog(genoFail + " SNPs were excluded because did not pass geno missing threshold " + cmdArgs.getGENO() + ".");
 			}
 			if (cmdArgs.isZeroVar() && zeroVarFail > 0) {
 				Logger.printUserLog(zeroVarFail + " SNPs were excluded because did not pass zero variance threshold.");
