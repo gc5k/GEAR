@@ -203,22 +203,6 @@ public class SFstCommandArguments extends CommandArguments
 		Me = Double.parseDouble(me);
 	}
 
-	public void setChr(String chr)
-	{
-		this.chr = Integer.parseInt(chr); 
-		chrFlag = true;
-	}
-
-	public int getChr()
-	{
-		return chr;
-	}
-
-	public boolean isChr()
-	{
-		return chrFlag;
-	}
-
 //	public void setClean()
 //	{
 //		isClean = true;
@@ -305,9 +289,6 @@ public class SFstCommandArguments extends CommandArguments
 	private double Me = 30000;
 	private double meFrac = 0;
 	private int Top = 0;
-
-	private int chr = 0;
-	private boolean chrFlag = false;
 
 	private double[] qtSize;
 	private double[] ccSize;

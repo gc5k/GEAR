@@ -24,6 +24,7 @@ public class LMDRCommand extends Command
 		return "Linear model implementation for MDR";
 	}
 
+	@SuppressWarnings("static-access")
 	@Override
 	public void prepareOptions(Options options)
 	{

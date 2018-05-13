@@ -8,18 +8,19 @@ import gear.util.NewIt;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
+import java.util.HashSet;
 
 public class FReader
 {
 
-	public FReader(String[] MetaFile, boolean[] FileKeep, String[] field, boolean isQT, boolean isGZ, boolean isChr, int Chr)
+	public FReader(String[] MetaFile, boolean[] FileKeep, String[] field, boolean isQT, boolean isGZ, boolean isChr, HashSet<String> Chr)
 	{
 		this.field = field;
 		this.isGZ = isGZ;
 
 		workingMetaFile = NewIt.newArrayList();
-		this.isChr = isChr;
-		this.chrKeep = Chr;
+		this.isChrKeep = isChr;
+		this.chrSet = Chr;
 
 		for (int i = 0; i < FileKeep.length; i++)
 		{
@@ -265,9 +266,14 @@ public class FReader
 					ms.setChr(chr);
 				}
 
-				if (isChr)
+				if (isChrKeep)
 				{
-					if( ms.getChr() != chrKeep)
+					if( chrSet != null & !chrSet.contains( (new Integer(ms.getChr())).toString()))
+					{
+						continue;
+					}
+				} else {
+					if( chrSet != null & chrSet.contains( (new Integer(ms.getChr())).toString()))
 					{
 						continue;
 					}
@@ -390,8 +396,8 @@ public class FReader
 		return workingMetaFile;
 	}
 
-	private boolean isChr;
-	private int chrKeep=0;
+	private boolean isChrKeep=true;
+	private HashSet<String> chrSet = null;
 	private String[] field;
 	private boolean isGZ;
 	private int[][] KeyIdx; //snp, chr, bp, beta, se, p, a1, a2

@@ -41,7 +41,7 @@ public class GenAboutInfo
 		writer.write("\t\t\" Commit " + commit + "\\n\" +\n");
 		writer.write("\t\t\" Built on " + Calendar.getInstance().getTime() +
 				(hasUncommittedChanges ? " with uncommitted changes" : "") + "\\n\" +\n");
-		writer.write("\t\t\"*****************************************************************\\n\";\n");
+		writer.write("\t\t\"****************************************************************\\n\";\n");
 		writer.write("}");
 		writer.close();
 	}

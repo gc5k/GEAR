@@ -48,7 +48,8 @@ public class MetaPCCommand extends Command
 		options.addOption(OptionBuilder.withDescription(OPT_BETA_DESC).withLongOpt(OPT_BETA_LONG).create(OPT_BETA));
 		options.addOption(OptionBuilder.withDescription(OPT_KEEP_ATGC_DESC).withLongOpt(OPT_KEEP_ATGC_LONG).create(OPT_KEEP_ATGC));
 
-		options.addOption(OptionBuilder.withDescription(OPT_CHR_DESC).hasArg().create(OPT_CHR));
+		options.addOption(OptionBuilder.withDescription(OPT_CHR_DESC).withLongOpt(OPT_CHR_LONG).hasArgs().create());
+		options.addOption(OptionBuilder.withDescription(OPT_NOT_CHR_DESC).withLongOpt(OPT_NOT_CHR_LONG).hasArgs().create());
 	}
 
 	@Override
@@ -116,9 +117,9 @@ public class MetaPCCommand extends Command
 //			metaPC.setVerbose();
 //		}
 
-		if (cmdLine.hasOption(OPT_CHR))
+		if (cmdLine.hasOption(OPT_CHR_LONG))
 		{
-			metaPC.setChr(cmdLine.getOptionValue(OPT_CHR));
+			metaPC.setChr(cmdLine.getOptionValues(OPT_CHR_LONG));
 		}
 
 
@@ -170,9 +171,6 @@ public class MetaPCCommand extends Command
 //	private final static String OPT_ME_FRAC_LONG_DEFAULT = "0.05";
 //	private final static String OPT_ME_FRAC_LONG_DESC = "Fraction of minumal markers required, at least 5% by default.";
 
-	private final static String OPT_CHR = "chr";
-	private final static String OPT_CHR_DESC = "Choose chromosome for analysis";
-	
 	private final static String OPT_KEEP_ATGC = "k";
 	private final static String OPT_KEEP_ATGC_LONG = "keep-atgc";
 	private final static String OPT_KEEP_ATGC_DESC = "Keep parlindormic loci.";

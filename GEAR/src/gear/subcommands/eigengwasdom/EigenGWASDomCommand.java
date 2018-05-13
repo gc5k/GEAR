@@ -8,82 +8,74 @@ import org.apache.commons.cli.CommandLine;
 import org.apache.commons.cli.OptionBuilder;
 import org.apache.commons.cli.Options;
 
-public class EigenGWASDomCommand extends Command
-{
+public class EigenGWASDomCommand extends Command {
 	private static final String OPT_PHE = "pheno";
 	private static final String OPT_PHE_DESC = "Specify the phenotype file (individual eigenvector)";
 	private static final String OPT_MPHE = "mpheno";
 	private static final String OPT_MPHE_DESC = "Specify the phenotype index";
-	private static final String OPT_CHR = "chr";
-	private static final String OPT_CHR_DESC = "Specify the chromosomes for analysis";
-	private static final String OPT_KEEP = "keep";
-	private static final String OPT_KEEP_DESC = "Specify the samples for analysis";
 
-	public EigenGWASDomCommand()
-	{
+	public EigenGWASDomCommand() {
 	}
 
-	public String getName()
-	{
+	public String getName() {
 		return "egwasd";
 	}
 
-	public String getDescription()
-	{
+	public String getDescription() {
 		return "Eigen GWAS a+d";
 	}
 
 	@SuppressWarnings("static-access")
-	public void prepareOptions(Options options)
-	{
-		options.addOption(OptionBuilder.withDescription(OPT_BFILE_DESC).withLongOpt(OPT_BFILE_LONG).hasArg().isRequired().create());
+	public void prepareOptions(Options options) {
+		options.addOption(OptionBuilder.withDescription(OPT_BFILE_DESC).withLongOpt(OPT_BFILE_LONG).hasArg()
+				.isRequired().create());
 		options.addOption(OptionBuilder.withDescription(OPT_PHE_DESC).hasArg().isRequired().create(OPT_PHE));
 		options.addOption(OptionBuilder.withDescription(OPT_MPHE_DESC).hasArg().create(OPT_MPHE));
-		options.addOption(OptionBuilder.withDescription(OPT_CHR_DESC).hasArg().create(OPT_CHR));
-		options.addOption(OptionBuilder.withDescription(OPT_KEEP_DESC).hasArg().create(OPT_KEEP));
+
+		options.addOption(OptionBuilder.withDescription(OPT_KEEP_DESC).withLongOpt(OPT_KEEP_LONG).hasArg().create());
+		options.addOption(
+				OptionBuilder.withDescription(OPT_REMOVE_DESC).withLongOpt(OPT_REMOVE_LONG).hasArg().create());
+
+		options.addOption(
+				OptionBuilder.withDescription(OPT_EXTRACT_DESC).withLongOpt(OPT_EXTRACT_LONG).hasArg().create());
+		options.addOption(
+				OptionBuilder.withDescription(OPT_EXCLUDE_DESC).withLongOpt(OPT_EXCLUDE_LONG).hasArg().create());
+
+		options.addOption(OptionBuilder.withDescription(OPT_CHR_DESC).withLongOpt(OPT_CHR_LONG).hasArgs().create());
+		options.addOption(
+				OptionBuilder.withDescription(OPT_NOT_CHR_DESC).withLongOpt(OPT_NOT_CHR_LONG).hasArgs().create());
+
+		options.addOption(OptionBuilder.withDescription(OPT_MAF_DESC).withLongOpt(OPT_MAF_LONG).hasArg().create());
+		options.addOption(
+				OptionBuilder.withDescription(OPT_MAX_MAF_DESC).withLongOpt(OPT_MAX_MAF_LONG).hasArg().create());
+		options.addOption(OptionBuilder.withDescription(OPT_GENO_DESC).withLongOpt(OPT_GENO_LONG).hasArg().create());
+		options.addOption(OptionBuilder.withDescription(OPT_ZERO_VAR_DESC).withLongOpt(OPT_ZERO_VAR_LONG).create());
+		options.addOption(
+				OptionBuilder.withDescription(OPT_MAF_RANGE_DESC).withLongOpt(OPT_MAF_RANGE_LONG).hasArgs().create());
 
 	}
 
-	public CommandArguments parse(CommandLine cmdLine) throws CommandArgumentException
-	{
+	public CommandArguments parse(CommandLine cmdLine) throws CommandArgumentException {
 		EigenGWASDomCommandArguments eigenArgs = new EigenGWASDomCommandArguments();
-		parseFileArguments(eigenArgs, cmdLine);
-		eigenArgs.setPhenotypeFile(cmdLine.getOptionValue(OPT_PHE));
-		eigenArgs.setPhentypeIndex(parseIntOptionValue(cmdLine, OPT_MPHE, "1"));
-		if (cmdLine.hasOption(OPT_KEEP))
-		{
-			eigenArgs.setKeepFile(cmdLine.getOptionValue(OPT_KEEP));
-		}
+		parseFileArguments((CommandArguments) eigenArgs, cmdLine);
+		parseSampleFilterArguments((CommandArguments) eigenArgs, cmdLine);
+
+		parseSNPFilterFileArguments((CommandArguments) eigenArgs, cmdLine);
+		parseSNPFilterChromosomeArguments((CommandArguments) eigenArgs, cmdLine);
+
+		parseMAFArguments((CommandArguments) eigenArgs, cmdLine);
+		parseMAXMAFArguments((CommandArguments) eigenArgs, cmdLine);
+		parseGENOArguments((CommandArguments) eigenArgs, cmdLine);
+		parseZeroVarArguments((CommandArguments) eigenArgs, cmdLine);
+		parseMAFRangeArguments((CommandArguments) eigenArgs, cmdLine);
+
+		parsePhenoFileArguments((CommandArguments) eigenArgs, cmdLine);
+		parsePhenoIndexArguments((CommandArguments) eigenArgs, cmdLine);
 
 		return eigenArgs;
 	}
 
-	private void parseFileArguments(EigenGWASDomCommandArguments eigenArgs, CommandLine cmdLine) throws CommandArgumentException
-	{
-		String bfile = cmdLine.getOptionValue("bfile");
-		String file = cmdLine.getOptionValue("file");
-
-		if ((bfile == null) && (file == null))
-		{
-			throw new CommandArgumentException("No genotypes are provided. Either --bfile or --file must be set.");
-		}
-
-		if ((bfile != null) && (file != null))
-		{
-			throw new CommandArgumentException("--bfile and --file cannot be set together.");
-		}
-
-		eigenArgs.setBFile(bfile);
-		eigenArgs.setFile(file);
-
-		if (cmdLine.hasOption(OPT_CHR))
-		{
-			eigenArgs.setChr(cmdLine.getOptionValue(OPT_CHR));
-		}
-	}
-
-	protected CommandImpl createCommandImpl()
-	{
-		return new EigenGWASDomImpl();
+	protected CommandImpl createCommandImpl() {
+		return new EigenGWASDomCommandImpl();
 	}
 }

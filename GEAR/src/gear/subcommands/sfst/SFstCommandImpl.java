@@ -72,7 +72,7 @@ public class SFstCommandImpl extends CommandImpl
 		}
 		WriteFstMat();
 		Logger.printUserLog("=========================================================");
-		Logger.printUserLog("Results has been saved in '" + sfstArgs
+		Logger.printUserLog("Results have been saved in '" + sfstArgs
 				.getOutRoot() + ".lmat'.");
 	}
 
@@ -82,7 +82,8 @@ public class SFstCommandImpl extends CommandImpl
 		Arrays.fill(FileKeep, true);
 		gReader = new GWASReader(sfstArgs.getMetaFile(), FileKeep,
 				sfstArgs.getKeys(), sfstArgs.isQT(), sfstArgs.isGZ(),
-				sfstArgs.isChr(), sfstArgs.getChr());
+				sfstArgs.getChr() != null? true:false,
+				sfstArgs.getChr() != null?sfstArgs.getChr():sfstArgs.getNotChr());
 
 		gReader.Start(sfstArgs.isFrq());
 

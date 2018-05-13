@@ -1,9 +1,6 @@
 package gear.subcommands.oath;
 
-import gear.CmdArgs;
-
-public class OATHConst 
-{
+public class OATHConst {
 	public static final String SNP = "SNP";
 	public static int snp = 0;
 
@@ -36,43 +33,26 @@ public class OATHConst
 
 	public static final String P = "P";
 	public static int p = 10;
-	
+
 	public static final int num_key = 11;
-	
-	public static boolean isNASNP(String snp)
-	{
-		String[] naSNP = initNAStrs();
-		for (String naStr : naSNP)
-		{
-			if (naStr.equalsIgnoreCase(snp))
-			{
-				return true;
-			}
-		}
-		return false;
-	}
-	
-	public static boolean isNA(String s)
-	{
-		for (String naStr : naStrs)
-		{
-			if (naStr.equalsIgnoreCase(s))
-			{
+
+	public static boolean isNASNP(String snp) {
+		for (String naStr : naStrs) {
+			if (naStr.equalsIgnoreCase(snp)) {
 				return true;
 			}
 		}
 		return false;
 	}
 
-	private static final String[] naStrs = initNAStrs();
-
-	private static String[] initNAStrs()
-	{
-		if (CmdArgs.INSTANCE.getNA() == null)
-		{
-			return new String[] { "-9", "na", "-Inf", "Inf", ".", "-"};
+	public static boolean isNA(String s) {
+		for (String naStr : naStrs) {
+			if (naStr.equalsIgnoreCase(s)) {
+				return true;
+			}
 		}
-		return CmdArgs.INSTANCE.getNA().trim().split(",");
+		return false;
 	}
 
+	private static final String[] naStrs = { "-9", "na", "-Inf", "Inf", ".", "-" };
 }

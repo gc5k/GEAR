@@ -118,7 +118,7 @@ public class OATHXCommandImpl extends CommandImpl
 			}
 			cnt++;
 		} while ((tokens = reader.readTokens()) != null);
-		Logger.printUserLog("Reading " +tokenLen +"X" +tokenLen +" correlation matrix from '" + obArgs.getCMFile() + "'.");
+		Logger.printUserLog("Read " +tokenLen +"X" +tokenLen +" correlation matrix from '" + obArgs.getCMFile() + "'.");
 	}
 
 	private OATHXCommandArguments obArgs = null;

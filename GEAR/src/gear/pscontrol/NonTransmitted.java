@@ -35,7 +35,7 @@ public class NonTransmitted
 			System.exit(1);
 		}
 		pp.Parse();
-		sf = new SampleFilter(pp.getPedigreeData(), pp.getMapData());
+		sf = new SampleFilter(pp.getPedigreeData());
 	}
 
 	public void GenerateNonTransmitted()

@@ -18,15 +18,13 @@ import org.apache.commons.math.random.RandomDataImpl;
 import org.apache.commons.math.stat.StatUtils;
 
 import gear.ConstValues;
+import gear.family.GenoMatrix.GenotypeMatrix;
 import gear.family.pedigree.Hukou;
-import gear.family.pedigree.file.MapFile;
 import gear.family.pedigree.file.SNP;
 import gear.family.plink.PLINKParser;
-import gear.family.popstat.GenotypeMatrix;
 import gear.family.qc.rowqc.SampleFilter;
 import gear.subcommands.CommandArguments;
 import gear.subcommands.CommandImpl;
-import gear.sumstat.qc.rowqc.SumStatQC;
 import gear.util.FileUtil;
 import gear.util.Logger;
 import gear.util.NewIt;
@@ -34,20 +32,33 @@ import gear.util.Sample;
 
 public class SimulationQTRealCommandImpl extends CommandImpl
 {
+	private SimulationQTRealCommandArguments qtArgs;
+	private SampleFilter sf;
+	private GenotypeMatrix pGM;
 
+	private RandomDataImpl rnd = new RandomDataImpl();
+	private long seed;
+
+	private int nullM;
+	private int rep;
+
+	private PLINKParser pp = null;
+	private double[][] genotype;
+	private double[] BV;
+	private double[][] phenotype;
+
+	private double[] effect;
+	private double h2;
+
+	private HashMap<String, Double> RefEffectMap = null;
 	@Override
 	public void execute(CommandArguments cmdArgs)
 	{
 		qtArgs = (SimulationQTRealCommandArguments) cmdArgs;
 
 		pp = PLINKParser.parse(this.qtArgs);
-		this.sf = new SampleFilter(pp.getPedigreeData(), pp.getMapData());
-		this.ssQC = new SumStatQC(pp.getPedigreeData(), pp.getMapData(), this.sf);
-		this.mapFile = this.ssQC.getMapFile();
-		this.gm = new GenotypeMatrix(this.ssQC.getSample());
-
-		sample = gm.getNumIndivdial();
-		M = gm.getNumMarker();
+		sf = new SampleFilter(pp.getPedigreeData(), cmdArgs);
+		pGM = new GenotypeMatrix(sf.getSample(), pp.getMapData(), cmdArgs);
 
 		h2 = qtArgs.getHsq();
 		nullM = 0;
@@ -65,11 +76,11 @@ public class SimulationQTRealCommandImpl extends CommandImpl
 		DecimalFormat fmt = new DecimalFormat("#.###E0");
 
 		RealMatrix Meffect = new Array2DRowRealMatrix(effect);
-		genotype = new double[sample][M];
-		phenotype = new double[sample][rep];
-		BV = new double[sample];
+		genotype = new double[pGM.getNumIndivdial()][pGM.getNumMarker()];
+		phenotype = new double[pGM.getNumIndivdial()][rep];
+		BV = new double[pGM.getNumIndivdial()];
 
-		for(int i = 0; i < sample; i++)
+		for(int i = 0; i < pGM.getNumIndivdial(); i++)
 		{
 			RealMatrix chr = SampleRealChromosome(i);
 			RealMatrix genoEff = chr.transpose().multiply(Meffect);
@@ -94,8 +105,8 @@ public class SimulationQTRealCommandImpl extends CommandImpl
 		Logger.printUserLog("Vg=" + fmt.format(vg));
 		for (int i = 0; i < rep; i++)
 		{
-			double[] pv=new double[sample];
-			for (int j = 0; j < sample; j++)
+			double[] pv=new double[pGM.getNumIndivdial()];
+			for (int j = 0; j < pGM.getNumIndivdial(); j++)
 			{
 				phenotype[j][i] = BV[j] + rnd.nextGaussian(0, E);
 				pv[j] = phenotype[j][i];
@@ -109,20 +120,20 @@ public class SimulationQTRealCommandImpl extends CommandImpl
 
 	private RealMatrix SampleRealChromosome(int sIdx)
 	{
-		double[] gn = new double[gm.getNumMarker()];
+		double[] gn = new double[pGM.getNumMarker()];
 		for (int i = 0; i < gn.length; i++)
 		{
-			int g = this.gm.getAdditiveScoreOnFirstAllele(sIdx, i);
-			gn[i] = (g == 3)? 0:g;
+			int g = pGM.getAdditiveScoreOnFirstAllele(sIdx, i);
+			gn[i] = (g == ConstValues.MISSING_GENOTYPE)? 0:g;
 		}
 		return new Array2DRowRealMatrix(gn);
 	}
 
 	private void getEffect()
 	{
-		effect = new double[M];
+		effect = new double[pGM.getNumMarker()];
 		Sample.setSeed(seed);
-		int[] idx = Sample.SampleIndex(0, M-1, M-nullM);
+		int[] idx = Sample.SampleIndex(0, pGM.getNumMarker()-1, pGM.getNumMarker()-nullM);
 		Arrays.sort(idx);
 
 		if(qtArgs.isPlainEffect())
@@ -161,9 +172,9 @@ public class SimulationQTRealCommandImpl extends CommandImpl
 			{
 				while ((line = reader.readLine()) != null)
 				{
-					if(c >= M)
+					if(c >= pGM.getNumMarker())
 					{
-						Logger.printUserLog("Have already read " + M + " allelic effects.  Ignore the rest of the content in '" + qtArgs.getPolyEffectFile() + "'.");
+						Logger.printUserLog("Have already read " + pGM.getNumMarker() + " allelic effects. Ignore the rest of the content in '" + qtArgs.getPolyEffectFile() + "'.");
 						break;
 					}
 
@@ -192,9 +203,9 @@ public class SimulationQTRealCommandImpl extends CommandImpl
 			{
 				while ((line = reader.readLine()) != null)
 				{
-					if(c >= M)
+					if(c >= pGM.getNumMarker())
 					{
-						Logger.printUserLog("Have already read " + M + " allelic effects.  Ignore the rest of the content in '" + qtArgs.getRefEffectFile() + "'.");
+						Logger.printUserLog("Have already read " + pGM.getNumMarker() + " allelic effects.  Ignore the rest of the content in '" + qtArgs.getRefEffectFile() + "'.");
 						break;
 					}
 
@@ -212,11 +223,10 @@ public class SimulationQTRealCommandImpl extends CommandImpl
 								+ qtArgs.getPolyEffectFile() + "'.");
 			}
 
-			Logger.printUserLog("Reading " + RefEffectMap.size() + " referenced effects from '" + qtArgs.getRefEffectFile() + "'.");
-			ArrayList<SNP> snps =mapFile.getMarkerList();
-			for(int i = 0; i < mapFile.getMarkerNumber(); i++)
+			Logger.printUserLog("Read " + RefEffectMap.size() + " referenced effects from '" + qtArgs.getRefEffectFile() + "'.");
+			for(int i = 0; i < pGM.getSNPList().size(); i++)
 			{
-				SNP snp = snps.get(i);
+				SNP snp = pGM.getSNPList().get(i);
 				String snp1 = snp.getName() + "_" + snp.getFirstAllele();
 				String snp2 = snp.getName() + "_" + snp.getSecAllele();
 				if (RefEffectMap.containsKey(snp1))
@@ -271,39 +281,13 @@ public class SimulationQTRealCommandImpl extends CommandImpl
 			phe.println();
 		}
 
-		MapFile mf = pp.getMapData();
-		ArrayList<SNP> snpList = mf.getMarkerList();
-		for (int i = 0; i < mf.getMarkerNumber(); i++)
+		for (int i = 0; i < pGM.getSNPList().size(); i++)
 		{
-			eff.println(mf.getMarkerName(i) + "\t" +  String.valueOf(snpList.get(i).getFirstAllele())  + "\t" + effect[i]);
+			eff.println(pGM.getSNPList().get(i).getName() + "\t" +  String.valueOf(pGM.getSNPList().get(i).getFirstAllele())  + "\t" + effect[i]);
 		}
 		phe.close();
 		eff.close();
 		breed.close();
 	}
-
-	private SimulationQTRealCommandArguments qtArgs;
-	private MapFile mapFile;
-	private SampleFilter sf;
-	private SumStatQC ssQC;
-	private GenotypeMatrix gm;
-
-	private RandomDataImpl rnd = new RandomDataImpl();
-	private long seed;
-
-	private int M;
-	private int nullM;
-	private int sample;
-	private int rep;
-
-	private PLINKParser pp = null;
-	private double[][] genotype;
-	private double[] BV;
-	private double[][] phenotype;
-
-	private double[] effect;
-	private double h2;
-	
-	private HashMap<String, Double> RefEffectMap = null;
 
 }

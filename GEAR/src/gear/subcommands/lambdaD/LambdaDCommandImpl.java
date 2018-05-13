@@ -87,7 +87,7 @@ public class LambdaDCommandImpl extends CommandImpl
 //			WriteRandMat();
 //		}
 		Logger.printUserLog("=========================================================");
-		Logger.printUserLog("Results has been saved in '" + lamArgs
+		Logger.printUserLog("Results have been saved in '" + lamArgs
 				.getOutRoot() + ".lmat'.");
 	}
 
@@ -97,7 +97,8 @@ public class LambdaDCommandImpl extends CommandImpl
 		Arrays.fill(FileKeep, true);
 		gReader = new GWASReader(lamArgs.getMetaFile(), FileKeep,
 				lamArgs.getKeys(), lamArgs.isQT(), lamArgs.isGZ(),
-				lamArgs.isChr(), lamArgs.getChr());
+				lamArgs.isChr(),
+			    lamArgs.isChr()?lamArgs.getChr():lamArgs.getNotChr());
 		gReader.Start(false);
 
 		Me = lamArgs.getMe();

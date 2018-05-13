@@ -343,7 +343,6 @@ public class HERegCommandImpl extends CommandImpl {
 		{
 			SimpleRegression sReg = new SimpleRegression();
 
-			int cnt = 0;
 			for (int i = 0; i < Y.length; i++)
 			{
 				if (i == jk)
@@ -371,7 +370,6 @@ public class HERegCommandImpl extends CommandImpl {
 					}
 					if (heArgs.isGRMcut() && A3[0][i][j] > heArgs.getGRMcutoff()) continue;
 					sReg.addData(A3[0][i][j], yy);
-					cnt++;
 				}
 			}
 //			Logger.printUserLog(cnt + " observations for HE regression -> Jackknife " + (jk+1) + " " + sReg.getSlope());

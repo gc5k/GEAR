@@ -2,12 +2,9 @@ package gear.subcommands.wgrm;
 
 import gear.subcommands.CommandArguments;
 import gear.util.FileUtil;
-import gear.util.Logger;
 
 public class WGRMCommandArguments extends CommandArguments
 {
-	private String chr;
-	private boolean chrFlag = false;
 	private boolean isGZ = true;
 	private boolean isVar = false;
 	private boolean isDom = false;
@@ -15,18 +12,7 @@ public class WGRMCommandArguments extends CommandArguments
 	private boolean isVanRaden = false;
 	private boolean isWeight = false;
 	private String wFile = null;
-
-	public void setChr(String c)
-	{
-		this.chr = c;
-		int chr1 = Integer.parseInt(c);
-		if (chr1 < 1)
-		{
-			Logger.printUserLog("Chromosome should be greater than 0.\n GEAR quitted");
-			System.exit(1);
-		}
-		this.chrFlag = true;
-	}
+	private boolean isInbred = false;
 
 	public void setGZ()
 	{
@@ -51,16 +37,6 @@ public class WGRMCommandArguments extends CommandArguments
 	public boolean isAdjVar()
 	{
 		return isVar;
-	}
-
-	public String getChr()
-	{
-		return this.chr;
-	}
-
-	public boolean isChrFlagOn()
-	{
-		return this.chrFlag;
 	}
 
 	public void setDom() 
@@ -109,4 +85,13 @@ public class WGRMCommandArguments extends CommandArguments
 	{
 		return wFile;
 	}
+
+	public void setInbred() {
+		isInbred = true;
+	}
+
+	public boolean isInbred() {
+		return isInbred;
+	}
+
 }

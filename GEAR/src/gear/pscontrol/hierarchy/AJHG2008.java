@@ -52,11 +52,10 @@ public class AJHG2008 extends ChenBase
 
 				if (family.hasAncestor(person))
 				{
-					s_P.add(new PersonIndex(family.getID(), person.getID(), person, false, false));
+					s_P.add(new PersonIndex(person, false, false));
 					Person pseudoper = new Person(person);
 					plist.add(pseudoper);
-					s_P.add(new PersonIndex(family.getID(), pseudoper
-							.getPersonID(), pseudoper, true, false));
+					s_P.add(new PersonIndex(pseudoper, true, false));
 					si++;
 					// s++;
 				}

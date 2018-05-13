@@ -38,9 +38,6 @@ public enum CmdArgs
 				"The second PLINK format binary input file", "bfile2");
 
 		// real-check
-		ops.addOption(OptionBuilder.withDescription("realcheck ")
-				.create(cmd_realcheck));
-		realCheckParameter.commandInitial();
 
 		ops.addOption(OptionBuilder.withDescription("linear")
 				.create(cmd_linear));
@@ -392,135 +389,6 @@ public enum CmdArgs
 	}
 
 	private FileArgs fileArgs;
-
-	// Real-check options Begin
-	public boolean hasRealCheckOption()
-	{
-		return realcheckFlag;
-	}
-
-	private final String cmd_realcheck = "realcheck";
-	private boolean realcheckFlag = false;
-
-	public class RealCheckArgs
-	{
-		private RealCheckArgs()
-		{
-		}
-
-		public double getThresholdUpper()
-		{
-			return thresholdUpper;
-		}
-
-		public double getThresholdLower()
-		{
-			return thresholdLower;
-		}
-
-		public int getMarkerNumber()
-		{
-			return markerNumber;
-		}
-
-		public boolean getMarkerNumberFlag()
-		{
-			return markerNumberFlag;
-		}
-
-		public String getSnps()
-		{
-			return snps;
-		}
-
-		@SuppressWarnings("static-access")
-		private void commandInitial()
-		{
-			ops.addOption(OptionBuilder
-					.withLongOpt(cmd_threshold_upper_long)
-					.withDescription("realcheck marker threshold upper bounder")
-					.hasArg().create(cmd_threshold_upper));
-			ops.addOption(OptionBuilder
-					.withLongOpt(cmd_threshold_lower_long)
-					.withDescription("realcheck marker threshold lower bounder")
-					.hasArg().create(cmd_threshold_lower));
-			ops.addOption(OptionBuilder.withLongOpt(cmd_marker_number_long)
-					.withDescription("realcheck marker number").hasArg()
-					.create(cmd_marker_number));
-			ops.addOption(OptionBuilder.withLongOpt(cmd_snps_long)
-					.withDescription("realcheck snp number").hasArg()
-					.create(cmd_snps));
-		}
-
-		private void commandListener(CommandLine cl)
-		{
-			if (cl.hasOption(cmd_threshold_upper))
-			{
-				thresholdUpper = Double.parseDouble(cl
-						.getOptionValue(cmd_threshold_upper));
-				if (thresholdUpper < 0 && thresholdUpper > 1)
-				{
-					Logger.printUserError("realcheck threshold upper bounder should be between 0 and 1");
-					System.exit(1);
-				}
-			}
-
-			if (cl.hasOption(cmd_threshold_lower))
-			{
-				thresholdLower = Double.parseDouble(cl
-						.getOptionValue(cmd_threshold_lower));
-				if (thresholdLower < 0 && thresholdLower > 1)
-				{
-					Logger.printUserError("realcheck threshold Lower bounder should be tween 0 and 1");
-					System.exit(1);
-				}
-			}
-
-			if (cl.hasOption(cmd_marker_number))
-			{
-				markerNumber = Integer.parseInt(cl
-						.getOptionValue(cmd_marker_number));
-				if (markerNumber < 0)
-				{
-					Logger.printUserError("realcheck marker number should be greater than 0");
-					System.exit(1);
-				}
-				markerNumberFlag = true;
-			}
-
-			if (cl.hasOption(cmd_snps))
-			{
-				snps = cl.getOptionValue(cmd_snps);
-				FileUtil.exists(snps);
-			}
-		}
-
-		private final String cmd_threshold_upper = "realcheck_threshold_upper";
-		private final String cmd_threshold_upper_long = "realcheck-threshold-upper";
-		private double thresholdUpper = 1;
-
-		private final String cmd_threshold_lower = "realcheck_threshold_lower";
-		private final String cmd_threshold_lower_long = "realcheck-threshold-lower";
-		private double thresholdLower = -1;
-
-		private final String cmd_marker_number = "realcheck_marker_number";
-		private final String cmd_marker_number_long = "realcheck-marker-number";
-		private int markerNumber = 100;
-		private boolean markerNumberFlag = false;
-
-		private final String cmd_snps = "realcheck_snps";
-		private final String cmd_snps_long = "realcheck-snps";
-		private String snps = null;
-	} // class RealCheckParameter
-
-	private RealCheckArgs realCheckParameter = new RealCheckArgs();
-
-	public RealCheckArgs getRealCheckParameter()
-	{
-		return realCheckParameter;
-	}
-
-	// Real-check options End
 
 	public RegressionModel getTranFunction()
 	{
@@ -1286,11 +1154,7 @@ public enum CmdArgs
 	public boolean ex_nosexFlag = false;
 	// /////////////////global
 
-	public boolean transFlag = false;
-
 	public boolean status_shiftFlag = false;
-
-	public String missing_phenotype = "-9";
 
 	public double status_shift = -1;
 
@@ -1330,9 +1194,6 @@ public enum CmdArgs
 			formatter.printHelp("HE Regression", ops);
 			System.exit(0);
 		}
-
-		realcheckFlag = cmdLine.hasOption(cmd_realcheck);
-		realCheckParameter.commandListener(cmdLine);
 
 		if (cmdLine.hasOption(cmd_linear))
 		{

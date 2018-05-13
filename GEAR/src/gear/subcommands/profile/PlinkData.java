@@ -1,23 +1,24 @@
 package gear.subcommands.profile;
 
 import gear.ConstValues;
+import gear.family.GenoMatrix.GenotypeMatrix;
 import gear.family.pedigree.file.SNP;
 import gear.family.plink.PLINKParser;
-import gear.family.popstat.GenotypeMatrix;
 import gear.family.qc.rowqc.SampleFilter;
+import gear.subcommands.CommandArguments;
 
 import java.util.ArrayList;
 
 public class PlinkData extends Data
-{	
-	public PlinkData(PLINKParser parser)
+{
+	public PlinkData(PLINKParser parser, CommandArguments cmdArgs)
 	{
-		sampleFilter = new SampleFilter(parser.getPedigreeData(), parser.getMapData());
-		genoMatrix = new GenotypeMatrix(sampleFilter.getSample());
-		snpList = sampleFilter.getMapFile().getMarkerList();
+		sampleFilter = new SampleFilter(parser.getPedigreeData(), cmdArgs);
+		genoMatrix = new GenotypeMatrix(sampleFilter.getSample(), parser.getMapData(), cmdArgs);
+		snpList = genoMatrix.getSNPList();
 		calcAllele1Frequencies();
 	}
-	
+
 	private void calcAllele1Frequencies()
 	{
 		allele1Freqs = new float[snpList.size()];
@@ -27,10 +28,10 @@ public class PlinkData extends Data
 		{
 			for (int locusIdx = 0; locusIdx < genoMatrix.getGCol(); ++locusIdx)
 			{
-				int genoValue = genoMatrix.getAdditiveScore(indIdx, locusIdx);
-				if (genoValue != ConstValues.BINARY_MISSING_GENOTYPE)
+				int g = genoMatrix.getAdditiveScore(indIdx, locusIdx);
+				if (g != ConstValues.MISSING_GENOTYPE)
 				{
-					allele1Freqs[locusIdx] += 2.0f - genoValue;
+					allele1Freqs[locusIdx] += 2.0f - g;
 					numAlleles[locusIdx] += 2;
 				}
 			}
@@ -89,7 +90,7 @@ public class PlinkData extends Data
 		public float getAllele1Fraction()
 		{
 			int genoValue = genoMatrix.getAdditiveScore(indIdx, locIdx);
-			return genoValue == ConstValues.BINARY_MISSING_GENOTYPE ? 2 * allele1Freqs[locIdx] : 2 - genoValue;
+			return genoValue == ConstValues.MISSING_GENOTYPE ? 2 * allele1Freqs[locIdx] : 2 - genoValue;
 		}
 
 		@Override

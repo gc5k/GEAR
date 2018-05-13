@@ -1,22 +1,21 @@
 package gear.family.pedigree;
 
 import gear.data.Person;
+import gear.data.SubjectID;
 
 public class PersonIndex
 {
-	private String FamilyID;
-	private String IndividualID;
+	private SubjectID subID;
 	private Person person;
 	private boolean pseudo;
 	private boolean isFounder;
 	private int group;
 	private double permutatedScore;
 
-	public PersonIndex(String FamilyID, String IndividualID, Person person,
+	public PersonIndex(Person person,
 			boolean pseudo, boolean isFounder)
 	{
-		this.FamilyID = FamilyID;
-		this.IndividualID = IndividualID;
+		subID = new SubjectID(person.getFamilyID(), person.getPersonID());
 		this.person = person;
 
 		this.pseudo = pseudo;
@@ -25,12 +24,12 @@ public class PersonIndex
 
 	public String getFamilyID()
 	{
-		return FamilyID;
+		return subID.getFamilyID();
 	}
 
 	public String getIndividualID()
 	{
-		return IndividualID;
+		return subID.getIndividualID();
 	}
 
 	public Person getPerson()

@@ -14,79 +14,72 @@ import gear.subcommands.exsnp.ExSNPCommandArguments;
 import gear.subcommands.profile.ProfileCommand;
 import gear.subcommands.profile.ProfileCommandArguments;
 
-public class PPCBatchCommand extends Command
-{
+public class PPCBatchCommand extends Command {
 
 	@Override
-	public String getName()
-	{
+	public String getName() {
 		return "probatch";
 	}
 
 	@Override
-	public String getDescription()
-	{
+	public String getDescription() {
 		return "Generate projected PC from the batch file.";
 	}
 
 	@SuppressWarnings("static-access")
 	@Override
-	public void prepareOptions(Options options)
-	{
+	public void prepareOptions(Options options) {
 		OptionGroup baseFileGroup = new OptionGroup();
 		baseFileGroup.setRequired(true);
 
-		baseFileGroup.addOption(OptionBuilder.withDescription(OPT_SCORE_DESC).withLongOpt(OPT_SCORE_LONG).hasArg().create(OPT_SCORE));
-		baseFileGroup.addOption(OptionBuilder.withDescription(OPT_SCORE_GZ_DESC).withLongOpt(OPT_SCORE_GZ_LONG).hasArg().create());
+		baseFileGroup.addOption(
+				OptionBuilder.withDescription(OPT_SCORE_DESC).withLongOpt(OPT_SCORE_LONG).hasArg().create(OPT_SCORE));
+		baseFileGroup.addOption(
+				OptionBuilder.withDescription(OPT_SCORE_GZ_DESC).withLongOpt(OPT_SCORE_GZ_LONG).hasArg().create());
 		options.addOptionGroup(baseFileGroup);
 
 		options.addOption(OptionBuilder.withDescription(OPT_BATCH_DESC).hasArg().create(OPT_BATCH));
-		options.addOption(OptionBuilder.withDescription(OPT_NO_SCORE_HEADER_DESC).withLongOpt(OPT_NO_SCORE_HEADER_LONG).create());
-//		options.addOption(OptionBuilder.withDescription(OPT_QSCORE_DESC).withLongOpt(OPT_QSCORE_LONG).hasArg().create());
-//		options.addOption(OptionBuilder.withDescription(OPT_QRANGE_DESC).withLongOpt(OPT_QRANGE_LONG).hasArg().create());
+		options.addOption(
+				OptionBuilder.withDescription(OPT_NO_SCORE_HEADER_DESC).withLongOpt(OPT_NO_SCORE_HEADER_LONG).create());
+		// options.addOption(OptionBuilder.withDescription(OPT_QSCORE_DESC).withLongOpt(OPT_QSCORE_LONG).hasArg().create());
+		// options.addOption(OptionBuilder.withDescription(OPT_QRANGE_DESC).withLongOpt(OPT_QRANGE_LONG).hasArg().create());
 
 		options.addOption(OptionBuilder.withDescription(OPT_GREEDY_DESC).create(OPT_GREEDY));
+
 		exsnpCommand.prepareOptions(options);
 		profileCommand.setIsCalledByEnigma(true);
 		profileCommand.prepareOptions(options);
 	}
 
 	@Override
-	public CommandArguments parse(CommandLine cmdLine)
-			throws CommandArgumentException
-	{
-		PPCBatchCommandArguments pbCmdArgs = new PPCBatchCommandArguments();
-		
-		pbCmdArgs.setBatch(cmdLine.getOptionValue(OPT_BATCH));
-		
-		if (cmdLine.hasOption(OPT_NO_SCORE_HEADER_LONG))
-		{
-			pbCmdArgs.setHeader();
+	public CommandArguments parse(CommandLine cmdLine) throws CommandArgumentException {
+		PPCBatchCommandArguments pbArgs = new PPCBatchCommandArguments();
+
+		pbArgs.setBatch(cmdLine.getOptionValue(OPT_BATCH));
+
+		if (cmdLine.hasOption(OPT_NO_SCORE_HEADER_LONG)) {
+			pbArgs.setHeader();
 		}
 
-		if (cmdLine.hasOption(OPT_SCORE))
-		{
-			pbCmdArgs.setScoreFile(cmdLine.getOptionValue(OPT_SCORE_LONG));
+		if (cmdLine.hasOption(OPT_SCORE)) {
+			pbArgs.setScoreFile(cmdLine.getOptionValue(OPT_SCORE_LONG));
 		}
-		
-		if (cmdLine.hasOption(OPT_SCORE_GZ_LONG))
-		{
-			pbCmdArgs.setScoreFileGZ(cmdLine.getOptionValue(OPT_SCORE_GZ_LONG));			
+
+		if (cmdLine.hasOption(OPT_SCORE_GZ_LONG)) {
+			pbArgs.setScoreFileGZ(cmdLine.getOptionValue(OPT_SCORE_GZ_LONG));
 		}
-		
-		if (cmdLine.hasOption(OPT_GREEDY))
-		{
-			pbCmdArgs.setGreedy();
+
+		if (cmdLine.hasOption(OPT_GREEDY)) {
+			pbArgs.setGreedy();
 		}
-		
-		pbCmdArgs.setExSNPCommandArguments((ExSNPCommandArguments) exsnpCommand.parse(cmdLine));
-		pbCmdArgs.setProfileCommandArguments((ProfileCommandArguments) profileCommand.parse(cmdLine));
-		return pbCmdArgs;
+
+		pbArgs.setExSNPCommandArguments((ExSNPCommandArguments) exsnpCommand.parse(cmdLine));
+		pbArgs.setProfileCommandArguments((ProfileCommandArguments) profileCommand.parse(cmdLine));
+		return pbArgs;
 	}
 
 	@Override
-	protected CommandImpl createCommandImpl()
-	{
+	protected CommandImpl createCommandImpl() {
 		return new PPCBatchCommandImpl();
 	}
 
@@ -103,12 +96,12 @@ public class PPCBatchCommand extends Command
 	private static final String OPT_NO_SCORE_HEADER_LONG = "no-score-header";
 	private static final String OPT_NO_SCORE_HEADER_DESC = "Indicate that the score file has no header (title) line";
 
-//	private static final String OPT_QSCORE_LONG = "qscore";
-//	private static final String OPT_QSCORE_DESC = "Specify q-score file";
+	// private static final String OPT_QSCORE_LONG = "qscore";
+	// private static final String OPT_QSCORE_DESC = "Specify q-score file";
 
-//	private static final String OPT_QRANGE_LONG = "qrange";
-//	private static final String OPT_QRANGE_DESC = "Specify q-score range file";
-	
+	// private static final String OPT_QRANGE_LONG = "qrange";
+	// private static final String OPT_QRANGE_DESC = "Specify q-score range file";
+
 	private static final String OPT_GREEDY = "greedy";
 	private static final String OPT_GREEDY_DESC = "Using all markers in each bed file.";
 

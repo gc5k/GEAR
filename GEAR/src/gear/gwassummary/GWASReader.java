@@ -11,6 +11,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.HashSet;
 
 import org.apache.commons.math.MathException;
 import org.apache.commons.math.distribution.ChiSquaredDistributionImpl;
@@ -18,15 +19,15 @@ import org.apache.commons.math.distribution.ChiSquaredDistributionImpl;
 public class GWASReader
 {
 
-	public GWASReader(String[] MetaFile, boolean[] FileKeep, String[] field, boolean isQT, boolean isGZ, boolean isChr, int Chr)
+	public GWASReader(String[] MetaFile, boolean[] FileKeep, String[] field, boolean isQT, boolean isGZ, boolean isKeepChr, HashSet<String> Chr)
 	{
 		this.field = field;
 		this.isQT = isQT;
 		this.isGZ = isGZ;
+		this.isKeepChr = isKeepChr;
 
 		workingMetaFile = NewIt.newArrayList();
-		this.isChr = isChr;
-		this.chrKeep = Chr;
+		this.chrSet = Chr;
 
 		for (int i = 0; i < FileKeep.length; i++)
 		{
@@ -357,12 +358,19 @@ public class GWASReader
 					ms.setChr(chr);
 				}
 				
-				if (isChr)
+				if (isKeepChr) 
 				{
-					if( ms.getChr() != chrKeep)
+					if( chrSet != null && !chrSet.contains( (new Integer(ms.getChr()).toString())) )
 					{
 						continue;
 					}
+				}
+				else
+				{
+					if( chrSet != null && chrSet.contains( (new Integer(ms.getChr()).toString())) )
+					{
+						continue;
+					}					
 				}
 			}
 			if (KeyIdx[metaIdx][BP] != -1)
@@ -593,8 +601,8 @@ public class GWASReader
 		return workingMetaFile;
 	}
 
-	private boolean isChr;
-	private int chrKeep=0;
+	private boolean isKeepChr = true;
+	private HashSet<String> chrSet;
 	private String[] field;
 	private boolean isQT;
 	private boolean isGZ;

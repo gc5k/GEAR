@@ -9,30 +9,28 @@ import gear.subcommands.CommandArgumentException;
 import gear.subcommands.CommandArguments;
 import gear.subcommands.CommandImpl;
 
-public class AtCommand extends Command
-{
+public class AtCommand extends Command {
 
-	public AtCommand()
-	{
+	public AtCommand() {
 		addAlias("ld");
 	}
 
 	@Override
-	public String getName() 
-	{
+	public String getName() {
 		return "ld-score";
 	}
+
 	@Override
-	public String getDescription() 
-	{
+	public String getDescription() {
 		// TODO Auto-generated method stub
 		return "Generate ld scores for chromosomes";
 	}
+
 	@SuppressWarnings("static-access")
 	@Override
-	public void prepareOptions(Options options)
-	{
-		options.addOption(OptionBuilder.withDescription(OPT_BFILE_DESC).withLongOpt(OPT_BFILE_LONG).hasArg().isRequired().create());
+	public void prepareOptions(Options options) {
+		options.addOption(OptionBuilder.withDescription(OPT_BFILE_DESC).withLongOpt(OPT_BFILE_LONG).hasArg()
+				.isRequired().create());
 		options.addOption(OptionBuilder.withDescription(OPT_DPRIME_DESC).create(OPT_DPRIME));
 		options.addOption(OptionBuilder.withDescription(OPT_D_DESC).create(OPT_D));
 		options.addOption(OptionBuilder.withDescription(OPT_RSQ_DESC).create(OPT_RSQ));
@@ -45,44 +43,27 @@ public class AtCommand extends Command
 		AtCommandArguments atArgs = new AtCommandArguments();
 		parseFileArguments(atArgs, cmdLine);
 
-		if(cmdLine.hasOption(OPT_WINDOW))
-		{
+		if (cmdLine.hasOption(OPT_WINDOW)) {
 			atArgs.setWindow(cmdLine.getOptionValue(OPT_WINDOW));
 		}
 
-		if(cmdLine.hasOption(OPT_DPRIME))
-		{
+		if (cmdLine.hasOption(OPT_DPRIME)) {
 			atArgs.setDPrime();
 		}
 
-		if(cmdLine.hasOption(OPT_D))
-		{
+		if (cmdLine.hasOption(OPT_D)) {
 			atArgs.setD();
 		}
 
-		if(cmdLine.hasOption(OPT_RSQ))
-		{
+		if (cmdLine.hasOption(OPT_RSQ)) {
 			atArgs.setRsq();
 		}
 
 		return atArgs;
 	}
-	
-	private void parseFileArguments(AtCommandArguments atArgs, CommandLine cmdLine) throws CommandArgumentException
-	{
-		String bfile = cmdLine.getOptionValue("bfile");
 
-		if (bfile == null)
-		{
-			throw new CommandArgumentException("No genotypes are provided. Either --bfile or --file must be set.");
-		}
-
-		atArgs.setBFile(bfile);
-	}
-	
 	@Override
-	protected CommandImpl createCommandImpl()
-	{
+	protected CommandImpl createCommandImpl() {
 		return new AtCommandImpl();
 	}
 

@@ -1,74 +1,356 @@
 package gear.subcommands;
 
-public abstract class CommandArguments
-{
-	public void setFile(String file)
-	{
+import java.util.HashSet;
+
+import gear.util.Logger;
+import gear.util.NewIt;
+
+public abstract class CommandArguments {
+	public void setFile(String file) {
 		this.file = file;
+		this.isFile = true;
 	}
-	
-	public String getFile()
-	{
+
+	public String getFile() {
 		return file;
 	}
-	
-	public String getPed()
-	{
+
+	public String getPed() {
 		return getFile() + ".ped";
 	}
-	
-	public String getMap()
-	{
+
+	public String getMap() {
 		return getFile() + ".map";
 	}
-	
-	public String getBFile()
-	{
+
+	public String getBFile() {
 		return bfile;
 	}
-	
-	public void setBFile(String bfile)
-	{
-		this.bfile = bfile;
+
+	public boolean isFile() {
+		return isFile;
 	}
-	
-	public String getBed()
-	{
+
+	public void setBFile(String bfile) {
+		this.bfile = bfile;
+		this.isbFile = true;
+	}
+
+	public String getBed() {
 		return getBFile() + ".bed";
 	}
-	
-	public String getBim()
-	{
+
+	public String getBim() {
 		return getBFile() + ".bim";
 	}
-	
-	public String getFam()
-	{
+
+	public String getFam() {
 		return getBFile() + ".fam";
 	}
-	
-	public String getOutRoot()
-	{
+
+	public boolean isbFile() {
+		return isbFile;
+	}
+
+	public String getOutRoot() {
 		return outRoot;
 	}
-	
-	public void setOutRoot(String outRoot)
-	{
+
+	public void setOutRoot(String outRoot) {
 		this.outRoot = outRoot;
 	}
-	
-	public long getSeed()
-	{
+
+	public long getSeed() {
 		return seed;
 	}
-	
-	public void setSeed(long seed)
-	{
+
+	public void setSeed(long seed) {
 		this.seed = seed;
 	}
+
+	public void setKeepFile(String kF) {
+		this.keepFile = kF;
+		isKeepFile = true;
+	}
+
+	public String getKeepFile() {
+		return keepFile;
+	}
+
+	public boolean isKeepFile() {
+		return isKeepFile;
+	}
+
+	
+	public void setKeepFamFile(String kFamF) {
+		this.keepFamFile = kFamF;
+		isKeepFamFile = true;
+	}
+
+	public String getKeepFamFile() {
+		return keepFamFile;
+	}
+
+	public boolean isKeepFamFile() {
+		return isKeepFamFile;
+	}
+
+	public void setRemoveFile(String rF) {
+		this.removeFile = rF;
+		isRemoveFile = true;
+	}
+
+	public String getRemoveFile() {
+		return removeFile;
+	}
+	
+	public boolean isRemoveFile() {
+		return isRemoveFile;
+	}
+
+	public void setRemoveFamFile(String rFamF) {
+		this.removeFamFile = rFamF;
+		isRemoveFamFile = true;
+	}
+
+	public String getRemoveFamFile() {
+		return removeFamFile;
+	}
+	
+	public boolean isRemoveFamFile() {
+		return isRemoveFamFile;
+	}
+
+	public void setExtractFile(String eF) {
+		this.extractFile = eF;
+		isExtractFile = true;
+	}
+
+	public String getExtractFile() {
+		return extractFile;
+	}
+
+	public boolean isExtractFile() {
+		return isExtractFile;
+	}
+
+	public void setExcludeFile(String exF) {
+		this.excludeFile = exF;
+		isExcludeFile = true;
+	}
+
+	public String getExcludeFile() {
+		return excludeFile;
+	}
+
+	public boolean isExcludeFile() {
+		return isExcludeFile;
+	}
+
+	public void setChr(String[] c) {
+		chr = NewIt.newHashSet();
+		CommandSplitter CS = new CommandSplitter.Builder(c).OPT("--chr").create();
+		chr.addAll(CS.ParseToStr());
+		isChr = true;
+	}
+
+	public HashSet<String> getChr() {
+		return chr;
+	}
+
+	public boolean isChr() {
+		return isChr;
+	}
+
+	public void setNotChr(String[] c) {
+		not_chr = NewIt.newHashSet();
+		CommandSplitter CS = new CommandSplitter.Builder(c).OPT("--not-chr").create();
+		not_chr.addAll(CS.ParseToStr());
+		isNotChr = true;
+	}
+
+	public HashSet<String> getNotChr() {
+		return not_chr;
+	}
+
+	public boolean isNotChr() {
+		return isNotChr;
+	}
+
+//	public static ArrayList<String> splitter(String[] cmd, String opt) {
+//		ArrayList<String> S = NewIt.newArrayList();
+//		for(int i = 0; i < cmd.length; i++) {
+//			if (cmd[i].contains("-")) {
+//				String[] s = cmd[i].split("-");
+//				try {
+//					int s0 = Integer.parseInt(s[0]); int s1 = Integer.parseInt(s[1]);
+//					for(int j = Math.min(s0, s1); j <= Math.max(s0, s1); j++) {
+//						S.add( (new Integer(j)).toString());
+//					}
+//				} catch (NumberFormatException e) {
+//					Logger.printUserLog("The value of " + cmd[i] + " is invalid for " + opt);
+//					System.exit(1);
+//				}
+//			} else {
+//				try {
+//					Integer.parseInt(cmd[i]);
+//					S.add(cmd[i]);
+//				} catch (NumberFormatException e) {
+//					Logger.printUserLog("The value of " + cmd[i] + " is invalid for " + opt);
+//					System.exit(1);
+//				}
+//			}
+//		}
+//		return S;
+//	}
+
+	public void setMAF(String m) {
+		maf = Double.parseDouble(m);
+		if (maf < 0 || maf > 0.5) {
+			Logger.printUserLog("incorrect --maf " + m + ". It should be > 0 and < 0.5");
+		}
+		isMAF = true;
+	}
+
+	public double getMAF() {
+		return maf;
+	}
+
+	public boolean isMAF() {
+		return isMAF;
+	}
+
+	public void setMAFRange(String[] mafRg) {
+		CommandSplitter CS = new CommandSplitter.Builder(mafRg).DoubleMin(0).DoubleMax(0.5).OPT(Command.OPT_MAF_RANGE_LONG).create();
+		maf_range = CS.ParseToDouble();
+		isMafRange = true;
+	}
+
+	public void setMAFRange2(double[][] mafRg2) {
+		maf_range = mafRg2;
+		isMafRange = true;
+	}
+
+	public boolean isMAFRange() {
+		return isMafRange;
+	}
+	
+	public double[][] getMAFRange() {
+		return maf_range;
+	}
+
+	public void setMaxMAF(String m) {
+		max_maf = Double.parseDouble(m);
+		if (max_maf < 0 || max_maf > 0.5) {
+			Logger.printUserLog("incorrect --max-maf " + m + ". It should be > 0 and < 0.5");
+		}
+		isMaxMAF = true;
+	}
+
+	public double getMaxMAF() {
+		return max_maf;
+	}
+
+	public boolean isMaxMAF() {
+		return isMaxMAF;
+	}
+
+	public void setGENO(String m) {
+		geno = Double.parseDouble(m);
+		if (geno < 0 || geno > 1) {
+			Logger.printUserLog("incorrect --geno " + m + ". It should be > 0 and < 1");
+		}
+		isGENO = true;
+	}
+
+	public double getGENO() {
+		return geno;
+	}
+
+	public boolean isGENO() {
+		return isGENO;
+	}
+
+	public void setZeroVar() {
+		isZeroVar = true;
+	}
+
+	public boolean isZeroVar() {
+		return isZeroVar;
+	}
+
+	public String getPhenotypeFile() {
+		return this.pheFile;
+	}
+
+	public void setPhenotypeFile(String pheFile) {
+		this.pheFile = pheFile;
+	}
+
+	public void setPhenotypeIndex(String[] pheIndex) {
+		CommandSplitter CS = new CommandSplitter.Builder(pheIndex).OPT(Command.OPT_MPHE).IntMin(1).create();
+		this.mPheno = CS.ParseToInt();
+	}
+
+	public void setPhenotypeIndex(int pheIndex) {
+		this.mPheno[0] = pheIndex - 1;
+	}
+
+	public int getSelectedPhenotype(int i) {
+		return this.mPheno[i];
+	}
+
+	public int[] getSelectedPhenotype() {
+		return this.mPheno;
+	}
+
+	private String outRoot;
+
+	private String pheFile;
+	private int[] mPheno = { 0 };	
 	
 	private String file;
+	private boolean isFile = false;
+
 	private String bfile;
-	private String outRoot;
+	private boolean isbFile = false;
+
+
+	private String keepFamFile = null;
+	private boolean isKeepFamFile = false;
+
+	private String removeFamFile = null;
+	private boolean isRemoveFamFile = false;
+
+	private String keepFile = null;
+	private boolean isKeepFile = false;
+
+	private String removeFile = null;
+	private boolean isRemoveFile = false;
+
+	private String extractFile = null;
+	private boolean isExtractFile = false;
+
+	private String excludeFile = null;
+	private boolean isExcludeFile = false;
+
+	private HashSet<String> chr = null;
+	private boolean isChr = false;
+	private HashSet<String> not_chr = null;
+	private boolean isNotChr = false;
+
+	private double maf = 0.01;
+	private boolean isMAF = false;
+
+	private double max_maf = 0.51;
+	private boolean isMaxMAF = false;
+
+	private double[][] maf_range;
+	private boolean isMafRange = false;
+
+	private double geno = 0.1;
+	private boolean isGENO = false;
+
+	private boolean isZeroVar = false;
 	private long seed;
 }

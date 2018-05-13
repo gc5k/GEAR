@@ -1,7 +1,6 @@
 package gear.subcommands.fastpca;
 
 import gear.subcommands.CommandArguments;
-import gear.util.FileUtil;
 import gear.util.Logger;
 
 public class FastPCACommandArguments extends CommandArguments
@@ -60,17 +59,6 @@ public class FastPCACommandArguments extends CommandArguments
 		return ev;
 	}
 
-	public void setKeepFile(String kFile) 
-	{
-		FileUtil.exists(kFile);
-		keepFile = kFile;
-	}
-
-	public String getKeepFile()
-	{
-		return keepFile;
-	}
-
 	public void setProp(String p)
 	{
 		prop = Double.parseDouble(p);
@@ -98,7 +86,6 @@ public class FastPCACommandArguments extends CommandArguments
 	}
 
 	private int ev = 10;
-	private String keepFile = null;
 	private double prop = 1;
 	private boolean isAdjVar = false;
 }

@@ -66,7 +66,9 @@ public class GLSMetaCommandImpl extends CommandImpl
 		}
 		generateCorMatrix();
 
-		gReader = new GWASReader(gMetaArgs.getMetaFile(), FileKeep, gMetaArgs.getKeys(), gMetaArgs.isQT(), gMetaArgs.isGZ(), gMetaArgs.isChr(), gMetaArgs.getChr());
+		gReader = new GWASReader(gMetaArgs.getMetaFile(), FileKeep, gMetaArgs.getKeys(), gMetaArgs.isQT(), gMetaArgs.isGZ(), 
+				gMetaArgs.isChr() ? true:false,
+				gMetaArgs.isChr()? gMetaArgs.getChr():gMetaArgs.getNotChr());
 		gReader.Start(false);
 
 		if (gReader.getNumMetaFile() < 2)
@@ -529,7 +531,7 @@ public class GLSMetaCommandImpl extends CommandImpl
 		if(gMetaArgs.IsKeepFile())
 		{
 			Arrays.fill(FileKeep, false);
-			String[] kf = gMetaArgs.getKeepFile();
+			String[] kf = gMetaArgs.getKeepCohortFile();
 			for(int i = 0; i < metaF.length; i++)
 			{
 				for(int j = 0; j < kf.length; j++ )
@@ -545,7 +547,7 @@ public class GLSMetaCommandImpl extends CommandImpl
 		if(gMetaArgs.IsRevFile())
 		{
 			Arrays.fill(FileKeep, true);
-			String[] kf = gMetaArgs.getRemoveFile();
+			String[] kf = gMetaArgs.getRemoveCohortFile();
 			for(int i = 0; i < metaF.length; i++)
 			{
 				for(int j = 0; j < kf.length; j++ )

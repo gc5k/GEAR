@@ -8,37 +8,31 @@ import gear.subcommands.profile.ProfileCommandArguments;
 import gear.subcommands.profile.ProfileCommandImpl;
 import gear.util.Logger;
 
-public class PPCBatchCommandImpl extends CommandImpl 
-{
+public class PPCBatchCommandImpl extends CommandImpl {
 
 	@Override
-	public void execute(CommandArguments cmdArgs)
-	{
-		PPCBatchCommandArguments pbCmdArgs = (PPCBatchCommandArguments) cmdArgs;
-		if (!pbCmdArgs.isGreedy())
-		{
-			ExSNPCommandArguments exSNPcmdArgs = pbCmdArgs.getExSNPCommandArguments();
-			exSNPcmdArgs.setOutRoot(pbCmdArgs.getOutRoot());
+	public void execute(CommandArguments cmdArgs) {
+		PPCBatchCommandArguments pbArgs = (PPCBatchCommandArguments) cmdArgs;
+		if (!pbArgs.isGreedy()) {
+			ExSNPCommandArguments exSNPcmdArgs = pbArgs.getExSNPCommandArguments();
+			exSNPcmdArgs.setOutRoot(pbArgs.getOutRoot());
 			ExSNPCommandImpl exSNPImpl = new ExSNPCommandImpl();
 			exSNPImpl.execute(exSNPcmdArgs);
 			Logger.printUserLog("");
 		}
 
-		for(int i = 0; i < pbCmdArgs.getBedFiles().size(); i++)
-		{
-			ProfileCommandArguments profCommandArguments = pbCmdArgs.getProfileCommandArguments();
-			profCommandArguments.setBFile(pbCmdArgs.getBedFiles().get(i));
-			if(!pbCmdArgs.isGreedy())
-			{
-				String scoreExtract = new String(pbCmdArgs.getOutRoot() + ".comsnp");
-				profCommandArguments.setIsExtract(scoreExtract);
+		for (int i = 0; i < pbArgs.getBedFiles().size(); i++) {
+			ProfileCommandArguments profArgs = pbArgs.getProfileCommandArguments();
+			profArgs.setBFile(pbArgs.getBedFiles().get(i));
+			if (!pbArgs.isGreedy()) {
+				String scoreExtract = new String(pbArgs.getOutRoot() + ".comsnp");
+				profArgs.setIsExtractScore(scoreExtract);
 			}
-			profCommandArguments.setResultFile(pbCmdArgs.getOutRoot() + "." + pbCmdArgs.getBedFiles().get(i));
-			profCommandArguments.setIsWeighted(false);
+			profArgs.setResultFile(pbArgs.getOutRoot() + "." + pbArgs.getBedFiles().get(i));
+			profArgs.setIsWeighted(false);
 			ProfileCommandImpl profImpl = new ProfileCommandImpl();
-			profImpl.execute(profCommandArguments);
+			profImpl.execute(profArgs);
 			Logger.printUserLog("");
-
 		}
 	}
 }

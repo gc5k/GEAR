@@ -12,6 +12,7 @@ public class QPCACommandArguments extends CommandArguments
 
 	public void setGrmBin(String grmBin)
 	{
+		FileUtil.exists(grmBin);
 		this.grmBin = grmBin;
 	}
 
@@ -19,12 +20,13 @@ public class QPCACommandArguments extends CommandArguments
 	{
 		return grmText;
 	}
-	
+
 	public void setGrmText(String grmText)
 	{
+		FileUtil.exists(grmText);
 		this.grmText = grmText;
 	}
-	
+
 	private String grmText;  // root name of the GRM files
 	
 	public String getGrmGZ()
@@ -34,6 +36,7 @@ public class QPCACommandArguments extends CommandArguments
 	
 	public void setGrmGZ(String grmGZ)
 	{
+		FileUtil.exists(grmGZ);
 		this.grmGZ = grmGZ;
 	}
 	
@@ -46,6 +49,7 @@ public class QPCACommandArguments extends CommandArguments
 
 	public void setGrmID(String grmID)
 	{
+		FileUtil.exists(grmID);
 		this.grmID = grmID;
 	}
 	
@@ -59,31 +63,7 @@ public class QPCACommandArguments extends CommandArguments
 		return ev;
 	}
 
-	public void setKeepFile(String kFile) 
-	{
-		FileUtil.exists(kFile);
-		keepFile = kFile;
-	}
-	
-	public String getKeepFile()
-	{
-		return keepFile;
-	}
-
-//	public void setAdjVar()
-//	{
-//		isVar=true;
-//	}
-//
-//	public boolean isAdjVar()
-//	{
-//		return isVar;
-//	}
-
-//	private static boolean isVar = false;
-	private static String grmBin;
-	private static String grmID;
-	private static int ev = 10;
-	private static String keepFile = null;
-
+	private String grmBin;
+	private String grmID;
+	private int ev = 10;
 }

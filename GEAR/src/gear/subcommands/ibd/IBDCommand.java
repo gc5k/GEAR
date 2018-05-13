@@ -9,84 +9,62 @@ import gear.subcommands.CommandArgumentException;
 import gear.subcommands.CommandArguments;
 import gear.subcommands.CommandImpl;
 
-public class IBDCommand extends Command
-{
+public class IBDCommand extends Command {
 
 	@Override
-	public String getName()
-	{
+	public String getName() {
 		return "ibd";
 	}
 
 	@Override
-	public String getDescription()
-	{
+	public String getDescription() {
 		return "Calculate IBD for sibpairs";
 	}
 
 	@SuppressWarnings("static-access")
 	@Override
-	public void prepareOptions(Options options)
-	{
-	    options.addOption(OptionBuilder.withDescription(OPT_FILE_DESC).withLongOpt(OPT_FILE_LONG).hasArg().create());
-	    options.addOption(OptionBuilder.withDescription(OPT_BFILE_DESC).withLongOpt(OPT_BFILE_LONG).hasArg().create());
-	    options.addOption(OptionBuilder.withDescription("Specify the chromosomes for analysis").hasArg().create(OPT_CHR));
-	    options.addOption(OptionBuilder.withDescription("Make gz format").create(OPT_GZ));
-	    options.addOption(OptionBuilder.withDescription("Make txt format").create(OPT_TXT));
+	public void prepareOptions(Options options) {
+		options.addOption(OptionBuilder.withDescription(OPT_BFILE_DESC).withLongOpt(OPT_BFILE_LONG).hasArg().isRequired().create());
+//		options.addOption(OptionBuilder.withDescription(OPT_FILE_DESC).withLongOpt(OPT_FILE_LONG).hasArg().create());
+
+		options.addOption(OptionBuilder.withDescription("Make gz format").create(OPT_GZ));
+		options.addOption(OptionBuilder.withDescription("Make txt format").create(OPT_TXT));
+
+		// options.addOption(OptionBuilder.withDescription(OPT_KEEP_DESC).withLongOpt(OPT_KEEP_LONG).hasArg().create());
+		// options.addOption(OptionBuilder.withDescription(OPT_REMOVE_DESC).withLongOpt(OPT_REMOVE_LONG).hasArg().create());
+
+		options.addOption(
+				OptionBuilder.withDescription(OPT_EXTRACT_DESC).withLongOpt(OPT_EXTRACT_LONG).hasArg().create());
+		options.addOption(
+				OptionBuilder.withDescription(OPT_EXCLUDE_DESC).withLongOpt(OPT_EXCLUDE_LONG).hasArg().create());
+
+		options.addOption(OptionBuilder.withDescription(OPT_CHR_DESC).withLongOpt(OPT_CHR_LONG).hasArgs().create());
+		options.addOption(
+				OptionBuilder.withDescription(OPT_NOT_CHR_DESC).withLongOpt(OPT_NOT_CHR_LONG).hasArgs().create());
 	}
 
 	@Override
-	public CommandArguments parse(CommandLine cmdLine) throws CommandArgumentException
-	{
+	public CommandArguments parse(CommandLine cmdLine) throws CommandArgumentException {
 		IBDCommandArguments ibdArgs = new IBDCommandArguments();
-	    parseFileArguments(ibdArgs, cmdLine);
-	    if(cmdLine.hasOption(OPT_GZ))
-	    {
-	    	ibdArgs.setGZ();
-	    }
-	    if(cmdLine.hasOption(OPT_TXT))
-	    {
-	    	ibdArgs.setTxt();
-	    }
-		if (cmdLine.hasOption(OPT_CHR))
-		{
-			ibdArgs.setChr(cmdLine.getOptionValue(OPT_CHR));
+		parseFileArguments((CommandArguments) ibdArgs, cmdLine);
+		// parseSampleFilterArguments((CommandArguments) ibdArgs, cmdLine);
+		parseSNPFilterFileArguments((CommandArguments) ibdArgs, cmdLine);
+		parseSNPFilterChromosomeArguments((CommandArguments) ibdArgs, cmdLine);
+
+		if (cmdLine.hasOption(OPT_GZ)) {
+			ibdArgs.setGZ();
+		}
+		if (cmdLine.hasOption(OPT_TXT)) {
+			ibdArgs.setTxt();
 		}
 		return ibdArgs;
 	}
 
-	private void parseFileArguments(IBDCommandArguments grmArgs, CommandLine cmdLine) throws CommandArgumentException 
-	{
-		String bfile = cmdLine.getOptionValue("bfile");
-		String file = cmdLine.getOptionValue("file");
-
-		if ((bfile == null) && (file == null))
-		{
-			throw new CommandArgumentException("No genotypes are provided. Either --bfile or --file must be set.");
-		}
-
-		if ((bfile != null) && (file != null))
-		{
-			throw new CommandArgumentException("--bfile and --file cannot be set together.");
-		}
-
-		if (bfile != null)
-		{
-			grmArgs.setBFile(bfile);			
-		}
-		if (file != null)
-		{
-			grmArgs.setFile(file);			
-		}
-	}
-
 	@Override
-	protected CommandImpl createCommandImpl()
-	{
+	protected CommandImpl createCommandImpl() {
 		return new IBDCommandImpl();
 	}
 
-	private static final String OPT_CHR = "chr";
 	private static final String OPT_GZ = "gz";
 	private static final String OPT_TXT = "txt";
 }

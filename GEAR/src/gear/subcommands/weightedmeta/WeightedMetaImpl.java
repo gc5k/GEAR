@@ -61,7 +61,9 @@ public class WeightedMetaImpl extends CommandImpl
 		}
 		generateCorMatrix();
 
-		gReader = new GWASReader(wMetaArgs.getMetaFile(), FileKeep, wMetaArgs.getKeys(), wMetaArgs.isQT(), wMetaArgs.isGZ(), wMetaArgs.isChr(), wMetaArgs.getChr());
+		gReader = new GWASReader(wMetaArgs.getMetaFile(), FileKeep, wMetaArgs.getKeys(), wMetaArgs.isQT(), wMetaArgs.isGZ(), 
+				wMetaArgs.getChr()!=null?true:false,
+				wMetaArgs.getChr()!=null?wMetaArgs.getChr():wMetaArgs.getNotChr());
 		gReader.Start(false);
 
 		if (gReader.getNumMetaFile() < 2)
@@ -502,7 +504,7 @@ public class WeightedMetaImpl extends CommandImpl
 		if(wMetaArgs.IsKeepFile())
 		{
 			Arrays.fill(FileKeep, false);
-			String[] kf = wMetaArgs.getKeepFile();
+			String[] kf = wMetaArgs.getKeepCohortFile();
 			for(int i = 0; i < metaF.length; i++)
 			{
 				for(int j = 0; j < kf.length; j++ )
@@ -518,7 +520,7 @@ public class WeightedMetaImpl extends CommandImpl
 		if(wMetaArgs.IsRevFile())
 		{
 			Arrays.fill(FileKeep, true);
-			String[] kf = wMetaArgs.getRemoveFile();
+			String[] kf = wMetaArgs.getRemoveCohortFile();
 			for(int i = 0; i < metaF.length; i++)
 			{
 				for(int j = 0; j < kf.length; j++ )

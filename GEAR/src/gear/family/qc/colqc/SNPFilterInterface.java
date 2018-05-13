@@ -1,9 +1,13 @@
 package gear.family.qc.colqc;
 
+import gear.subcommands.CommandArguments;
+
 public interface SNPFilterInterface
 {
 
-	public void Select();
+	public void SelectSNP();
+
+	public void SelectSNP(CommandArguments cmdArgs);
 
 	public int[] getWorkingSNP();
 

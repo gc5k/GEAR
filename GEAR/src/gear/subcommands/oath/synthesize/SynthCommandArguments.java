@@ -43,22 +43,6 @@ public class SynthCommandArguments extends CommandArguments
 		return md.toArray(new String[0]);
 	}
 
-	public void setChr(String chr)
-	{
-		this.chr = Integer.parseInt(chr); 
-		chrFlag = true;
-	}
-
-	public int getChr()
-	{
-		return chr;
-	}
-
-	public boolean isChr()
-	{
-		return chrFlag;
-	}
-
 	public String[] getKeys() 
 	{
 		return field;
@@ -134,8 +118,6 @@ public class SynthCommandArguments extends CommandArguments
 	private int[] keepBatchIdx = null;
 	private String cmFile;
 	private ArrayList<String> md;
-	private int chr = 1;
-	private boolean chrFlag = false;
 	private boolean isGZ = false;
 	private int N = 1000;
 	private String[] field = {OATHConst.SNP, OATHConst.CHR, OATHConst.BP, OATHConst.RefAle, OATHConst.AltAle, OATHConst.RAF, OATHConst.Vg, OATHConst.BETA, OATHConst.SE, OATHConst.CHI, OATHConst.P};

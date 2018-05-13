@@ -9,73 +9,6 @@ public class OATHBusCommandArguments extends CommandArguments
 	private String covFile = null;
 	private int[] covIdx = {0};
 
-	private int chr;
-	private boolean chrFlag = false;
-
-	private String pheFile;
-	private int[] mPheno;
-
-	private String keepFile;
-
-	private double maf = 0.05;
-	public String getPhenotypeFile()
-	{
-		return this.pheFile;
-	}
-
-	public void setPhenotypeFile(String pheFile)
-	{
-		this.pheFile = pheFile;
-	}
-
-	public void setPhentypeIndex(String mPhe)
-	{
-		this.mPheno = new int[1];
-		mPheno[0] = Integer.parseInt(mPhe) - 1;
-		if (mPheno[0] < 0)
-		{
-			Logger.printUserLog("Phenotype index should be greater than 0.\nGEAR quitted.");
-			System.exit(1);
-		}
-	}
-
-	public int[] getMpheno()
-	{
-		return this.mPheno;
-	}
-
-	public void setChr(String c)
-	{
-		this.chr = Integer.parseInt(c);
-		if (this.chr < 1)
-		{
-			Logger.printUserLog("Chromosome should be greater than 0.\n GEAR quitted.");
-			System.exit(1);
-		}
-		this.chrFlag = true;
-	}
-
-	public int getChr()
-	{
-		return this.chr;
-	}
-
-	public boolean isChrFlagOn()
-	{
-		return this.chrFlag;
-	}
-
-	public void setKeeFile(String kFile) 
-	{
-		FileUtil.exists(kFile);
-		keepFile = kFile;
-	}
-	
-	public String getKeepFile()
-	{
-		return keepFile;
-	}
-	
 	public void setCovFile(String cFile) 
 	{
 		FileUtil.exists(cFile);
@@ -107,15 +40,4 @@ public class OATHBusCommandArguments extends CommandArguments
 	{
 		return covIdx;
 	}
-	
-	public void setMAF(String mf) 
-	{
-		maf = Double.parseDouble(mf);
-	}
-	
-	public double getMAF()
-	{
-		return maf;
-	}
-
 }

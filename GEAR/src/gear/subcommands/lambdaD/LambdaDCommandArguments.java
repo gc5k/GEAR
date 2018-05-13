@@ -214,22 +214,6 @@ public class LambdaDCommandArguments extends CommandArguments
 		Me = Double.parseDouble(me);
 	}
 
-	public void setChr(String chr)
-	{
-		this.chr = Integer.parseInt(chr); 
-		chrFlag = true;
-	}
-
-	public int getChr()
-	{
-		return chr;
-	}
-	
-	public boolean isChr()
-	{
-		return chrFlag;
-	}
-
 	public boolean isBeta()
 	{
 		return isBeta;
@@ -380,8 +364,6 @@ public class LambdaDCommandArguments extends CommandArguments
 	private double meFrac = 0;
 	private int Top = 0;
 
-	private int chr = 0;
-	private boolean chrFlag = false;
 	private int keyLen=6;
 
 	private double[] qtSize;

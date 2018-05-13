@@ -10,39 +10,6 @@ import gear.util.NewIt;
 
 public class OATHXCommandArguments extends CommandArguments 
 {
-
-
-	public void setChr(String c)
-	{
-		this.chr = Integer.parseInt(c);
-		if (this.chr < 1)
-		{
-			Logger.printUserLog("Chromosome should be greater than 0.\n GEAR quitted.");
-			System.exit(1);
-		}
-		this.chrFlag = true;
-	}
-
-	public int getChr()
-	{
-		return this.chr;
-	}
-
-	public boolean isChrFlagOn()
-	{
-		return this.chrFlag;
-	}
-
-	public void setKeeFile(String kFile) 
-	{
-		FileUtil.exists(kFile);
-		keepFile = kFile;
-	}
-	
-	public String getKeepFile()
-	{
-		return keepFile;
-	}
 	
 	public void setMAF(String mf) 
 	{
@@ -115,14 +82,10 @@ public class OATHXCommandArguments extends CommandArguments
 		return verbose;
 	}
 
-	private int chr;
 	private int n;
-	private boolean chrFlag = false;
 	private String cmFile = null;
 	private String batchFile = null;
 	private ArrayList<String> md;
-
-	private String keepFile;
 
 	private double maf = 0.05;
 	private boolean verbose = false;
