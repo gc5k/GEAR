@@ -2,6 +2,7 @@
 */.settings
 */.DS_Store
 */gear.jar
+*/gear.log
 /.metadata/
 /.recommenders/
 GEAR/src/gear/AboutInfo.java
