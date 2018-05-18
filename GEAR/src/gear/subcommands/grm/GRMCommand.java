@@ -34,6 +34,8 @@ public class GRMCommand extends Command {
 		options.addOption(OptionBuilder.withDescription(OPT_ADJ_VAR_DESC).withLongOpt(OPT_ADJ_VAR_LONG).create());
 		options.addOption(OptionBuilder.withDescription(OPT_INBRED_DESC).withLongOpt(OPT_INBRED_LONG).create());
 
+		options.addOption(OptionBuilder.withDescription(OPT_INBRED_LIST_DESC).withLongOpt(OPT_INBRED_LIST_LONG).hasArgs().create());
+
 		options.addOption(OptionBuilder.withDescription(OPT_KEEP_DESC).withLongOpt(OPT_KEEP_LONG).hasArg().create());
 		options.addOption(
 				OptionBuilder.withDescription(OPT_REMOVE_DESC).withLongOpt(OPT_REMOVE_LONG).hasArg().create());
@@ -64,7 +66,7 @@ public class GRMCommand extends Command {
 	@Override
 	public CommandArguments parse(CommandLine cmdLine) throws CommandArgumentException {
 		GRMCommandArguments grmArgs = new GRMCommandArguments();
-		
+
 		parseFileArguments((CommandArguments) grmArgs, cmdLine);
 
 		parseSampleFilterArguments((CommandArguments) grmArgs, cmdLine);
@@ -88,6 +90,9 @@ public class GRMCommand extends Command {
 		}
 		if (cmdLine.hasOption(OPT_ADJ_VAR_LONG)) {
 			grmArgs.setAdjVar();
+		}
+		if (cmdLine.hasOption(OPT_INBRED_LIST_LONG)) {
+			grmArgs.setInbedList(cmdLine.getOptionValue(OPT_INBRED_LIST_LONG));
 		}
 		if (cmdLine.hasOption(OPT_INBRED_LONG)) {
 			grmArgs.setInbred();
@@ -118,4 +123,7 @@ public class GRMCommand extends Command {
 
 	private static final String OPT_DOM = "dom";
 	private static final String OPT_DOM_DESC = "dominance relationship";
+	
+	private static final String OPT_INBRED_LIST_LONG = "inbred-list";
+	private static final String OPT_INBRED_LIST_DESC = "inbred individual list";	
 }

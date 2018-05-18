@@ -5,16 +5,21 @@ import java.io.IOException;
 import java.io.PrintStream;
 import java.text.DecimalFormat;
 import java.util.ArrayList;
+import java.util.HashSet;
 
+import gear.ConstValues;
 import gear.data.Person;
+import gear.data.SubjectID;
 import gear.family.GenoMatrix.GenotypeMatrix;
 import gear.family.pedigree.PersonIndex;
 import gear.family.plink.PLINKParser;
 import gear.family.qc.rowqc.SampleFilter;
 import gear.subcommands.CommandArguments;
 import gear.subcommands.CommandImpl;
+import gear.util.BufferedReader;
 import gear.util.FileUtil;
 import gear.util.Logger;
+import gear.util.NewIt;
 import gear.util.pop.PopStat;
 
 public class GRMCommandImpl extends CommandImpl {
@@ -24,7 +29,8 @@ public class GRMCommandImpl extends CommandImpl {
 	private double[] allelevar;
 	private GRMCommandArguments grmArgs;
 	private SampleFilter sf;
-
+	private HashSet<SubjectID> subjectSet =	NewIt.newHashSet();
+	
 	@Override
 	public void execute(CommandArguments cmdArgs) {
 		grmArgs = (GRMCommandArguments) cmdArgs;
@@ -36,10 +42,50 @@ public class GRMCommandImpl extends CommandImpl {
 		allelefreq = PopStat.calAlleleFrequency(pGM);
 		allelevar = PopStat.calGenoVariance(pGM);
 
+		if (grmArgs.isInbredList()) {
+			readInbredList();
+		}
+		
 		makeAddScore();
 
 		if (grmArgs.isDom()) {
 			makeDomScore();
+		}
+	}
+
+	private void readInbredList() {
+		BufferedReader reader = BufferedReader.openTextFile(grmArgs.getInbredList(), "inbred list");
+		int numCols = 2;
+
+		String[] tokens = reader.readTokensAtLeast(numCols);
+
+		if (tokens == null)	{
+			Logger.printUserError("The file '" + grmArgs.getInbredList() + "' is empty.");
+			System.exit(1);
+		}
+
+		do {
+			SubjectID subjectID = new SubjectID(/*famID*/tokens[0], /*indID*/tokens[1]);
+			if (subjectSet.contains(subjectID)) {
+				Logger.printUserLog("Subject " + subjectID + " is duplicated.");
+			} else {
+				subjectSet.add(subjectID);
+			}
+		} while ((tokens = reader.readTokensAtLeast(numCols)) != null);
+		reader.close();
+
+		ArrayList<PersonIndex> sList= pGM.getSample();
+		int cCnt = 0;
+		for(int i = 0; i < sList.size(); i++) {
+			SubjectID sID = new SubjectID(sList.get(i).getFamilyID(), sList.get(i).getIndividualID());
+			if (subjectSet.contains(sID)) cCnt++;
+		}
+		Logger.printUserLog("Read " + subjectSet.size() + " individuals from '" + grmArgs.getInbredList() + "'.");
+		Logger.printUserLog("Matched '" + cCnt + "' individuals.");
+
+		if (cCnt < ConstValues.TooFewSample) {
+			Logger.printUserLog("Too few individuals left for analysis <" + ConstValues.TooFewSample+". GEAR quit.");
+			System.exit(1);
 		}
 	}
 
@@ -235,8 +281,13 @@ public class GRMCommandImpl extends CommandImpl {
 	private double[] GRMScore(int idx1, int idx2) {
 		double[] s = { 0, 0 };
 
+		SubjectID subjectID1 = new SubjectID(pGM.getSample().get(idx1).getFamilyID(), pGM.getSample().get(idx1).getIndividualID());
+		SubjectID subjectID2 = new SubjectID(pGM.getSample().get(idx2).getFamilyID(), pGM.getSample().get(idx2).getIndividualID());
+		boolean idxFlag1 = subjectSet.contains(subjectID1);
+		boolean idxFlag2 = subjectSet.contains(subjectID2);
+
 		for (int i = 0; i < allelefreq.length; i++) {
-			
+
 			//inside control
 			if (allelefreq[i][1] == Double.NaN || allelefreq[i][0] == 0 || allelefreq[i][1] == 0 || allelevar[i] == 0) continue;
 
@@ -246,8 +297,19 @@ public class GRMCommandImpl extends CommandImpl {
 			if (g1 == Person.MissingGenotypeCode || g2 == Person.MissingGenotypeCode) {
 				continue;
 			} else {
-				double de = grmArgs.isInbred()? 4 * allelefreq[i][0] * allelefreq[i][1] : 2 * allelefreq[i][0] * allelefreq[i][1];
-				if (grmArgs.isAdjVar()) de = allelevar[i];
+				double de;
+				if (grmArgs.isInbredList()) {
+					if (idxFlag1 == true && idxFlag2 == true) {
+						de = 4 * allelefreq[i][0] *  allelefreq[i][1];
+					} if (idxFlag1 == false && idxFlag2 == false) {
+						de = 2 * allelefreq[i][0] *  allelefreq[i][1];						
+					} else {
+						de = 2 * Math.sqrt(2) * allelefreq[i][0] *  allelefreq[i][1];						
+					}
+				} else {
+					de = grmArgs.isInbred()? 4 * allelefreq[i][0] * allelefreq[i][1] : 2 * allelefreq[i][0] * allelefreq[i][1];
+					if (grmArgs.isAdjVar()) de = allelevar[i];
+				}
 				s[0]++;
 				s[1] += (g1 - 2 * m) * (g2 - 2 * m) / de;
 			}

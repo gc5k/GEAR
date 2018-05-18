@@ -1,5 +1,7 @@
 package gear.subcommands.ebatchgwas;
 
+import java.io.PrintStream;
+
 import gear.subcommands.CommandArguments;
 import gear.subcommands.CommandImpl;
 import gear.subcommands.eigengwas.EigenGWASCommandArguments;
@@ -11,6 +13,7 @@ import gear.subcommands.grm.GRMCommandArguments;
 import gear.subcommands.grm.GRMCommandImpl;
 import gear.subcommands.qpca.QPCACommandArguments;
 import gear.subcommands.qpca.QPCACommandImpl;
+import gear.util.FileUtil;
 import gear.util.Logger;
 
 public class EbatchGWASCommandImpl extends CommandImpl {
@@ -65,6 +68,13 @@ public class EbatchGWASCommandImpl extends CommandImpl {
 		GRMCommandImpl gImpl = new GRMCommandImpl();
 		gImpl.execute(gArgs);
 
+		PrintStream gui_file = null;
+
+		if (eArgs.isGUI()) {
+			gui_file = FileUtil.CreatePrintStream(eArgs.getOutRoot()+".gui");
+			gui_file.println("s1");
+		}
+
 		Logger.printUserLog("\n---------Generating eigenvectors---------");
 
 		QPCACommandArguments qpcaArgs = new QPCACommandArguments();
@@ -81,6 +91,10 @@ public class EbatchGWASCommandImpl extends CommandImpl {
 		QPCACommandImpl qpcaImpl = new QPCACommandImpl();
 		qpcaImpl.execute(qpcaArgs);
 
+		if (eArgs.isGUI()) {
+			gui_file.println("s2");
+		}
+		
 		if (!eArgs.isDom() && !eArgs.isEpi()) {
 			for (int i = 1; i <= eArgs.getEV(); i++) {
 				Logger.printUserLog("\n---------Running EigenGWAS (Additive model) for the " + i + "th eigenvector.");
@@ -128,8 +142,15 @@ public class EbatchGWASCommandImpl extends CommandImpl {
 
 				EigenGWASCommandImpl eigenImpl = new EigenGWASCommandImpl();
 				eigenImpl.execute(eigenArgs);
+				if (eArgs.isGUI()) {
+					gui_file.println("s3-" + i);
+				}
 				Logger.printUserLog("Saved EigenGWAS results in '" + eigenArgs.getOutRoot() + ".egwas'.");
 			}
+		}
+		
+		if (eArgs.isGUI()) {
+			gui_file.close();
 		}
 		// else if (eArgs.isEpi())
 		// {
