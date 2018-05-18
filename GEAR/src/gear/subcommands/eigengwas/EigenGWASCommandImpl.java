@@ -157,6 +157,12 @@ public class EigenGWASCommandImpl extends CommandImpl {
 
 		Logger.printUserLog("Lambda GC is: " + lambdaGC);
 
+		if (eigenArgs.isGUI()) {
+			PrintStream gui_file = null;
+			gui_file = FileUtil.CreatePrintStream(eigenArgs.getOutRoot()+".egwas.gui");
+			gui_file.println(lambdaGC);
+			gui_file.close();
+		}
 		// ////TEST
 		// try {
 		// write.close();

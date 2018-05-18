@@ -249,7 +249,7 @@ public class GRMCommandImpl extends CommandImpl {
 		grmSq /= cnt;
 		double Effective_sample = -1 / grmMean + 1;
 		double grmSD = (grmSq - grmMean * grmMean) * cnt / (cnt - 1);
-		double Effeictive_marker = 1 / grmSD;
+		double Effective_marker = 1 / grmSD;
 
 		DecimalFormat df = new DecimalFormat("0.0000");
 		DecimalFormat dfE = new DecimalFormat("0.00E0");
@@ -265,17 +265,26 @@ public class GRMCommandImpl extends CommandImpl {
 			Logger.printUserLog("Sampling variance of genetic relatedness is: " + dfE.format(grmSD));
 		}
 
-		if (Math.abs(Effeictive_marker) > 0.0001) {
+		if (Math.abs(Effective_marker) > 0.0001) {
 			Logger.printUserLog("Effective sample size is: " + df.format(Effective_sample));
 		} else {
 			Logger.printUserLog("Effective sample size is: " + dfE.format(Effective_sample));
 		}
-
-		if (Math.abs(Effeictive_marker) > 0.0001) {
-			Logger.printUserLog("Effective number of genome segments is: " + df.format(Effeictive_marker));
+		
+		if (Math.abs(Effective_marker) > 0.0001) {
+			Logger.printUserLog("Effective number of genome segments is: " + df.format(Effective_marker));
 		} else {
-			Logger.printUserLog("Effective number of genome segments is: " + dfE.format(Effeictive_marker));
+			Logger.printUserLog("Effective number of genome segments is: " + dfE.format(Effective_marker));
 		}
+		
+		if(grmArgs.isGUI()) {
+			PrintStream gui_file = null;
+			gui_file = FileUtil.CreatePrintStream(grmArgs.getOutRoot()+".grm.gui");
+			gui_file.println(df.format(Effective_sample) + "\t" + PI.size());
+			gui_file.println(df.format(Effective_marker) + "\t" + allelefreq.length);
+			gui_file.close();
+		}
+
 	}
 
 	private double[] GRMScore(int idx1, int idx2) {

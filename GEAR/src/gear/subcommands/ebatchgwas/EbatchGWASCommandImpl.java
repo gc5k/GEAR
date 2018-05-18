@@ -28,6 +28,9 @@ public class EbatchGWASCommandImpl extends CommandImpl {
 		if (eArgs.isInbred()) {
 			gArgs.setInbred();
 		}
+		if (eArgs.isGUI()) {
+			gArgs.setGUI();
+		}
 
 		if (eArgs.isExtractFile()) {
 			gArgs.setExtractFile(eArgs.getExtractFile());
@@ -103,6 +106,9 @@ public class EbatchGWASCommandImpl extends CommandImpl {
 				eigenArgs.setPhenotypeFile(eArgs.getOutRoot() + ".eigenvec");
 				eigenArgs.setPhenotypeIndex(i);
 				eigenArgs.setOutRoot(eArgs.getOutRoot() + "." + i);
+				if (eArgs.isGUI()) {
+					eigenArgs.setGUI();
+				}
 
 				if (eArgs.isExtractFile()) {
 					eigenArgs.setExtractFile(eArgs.getExtractFile());

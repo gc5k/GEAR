@@ -1,7 +1,5 @@
 package gear.subcommands.grm;
 
-import java.nio.file.Files;
-
 import gear.subcommands.CommandArguments;
 import gear.util.FileUtil;
 
@@ -12,6 +10,7 @@ public class GRMCommandArguments extends CommandArguments {
 	private boolean isInbred = false;
 	private boolean isInbredList = false;
 	private String InbredFile = null;
+	private boolean isGUI = false;
 
 	public void setGZ() {
 		isGZ = true;
@@ -61,5 +60,13 @@ public class GRMCommandArguments extends CommandArguments {
 	
 	public String getInbredList() {
 		return InbredFile;
+	}
+
+	public void setGUI() {
+		isGUI = true;
+	}
+	
+	public boolean isGUI() {
+		return isGUI;
 	}
 }
