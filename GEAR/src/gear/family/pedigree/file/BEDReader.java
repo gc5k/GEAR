@@ -6,6 +6,7 @@ import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.HashSet;
 
 import org.apache.commons.lang3.ArrayUtils;
 
@@ -82,6 +83,8 @@ public class BEDReader extends PedigreeFile {
 
 	@Override
 	public void parseLinkage(String infile, int numMarkerInFile, int[] WSNP) {
+		long startTime = System.nanoTime();
+
 		initial();
 		pedfile = infile;
 		BufferedInputStream in = null;
@@ -103,6 +106,8 @@ public class BEDReader extends PedigreeFile {
 				individual_major(in, numMarkerInFile, WSNP);
 			}
 			in.close();
+			long endTime = System.nanoTime();
+			Logger.printUserLog(String.format("It takes %.1fs to read the data.", (endTime - startTime) / 1e9));
 		} catch (IOException e) {
 			Logger.handleException(e, "An I/O exception occurred when reading the bed file.");
 		}
@@ -176,28 +181,27 @@ public class BEDReader extends PedigreeFile {
 		return table;
 	}
 
-	private void snp_major(BufferedInputStream in, int numMarkerInFile, int[] WSNP) throws IOException {
+	private void snp_major(BufferedInputStream in, int numMarkerInFile, int[] wsnp) throws IOException {
 		byte[] g = new byte[(n_individual + 3) / 4];
 		int[][] genoByteCvtTable = constructSnpMajorGenotypeByteConvertTable();
+		
+		// Convert wsnp from array to set
+		HashSet<Integer> wsnpSet = new HashSet<Integer>();
+		for (int snp : wsnp)
+		{
+			wsnpSet.add(snp);
+		}
+		
 		int snpIdx = 0;
 		for (int i = 0; i < numMarkerInFile; i++) {
 			in.read(g, 0, g.length);
-			if (ArrayUtils.indexOf(WSNP, i) >= 0) {
+			if (wsnpSet.contains(i)) {
 				int indIdx = 0;
 				int posByte = snpIdx >> Person.shift;
 				int posBit = (i & 0xf) << 1;
 				for (int byteIdx = 0; byteIdx < g.length; ++byteIdx) {
-					int[] genoValues = genoByteCvtTable[g[byteIdx] & 0xff]; // 0xff
-																			// is
-																			// necessary
-																			// here,
-																			// otherwise
-																			// Java
-																			// will
-																			// sign
-																			// extend
-																			// the
-																			// byte
+					// 0xff is necessary here, otherwise Java will sign extend the byte
+					int[] genoValues = genoByteCvtTable[g[byteIdx] & 0xff];
 					for (int j = 0; j < 4 && indIdx < n_individual; ++j, ++indIdx) {
 						persons.get(indIdx).addByteGenotype(genoValues[j], posByte, posBit);
 					}
