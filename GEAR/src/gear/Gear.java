@@ -35,6 +35,7 @@ public enum Gear {
 		addCommand(new gear.subcommands.metawatchdog.encrypt.EnigmaCommand());
 		addCommand(new gear.subcommands.profile.ProfileCommand());
 		addCommand(new gear.subcommands.exsnp.ExSNPCommand());
+		addCommand(new gear.subcommands.exsnp2.ExSNP2Command());
 		addCommand(new gear.subcommands.lmdr.LMDRCommand());
 		addCommand(new gear.subcommands.ppcbatch.PPCBatchCommand());
 		addCommand(new gear.subcommands.projectedpc.ProjectedPCCommand());
