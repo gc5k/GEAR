@@ -36,7 +36,7 @@ public class DogPowerCommandImpl extends CommandImpl
 		}
 		else
 		{
-			Logger.printUserLog("No method has been specified. GEAR quitted.");
+			Logger.printUserLog("No method has been specified. GEAR quit.");
 			System.exit(0);
 		}
 

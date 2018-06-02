@@ -20,7 +20,7 @@ public class ExSNPCommandImpl extends CommandImpl {
 		esArgs = (ExSNPCommandArguments) cmdArgs;
 		ArrayList<String> bFile = esArgs.getBFiles();
 		if (bFile.size() == 0) {
-			Logger.printUserLog("no bfiles found. GEAR quitted.");
+			Logger.printUserLog("no bfiles found. GEAR quit.");
 			System.exit(0);
 		}
 		for (int i = 0; i < bFile.size(); i++) {

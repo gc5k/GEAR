@@ -103,8 +103,7 @@ public class OATHXCommandImpl extends CommandImpl
 
 		if (tokenLen != obArgs.getNSSFile().length)
 		{
-			Logger.printUserError("The dimension of the matrix does not match the number of nss files.");
-			Logger.printUserError("Gear quitted.");
+			Logger.printUserLog("The dimension of the matrix does not match the number of nss files. Gear quitted.");
 			System.exit(1);
 		}
 		corMat = new double[tokenLen][tokenLen];

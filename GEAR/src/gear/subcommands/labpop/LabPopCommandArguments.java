@@ -107,7 +107,7 @@ public class LabPopCommandArguments extends CommandArguments
 				rec[c++] = Double.parseDouble(l[0]);
 				if (rec[c] > 0.5 || rec[c] < 0)
 				{
-					Logger.printUserError("incorrect recombination fraction : '" + rec[c] + "' in line " + c + ".\n Gear quitted.");
+					Logger.printUserLog("incorrect recombination fraction : '" + rec[c] + "' in line " + c + ".\n Gear quit.");
 					System.exit(0);
 				}
 			}
@@ -122,7 +122,7 @@ public class LabPopCommandArguments extends CommandArguments
 
 		if (rec.length < getNumberOfMarkers())
 		{
-			Logger.printUserError("The number of recombination fraction is fewer than the number of markers.\nGEAR quitted.");
+			Logger.printUserLog("The number of recombination fraction is fewer than the number of markers.\nGEAR quit.");
 			System.exit(0);
 		}
 		rec[0] = 0.5;
@@ -151,13 +151,13 @@ public class LabPopCommandArguments extends CommandArguments
 		if (hd < 0 || hd > 0.99)
 		{
 			{
-				Logger.printUserLog("hsq should be between 0 ~ 1.\n GEAR quitted.");
+				Logger.printUserLog("hsq should be between 0 ~ 1.\n GEAR quit.");
 			}
 		}
 		if ((hd+hsq) > 1)
 		{
 			{
-				Logger.printUserLog("The total heritability (hsq+hsq_dom) should be between 0 ~ 1.\n GEAR quitted.");
+				Logger.printUserLog("The total heritability (hsq+hsq_dom) should be between 0 ~ 1.\n GEAR quit.");
 			}
 		}
 		hsqDom = hd;
@@ -297,7 +297,7 @@ public class LabPopCommandArguments extends CommandArguments
 		replication = Integer.parseInt(rep);
 		if (replication < 1)
 		{
-			Logger.printUserError("Replication should be greater than 0.\nGear quitted.");
+			Logger.printUserLog("Replication should be greater than 0. Gear quit.");
 			System.exit(0);
 		}
 	}

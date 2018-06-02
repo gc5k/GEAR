@@ -187,7 +187,7 @@ public final class SimuFamilyMPCommandArguments extends CommandArguments
 			hsq[i] = Double.parseDouble(h2[i]);
 			if(hsq[i] < 0 || hsq[i] > 1.0)
 			{
-				Logger.printUserLog("hsq should be between 0~1.\n GEAR quitted.");
+				Logger.printUserLog("hsq should be between 0~1. GEAR quit.");
 				System.exit(0);
 			}
 			isHsqFlag = true;

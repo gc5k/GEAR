@@ -32,7 +32,7 @@ public class FReader
 
 		if (workingMetaFile.size() == 0)
 		{
-			Logger.printUserLog("No cohort left. GEAR quitted.");
+			Logger.printUserLog("No cohorts left for analysis. GEAR quit.");
 			System.exit(0);
 		}
 		else
@@ -177,7 +177,7 @@ public class FReader
 
 		if (qFlag)
 		{
-			Logger.printUserLog("GEAR quitted.");
+			Logger.printUserLog("GEAR quit.");
 			System.exit(0);
 		}
 
