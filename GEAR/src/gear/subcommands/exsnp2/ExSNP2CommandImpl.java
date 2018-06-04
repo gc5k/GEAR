@@ -60,11 +60,6 @@ public class ExSNP2CommandImpl extends CommandImpl {
 			String[] tokens = null;
 			while ((tokens = reader.readTokens()) != null) {
 				if (tokens.length == 6) {
-					if (i == 0) {
-						SNP snp = new SNP(tokens[0], tokens[1], Float.parseFloat(tokens[2]),
-								Integer.parseInt(tokens[3]), tokens[4].charAt(0), tokens[5].charAt(0));
-						snpInfo.add(snp);
-					}
 					if (snpCnt.containsKey(tokens[1])) {
 						Integer cnt = snpCnt.get(tokens[1]);
 						cnt++;
@@ -84,7 +79,7 @@ public class ExSNP2CommandImpl extends CommandImpl {
 			SNP snp = snpInfo.get(i);
 			String key = snp.getName();
 			Integer cnt = snpCnt.get(key);
-			if (cnt.intValue() == bFile.size()) {
+			if (cnt.intValue() == (bFile.size() + 1)) {
 				finalSNP.add(snp);
 			}
 		}

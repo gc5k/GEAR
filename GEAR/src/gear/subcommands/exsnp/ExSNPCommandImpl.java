@@ -27,7 +27,7 @@ public class ExSNPCommandImpl extends CommandImpl {
 			int SNPcnt = 0;
 			String bim = bFile.get(i) + ".bim";
 			BufferedReader reader = BufferedReader.openTextFile(bim, "Extract SNP Batch");
-			
+
 			String[] tokens = null;
 			while ((tokens = reader.readTokens()) != null) {
 				if (tokens.length == 6) {

@@ -177,11 +177,19 @@ public class EigenGWASCommandImpl extends CommandImpl {
 	public void printResult() {
 
 		PrintStream eGWAS = FileUtil.CreatePrintStream(this.eigenArgs.getOutRoot() + ".egwas");
-		eGWAS.println("SNP\tCHR\tBP\tRefAllele\tAltAllele\tfreq\tBeta\tSE\tChi\tP\tPGC\tn1\tfreq1\tn2\tfreq2\tFst");
+		if (eigenArgs.isTAB()) {
+			eGWAS.println("SNP\tRefAllele\tBeta");
+		} else {
+			eGWAS.println("SNP\tCHR\tBP\tRefAllele\tAltAllele\tfreq\tBeta\tSE\tChi\tP\tPGC\tn1\tfreq1\tn2\tfreq2\tFst");
+		}
 
 		for (int i = 0; i < eGWASResult.size(); i++) {
 			EigenGWASResult e1 = eGWASResult.get(i);
-			eGWAS.println(e1.printEGWASResult(lambdaGC));
+			if (eigenArgs.isTAB()) {
+				eGWAS.println(e1.printEGWASTab(lambdaGC));
+			} else {
+				eGWAS.println(e1.printEGWASResult(lambdaGC));				
+			}
 		}
 		eGWAS.close();
 	}

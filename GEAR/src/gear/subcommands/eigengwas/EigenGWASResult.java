@@ -144,6 +144,23 @@ public class EigenGWASResult {
 		return sb.toString();
 	}
 
+	public String printEGWASTab(double gc) {
+		StringBuffer sb = new StringBuffer();
+		sb.append(snp.getName() + "\t" +  snp.getFirstAllele()
+				+ "\t" );
+
+		if (!isGoodLocus) {
+			sb.append(ConstValues.NA_String + "\t");
+		} else {
+			if (Math.abs(b) > 0.0001) {
+				sb.append(df.format(b) + "\t");
+			} else {
+				sb.append(dfE.format(b) + "\t");
+			}
+		}
+		return sb.toString();
+	}
+
 	private double getP(double z) {
 		double p = 1;
 		try {
@@ -155,7 +172,6 @@ public class EigenGWASResult {
 		} catch (MathException e) {
 			Logger.printUserError(e.toString());
 		}
-
 		return p;
 	}
 
