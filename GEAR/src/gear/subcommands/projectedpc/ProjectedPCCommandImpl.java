@@ -236,6 +236,7 @@ public class ProjectedPCCommandImpl extends CommandImpl {
 			profArgs.setHasScoreHeader(true);
 			profArgs.setIsWeighted(false);
 			profArgs.setResultFile(proArgs.getAllBedFiles().get(i));
+			profArgs.setIsAutoFlip(true);
 
 			ProfileCommandImpl profImpl = new ProfileCommandImpl();
 			profImpl.execute(profArgs);
