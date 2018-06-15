@@ -143,7 +143,7 @@ public class FastFisherExactTest
 	public static void main(String[] args)
 	{
 		// this data was used to test the program, the results were same like
-		// the one presented in Am. J. Hum. Genet. 76:887¨C883, 2005
+		// the one presented in Am. J. Hum. Genet. 76:887-883, 2005
 		FastFisherExactTest f0 = new FastFisherExactTest(100, 5, 21);
 		Logger.printUserLog(f0.getPobs() + " " + f0.getPW() + " " + f0.HDP());
 		FastFisherExactTest f2 = new FastFisherExactTest(100, 7, 21);
