@@ -9,7 +9,7 @@ import gear.subcommands.CommandArgumentException;
 import gear.subcommands.CommandArguments;
 import gear.subcommands.CommandImpl;
 
-public class FSTCommand extends Command {
+public class FstCommand extends Command {
     
     @Override
     public String getName() {
