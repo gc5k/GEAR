@@ -56,7 +56,7 @@ public class FstCommand extends Command {
     
     @Override
     public CommandArguments parse(CommandLine cmdLine) throws CommandArgumentException {
-        FSTCommandArguments fstArgs = new FSTCommandArguments();
+        FstCommandArguments fstArgs = new FstCommandArguments();
         
         parseFileArguments((CommandArguments) fstArgs, cmdLine);
         parseSampleFilterArguments((CommandArguments) fstArgs, cmdLine);
@@ -78,7 +78,7 @@ public class FstCommand extends Command {
     
     @Override
     protected CommandImpl createCommandImpl() {
-        return new FSTCommandImpl();
+        return new FstCommandImpl();
     }
     
     private static String OPT_GROUP_LONG = "group";

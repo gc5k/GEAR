@@ -39,7 +39,7 @@ public enum Gear {
 		addCommand(new gear.subcommands.lmdr.LMDRCommand());
 		addCommand(new gear.subcommands.ppcbatch.PPCBatchCommand());
 		addCommand(new gear.subcommands.projectedpc.ProjectedPCCommand());
-		addCommand(new gear.subcommands.fst.FSTCommand());
+		addCommand(new gear.subcommands.fst.FstCommand());
 
 		addCommand(new gear.subcommands.sfst.SFstCommand());
 		addCommand(new gear.subcommands.fpc.FPCCommand());

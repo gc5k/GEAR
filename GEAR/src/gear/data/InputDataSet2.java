@@ -69,7 +69,7 @@ public class InputDataSet2 implements SubjectOrder {
 		}
 
 		if (effectiveSubList.size() == 0) {
-			Logger.printUserLog("No individuals were remained for analysis. GEAR quit.");
+			Logger.printUserLog("No samples were remained for analysis. GEAR quit.");
 			System.exit(1);
 		}
 		if (fileList.size() > 0) {

@@ -5,7 +5,6 @@ import gear.util.FileUtil;
 
 public class FstCommandArguments extends CommandArguments {
 
-	
 	public void setGroup(String gFile) {
 		FileUtil.exists(gFile);
 		groupFile = gFile;
