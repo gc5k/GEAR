@@ -28,6 +28,7 @@ public class FstCommandImpl extends CommandImpl {
 	private HashMap<SubjectID, Integer> fstGroup = NewIt.newHashMap();
 	private int fstG = 0;
 	private double[][] Fst = null;
+	private double[][] FstAssist= null;
 
 	@Override
 	public void execute(CommandArguments cmdArgs) {
@@ -98,6 +99,7 @@ public class FstCommandImpl extends CommandImpl {
 			Logger.printUserLog("Should be at least 2 groups.");
 			System.exit(1);
 		}
+		Logger.printUserLog("");
 		Logger.printUserLog("Read " + fstGroup.size() + " subjects for " + groupCntMap.size() + " groups.");
 		fstG = groupCntMap.size();
 
@@ -110,6 +112,7 @@ public class FstCommandImpl extends CommandImpl {
 	private void calFst() {
 
 		Fst = new double[pGM.getNumMarker()][2];
+		FstAssist = new double[pGM.getNumMarker()][2];
 
 		for (int i = 0; i < pGM.getNumMarker(); i++) {
 			double[] gSub = new double[fstG], freqSub = new double[fstG];
@@ -146,6 +149,9 @@ public class FstCommandImpl extends CommandImpl {
 			}
 			// see bruce weir [genetic data analysis] page 172-3.
 			if (!badLocus) {
+				FstAssist[i][0] = nTotal;
+				FstAssist[i][1] = gTotal / (2.0 * nTotal);
+
 				nMean = nTotal / (1.0 * fstG);
 				freqMean = gTotal / (2.0 * nTotal);
 				hetMean = hetTotal / (1.0 * nTotal);
@@ -179,11 +185,11 @@ public class FstCommandImpl extends CommandImpl {
 		double s1 = 0, s2 = 0;
 		double ss1 = 0, ss2 = 0;
 		int cnt1 = 0, cnt2 = 0;
-		fstOut.println("SNP\tCHR\tBP\tRefAllele\tAltAllele\tFst[R]\tFst[F]");
+		fstOut.println("CHR\tSNP\tBP\tA1\tA2\tNMISS\tRAF\tFst[R]\tFst[F]");
 		for (int i = 0; i < pGM.getNumMarker(); i++) {
 			SNP snp = pGM.getSNPList().get(i);
-			fstOut.print(snp.getName() + "\t" + snp.getChromosome() + "\t" + snp.getPosition() + "\t"
-					+ snp.getFirstAllele() + "\t" + snp.getSecAllele() + "\t");
+			fstOut.print(snp.getChromosome() + "\t" + snp.getName() + "\t" + snp.getPosition() + "\t"
+					+ snp.getFirstAllele() + "\t" + snp.getSecAllele() + "\t" + FstAssist[i][0] + "\t" + df.format(1-FstAssist[i][1]) +"\t");
 			if (Math.abs(Fst[i][0]) > 0.0001) {
 				fstOut.print(df.format(Fst[i][0]) + "\t");
 			} else {
@@ -208,8 +214,11 @@ public class FstCommandImpl extends CommandImpl {
 		}
 		fstOut.close();
 		Logger.printUserLog(
-				"Fst[R] mean: " + s1 / (1.0 * cnt1) + ", sd: " + Math.sqrt((ss1/cnt1 - s1 * s1 / (cnt1 * cnt1))));
+				"Fst[R] mean: " + df.format(s1 / (1.0 * cnt1)) + ", sd: " + df.format(Math.sqrt((ss1/cnt1 - s1 * s1 / (cnt1 * cnt1)))));
 		Logger.printUserLog(
-				"Fst[F] mean: " + s2 / (1.0 * cnt2) + ", sd: " + Math.sqrt((ss2/cnt1 - s2 * s2 / (cnt2 * cnt2))));
+				"Fst[F] mean: " + df.format(s2 / (1.0 * cnt2)) + ", sd: " + df.format(Math.sqrt((ss2/cnt1 - s2 * s2 / (cnt2 * cnt2)))));
+		Logger.printUserLog("");
+		Logger.printUserLog("Results have been saved in '"+this.fstArgs.getOutRoot() + ".fst" + "'.");
 	}
+	
 }
