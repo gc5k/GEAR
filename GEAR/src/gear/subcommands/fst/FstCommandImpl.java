@@ -111,7 +111,7 @@ public class FstCommandImpl extends CommandImpl {
 
 	private void calFst() {
 
-		Fst = new double[pGM.getNumMarker()][2];
+		Fst = new double[pGM.getNumMarker()][3];
 		FstAssist = new double[pGM.getNumMarker()][2];
 
 		for (int i = 0; i < pGM.getNumMarker(); i++) {
@@ -155,7 +155,7 @@ public class FstCommandImpl extends CommandImpl {
 				nMean = nTotal / (1.0 * fstG);
 				freqMean = gTotal / (2.0 * nTotal);
 				hetMean = hetTotal / (1.0 * nTotal);
-				double nc = nTotal / (fstG - 1);
+				double nc = nTotal;
 				double SAsq = 0;
 				for (int k = 0; k < fstG; k++) {
 					nc -= (nSub[k] * nSub[k]) / nTotal;
@@ -167,8 +167,19 @@ public class FstCommandImpl extends CommandImpl {
 				T1 = SAsq - 1 / (nMean - 1) * (freqMean * (1 - freqMean) - SAsq * (fstG - 1) / fstG);
 				T2 = (nc - 1) / (nMean - 1) * freqMean * (1 - freqMean)
 						+ (1 + (fstG - 1) * (nMean - nc) / (nMean - 1)) * (SAsq / fstG);
+				
+				double a = 0, b = 0, c = 0;
+				a = nMean/nc * (SAsq - (freqMean * (1-freqMean) - SAsq * (fstG-1)/fstG - 1/4*hetMean)/(nMean - 1));
+				b = nMean/(nMean-1) * (freqMean * (1-freqMean) - SAsq * (fstG-1)/fstG - (2*nMean -1)/(4*nMean)*hetMean);
+				c = 1/2 * hetMean;
+				
+				double S1 = 0, S2 = 0;
+				S1 = SAsq - 1/(nMean-1) * (freqMean * (1-freqMean) - (fstG-1)/fstG * SAsq - 1/4 * hetMean)/(nMean-1);
+				S2 = freqMean * (1-freqMean) - nMean / (fstG * (nMean-1)) * (fstG * (nMean - nc)/nMean * freqMean * (1-freqMean)
+						- 1/nMean *((nMean-1) + (fstG-1)*(nMean - nc))*SAsq - fstG * (nMean - nc)/(4 * nMean * nc)*hetMean);
 				Fst[i][0] = T1 / T2;
 				Fst[i][1] = SAsq / (freqMean * (1 - freqMean));
+				Fst[i][2] = a/(a+b+c);
 				// SNP snp = pGM.getSNPList().get(i);
 				// Logger.printUserLog("SNP::" + snp.getName() + " FstR " + Fst[i][0] + " FstF "
 				// + Fst[i][1]+ " Freq " + freqMean + " " + SAsq + " "
@@ -182,10 +193,10 @@ public class FstCommandImpl extends CommandImpl {
 		DecimalFormat df = new DecimalFormat("0.0000");
 		DecimalFormat dfE = new DecimalFormat("0.00E000");
 
-		double s1 = 0, s2 = 0;
-		double ss1 = 0, ss2 = 0;
-		int cnt1 = 0, cnt2 = 0;
-		fstOut.println("CHR\tSNP\tBP\tA1\tA2\tNMISS\tRAF\tFst[R]\tFst[F]");
+		double s1 = 0, s2 = 0, s3 = 0;
+		double ss1 = 0, ss2 = 0, ss3 = 0;
+		int cnt1 = 0, cnt2 = 0, cnt3 = 0;
+		fstOut.println("CHR\tSNP\tBP\tA1\tA2\tNMISS\tRAF\tFst[R]\tFst[F]\tFst");
 		for (int i = 0; i < pGM.getNumMarker(); i++) {
 			SNP snp = pGM.getSNPList().get(i);
 			fstOut.print(snp.getChromosome() + "\t" + snp.getName() + "\t" + snp.getPosition() + "\t"
@@ -200,6 +211,11 @@ public class FstCommandImpl extends CommandImpl {
 			} else {
 				fstOut.println(dfE.format(Fst[i][1]));
 			}
+//			if (Math.abs(Fst[i][2]) < 0.0001) {
+//				fstOut.println(df.format(Fst[i][2]));
+//			} else {
+//				fstOut.println(dfE.format(Fst[i][2]));
+//			}
 
 			if (Fst[i][0] != 0) {
 				ss1 += Fst[i][0] * Fst[i][0];
@@ -211,12 +227,19 @@ public class FstCommandImpl extends CommandImpl {
 				s2 += Fst[i][1];
 				cnt2++;
 			}
+			if (Fst[i][2] != 0) {
+				ss3 += Fst[i][2] * Fst[i][2];
+				s3 += Fst[i][2];
+				cnt3++;
+			}
 		}
 		fstOut.close();
 		Logger.printUserLog(
 				"Fst[R] mean: " + df.format(s1 / (1.0 * cnt1)) + ", sd: " + df.format(Math.sqrt((ss1/cnt1 - s1 * s1 / (cnt1 * cnt1)))));
 		Logger.printUserLog(
-				"Fst[F] mean: " + df.format(s2 / (1.0 * cnt2)) + ", sd: " + df.format(Math.sqrt((ss2/cnt1 - s2 * s2 / (cnt2 * cnt2)))));
+				"Fst[F] mean: " + df.format(s2 / (1.0 * cnt2)) + ", sd: " + df.format(Math.sqrt((ss2/cnt2 - s2 * s2 / (cnt2 * cnt2)))));
+//		Logger.printUserLog(
+//				"Fst[F] mean: " + df.format(s3 / (1.0 * cnt3)) + ", sd: " + df.format(Math.sqrt((ss3/cnt3 - s3 * s3 / (cnt3 * cnt3)))));
 		Logger.printUserLog("");
 		Logger.printUserLog("Results have been saved in '"+this.fstArgs.getOutRoot() + ".fst" + "'.");
 	}
