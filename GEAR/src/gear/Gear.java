@@ -72,6 +72,8 @@ public enum Gear {
 		addCommand(new gear.subcommands.simulationinbred.SimulationInbredCommand());
 
 		addCommand(new gear.subcommands.ibd.IBDCommand());
+		
+		addCommand(new gear.subcommands.testbed.TestBedCommand());
 	}
 
 	private void addCommand(Command cmd) {
