@@ -146,7 +146,6 @@ public final class ProfileCommandImpl extends CommandImpl {
 				default:
 					continue;
 				}
-				System.out.println(coeffModels[locIdx].compute(scoreAlleleFrac) + " : " + scoreAlleleFrac);
 				float riskValue = coeffModels[locIdx].compute(scoreAlleleFrac)
 						* filteredSNPs.getScore(traitIdx, locIdx);
 
@@ -165,8 +164,6 @@ public final class ProfileCommandImpl extends CommandImpl {
 					for (int locGrpIdx = 0; locGrpIdx < filteredSNPs.getNumLocusGroups(); ++locGrpIdx) {
 						int denom = numLociUsed.get(indIdx)[traitIdx][locGrpIdx];
 						if (denom != 0) {
-							System.out.println(riskProfiles.get(indIdx)[traitIdx][locGrpIdx] + " " + denom);
-
 							riskProfiles.get(indIdx)[traitIdx][locGrpIdx] /= profCmdArgs.getIsSameAsPlink()
 									? (denom << 1)
 									: denom;
