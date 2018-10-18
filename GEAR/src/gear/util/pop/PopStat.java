@@ -87,14 +87,14 @@ public class PopStat {
 		return gfreq;
 	}
 
-	public static void Imputation(GenotypeMatrix G) {
+	public static void Imputation(GenotypeMatrix G, boolean isInbred, long seed) {
 		Logger.printUserLog("Implementing naive imputatation......");
 		double[][] f = calAlleleFrequency(G);
 		Logger.printUserLog(
 				"Missing genotypes will be imputed according to Hardy-Weinberg proportion for each locus with its estimated allele frequency.");
 
 		RandomDataImpl rnd = new RandomDataImpl();
-		rnd.reSeed(CmdArgs.INSTANCE.simuSeed);
+		rnd.reSeed(seed);
 
 		int cn = 0;
 		for (int i = 0; i < G.getNumMarker(); i++) {
@@ -105,7 +105,11 @@ public class PopStat {
 					cn++;
 					int v;
 					try {
-						v = rnd.nextBinomial(2, 1 - f[i][0]);
+						if(isInbred) {
+							v = rnd.nextBinomial(1, 1 - f[i][0]) * 2;
+						} else {
+							v = rnd.nextBinomial(2, 1 - f[i][0]);														
+						}
 						G.setAdditiveScore(j, i, v);
 					} catch (MathException e) {
 						Logger.handleException(e, "Error in imputation.");

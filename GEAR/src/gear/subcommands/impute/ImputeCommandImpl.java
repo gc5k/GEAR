@@ -125,8 +125,7 @@ public class ImputeCommandImpl extends CommandImpl {
 	}
 
 	private void naiveImpute() {
-		PopStat.Imputation(gm);
-
+		PopStat.Imputation(gm, imputeArgs.isInbred(), imputeArgs.getSeed());
 	}
 
 }
