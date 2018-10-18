@@ -3,7 +3,6 @@ package gear.util.pop;
 import org.apache.commons.math.MathException;
 import org.apache.commons.math.random.RandomDataImpl;
 
-import gear.CmdArgs;
 import gear.ConstValues;
 import gear.family.GenoMatrix.GenotypeMatrix;
 import gear.util.Logger;

@@ -16,7 +16,6 @@ import gear.family.plink.PLINKParser;
 import gear.family.qc.rowqc.SampleFilter;
 import gear.subcommands.CommandArguments;
 import gear.subcommands.CommandImpl;
-import gear.subcommands.ibd.IBDCommandArguments;
 import gear.util.Logger;
 import gear.util.pop.PopStat;
 
@@ -55,6 +54,7 @@ public class ImputeCommandImpl extends CommandImpl {
 		} catch (IOException e) {
 			Logger.handleException(e, "An I/O exception occurred when creating the .bed, .fam and .bim files.");
 		}
+		Logger.printUserLog("Writing the imputed genotypes into binary format.");
 
 		for (int i = 0; i < gm.getNumIndivdial(); i++) {
 			PersonIndex pi = sf.getSample().get(i);
