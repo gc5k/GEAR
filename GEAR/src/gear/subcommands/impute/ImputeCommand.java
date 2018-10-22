@@ -45,7 +45,8 @@ public class ImputeCommand extends Command {
 		ImputeCommandArguments imputeArgs = new ImputeCommandArguments();
 		parseFileArguments((CommandArguments) imputeArgs, cmdLine);
 		
-		imputeArgs.setSeed(parseLongOptionValue(cmdLine, OPT_SEED_LONG, (new Long(CmdArgs.INSTANCE.simuSeed)).toString()));
+		imputeArgs.setSeed(parseLongOptionValue(cmdLine, OPT_SEED_LONG, OPT_SEED_DEFAULT));
+
 		if (cmdLine.hasOption(OPT_INBRED_LONG)) {
 			imputeArgs.setInbred();
 		}
