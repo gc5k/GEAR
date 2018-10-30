@@ -34,7 +34,7 @@ public class EigenGWASCommandImpl extends CommandImpl {
 	public void execute(CommandArguments cmdArgs) {
 
 		eigenArgs = (EigenGWASCommandArguments) cmdArgs;
-		
+
 		PLINKParser pp = PLINKParser.parse(cmdArgs);
 
 		traitIdx = eigenArgs.getSelectedPhenotype(0);
