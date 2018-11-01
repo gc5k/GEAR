@@ -64,7 +64,7 @@ public class PopStat {
 		return axsq;
 	}
 
-	public static double[][] calGenoFrequency(GenotypeMatrix G) {
+	public static double[][] calGenoFrequency(GenotypeMatrix G, boolean isFreq) {
 		double[][] gfreq = new double[G.getNumMarker()][3];
 		for (int i = 0; i < G.getGRow(); i++) {
 			for (int j = 0; j < G.getNumMarker(); j++) {
@@ -75,12 +75,14 @@ public class PopStat {
 			}
 		}
 
-		for (int i = 0; i < G.getNumMarker(); i++) {
-			double wa = gfreq[i][0] + gfreq[i][1] + gfreq[i][2];
-			if (wa > 0) {
-				gfreq[i][0] /= wa;
-				gfreq[i][1] /= wa;
-				gfreq[i][2] /= wa;
+		if (isFreq) {
+			for (int i = 0; i < G.getNumMarker(); i++) {
+				double wa = gfreq[i][0] + gfreq[i][1] + gfreq[i][2];
+				if (wa > 0) {
+					gfreq[i][0] /= wa;
+					gfreq[i][1] /= wa;
+					gfreq[i][2] /= wa;
+				}
 			}
 		}
 		return gfreq;
