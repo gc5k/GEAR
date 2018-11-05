@@ -13,6 +13,8 @@ import gear.util.FileUtil;
 import gear.util.Logger;
 import gear.util.NewIt;
 
+import java.io.BufferedWriter;
+import java.io.IOException;
 import java.io.PrintStream;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -49,8 +51,9 @@ public class NSSCommandImpl extends CommandImpl {
 		this.covIdx = this.nssArgs.getCovNumber();
 
 		data = new InputDataSet2();
-		data.addFile(this.nssArgs.getFam());
+		data.addFile(this.nssArgs.getFam());		
 		data.addFile(this.nssArgs.getPhenotypeFile(), this.nssArgs.getSelectedPhenotype());
+
 		data.addFile(this.nssArgs.getCovFile(), this.nssArgs.getCovNumber());
 		if (this.nssArgs.isKeepFile())
 			data.addFile(this.nssArgs.getKeepFile());
@@ -59,7 +62,7 @@ public class NSSCommandImpl extends CommandImpl {
 		this.N = data.getNumberOfSubjects();
 
 		PLINKParser pp = PLINKParser.parse(this.nssArgs);
-		sf = new SampleFilter(pp.getPedigreeData(), cmdArgs);
+		sf = new SampleFilter(pp.getPedigreeData(), data.getMatchSubjetList());
 		pGM = new GenotypeMatrix(sf.getSample(), pp.getMapData(), cmdArgs);
 
 		for (int i = 0; i < traitIdx.length; i++) {
@@ -83,10 +86,10 @@ public class NSSCommandImpl extends CommandImpl {
 		String Fout = nssArgs.getOutRoot() + ".list.nss";
 		PrintStream nssList = FileUtil.CreatePrintStream(Fout);
 		for (int i = 0; i < traitIdx.length; i++) {
-			nssList.println(nssArgs.getOutRoot() + ".p." + (traitIdx[i] + 1) + ".nss");
+			nssList.println(nssArgs.getOutRoot() + ".p." + (traitIdx[i] + 1) + ".nss.gz");
 		}
 		for (int i = 0; i < covIdx.length; i++) {
-			nssList.println(nssArgs.getOutRoot() + ".c." + (covIdx[i] + 1) + ".nss");
+			nssList.println(nssArgs.getOutRoot() + ".c." + (covIdx[i] + 1) + ".nss.gz");
 		}
 
 		nssList.close();
@@ -205,18 +208,41 @@ public class NSSCommandImpl extends CommandImpl {
 		} else {
 			Fout = nssArgs.getOutRoot() + ".c." + fidx + ".nss";
 		}
-		PrintStream nssGWAS = FileUtil.CreatePrintStream(Fout);
-		nssGWAS.println(OATHConst.SNP + "\t" + OATHConst.CHR + "\t" + OATHConst.BP + "\t" + OATHConst.RefAle + "\t"
-				+ OATHConst.AltAle + "\t" + OATHConst.RAF + "\t" + OATHConst.Vg + "\t" + OATHConst.BETA + "\t"
-				+ OATHConst.SE + "\t" + OATHConst.CHI + "\t" + OATHConst.P);
+//		PrintStream nssGWAS = FileUtil.CreatePrintStream(Fout);
+		BufferedWriter nssGZ = FileUtil.ZipFileWriter(Fout+".gz");
+
+//		nssGWAS.println(OATHConst.SNP + "\t" + OATHConst.CHR + "\t" + OATHConst.BP + "\t" + OATHConst.RefAle + "\t"
+//				+ OATHConst.AltAle + "\t" + OATHConst.RAF + "\t" + OATHConst.Vg + "\t" + OATHConst.BETA + "\t"
+//				+ OATHConst.SE + "\t" + OATHConst.CHI + "\t" + OATHConst.P);
+
+		try {
+			nssGZ.append(OATHConst.SNP + "\t" + OATHConst.CHR + "\t" + OATHConst.BP + "\t" + OATHConst.RefAle + "\t"
+					+ OATHConst.AltAle + "\t" + OATHConst.RAF + "\t" + OATHConst.Vg + "\t" + OATHConst.BETA + "\t"
+					+ OATHConst.SE + "\t" + OATHConst.CHI + "\t" + OATHConst.P + "\n");
+		} catch (IOException e) {
+			Logger.handleException(e,
+					"error in writing '" + Fout + ".gz.");
+		}
 
 		for (int i = 0; i < nssResult.size(); i++) {
 			NSSGWASResult e1 = nssResult.get(i);
-			nssGWAS.println(e1.printEGWASResult(lambdaGC));
+//			nssGWAS.println(e1.printEGWASResult(lambdaGC));
+			try {
+				nssGZ.append(e1.printEGWASResult(lambdaGC) +"\n");
+			} catch (IOException e) {
+				Logger.handleException(e,
+						"error in writing '" + Fout + ".gz.");
+			}
 		}
-		nssGWAS.close();
+//		nssGWAS.close();
+		try {
+			nssGZ.close();
+		} catch (IOException e) {
+			Logger.handleException(e,
+					"error in closing '" + Fout + ".gz.");
+		}
 
-		Logger.printUserLog("Write the NSS into '" + Fout + "'.");
+		Logger.printUserLog("Write the NSS into '" + Fout + ".gz'.");
 	}
 
 	public int getN() {

@@ -20,7 +20,7 @@ public class PhenotypeFile implements SubjectOrder
 		
 		BufferedReader reader = BufferedReader.openTextFile(fileName, "phenotype");
 
-		String[] tokens = reader.readTokensAtLeast(3);
+		String[] tokens = reader.readTokensAtLeast(9);
 		
 		if (tokens == null)
 		{

@@ -8,6 +8,7 @@ public class OATHBusCommandArguments extends CommandArguments
 {
 	private String covFile = null;
 	private int[] covIdx = {0};
+	private boolean keepInter = false;
 
 	public void setCovFile(String cFile) 
 	{
@@ -39,5 +40,13 @@ public class OATHBusCommandArguments extends CommandArguments
 	public int[] getCovNumber()
 	{
 		return covIdx;
+	}
+
+	public void setKeepInter() {
+		keepInter = true;
+	}
+
+	public boolean isKeepInter() {
+		return keepInter;
 	}
 }

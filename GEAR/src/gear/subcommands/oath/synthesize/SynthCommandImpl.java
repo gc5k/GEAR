@@ -1,9 +1,7 @@
 package gear.subcommands.oath.synthesize;
 
 import java.io.BufferedWriter;
-import java.io.FileWriter;
 import java.io.IOException;
-import java.io.PrintWriter;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -17,6 +15,7 @@ import gear.subcommands.oath.synthesize.freader.SynthFStat;
 import gear.subcommands.oath.synthesize.freader.SynthMatrix;
 import gear.subcommands.oath.synthesize.freader.SynthRes;
 import gear.util.BufferedReader;
+import gear.util.FileUtil;
 import gear.util.Logger;
 import gear.util.NewIt;
 
@@ -184,29 +183,46 @@ public class SynthCommandImpl extends CommandImpl {
 	}
 
 	private void PrintSynResults() {
-		PrintWriter writer = null;
-		try {
-			writer = new PrintWriter(new BufferedWriter(new FileWriter(synArgs.getOutRoot() + ".oath")));
-			Logger.printUserLog("Writting detailed test statistics into '" + synArgs.getOutRoot() + ".oath.'\n");
-		} catch (IOException e) {
-			Logger.handleException(e, "An I/O exception occurred when writing '" + synArgs.getOutRoot() + ".oath'.\n");
-		}
+//		PrintWriter writer = null;
+		BufferedWriter synGZ = null;
+
+//			writer = new PrintWriter(new BufferedWriter(new FileWriter(synArgs.getOutRoot() + ".oath")));
+		synGZ = FileUtil.ZipFileWriter(synArgs.getOutRoot() + ".oath"+".gz");
+		Logger.printUserLog("Writting detailed test statistics into '" + synArgs.getOutRoot() + ".oath.gz'.\n");
 
 		for (int i = 0; i < grArray.size(); i++) {
 			SynthRes gr = grArray.get(i);
 			if (i == 0) {
-				writer.write(gr.printTitle() + "\n");
-			}
-			writer.write(gr.toString() + "ADD\n");
-
-			if (synArgs.isVerbose() && covArray.size() > 0) {
-				for (int j = 0; j < covArray.size(); j++) {
-					SynthRes cov = covArray.get(j).get(i);
-					writer.write(cov.toString() + "COV" + synArgs.getKeepBatchIdx()[j + 1] + "\n");
+				try {
+					synGZ.append(gr.printTitle() + "\n");
+				} catch (IOException e) {
+					Logger.handleException(e,
+							synArgs.getOutRoot() + ".oath"+".gz");
 				}
+//				writer.write(gr.printTitle() + "\n");
 			}
+//			writer.write(gr.toString() + "ADD\n");
+			try {
+				synGZ.append(gr.toString() + "ADD\n");
+			} catch (IOException e) {
+				Logger.handleException(e,
+						synArgs.getOutRoot() + ".oath"+".gz");
+			}
+
+//			if (synArgs.isVerbose() && covArray.size() > 0) {
+//				for (int j = 0; j < covArray.size(); j++) {
+//					SynthRes cov = covArray.get(j).get(i);
+//					writer.write(cov.toString() + "COV" + synArgs.getKeepBatchIdx()[j + 1] + "\n");
+//				}
+//			}
 		}
-		writer.close();
+//		writer.close();
+		try {
+			synGZ.close();
+		} catch (IOException e) {
+			Logger.handleException(e,
+					synArgs.getOutRoot() + ".oath"+".gz");
+		}
 	}
 
 	private boolean[] keepBatch = null;

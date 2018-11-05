@@ -52,6 +52,10 @@ public class OATHBusCommand extends Command {
 		options.addOption(OptionBuilder.withDescription(OPT_GENO_DESC).withLongOpt(OPT_GENO_LONG).hasArg().create());
 		options.addOption(
 				OptionBuilder.withDescription(OPT_ZERO_VAR_DESC).withLongOpt(OPT_ZERO_VAR_LONG).create());
+
+		options.addOption(
+				OptionBuilder.withDescription(OPT_KEEP_OATH_DESC).withLongOpt(OPT_ZERO_VAR_LONG).create());
+
 	}
 
 	@Override
@@ -75,6 +79,9 @@ public class OATHBusCommand extends Command {
 			obArgs.setCovNumber(cmdLine.getOptionValues(OPT_COVAR_NUMBER));
 		}
 
+		if (cmdLine.hasOption(OPT_KEEP_OATH)) {
+			obArgs.setKeepInter();
+		}
 		return obArgs;
 	}
 
@@ -89,4 +96,7 @@ public class OATHBusCommand extends Command {
 
 	private final static String OPT_COVAR_NUMBER = "covar-number";
 	private final static String OPT_COVAR_NUMBER_DESC = "Specify the indices for covariate file";
+	
+	private final static String OPT_KEEP_OATH = "keep-oath";
+	private final static String OPT_KEEP_OATH_DESC = "Keep intermediate results";
 }
