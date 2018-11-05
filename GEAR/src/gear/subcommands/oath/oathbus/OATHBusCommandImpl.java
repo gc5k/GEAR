@@ -89,7 +89,7 @@ public class OATHBusCommandImpl extends CommandImpl {
 			}
 		}
 
-		PrintStream Mout = FileUtil.CreatePrintStream(obArgs.getOutRoot() + ".oath.mod'.");
+		PrintStream Mout = FileUtil.CreatePrintStream(obArgs.getOutRoot() + ".oath.mod");
 		for (int i = 0; i < ModCode.size(); i++) {
 			ArrayList<Integer> mm = ModCode.get(i);
 			for (int j = 0; j < mm.size(); j++) {
@@ -101,7 +101,7 @@ public class OATHBusCommandImpl extends CommandImpl {
 			}
 		}
 		Mout.close();
-		Logger.printUserLog("Saving model information in '"+ obArgs.getOutRoot() + ".oath.mod");
+		Logger.printUserLog("Saving model information in '"+ obArgs.getOutRoot() + ".oath.mod'.");
 	}
 	
 	private void step1() {
