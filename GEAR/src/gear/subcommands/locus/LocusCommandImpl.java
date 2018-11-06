@@ -52,7 +52,7 @@ public class LocusCommandImpl extends CommandImpl {
 					+ (int) (genoCnt[i][0]) + "\t"
 					+ (int) (genoCnt[i][1]) + "\t"
 					+ (int) (genoCnt[i][2]) + "\t"
-					+ (int) ((1 - allelefreq[i][2]) * pGM.getNumIndivdial() * 2));
+					+ (int) (2*(genoCnt[i][0] + genoCnt[i][1] + genoCnt[i][2])));
 		}
 		LocusPrint.close();
 		Logger.printUserLog("Save results to " + locusArgs.getOutRoot() + ".locus.");
