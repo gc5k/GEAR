@@ -22,8 +22,7 @@ public class OathPickCommandArguments extends CommandArguments {
 				pickList.add(oathF);
 			}
 		} catch (IOException e) {
-			Logger.handleException(e, "Could not find '"
-					+ oathF + "'.");
+			Logger.handleException(e, "Could not find '" + oathF + "'.");
 		}
 	}
 

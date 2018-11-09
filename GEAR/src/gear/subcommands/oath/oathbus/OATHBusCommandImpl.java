@@ -32,12 +32,14 @@ public class OATHBusCommandImpl extends CommandImpl {
 
 		writeMod();
 
-		if (!obArgs.isKeepInter()) {
+		if (obArgs.RemoveInter()!=null) {
 			Logger.printUserLog("Clean up intermediate files.");
-			ArrayList<String> fList = pkArgs.getPickList();
-			for(int i = 1; i < fList.size(); i++) {
-				java.io.File myFilePath = new java.io.File(fList.get(i));
-		        myFilePath.delete();				
+			if (obArgs.RemoveInter().substring(0, 1).compareTo("1")==0) {
+				ArrayList<String> fList = pkArgs.getPickList();
+				for(int i = 1; i < fList.size(); i++) {
+					java.io.File myFilePath = new java.io.File(fList.get(i));
+			        myFilePath.delete();				
+				}				
 			}
 
 			java.io.File bFile = new java.io.File(obArgs.getOutRoot() + ".oath-bus");
@@ -49,18 +51,19 @@ public class OATHBusCommandImpl extends CommandImpl {
 			java.io.File lFile = new java.io.File(obArgs.getOutRoot() + ".list.nss");
 			lFile.delete();
 
-			java.io.File mFile = new java.io.File(obArgs.getOutRoot() + ".m.nss");
-			mFile.delete();
+			if (obArgs.RemoveInter().substring(1, 2).compareTo("1") == 0) {
+				java.io.File mFile = new java.io.File(obArgs.getOutRoot() + ".m.nss");
+				mFile.delete();
 
-			java.io.File pheFile = new java.io.File(obArgs.getOutRoot() + ".p." + (obArgs.getSelectedPhenotype()[0]+1)+".nss.gz");
-			pheFile.delete();
+				java.io.File pheFile = new java.io.File(obArgs.getOutRoot() + ".p." + (obArgs.getSelectedPhenotype()[0]+1)+".nss.gz");
+				pheFile.delete();
 
-			int[] covIdx = obArgs.getCovNumber();
-			for(int i = 0; i < covIdx.length; i++) {
-				java.io.File covFile = new java.io.File(obArgs.getOutRoot() + ".c." + (covIdx[i]+1)+".nss.gz");
-				covFile.delete();				
+				int[] covIdx = obArgs.getCovNumber();
+				for(int i = 0; i < covIdx.length; i++) {
+					java.io.File covFile = new java.io.File(obArgs.getOutRoot() + ".c." + (covIdx[i]+1)+".nss.gz");
+					covFile.delete();
+				}				
 			}
-
 		}
 	}
 	
