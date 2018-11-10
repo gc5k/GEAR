@@ -45,6 +45,8 @@ public enum Gear {
 		addCommand(new gear.subcommands.fpc.FPCCommand());
 		addCommand(new gear.subcommands.metapc.MetaPCCommand());
 		addCommand(new gear.subcommands.grm.GRMCommand());
+		addCommand(new gear.subcommands.grmA.GRMACommand());
+
 		addCommand(new gear.subcommands.wgrm.WGRMCommand());
 
 		addCommand(new gear.subcommands.qpca.QPCACommand());
