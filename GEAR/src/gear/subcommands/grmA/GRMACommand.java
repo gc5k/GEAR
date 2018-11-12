@@ -13,7 +13,7 @@ public class GRMACommand extends Command {
 
 	@Override
 	public String getName() {
-		return "grma";
+		return "grm";
 	}
 
 	@Override
