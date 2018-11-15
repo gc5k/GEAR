@@ -15,8 +15,8 @@ import gear.subcommands.eigengwas.EigenGWASCommandArguments;
 import gear.subcommands.eigengwas.EigenGWASCommandImpl;
 import gear.subcommands.exsnp2.ExSNP2CommandArguments;
 import gear.subcommands.exsnp2.ExSNP2CommandImpl;
-import gear.subcommands.grm.GRMCommandArguments;
-import gear.subcommands.grm.GRMCommandImpl;
+import gear.subcommands.grmA.GRMACommandArguments;
+import gear.subcommands.grmA.GRMACommandImpl;
 import gear.subcommands.profile.CoeffModelType;
 import gear.subcommands.profile.ProfileCommandArguments;
 import gear.subcommands.profile.ProfileCommandImpl;
@@ -81,7 +81,7 @@ public class ProjectedPCCommandImpl extends CommandImpl {
 		exsnp2Impl.execute(exArgs);
 
 		
-		GRMCommandArguments gArgs = new GRMCommandArguments();
+		GRMACommandArguments gArgs = new GRMACommandArguments();
 		gArgs.setBFile(proArgs.getBFile());
 		gArgs.setGZ();
 		gArgs.setOutRoot(proArgs.getOutRoot());
@@ -106,7 +106,7 @@ public class ProjectedPCCommandImpl extends CommandImpl {
 
 		Logger.printUserLog("");
 		Logger.printUserLog("---------Generating GRM---------");
-		GRMCommandImpl gImpl = new GRMCommandImpl();
+		GRMACommandImpl gImpl = new GRMACommandImpl();
 		gImpl.execute(gArgs);
 
 		// PrintStream gui_file = null;

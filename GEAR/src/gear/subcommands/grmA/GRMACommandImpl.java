@@ -45,6 +45,8 @@ public class GRMACommandImpl extends CommandImpl {
 		sf = new SampleFilter(pp.getPedigreeData(), cmdArgs);
 		pGM = new GenotypeMatrix(sf.getSample(), pp.getMapData(), cmdArgs);
 
+		Logger.printUserLog("");
+		Logger.printUserLog("Calculating allele frequencies...");
 		allelefreq = PopStat.calAlleleFrequencyFloat(pGM);
 		allelevar = PopStat.calGenoVarianceFloat(pGM);
 
@@ -53,6 +55,7 @@ public class GRMACommandImpl extends CommandImpl {
 		}
 
 		Gcnt = new int[pGM.getNumIndivdial()][pGM.getNumIndivdial()];
+
 		makeGA();
 
 		if (grmArgs.isDom()) {
@@ -66,12 +69,14 @@ public class GRMACommandImpl extends CommandImpl {
 	}
 
 	private void makeGA() {
+		Logger.printUserLog("Making additive genetic relatedness matrix...");
 		float[][] gMat = new float[pGM.getNumIndivdial()][pGM.getNumMarker()];
 		for (int i = 0; i < pGM.getNumIndivdial(); i++) {
 			ArrayList<Integer> mL = NewIt.newArrayList();
 			missList.add(mL);
 		}
 
+		Logger.printUserLog("Standardizing genotypes...");
 		for (int i = 0; i < pGM.getNumMarker(); i++) {
 			if (allelefreq[i][1] == Float.NaN || allelefreq[i][0] == 0 || allelefreq[i][1] == 0 || allelevar[i] == 0) continue;
 
@@ -97,11 +102,34 @@ public class GRMACommandImpl extends CommandImpl {
 				}
 			}
 		}
-		
+
+		int F = 15;
+		int Nt = (gMat.length*gMat.length + gMat.length)/2;
+		if (Nt < F) {
+			Logger.printUserError("Too small sample size. GEAR quit.");
+		}
+		int K = 1;
+		int n = 1;
+		ArrayList<Integer> nSet = NewIt.newArrayList();
+		while(K<F) {
+			if ( (n*n + n) <= (Nt*K)/F ) {
+				n++;
+			} else {
+				nSet.add(n-1);
+				n++;
+				K++;
+			}
+		}
+		nSet.add(gMat.length-1);
+
 		float[][] GA = new float[gMat.length][gMat.length];
 
 		for (int i = 0; i < gMat.length; i++) {
 			ArrayList<Integer> mL1 = missList.get(i);
+
+			if(Collections.binarySearch(nSet, i) >= 0) {
+				Logger.printUserLog("Starting individual: " + (i + 1) +"...");
+			}
 
 			for (int j = 0; j <= i; j++) {
 				ArrayList<Integer> mL2 = missList.get(j);
@@ -132,6 +160,7 @@ public class GRMACommandImpl extends CommandImpl {
 				Gcnt[i][j] = mLoci;
 			}
 		}
+		Logger.printUserLog("");
 
 		double grmMean = 0;
 		double grmSq = 0;
