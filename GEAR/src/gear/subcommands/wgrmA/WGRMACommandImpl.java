@@ -58,6 +58,8 @@ public class WGRMACommandImpl extends CommandImpl {
 
 		if(wgrmArgs.isWeight() || wgrmArgs.isVanRaden()) {
 			prepareWeight();
+		} else {
+			Arrays.fill(weight, 1);
 		}
 
 		if (wgrmArgs.isInbredList()) {
@@ -80,7 +82,6 @@ public class WGRMACommandImpl extends CommandImpl {
 
 	private void prepareWeight() {
 		Logger.printUserLog("Preparing weights...");
-		Arrays.fill(weight, 1);
 
 		if (wgrmArgs.isWeight()) {
 			BufferedReader reader = BufferedReader.openTextFile(wgrmArgs.getWeightFile(), "weight");
@@ -176,10 +177,10 @@ public class WGRMACommandImpl extends CommandImpl {
 		float[][] GA = new float[gMat.length][gMat.length];
 
 		for (int i = 0; i < gMat.length; i++) {
-			float ws = W;
+			float ws1 = W;
 			ArrayList<Integer> mL1 = missList.get(i);
 			for(int j = 0; j < mL1.size(); j++) {
-				ws -= weight[mL1.get(j)]*weight[mL1.get(j)];		
+				ws1 -= weight[mL1.get(j)]*weight[mL1.get(j)];		
 			}
 
 			if (Collections.binarySearch(nSet, i) >= 0) {
@@ -187,10 +188,11 @@ public class WGRMACommandImpl extends CommandImpl {
 			}
 
 			for (int j = 0; j <= i; j++) {
+				float ws2 = ws1;
 				ArrayList<Integer> mL2 = missList.get(j);
 
 				for(int k = 0; k < mL2.size(); k++) {
-					ws -= weight[mL2.get(k)]*weight[mL2.get(k)];
+					ws2 -= weight[mL2.get(k)]*weight[mL2.get(k)];
 				}
 
 				int mLoci = gMat[i].length;
@@ -198,14 +200,14 @@ public class WGRMACommandImpl extends CommandImpl {
 				if ( mL1.size() <= mL2.size() ) {
 					for (int k = 0; k < mL1.size(); k++) {
 						if (Collections.binarySearch(mL2, mL1.get(k)) >=0) {
-							ws += weight[mL1.get(k)]*weight[mL1.get(k)];
+							ws2 += weight[mL1.get(k)]*weight[mL1.get(k)];
 							cnt++;
 						}
 					}
 				} else {
 					for (int k = 0; k < mL2.size(); k++) {
 						if (Collections.binarySearch(mL1, mL2.get(k)) >=0) {
-							ws += weight[mL2.get(k)]*weight[mL2.get(k)];
+							ws2 += weight[mL2.get(k)]*weight[mL2.get(k)];
 							cnt++;
 						}
 					}
@@ -217,7 +219,7 @@ public class WGRMACommandImpl extends CommandImpl {
 				for (int l = 0; l < gMat[i].length; l++) {
 					s += gMat[i][l] * gMat[j][l];
 				}
-				GA[i][j] = s/ws;
+				GA[i][j] = s/ws2;
 				Gcnt[i][j] = mLoci;
 			}
 		}
@@ -491,7 +493,6 @@ public class WGRMACommandImpl extends CommandImpl {
 			System.exit(1);
 		}
 	}
-
 
 	public void makeDomScore() {
 		double grmDomMean = 0;
