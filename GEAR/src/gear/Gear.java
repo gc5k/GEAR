@@ -49,6 +49,7 @@ public enum Gear {
 		addCommand(new gear.subcommands.grmstat.GRMStatCommand());
 
 		addCommand(new gear.subcommands.wgrm.WGRMCommand());
+		addCommand(new gear.subcommands.wgrmA.WGRMACommand());
 
 		addCommand(new gear.subcommands.qpca.QPCACommand());
 		addCommand(new gear.subcommands.locus.LocusCommand());
