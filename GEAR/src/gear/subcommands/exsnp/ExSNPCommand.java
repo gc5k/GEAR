@@ -9,59 +9,56 @@ import gear.subcommands.CommandArgumentException;
 import gear.subcommands.CommandArguments;
 import gear.subcommands.CommandImpl;
 
-public class ExSNPCommand extends Command
-{
-	public ExSNPCommand()
-	{
+public class ExSNPCommand extends Command {
+	public ExSNPCommand() {
 		addAlias("cs");
 	}
 
 	@Override
-	public String getName()
-	{
+	public String getName() {
 		return "comsnp";
 	}
 
 	@Override
-	public String getDescription()
-	{
+	public String getDescription() {
 		return "Extract common snps between files";
 	}
 
 	@SuppressWarnings("static-access")
 	@Override
-	public void prepareOptions(Options options)
-	{
+	public void prepareOptions(Options options) {
+		options.addOption(OptionBuilder.withDescription(OPT_BFILE_LONG).hasArg().create(OPT_BFILE_LONG));
 		options.addOption(OptionBuilder.withDescription(OPT_BATCH_DESC).hasArg().create(OPT_BATCH));
 		options.addOption(OptionBuilder.withDescription(OPT_BFILES_DESC).hasArgs().create(OPT_BFILES));
 	}
 
 	@Override
-	public CommandArguments parse(CommandLine cmdLine)
-			throws CommandArgumentException
-	{
+	public CommandArguments parse(CommandLine cmdLine) throws CommandArgumentException {
 		ExSNPCommandArguments esArgs = new ExSNPCommandArguments();
-		
-		if (cmdLine.hasOption(OPT_BATCH))
-		{
+
+		if (cmdLine.hasOption(OPT_BFILE_LONG)) {
+			parseFileArguments((CommandArguments) esArgs, cmdLine);
+			esArgs.addBfile(cmdLine.getOptionValue(OPT_BFILE_LONG));
+		}
+
+		if (cmdLine.hasOption(OPT_BATCH)) {
 			esArgs.setBatch(cmdLine.getOptionValue(OPT_BATCH));
 		}
-		if (cmdLine.hasOption(OPT_BFILES))
-		{
+
+		if (cmdLine.hasOption(OPT_BFILES)) {
 			esArgs.setBFiles(cmdLine.getOptionValues(OPT_BFILES));
 		}
 		return esArgs;
 	}
 
 	@Override
-	protected CommandImpl createCommandImpl()
-	{
+	protected CommandImpl createCommandImpl() {
 		return new ExSNPCommandImpl();
 	}
 
 	private String OPT_BFILES = "bfiles";
 	private String OPT_BFILES_DESC = "bfiles from which to extract common snps.";
-	
+
 	private String OPT_BATCH = "batch";
 	private String OPT_BATCH_DESC = "the batch file for bfiles.";
 }

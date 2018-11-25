@@ -35,13 +35,21 @@ public enum Gear {
 		addCommand(new gear.subcommands.metawatchdog.encrypt.EnigmaCommand());
 		addCommand(new gear.subcommands.profile.ProfileCommand());
 		addCommand(new gear.subcommands.exsnp.ExSNPCommand());
+		addCommand(new gear.subcommands.exsnp2.ExSNP2Command());
 		addCommand(new gear.subcommands.lmdr.LMDRCommand());
 		addCommand(new gear.subcommands.ppcbatch.PPCBatchCommand());
+		addCommand(new gear.subcommands.projectedpc.ProjectedPCCommand());
+		addCommand(new gear.subcommands.fst.FstCommand());
+
 		addCommand(new gear.subcommands.sfst.SFstCommand());
 		addCommand(new gear.subcommands.fpc.FPCCommand());
 		addCommand(new gear.subcommands.metapc.MetaPCCommand());
 		addCommand(new gear.subcommands.grm.GRMCommand());
+		addCommand(new gear.subcommands.grmA.GRMACommand());
+		addCommand(new gear.subcommands.grmstat.GRMStatCommand());
+
 		addCommand(new gear.subcommands.wgrm.WGRMCommand());
+		addCommand(new gear.subcommands.wgrmA.WGRMACommand());
 
 		addCommand(new gear.subcommands.qpca.QPCACommand());
 		addCommand(new gear.subcommands.locus.LocusCommand());
@@ -56,6 +64,8 @@ public enum Gear {
 		addCommand(new gear.subcommands.oath.oathx.OATHXCommand());
 		addCommand(new gear.subcommands.oath.synthesize.SynthCommand());
 		addCommand(new gear.subcommands.oath.oathbus.OATHBusCommand());
+		addCommand(new gear.subcommands.oath.pick.OathPickCommand());
+
 		addCommand(new gear.subcommands.reml.REMLCommand());
 		addCommand(new gear.subcommands.hereg.HERegCommand());
 		addCommand(new gear.subcommands.hefam.HEFamCommand());
@@ -73,7 +83,11 @@ public enum Gear {
 
 		addCommand(new gear.subcommands.ibd.IBDCommand());
 		
+<<<<<<< HEAD
 		addCommand(new gear.subcommands.testbed.TestBedCommand());
+=======
+		addCommand(new gear.subcommands.impute.ImputeCommand());
+>>>>>>> cgbwk
 	}
 
 	private void addCommand(Command cmd) {

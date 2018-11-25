@@ -31,6 +31,7 @@ public class EbatchGWASCommand extends Command {
 		options.addOption(OptionBuilder.withDescription(OPT_DOM_DESC).create(OPT_DOM));
 		options.addOption(OptionBuilder.withDescription(OPT_EPI_DESC).create(OPT_EPI));
 		options.addOption(OptionBuilder.withDescription(OPT_INBRED_DESC).withLongOpt(OPT_INBRED_LONG).create());
+		options.addOption(OptionBuilder.withDescription(OPT_GUI_DESC).withLongOpt(OPT_GUI_LONG).create());
 
 		options.addOption(OptionBuilder.withDescription(OPT_KEEP_DESC).withLongOpt(OPT_KEEP_LONG).hasArg().create());
 		options.addOption(
@@ -89,6 +90,10 @@ public class EbatchGWASCommand extends Command {
 		if (cmdLine.hasOption(OPT_INBRED_LONG)) {
 			EbatArgs.setInbred();
 		}
+		
+		if (cmdLine.hasOption(OPT_GUI_LONG)) {
+			EbatArgs.setGUI();
+		}
 		return EbatArgs;
 	}
 
@@ -106,4 +111,7 @@ public class EbatchGWASCommand extends Command {
 
 	private final static String OPT_INBRED_LONG = "inbred";
 	private final static String OPT_INBRED_DESC = "for inbred line populations.";
+	
+	private final static String OPT_GUI_LONG = "gui";
+	private final static String OPT_GUI_DESC = "GUI";
 }

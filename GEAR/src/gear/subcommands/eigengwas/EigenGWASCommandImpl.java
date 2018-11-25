@@ -34,7 +34,7 @@ public class EigenGWASCommandImpl extends CommandImpl {
 	public void execute(CommandArguments cmdArgs) {
 
 		eigenArgs = (EigenGWASCommandArguments) cmdArgs;
-		
+
 		PLINKParser pp = PLINKParser.parse(cmdArgs);
 
 		traitIdx = eigenArgs.getSelectedPhenotype(0);
@@ -157,6 +157,12 @@ public class EigenGWASCommandImpl extends CommandImpl {
 
 		Logger.printUserLog("Lambda GC is: " + lambdaGC);
 
+		if (eigenArgs.isGUI()) {
+			PrintStream gui_file = null;
+			gui_file = FileUtil.CreatePrintStream(eigenArgs.getOutRoot()+".egwas.gui");
+			gui_file.println(lambdaGC);
+			gui_file.close();
+		}
 		// ////TEST
 		// try {
 		// write.close();
@@ -171,11 +177,19 @@ public class EigenGWASCommandImpl extends CommandImpl {
 	public void printResult() {
 
 		PrintStream eGWAS = FileUtil.CreatePrintStream(this.eigenArgs.getOutRoot() + ".egwas");
-		eGWAS.println("SNP\tCHR\tBP\tRefAllele\tAltAllele\tfreq\tBeta\tSE\tChi\tP\tPGC\tn1\tfreq1\tn2\tfreq2\tFst");
+		if (eigenArgs.isTAB()) {
+			eGWAS.println("SNP\tRefAllele\tBeta");
+		} else {
+			eGWAS.println("SNP\tCHR\tBP\tRefAllele\tAltAllele\tfreq\tBeta\tSE\tChi\tP\tPGC\tn1\tfreq1\tn2\tfreq2\tFst");
+		}
 
 		for (int i = 0; i < eGWASResult.size(); i++) {
 			EigenGWASResult e1 = eGWASResult.get(i);
-			eGWAS.println(e1.printEGWASResult(lambdaGC));
+			if (eigenArgs.isTAB()) {
+				eGWAS.println(e1.printEGWASTab(lambdaGC));
+			} else {
+				eGWAS.println(e1.printEGWASResult(lambdaGC));				
+			}
 		}
 		eGWAS.close();
 	}

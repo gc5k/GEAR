@@ -167,6 +167,27 @@ public class GenotypeMatrix {
 		genotypeMat[idx][posByte] |= (v & 3) << posBit;
 	}
 
+	public boolean isNA(int idx, int i) {
+		// 0 homozygote 1/1
+		// 1 heterozygosity 1/2
+		// 2 homozygote 2/2
+		// 3 missing
+		int posByte = QCedSnpIndex.get(i) >> shift;
+		int posBit = (QCedSnpIndex.get(i) & 0xf) << 1;
+		int g = (genotypeMat[idx][posByte] >> (posBit)) & 3;
+		return g == 3? true:false;
+		// if (g == 1) {// 01
+		// return 3;
+		// } else if (g == 0) {
+		// return 0;
+		// } else if (g == 2) {
+		// return 1;
+		// } else {
+		// return 2;
+		// }
+
+	}
+
 	public int getAdditiveScore(int idx, int i) {
 		// 0 homozygote 1/1
 		// 1 heterozygosity 1/2

@@ -102,7 +102,7 @@ public class HERegCommandArguments extends CommandArguments
 		this.pheIdx[0] = Integer.parseInt(pIdx);
 		if (this.pheIdx[0] < 1)
 		{
-			Logger.printUserLog("Phenotype index should be greater than 1.\nGEAR quitted");
+			Logger.printUserLog("Phenotype index should be greater than 1.\nGEAR quit.");
 			System.exit(1);
 		}
 		this.pheIdx[0]--;

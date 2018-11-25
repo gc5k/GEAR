@@ -37,9 +37,18 @@ public class EbatchGWASCommandArguments extends CommandArguments {
 		return adjvar;
 	}
 
+	public void setGUI() {
+		isGUI = true;
+	}
+	
+	public boolean isGUI() {
+		return isGUI;
+	}
+
 	private int ev = 1;
 	private boolean isDom = false;
 	private boolean isEpi = false;
 	private boolean adjvar = false;
+	private boolean isGUI = false;
 
 }

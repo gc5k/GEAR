@@ -19,8 +19,8 @@ import gear.family.plink.PLINKParser;
 import gear.family.qc.rowqc.SampleFilter;
 import gear.subcommands.CommandArguments;
 import gear.subcommands.CommandImpl;
-import gear.subcommands.grm.GRMCommandArguments;
-import gear.subcommands.grm.GRMCommandImpl;
+import gear.subcommands.grmA.GRMACommandArguments;
+import gear.subcommands.grmA.GRMACommandImpl;
 import gear.util.BufferedReader;
 import gear.util.FileUtil;
 import gear.util.Logger;
@@ -44,14 +44,14 @@ public class FastPCACommandImpl extends CommandImpl {
 	public void execute(CommandArguments cmdArgs) {
 		fpcaArgs = (FastPCACommandArguments) cmdArgs;
 
-		GRMCommandArguments grmArgs = new GRMCommandArguments();
+		GRMACommandArguments grmArgs = new GRMACommandArguments();
 		grmArgs.setBFile(fpcaArgs.getBFile());
 		grmArgs.setOutRoot(fpcaArgs.getOutRoot());
 		grmArgs.setGZ();
 		if (fpcaArgs.isAdjVar())
 			grmArgs.setAdjVar();
 
-		GRMCommandImpl grmImpl = new GRMCommandImpl();
+		GRMACommandImpl grmImpl = new GRMACommandImpl();
 		grmImpl.execute(grmArgs);
 
 		data = new InputDataSet2();

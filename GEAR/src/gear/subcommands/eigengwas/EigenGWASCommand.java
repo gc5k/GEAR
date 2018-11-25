@@ -26,6 +26,8 @@ public class EigenGWASCommand extends Command {
 				.isRequired().create());
 		options.addOption(OptionBuilder.withDescription(OPT_PHE_DESC).hasArg().isRequired().create(OPT_PHE));
 		options.addOption(OptionBuilder.withDescription(OPT_MPHE_DESC).hasArgs().create(OPT_MPHE));
+		options.addOption(OptionBuilder.withDescription(OPT_GUI_DESC).withLongOpt(OPT_GUI_LONG).create());
+		options.addOption(OptionBuilder.withDescription(OPT_TAB_DESC).withLongOpt(OPT_TAB_LONG).create());
 
 		options.addOption(OptionBuilder.withDescription(OPT_KEEP_DESC).withLongOpt(OPT_KEEP_LONG).hasArg().create());
 		options.addOption(
@@ -71,10 +73,24 @@ public class EigenGWASCommand extends Command {
 
 		parsePhenoFileArguments((CommandArguments) eigenArgs, cmdLine);
 		parsePhenoIndexArguments((CommandArguments) eigenArgs, cmdLine);
+		
+		if (cmdLine.hasOption(OPT_GUI_LONG)) {
+			eigenArgs.setGUI();
+		}
+		if (cmdLine.hasOption(OPT_TAB_LONG)) {
+			eigenArgs.setTAB();
+		}
+		
 		return eigenArgs;
 	}
 
 	protected CommandImpl createCommandImpl() {
 		return new EigenGWASCommandImpl();
 	}
+
+	private final static String OPT_GUI_LONG = "gui";
+	private final static String OPT_GUI_DESC = "GUI";
+
+	private final static String OPT_TAB_LONG = "tab";
+	private final static String OPT_TAB_DESC = "table";
 }

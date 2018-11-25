@@ -43,7 +43,7 @@ public class Family implements UniqueRecord
 	/**
 	 * adds a member to this family (adds to persons ArrayList)
 	 * 
-	 * @param ind Person to add to persons ArrayList
+	 * @param per Person to add to persons ArrayList
 	 */
 	public void addPerson(Person per)
 	{
@@ -148,11 +148,6 @@ public class Family implements UniqueRecord
 	 * non-transmitted genotypes when only children's genotypes but no parent's
 	 * genotype are available at marker locus A
 	 * 
-	 * @param genotype
-	 *            , transmitted genotype at locus i of indiviudal j
-	 * @param genoset
-	 *            , configuration of parents' and children's genotypes.
-	 * @return non-transmitted genotype
 	 */
 	public String[] getNonTransmitted(String transmitted,
 			AbstractGenoDistribution genodis)

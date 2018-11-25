@@ -87,7 +87,7 @@ public class EigenGWASEpiCommandImpl extends CommandImpl {
 		// FileUtil.CreatePrintStream(this.eigenArgs.getOutRoot() + ".egwas");
 		// eGWAS.println("SNP\tCHR\tBP\tRefAllele\tAltAllele\tfreq\tBeta\tSE\tChi\tP\tPGC\tn1\tfreq1\tn2\tfreq2\tFst");
 
-		gfreq = PopStat.calGenoFrequency(pGM);
+		gfreq = PopStat.calGenoFrequency(pGM, true);
 		for (int i = 0; i < pGM.getNumMarker(); i++) {
 			SNP snp1 = pGM.getSNPList().get(i);
 			double[][] x = new double[pGM.getNumIndivdial()][4]; // a1+d1+a2+d2

@@ -146,7 +146,6 @@ public final class ProfileCommandImpl extends CommandImpl {
 				default:
 					continue;
 				}
-
 				float riskValue = coeffModels[locIdx].compute(scoreAlleleFrac)
 						* filteredSNPs.getScore(traitIdx, locIdx);
 

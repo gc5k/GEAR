@@ -29,7 +29,7 @@ public class CovReader
 					if ( (covar_idx[i]-1) >= nCol)
 					{
 						Logger.printUserLog(covar_idx[i] + " is a too big index for '" + covar + "'.");
-						Logger.printUserLog("GEAR quitted.");
+						Logger.printUserLog("GEAR quit.");
 						System.exit(0);
 					}
 				}
@@ -74,7 +74,7 @@ public class CovReader
 			if (cov.size() != NumCohort)
 			{
 				Logger.printUserLog("The number of lines do not match cohort size.");
-				Logger.printUserLog("GEAR Quitted.");
+				Logger.printUserLog("GEAR quit.");
 				System.exit(0);
 			}
 			Logger.printUserLog("Read " + cov.size() + " lines in '" + this.covar + ".'");

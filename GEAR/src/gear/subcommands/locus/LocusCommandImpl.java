@@ -17,6 +17,7 @@ public class LocusCommandImpl extends CommandImpl {
 	private GenotypeMatrix pGM;
 	private double[][] allelefreq;
 	private double[] allelevar;
+	private double[][] genoCnt;
 	private LocusCommandArguments locusArgs;
 
 	@Override
@@ -29,6 +30,7 @@ public class LocusCommandImpl extends CommandImpl {
 
 		allelefreq = PopStat.calAlleleFrequency(pGM);
 		allelevar = PopStat.calGenoVariance(pGM);
+		genoCnt = PopStat.calGenoFrequency(pGM, false);
 		printResult();
 	}
 
@@ -36,7 +38,7 @@ public class LocusCommandImpl extends CommandImpl {
 		DecimalFormat fmt = new DecimalFormat("0.0000");
 		DecimalFormat fmtp = new DecimalFormat("0.00E000");
 		PrintStream LocusPrint = FileUtil.CreatePrintStream(this.locusArgs.getOutRoot() + ".locus");
-		LocusPrint.println("SNP\tCHR\tBP\tRefAllele\tAltAllele\tFreq\tVar\tEVar\tnChr");
+		LocusPrint.println("SNP\tCHR\tBP\tRefAllele\tAltAllele\tFreq\tVar\tEVar\tAA\tAa\taa\tnChr");
 
 		for (int i = 0; i < pGM.getSNPList().size(); i++) {
 			SNP snp = pGM.getSNPList().get(i);
@@ -47,7 +49,10 @@ public class LocusCommandImpl extends CommandImpl {
 					+ (allelefreq[i][0] > 0.0001 ? fmt.format(allelefreq[i][0]) : fmtp.format(allelefreq[i][0])) + "\t"
 					+ (allelevar[i] > 0.0001 ? fmt.format(allelevar[i]) : fmtp.format(allelevar[i])) + "\t"
 					+ (eVar > 0.001 ? fmt.format(eVar) : fmtp.format(eVar)) + "\t"
-					+ (int) ((1 - allelefreq[i][2]) * pGM.getNumIndivdial() * 2));
+					+ (int) (genoCnt[i][0]) + "\t"
+					+ (int) (genoCnt[i][1]) + "\t"
+					+ (int) (genoCnt[i][2]) + "\t"
+					+ (int) (2*(genoCnt[i][0] + genoCnt[i][1] + genoCnt[i][2])));
 		}
 		LocusPrint.close();
 		Logger.printUserLog("Save results to " + locusArgs.getOutRoot() + ".locus.");

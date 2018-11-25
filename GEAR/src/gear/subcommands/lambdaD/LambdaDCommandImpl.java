@@ -120,8 +120,8 @@ public class LambdaDCommandImpl extends CommandImpl
 
 		if (NumMetaFile < 2)
 		{
-			Logger.printUserError("At least two summary statistic files should be specified.\n");
-			Logger.printUserError("GEAR quitted.\n");
+			Logger.printUserLog("At least two summary statistic files should be specified.");
+			Logger.printUserLog("GEAR quitted.");
 			System.exit(0);
 		}
 

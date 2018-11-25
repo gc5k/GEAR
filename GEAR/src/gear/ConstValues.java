@@ -28,6 +28,7 @@ public class ConstValues {
 	public static String MISSING_PHENOTYPE = "-9";
 	public static String NA_String = "NA";
 
+	public static final int TooFewSample = 5;
 	public static final boolean HAS_HEADER = true;
 	public static final boolean NO_HEADER = false;
 
