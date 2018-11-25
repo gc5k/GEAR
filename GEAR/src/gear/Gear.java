@@ -81,13 +81,8 @@ public enum Gear {
 		addCommand(new gear.subcommands.simulationcc.SimulationCCCommand());
 		addCommand(new gear.subcommands.simulationinbred.SimulationInbredCommand());
 
-		addCommand(new gear.subcommands.ibd.IBDCommand());
-		
-<<<<<<< HEAD
-		addCommand(new gear.subcommands.testbed.TestBedCommand());
-=======
+		addCommand(new gear.subcommands.ibd.IBDCommand());		
 		addCommand(new gear.subcommands.impute.ImputeCommand());
->>>>>>> cgbwk
 	}
 
 	private void addCommand(Command cmd) {
