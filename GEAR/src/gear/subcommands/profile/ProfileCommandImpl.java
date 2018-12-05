@@ -112,36 +112,26 @@ public final class ProfileCommandImpl extends CommandImpl {
 				case MATCH_ALLELE1:
 				case MATCH_ALLELE1_FLIPPED:
 					scoreAlleleFrac = iter.getAllele1Fraction();
-					// if (profCmdArgs.isScale())
-					// {
-					// if(freq[locIdx][0] != Double.NaN && freq[locIdx][0] != 1.0)
-					// {
-					// float p = (float) freq[locIdx][0];
-					// scoreAlleleFrac = (float) ((scoreAlleleFrac - 2 * p) / Math.sqrt(2 * p *
-					// (1-p)));
-					// }
-					// else
-					// {
-					// scoreAlleleFrac = 0.0f;
-					// }
-					// }
+					if (profCmdArgs.isScale()) {
+						if (freq[locIdx][0] != Double.NaN && freq[locIdx][0] != 1.0) {
+							float p = (float) freq[locIdx][0];
+							scoreAlleleFrac = (float) ((scoreAlleleFrac - 2 * p) / Math.sqrt(2 * p * (1 - p)));
+						} else {
+							scoreAlleleFrac = 0.0f;
+						}
+					}
 					break;
 				case MATCH_ALLELE2:
 				case MATCH_ALLELE2_FLIPPED:
 					scoreAlleleFrac = 2.0f - iter.getAllele1Fraction();
-					// if (profCmdArgs.isScale())
-					// {
-					// if (freq[locIdx][1] != Double.NaN && freq[locIdx][1] != 1.0)
-					// {
-					// float p = (float) freq[locIdx][1];
-					// scoreAlleleFrac = (float) ((scoreAlleleFrac - 2*p) / Math.sqrt(2 * p *
-					// (1-p)));
-					// }
-					// else
-					// {
-					// scoreAlleleFrac = 0.0f;
-					// }
-					// }
+					if (profCmdArgs.isScale()) {
+						if (freq[locIdx][1] != Double.NaN && freq[locIdx][1] != 1.0) {
+							float p = (float) freq[locIdx][1];
+							scoreAlleleFrac = (float) ((scoreAlleleFrac - 2 * p) / Math.sqrt(2 * p * (1 - p)));
+						} else {
+							scoreAlleleFrac = 0.0f;
+						}
+					}
 					break;
 				default:
 					continue;
