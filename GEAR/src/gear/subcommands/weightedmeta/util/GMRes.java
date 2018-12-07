@@ -99,23 +99,28 @@ public class GMRes implements Comparable<GMRes>
 	{
 		//see Guido Schwarzer et al [Meta-Analysis with R, Springer], page 34, 40
 		
-		for (int i = 0; i < beta.size(); i++)
-		{
-			Q += wt.get(i) * (beta.get(i) - b) * (beta.get(i) - b);
-		}
-		ChiSquaredDistributionImpl chi = new ChiSquaredDistributionImpl(wt.size()-1);
-		try
-		{
-			pQchisq = 1-chi.cumulativeProbability(Q);
-		}
-		catch (MathException e)
-		{
-			e.printStackTrace();
-		}
-		H2 = Q/(wt.size() - 1);
-		if (Q > (wt.size() - 1))
-		{
-			I2 = (H2 - 1)/H2;
+		if (wt.size() < 2) {
+			H2 = 0;
+			I2 = 0;
+		} else {
+			for (int i = 0; i < beta.size(); i++)
+			{
+				Q += wt.get(i) * (beta.get(i) - b) * (beta.get(i) - b);
+			}
+			ChiSquaredDistributionImpl chi = new ChiSquaredDistributionImpl(wt.size()-1);
+			try
+			{
+				pQchisq = 1-chi.cumulativeProbability(Q);
+			}
+			catch (MathException e)
+			{
+				e.printStackTrace();
+			}
+			H2 = Q/(wt.size() - 1);
+			if (Q > (wt.size() - 1))
+			{
+				I2 = (H2 - 1)/H2;
+			}			
 		}
 	}
 
