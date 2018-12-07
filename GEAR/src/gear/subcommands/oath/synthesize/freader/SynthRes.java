@@ -2,6 +2,9 @@ package gear.subcommands.oath.synthesize.freader;
 
 import java.text.DecimalFormat;
 
+import gear.util.stat.PrecisePvalue;
+import gear.util.stat.Z;
+
 public class SynthRes implements Comparable<SynthRes> {
 	private String snp;
 	private int chr;
@@ -108,7 +111,13 @@ public class SynthRes implements Comparable<SynthRes> {
 		} else {
 			sb.append(fmtp.format(z) + "\t");
 		}
-		sb.append("1\t");
+
+		double P = PrecisePvalue.getPvalue4Z_2Tail(z);
+		if (P >= 0.001) {
+			sb.append(fmt.format(P) + "\t");
+		} else {
+			sb.append(fmtp.format(P) + "\t");
+		}
 		return sb.toString();
 	}
 

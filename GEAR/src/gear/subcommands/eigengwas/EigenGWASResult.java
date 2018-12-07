@@ -2,10 +2,6 @@ package gear.subcommands.eigengwas;
 
 import java.text.DecimalFormat;
 
-import org.apache.commons.math.MathException;
-import org.apache.commons.math.distribution.NormalDistributionImpl;
-
-import gear.util.Logger;
 import gear.util.pop.PopStat;
 import gear.util.stat.PrecisePvalue;
 import gear.ConstValues;
@@ -28,8 +24,6 @@ public class EigenGWASResult {
 	private static DecimalFormat dfE = new DecimalFormat("0.00E000");
 	private boolean isGoodLocus;
 
-	private static NormalDistributionImpl unitNormal = new NormalDistributionImpl(0.0D, 1.0D);
-
 	public EigenGWASResult(SNP snp, double freq, double b, double b_se, double n1, double freq1, double n2,
 			double freq2, boolean isGood) {
 		this.snp = snp;
@@ -37,7 +31,7 @@ public class EigenGWASResult {
 		this.b = b;
 		this.b_se = b_se;
 		Z = b / b_se;
-		this.P = getP(Z);
+		this.P = PrecisePvalue.getPvalue4Z_2Tail(Z);
 
 		this.n1 = n1;
 		this.freq1 = freq1;
@@ -59,7 +53,7 @@ public class EigenGWASResult {
 	public String printEGWASResult(double gc) {
 		StringBuffer sb = new StringBuffer();
 		double z1 = Z / Math.sqrt(gc);
-		PGC = getP(z1);
+		PGC = PrecisePvalue.getPvalue4Z_2Tail(z1);
 		sb.append(snp.getName() + "\t" + snp.getChromosome() + "\t" + snp.getPosition() + "\t" + snp.getFirstAllele()
 				+ "\t" + snp.getSecAllele() + "\t" + df.format(freq) + "\t");
 
@@ -159,20 +153,6 @@ public class EigenGWASResult {
 			}
 		}
 		return sb.toString();
-	}
-
-	private double getP(double z) {
-		double p = 1;
-		try {
-			if (Math.abs(z) < 8.0D) {
-				p = (1.0D - unitNormal.cumulativeProbability(Math.abs(z))) * 2.0D;
-			} else {
-				p = PrecisePvalue.TwoTailZcumulativeProbability(Math.abs(z));
-			}
-		} catch (MathException e) {
-			Logger.printUserError(e.toString());
-		}
-		return p;
 	}
 
 }
