@@ -201,9 +201,9 @@ public class SimulationCCCommandArguments extends CommandArguments {
 			Logger.printUserError("LD (Lewontin's) frequency is out of range: " + ldRangeLow + "--" + ldRangeHigh);
 		}
 		if (ldRangeLow > ldRangeHigh) {
-			double t = FreqRangeLow;
-			FreqRangeLow = FreqRangeHigh;
-			FreqRangeLow = t;
+			double t = ldRangeLow;
+			ldRangeLow = ldRangeHigh;
+			ldRangeLow = t;
 		}
 		setUnifFreq();
 		isPlainLD = false;
