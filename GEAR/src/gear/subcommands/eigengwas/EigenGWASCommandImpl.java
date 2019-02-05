@@ -30,6 +30,8 @@ public class EigenGWASCommandImpl extends CommandImpl {
 	private ArrayList<EigenGWASResult> eGWASResult = NewIt.newArrayList();
 
 	private double lambdaGC = 1;
+	private double[] GC;
+	private double[] pQuantile;
 
 	public void execute(CommandArguments cmdArgs) {
 
@@ -146,11 +148,25 @@ public class EigenGWASCommandImpl extends CommandImpl {
 		Collections.sort(pArray);
 		int idx = (int) Math.ceil(pArray.size() / 2);
 
+		if(Math.log10(pArray.size()) <= 6) {
+			GC = new double[(int) (Math.log10(pArray.size()))];
+			pQuantile = new double[(int) (Math.log10(pArray.size()))];
+		} else {
+			GC = new double[7];
+			pQuantile = new double[7];
+		}
 		Logger.printUserLog("Median of p values is " + pArray.get(idx));
 
 		try {
 			double chisq = ci.inverseCumulativeProbability(1 - pArray.get(idx).doubleValue());
 			lambdaGC = chisq / 0.4549;
+			GC[0] = lambdaGC;
+			pQuantile[0] = 0.5;
+			for(int i = 1; i < GC.length; i++) {
+				chisq = ci.inverseCumulativeProbability(Math.pow(10, -1*i));
+				GC[i] = ci.inverseCumulativeProbability(1 - pArray.get((int) (pArray.size()*Math.pow(10, -1*i))) );
+				pQuantile[i] = Math.pow(10, -1*i);
+			}
 		} catch (MathException e) {
 			e.printStackTrace();
 		}
@@ -185,10 +201,18 @@ public class EigenGWASCommandImpl extends CommandImpl {
 
 		for (int i = 0; i < eGWASResult.size(); i++) {
 			EigenGWASResult e1 = eGWASResult.get(i);
+			int j = 0;
+			for (; j < GC.length; j++) {
+				if (e1.GetP() >= pQuantile[j]) {
+					break;
+				}
+			}
 			if (eigenArgs.isTAB()) {
-				eGWAS.println(e1.printEGWASTab(lambdaGC));
+//				eGWAS.println(e1.printEGWASTab(lambdaGC));
+				eGWAS.println(e1.printEGWASTab(GC[j]));
 			} else {
-				eGWAS.println(e1.printEGWASResult(lambdaGC));				
+				eGWAS.println(e1.printEGWASResult(GC[j]));
+//				eGWAS.println(e1.printEGWASResult(lambdaGC));				
 			}
 		}
 		eGWAS.close();

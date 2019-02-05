@@ -72,7 +72,8 @@ public enum Gear {
 		addCommand(new gear.subcommands.heregb.HERegBCommand());
 
 		addCommand(new gear.subcommands.fastpca.FastPCACommand());
-
+		
+		addCommand(new gear.subcommands.simulationdipop.SimulationDiPopCommand());
 		addCommand(new gear.subcommands.simuqtreal.SimulationQTRealCommand());
 		addCommand(new gear.subcommands.simulationmpheno.SimulationMPCommand());
 		addCommand(new gear.subcommands.simulationfammpheno.SimuFamilyMPCommand());

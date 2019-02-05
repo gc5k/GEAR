@@ -25,13 +25,11 @@ import gear.util.Logger;
 import gear.util.Sample;
 import gear.util.pop.PopStat;
 
-public class SimulationQTCommandImpl extends CommandImpl
-{
+public class SimulationQTCommandImpl extends CommandImpl {
 
 	@Override
-	public void execute(CommandArguments cmdArgs)
-	{
-		qtArgs = (SimulationQTCommandArguments)cmdArgs;
+	public void execute(CommandArguments cmdArgs) {
+		qtArgs = (SimulationQTCommandArguments) cmdArgs;
 
 		sample = qtArgs.getSampleSize();
 		h2 = qtArgs.getHsq();
@@ -41,7 +39,7 @@ public class SimulationQTCommandImpl extends CommandImpl
 		rnd.reSeed(seed);
 		rep = qtArgs.getRep();
 
-		idx = Sample.SampleIndex(0, M-1, M-nullM);
+		idx = Sample.SampleIndex(0, M - 1, M - nullM);
 		Arrays.sort(idx);
 
 		getFreq();
@@ -51,20 +49,16 @@ public class SimulationQTCommandImpl extends CommandImpl
 		calLD();
 		generateSampleNoSelection();
 
-		if (qtArgs.isMakeBed())
-		{
+		if (qtArgs.isMakeBed()) {
 			writeBFile();
-		}
-		else
-		{
+		} else {
 			writeFile();
 		}
 		writeEffFile();
 
 	}
 
-	private void generateSampleNoSelection()
-	{
+	private void generateSampleNoSelection() {
 		DecimalFormat fmt = new DecimalFormat("#.###E0");
 
 		RealMatrix Meffect = new Array2DRowRealMatrix(effect);
@@ -72,69 +66,56 @@ public class SimulationQTCommandImpl extends CommandImpl
 		phenotype = new double[sample][rep];
 		BV = new double[sample];
 
-		for (int i = 0; i < sample; i++)
-		{
+		for (int i = 0; i < sample; i++) {
 			RealMatrix chr = SampleChromosome();
 			RealMatrix genoEff = chr.transpose().multiply(Meffect);
 
 			double bv = genoEff.getEntry(0, 0);
 
-			for (int j = 0; j < deffect.length; j++)
-			{
-				bv += chr.getEntry(j, 0) == 0 ? deffect[j]:0;
+			for (int j = 0; j < deffect.length; j++) {
+				bv += chr.getEntry(j, 0) == 0 ? deffect[j] : 0;
 			}
 			BV[i] = bv;
 			genotype[i] = chr.getColumn(0);
 		}
 
-		double H2=qtArgs.getHsq() + qtArgs.getHsqDom();
-		if (H2 == 0)
-		{
+		double H2 = qtArgs.getHsq() + qtArgs.getHsqDom();
+		if (H2 == 0) {
 			Arrays.fill(BV, 0);
 		}
 
 		double vg = StatUtils.variance(BV);
-		//rescale the phenotype to get the heritability and residual
-		double ve = H2 == 0 ? 1:vg * (1 - H2) / H2;
+		// rescale the phenotype to get the heritability and residual
+		double ve = H2 == 0 ? 1 : vg * (1 - H2) / H2;
 		double E = Math.sqrt(ve);
 		Logger.printUserLog("Vg=" + fmt.format(vg));
-		for (int i = 0; i < rep; i++)
-		{
-			double[] pv=new double[sample];
-			for (int j = 0; j < sample; j++)
-			{
+		for (int i = 0; i < rep; i++) {
+			double[] pv = new double[sample];
+			for (int j = 0; j < sample; j++) {
 				phenotype[j][i] = BV[j] + rnd.nextGaussian(0, E);
 				pv[j] = phenotype[j][i];
 			}
-			double Vp=StatUtils.variance(pv);
-			Logger.printUserLog("Vp=" + fmt.format(Vp) + "; hsq=" + fmt.format(vg/Vp) + " for replicate " + (i+1));
+			double Vp = StatUtils.variance(pv);
+			Logger.printUserLog("Vp=" + fmt.format(Vp) + "; hsq=" + fmt.format(vg / Vp) + " for replicate " + (i + 1));
 		}
-		Logger.printUserLog("Total individuals visited (no selection): "
-				+ BV.length + "\n");
+		Logger.printUserLog("Total individuals visited (no selection): " + BV.length + "\n");
 	}
 
-	public RealMatrix SampleChromosome()
-	{
+	public RealMatrix SampleChromosome() {
 		double[] g = new double[M];
 		double[][] v = new double[M][2];
-		for (int i = 0; i < M; i++)
-		{
-			for (int j = 0; j < 2; j++)
-			{
+		for (int i = 0; i < M; i++) {
+			for (int j = 0; j < 2; j++) {
 				double r = rnd.nextUniform(0, 1);
 				double z = r < freq[i] ? 0 : 1;
-				if (i == 0)
-				{
+				if (i == 0) {
 					v[i][j] = z;
-				}
-				else
-				{
+				} else {
 					double d = rnd.nextUniform(0, 1);
 					int a = (int) v[i - 1][j];
 					double f1 = a == 0 ? freq[i - 1] : (1 - freq[i - 1]);
 					double f2 = a == 0 ? freq[i] : (1 - freq[i]);
-					v[i][j] = d < (f1 * f2 + LD[i - 1]) / f1 ? v[i - 1][j]
-							: (1 - v[i - 1][j]);
+					v[i][j] = d < (f1 * f2 + LD[i - 1]) / f1 ? v[i - 1][j] : (1 - v[i - 1][j]);
 				}
 			}
 			g[i] = v[i][0] + v[i][1] - 1;
@@ -144,307 +125,242 @@ public class SimulationQTCommandImpl extends CommandImpl
 		return chr;
 	}
 
-	private void getFreq()
-	{
+	private void getFreq() {
 		freq = new double[M];
 
-		if (qtArgs.isPlainFreq())
-		{
+		if (qtArgs.isPlainFreq()) {
 			Arrays.fill(freq, qtArgs.getFreq());
-		}
-		else if (qtArgs.isUnifFreq())
-		{
-			for(int i = 0; i < M; i++)
-			{
+		} else if (qtArgs.isUnifFreq()) {
+			for (int i = 0; i < M; i++) {
 				freq[i] = rnd.nextUniform(qtArgs.getFreqRangeLow(), qtArgs.getFreqRangeHigh());
 			}
-		}
-		else if (qtArgs.isFreqFile())
-		{
+		} else if (qtArgs.isFreqFile()) {
 			BufferedReader reader = FileUtil.FileOpen(qtArgs.getFreqFile());
 			int c = 0;
 			String line = null;
-			try
-			{
-				while ((line = reader.readLine()) != null)
-				{
-					if(c >= M)
-					{
-						Logger.printUserLog("Have already read " + M + " allelic frequencies. Ignore the rest of the content in '" + qtArgs.getFreqFile() + "'.");
+			try {
+				while ((line = reader.readLine()) != null) {
+					if (c >= M) {
+						Logger.printUserLog(
+								"Have already read " + M + " allelic frequencies. Ignore the rest of the content in '"
+										+ qtArgs.getFreqFile() + "'.");
 						break;
 					}
 					line.trim();
 					String[] l = line.split(ConstValues.WHITESPACE_DELIMITER);
-					if (l.length < 1) continue;
+					if (l.length < 1)
+						continue;
 					freq[c++] = Double.parseDouble(l[0]);
 				}
 				reader.close();
-			}
-			catch (IOException e)
-			{
+			} catch (IOException e) {
 				Logger.handleException(e,
-						"An exception occurred when reading the frequency file '"
-								+ qtArgs.getFreqFile() + "'.");
+						"An exception occurred when reading the frequency file '" + qtArgs.getFreqFile() + "'.");
 			}
 		}
 	}
 
-	private void getEffect()
-	{
+	private void getEffect() {
 		effect = new double[M];
-		
+
 		Sample.setSeed(seed);
 
-		if(qtArgs.isPlainEffect())
-		{
-			for(int i = 0; i < idx.length; i++) effect[idx[i]] = qtArgs.getPolyEffect();
-		}
-		else if (qtArgs.isPolyEffect())
-		{
+		if (qtArgs.isPlainEffect()) {
 			for (int i = 0; i < idx.length; i++)
-			{
+				effect[idx[i]] = qtArgs.getPolyEffect();
+		} else if (qtArgs.isPolyEffect()) {
+			for (int i = 0; i < idx.length; i++) {
 				effect[idx[i]] = rnd.nextGaussian(0, 1);
 			}
-		}
-		else if (qtArgs.isPolyEffectSort())
-		{
+		} else if (qtArgs.isPolyEffectSort()) {
 			NormalDistributionImpl ndImpl = new NormalDistributionImpl();
 			ndImpl.reseedRandomGenerator(qtArgs.getSeed());
-			for (int i = 0; i < idx.length; i++)
-			{
-				try
-				{
-					effect[idx[i]] = ndImpl.inverseCumulativeProbability((i+0.5)/(idx.length));
-				}
-				catch (MathException e)
-				{
+			for (int i = 0; i < idx.length; i++) {
+				try {
+					effect[idx[i]] = ndImpl.inverseCumulativeProbability((i + 0.5) / (idx.length));
+				} catch (MathException e) {
 					e.printStackTrace();
 				}
 			}
-		}
-		else if (qtArgs.isPolyEffectFile())
-		{
+		} else if (qtArgs.isPolyEffectFile()) {
 			BufferedReader reader = FileUtil.FileOpen(qtArgs.getPolyEffectFile());
 			int c = 0;
 			String line = null;
-			try
-			{
-				while ((line = reader.readLine()) != null)
-				{
-					if(c >= M)
-					{
-						Logger.printUserLog("Have already read " + M + " allelic effects. Ignore the rest of the content in '" + qtArgs.getPolyEffectFile() + "'.");
+			try {
+				while ((line = reader.readLine()) != null) {
+					if (c >= M) {
+						Logger.printUserLog(
+								"Have already read " + M + " allelic effects. Ignore the rest of the content in '"
+										+ qtArgs.getPolyEffectFile() + "'.");
 						break;
 					}
 
 					line.trim();
 					String[] l = line.split(ConstValues.WHITESPACE_DELIMITER);
-					if (l.length < 1) continue;
+					if (l.length < 1)
+						continue;
 					effect[c++] = Double.parseDouble(l[0]);
 				}
 				reader.close();
-			}
-			catch (IOException e)
-			{
+			} catch (IOException e) {
 				Logger.handleException(e,
-						"An exception occurred when reading the frequency file '"
-								+ qtArgs.getPolyEffectFile() + "'.");
+						"An exception occurred when reading the frequency file '" + qtArgs.getPolyEffectFile() + "'.");
 			}
 		}
-		
-		if (h2 == 0)
-		{
+
+		if (h2 == 0) {
 			Arrays.fill(effect, 0);
 		}
 	}
 
-	private void getDomEffect()
-	{
+	private void getDomEffect() {
 		deffect = new double[M];
-		if (qtArgs.getHsqDom() == 0)
-		{
+		if (qtArgs.getHsqDom() == 0) {
 			Arrays.fill(deffect, 0);
 			return;
 		}
 
-		Sample.setSeed(seed+1);
+		Sample.setSeed(seed + 1);
 
-		if (qtArgs.isPlainDomEffect())
-		{
-			for (int i = 0; i < idx.length; i++) deffect[idx[i]] = qtArgs.getPolyDomEffect();
-		}
-		else if (qtArgs.isPolyDomEffect())
-		{
+		if (qtArgs.isPlainDomEffect()) {
+			for (int i = 0; i < idx.length; i++)
+				deffect[idx[i]] = qtArgs.getPolyDomEffect();
+		} else if (qtArgs.isPolyDomEffect()) {
 			double t = 0;
-			double adj=1;
-			if (qtArgs.isPolyDomEffect())
-			{
-				if (qtArgs.getHsq() > 0)
-				{
-					t = qtArgs.getHsq()/qtArgs.getHsqDom();
-					if (t < 2)
-					{
-						Logger.printUserError("Impossible heritability: hsq_add = " + qtArgs.getHsq() + " hsq_dom = " + qtArgs.getHsqDom());
+			double adj = 1;
+			if (qtArgs.isPolyDomEffect()) {
+				if (qtArgs.getHsq() > 0) {
+					t = qtArgs.getHsq() / qtArgs.getHsqDom();
+					if (t < 2) {
+						Logger.printUserError("Impossible heritability: hsq_add = " + qtArgs.getHsq() + " hsq_dom = "
+								+ qtArgs.getHsqDom());
 						System.exit(0);
-					}
-					else 
-					{
-						adj = Math.sqrt(5/(2*t-1));
+					} else {
+						adj = Math.sqrt(5 / (2 * t - 1));
 					}
 				}
 			}
 
-			for (int i = 0; i < idx.length; i++)
-			{
+			for (int i = 0; i < idx.length; i++) {
 				deffect[idx[i]] = rnd.nextGaussian(0, adj);
 			}
-		}
-		else if (qtArgs.isPolyDomEffectSort())
-		{
+		} else if (qtArgs.isPolyDomEffectSort()) {
 			NormalDistributionImpl ndImpl = new NormalDistributionImpl();
 			ndImpl.reseedRandomGenerator(qtArgs.getSeed());
-			for (int i = 0; i < idx.length; i++)
-			{
-				try
-				{
-					deffect[idx[i]] = ndImpl.inverseCumulativeProbability((i+0.5)/(idx.length));
-				}
-				catch (MathException e)
-				{
+			for (int i = 0; i < idx.length; i++) {
+				try {
+					deffect[idx[i]] = ndImpl.inverseCumulativeProbability((i + 0.5) / (idx.length));
+				} catch (MathException e) {
 					e.printStackTrace();
 				}
 			}
-		}
-		else if (qtArgs.isPolyDomEffectFile())
-		{
+		} else if (qtArgs.isPolyDomEffectFile()) {
 			BufferedReader reader = FileUtil.FileOpen(qtArgs.getPolyDomEffectFile());
 			int c = 0;
 			String line = null;
-			try
-			{
-				while ((line = reader.readLine()) != null)
-				{
-					if(c >= M)
-					{
-						Logger.printUserLog("Have already read " + M + " allelic effects. Ignore the rest of the content in '" + qtArgs.getPolyDomEffectFile() + "'.");
+			try {
+				while ((line = reader.readLine()) != null) {
+					if (c >= M) {
+						Logger.printUserLog(
+								"Have already read " + M + " allelic effects. Ignore the rest of the content in '"
+										+ qtArgs.getPolyDomEffectFile() + "'.");
 						break;
 					}
 
 					line.trim();
 					String[] l = line.split(ConstValues.WHITESPACE_DELIMITER);
-					if (l.length < 1) continue;
+					if (l.length < 1)
+						continue;
 					deffect[c++] = Double.parseDouble(l[0]);
 				}
 				reader.close();
-			}
-			catch (IOException e)
-			{
-				Logger.handleException(e,
-						"An exception occurred when reading the frequency file '"
-								+ qtArgs.getPolyDomEffectFile() + "'.");
+			} catch (IOException e) {
+				Logger.handleException(e, "An exception occurred when reading the frequency file '"
+						+ qtArgs.getPolyDomEffectFile() + "'.");
 			}
 		}
 
 	}
 
-	private void getDPrime()
-	{
-		dprime = new double[M-1];
-		if(qtArgs.isPlainLD())
-		{
+	private void getDPrime() {
+		dprime = new double[M - 1];
+		if (qtArgs.isPlainLD()) {
 			Arrays.fill(dprime, qtArgs.getLD());
-		}
-		else if (qtArgs.isRandLD())
-		{
-			for(int i = 0; i < dprime.length; i++)
-			{
+		} else if (qtArgs.isRandLD()) {
+			for (int i = 0; i < dprime.length; i++) {
 				dprime[i] = rnd.nextUniform(-1, 1);
 			}
-		}
-		else if (qtArgs.isLDFile())
-		{
+		} else if (qtArgs.isLDFile()) {
 			BufferedReader reader = FileUtil.FileOpen(qtArgs.getLDFile());
 			int c = 0;
 			String line = null;
-			try
-			{
-				while ((line = reader.readLine()) != null)
-				{
-					if (c >= dprime.length)
-					{
-						Logger.printUserLog("Have already read " + dprime.length + " LD. Ignore the rest of the content in '" + qtArgs.getLDFile() + "'.");
+			try {
+				while ((line = reader.readLine()) != null) {
+					if (c >= dprime.length) {
+						Logger.printUserLog("Have already read " + dprime.length
+								+ " LD. Ignore the rest of the content in '" + qtArgs.getLDFile() + "'.");
 						break;
 					}
 
 					line.trim();
 					String[] l = line.split(ConstValues.WHITESPACE_DELIMITER);
-					if (l.length < 1) continue;
+					if (l.length < 1)
+						continue;
 					dprime[c++] = Double.parseDouble(l[0]);
 				}
 				reader.close();
-			}
-			catch (IOException e)
-			{
+			} catch (IOException e) {
 				Logger.handleException(e,
-						"An exception occurred when reading the ld file '"
-								+ qtArgs.getLDFile() + "'.");
+						"An exception occurred when reading the ld file '" + qtArgs.getLDFile() + "'.");
 			}
 		}
 	}
 
-	public void calLD()
-	{
+	public void calLD() {
 		LD = PopStat.CalcLDfromDPrime(freq, dprime);
-//		LD = new double[M-1];
-//
-//		for (int i = 0; i < LD.length; i++)
-//		{
-//			if (dprime[i] > 0)
-//			{
-//				LD[i] = dprime[i]
-//						* Math.min(freq[i] * (1 - freq[i + 1]), freq[i + 1] * (1 - freq[i]));
-//			} 
-//			else
-//			{
-//				LD[i] = dprime[i]
-//						* Math.min(freq[i] * freq[i + 1], (1 - freq[i]) * (1 - freq[i + 1]));
-//			}
-//		}
+		// LD = new double[M-1];
+		//
+		// for (int i = 0; i < LD.length; i++)
+		// {
+		// if (dprime[i] > 0)
+		// {
+		// LD[i] = dprime[i]
+		// * Math.min(freq[i] * (1 - freq[i + 1]), freq[i + 1] * (1 - freq[i]));
+		// }
+		// else
+		// {
+		// LD[i] = dprime[i]
+		// * Math.min(freq[i] * freq[i + 1], (1 - freq[i]) * (1 - freq[i + 1]));
+		// }
+		// }
 	}
 
-	public void writeBFile()
-	{
+	public void writeBFile() {
 		DataOutputStream bedout = null;
 		PrintWriter fam = null;
 		PrintWriter bim = null;
 		PrintWriter phe = null;
-		PrintWriter geno = null;
+		// PrintWriter geno = null;
 		PrintWriter breed = null;
 
-		try
-		{
+		try {
 			bedout = new DataOutputStream(new FileOutputStream(qtArgs.getOutRoot() + ".bed"));
 
 			fam = new PrintWriter(new BufferedWriter(new FileWriter(qtArgs.getOutRoot() + ".fam")));
 			bim = new PrintWriter(new BufferedWriter(new FileWriter(qtArgs.getOutRoot() + ".bim")));
 			phe = new PrintWriter(new BufferedWriter(new FileWriter(qtArgs.getOutRoot() + ".phe")));
-			geno = new PrintWriter(new BufferedWriter(new FileWriter(qtArgs.getOutRoot() + ".add")));
+			// geno = new PrintWriter(new BufferedWriter(new FileWriter(qtArgs.getOutRoot()
+			// + ".add")));
 			breed = new PrintWriter(new BufferedWriter(new FileWriter(qtArgs.getOutRoot() + ".breed")));
-		}
-		catch (IOException e)
-		{
+		} catch (IOException e) {
 			e.printStackTrace();
 		}
 
-		for (int i = 0; i < genotype.length; i++)
-		{
-			if (qtArgs.isFID())
-			{
+		for (int i = 0; i < genotype.length; i++) {
+			if (qtArgs.isFID()) {
 				fam.print(qtArgs.getFamIDPrefix() + "sample_" + i + " ");
-			}
-			else
-			{
-				fam.print("sample_" + i + " ");				
+			} else {
+				fam.print("sample_" + i + " ");
 			}
 			fam.print(1 + " ");
 			fam.print(0 + " ");
@@ -453,47 +369,39 @@ public class SimulationQTCommandImpl extends CommandImpl
 
 			fam.println(phenotype[i][0] + " ");
 
-			if (qtArgs.isFID())
-			{
-				phe.print("sample_" + i + " " + 1);
-				breed.println("sample_" + i + " " + 1 + " " + BV[i]);				
-			}
-			else
-			{
+			if (qtArgs.isFID()) {
 				phe.print(qtArgs.getFamIDPrefix() + "sample_" + i + " " + 1);
-				breed.println(qtArgs.getFamIDPrefix() + "sample_" + i + " " + 1 + " " + BV[i]);				
+				breed.println(qtArgs.getFamIDPrefix() + "sample_" + i + " " + 1 + " " + BV[i]);
+			} else {
+				phe.print("sample_" + i + " " + 1);
+				breed.println("sample_" + i + " " + 1 + " " + BV[i]);
 			}
 
-			for (int j = 0; j < rep; j++)
-			{
+			for (int j = 0; j < rep; j++) {
 				phe.print(" " + phenotype[i][j]);
 			}
 			phe.println();
 		}
 
-		for (int i = 0; i < genotype.length; i++)
-		{
-			for (int j = 0; j < genotype[i].length; j++)
-			{
-				geno.print(((int) genotype[i][j] + 1) + " ");
-			}
-			geno.println();
-		}
+		// for (int i = 0; i < genotype.length; i++)
+		// {
+		// for (int j = 0; j < genotype[i].length; j++)
+		// {
+		// geno.print(((int) genotype[i][j] + 1) + " ");
+		// }
+		// geno.println();
+		// }
 
-		try
-		{
+		try {
 			bedout.writeByte(ConstValues.PLINK_BED_BYTE1);
 			bedout.writeByte(ConstValues.PLINK_BED_BYTE2);
 			bedout.writeByte(ConstValues.PLINK_BED_BYTE3);
-			for (int i = 0; i < M; i++)
-			{
+			for (int i = 0; i < M; i++) {
 				byte gbyte = 0;
 				int idx = 0;
-				for (int j = 0; j < sample; j++)
-				{
+				for (int j = 0; j < sample; j++) {
 					int g = (int) genotype[j][i] + 1;
-					switch (g)
-					{
+					switch (g) {
 					case 0:
 						g = 0;
 						break;
@@ -512,30 +420,23 @@ public class SimulationQTCommandImpl extends CommandImpl
 					gbyte |= g;
 					idx++;
 
-					if (j != (sample - 1))
-					{
-						if (idx == 4)
-						{
+					if (j != (sample - 1)) {
+						if (idx == 4) {
 							bedout.writeByte(gbyte);
 							gbyte = 0;
 							idx = 0;
 						}
-					} 
-					else
-					{
+					} else {
 						bedout.writeByte(gbyte);
 					}
 				}
 			}
 			bedout.close();
-		} 
-		catch (IOException e)
-		{
+		} catch (IOException e) {
 			e.printStackTrace();
 		}
 
-		for (int i = 0; i < M; i++)
-		{
+		for (int i = 0; i < M; i++) {
 			bim.print(1 + " ");
 			bim.print("rs" + i + " ");
 			bim.print(i / (M * 1.0) + " ");
@@ -543,42 +444,33 @@ public class SimulationQTCommandImpl extends CommandImpl
 			bim.println(A1 + " " + A2);
 		}
 
-		geno.close();
+		// geno.close();
 		phe.close();
 		bim.close();
 		fam.close();
 		breed.close();
 	}
 
-	public void writeFile()
-	{
+	public void writeFile() {
 		PrintWriter pedout = null;
 		PrintWriter map = null;
 		PrintWriter phe = null;
 		PrintWriter geno = null;
 		PrintWriter breed = null;
-		try
-		{
+		try {
 			pedout = new PrintWriter(new BufferedWriter(new FileWriter(qtArgs.getOutRoot() + ".ped")));
 			map = new PrintWriter(new BufferedWriter(new FileWriter(qtArgs.getOutRoot() + ".map")));
 			phe = new PrintWriter(new BufferedWriter(new FileWriter(qtArgs.getOutRoot() + ".phe")));
 			geno = new PrintWriter(new BufferedWriter(new FileWriter(qtArgs.getOutRoot() + ".add")));
 			breed = new PrintWriter(new BufferedWriter(new FileWriter(qtArgs.getOutRoot() + ".breed")));
-		}
-		catch (IOException e)
-		{
-			Logger.handleException(e,
-					"An exception occurred when writing files.");
+		} catch (IOException e) {
+			Logger.handleException(e, "An exception occurred when writing files.");
 		}
 
-		for (int i = 0; i < genotype.length; i++)
-		{
-			if (qtArgs.isFID())
-			{
-				pedout.print(qtArgs.getFamIDPrefix() + "sample_" + i + " ");				
-			}
-			else 
-			{
+		for (int i = 0; i < genotype.length; i++) {
+			if (qtArgs.isFID()) {
+				pedout.print(qtArgs.getFamIDPrefix() + "sample_" + i + " ");
+			} else {
 				pedout.print("sample_" + i + " ");
 			}
 			pedout.print(1 + " ");
@@ -587,51 +479,40 @@ public class SimulationQTCommandImpl extends CommandImpl
 			pedout.print(1 + " ");
 			pedout.print(phenotype[i][0] + " ");
 
-			for (int j = 0; j < genotype[i].length; j++)
-			{
+			for (int j = 0; j < genotype[i].length; j++) {
 				int g = (int) genotype[i][j];
-				if (g == -1)
-				{
+				if (g == -1) {
 					pedout.print(A1 + " " + A1 + "  ");
-				} else if (g == 0)
-				{
+				} else if (g == 0) {
 					pedout.print(A1 + " " + A2 + "  ");
-				} else
-				{
+				} else {
 					pedout.print(A2 + " " + A2 + "  ");
 				}
 			}
 			pedout.println();
 
-			if (qtArgs.isFID())
-			{
+			if (qtArgs.isFID()) {
 				phe.print(qtArgs.getFamIDPrefix() + "sample_" + i + " " + 1);
-				breed.println(qtArgs.getFamIDPrefix() + "sample_" + i + " " + 1 + " " + BV[i]);				
-			}
-			else
-			{
+				breed.println(qtArgs.getFamIDPrefix() + "sample_" + i + " " + 1 + " " + BV[i]);
+			} else {
 				phe.print("sample_" + i + " " + 1);
-				breed.println("sample_" + i + " " + 1 + " " + BV[i]);				
+				breed.println("sample_" + i + " " + 1 + " " + BV[i]);
 			}
-			for (int j = 0; j < rep; j++)
-			{
+			for (int j = 0; j < rep; j++) {
 				phe.print(" " + phenotype[i][j]);
 			}
 			phe.println();
 		}
 
-		for (int i = 0; i < M; i++)
-		{
+		for (int i = 0; i < M; i++) {
 			map.print(1 + " ");
 			map.print("rs" + i + " ");
 			map.print(i / (M * 1.0) + " ");
 			map.println(i * 100);
 		}
 
-		for (int i = 0; i < genotype.length; i++)
-		{
-			for (int j = 0; j < genotype[i].length; j++)
-			{
+		for (int i = 0; i < genotype.length; i++) {
+			for (int j = 0; j < genotype[i].length; j++) {
 				geno.print(((int) genotype[i][j] + 1) + " ");
 			}
 			geno.println();
@@ -644,43 +525,30 @@ public class SimulationQTCommandImpl extends CommandImpl
 		breed.close();
 	}
 
-	private void writeEffFile()
-	{
+	private void writeEffFile() {
 		PrintWriter eff = null;
-		try
-		{
+		try {
 			eff = new PrintWriter(new BufferedWriter(new FileWriter(qtArgs.getOutRoot() + ".rnd")));
-		}
-		catch (IOException e)
-		{
-			Logger.handleException(e,
-					"An exception occurred when writing files.");
+		} catch (IOException e) {
+			Logger.handleException(e, "An exception occurred when writing files.");
 		}
 
-		for (int i = 0; i < M; i++)
-		{
+		for (int i = 0; i < M; i++) {
 			eff.println("rs" + i + " " + A1 + " " + effect[i] + " " + deffect[i]);
 		}
 		eff.close();
-		
-		if (nullM > 0)
-		{
+
+		if (nullM > 0) {
 			PrintWriter nullMFile = null;
-			try
-			{
+			try {
 				nullMFile = new PrintWriter(new BufferedWriter(new FileWriter(qtArgs.getOutRoot() + ".exclude")));
-			}
-			catch (IOException e)
-			{
-				Logger.handleException(e,
-						"An exception occurred when writing files.");
+			} catch (IOException e) {
+				Logger.handleException(e, "An exception occurred when writing files.");
 			}
 
-			int cnt=0;
-			for (int i = 0; i < M; i++)
-			{
-				if (cnt < idx.length && i == idx[cnt])
-				{
+			int cnt = 0;
+			for (int i = 0; i < M; i++) {
+				if (cnt < idx.length && i == idx[cnt]) {
 					cnt++;
 					continue;
 				}
@@ -690,7 +558,7 @@ public class SimulationQTCommandImpl extends CommandImpl
 		}
 
 	}
-	
+
 	private SimulationQTCommandArguments qtArgs;
 
 	private RandomDataImpl rnd = new RandomDataImpl();
@@ -710,7 +578,7 @@ public class SimulationQTCommandImpl extends CommandImpl
 	private double[] effect;
 	private double[] deffect;
 	private double[] freq;
-	
+
 	private double[] dprime;
 	private double[] LD;
 
