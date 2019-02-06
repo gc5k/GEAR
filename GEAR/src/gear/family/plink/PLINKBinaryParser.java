@@ -35,7 +35,7 @@ public class PLINKBinaryParser extends PLINKParser {
 	}
 
 	@Override
-	public void Parse(CommandArguments cmdArgs) {
+	protected void doParse(CommandArguments cmdArgs) {
 		mapData = new BIMReader(mapFile);
 		ParseMapFile(cmdArgs);
 

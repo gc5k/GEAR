@@ -16,7 +16,7 @@ public class PLINKParser {
 		} else {
 			return null;
 		}
-		pp.Parse(cmdArgs);
+		pp.doParse(cmdArgs);
 		return pp;
 	}
 
@@ -58,7 +58,7 @@ public class PLINKParser {
 
 	}
 
-	public void Parse(CommandArguments cmdArgs) {
+	protected void doParse(CommandArguments cmdArgs) {
 		mapData = new MapFile(mapFile);
 
 		pedData = new PedigreeFile();
