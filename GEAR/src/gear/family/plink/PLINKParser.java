@@ -22,7 +22,6 @@ public class PLINKParser {
 
 	protected MapFile mapData = null;
 	protected PedigreeFile pedData = null;
-	// protected PhenotypeFile phenoData = null;
 	protected SNPFilter snpFilter;
 	protected String pedigreeFile;
 	protected String mapFile;
