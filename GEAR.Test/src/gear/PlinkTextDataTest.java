@@ -18,7 +18,7 @@ public class PlinkTextDataTest
 	public void testTextData()
 	{
 		PLINKParser parser = new PLINKParser("data/sim.ped", "data/sim.map");
-		parser.Parse();
+		parser.parse();
 		
 		PedigreeFile pedData = parser.getPedigreeData();
 		

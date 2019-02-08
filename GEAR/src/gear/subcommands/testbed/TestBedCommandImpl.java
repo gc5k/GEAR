@@ -9,7 +9,7 @@ public final class TestBedCommandImpl extends CommandImpl {
 	@Override
 	public void execute(CommandArguments cmdArgs) {
 		PLINKBinaryParser parser = new PLINKBinaryParser(cmdArgs.getBed(), cmdArgs.getBim(), cmdArgs.getFam());
-		parser.Parse();
+		parser.parse();
 	}
 
 }

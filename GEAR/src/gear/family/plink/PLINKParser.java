@@ -16,7 +16,7 @@ public class PLINKParser {
 		} else {
 			return null;
 		}
-		pp.doParse(cmdArgs);
+		pp.parse();
 		return pp;
 	}
 
@@ -31,7 +31,7 @@ public class PLINKParser {
 		mapFile = map;
 	}
 
-	public void Parse() {
+	public void parse() {
 		mapData = new MapFile(mapFile);
 
 		pedData = new PedigreeFile();
@@ -39,31 +39,6 @@ public class PLINKParser {
 
 		if (mapFile != null) {// bim
 			ParseMapFile();
-			Logger.printUserLog("Reading '" + mapFile + "'.");
-			Logger.printUserLog("Marker number: " + mapData.getMarkerNumberOriginal());
-			Logger.printUserLog("Selected marker number: " + mapData.getMarkerNumber());
-			pedData.setHeader(false);
-			ParsePedFile();
-			Logger.printUserLog("Reading '" + pedigreeFile + "'.");
-			Logger.printUserLog("Individual number: " + pedData.getNumIndividuals());
-		} else {
-			pedData.setHeader(true);
-			ParsePedFile();
-			mapData.setMarker(pedData.getNumMarker());
-		}
-		mapData.setPolymorphismMarker(pedData.getPolymorphism());
-		pedData.cleanup();
-
-	}
-
-	protected void doParse(CommandArguments cmdArgs) {
-		mapData = new MapFile(mapFile);
-
-		pedData = new PedigreeFile();
-		pedData.setHeader(false);
-
-		if (mapFile != null) {// bim
-			ParseMapFile(cmdArgs);
 			Logger.printUserLog("Reading '" + mapFile + "'.");
 			Logger.printUserLog("Marker number: " + mapData.getMarkerNumberOriginal());
 			Logger.printUserLog("Selected marker number: " + mapData.getMarkerNumber());

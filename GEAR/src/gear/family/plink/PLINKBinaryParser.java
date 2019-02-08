@@ -2,7 +2,6 @@ package gear.family.plink;
 
 import gear.family.pedigree.file.BEDReader;
 import gear.family.pedigree.file.BIMReader;
-import gear.subcommands.CommandArguments;
 
 public class PLINKBinaryParser extends PLINKParser {
 
@@ -35,19 +34,7 @@ public class PLINKBinaryParser extends PLINKParser {
 	}
 
 	@Override
-	protected void doParse(CommandArguments cmdArgs) {
-		mapData = new BIMReader(mapFile);
-		ParseMapFile(cmdArgs);
-
-		pedData = new BEDReader(FamFile, snpFilter.getWorkingSNP().length, mapData);
-		pedData.setHeader(false);
-		ParsePedFile();
-
-		pedData.cleanup();
-	}
-
-	@Override
-	public void Parse() {
+	public void parse() {
 		mapData = new BIMReader(mapFile);
 		ParseMapFile();
 

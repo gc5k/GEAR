@@ -29,7 +29,7 @@ public class PlinkBinaryDataTest
 	public void test(String bed, String bim, String fam)
 	{
 		PLINKBinaryParser parser = new PLINKBinaryParser(bed, bim, fam);
-		parser.Parse();
+		parser.parse();
 		
 		PedigreeFile pedData = parser.getPedigreeData();
 		
