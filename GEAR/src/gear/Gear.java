@@ -7,8 +7,6 @@ import java.util.TreeMap;
 import java.util.TreeSet;
 
 //import gear.he.h2trans.H2Transformer;
-//import gear.ibd.jhe.JointHELinkLS;
-//import gear.ibd.jhe.JointHELinkML;
 //import gear.pscontrol.NonTransmitted;
 import gear.subcommands.Command;
 //import gear.util.Logger;
@@ -145,13 +143,6 @@ public enum Gear {
 //			} else if (CmdArgs.INSTANCE.naiveImputFlag) {
 //				NaiveImputation ni = new NaiveImputation();
 //				ni.Imputation();
-//			} else if (CmdArgs.INSTANCE.helinkFlag) {
-//				if (CmdArgs.INSTANCE.remlFlag) {
-//					JointHELinkML heReml = new JointHELinkML();
-//				} else {
-//					JointHELinkLS heLS = new JointHELinkLS();
-//					heLS.JHE();
-//				}
 //			} else if (CmdArgs.INSTANCE.imputeFlag) {
 //				ImputeProbabilityBestGuess bestGuess = new ImputeProbabilityBestGuess();
 //				bestGuess.convert();
