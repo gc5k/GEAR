@@ -65,15 +65,6 @@ public class PLINKParser {
 		mapData.setWSNP(WSNP);
 	}
 
-	public void ParseMapFile(CommandArguments cmdArgs) {
-		mapData.parseMap();
-		Logger.printUserLog("Read " + mapData.getMarkerNumberOriginal() + " SNPs from '" + cmdArgs.getBim() + "'.");
-		snpFilter = new SNPFilter(mapData);
-		snpFilter.SelectSNP(cmdArgs);
-		int[] WSNP = snpFilter.getWorkingSNP();
-		mapData.setWSNP(WSNP);
-	}
-
 	/**
 	 * Initialize basic implementation of the genotype file.
 	 * 
