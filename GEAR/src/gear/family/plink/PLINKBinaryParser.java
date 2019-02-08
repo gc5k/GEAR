@@ -10,11 +10,11 @@ public class PLINKBinaryParser extends PLINKParser {
 	public static final int HOMOZYGOTE_SECOND = 0x3;
 	public static final int MISSING_GENOTYPE = 0x1;
 
-	protected String FamFile;
+	protected String famFile;
 
 	public PLINKBinaryParser(String ped, String map, String fam) {
 		super(ped, map);
-		FamFile = fam;
+		famFile = fam;
 	}
 
 	public static int convertToGearGenotype(int plinkGenotype) {
@@ -38,7 +38,7 @@ public class PLINKBinaryParser extends PLINKParser {
 		mapData = new BIMReader(mapFile);
 		ParseMapFile();
 
-		pedData = new BEDReader(FamFile, snpFilter.getWorkingSNP().length, mapData);
+		pedData = new BEDReader(famFile, snpFilter.getWorkingSNP().length, mapData);
 		pedData.setHeader(false);
 		ParsePedFile();
 		pedData.cleanup();
