@@ -95,8 +95,4 @@ public class PLINKParser {
 	public SNPFilter getSNPFilter() {
 		return snpFilter;
 	}
-
-	public void setAlleleFrequency(double[][] freq) {
-		mapData.setAlleleFrequency(freq);
-	}
 }
