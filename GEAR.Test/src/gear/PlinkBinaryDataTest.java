@@ -34,7 +34,7 @@ public class PlinkBinaryDataTest
 		PedigreeFile pedData = parser.getPedigreeData();
 		
 		assertEquals(6, pedData.getNumIndividuals());
-		assertEquals(5, pedData.getNumMarker());
+		assertEquals(5, pedData.getNumMarkers());
 
 		// individual info begin
 		UniqueRecordSet<Family> families = pedData.getFamilies();

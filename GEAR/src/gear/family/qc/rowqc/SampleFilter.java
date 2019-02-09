@@ -26,16 +26,17 @@ import gear.util.NewIt;
  */
 
 public class SampleFilter {
-	protected PedigreeFile PedData;
+	protected PedigreeFile pedData;
 	protected PLINKParser plinkParser;
-
-	protected int filterType = 0; // 0 for no filter, 1 for keep, 2 for remove
+	
+	public enum FilterType { NONE, KEEP_SAMPLES, REMOVE_SAMPLES, KEEP_FAMILIES, REMOVE_FAMILIES }
+	protected FilterType filterType = FilterType.NONE;
 
 	protected double[] status;
 	protected double[] score;
 
-	protected ArrayList<PersonIndex> PersonTable;// The indexing file records
-	private ArrayList<Hukou> HukouBook;
+	protected ArrayList<PersonIndex> personTable;// The indexing file records
+	private ArrayList<Hukou> hukouBook;
 	protected int[][] num_qualified;//
 	protected boolean[][] keep;
 
@@ -45,38 +46,38 @@ public class SampleFilter {
 	private HashSet<String> famSet;
 
 	public SampleFilter(PedigreeFile ped) {
-		PedData = ped;
-		PersonTable = NewIt.newArrayList();
-
+		pedData = ped;
+		personTable = NewIt.newArrayList();
 		qualification();
-
+	}
+	
+	public SampleFilter(CommandArguments cmdArgs) {
+		personTable = NewIt.newArrayList();
+		if (cmdArgs.isKeepFile()) {
+			readIndividualFile(cmdArgs.getKeepFile(), "keep-individual");
+			filterType = FilterType.KEEP_SAMPLES;
+		} else if (cmdArgs.isRemoveFile()) {
+			readIndividualFile(cmdArgs.getRemoveFile(), "remove-individual");
+			filterType = FilterType.REMOVE_SAMPLES;
+		} else if (cmdArgs.isKeepFamFile()) {
+			readFamilyFile(cmdArgs.getKeepFamFile(), "keep-family");
+			filterType = FilterType.KEEP_FAMILIES;
+		} else if (cmdArgs.isRemoveFamFile()) {
+			readFamilyFile(cmdArgs.getRemoveFamFile(), "remove-family");
+			filterType = FilterType.REMOVE_FAMILIES;
+		}
 	}
 
 	public SampleFilter(PedigreeFile ped, CommandArguments cmdArgs) {
-		PedData = ped;
-		PersonTable = NewIt.newArrayList();
-
-		if (cmdArgs.isKeepFile()) {
-			readIndividualFile(cmdArgs.getKeepFile(), "keep-individual");
-			filterType = 1;
-		} else if (cmdArgs.isRemoveFile()) {
-			readIndividualFile(cmdArgs.getRemoveFile(), "remove-individual");
-			filterType = 2;
-		} else if (cmdArgs.isKeepFamFile()) {
-			readFamilyFile(cmdArgs.getKeepFamFile(), "keep-family");
-			filterType = 3;
-		} else if (cmdArgs.isRemoveFamFile()) {
-			readFamilyFile(cmdArgs.getRemoveFamFile(), "remove-family");
-			filterType = 4;
-		}
-		
+		this(cmdArgs);
+		pedData = ped;
 		qualification();
 	}
 
 	public SampleFilter(PedigreeFile ped, ArrayList<SubjectID> sID) {
-		PedData = ped;
-		PersonTable = NewIt.newArrayList();
-		filterType = 1;
+		pedData = ped;
+		personTable = NewIt.newArrayList();
+		filterType = FilterType.KEEP_SAMPLES;
 		subSet = NewIt.newHashSet();
 		for (SubjectID sid : sID) {
 			subSet.add(sid);
@@ -85,9 +86,9 @@ public class SampleFilter {
 	}
 
 	private void qualification() {
-		ArrayList<Hukou> hukoubook = PedData.getHukouBook();
-		HukouBook = NewIt.newArrayList();
-		UniqueRecordSet<Family> families = PedData.getFamilies();
+		ArrayList<Hukou> hukoubook = pedData.getHukouBook();
+		hukouBook = NewIt.newArrayList();
+		UniqueRecordSet<Family> families = pedData.getFamilies();
 
 		for (Iterator<Hukou> e = hukoubook.iterator(); e.hasNext();) {
 			Hukou hukou = e.next();
@@ -99,44 +100,43 @@ public class SampleFilter {
 				continue;
 			}
 			boolean isFounder = family.hasAncestor(per);
-			HukouBook.add(hukou);
-			PersonTable.add(new PersonIndex(per, false, isFounder));
+			hukouBook.add(hukou);
+			personTable.add(new PersonIndex(per, false, isFounder));
 		}
-		if (PersonTable.size() == 0) {
+		if (personTable.size() == 0) {
 			Logger.printUserLog("No individuals were remained for analysis. GEAR quit.");
 			System.exit(1);
 		}
 
-		Logger.printUserLog(PersonTable.size() + " individuals were matched for analysis.");
+		Logger.printUserLog(personTable.size() + " individuals were matched for analysis.");
 	}
 
 	protected boolean keep(Person p) {
-		boolean flag = true;
-
-		if (filterType == 0) {
-			return flag;
-		} else if (filterType == 1) {
-			flag = subSet.contains(new SubjectID(p.getFamilyID(), p.getPersonID()));
-		} else if (filterType == 2) {
-			flag = !subSet.contains(new SubjectID(p.getFamilyID(), p.getPersonID()));
-		} else if (filterType == 3) {
-			flag = famSet.contains(p.getFamilyID());
-		} else if (filterType == 4) {
-			flag = !famSet.contains(p.getFamilyID());
+		switch (filterType) {
+		case NONE:
+			return true;
+		case KEEP_SAMPLES:
+			return subSet.contains(new SubjectID(p.getFamilyID(), p.getPersonID()));
+		case REMOVE_SAMPLES:
+			return !subSet.contains(new SubjectID(p.getFamilyID(), p.getPersonID()));
+		case KEEP_FAMILIES:
+			return famSet.contains(p.getFamilyID());
+		case REMOVE_FAMILIES:
+			return !famSet.contains(p.getFamilyID());
 		}
-		return flag;
+		return true;
 	}
 
 	public int SampleSize() {
-		return PersonTable.size();
+		return personTable.size();
 	}
 
 	public ArrayList<PersonIndex> getSample() {
-		return PersonTable;
+		return personTable;
 	}
 
 	public ArrayList<Hukou> getHukouBook() {
-		return HukouBook;
+		return hukouBook;
 	}
 
 	private void readIndividualFile(String kFile, String opt) {

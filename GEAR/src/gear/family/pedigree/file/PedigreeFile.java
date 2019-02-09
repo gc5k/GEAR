@@ -21,16 +21,24 @@ import gear.util.NewIt;
 public class PedigreeFile
 {
 
-	protected char[][] AlleleSet;
-	protected short[][] AlleleFreq;
-	protected ArrayList<Hukou> HukouBook;
+	protected char[][] alleleSet;
+	protected short[][] alleleFreq;
+	protected ArrayList<Hukou> hukouBook;
 	protected UniqueRecordSet<Family> families = new UniqueRecordSet<Family>();
-	protected HashSet<String> SixthCol = NewIt.newHashSet();
-	protected boolean IsSixthColBinary = true;
-	protected int num_marker;
+	protected HashSet<String> sixthCol = NewIt.newHashSet();
+	protected boolean isSixthColBinary = true;
+	protected int numMarkers;
 	protected String titleLine = null;
-	protected String pedfile;
+	protected String filename;
 	protected boolean header = true;
+	
+	public PedigreeFile(String filename) {
+		this.filename = filename;
+	}
+	
+	public String getFilename() {
+		return filename;
+	}
 
 	public Family getFamily(String familystrID)
 	{
@@ -60,33 +68,26 @@ public class PedigreeFile
 		return families;
 	}
 
-	public void initial()
-	{
-
-	}
-
 	/**
 	 * Taking in a pedigree file in the form of a vector of strings and parses
 	 * it. The data parsed is stored in families in the member hashtable
 	 * families. Note that the "Linkage" here is the relationship between
 	 * relatives in a pedigree, but is not that term of genetics.
 	 */
-	public void parseLinkage(String infile, int numMarkerInFile, int[] WSNP)
+	public void parseLinkage(int[] workingSnpIndexes)
 	{
-		initial();
-		num_marker = WSNP.length;
-		AlleleSet = new char[num_marker][2];
-		AlleleFreq = new short[num_marker][2];
-		for (int i = 0; i < num_marker; i++)
+		numMarkers = workingSnpIndexes.length;
+		alleleSet = new char[numMarkers][2];
+		alleleFreq = new short[numMarkers][2];
+		for (int i = 0; i < numMarkers; i++)
 		{
-			AlleleSet[i][0] = AlleleSet[i][1] = ConstValues.MISSING_ALLELE_CHAR;
+			alleleSet[i][0] = alleleSet[i][1] = ConstValues.MISSING_ALLELE_CHAR;
 		}
-		BufferedReader reader = BufferedReader.openTextFile(infile, "ped");
-		pedfile = infile;
+		BufferedReader reader = BufferedReader.openTextFile(filename, "ped");
 		Person per;
 		int k = 0;
 		Hukou hukou;
-		HukouBook = NewIt.newArrayList();
+		hukouBook = NewIt.newArrayList();
 		String[] tokens = reader.readTokensAtLeast(6);
 		
 		if (tokens.length % 2 != 0)
@@ -107,14 +108,14 @@ public class PedigreeFile
 				reader.errorPreviousLine(msg);
 			}
 
-			per = new Person(num_marker);
+			per = new Person(numMarkers);
 			per.setFamilyID(tokens[0]);
 			per.setPersonID(tokens[1]);
 			per.setDadID(tokens[2]);
 			per.setMomID(tokens[3]);
 
 			int Gender = Integer.parseInt(tokens[4]);
-			SixthCol.add(tokens[5]);
+			sixthCol.add(tokens[5]);
 
 			per.setGender(Gender);
 			per.setAffectedStatus(tokens[5]);
@@ -124,7 +125,7 @@ public class PedigreeFile
 			int c = 0;
 			for (int j = 0; j < numMarkers; j++)
 			{
-				int idx = ArrayUtils.indexOf(WSNP, j);
+				int idx = ArrayUtils.indexOf(workingSnpIndexes, j);
 				if (idx < 0)
 				{
 					continue;
@@ -140,8 +141,8 @@ public class PedigreeFile
 					{
 						int[] code = recode(c, allele);
 						per.addMarker(flag, code[0], code[1], c);
-						AlleleFreq[c][code[0]]++;
-						AlleleFreq[c][code[1]]++;
+						alleleFreq[c][code[0]]++;
+						alleleFreq[c][code[1]]++;
 					}
 					else
 					{
@@ -173,36 +174,31 @@ public class PedigreeFile
 				msg += per.getFamilyID() + " appears more than once.";
 				reader.errorPreviousLine(msg);
 			}
-			HukouBook.add(hukou);
+			hukouBook.add(hukou);
 			family.addPerson(per);
 			k++;
 		} while ((tokens = reader.readTokens(numCols)) != null);
-		Is6ColBinary();
-		Logger.printUserLog("Read " + HukouBook.size() + " individuals from '" + infile + "'.");
+		checkIs6ColBinary();
+		Logger.printUserLog("Read " + hukouBook.size() + " individuals from '" + filename + "'.");
 
 	}
 
-	protected void Is6ColBinary()
+	protected void checkIs6ColBinary()
 	{
-		for (String c : SixthCol)
-		{
-			if (CmdArgs.INSTANCE.status_shiftFlag)
-			{
+		for (String c : sixthCol) {
+			if (CmdArgs.INSTANCE.status_shiftFlag) {
 				if (c.compareTo("1") != 0
 						&& c.compareTo("0") != 0
-						&& c.compareTo(ConstValues.MISSING_PHENOTYPE) != 0)
-				{
-					IsSixthColBinary = false;
+						&& c.compareTo(ConstValues.MISSING_PHENOTYPE) != 0) {
+					isSixthColBinary = false;
 					break;
 				}
-			} else
-			{
+			} else {
 				if (c.compareTo("2") != 0
 						&& c.compareTo("1") != 0
 						&& c.compareTo("0") != 0
-						&& c.compareTo(ConstValues.MISSING_PHENOTYPE) != 0)
-				{
-					IsSixthColBinary = false;
+						&& c.compareTo(ConstValues.MISSING_PHENOTYPE) != 0) {
+					isSixthColBinary = false;
 					break;
 				}
 			}
@@ -211,13 +207,12 @@ public class PedigreeFile
 
 	public boolean IsSixthColBinary()
 	{
-		return IsSixthColBinary;
+		return isSixthColBinary;
 	}
 
-	protected int[] recode(int idx, String[] allele)
-	{
+	protected int[] recode(int idx, String[] allele) {
 		int[] code = { -1, -1 };
-		char[] ref = AlleleSet[idx];
+		char[] ref = alleleSet[idx];
 		if (ref[1] != ConstValues.MISSING_ALLELE_CHAR)
 		{
 			// two detected alleles
@@ -237,8 +232,7 @@ public class PedigreeFile
 				Logger.printUserError("There're more than 2 alleles in the marker column "
 						+ (idx + 1));
 			}
-		} else
-		{
+		} else {
 			// less than two detected alleles
 			if (allele[0].compareTo(allele[1]) == 0)
 			{
@@ -298,39 +292,13 @@ public class PedigreeFile
 		return code;
 	}
 
-	public char[][] getPolymorphism()
-	{
-		return AlleleSet;
-	}
+	public char[][] getPolymorphism() { return alleleSet; }
 
-	public short[][] getAlleleFrequency()
-	{
-		return AlleleFreq;
-	}
+	public short[][] getAlleleFrequency() { return alleleFreq; }
 
-	public int getNumMarker()
-	{
-		return num_marker;
-	}
+	public int getNumMarkers() { return numMarkers; }
 
-	public void setHeader(boolean flag)
-	{
-		header = flag;
-	}
+	public void setHeader(boolean flag) { header = flag; }
 
-	public ArrayList<Hukou> getHukouBook()
-	{
-		return HukouBook;
-	}
-
-	public void cleanup()
-	{
-		for (int i = 0; i < AlleleSet.length; i++)
-		{
-			AlleleSet[i] = null;
-			AlleleFreq[i] = null;
-		}
-		AlleleSet = null;
-		AlleleFreq = null;
-	}
+	public ArrayList<Hukou> getHukouBook() { return hukouBook; }
 }

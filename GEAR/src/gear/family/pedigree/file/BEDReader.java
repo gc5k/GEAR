@@ -20,36 +20,48 @@ import gear.util.NewIt;
 
 public class BEDReader extends PedigreeFile {
 	public String famFile;
-	private int n_individual = 0;
 	private ArrayList<String> famIDs;
 	private ArrayList<Person> persons;
 	private MapFile mapData;
+	private BufferedInputStream inStream;
+	private boolean isSnpMajor;
+	private long bytesPerRow;
 
-	public BEDReader(String famF, int numMark, MapFile mapdata) {
-		super();
-		famFile = famF;
-		num_marker = numMark;
-		mapData = mapdata;
+	public BEDReader(String bedFilename, String famFilename, MapFile mapData) {
+		super(bedFilename);
+		famFile = famFilename;
+		this.mapData = mapData;
+		try {
+			inStream = new BufferedInputStream(new FileInputStream(new File(bedFilename)));
+			byte[] magic = new byte[3];
+			inStream.read(magic, 0, 3);
+			isSnpMajor = magic[2] == 1;
+		} catch (FileNotFoundException e) {
+			Logger.handleException(e, "Cannot open the bed file '" + bedFilename + "'.");
+		} catch (IOException e) {
+			Logger.handleException(e, "An I/O exception occurred when reading the bed file.");
+		}
 	}
-
-	@Override
-	public void initial() {
+	
+	public boolean IsSnpMajor() { return isSnpMajor; }
+	
+	private void parseFam() {
 		famIDs = NewIt.newArrayList();
 		persons = NewIt.newArrayList();
-
+		numMarkers = mapData.getMarkerNumberOriginal();
 		BufferedReader reader = BufferedReader.openTextFile(famFile, "fam");
-		AlleleSet = new char[num_marker][];
-		AlleleFreq = new short[num_marker][2];
+		alleleSet = new char[numMarkers][];
+		alleleFreq = new short[numMarkers][2];
 		for (int i = 0; i < mapData.snpList.size(); i++) {
 			SNP snp = mapData.snpList.get(i);
-			AlleleSet[i] = snp.getSNP();
+			alleleSet[i] = snp.getSNP();
 		}
 
-		HukouBook = NewIt.newArrayList();
+		hukouBook = NewIt.newArrayList();
 		Hukou hukou;
 		String[] tokens;
 		while ((tokens = reader.readTokens(6)) != null) {
-			Person person = new Person(num_marker);
+			Person person = new Person(numMarkers);
 			famIDs.add(tokens[0]);
 
 			person.setFamilyID(tokens[0]);
@@ -58,7 +70,7 @@ public class BEDReader extends PedigreeFile {
 			person.setMomID(tokens[3]);
 			person.setGender(Integer.parseInt(tokens[4]));
 			person.setAffectedStatus(tokens[5]);
-			SixthCol.add(tokens[5]);
+			sixthCol.add(tokens[5]);
 
 			hukou = new Hukou(tokens[0], tokens[1], tokens[2], tokens[3], tokens[4], tokens[5]);
 			Family family = families.get(tokens[0]);
@@ -72,40 +84,55 @@ public class BEDReader extends PedigreeFile {
 				msg += person.getFamilyID() + " appears more than once.";
 				reader.errorPreviousLine(msg);
 			}
-			HukouBook.add(hukou);
+			hukouBook.add(hukou);
 			family.addPerson(person);
 			persons.add(person);
-			n_individual++;
 		}
-		Is6ColBinary();
-		Logger.printUserLog("Read " + HukouBook.size() + " individuals from '" + famFile + "'.");
+		checkIs6ColBinary();
+		Logger.printUserLog("Read " + hukouBook.size() + " individuals from '" + famFile + "'.");
+	}
+	
+	private void calculateBytesPerRow() {
+		if (IsSnpMajor()) {
+			bytesPerRow = (mapData.getMarkerNumberOriginal() + 3) / 4;
+		} else {
+			bytesPerRow = (persons.size() + 3) / 4;
+		}
+	}
+	
+	public void prepareToParseGenotypes() {
+		parseFam();
+		calculateBytesPerRow();
+	}
+	
+	public long getBytesPerRow() { return bytesPerRow; }
+	
+	public int readNextByte() {
+		int nextByte = -1;
+		try {
+			nextByte = inStream.read();
+		} catch (IOException e) {
+			Logger.handleException(e, "I/O exception occurred when reading the bed file.");
+		}
+		if (nextByte == -1) {
+			Logger.printUserError("Read past the end of the bed file.");
+			System.exit(-1);
+		}
+		return nextByte;
 	}
 
 	@Override
-	public void parseLinkage(String infile, int numMarkerInFile, int[] WSNP) {
+	public void parseLinkage(int[] WSNP) {
 		long startTime = System.nanoTime();
-
-		initial();
-		pedfile = infile;
-		BufferedInputStream in = null;
-
 		try {
-			in = new BufferedInputStream(new FileInputStream(new File(pedfile)));
-		} catch (FileNotFoundException e) {
-			Logger.handleException(e, "Cannot open the pedigree file '" + pedfile + "'.");
-		}
-
-		try {
-			byte[] magic = new byte[3];
-			in.read(magic, 0, 3);
-			if (magic[2] == 1) {
+			if (isSnpMajor) {
 				Logger.printUserLog("Reading data in PLINK SNP-major mode.");
-				snp_major(in, numMarkerInFile, WSNP);
+				parseWithSnpMajor(inStream, mapData.getMarkerNumberOriginal(), WSNP);
 			} else {
 				Logger.printUserLog("Reading data in PLINK individual-major mode.");
-				individual_major(in, numMarkerInFile, WSNP);
+				parseWithIndividualMajor(inStream, mapData.getMarkerNumberOriginal(), WSNP);
 			}
-			in.close();
+			inStream.close();
 			long endTime = System.nanoTime();
 			Logger.printUserLog(String.format("It takes %.1fs to read the data.", (endTime - startTime) / 1e9));
 		} catch (IOException e) {
@@ -113,7 +140,7 @@ public class BEDReader extends PedigreeFile {
 		}
 	}
 
-	private void individual_major(BufferedInputStream in, int numMarkerInFile, int[] WSNP) throws IOException {
+	private void parseWithIndividualMajor(BufferedInputStream in, int numMarkerInFile, int[] WSNP) throws IOException {
 		int L = 0;
 		if (numMarkerInFile % 4 == 0) {
 			L = numMarkerInFile / 4;
@@ -128,7 +155,7 @@ public class BEDReader extends PedigreeFile {
 		}
 		byte[] geno = new byte[L];
 		byte[] extract_geno = new byte[exL];
-		for (int i = 0; i < n_individual; i++) {
+		for (int i = 0; i < persons.size(); i++) {
 			in.read(geno, 0, L);
 			extract_geno = extractGenotype(geno, numMarkerInFile, WSNP);
 			persons.get(i).addAllMarker(extract_geno);
@@ -159,12 +186,12 @@ public class BEDReader extends PedigreeFile {
 			int ExposBit = (c & 0x3) << 1;
 			Exg[ExposByte] |= g1 << ExposBit;
 			if (g1 == 0) {
-				AlleleFreq[c][0] += 2;
+				alleleFreq[c][0] += 2;
 			} else if (g1 == 2) {
-				AlleleFreq[c][0]++;
-				AlleleFreq[c][1]++;
+				alleleFreq[c][0]++;
+				alleleFreq[c][1]++;
 			} else if (g1 == 3) {
-				AlleleFreq[c][1] += 2;
+				alleleFreq[c][1] += 2;
 			}
 			c++;
 		}
@@ -181,8 +208,8 @@ public class BEDReader extends PedigreeFile {
 		return table;
 	}
 
-	private void snp_major(BufferedInputStream in, int numMarkerInFile, int[] wsnp) throws IOException {
-		byte[] g = new byte[(n_individual + 3) / 4];
+	private void parseWithSnpMajor(BufferedInputStream in, int numMarkerInFile, int[] wsnp) throws IOException {
+		byte[] g = new byte[(persons.size() + 3) / 4];
 		int[][] genoByteCvtTable = constructSnpMajorGenotypeByteConvertTable();
 		
 		// Convert wsnp from array to set
@@ -202,12 +229,20 @@ public class BEDReader extends PedigreeFile {
 				for (int byteIdx = 0; byteIdx < g.length; ++byteIdx) {
 					// 0xff is necessary here, otherwise Java will sign extend the byte
 					int[] genoValues = genoByteCvtTable[g[byteIdx] & 0xff];
-					for (int j = 0; j < 4 && indIdx < n_individual; ++j, ++indIdx) {
+					for (int j = 0; j < 4 && indIdx < persons.size(); ++j, ++indIdx) {
 						persons.get(indIdx).addByteGenotype(genoValues[j], posByte, posBit);
 					}
 				}
 				snpIdx++;
 			}
+		}
+	}
+	
+	public void skipOneRow() {
+		try {
+			inStream.skip(bytesPerRow);
+		} catch (IOException e) {
+			Logger.handleException(e, "An I/O exception occurred when reading the bed file.");
 		}
 	}
 }

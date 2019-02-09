@@ -2,9 +2,9 @@ package gear.family.qc.colqc;
 
 import java.io.BufferedReader;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashSet;
-import java.util.Iterator;
 
 import gear.ConstValues;
 import gear.family.pedigree.file.MapFile;
@@ -15,51 +15,38 @@ import gear.util.Logger;
 import gear.util.NewIt;
 
 public class SNPFilter {
-
 	protected MapFile mapData;
-	protected int[] WSNP;
-
-	protected int[] wseq = null;
-	private HashSet<String> snpChosenSet;
-
-	protected HashSet<Integer> selectedSNPSet;
-	protected HashSet<Integer> excludedSNPSet;
+	private int[] workingSNPs;
+	private boolean[] snpWorkingFlags;
 
 	public SNPFilter(MapFile mapData) {
 		this.mapData = mapData;
-		selectedSNPSet = NewIt.newHashSet();
-		excludedSNPSet = NewIt.newHashSet();
 	}
 
-	public void SelectSNP() {
-		makeWSNPList();
-		return;
-	}
-
-	public void SelectSNP(CommandArguments cmdArgs) {
-
+	public void filter(CommandArguments cmdArgs) {
+		snpWorkingFlags = new boolean[mapData.getMarkerNumber()];
 		if (cmdArgs.isExtractFile()) {
-			selectSNP(cmdArgs);
+			selectSNPs(cmdArgs);
 		} else if (cmdArgs.isExcludeFile()) {
-			removeSNP(cmdArgs);
+			removeSNPs(cmdArgs);
 		} else if (cmdArgs.isChr()) {
-			selectChromosome(cmdArgs);
+			selectChromosomes(cmdArgs);
 		} else if (cmdArgs.isNotChr()) {
-			removeChromosome(cmdArgs);
+			removeChromosomes(cmdArgs);
+		} else {
+			Arrays.fill(snpWorkingFlags, true);
 		}
-
-		makeWSNPList();
-		if (WSNP.length == 0) {
+		collectWorkingSNPs();
+		if (workingSNPs.length == 0) {
 			Logger.printUserLog("No SNPs were remained for analysis. GEAR quit.");
 			System.exit(1);
 		}
-		Logger.printUserLog(WSNP.length + " SNPs were remained for analysis.");
-		return;
+		Logger.printUserLog(workingSNPs.length + " SNPs were remained for analysis.");
 	}
 
-	private void selectSNP(CommandArguments cmdArgs) {
+	private void selectSNPs(CommandArguments cmdArgs) {
 		BufferedReader eFile = FileUtil.FileOpen(cmdArgs.getExtractFile());
-		snpChosenSet = NewIt.newHashSet();
+		HashSet<String> snpChosenSet = NewIt.newHashSet();
 		String line;
 		try {
 			while ((line = eFile.readLine()) != null) {
@@ -67,133 +54,78 @@ public class SNPFilter {
 				for(int i = 0; i < s.length; i++) snpChosenSet.add(s[i]);
 			}
 		} catch (IOException e) {
-			Logger.handleException(e, "An exception occurred when reading '"
-					+ cmdArgs.getExtractFile() + "'.");
+			Logger.handleException(e, "An exception occurred when reading '" + cmdArgs.getExtractFile() + "'.");
 		}
 
 		if (snpChosenSet.size() > 0) {
-			Logger.printUserLog("Read " + snpChosenSet.size() + " SNPs from '"
-					+ cmdArgs.getExtractFile()+ "'.");
+			Logger.printUserLog("Read " + snpChosenSet.size() + " SNPs from '" + cmdArgs.getExtractFile()+ "'.");
 			for (int i = 0; i < mapData.getMarkerList().size(); i++) {
 				SNP snp = mapData.getMarkerList().get(i);
 				String snpName = snp.getName();
-				if (snpChosenSet.contains(snpName)) {
-					includeSNP(i);
-				}
+				snpWorkingFlags[i] = snpChosenSet.contains(snpName);
 			}
 		}
 	}
 
-	private void removeSNP(CommandArguments cmdArgs) {
-
+	private void removeSNPs(CommandArguments cmdArgs) {
 		BufferedReader eFile = FileUtil.FileOpen(cmdArgs.getExcludeFile());
-		snpChosenSet = NewIt.newHashSet();
+		HashSet<String> snpExcludeSet = NewIt.newHashSet();
 		String line;
 		try {
 			while ((line = eFile.readLine()) != null) {
 				String[] s = line.split(ConstValues.WHITESPACE_DELIMITER);
-				for (int i = 0; i < s.length; i++) snpChosenSet.add(s[i]);
+				for (int i = 0; i < s.length; i++) snpExcludeSet.add(s[i]);
 			}
 		} catch (IOException e) {
-			Logger.handleException(e, "An exception occurred when reading '"
-					+ cmdArgs.getExcludeFile() + "'.");
+			Logger.handleException(e, "An exception occurred when reading '" + cmdArgs.getExcludeFile() + "'.");
 		}
 
-		if (snpChosenSet.size() > 0) {
-			Logger.printUserLog("Read " + snpChosenSet.size() + " SNPs from '"
-					+ cmdArgs.getExcludeFile() + "'.");
+		if (snpExcludeSet.size() > 0) {
+			Logger.printUserLog("Read " + snpExcludeSet.size() + " SNPs from '" + cmdArgs.getExcludeFile() + "'.");
 			for (int i = 0; i < mapData.getMarkerList().size(); i++) {
 				SNP snp = mapData.getMarkerList().get(i);
 				String snpName = snp.getName();
-				if (snpChosenSet.contains(snpName)) {
-					excludeSNP(i);
-				}
+				snpWorkingFlags[i] = !snpExcludeSet.contains(snpName);
 			}
 		}
 	}
 
-	private void removeChromosome(CommandArguments cmdArgs) {
-
+	private void removeChromosomes(CommandArguments cmdArgs) {
 		Logger.printUserLog("Filtering out SNPs not at the selected chromosome(s)...");
 		HashSet<String> chrNotSet = cmdArgs.getNotChr();
 		for (int i = 0; i < mapData.getMarkerList().size(); i++) {
 			SNP snp = mapData.getMarkerList().get(i);
 			String chr = snp.getChromosome();
-			if (chrNotSet.contains(chr)) {
-				excludeSNP(i);
-			} else {
-				includeSNP(i);
-			}
+			snpWorkingFlags[i] = !chrNotSet.contains(chr);
 		}
 	}
 
-	private void selectChromosome(CommandArguments cmdArgs) {
-
-		Logger.printUserLog("Choosing SNPs from the selected chromosome(s)...");
+	private void selectChromosomes(CommandArguments cmdArgs) {
 		HashSet<String> chrSet = cmdArgs.getChr();
 		for (int i = 0; i < mapData.getMarkerList().size(); i++) {
 			SNP snp = mapData.getMarkerList().get(i);
 			String chr = snp.getChromosome();
-			if (chrSet.contains(chr)) {
-				includeSNP(i);
-			} else {
-				excludeSNP(i);
-			}
+			snpWorkingFlags[i] = chrSet.contains(chr);
 		}
 	}
 
-	private void makeWSNPList() {
-
-		if (selectedSNPSet.size() > 0) {
-			WSNP = new int[selectedSNPSet.size()];
-			int c = 0;
-			for (Iterator<Integer> e = selectedSNPSet.iterator(); e.hasNext();) {
-				Integer V = e.next();
-				WSNP[c++] = V.intValue();
-			}
-			Arrays.sort(WSNP);
-		} else if (excludedSNPSet.size() > 0) {
-			WSNP = new int[mapData.getMarkerList().size() - excludedSNPSet.size()];
-			int c = 0;
-			for (int i = 0; i < mapData.getMarkerList().size(); i++) {
-				if (!excludedSNPSet.contains(i)) {
-					WSNP[c++] = i;
-				}
-			}
-		} else {
-			WSNP = new int[mapData.getMarkerList().size()];
-			for (int i = 0; i < mapData.getMarkerList().size(); i++) {
-				WSNP[i] = i;
-			}
+	private void collectWorkingSNPs() {
+		ArrayList<Integer> workingSNPsArrayList = new ArrayList<Integer>();
+		for (int i = 0; i < snpWorkingFlags.length; ++i) {
+			if (snpWorkingFlags[i])
+				workingSNPsArrayList.add(i);
 		}
-
-		wseq = new int[WSNP.length];
-		for (int i = 0; i < WSNP.length; i++) {
-			wseq[i] = i;
+		workingSNPs = new int[workingSNPsArrayList.size()];
+		for (int i = 0; i < workingSNPs.length; ++i) {
+			workingSNPs[i] = workingSNPsArrayList.get(i);
 		}
 	}
-
-	private boolean includeSNP(int i) {
-		if (selectedSNPSet.contains(i)) {
-			return true;
-		} else {
-			selectedSNPSet.add(i);
-			return false;
-		}
+	
+	public boolean isSnpIncluded(int snpIndex) {
+		return snpWorkingFlags[snpIndex];
 	}
 
-	private boolean excludeSNP(int i) {
-
-		if (excludedSNPSet.contains(i)) {
-			return true;
-		} else {
-			excludedSNPSet.add(i);
-			return false;
-		}
+	public int[] getWorkingSNPs() {
+		return workingSNPs;
 	}
-
-	public int[] getWorkingSNP() {
-		return WSNP;
-	}
-
 }

@@ -11,19 +11,20 @@ import gear.family.pedigree.file.MapFile;
 import gear.family.pedigree.file.PedigreeFile;
 import gear.family.pedigree.file.SNP;
 import gear.family.plink.PLINKParser;
+import gear.family.plink.PLINKTextParser;
 
 public class PlinkTextDataTest
 {
 	@Test
 	public void testTextData()
 	{
-		PLINKParser parser = new PLINKParser("data/sim.ped", "data/sim.map");
+		PLINKParser parser = new PLINKTextParser("data/sim.ped", "data/sim.map");
 		parser.parse();
 		
 		PedigreeFile pedData = parser.getPedigreeData();
 		
 		assertEquals(6, pedData.getNumIndividuals());
-		assertEquals(5, pedData.getNumMarker());
+		assertEquals(5, pedData.getNumMarkers());
 
 		// individual info begin
 		UniqueRecordSet<Family> families = pedData.getFamilies();

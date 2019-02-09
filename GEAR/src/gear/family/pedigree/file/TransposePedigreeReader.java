@@ -11,15 +11,13 @@ import gear.util.NewIt;
 public class TransposePedigreeReader extends PedigreeFile
 {
 	public String famFile;
-	public String tPedFile;
 	private ArrayList<String> familyIDs;
 	private ArrayList<String> Individualid;
 	private MapFile mapData;
 
 	public TransposePedigreeReader(String tped, String famF, MapFile md)
 	{
-		super();
-		tPedFile = tped;
+		super(tped);
 		famFile = famF;
 		mapData = md;
 	}
@@ -30,26 +28,26 @@ public class TransposePedigreeReader extends PedigreeFile
 		Individualid = NewIt.newArrayList();
 
 		BufferedReader famReader = BufferedReader.openTextFile(famFile, "fam");
-		BufferedReader tpedReader = BufferedReader.openTextFile(tPedFile, "tped");
+		BufferedReader tpedReader = BufferedReader.openTextFile(filename, "tped");
 
 		String line = tpedReader.readLine();
 		while (line != null)
 		{
-			num_marker++;
+			numMarkers++;
 			line = tpedReader.readLine();
 		}
 		tpedReader.close();
-		AlleleSet = new char[num_marker][2];
-		for (int i = 0; i < num_marker; i++)
+		alleleSet = new char[numMarkers][2];
+		for (int i = 0; i < numMarkers; i++)
 		{
-			AlleleSet[i][0] = AlleleSet[i][1] = ConstValues.MISSING_ALLELE_CHAR;
+			alleleSet[i][0] = alleleSet[i][1] = ConstValues.MISSING_ALLELE_CHAR;
 		}
-		AlleleFreq = new short[num_marker][2];
+		alleleFreq = new short[numMarkers][2];
 		
 		String[] tokens;
 		while ((tokens = famReader.readTokens(6)) != null)
 		{
-			Person per = new Person(num_marker);
+			Person per = new Person(numMarkers);
 			familyIDs.add(tokens[0]);
 			Individualid.add(tokens[1]);
 			per.setFamilyID(tokens[0]);
@@ -69,11 +67,11 @@ public class TransposePedigreeReader extends PedigreeFile
 		}
 	}
 
-	public void parseLinkage(String infile, int numMarker)
+	public void parseLinkage(int numMarker)
 	{
 		initial();
 		int numCols = Individualid.size() * 2 + 4;
-		BufferedReader reader = BufferedReader.openTextFile(tPedFile, "tped");
+		BufferedReader reader = BufferedReader.openTextFile(filename, "tped");
 		Person per;
 		int k = 0;
 		String[] tokens;
@@ -94,8 +92,8 @@ public class TransposePedigreeReader extends PedigreeFile
 					{
 						int[] code = recode(k, allele);
 						per.addMarker(flag, code[0], code[1], k);
-						AlleleFreq[k][code[0]]++;
-						AlleleFreq[k][code[1]]++;
+						alleleFreq[k][code[0]]++;
+						alleleFreq[k][code[1]]++;
 					}
 					else
 					{

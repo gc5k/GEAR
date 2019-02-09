@@ -4,19 +4,15 @@ import gear.util.Logger;
 import gear.util.NewIt;
 import gear.util.BufferedReader;
 
-//import java.io.BufferedReader;
-import java.io.File;
 import java.util.HashSet;
 
 public class BIMReader extends MapFile {
-
 	public BIMReader(String m) {
 		super(m);
 	}
 
 	public void parseMap() {
-		mapfile = new File(mf);
-		BufferedReader reader = BufferedReader.openTextFile(mf, "bim");
+		BufferedReader reader = BufferedReader.openTextFile(filename, "bim");
 		String[] tokens = null;
 		int c = 0;
 		HashSet<String> markerSet = NewIt.newHashSet();
@@ -43,8 +39,6 @@ public class BIMReader extends MapFile {
 				markerSet.add(name);
 			}
 		}
-
 		numMarkerOriginal = snpList.size();
 	}
-
 }

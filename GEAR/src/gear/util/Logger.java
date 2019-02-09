@@ -82,6 +82,11 @@ public class Logger
 		}
 	}
 
+	public static void printUserLog(String format, Object... args)
+	{
+		printUserLog(LogLevel.INFO, String.format(format, args));
+	}
+
 	public static void printUserLog(String msg)
 	{
 		printUserLog(LogLevel.INFO, msg);

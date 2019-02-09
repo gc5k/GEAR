@@ -16,42 +16,38 @@ public class MapFile
 	protected ArrayList<SNP> snpList = NewIt.newArrayList();
 	protected HashMap<String, Integer> chrSNPCount = NewIt.newHashMap();
 	protected ArrayList<Integer> badline;
-	protected int[] WSNP;
+	protected int[] workingSnpIndexes;
 	protected int numMarkerOriginal;
-	protected String mf = null;
-	protected File mapfile = null;
+	protected String filename = null;
 
-	public MapFile(String m)
-	{
-		mf = m;
+	public MapFile(String filename) {
+		this.filename = filename;
+	}
+	
+	public String getFilename() {
+		return filename;
 	}
 
-	public void setWSNP(int[] WSNP)
-	{
-		this.WSNP = WSNP;
-		ArrayList<SNP> filterSNP = NewIt.newArrayList();
-		filterSNP.ensureCapacity(WSNP.length);
-		for (int i = 0; i < WSNP.length; i++)
+	public void setWorkingSNPs(int[] workingSnpIndexes) {
+		this.workingSnpIndexes = workingSnpIndexes;
+		ArrayList<SNP> filteredSNPs = NewIt.newArrayList();
+		filteredSNPs.ensureCapacity(workingSnpIndexes.length);
+		for (int i = 0; i < workingSnpIndexes.length; i++)
 		{
-			SNP snp = snpList.get(WSNP[i]);
-			filterSNP.add(snp);
+			SNP snp = snpList.get(workingSnpIndexes[i]);
+			filteredSNPs.add(snp);
 		}
-		snpList = null;
-		snpList = filterSNP;
+		snpList = filteredSNPs;
 	}
 
-	public void parseMap()
-	{
-		mapfile = new File(mf);
+	public void parseMap() {
+		File mapfile = new File(filename);
 
 		BufferedReader reader = null;
-		try
-		{
+		try {
 			reader = new BufferedReader(new FileReader(mapfile));
-		} catch (IOException e)
-		{
-			Logger.handleException(e, "Cannot open the map file '" + mapfile
-					+ "'.");
+		} catch (IOException e) {
+			Logger.handleException(e, "Cannot open the map file '" + mapfile + "'.");
 		}
 
 		String line = null;
@@ -80,8 +76,7 @@ public class MapFile
 		catch (IOException e)
 		{
 			Logger.handleException(e,
-					"An exception occured when reading the map file '" + mf
-							+ "'.");
+					"An exception occured when reading the map file '" + filename + "'.");
 		}
 
 		if (badline != null)
@@ -116,15 +111,12 @@ public class MapFile
 		}
 	}
 
-	public void addSNP(String chr, String name, float dis, int pos)
-	{
+	public void addSNP(String chr, String name, float dis, int pos) {
 		count(chr);
 		snpList.add(new SNP(chr, name, dis, pos));
 	}
 
-	public void addSNP(String chr, String name, float dis, int pos, char a1,
-			char a2)
-	{
+	public void addSNP(String chr, String name, float dis, int pos, char a1, char a2) {
 		count(chr);
 		snpList.add(new SNP(chr, name, dis, pos, a1, a2));
 	}
