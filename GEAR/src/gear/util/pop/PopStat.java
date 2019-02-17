@@ -126,7 +126,7 @@ public class PopStat {
 		double[][] gfreq = new double[G.getNumMarker()][3];
 		for (int i = 0; i < G.getGRow(); i++) {
 			for (int j = 0; j < G.getNumMarker(); j++) {
-				int g = G.getAdditiveScoreOnFirstAllele(i, j);
+				int g = G.getAdditiveScore(i, j);
 				if (g != ConstValues.MISSING_GENOTYPE) {
 					gfreq[j][g]++;
 				}
