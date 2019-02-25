@@ -85,11 +85,12 @@ public class LocusCommandImpl extends CommandImpl {
 					int nextByte = bed.readNextByte();
 					int indCnt = j;
 					for (int k = 0; k < 8; k += 2) {
-						int genotype = (nextByte >> k) & 0b11;
 						
-						if(!hkBook.get(indCnt++).isAvailable()) {
+						if (!hkBook.get(indCnt++).isAvailable()) {
 							continue;
 						}
+
+						int genotype = (nextByte >> k) & 0b11;
 
 						switch (genotype) {
 						case PLINKBinaryParser.HOMOZYGOTE_FIRST:
