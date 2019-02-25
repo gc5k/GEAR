@@ -4,8 +4,7 @@ import java.io.PrintStream;
 import java.text.DecimalFormat;
 import java.util.ArrayList;
 
-import gear.data.InputDataSet2;
-import gear.family.GenoMatrix.GenotypeMatrix;
+//import gear.family.GenoMatrix.GenotypeMatrix;
 import gear.family.pedigree.Hukou;
 import gear.family.pedigree.file.BEDReader;
 import gear.family.pedigree.file.MapFile;
@@ -18,13 +17,12 @@ import gear.subcommands.CommandArguments;
 import gear.subcommands.CommandImpl;
 import gear.util.FileUtil;
 import gear.util.Logger;
-import gear.util.pop.PopStat;
 
 public class LocusCommandImpl extends CommandImpl {
-	private GenotypeMatrix pGM;
-	private double[][] allelefreq;
-	private double[] allelevar;
-	private double[][] genoCnt;
+//	private GenotypeMatrix pGM;
+//	private double[][] allelefreq;
+//	private double[] allelevar;
+//	private double[][] genoCnt;
 	private LocusCommandArguments locusArgs;
 	private MapFile map;
 	private SNPFilter snpFilter;
@@ -49,7 +47,7 @@ public class LocusCommandImpl extends CommandImpl {
 
 		if (pp.getPedigreeData() instanceof BEDReader) {
 			bed = (BEDReader) pp.getPedigreeData();
-			bed.getHukouBook();
+//			bed.getHukouBook();
 			if (bed.IsSnpMajor()) {
 				executeBedSnpMajor();
 				return;
@@ -85,7 +83,9 @@ public class LocusCommandImpl extends CommandImpl {
 					int nextByte = bed.readNextByte();
 					int indCnt = j;
 					for (int k = 0; k < 8; k += 2) {
-						
+
+						if(indCnt == numSamples) break;
+
 						if (!hkBook.get(indCnt++).isAvailable()) {
 							continue;
 						}
@@ -135,22 +135,22 @@ public class LocusCommandImpl extends CommandImpl {
 		return locusArgs.isInbred() ? 4 * alleleFreq0 * alleleFreq1 : 2 * alleleFreq0 * alleleFreq1;
 	}
 
-	private void printResult() {
-		for (int i = 0; i < pGM.getSNPList().size(); i++) {
-			SNP snp = pGM.getSNPList().get(i);
-			double eVar = calculateEVariance(allelefreq[i][0], allelefreq[i][1]);
-			printResultOfSNP(
-					snp,
-					allelefreq[i][0],
-					allelevar[i],
-					eVar,
-					(int)genoCnt[i][0],
-					(int)genoCnt[i][1],
-					(int)genoCnt[i][2]);
-		}
-		resultFile.close();
-		Logger.printUserLog("Save results to " + locusArgs.getOutRoot() + ".locus.");
-	}
+//	private void printResult() {
+//		for (int i = 0; i < pGM.getSNPList().size(); i++) {
+//			SNP snp = pGM.getSNPList().get(i);
+//			double eVar = calculateEVariance(allelefreq[i][0], allelefreq[i][1]);
+//			printResultOfSNP(
+//					snp,
+//					allelefreq[i][0],
+//					allelevar[i],
+//					eVar,
+//					(int)genoCnt[i][0],
+//					(int)genoCnt[i][1],
+//					(int)genoCnt[i][2]);
+//		}
+//		resultFile.close();
+//		Logger.printUserLog("Save results to " + locusArgs.getOutRoot() + ".locus.");
+//	}
 	
 	private void printResultOfSNP(
 			SNP snp,
