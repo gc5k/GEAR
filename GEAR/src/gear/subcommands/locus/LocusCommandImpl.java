@@ -2,8 +2,11 @@ package gear.subcommands.locus;
 
 import java.io.PrintStream;
 import java.text.DecimalFormat;
+import java.util.ArrayList;
 
+import gear.data.InputDataSet2;
 import gear.family.GenoMatrix.GenotypeMatrix;
+import gear.family.pedigree.Hukou;
 import gear.family.pedigree.file.BEDReader;
 import gear.family.pedigree.file.MapFile;
 import gear.family.pedigree.file.SNP;
@@ -39,31 +42,37 @@ public class LocusCommandImpl extends CommandImpl {
 		map = pp.getMapData();
 		snpFilter = pp.getSNPFilter();
 
+		SampleFilter samFilter = new SampleFilter(pp.getPedigreeData(), locusArgs);
+
 		resultFile = FileUtil.CreatePrintStream(locusArgs.getOutRoot() + ".locus");
 		resultFile.println("SNP\tCHR\tBP\tRefAllele\tAltAllele\tFreq\tVar\tEVar\tAA\tAa\taa\tnChr");
 
 		if (pp.getPedigreeData() instanceof BEDReader) {
 			bed = (BEDReader) pp.getPedigreeData();
+			bed.getHukouBook();
 			if (bed.IsSnpMajor()) {
 				executeBedSnpMajor();
 				return;
 			}
 		}
 
-		pp.parsePedigreeFile();
-		SampleFilter sf = new SampleFilter(pp.getPedigreeData(), cmdArgs);
-		pGM = new GenotypeMatrix(sf.getSample(), pp.getMapData(), cmdArgs);
-
-		allelefreq = PopStat.calAlleleFrequency(pGM);
-		allelevar = PopStat.calGenoVariance(pGM);
-		genoCnt = PopStat.calGenoFrequency(pGM, false);
-		printResult();
+//		pp.parsePedigreeFile();
+//		SampleFilter sf = new SampleFilter(pp.getPedigreeData(), cmdArgs);
+//		pGM = new GenotypeMatrix(sf.getSample(), pp.getMapData(), cmdArgs);
+//
+//		allelefreq = PopStat.calAlleleFrequency(pGM);
+//		allelevar = PopStat.calGenoVariance(pGM);
+//		genoCnt = PopStat.calGenoFrequency(pGM, false);
+//		printResult();
 	}
 	
 	private void executeBedSnpMajor() {
 		int numMarkers = map.getMarkerNumberOriginal();
 		int numSamples = bed.getNumIndividuals();
 		int workingSnpIndex = 0;
+		
+		ArrayList<Hukou> hkBook = bed.getHukouBook();
+
 		for (int i = 0; i < numMarkers; ++i) {
 			if (snpFilter.isSnpIncluded(i)) {
 				int genoCnt_AA = 0;
@@ -74,9 +83,14 @@ public class LocusCommandImpl extends CommandImpl {
 				int squareSum = 0;
 				for (int j = 0; j < numSamples; j += 4) {
 					int nextByte = bed.readNextByte();
+					int indCnt = j;
 					for (int k = 0; k < 8; k += 2) {
-						// TODO: sample filter
 						int genotype = (nextByte >> k) & 0b11;
+						
+						if(!hkBook.get(indCnt++).isAvailable()) {
+							continue;
+						}
+
 						switch (genotype) {
 						case PLINKBinaryParser.HOMOZYGOTE_FIRST:
 							++genoCnt_AA;
