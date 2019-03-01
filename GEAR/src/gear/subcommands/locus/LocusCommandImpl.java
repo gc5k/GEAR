@@ -96,21 +96,26 @@ public class LocusCommandImpl extends CommandImpl {
 				}
 				int validSampleCnt = numSamples - missingCnt;
 				double variance = 0;
+				double alleleFreq0 = 0;
+				double alleleFreq1 = 0;
+
 				if (validSampleCnt > 2) {
-					double average = (double)sum / validSampleCnt;
-					variance = (squareSum - validSampleCnt * average * average) / (validSampleCnt - 1);
+					alleleFreq1 = (double)sum / (2.0*validSampleCnt);
+					alleleFreq0 = 1-alleleFreq1;
+					variance = (squareSum - validSampleCnt * alleleFreq1 * alleleFreq1) / (validSampleCnt - 1);
 				}
-				double alleleFreq0 = (double)((genoCnt_AA << 1) + genoCnt_Aa) / ((genoCnt_AA + genoCnt_Aa + genoCnt_aa) << 1);
-				double alleleFreq1 = 1.0 - alleleFreq0;
 				double eVariance = calculateEVariance(alleleFreq0, alleleFreq1);
-				
-				if (locusArgs.isMAF() || locusArgs.isMaxMAF() 
+
+				if (locusArgs.isMAF() || locusArgs.isMaxMAF()
 						|| locusArgs.isGENO() || locusArgs.isMAFRange()) {
 					double maf = alleleFreq0<alleleFreq1 ? alleleFreq0 : alleleFreq1;
 					if (locusArgs.isMAF() && maf < locusArgs.getMAF()) {
 						continue;
 					}
 					if (locusArgs.isMaxMAF() && maf > locusArgs.getMaxMAF()) {
+						continue;
+					}
+					if (locusArgs.isGENO() && (missingCnt * 1.0D/numSamples) > locusArgs.getGENO()) {
 						continue;
 					}
 					if (locusArgs.isMAFRange() ) {
@@ -124,9 +129,6 @@ public class LocusCommandImpl extends CommandImpl {
 						if (!mafFlag) {
 							continue;
 						}
-					}
-					if (locusArgs.isGENO() && (missingCnt * 1.0D/numSamples) > locusArgs.getGENO()) {
-						continue;
 					}
 				}
 				SNP snp = map.getSNP(workingSnpIndex++);
