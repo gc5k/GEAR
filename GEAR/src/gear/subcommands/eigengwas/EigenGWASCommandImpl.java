@@ -147,15 +147,13 @@ public class EigenGWASCommandImpl extends CommandImpl {
 					variance = (squareSum - validSampleCnt * average * average) / (validSampleCnt - 1);
 				}
 
-				SNP snp = map.getSNP(workingSnpIndex++);
-				
-				double freq = (sum*1.0D)/(2.0D*(Fn[0]+Fn[1]));
-				double freq1 = (Fsum[0]*1.0D)/(2.0D*Fn[0]);
-				double freq2 = (Fsum[1]*1.0D)/(2.0D*Fn[1]);
+				double freq = 1-(sum*1.0D)/(2*validSampleCnt);
+				double freq1 = 1-(Fsum[0]*1.0D)/(2.0D*Fn[0]);
+				double freq2 = 1-(Fsum[1]*1.0D)/(2.0D*Fn[1]);
 
 				double b, b_se;
 				boolean isGood;
-				if (freq == 0 || freq == 1 || ((Fn[0]+Fn[1]) < pGM.getNumIndivdial() * eigenArgs.getGENO())
+				if (freq == 0 || freq == 1 || ((Fn[0]+Fn[1]) < numSamples * eigenArgs.getGENO())
 					|| variance == 0) {
 					b = Double.NaN;
 					b_se = Double.NaN;
@@ -166,6 +164,7 @@ public class EigenGWASCommandImpl extends CommandImpl {
 					isGood = true;
 				}
 //				System.out.println(snp.getName() + " freq= "+ freq + " b="+b + " b_se=" + b_se + " f1="+ freq1 + " f2=" + freq2);
+				SNP snp = map.getSNP(workingSnpIndex++);
 
 				EigenGWASResult e1 = new EigenGWASResult(snp, freq, b, b_se, Fn[0], freq1, Fn[1], freq2, isGood);
 				eGWASResult.add(e1);
