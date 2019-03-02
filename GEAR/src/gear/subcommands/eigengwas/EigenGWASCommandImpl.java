@@ -9,6 +9,7 @@ import gear.family.plink.PLINKBinaryParser;
 import gear.family.plink.PLINKParser;
 import gear.qc.sampleqc.SampleFilter;
 import gear.qc.snpqc.SNPFilter;
+import gear.qc.snpqc.SNPFilterPostQC;
 import gear.subcommands.CommandArguments;
 import gear.subcommands.CommandImpl;
 import gear.util.FileUtil;
@@ -16,6 +17,7 @@ import gear.util.Logger;
 import gear.util.NewIt;
 
 import java.io.PrintStream;
+import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.Collections;
 
@@ -38,6 +40,8 @@ public class EigenGWASCommandImpl extends CommandImpl {
 	private double lambdaGC = 1;
 	private double[] GC;
 	private double[] pQuantile;
+	private DecimalFormat fmt1 = new DecimalFormat("0.0000");
+	private DecimalFormat fmt2 = new DecimalFormat("0.00E000");
 
 	public void execute(CommandArguments cmdArgs) {
 
@@ -63,6 +67,8 @@ public class EigenGWASCommandImpl extends CommandImpl {
 
 	private void eigenGWASBed() {
 		ChiSquaredDistributionImpl ci = new ChiSquaredDistributionImpl(1);
+		SNPFilterPostQC snpPostQC = new SNPFilterPostQC(eigenArgs);
+		ArrayList<Hukou> hkBook = bed.getHukouBook();
 
 		double threshold = 0.0D;
 		int[] pIdx = this.data.getMatchedSubjectIdx(1);
@@ -79,7 +85,6 @@ public class EigenGWASCommandImpl extends CommandImpl {
 		int numSamples = bed.getNumIndividuals();
 		int workingSnpIndex = 0;
 
-		ArrayList<Hukou> hkBook = bed.getHukouBook();
 
 		for (int i = 0; i < numMarkers; ++i) {
 
@@ -147,48 +152,26 @@ public class EigenGWASCommandImpl extends CommandImpl {
 				double freq1 = 1 - (Fsum[0] * 1.0D) / (2.0D * Fn[0]);
 				double freq2 = 1 - (Fsum[1] * 1.0D) / (2.0D * Fn[1]);
 
-				if (eigenArgs.isMAF() || eigenArgs.isMaxMAF() || eigenArgs.isGENO() || eigenArgs.isMAFRange()) {
-					if (eigenArgs.isMAF() && maf < eigenArgs.getMAF()) {
-						continue;
-					}
-					if (eigenArgs.isMaxMAF() && maf > eigenArgs.getMaxMAF()) {
-						continue;
-					}
-					if (eigenArgs.isMAFRange()) {
-						double[][] mafR = eigenArgs.getMAFRange();
-						boolean mafFlag = false;
-						for (int j = 0; j < mafR.length; j++) {
-							if (maf >= mafR[j][0] && maf <= mafR[j][1]) {
-								mafFlag = true;
-							}
-						}
-						if (!mafFlag) {
-							continue;
-						}
-					}
-					if (eigenArgs.isGENO() && (missingCnt * 1.0D / numSamples) > eigenArgs.getGENO()) {
-						continue;
-					}
-				}
+				boolean isPassPostQC = snpPostQC.isPassPostQC(maf, missingCnt * 1.0D / numSamples);
+				if (!isPassPostQC) continue;
+
 				double b, b_se;
-				boolean isGood;
-				if (freq == 0 || ((Fn[0] + Fn[1]) < numSamples * eigenArgs.getGENO())
-						|| variance == 0) {
+				boolean isGood = true;
+				if (freq == 0 || variance == 0) {
 					b = Double.NaN;
 					b_se = Double.NaN;
 					isGood = false;
 				} else {
 					b = sReg.getSlope();
 					b_se = sReg.getSlopeStdErr();
-					isGood = true;
 				}
 				SNP snp = map.getSNP(workingSnpIndex++);
 				EigenGWASResult e1 = new EigenGWASResult(snp, freq, b, b_se, Fn[0], freq1, Fn[1], freq2, isGood);
 				eGWASResult.add(e1);
 				pArray.add(e1.GetP());
-
 			}
 		}
+		snpPostQC.printPostQCSummary();
 		Collections.sort(pArray);
 		int idx = (int) Math.ceil(pArray.size() / 2);
 
@@ -199,8 +182,8 @@ public class EigenGWASCommandImpl extends CommandImpl {
 			GC = new double[7];
 			pQuantile = new double[7];
 		}
-		Logger.printUserLog("Median of p values is " + pArray.get(idx));
-
+		double pMedian = pArray.get(idx);
+		Logger.printUserLog("Median of p values is " + (pMedian > 0.0001? fmt1.format(pMedian):fmt2.format(pMedian))+ " for " + pArray.size() +" analyzed SNPs.");
 		try {
 			double chisq = ci.inverseCumulativeProbability(1 - pArray.get(idx).doubleValue());
 			lambdaGC = chisq / 0.4549;
@@ -215,7 +198,7 @@ public class EigenGWASCommandImpl extends CommandImpl {
 			e.printStackTrace();
 		}
 
-		Logger.printUserLog("Lambda GC is: " + lambdaGC);
+		Logger.printUserLog("Lambda GC is: " + fmt1.format(lambdaGC));
 
 		if (eigenArgs.isGUI()) {
 			PrintStream gui_file = null;
@@ -223,159 +206,7 @@ public class EigenGWASCommandImpl extends CommandImpl {
 			gui_file.println(lambdaGC);
 			gui_file.close();
 		}
-		// ////TEST
-		// try {
-		// write.close();
-		// bw.close();
-		//
-		// } catch (IOException e) {
-		// e.printStackTrace();
-		// }
-		// ////TEST
-
 	}
-
-	// private void eigenGWAS() {
-	// // ////TEST
-	// // File f = new File(this.eigenArgs.getOutRoot() + ".egwas");
-	// // BufferedWriter bw = null;
-	// // OutputStreamWriter write = null;
-	// // try {
-	// // f.createNewFile();
-	// // write = new OutputStreamWriter(new FileOutputStream(f));
-	// // bw = new BufferedWriter(write);
-	// //
-	// bw.write("SNP\tCHR\tBP\tRefAllele\tAltAllele\tfreq\tBeta\tSE\tChi\tP\tPGC\tn1\tfreq1\tn2\tfreq2\tFst\n");
-	// // } catch (IOException e2) {
-	// // e2.printStackTrace();
-	// // }
-	// // ////TEST
-	//
-	// ChiSquaredDistributionImpl ci = new ChiSquaredDistributionImpl(1);
-	//
-	//// int[] gIdx = this.data.getMatchedSubjectIdx(0);
-	// int[] pIdx = this.data.getMatchedSubjectIdx(1);
-	//
-	// double[] Y = new double[pIdx.length];
-	// ArrayList<Double> pArray = NewIt.newArrayList();
-	// double threshold = 0.0;
-	//
-	// for (int subjectIdx = 0; subjectIdx < Y.length; subjectIdx++) {
-	// Y[subjectIdx] = this.data.getVariable(1, pIdx[subjectIdx], this.traitIdx);
-	// threshold += Y[subjectIdx];
-	// }
-	// threshold /= Y.length;
-	//
-	// for (int i = 0; i < pGM.getNumMarker(); i++) {
-	// SNP snp = pGM.getSNPList().get(i);
-	//
-	// SimpleRegression sReg = new SimpleRegression();
-	// double n1 = 0.0D;
-	// double n2 = 0.0D;
-	// double N = 0.0D;
-	// double freq1 = 0.0D;
-	// double freq2 = 0.0D;
-	// double freq = 0.0D;
-	//
-	// for (int j = 0; j < pGM.getNumIndivdial(); j++) {
-	//
-	//// int g = pGM.getAdditiveScoreOnFirstAllele(gIdx[j], i);
-	// int g = pGM.getAdditiveScoreOnFirstAllele(j, i);
-	// if (g != ConstValues.MISSING_GENOTYPE) {
-	// sReg.addData(g, Y[j]);
-	// if (Y[j] < threshold) {
-	// n1 += 1.0D;
-	// freq1 += g;
-	// } else {
-	// n2 += 1.0D;
-	// freq2 += g;
-	// }
-	// N += 1.0D;
-	// freq += g;
-	// }
-	// }
-	//
-	// freq1 /= 2.0D * n1;
-	// freq2 /= 2.0D * n2;
-	// freq /= 2.0D * N;
-	//
-	// double b, b_se;
-	// boolean isGood;
-	// if (freq == 0 || freq == 1 || (N < pGM.getNumIndivdial() *
-	// eigenArgs.getGENO())
-	// || pGM.getAlleleVar(i) == 0) {
-	// b = Double.NaN;
-	// b_se = Double.NaN;
-	// isGood = false;
-	// } else {
-	// b = sReg.getSlope();
-	// b_se = sReg.getSlopeStdErr();
-	// isGood = true;
-	// }
-	// EigenGWASResult e1 = new EigenGWASResult(snp, freq, b, b_se, n1, freq1, n2,
-	// freq2, isGood);
-	// eGWASResult.add(e1);
-	// pArray.add(e1.GetP());
-	//
-	// // ///TEST
-	// // try {
-	// // bw.write(e1.printEGWASResult(1) + "\n");
-	// // if (i > 10000)
-	// // {
-	// // bw.flush();
-	// // }
-	// //
-	// // } catch (IOException e) {
-	// // e.printStackTrace();
-	// // }
-	// // ///TEST
-	// }
-	// Collections.sort(pArray);
-	// int idx = (int) Math.ceil(pArray.size() / 2);
-	//
-	// if(Math.log10(pArray.size()) <= 6) {
-	// GC = new double[(int) (Math.log10(pArray.size()))];
-	// pQuantile = new double[(int) (Math.log10(pArray.size()))];
-	// } else {
-	// GC = new double[7];
-	// pQuantile = new double[7];
-	// }
-	// Logger.printUserLog("Median of p values is " + pArray.get(idx));
-	//
-	// try {
-	// double chisq = ci.inverseCumulativeProbability(1 -
-	// pArray.get(idx).doubleValue());
-	// lambdaGC = chisq / 0.4549;
-	// GC[0] = lambdaGC;
-	// pQuantile[0] = 0.5;
-	// for(int i = 1; i < GC.length; i++) {
-	// chisq = ci.inverseCumulativeProbability(Math.pow(10, -1*i));
-	// GC[i] = ci.inverseCumulativeProbability(1 - pArray.get((int)
-	// (pArray.size()*Math.pow(10, -1*i))) );
-	// pQuantile[i] = Math.pow(10, -1*i);
-	// }
-	// } catch (MathException e) {
-	// e.printStackTrace();
-	// }
-	//
-	// Logger.printUserLog("Lambda GC is: " + lambdaGC);
-	//
-	// if (eigenArgs.isGUI()) {
-	// PrintStream gui_file = null;
-	// gui_file = FileUtil.CreatePrintStream(eigenArgs.getOutRoot()+".egwas.gui");
-	// gui_file.println(lambdaGC);
-	// gui_file.close();
-	// }
-	// // ////TEST
-	// // try {
-	// // write.close();
-	// // bw.close();
-	// //
-	// // } catch (IOException e) {
-	// // e.printStackTrace();
-	// // }
-	// // ////TEST
-	// }
 
 	public void printResult() {
 

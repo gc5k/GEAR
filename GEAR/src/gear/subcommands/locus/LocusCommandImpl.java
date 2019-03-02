@@ -12,6 +12,7 @@ import gear.family.plink.PLINKBinaryParser;
 import gear.family.plink.PLINKParser;
 import gear.qc.sampleqc.SampleFilter;
 import gear.qc.snpqc.SNPFilter;
+import gear.qc.snpqc.SNPFilterPostQC;
 import gear.subcommands.CommandArguments;
 import gear.subcommands.CommandImpl;
 import gear.util.FileUtil;
@@ -50,6 +51,7 @@ public class LocusCommandImpl extends CommandImpl {
 		int numMarkers = map.getMarkerNumberOriginal();
 		int numSamples = bed.getNumIndividuals();
 		int workingSnpIndex = 0;
+		SNPFilterPostQC snpPostQC = new SNPFilterPostQC(locusArgs);
 		
 		ArrayList<Hukou> hkBook = bed.getHukouBook();
 
@@ -101,36 +103,14 @@ public class LocusCommandImpl extends CommandImpl {
 
 				if (validSampleCnt > 2) {
 					alleleFreq1 = (double)sum / (2.0*validSampleCnt);
-					alleleFreq0 = 1-alleleFreq1;
+					alleleFreq0 = 1 - alleleFreq1;
 					variance = (squareSum - validSampleCnt * alleleFreq1 * alleleFreq1) / (validSampleCnt - 1);
 				}
 				double eVariance = calculateEVariance(alleleFreq0, alleleFreq1);
 
-				if (locusArgs.isMAF() || locusArgs.isMaxMAF()
-						|| locusArgs.isGENO() || locusArgs.isMAFRange()) {
-					double maf = alleleFreq0<alleleFreq1 ? alleleFreq0 : alleleFreq1;
-					if (locusArgs.isMAF() && maf < locusArgs.getMAF()) {
-						continue;
-					}
-					if (locusArgs.isMaxMAF() && maf > locusArgs.getMaxMAF()) {
-						continue;
-					}
-					if (locusArgs.isGENO() && (missingCnt * 1.0D/numSamples) > locusArgs.getGENO()) {
-						continue;
-					}
-					if (locusArgs.isMAFRange() ) {
-						double[][] mafR = locusArgs.getMAFRange();
-						boolean mafFlag = false;
-						for (int j = 0; j < mafR.length; j++) {
-							if (maf >= mafR[j][0] && maf <= mafR[j][1]) {
-								mafFlag = true;
-							}
-						}
-						if (!mafFlag) {
-							continue;
-						}
-					}
-				}
+				boolean isPassPostQC = snpPostQC.isPassPostQC(alleleFreq0, missingCnt * 1.0D / numSamples);
+				if (!isPassPostQC) continue;
+
 				SNP snp = map.getSNP(workingSnpIndex++);
 				printResultOfSNP(snp, alleleFreq0, variance, eVariance, genoCnt_AA, genoCnt_Aa, genoCnt_aa);
 			} else {
@@ -138,6 +118,7 @@ public class LocusCommandImpl extends CommandImpl {
 			}
 		}
 		resultFile.close();
+		snpPostQC.printPostQCSummary();
 		Logger.printUserLog("Save " + workingSnpIndex + " results to " + locusArgs.getOutRoot() + ".locus.");
 	}
 	
