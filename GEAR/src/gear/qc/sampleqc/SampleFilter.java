@@ -1,4 +1,4 @@
-package gear.family.qc.rowqc;
+package gear.qc.sampleqc;
 
 import java.io.BufferedReader;
 import java.io.IOException;

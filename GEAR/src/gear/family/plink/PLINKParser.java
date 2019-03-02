@@ -2,7 +2,7 @@ package gear.family.plink;
 
 import gear.family.pedigree.file.MapFile;
 import gear.family.pedigree.file.PedigreeFile;
-import gear.family.qc.colqc.SNPFilter;
+import gear.qc.snpqc.SNPFilter;
 import gear.subcommands.CommandArguments;
 import gear.util.Logger;
 

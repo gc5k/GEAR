@@ -14,7 +14,7 @@ import gear.family.pedigree.PersonIndex;
 import gear.family.pedigree.file.SNP;
 import gear.family.plink.PLINKBinaryParser;
 import gear.family.plink.PLINKParser;
-import gear.family.qc.rowqc.SampleFilter;
+import gear.qc.sampleqc.SampleFilter;
 import gear.subcommands.CommandArguments;
 import gear.subcommands.CommandImpl;
 import gear.util.FileUtil;

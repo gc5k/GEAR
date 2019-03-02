@@ -16,7 +16,7 @@ import gear.data.InputDataSet2;
 import gear.data.SubjectID;
 import gear.family.GenoMatrix.GenotypeMatrix;
 import gear.family.plink.PLINKParser;
-import gear.family.qc.rowqc.SampleFilter;
+import gear.qc.sampleqc.SampleFilter;
 import gear.subcommands.CommandArguments;
 import gear.subcommands.CommandImpl;
 import gear.subcommands.grmA.GRMACommandArguments;

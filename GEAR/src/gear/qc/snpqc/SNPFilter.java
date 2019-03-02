@@ -1,4 +1,4 @@
-package gear.family.qc.colqc;
+package gear.qc.snpqc;
 
 import java.io.BufferedReader;
 import java.io.IOException;

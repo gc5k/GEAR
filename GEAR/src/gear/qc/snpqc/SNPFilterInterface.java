@@ -1,4 +1,4 @@
-package gear.family.qc.colqc;
+package gear.qc.snpqc;
 
 import gear.subcommands.CommandArguments;
 
