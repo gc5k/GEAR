@@ -1,11 +1,15 @@
 package gear.subcommands.oath.nss;
 
-import gear.ConstValues;
 import gear.data.InputDataSet2;
-import gear.family.GenoMatrix.GenotypeMatrix;
+import gear.family.pedigree.Hukou;
+import gear.family.pedigree.file.BEDReader;
+import gear.family.pedigree.file.MapFile;
 import gear.family.pedigree.file.SNP;
+import gear.family.plink.PLINKBinaryParser;
 import gear.family.plink.PLINKParser;
 import gear.qc.sampleqc.SampleFilter;
+import gear.qc.snpqc.SNPFilter;
+import gear.qc.snpqc.SNPFilterPostQC;
 import gear.subcommands.CommandArguments;
 import gear.subcommands.CommandImpl;
 import gear.subcommands.oath.OATHConst;
@@ -16,6 +20,7 @@ import gear.util.NewIt;
 import java.io.BufferedWriter;
 import java.io.IOException;
 import java.io.PrintStream;
+import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.Collections;
 
@@ -23,26 +28,31 @@ import org.apache.commons.math.MathException;
 import org.apache.commons.math.distribution.ChiSquaredDistributionImpl;
 import org.apache.commons.math.linear.RealMatrix;
 import org.apache.commons.math.stat.regression.SimpleRegression;
-import org.apache.commons.math.stat.StatUtils;
 import org.apache.commons.math.stat.correlation.PearsonsCorrelation;
 
 public class NSSCommandImpl extends CommandImpl {
 	private NSSCommandArguments nssArgs;
 	private SampleFilter sf;
-	private GenotypeMatrix pGM;
+	
+	private MapFile map;
+	private SNPFilter snpFilter;
+	private BEDReader bed;
 
 	private int[] traitIdx;
 	private int[] covIdx;
 	private int N;
 	private InputDataSet2 data = null;
-	private ArrayList<NSSGWASResult> nssResult;
-	ArrayList<SNP> snpList;
+	private ArrayList< ArrayList<NSSGWASResult>> nssResultList; 
+	private ArrayList<ArrayList<Double>> pArrayList;
 
 	private double lambdaGC = 1;
 
 //	private int famFileIdx = 0;
 	private int pheFileIdx = 1;
 	private int covFileIdx = 2;
+
+	private DecimalFormat fmt1 = new DecimalFormat("0.0000");
+	private DecimalFormat fmt2 = new DecimalFormat("0.00E000");
 
 	public void execute(CommandArguments cmdArgs) {
 		this.nssArgs = ((NSSCommandArguments) cmdArgs);
@@ -61,27 +71,19 @@ public class NSSCommandImpl extends CommandImpl {
 
 		this.N = data.getNumberOfSubjects();
 
-		PLINKParser pp = PLINKParser.parse(this.nssArgs);
+		PLINKParser pp = PLINKParser.create(nssArgs);
+		pp.parseSmallFiles();
+		map = pp.getMapData();
+		snpFilter = pp.getSNPFilter();
+
 		sf = new SampleFilter(pp.getPedigreeData(), data.getMatchSubjetList());
-		pGM = new GenotypeMatrix(sf.getSample(), pp.getMapData(), cmdArgs);
+		bed = (BEDReader) pp.getPedigreeData();
 
-		for (int i = 0; i < traitIdx.length; i++) {
-			Logger.printUserLog("");
-			Logger.printUserLog("Generating naive summary statistics (NSS) for " + (traitIdx[i] + 1)
-					+ "th variable in file '" + nssArgs.getPhenotypeFile() + "'.");
-			nssResult = NewIt.newArrayList();
-			naiveGWAS(pheFileIdx, traitIdx, i);
-			printResult(traitIdx, i, pheFileIdx);
-		}
+		nssResultList = NewIt.newArrayList();
+		pArrayList = NewIt.newArrayList();
 
-		for (int i = 0; i < covIdx.length; i++) {
-			Logger.printUserLog("");
-			Logger.printUserLog("Generating naive summary statistics (NSS) for " + (covIdx[i] + 1)
-					+ "th variable in file '" + nssArgs.getCovFile() + "'.");
-			nssResult = NewIt.newArrayList();
-			naiveGWAS(covFileIdx, covIdx, i);
-			printResult(covIdx, i, covFileIdx);
-		}
+		naiveGWASBed();
+		printResult();
 
 		String Fout = nssArgs.getOutRoot() + ".list.nss";
 		PrintStream nssList = FileUtil.CreatePrintStream(Fout);
@@ -94,6 +96,147 @@ public class NSSCommandImpl extends CommandImpl {
 
 		nssList.close();
 		printCovMat();
+	}
+
+	private void naiveGWASBed() {
+		ChiSquaredDistributionImpl ci = new ChiSquaredDistributionImpl(1);
+		SNPFilterPostQC snpPostQC = new SNPFilterPostQC(nssArgs);
+		ArrayList<Hukou> hkBook = bed.getHukouBook();
+
+		int[] pIdx = this.data.getMatchedSubjectIdx(1);
+		double[][] YY = new double[1+covIdx.length][pIdx.length];
+
+
+		for (int subjectIdx = 0; subjectIdx < pIdx.length; subjectIdx++) {
+			YY[0][subjectIdx] = this.data.getVariable(pheFileIdx, pIdx[subjectIdx], traitIdx[0]);
+
+		}
+		ArrayList<NSSGWASResult> nssPheResult = NewIt.newArrayList();
+		nssResultList.add(nssPheResult);
+
+		ArrayList<Double> pPheArray = NewIt.newArrayList();
+		pArrayList.add(pPheArray);
+
+		for (int i = 0; i < covIdx.length; i++) {
+			for (int subjectIdx = 0; subjectIdx < pIdx.length; subjectIdx++) {
+				YY[i+1][subjectIdx] = this.data.getVariable(covFileIdx, pIdx[subjectIdx], covIdx[i]);
+			}
+			ArrayList<NSSGWASResult> nssCovResult = NewIt.newArrayList();
+			nssResultList.add(nssCovResult);
+			
+			ArrayList<Double> pCovArray = NewIt.newArrayList();
+			pArrayList.add(pCovArray);
+		}
+
+		int numMarkers = map.getMarkerNumberOriginal();
+		int numSamples = bed.getNumIndividuals();
+		int workingSnpIndex = 0;
+
+		for (int i = 0; i < numMarkers; ++i) {
+
+			if (snpFilter.isSnpIncluded(i)) {
+				
+				ArrayList<SimpleRegression> sRegArray = NewIt.newArrayList();
+				for (int l = 0; l < pArrayList.size(); l++) {
+					sRegArray.add(new SimpleRegression());
+				}
+
+				int missingCnt = 0;
+				int sum = 0;
+				int squareSum = 0;
+
+				for (int j = 0; j < numSamples; j += 4) {
+					int nextByte = bed.readNextByte();
+					int indCnt = j;
+					for (int k = 0; k < 8; k += 2) {
+						if (indCnt == numSamples)
+							break;
+						if (!hkBook.get(indCnt++).isAvailable()) {
+							continue;
+						}
+
+						boolean isMissing = false;
+
+						int genotype = (nextByte >> k) & 0b11;
+
+						switch (genotype) {
+						case PLINKBinaryParser.HOMOZYGOTE_FIRST:
+							break;
+						case PLINKBinaryParser.HETEROZYGOTE:
+							sum += 1;
+							squareSum += 1;
+							break;
+						case PLINKBinaryParser.HOMOZYGOTE_SECOND:
+							sum += 2;
+							squareSum += 4;
+							break;
+						case PLINKBinaryParser.MISSING_GENOTYPE:
+							++missingCnt;
+							isMissing = true;
+							break;
+						}
+						if (!isMissing) {
+							for (int l = 0; l < pArrayList.size(); l++) {
+								SimpleRegression sReg = sRegArray.get(l);
+								sReg.addData(genotype, YY[l][indCnt - 1]);
+							}
+						}
+					}
+				}
+
+				int validSampleCnt = numSamples - missingCnt;
+				double variance = 0;
+				double average = 0;
+				if (validSampleCnt > 2) {
+					average = (double) sum / validSampleCnt;
+					variance = (squareSum - validSampleCnt * average * average) / (validSampleCnt - 1);
+				}
+
+				double freq = 1 - average/2;
+				double maf = freq < 0.5 ? freq : (1 - freq);
+
+				boolean isPassPostQC = snpPostQC.isPassPostQC(maf, missingCnt * 1.0D / numSamples);
+				if (!isPassPostQC) continue;
+
+				for (int l = 0; l < pArrayList.size(); l++) {
+					SimpleRegression sReg = sRegArray.get(l);
+					ArrayList<NSSGWASResult> nssResult = nssResultList.get(l);
+					ArrayList<Double> pArray = pArrayList.get(l);
+					double b, b_se;
+					if (freq == 0 || variance == 0) {
+						b = Double.NaN;
+						b_se = Double.NaN;
+					} else {
+						b = sReg.getSlope();
+						b_se = sReg.getSlopeStdErr();
+					}
+					SNP snp = map.getSNP(workingSnpIndex);
+					NSSGWASResult e1 = new NSSGWASResult(snp, freq, variance, b, b_se);
+					nssResult.add(e1);
+					pArray.add(e1.GetP());
+				}
+				workingSnpIndex++;
+			}
+		}
+		snpPostQC.printPostQCSummary();
+		
+		for (int l = 0; l < pArrayList.size(); l++) {
+			ArrayList<Double> pArray = pArrayList.get(l);
+			
+			Collections.sort(pArray);
+			int idx = (int) Math.ceil(pArray.size() / 2);
+
+			Logger.printUserLog("Median of p values is " + pArray.get(idx));
+
+			try {
+				double chisq = ci.inverseCumulativeProbability(1 - pArray.get(idx).doubleValue());
+				lambdaGC = chisq / 0.4549;
+			} catch (MathException e) {
+				e.printStackTrace();
+			}
+			Logger.printUserLog("Lambda GC is: " + (lambdaGC > 0.0001?fmt1.format(lambdaGC):fmt2.format(lambdaGC)));		
+			
+		}
 	}
 
 	private void printCovMat() {
@@ -130,119 +273,44 @@ public class NSSCommandImpl extends CommandImpl {
 				+ " correlation matrix into '" + Fout + "'.");
 	}
 
-	private void naiveGWAS(int fileIdx, int[] variable, int tIdx) {
-		int monoLoci = 0;
-		ChiSquaredDistributionImpl ci = new ChiSquaredDistributionImpl(1);
-
-		int[] pIdx = data.getMatchedSubjectIdx(fileIdx);
-		double[] Y = new double[pIdx.length];
-		ArrayList<Double> pArray = NewIt.newArrayList();
-
-		for (int subjectIdx = 0; subjectIdx < Y.length; subjectIdx++) {
-			Y[subjectIdx] = this.data.getVariable(fileIdx, pIdx[subjectIdx], variable[tIdx]);
-		}
-		Y = StatUtils.normalize(Y);
-
-//		int[] subIdx = data.getMatchedSubjectIdx(famFileIdx);
-		for (int i = 0; i < pGM.getNumMarker(); i++) {
-			SNP snp = pGM.getSNPList().get(i);
-
-			SimpleRegression sReg = new SimpleRegression();
-			double N = 0.0D;
-			double freq = 0.0D;
-			double xx = 0;
-			double mx = 0;
-
-			for (int j = 0; j < pGM.getNumIndivdial(); j++) {
-				int g = pGM.getAdditiveScoreOnFirstAllele(j, i);
-				if (g != ConstValues.MISSING_GENOTYPE) {
-					sReg.addData(g, Y[j]);
-					N += 1.0D;
-					freq += g;
-					mx += g;
-					xx += g * g;
-				}
+	public void printResult() {
+		
+		for (int l = 0; l < pArrayList.size(); l++) {
+			String Fout = null;
+			if (l == 0) {
+				Fout = nssArgs.getOutRoot() + ".p." + (traitIdx[0] + 1) + ".nss";
+			} else {
+				Fout = nssArgs.getOutRoot() + ".c." + (covIdx[l-1] + 1) + ".nss";
 			}
+			BufferedWriter nssGZ = FileUtil.ZipFileWriter(Fout+".gz");
 
-			if (freq == 0 || freq == 1 || (N < pGM.getNumIndivdial() * nssArgs.getGENO())) {
-				monoLoci++;
-				continue;
-			}
-
-			double vg = (xx - (mx / N) * (mx / N) * N) / (N - 1);
-
-			freq /= 2.0D * N;
-
-			double b = sReg.getSlope();
-			double b_se = sReg.getSlopeStdErr();
-
-			NSSGWASResult e1 = new NSSGWASResult(snp, freq, vg, b, b_se);
-			nssResult.add(e1);
-			pArray.add(e1.GetP());
-		}
-		Collections.sort(pArray);
-		int idx = (int) Math.ceil(pArray.size() / 2);
-
-		if (monoLoci > 1) {
-			Logger.printUserLog("Removed " + monoLoci + " SNP [MAF < " + nssArgs.getMAF() + "].");
-		} else if (monoLoci == 1) {
-			Logger.printUserLog("Removed " + monoLoci + " SNPs [MAF < " + nssArgs.getMAF() + "].");
-		}
-
-		Logger.printUserLog("Median of p values is " + pArray.get(idx));
-
-		try {
-			double chisq = ci.inverseCumulativeProbability(1 - pArray.get(idx).doubleValue());
-			lambdaGC = chisq / 0.4549;
-		} catch (MathException e) {
-			e.printStackTrace();
-		}
-		Logger.printUserLog("Lambda GC is: " + lambdaGC);
-	}
-
-	public void printResult(int[] variable, int tIdx, int fileIdx) {
-		int fidx = variable[tIdx] + 1;
-		String Fout = null;
-		if (fileIdx == pheFileIdx) {
-			Fout = nssArgs.getOutRoot() + ".p." + fidx + ".nss";
-		} else {
-			Fout = nssArgs.getOutRoot() + ".c." + fidx + ".nss";
-		}
-//		PrintStream nssGWAS = FileUtil.CreatePrintStream(Fout);
-		BufferedWriter nssGZ = FileUtil.ZipFileWriter(Fout+".gz");
-
-//		nssGWAS.println(OATHConst.SNP + "\t" + OATHConst.CHR + "\t" + OATHConst.BP + "\t" + OATHConst.RefAle + "\t"
-//				+ OATHConst.AltAle + "\t" + OATHConst.RAF + "\t" + OATHConst.Vg + "\t" + OATHConst.BETA + "\t"
-//				+ OATHConst.SE + "\t" + OATHConst.CHI + "\t" + OATHConst.P);
-
-		try {
-			nssGZ.append(OATHConst.SNP + "\t" + OATHConst.CHR + "\t" + OATHConst.BP + "\t" + OATHConst.RefAle + "\t"
-					+ OATHConst.AltAle + "\t" + OATHConst.RAF + "\t" + OATHConst.Vg + "\t" + OATHConst.BETA + "\t"
-					+ OATHConst.SE + "\t" + OATHConst.CHI + "\t" + OATHConst.P + "\n");
-		} catch (IOException e) {
-			Logger.handleException(e,
-					"error in writing '" + Fout + ".gz.");
-		}
-
-		for (int i = 0; i < nssResult.size(); i++) {
-			NSSGWASResult e1 = nssResult.get(i);
-//			nssGWAS.println(e1.printEGWASResult(lambdaGC));
 			try {
-				nssGZ.append(e1.printEGWASResult(lambdaGC) +"\n");
+				nssGZ.append(OATHConst.SNP + "\t" + OATHConst.CHR + "\t" + OATHConst.BP + "\t" + OATHConst.RefAle + "\t"
+						+ OATHConst.AltAle + "\t" + OATHConst.RAF + "\t" + OATHConst.Vg + "\t" + OATHConst.BETA + "\t"
+						+ OATHConst.SE + "\t" + OATHConst.CHI + "\t" + OATHConst.P + "\n");
 			} catch (IOException e) {
 				Logger.handleException(e,
 						"error in writing '" + Fout + ".gz.");
 			}
-		}
-//		nssGWAS.close();
-		try {
-			nssGZ.close();
-		} catch (IOException e) {
-			Logger.handleException(e,
-					"error in closing '" + Fout + ".gz.");
-		}
 
-		Logger.printUserLog("Write the NSS into '" + Fout + ".gz'.");
+			ArrayList<NSSGWASResult> nssResult = nssResultList.get(l);
+			for (int i = 0; i < nssResult.size(); i++) {
+				NSSGWASResult e1 = nssResult.get(i);
+				try {
+					nssGZ.append(e1.printEGWASResult(lambdaGC) +"\n");
+				} catch (IOException e) {
+					Logger.handleException(e,
+							"error in writing '" + Fout + ".gz.");
+				}
+			}
+			try {
+				nssGZ.close();
+			} catch (IOException e) {
+				Logger.handleException(e,
+						"error in closing '" + Fout + ".gz.");
+			}
+			Logger.printUserLog("Write the NSS into '" + Fout + ".gz'.");
+		}
 	}
 
 	public int getN() {

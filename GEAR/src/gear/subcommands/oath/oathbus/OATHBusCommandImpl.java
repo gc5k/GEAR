@@ -116,6 +116,12 @@ public class OATHBusCommandImpl extends CommandImpl {
 		nssArgs.setCovFile(obArgs.getCovFile());
 		nssArgs.setCovNumber(obArgs.getCovNumber());
 		nssArgs.setMAF((new Double(obArgs.getMAF())).toString());
+		if (obArgs.isExtractFile()) {
+			nssArgs.setExtractFile(obArgs.getExtractFile());
+		}
+		if (obArgs.isExcludeFile()) {
+			nssArgs.setExcludeFile(obArgs.getExcludeFile());
+		}
 		if (obArgs.isKeepFile())
 			nssArgs.setKeepFile(obArgs.getKeepFile());
 
