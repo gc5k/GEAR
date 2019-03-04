@@ -102,9 +102,10 @@ public class LocusCommandImpl extends CommandImpl {
 				double alleleFreq1 = 0;
 
 				if (validSampleCnt > 2) {
-					alleleFreq1 = (double)sum / (2.0*validSampleCnt);
+					double average = (double)sum / validSampleCnt;
+					alleleFreq1 = average/2;
 					alleleFreq0 = 1 - alleleFreq1;
-					variance = (squareSum - validSampleCnt * alleleFreq1 * alleleFreq1) / (validSampleCnt - 1);
+					variance = (squareSum - validSampleCnt * average * average) / (validSampleCnt - 1);
 				}
 				double eVariance = calculateEVariance(alleleFreq0, alleleFreq1);
 

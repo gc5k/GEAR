@@ -42,6 +42,7 @@ public class EigenGWASCommandImpl extends CommandImpl {
 	private double[] pQuantile;
 	private DecimalFormat fmt1 = new DecimalFormat("0.0000");
 	private DecimalFormat fmt2 = new DecimalFormat("0.00E000");
+	private int pheFileIdx = 1;
 
 	public void execute(CommandArguments cmdArgs) {
 
@@ -76,7 +77,7 @@ public class EigenGWASCommandImpl extends CommandImpl {
 		ArrayList<Double> pArray = NewIt.newArrayList();
 
 		for (int subjectIdx = 0; subjectIdx < Y.length; subjectIdx++) {
-			Y[subjectIdx] = this.data.getVariable(1, pIdx[subjectIdx], this.traitIdx);
+			Y[subjectIdx] = this.data.getVariable(pheFileIdx, pIdx[subjectIdx], this.traitIdx);
 			threshold += Y[subjectIdx];
 		}
 		threshold /= Y.length;
@@ -198,7 +199,7 @@ public class EigenGWASCommandImpl extends CommandImpl {
 			e.printStackTrace();
 		}
 
-		Logger.printUserLog("Lambda GC is: " + fmt1.format(lambdaGC));
+		Logger.printUserLog("Lambda GC is: " + (lambdaGC > 0.0001?fmt1.format(lambdaGC):fmt2.format(lambdaGC)));
 
 		if (eigenArgs.isGUI()) {
 			PrintStream gui_file = null;
