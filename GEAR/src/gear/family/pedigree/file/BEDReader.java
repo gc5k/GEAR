@@ -94,9 +94,9 @@ public class BEDReader extends PedigreeFile {
 	
 	private void calculateBytesPerRow() {
 		if (IsSnpMajor()) {
-			bytesPerRow = (mapData.getMarkerNumberOriginal() + 3) / 4;
-		} else {
 			bytesPerRow = (persons.size() + 3) / 4;
+		} else {
+			bytesPerRow = (mapData.getMarkerNumberOriginal()) / 4;
 		}
 	}
 	

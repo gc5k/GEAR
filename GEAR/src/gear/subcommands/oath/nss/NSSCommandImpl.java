@@ -44,7 +44,6 @@ public class NSSCommandImpl extends CommandImpl {
 	private InputDataSet2 data = null;
 	private ArrayList< ArrayList<NSSGWASResult>> nssResultList; 
 	private ArrayList<ArrayList<Double>> pArrayList;
-	private ArrayList<SNP> snpList;
 
 	private double lambdaGC = 1;
 
@@ -85,23 +84,6 @@ public class NSSCommandImpl extends CommandImpl {
 
 		naiveGWASBed();
 		printResult();
-//		for (int i = 0; i < traitIdx.length; i++) {
-//			Logger.printUserLog("");
-//			Logger.printUserLog("Generating naive summary statistics (NSS) for " + (traitIdx[i] + 1)
-//					+ "th variable in file '" + nssArgs.getPhenotypeFile() + "'.");
-//			nssResult = NewIt.newArrayList();
-//			naiveGWASBed();
-//			printResult(traitIdx, i, pheFileIdx);
-//		}
-//
-//		for (int i = 0; i < covIdx.length; i++) {
-//			Logger.printUserLog("");
-//			Logger.printUserLog("Generating naive summary statistics (NSS) for " + (covIdx[i] + 1)
-//					+ "th variable in file '" + nssArgs.getCovFile() + "'.");
-//			nssResult = NewIt.newArrayList();
-//			naiveGWASBed(pheFileIdx, covIdx[i]);
-//			printResult(covIdx, i, covFileIdx);
-//		}
 
 		String Fout = nssArgs.getOutRoot() + ".list.nss";
 		PrintStream nssList = FileUtil.CreatePrintStream(Fout);

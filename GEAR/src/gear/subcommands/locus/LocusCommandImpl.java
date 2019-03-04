@@ -35,6 +35,7 @@ public class LocusCommandImpl extends CommandImpl {
 		pp.parseSmallFiles();
 		map = pp.getMapData();
 		snpFilter = pp.getSNPFilter();
+//		snpFilter.filter(locusArgs);
 
 		SampleFilter samFilter = new SampleFilter(pp.getPedigreeData(), locusArgs);
 
