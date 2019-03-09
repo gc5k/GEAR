@@ -6,6 +6,7 @@ import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashSet;
 
 import org.apache.commons.lang3.ArrayUtils;
@@ -140,42 +141,43 @@ public class BEDReader extends PedigreeFile {
 		}
 	}
 
-	private void parseWithIndividualMajor(BufferedInputStream in, int numMarkerInFile, int[] WSNP) throws IOException {
+	private void parseWithIndividualMajor(BufferedInputStream in, int numMarkersInFile, int[] workingSNPs) throws IOException {
 		int L = 0;
-		if (numMarkerInFile % 4 == 0) {
-			L = numMarkerInFile / 4;
+		if (numMarkersInFile % 4 == 0) {
+			L = numMarkersInFile / 4;
 		} else {
-			L = numMarkerInFile / 4 + 1;
+			L = numMarkersInFile / 4 + 1;
 		}
 		int exL = 0;
-		if (WSNP.length % 4 == 0) {
-			exL = WSNP.length / 4;
+		int numMarkers = workingSNPs == null ? numMarkersInFile : workingSNPs.length;
+		if (numMarkers % 4 == 0) {
+			exL = numMarkers / 4;
 		} else {
-			exL = WSNP.length / 4 + 1;
+			exL = numMarkers / 4 + 1;
 		}
 		byte[] geno = new byte[L];
 		byte[] extract_geno = new byte[exL];
 		for (int i = 0; i < persons.size(); i++) {
 			in.read(geno, 0, L);
-			extract_geno = extractGenotype(geno, numMarkerInFile, WSNP);
+			extract_geno = extractGenotype(geno, numMarkersInFile, workingSNPs);
 			persons.get(i).addAllMarker(extract_geno);
 		}
 		famIDs = null;
 		persons = null;
 	}
 
-	private byte[] extractGenotype(byte[] g, int numMarkerInFile, int[] WSNP) {
-
+	private byte[] extractGenotype(byte[] g, int numMarkersInFile, int[] workingSNPs) {
 		int exL = 0;
-		if (WSNP.length % 4 == 0) {
-			exL = WSNP.length / 4;
+		int numMarkers = workingSNPs == null ? numMarkersInFile : workingSNPs.length;
+		if (numMarkers % 4 == 0) {
+			exL = numMarkers / 4;
 		} else {
-			exL = WSNP.length / 4 + 1;
+			exL = numMarkers / 4 + 1;
 		}
 		byte[] Exg = new byte[exL];
 		int c = 0;
-		for (int i = 0; i < numMarkerInFile; i++) {
-			int idx = ArrayUtils.indexOf(WSNP, i);
+		for (int i = 0; i < numMarkersInFile; i++) {
+			int idx = workingSNPs == null ? i : ArrayUtils.indexOf(workingSNPs, i);
 			if (idx < 0)
 				continue;
 			int posByte = i >> 2;
@@ -208,21 +210,23 @@ public class BEDReader extends PedigreeFile {
 		return table;
 	}
 
-	private void parseWithSnpMajor(BufferedInputStream in, int numMarkerInFile, int[] wsnp) throws IOException {
+	private void parseWithSnpMajor(BufferedInputStream in, int numMarkersInFile, int[] wsnp) throws IOException {
 		byte[] g = new byte[(persons.size() + 3) / 4];
 		int[][] genoByteCvtTable = constructSnpMajorGenotypeByteConvertTable();
 		
-		// Convert wsnp from array to set
-		HashSet<Integer> wsnpSet = new HashSet<Integer>();
-		for (int snp : wsnp)
-		{
-			wsnpSet.add(snp);
+		boolean[] workingSnpFlags = new boolean[numMarkersInFile];
+		if (wsnp == null) {
+			Arrays.fill(workingSnpFlags, true);
+		} else {
+			Arrays.fill(workingSnpFlags, false);
+			for (int idx : wsnp)
+				workingSnpFlags[idx] = true;
 		}
 		
 		int snpIdx = 0;
-		for (int i = 0; i < numMarkerInFile; i++) {
+		for (int i = 0; i < numMarkersInFile; i++) {
 			in.read(g, 0, g.length);
-			if (wsnpSet.contains(i)) {
+			if (workingSnpFlags[i]) {
 				int indIdx = 0;
 				int posByte = snpIdx >> Person.shift;
 				int posBit = (i & 0xf) << 1;

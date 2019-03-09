@@ -11,9 +11,9 @@ public class PLINKTextParser extends PLINKParser {
 	@Override
 	public void parse() {
 		super.parse();
+		mapData.setPolymorphismMarker(pedigreeData.getPolymorphism());
 		if (mapData.getFilename() == null) {
 			mapData.setMarker(pedigreeData.getNumMarkers());
-			mapData.setPolymorphismMarker(pedigreeData.getPolymorphism());
 		}
 	}
 }

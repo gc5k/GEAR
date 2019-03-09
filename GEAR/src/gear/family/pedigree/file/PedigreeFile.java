@@ -76,13 +76,6 @@ public class PedigreeFile
 	 */
 	public void parseLinkage(int[] workingSnpIndexes)
 	{
-		numMarkers = workingSnpIndexes.length;
-		alleleSet = new char[numMarkers][2];
-		alleleFreq = new short[numMarkers][2];
-		for (int i = 0; i < numMarkers; i++)
-		{
-			alleleSet[i][0] = alleleSet[i][1] = ConstValues.MISSING_ALLELE_CHAR;
-		}
 		BufferedReader reader = BufferedReader.openTextFile(filename, "ped");
 		Person per;
 		int k = 0;
@@ -97,6 +90,14 @@ public class PedigreeFile
 		
 		int numCols = tokens.length;
 		int numMarkers = (numCols - 6) / 2;
+
+		this.numMarkers = workingSnpIndexes == null ? numMarkers : workingSnpIndexes.length;
+		alleleSet = new char[this.numMarkers][2];
+		alleleFreq = new short[this.numMarkers][2];
+		for (int i = 0; i < this.numMarkers; i++)
+		{
+			alleleSet[i][0] = alleleSet[i][1] = ConstValues.MISSING_ALLELE_CHAR;
+		}
 		
 		do
 		{
@@ -125,7 +126,7 @@ public class PedigreeFile
 			int c = 0;
 			for (int j = 0; j < numMarkers; j++)
 			{
-				int idx = ArrayUtils.indexOf(workingSnpIndexes, j);
+				int idx = workingSnpIndexes == null ? j : ArrayUtils.indexOf(workingSnpIndexes, j);
 				if (idx < 0)
 				{
 					continue;
