@@ -1,13 +1,10 @@
 package gear.family.pedigree.file;
 
-import java.io.BufferedInputStream;
-import java.io.File;
-import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.io.RandomAccessFile;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.HashSet;
 
 import org.apache.commons.lang3.ArrayUtils;
 
@@ -24,18 +21,18 @@ public class BEDReader extends PedigreeFile {
 	private ArrayList<String> famIDs;
 	private ArrayList<Person> persons;
 	private MapFile mapData;
-	private BufferedInputStream inStream;
+	private RandomAccessFile bedFile;
 	private boolean isSnpMajor;
-	private long bytesPerRow;
+	private int bytesPerRow;
 
 	public BEDReader(String bedFilename, String famFilename, MapFile mapData) {
 		super(bedFilename);
 		famFile = famFilename;
 		this.mapData = mapData;
 		try {
-			inStream = new BufferedInputStream(new FileInputStream(new File(bedFilename)));
+			bedFile = new RandomAccessFile(bedFilename, "r");
 			byte[] magic = new byte[3];
-			inStream.read(magic, 0, 3);
+			bedFile.read(magic, 0, 3);
 			isSnpMajor = magic[2] == 1;
 		} catch (FileNotFoundException e) {
 			Logger.handleException(e, "Cannot open the bed file '" + bedFilename + "'.");
@@ -45,6 +42,14 @@ public class BEDReader extends PedigreeFile {
 	}
 	
 	public boolean IsSnpMajor() { return isSnpMajor; }
+	
+	public void reset() {
+		try {
+			bedFile.seek(3);
+		} catch (IOException e) {
+			Logger.handleException(e, "An I/O exception occurred when reading the bed file.");
+		}
+	}
 	
 	private void parseFam() {
 		famIDs = NewIt.newArrayList();
@@ -106,12 +111,10 @@ public class BEDReader extends PedigreeFile {
 		calculateBytesPerRow();
 	}
 	
-	public long getBytesPerRow() { return bytesPerRow; }
-	
 	public int readNextByte() {
 		int nextByte = -1;
 		try {
-			nextByte = inStream.read();
+			nextByte = bedFile.read();
 		} catch (IOException e) {
 			Logger.handleException(e, "I/O exception occurred when reading the bed file.");
 		}
@@ -128,12 +131,12 @@ public class BEDReader extends PedigreeFile {
 		try {
 			if (isSnpMajor) {
 				Logger.printUserLog("Reading data in PLINK SNP-major mode.");
-				parseWithSnpMajor(inStream, mapData.getMarkerNumberOriginal(), WSNP);
+				parseWithSnpMajor(mapData.getMarkerNumberOriginal(), WSNP);
 			} else {
 				Logger.printUserLog("Reading data in PLINK individual-major mode.");
-				parseWithIndividualMajor(inStream, mapData.getMarkerNumberOriginal(), WSNP);
+				parseWithIndividualMajor(mapData.getMarkerNumberOriginal(), WSNP);
 			}
-			inStream.close();
+			bedFile.close();
 			long endTime = System.nanoTime();
 			Logger.printUserLog(String.format("It takes %.1fs to read the data.", (endTime - startTime) / 1e9));
 		} catch (IOException e) {
@@ -141,7 +144,7 @@ public class BEDReader extends PedigreeFile {
 		}
 	}
 
-	private void parseWithIndividualMajor(BufferedInputStream in, int numMarkersInFile, int[] workingSNPs) throws IOException {
+	private void parseWithIndividualMajor(int numMarkersInFile, int[] workingSNPs) throws IOException {
 		int L = 0;
 		if (numMarkersInFile % 4 == 0) {
 			L = numMarkersInFile / 4;
@@ -158,7 +161,7 @@ public class BEDReader extends PedigreeFile {
 		byte[] geno = new byte[L];
 		byte[] extract_geno = new byte[exL];
 		for (int i = 0; i < persons.size(); i++) {
-			in.read(geno, 0, L);
+			bedFile.read(geno, 0, L);
 			extract_geno = extractGenotype(geno, numMarkersInFile, workingSNPs);
 			persons.get(i).addAllMarker(extract_geno);
 		}
@@ -210,7 +213,7 @@ public class BEDReader extends PedigreeFile {
 		return table;
 	}
 
-	private void parseWithSnpMajor(BufferedInputStream in, int numMarkersInFile, int[] wsnp) throws IOException {
+	private void parseWithSnpMajor(int numMarkersInFile, int[] wsnp) throws IOException {
 		byte[] g = new byte[(persons.size() + 3) / 4];
 		int[][] genoByteCvtTable = constructSnpMajorGenotypeByteConvertTable();
 		
@@ -225,7 +228,7 @@ public class BEDReader extends PedigreeFile {
 		
 		int snpIdx = 0;
 		for (int i = 0; i < numMarkersInFile; i++) {
-			in.read(g, 0, g.length);
+			bedFile.read(g, 0, g.length);
 			if (workingSnpFlags[i]) {
 				int indIdx = 0;
 				int posByte = snpIdx >> Person.shift;
@@ -244,7 +247,7 @@ public class BEDReader extends PedigreeFile {
 	
 	public void skipOneRow() {
 		try {
-			inStream.skip(bytesPerRow);
+			bedFile.skipBytes(bytesPerRow);
 		} catch (IOException e) {
 			Logger.handleException(e, "An I/O exception occurred when reading the bed file.");
 		}
