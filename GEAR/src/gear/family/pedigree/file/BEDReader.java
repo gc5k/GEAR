@@ -127,7 +127,7 @@ public class BEDReader extends PedigreeFile {
 
 	@Override
 	public void parseLinkage(int[] WSNP) {
-		long startTime = System.nanoTime();
+		long startNanoTime = System.nanoTime();
 		try {
 			if (isSnpMajor) {
 				Logger.printUserLog("Reading data in PLINK SNP-major mode.");
@@ -137,8 +137,7 @@ public class BEDReader extends PedigreeFile {
 				parseWithIndividualMajor(mapData.getMarkerNumberOriginal(), WSNP);
 			}
 			bedFile.close();
-			long endTime = System.nanoTime();
-			Logger.printUserLog(String.format("It takes %.1fs to read the data.", (endTime - startTime) / 1e9));
+			Logger.printElapsedTime(startNanoTime, "read the bed data");
 		} catch (IOException e) {
 			Logger.handleException(e, "An I/O exception occurred when reading the bed file.");
 		}

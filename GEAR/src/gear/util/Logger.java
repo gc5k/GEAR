@@ -113,13 +113,44 @@ public class Logger
 		return devLogger;
 	}
 
-	public static void handleException(Exception e, String msg)
-	{
+	public static void handleException(Exception e, String msg) {
 		initDevLogger();
 		printUserError(msg);
 		printUserError("Exception Message: " + e.getMessage());
 		devLogger.log(Level.SEVERE, msg, e);
 		System.exit(1);
+	}
+	
+	public static void printElapsedTime(long startNanoTime, String doWhat) {
+		long endTime = System.nanoTime();
+		long totalSeconds = (endTime - startNanoTime) / 1000000000;
+		long seconds = totalSeconds % 60;
+		long totalMinutes = totalSeconds / 60;
+		long minutes = totalMinutes % 60;
+		long totalHours = totalMinutes / 60;
+		long hours = totalHours % 24;
+		long days = totalHours / 24;
+		String timespanString = "";
+		if (days > 0) {
+			timespanString += days;
+			timespanString += days == 1 ? " day " : " days ";
+		}
+		if (hours > 0) {
+			timespanString += hours;
+			timespanString += hours == 1 ? " hour " : " hours ";
+		}
+		if (minutes > 0) {
+			timespanString += minutes;
+			timespanString += minutes == 1 ? " minute " : " minutes ";
+		}
+		if (seconds > 0) {
+			timespanString += seconds;
+			timespanString += seconds == 1 ? " second " : " seconds ";
+		}
+		if (timespanString.isEmpty()) {
+			timespanString = "less than 1 second ";
+		}
+		printUserLog("It took %sto %s.", timespanString, doWhat);
 	}
 	
 	public static void initUserLogWriter()

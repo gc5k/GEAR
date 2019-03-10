@@ -24,6 +24,7 @@ import gear.util.FileUtil;
 import gear.util.Logger;
 import gear.util.NewIt;
 import gear.util.pop.PopStat;
+import gear.util.stat.CommonMath;
 
 public class WGRMACommandImpl extends CommandImpl {
 	private HashMap<String, Float> scores = NewIt.newHashMap(); // name-to-score
@@ -39,6 +40,9 @@ public class WGRMACommandImpl extends CommandImpl {
 	private HashSet<SubjectID> subjectSet =	NewIt.newHashSet();
 
 	private int[][] Gcnt = null;
+	private int grmTriangleSize;
+	private int row;
+	private int col;
 
 	ArrayList<ArrayList<Integer>> missList = NewIt.newArrayList();
 
@@ -120,6 +124,7 @@ public class WGRMACommandImpl extends CommandImpl {
 
 	private void makeGA() {
 		Logger.printUserLog("Making additive genetic relatedness matrix...");
+		long startNanoTime = System.nanoTime();
 		float[][] gMat = new float[pGM.getNumIndivdial()][pGM.getNumMarker()];
 		for (int i = 0; i < pGM.getNumIndivdial(); i++) {
 			ArrayList<Integer> mL = NewIt.newArrayList();
@@ -155,47 +160,33 @@ public class WGRMACommandImpl extends CommandImpl {
 			}
 		}
 
-		int F = 15;
-		int Nt = (gMat.length*gMat.length + gMat.length)/2;
-		if (Nt < F) {
+		grmTriangleSize = CommonMath.calculateTriangleSize(gMat.length);
+		if (grmTriangleSize < 15) {
 			Logger.printUserError("Too small sample size. GEAR quit.");
+			System.exit(1);
 		}
-		int K = 1;
-		int n = 1;
-		ArrayList<Integer> nSet = NewIt.newArrayList();
-		while(K<F) {
-			if ( (n*n + n) <= (Nt*K)/F ) {
-				n++;
-			} else {
-				nSet.add(n-1);
-				n++;
-				K++;
-			}
-		}
-		nSet.add(gMat.length-1);
 
 		float[][] GA = new float[gMat.length][gMat.length];
+		
+		ProgressGA progress = new ProgressGA();
+		progress.start();
 
-		for (int i = 0; i < gMat.length; i++) {
+		for (row = 0; row < gMat.length; row++) {
 			float ws1 = W;
-			ArrayList<Integer> mL1 = missList.get(i);
+			ArrayList<Integer> mL1 = missList.get(row);
 			for(int j = 0; j < mL1.size(); j++) {
 				ws1 -= weight[mL1.get(j)]*weight[mL1.get(j)];		
 			}
 
-			if (Collections.binarySearch(nSet, i) >= 0) {
-				Logger.printUserLog("Starting individual: " + (i + 1) +"...");
-			}
-
-			for (int j = 0; j <= i; j++) {
+			for (col = 0; col <= row; col++) {
 				float ws2 = ws1;
-				ArrayList<Integer> mL2 = missList.get(j);
+				ArrayList<Integer> mL2 = missList.get(col);
 
 				for(int k = 0; k < mL2.size(); k++) {
 					ws2 -= weight[mL2.get(k)]*weight[mL2.get(k)];
 				}
 
-				int mLoci = gMat[i].length;
+				int mLoci = gMat[row].length;
 				int cnt = 0;
 				if ( mL1.size() <= mL2.size() ) {
 					for (int k = 0; k < mL1.size(); k++) {
@@ -216,13 +207,17 @@ public class WGRMACommandImpl extends CommandImpl {
 				mLoci -= (mL1.size() + mL2.size() - cnt);
 				
 				float s = 0; 
-				for (int l = 0; l < gMat[i].length; l++) {
-					s += gMat[i][l] * gMat[j][l];
+				for (int l = 0; l < gMat[row].length; l++) {
+					s += gMat[row][l] * gMat[col][l];
 				}
-				GA[i][j] = s/ws2;
-				Gcnt[i][j] = mLoci;
+				GA[row][col] = s/ws2;
+				Gcnt[row][col] = mLoci;
 			}
 		}
+
+		try {
+			progress.join();
+		} catch (InterruptedException e) { }
 		Logger.printUserLog("");
 
 		double grmMean = 0;
@@ -324,6 +319,22 @@ public class WGRMACommandImpl extends CommandImpl {
 			gui_file.close();
 		}
 		
+		Logger.printElapsedTime(startNanoTime, "make additive genetic relatedness matrix");
+	}
+	
+	class ProgressGA extends Thread {
+		public void run() {
+			int calculatedElements;
+			do {
+				calculatedElements = CommonMath.calculateTriangleSize(row) + col + 1;
+				float percentage = Math.min(100f, (float)calculatedElements / grmTriangleSize * 100f);
+				System.out.print(String.format(
+						"[INFO] Calculating additive genetic relatedness matrix, %.2f%% completed...\r", percentage));
+				try {
+					Thread.sleep(1000);
+				} catch (InterruptedException  e) { }
+			} while (calculatedElements < grmTriangleSize);
+		}
 	}
 
 	private void makeGD() {
