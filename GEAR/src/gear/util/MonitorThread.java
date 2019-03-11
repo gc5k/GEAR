@@ -9,27 +9,17 @@ public class MonitorThread extends Thread
 		setPriority(MIN_PRIORITY);
 	}
 	
-	public void run()
-	{
+	public void run() {
 		isRun = true;
-		
 		do
 		{
 			long totalMem = Runtime.getRuntime().totalMemory();
-			if (totalMem > peakMem)
-			{
-				peakMem = totalMem;
-				synchronized (this)
-				{
-					try
-					{
-						wait(1000);  // Don't use 'sleep' method.
-					}
-					catch (InterruptedException e)
-					{
-						// Do nothing
-					}
-				}
+			peakMem = Math.max(peakMem, totalMem);
+			try {
+				Thread.sleep(500);
+			}
+			catch (InterruptedException e) {
+				// Do nothing
 			}
 		} while (isRun);
 	}

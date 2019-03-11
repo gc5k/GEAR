@@ -9,6 +9,7 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.stream.IntStream;
 
 import gear.ConstValues;
 import gear.data.Person;
@@ -24,7 +25,6 @@ import gear.util.FileUtil;
 import gear.util.Logger;
 import gear.util.NewIt;
 import gear.util.pop.PopStat;
-import gear.util.stat.CommonMath;
 
 public class WGRMACommandImpl extends CommandImpl {
 	private HashMap<String, Float> scores = NewIt.newHashMap(); // name-to-score
@@ -40,9 +40,6 @@ public class WGRMACommandImpl extends CommandImpl {
 	private HashSet<SubjectID> subjectSet =	NewIt.newHashSet();
 
 	private int[][] Gcnt = null;
-	private int grmTriangleSize;
-	private int row;
-	private int col;
 
 	ArrayList<ArrayList<Integer>> missList = NewIt.newArrayList();
 
@@ -121,11 +118,12 @@ public class WGRMACommandImpl extends CommandImpl {
 			}
 		}
 	}
-
+	
 	private void makeGA() {
 		Logger.printUserLog("Making additive genetic relatedness matrix...");
 		long startNanoTime = System.nanoTime();
-		float[][] gMat = new float[pGM.getNumIndivdial()][pGM.getNumMarker()];
+		int numSamples = pGM.getNumIndivdial();
+		float[][] gMat = new float[numSamples][pGM.getNumMarker()];
 		for (int i = 0; i < pGM.getNumIndivdial(); i++) {
 			ArrayList<Integer> mL = NewIt.newArrayList();
 			missList.add(mL);
@@ -160,64 +158,120 @@ public class WGRMACommandImpl extends CommandImpl {
 			}
 		}
 
-		grmTriangleSize = CommonMath.calculateTriangleSize(gMat.length);
+		int grmTriangleSize = (numSamples * (numSamples + 1)) >> 1;
 		if (grmTriangleSize < 15) {
 			Logger.printUserError("Too small sample size. GEAR quit.");
 			System.exit(1);
 		}
 
-		float[][] GA = new float[gMat.length][gMat.length];
+		final float[] GA = new float[grmTriangleSize];
+		final float finalWeightSquareSum = W;
+
+		final int cpus = Runtime.getRuntime().availableProcessors();
+		Logger.printUserLog("Calculate GA with " + cpus + (cpus == 1 ? " thread." : " threads."));
 		
-		ProgressGA progress = new ProgressGA();
-		progress.start();
+		Thread[] computeThreads = new Thread[cpus];
+		final int[] taskProgresses = new int[cpus];
+		final int smallTaskSize = grmTriangleSize / cpus;
+		final int bigTaskSize = smallTaskSize + 1;
+		final int bigTaskCount = grmTriangleSize % cpus;
+		final int bigTasksEndGrmIndex = bigTaskSize * bigTaskCount;
 
-		for (row = 0; row < gMat.length; row++) {
-			float ws1 = W;
-			ArrayList<Integer> mL1 = missList.get(row);
-			for(int j = 0; j < mL1.size(); j++) {
-				ws1 -= weight[mL1.get(j)]*weight[mL1.get(j)];		
+		for (int i = 0; i < cpus; ++i) {
+			final int threadIndex = i;
+			Thread thread = new Thread() {
+				public void run() {
+					final int taskSize = threadIndex < bigTaskCount ? bigTaskSize : smallTaskSize;
+					final int startGrmIndex = (threadIndex < bigTaskCount) ? bigTaskSize * threadIndex :
+						bigTasksEndGrmIndex + smallTaskSize * (threadIndex - bigTaskCount);
+
+					int sampleIndex1 = (int)Math.sqrt(startGrmIndex << 1);
+					if (((sampleIndex1 * (sampleIndex1 + 1)) >> 1) > startGrmIndex)
+						sampleIndex1 = sampleIndex1 - 1;
+					int sampleIndex2 = startGrmIndex - ((sampleIndex1 * (sampleIndex1 + 1)) >> 1);
+					int taskProgress = 0;
+
+					do {
+						float ws1 = finalWeightSquareSum ;
+						ArrayList<Integer> mL1 = missList.get(sampleIndex1);
+						for(int j = 0; j < mL1.size(); j++) {
+							ws1 -= weight[mL1.get(j)]*weight[mL1.get(j)];		
+						}
+
+						do {
+							float ws2 = ws1;
+							ArrayList<Integer> mL2 = missList.get(sampleIndex2);
+
+							for(int k = 0; k < mL2.size(); k++) {
+								ws2 -= weight[mL2.get(k)]*weight[mL2.get(k)];
+							}
+
+							int mLoci = gMat[sampleIndex1].length;
+							int cnt = 0;
+							if ( mL1.size() <= mL2.size() ) {
+								for (int k = 0; k < mL1.size(); k++) {
+									if (Collections.binarySearch(mL2, mL1.get(k)) >=0) {
+										ws2 += weight[mL1.get(k)]*weight[mL1.get(k)];
+										cnt++;
+									}
+								}
+							} else {
+								for (int k = 0; k < mL2.size(); k++) {
+									if (Collections.binarySearch(mL1, mL2.get(k)) >=0) {
+										ws2 += weight[mL2.get(k)]*weight[mL2.get(k)];
+										cnt++;
+									}
+								}
+							}
+
+							mLoci -= (mL1.size() + mL2.size() - cnt);
+
+							float s = 0; 
+							for (int l = 0; l < gMat[sampleIndex1].length; l++) {
+								s += gMat[sampleIndex1][l] * gMat[sampleIndex2][l];
+							}
+							GA[startGrmIndex + taskProgress] = s/ws2;
+							Gcnt[sampleIndex1][sampleIndex2] = mLoci;
+							taskProgresses[threadIndex] = ++taskProgress;
+						} while (++sampleIndex2 <= sampleIndex1 && taskProgress < taskSize);
+						sampleIndex2 = 0;
+					} while (++sampleIndex1 < numSamples && taskProgress < taskSize);
+				}
+			};
+			thread.start();
+			computeThreads[i] = thread;
+		}
+		
+		Thread progressDisplayThread = new Thread() {
+			public void run() {
+				int totalProgress;
+				do {
+					totalProgress = IntStream.of(taskProgresses).sum();
+					float percentage = Math.min(100f, (float)totalProgress / GA.length * 100f);
+					System.out.print(String.format(
+							"\r[INFO] Calculating additive genetic relatedness matrix, %.2f%% completed...", percentage));
+					try {
+						Thread.sleep(1000);
+					} catch (InterruptedException e) {}
+				} while (totalProgress < GA.length);
+				System.out.println();
 			}
-
-			for (col = 0; col <= row; col++) {
-				float ws2 = ws1;
-				ArrayList<Integer> mL2 = missList.get(col);
-
-				for(int k = 0; k < mL2.size(); k++) {
-					ws2 -= weight[mL2.get(k)]*weight[mL2.get(k)];
-				}
-
-				int mLoci = gMat[row].length;
-				int cnt = 0;
-				if ( mL1.size() <= mL2.size() ) {
-					for (int k = 0; k < mL1.size(); k++) {
-						if (Collections.binarySearch(mL2, mL1.get(k)) >=0) {
-							ws2 += weight[mL1.get(k)]*weight[mL1.get(k)];
-							cnt++;
-						}
-					}
-				} else {
-					for (int k = 0; k < mL2.size(); k++) {
-						if (Collections.binarySearch(mL1, mL2.get(k)) >=0) {
-							ws2 += weight[mL2.get(k)]*weight[mL2.get(k)];
-							cnt++;
-						}
-					}
-				}
-
-				mLoci -= (mL1.size() + mL2.size() - cnt);
-				
-				float s = 0; 
-				for (int l = 0; l < gMat[row].length; l++) {
-					s += gMat[row][l] * gMat[col][l];
-				}
-				GA[row][col] = s/ws2;
-				Gcnt[row][col] = mLoci;
+		};
+		progressDisplayThread.start();
+		
+		for (int i = 0; i < computeThreads.length; ++i) {
+			try {
+				computeThreads[i].join();
+			} catch (InterruptedException e) {
+				Logger.handleException(e, String.format("Compute thread %d is interrupted.", i));
 			}
 		}
-
 		try {
-			progress.join();
-		} catch (InterruptedException e) { }
+			progressDisplayThread.join();
+		} catch (InterruptedException e) {
+			Logger.printUserError("Progress display thread is interrupted.");
+		}
+		
 		Logger.printUserLog("");
 
 		double grmMean = 0;
@@ -236,22 +290,23 @@ public class WGRMACommandImpl extends CommandImpl {
 		}
 
 		int cnt = 0;
+		int grmIndex = 0;
 		for (int i = 0; i < Gcnt.length; i++) {
-			for (int j = 0; j <= i; j++) {
+			for (int j = 0; j <= i; j++, ++grmIndex) {
 				if (i != j) {
-					grmMean += GA[i][j];
-					grmSq += GA[i][j] * GA[i][j];
+					grmMean += GA[grmIndex];
+					grmSq += GA[grmIndex] * GA[grmIndex];
 					cnt++;
 				}
 				if (wgrmArgs.isGZ()) {
 					try {
-						grmGZ.append((i + 1) + "\t" + (j + 1) + "\t" + Gcnt[i][j] + "\t" + GA[i][j] + "\n");
+						grmGZ.append((i + 1) + "\t" + (j + 1) + "\t" + Gcnt[i][j] + "\t" + GA[grmIndex] + "\n");
 					} catch (IOException e) {
 						Logger.handleException(e,
 								"error in writing '" + sb.toString() + "' for " + (i + 1) + " " + (j + 1) + ".");
 					}
 				} else {
-					grm.println((i + 1) + "\t" + (j + 1) + "\t" + Gcnt[i][j] + "\t" + GA[i][j]);
+					grm.println((i + 1) + "\t" + (j + 1) + "\t" + Gcnt[i][j] + "\t" + GA[grmIndex]);
 				}
 			}
 		}
@@ -320,21 +375,6 @@ public class WGRMACommandImpl extends CommandImpl {
 		}
 		
 		Logger.printElapsedTime(startNanoTime, "make additive genetic relatedness matrix");
-	}
-	
-	class ProgressGA extends Thread {
-		public void run() {
-			int calculatedElements;
-			do {
-				calculatedElements = CommonMath.calculateTriangleSize(row) + col + 1;
-				float percentage = Math.min(100f, (float)calculatedElements / grmTriangleSize * 100f);
-				System.out.print(String.format(
-						"[INFO] Calculating additive genetic relatedness matrix, %.2f%% completed...\r", percentage));
-				try {
-					Thread.sleep(1000);
-				} catch (InterruptedException  e) { }
-			} while (calculatedElements < grmTriangleSize);
-		}
 	}
 
 	private void makeGD() {
