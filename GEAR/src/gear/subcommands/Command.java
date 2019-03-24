@@ -220,6 +220,13 @@ public abstract class Command implements Comparable<Command> {
 		}
 	}
 
+	protected void parseThreadNumArguments(CommandArguments cmdArgs, CommandLine cmdLine)
+			throws CommandArgumentException {
+		if (cmdLine.hasOption(OPT_THREAD_NUM_LONG)) {
+			cmdArgs.setThreadNum(cmdLine.getOptionValue(OPT_THREAD_NUM_LONG, OPT_THREAD_NUM_LONG_DEFAULT));
+		}
+	}
+
 	protected void printOptionsInEffect(CommandLine cmdLine, String subcmd) {
 		Logger.printUserLog("Subcommand: " + subcmd);
 		Logger.printUserLog("Options in effect: ");
@@ -412,4 +419,9 @@ public abstract class Command implements Comparable<Command> {
 	protected static final String OPT_SEED_DEFAULT = "2012";
 	protected static final String OPT_SEED_DESC = "Specify the seed of random number generator, default to "
 			+ OPT_SEED_DEFAULT;
+	
+	protected static final String OPT_THREAD_NUM_LONG = "thread-num";
+	protected static final String OPT_THREAD_NUM_LONG_DEFAULT = "1";
+	protected static final String OPT_THREAD_NUM_LONG_DESC = "Specify the thread number generator, default to "
+			+ OPT_THREAD_NUM_LONG_DEFAULT;
 }

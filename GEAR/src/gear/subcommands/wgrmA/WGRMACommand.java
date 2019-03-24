@@ -64,7 +64,8 @@ public class WGRMACommand extends Command {
 				OptionBuilder.withDescription(OPT_ZERO_VAR_DESC).withLongOpt(OPT_ZERO_VAR_LONG).create());
 		options.addOption(
 				OptionBuilder.withDescription(OPT_MAF_RANGE_DESC).withLongOpt(OPT_MAF_RANGE_LONG).hasArgs().create());
-
+		options.addOption(
+				OptionBuilder.withDescription(OPT_THREAD_NUM_LONG_DESC).withLongOpt(OPT_THREAD_NUM_LONG).hasArgs().create());
 	}
 
 	@Override
@@ -85,6 +86,7 @@ public class WGRMACommand extends Command {
 		parseZeroVarArguments((CommandArguments) grmArgs, cmdLine);
 
 		parseMAFRangeArguments((CommandArguments) grmArgs, cmdLine);
+		parseThreadNumArguments((CommandArguments) grmArgs, cmdLine);
 
 		if (cmdLine.hasOption(OPT_GZ)) {
 			grmArgs.setGZ();

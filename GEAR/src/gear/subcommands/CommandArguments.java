@@ -81,7 +81,6 @@ public abstract class CommandArguments {
 		return isKeepFile;
 	}
 
-	
 	public void setKeepFamFile(String kFamF) {
 		this.keepFamFile = kFamF;
 		isKeepFamFile = true;
@@ -177,37 +176,11 @@ public abstract class CommandArguments {
 		return isNotChr;
 	}
 
-//	public static ArrayList<String> splitter(String[] cmd, String opt) {
-//		ArrayList<String> S = NewIt.newArrayList();
-//		for(int i = 0; i < cmd.length; i++) {
-//			if (cmd[i].contains("-")) {
-//				String[] s = cmd[i].split("-");
-//				try {
-//					int s0 = Integer.parseInt(s[0]); int s1 = Integer.parseInt(s[1]);
-//					for(int j = Math.min(s0, s1); j <= Math.max(s0, s1); j++) {
-//						S.add( (new Integer(j)).toString());
-//					}
-//				} catch (NumberFormatException e) {
-//					Logger.printUserLog("The value of " + cmd[i] + " is invalid for " + opt);
-//					System.exit(1);
-//				}
-//			} else {
-//				try {
-//					Integer.parseInt(cmd[i]);
-//					S.add(cmd[i]);
-//				} catch (NumberFormatException e) {
-//					Logger.printUserLog("The value of " + cmd[i] + " is invalid for " + opt);
-//					System.exit(1);
-//				}
-//			}
-//		}
-//		return S;
-//	}
-
 	public void setMAF(String m) {
 		maf = Double.parseDouble(m);
 		if (maf < 0 || maf > 0.5) {
-			Logger.printUserLog("incorrect --maf " + m + ". It should be > 0 and < 0.5");
+			Logger.printUserLog("incorrect --maf " + m + ". It should be > 0 and < 0.5.");
+			System.exit(0);
 		}
 		isMAF = true;
 	}
@@ -242,7 +215,8 @@ public abstract class CommandArguments {
 	public void setMaxMAF(String m) {
 		max_maf = Double.parseDouble(m);
 		if (max_maf < 0 || max_maf > 0.5) {
-			Logger.printUserLog("incorrect --max-maf " + m + ". It should be > 0 and < 0.5");
+			Logger.printUserLog("incorrect --max-maf " + m + ". It should be > 0 and < 0.5.");
+			System.exit(0);
 		}
 		isMaxMAF = true;
 	}
@@ -258,7 +232,8 @@ public abstract class CommandArguments {
 	public void setGENO(String m) {
 		geno = Double.parseDouble(m);
 		if (geno < 0 || geno > 1) {
-			Logger.printUserLog("incorrect --geno " + m + ". It should be > 0 and < 1");
+			Logger.printUserLog("incorrect --geno " + m + ". It should be > 0 and < 1.");
+			System.exit(0);
 		}
 		isGENO = true;
 	}
@@ -290,10 +265,21 @@ public abstract class CommandArguments {
 	public void setPhenotypeIndex(String[] pheIndex) {
 		CommandSplitter CS = new CommandSplitter.Builder(pheIndex).OPT(Command.OPT_MPHE).IntMin(1).create();
 		this.mPheno = CS.ParseToInt();
+		for(int i = 0; i < this.mPheno.length; i++) {
+			this.mPheno[i]--;
+			if (this.mPheno[i] < 0) {
+				Logger.printUserLog("incorrect --mphe " + (mPheno[i]+1) + ". It should be > 0.");
+				System.exit(0);
+			}
+		}
 	}
 
 	public void setPhenotypeIndex(int pheIndex) {
 		this.mPheno[0] = pheIndex - 1;
+		if (this.mPheno[0] < 0) {
+			Logger.printUserLog("incorrect --mphe " + (mPheno[0]+1) + ". It should be > 0.");
+			System.exit(0);
+		}
 	}
 
 	public int getSelectedPhenotype(int i) {
@@ -302,6 +288,23 @@ public abstract class CommandArguments {
 
 	public int[] getSelectedPhenotype() {
 		return this.mPheno;
+	}
+
+	public void setThreadNum(String threadNum) {
+		thread_num = Integer.parseInt(threadNum);
+		if (thread_num < 1) {
+			Logger.printUserLog("incorrect --thread-num " + thread_num + ". It should be > 0.");
+			System.exit(0);
+		}
+		isThread_num = true;
+	}
+
+	public boolean isThreadNum() {
+		return isThread_num;
+	}
+
+	public int getThreadNum() {
+		return thread_num;
 	}
 
 	private String outRoot;
@@ -353,4 +356,7 @@ public abstract class CommandArguments {
 
 	private boolean isZeroVar = false;
 	private long seed;
+	
+	private boolean isThread_num = false;
+	private int thread_num = 1;
 }
