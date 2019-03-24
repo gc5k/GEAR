@@ -8,242 +8,198 @@ import gear.util.FileUtil;
 import gear.util.Logger;
 import gear.util.NewIt;
 
-public class HERegCommandArguments extends CommandArguments 
-{
-	public void setSD()
-	{
+public class HERegCommandArguments extends CommandArguments {
+	public void setSD() {
 		isSD = true;
 		isSS = false;
 		isCP = false;
 	}
-	
-	public boolean isSD()
-	{
+
+	public boolean isSD() {
 		return isSD;
 	}
 
-	public void setSS()
-	{
+	public void setSS() {
 		isSD = false;
 		isSS = true;
 		isCP = false;
 	}
 
-	public boolean isSS()
-	{
+	public boolean isSS() {
 		return isSS;
 	}
-	
-	public void setCP()
-	{
+
+	public void setCP() {
 		isSD = false;
 		isSS = false;
 		isCP = true;
 	}
-	
-	public boolean isCP()
-	{
+
+	public boolean isCP() {
 		return isCP;
 	}
 
-	public String getGrmBin()
-	{
+	public String getGrmBin() {
 		return grmBin;
 	}
-	
-	public void setGrmBin(String grmBin)
-	{
+
+	public void setGrmBin(String grmBin) {
 		this.grmBin = grmBin;
 	}
 
-	public String getGrmText()
-	{
+	public String getGrmText() {
 		return grmText;
 	}
-	
-	public void setGrmText(String grmText)
-	{
+
+	public void setGrmText(String grmText) {
 		this.grmText = grmText;
 	}
-	
-	public String getGrmGZ()
-	{
+
+	public String getGrmGZ() {
 		return grmGZ;
 	}
-	
-	public void setGrmGZ(String grmGZ)
-	{
+
+	public void setGrmGZ(String grmGZ) {
 		this.grmGZ = grmGZ;
 	}
-	
-	public String getGrmID()
-	{
+
+	public String getGrmID() {
 		return grmID;
 	}
-	
-	public void setGrmID(String grmID)
-	{
+
+	public void setGrmID(String grmID) {
 		this.grmID = grmID;
 	}
-	
 
-	public String getPhenotypeFile()
-	{
+	public String getPhenotypeFile() {
 		return pheFile;
 	}
 
-	public void setPhenotypeFile(String pheFile)
-	{
+	public void setPhenotypeFile(String pheFile) {
 		this.pheFile = pheFile;
 	}
 
-	public void setPhenotypeIdx(String pIdx)
-	{
+	public void setPhenotypeIdx(String pIdx) {
 		this.pheIdx[0] = Integer.parseInt(pIdx);
-		if (this.pheIdx[0] < 1)
-		{
+		if (this.pheIdx[0] < 1) {
 			Logger.printUserLog("Phenotype index should be greater than 1.\nGEAR quit.");
 			System.exit(1);
 		}
 		this.pheIdx[0]--;
 	}
 
-	public int[] getPhenotypeIdx()
-	{
+	public int[] getPhenotypeIdx() {
 		return pheIdx;
 	}
 
-	public void setGrmList(String grmL) 
-	{
+	public void setGrmList(String grmL) {
 		grmList = grmL;
 		FileUtil.exists(grmList);
 		ArrayList<String> gFile = NewIt.newArrayList();
 		BufferedReader reader = BufferedReader.openTextFile(grmList, "GRM-list");
 
 		String[] tokens = null;
-		while((tokens = reader.readTokens())!=null)
-		{
+		while ((tokens = reader.readTokens()) != null) {
 			gFile.add(tokens[0]);
 		}
 		grmGZList = gFile.toArray(new String[0]);
 		isGRMList = true;
 	}
 
-	public boolean isGRMList()
-	{
+	public boolean isGRMList() {
 		return isGRMList;
 	}
-	
-	public String[] getGrmList()
-	{
+
+	public String[] getGrmList() {
 		return grmGZList;
 	}
-	
-	public void setScale(boolean flag) 
-	{
+
+	public void setScale(boolean flag) {
 		isScale = flag;
 	}
 
-	public boolean isScale()
-	{
+	public boolean isScale() {
 		return isScale;
 	}
 
-	public void setCovFile(String cFile) 
-	{
+	public void setCovFile(String cFile) {
 		FileUtil.exists(cFile);
 		covFile = cFile;
 	}
 
-	public String getCovFile()
-	{
+	public String getCovFile() {
 		return covFile;
 	}
 
-	public void setCovNumber(String[] cIdx) 
-	{
+	public void setCovNumber(String[] cIdx) {
 		covIdx = new int[cIdx.length];
-		for (int i = 0; i < covIdx.length; i++)
-		{
+		for (int i = 0; i < covIdx.length; i++) {
 			covIdx[i] = Integer.parseInt(cIdx[i]);
-			if (covIdx[i] < 1)
-			{
-				Logger.printUserLog(covIdx[i] +"< 1. Incorrect index for covar-number.");
+			if (covIdx[i] < 1) {
+				Logger.printUserLog(covIdx[i] + "< 1. Incorrect index for covar-number.");
 				Logger.printUserLog("GEAR quittted.");
 				System.exit(1);
 			}
 			covIdx[i]--;
 		}
 	}
-	
-	public int[] getCovNumber()
-	{
+
+	public int[] getCovNumber() {
 		return covIdx;
 	}
 
-	public void setKeepFile(String kFile) 
-	{
+	public void setKeepFile(String kFile) {
 		FileUtil.exists(kFile);
 		keepFile = kFile;
 	}
-	
-	public String getKeepFile()
-	{
+
+	public String getKeepFile() {
 		return keepFile;
 	}
 
-	public void setGRMcutoff(String gc) 
-	{
+	public void setGRMcutoff(String gc) {
 		this.isGRMCut = true;
 		this.grmCutoff = Double.parseDouble(gc);
 	}
 
-	public double getGRMcutoff()
-	{
+	public double getGRMcutoff() {
 		return grmCutoff;
 	}
 
-	public boolean isGRMcut()
-	{
+	public boolean isGRMcut() {
 		return isGRMCut;
 	}
 
-	public void setJackknife() 
-	{
+	public void setJackknife() {
 		isJackknife = true;
 	}
 
-	public boolean isJackknife()
-	{
+	public boolean isJackknife() {
 		return isJackknife;
 	}
 
-	public void setGrmDom()
-	{
+	public void setGrmDom() {
 		isDom = true;
 	}
-	
-	public boolean isDom()
-	{
+
+	public boolean isDom() {
 		return isDom;
 	}
 
-	public void setFam()
-	{
+	public void setFam() {
 		isFam = true;
 	}
-	
-	public boolean isFam()
-	{
+
+	public boolean isFam() {
 		return isFam;
 	}
 
 	private boolean isJackknife = false;
 	private String covFile = null;
-	private int[] covIdx = {0};
+	private int[] covIdx = { 0 };
 	private String grmBin;
-	private String grmText;  // root name of the GRM files
-	private String grmGZ;  // root name of the GRM files
+	private String grmText; // root name of the GRM files
+	private String grmGZ; // root name of the GRM files
 	private String grmID;
 	private String grmList;
 	private boolean isGRMList;
@@ -251,13 +207,13 @@ public class HERegCommandArguments extends CommandArguments
 	private boolean isScale;
 
 	private String pheFile = null;
-	private int[] pheIdx = {0};
+	private int[] pheIdx = { 0 };
 	private String keepFile = null;
 
 	private boolean isSD = true;
 	private boolean isSS = false;
 	private boolean isCP = false;
-	
+
 	private boolean isDom = false;
 
 	private boolean isGRMCut = false;
