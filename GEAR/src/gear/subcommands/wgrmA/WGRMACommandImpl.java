@@ -168,20 +168,14 @@ public class WGRMACommandImpl extends CommandImpl {
 		final float finalWeightSquareSum = W;
 
 		int cpuNum = 1;
-		int cpuTotal = Runtime.getRuntime().availableProcessors();
 		if (wgrmArgs.isThreadNum()) {
-			if (wgrmArgs.getThreadNum() <= cpuTotal) {
-				cpuNum = wgrmArgs.getThreadNum();
-			} else {
-				Logger.printUserLog("Only " + cpuTotal + " cpus are available. Thread number is set to " + cpuTotal + ".");
-				cpuNum = cpuTotal;
-			}
+			cpuNum = wgrmArgs.getThreadNum();
 		}
 
 		final int cpus = cpuNum;
 
-		Logger.printUserLog("Calculate GA with " + cpus + (cpus == 1 ? " thread." : " threads."));
-		
+		Logger.printUserLog("Calculating GA with " + cpus + (cpus == 1 ? " thread." : " threads."));
+
 		Thread[] computeThreads = new Thread[cpus];
 		final int[] taskProgresses = new int[cpus];
 		final int smallTaskSize = grmTriangleSize / cpus;

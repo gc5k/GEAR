@@ -295,6 +295,12 @@ public abstract class CommandArguments {
 		if (thread_num < 1) {
 			Logger.printUserLog("incorrect --thread-num " + thread_num + ". It should be > 0.");
 			System.exit(0);
+		} else {
+			int cpuTotal = Runtime.getRuntime().availableProcessors();
+			if (thread_num > cpuTotal) {
+				Logger.printUserLog("Only " + cpuTotal + " cpus are available. Thread number is set to " + cpuTotal + ".");
+				thread_num = cpuTotal;
+			}
 		}
 		isThread_num = true;
 	}
