@@ -37,7 +37,6 @@ public class PopStat {
 
 		return allelefreq;
 	}
-
 	
 	public static double[][] calAlleleFrequency(GenotypeMatrix G) {
 		// [][0]a1 freq; [][1]a2 freq; [][2] missing rate

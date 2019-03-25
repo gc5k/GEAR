@@ -20,8 +20,8 @@ public class GenotypeMatrix {
 	private ArrayList<PersonIndex> pidx;
 	private ArrayList<SNP> snpList;
 	private ArrayList<Integer> QCedSnpIndex = NewIt.newArrayList();
-	private double[][] allelefreq;
-	private double[] allelevar;
+	private float[][] allelefreq;
+	private float[] allelevar;
 
 	public GenotypeMatrix(ArrayList<PersonIndex> pi, MapFile mapF) {
 		QCedSnpIndex = NewIt.newArrayList();
@@ -72,8 +72,8 @@ public class GenotypeMatrix {
 		}
 		numMarker = pidx.get(0).getPerson().getNumMarkers();
 		
-		allelefreq = PopStat.calAlleleFrequency(this);
-		allelevar = PopStat.calGenoVariance(this);
+		allelefreq = PopStat.calAlleleFrequencyFloat(this);
+		allelevar = PopStat.calGenoVarianceFloat(this);
 
 		if (cmdArgs.isMAF() || cmdArgs.isMaxMAF() || cmdArgs.isGENO() || cmdArgs.isZeroVar() || cmdArgs.isMAFRange()) {
 			Logger.printUserLog("");
@@ -148,8 +148,11 @@ public class GenotypeMatrix {
 			}
 		}
 		numMarker = pidx.get(0).getPerson().getNumMarkers();
-		allelefreq = PopStat.calAlleleFrequency(this);
-		allelevar = PopStat.calGenoVariance(this);
+		
+		Logger.printUserLog("Calculating allele frequencies and variance...");
+
+		allelefreq = PopStat.calAlleleFrequencyFloat(this);
+		allelevar = PopStat.calGenoVarianceFloat(this);
 	}
 
 	public int getNumIndivdial() {
@@ -311,6 +314,14 @@ public class GenotypeMatrix {
 		return allelevar[QCedSnpIndex.get(i)];
 	}
 
+	public float[] getQCedGenoVar() {
+		float[] QCedAlleleVar = new float[QCedSnpIndex.size()];
+		for(int i = 0; i < QCedSnpIndex.size(); i++) {
+			QCedAlleleVar[i] = allelevar[QCedSnpIndex.get(i)];
+		}
+		return QCedAlleleVar;
+	}
+
 	public double getMAF(int i) {
 		return allelefreq[QCedSnpIndex.get(i)][0] < 0.5 ? allelefreq[QCedSnpIndex.get(i)][0]:allelefreq[QCedSnpIndex.get(i)][1];
 	}
@@ -323,8 +334,23 @@ public class GenotypeMatrix {
 		return allelefreq[QCedSnpIndex.get(i)][1];
 	}
 
+	public float[][] getQCedAlleleFreq() {
+		float[][] QCedAlleleFreq = new float[QCedSnpIndex.size()][3];
+		for(int i = 0; i < QCedSnpIndex.size(); i++) {
+			System.arraycopy(allelefreq[QCedSnpIndex.get(i)], 0, QCedAlleleFreq[i], 0, 3);
+		}
+		return QCedAlleleFreq;
+	}
+
 	public double getGenoMissing(int i) {
 		return allelefreq[QCedSnpIndex.get(i)][2];
 	}
 
+	public float[] getQCedGenoMissing() {
+		float[] QCedGenoMissing = new float[QCedSnpIndex.size()];
+		for(int i = 0; i < QCedSnpIndex.size(); i++) {
+			QCedGenoMissing[i] = allelefreq[i][2];
+		}
+		return QCedGenoMissing;
+	}
 }

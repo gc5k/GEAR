@@ -24,7 +24,6 @@ import gear.util.BufferedReader;
 import gear.util.FileUtil;
 import gear.util.Logger;
 import gear.util.NewIt;
-import gear.util.pop.PopStat;
 
 public class WGRMACommandImpl extends CommandImpl {
 	private HashMap<String, Float> scores = NewIt.newHashMap(); // name-to-score
@@ -52,9 +51,10 @@ public class WGRMACommandImpl extends CommandImpl {
 		pGM = new GenotypeMatrix(sf.getSample(), pp.getMapData(), cmdArgs);
 
 		Logger.printUserLog("");
-		Logger.printUserLog("Calculating allele frequencies...");
-		allelefreq = PopStat.calAlleleFrequencyFloat(pGM);
-		allelevar = PopStat.calGenoVarianceFloat(pGM);
+		
+		allelefreq = pGM.getQCedAlleleFreq();
+		allelevar = pGM.getQCedGenoVar();
+
 		weight = new float[pGM.getNumMarker()];
 
 		if(wgrmArgs.isWeight() || wgrmArgs.isVanRaden()) {
