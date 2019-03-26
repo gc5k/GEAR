@@ -9,8 +9,8 @@ import gear.subcommands.eigengwas.EigenGWASCommandImpl;
 //import gear.subcommands.eigengwasdom.EigenGWASDomCommandArguments;
 //import gear.subcommands.eigengwasdom.EigenGWASDomCommandImpl;
 //import gear.subcommands.eigengwasepi.EigenGWASEpiCommandArguments;
-import gear.subcommands.grmA.GRMACommandArguments;
-import gear.subcommands.grmA.GRMACommandImpl;
+import gear.subcommands.wgrmA.WGRMACommandArguments;
+import gear.subcommands.wgrmA.WGRMACommandImpl;
 import gear.subcommands.qpca.QPCACommandArguments;
 import gear.subcommands.qpca.QPCACommandImpl;
 import gear.util.FileUtil;
@@ -21,7 +21,7 @@ public class EbatchGWASCommandImpl extends CommandImpl {
 	public void execute(CommandArguments cmdArgs) {
 		EbatchGWASCommandArguments eArgs = (EbatchGWASCommandArguments) cmdArgs;
 
-		GRMACommandArguments gArgs = new GRMACommandArguments();
+		WGRMACommandArguments gArgs = new WGRMACommandArguments();
 		gArgs.setBFile(eArgs.getBFile());
 		gArgs.setGZ();
 		gArgs.setOutRoot(eArgs.getOutRoot());
@@ -68,7 +68,7 @@ public class EbatchGWASCommandImpl extends CommandImpl {
 			gArgs.setRemoveFamFile(eArgs.getRemoveFamFile());
 		}
 
-		GRMACommandImpl gImpl = new GRMACommandImpl();
+		WGRMACommandImpl gImpl = new WGRMACommandImpl();
 		gImpl.execute(gArgs);
 
 		PrintStream gui_file = null;
