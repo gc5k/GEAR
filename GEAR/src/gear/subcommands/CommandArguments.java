@@ -305,6 +305,24 @@ public abstract class CommandArguments {
 		isThread_num = true;
 	}
 
+	public void setThreadGreedy(String threadGreedy) {
+
+		int cpuTotal = Runtime.getRuntime().availableProcessors();
+		int thread_G= Integer.parseInt(threadGreedy);
+		if (thread_G > 0) {
+			Logger.printUserLog("incorrect --thread-greedy " + thread_G + ". It should be < 0.");
+			System.exit(0);
+		} else {
+			if ((cpuTotal-thread_G) <1) {
+				Logger.printUserLog("At least 1 cpu should be used. Thread number is set to " + 1 + ".");
+				thread_num = 1;
+			} else {
+				thread_num = cpuTotal - thread_G;
+			}
+		}
+		isThread_num = true;
+	}
+
 	public boolean isThreadNum() {
 		return isThread_num;
 	}

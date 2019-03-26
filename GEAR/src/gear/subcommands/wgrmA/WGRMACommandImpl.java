@@ -84,16 +84,14 @@ public class WGRMACommandImpl extends CommandImpl {
 	}
 
 	private void countMissing() {
-		Logger.printUserLog("Counting missing genotypes...");
 
-		long missCnt = 0;
 		for (int i = 0; i < pGM.getNumIndivdial(); i++) {
 			ArrayList<Integer> mL = NewIt.newArrayList();
 			missList.add(mL);
 		}
 
+		long missCnt = 0;
 		for (int i = 0; i < pGM.getNumMarker(); i++) {
-
 			for (int j = 0; j < pGM.getNumIndivdial(); j++) {
 				int g = pGM.getAdditiveScore(j,i);
 				if (g == Person.MissingGenotypeCode) {
@@ -105,8 +103,8 @@ public class WGRMACommandImpl extends CommandImpl {
 			}
 		}
 		DecimalFormat df = new DecimalFormat("0.0000");
-
-		Logger.printUserLog("Missing rate is " + df.format(missCnt*1.0d /(pGM.getNumIndivdial() * pGM.getNumMarker())) + ".");
+		double mG = missCnt * 1.0d / ((pGM.getNumIndivdial() * 1L) * (pGM.getNumMarker() * 1L));
+		Logger.printUserLog("Genotype missing rate is " + df.format(mG) + ".");
 	}
 
 	private void prepareWeight() {

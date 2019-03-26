@@ -11,6 +11,10 @@ import gear.subcommands.CommandImpl;
 
 public class WGRMACommand extends Command {
 
+	public WGRMACommand() {
+		addAlias("wgrm");
+	}
+
 	@Override
 	public String getName() {
 		return "wgrmA";
@@ -67,7 +71,9 @@ public class WGRMACommand extends Command {
 		options.addOption(
 				OptionBuilder.withDescription(OPT_MAF_RANGE_DESC).withLongOpt(OPT_MAF_RANGE_LONG).hasArgs().create());
 		options.addOption(
-				OptionBuilder.withDescription(OPT_THREAD_NUM_LONG_DESC).withLongOpt(OPT_THREAD_NUM_LONG).hasArgs().create());
+				OptionBuilder.withDescription(OPT_THREAD_NUM_LONG_DESC).withLongOpt(OPT_THREAD_NUM_LONG).hasArg().create());
+		options.addOption(
+				OptionBuilder.withDescription(OPT_THREAD_GREEDY_LONG_DESC).withLongOpt(OPT_THREAD_GREEDY_LONG).hasArg().create());
 	}
 
 	@Override

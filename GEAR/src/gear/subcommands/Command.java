@@ -222,8 +222,16 @@ public abstract class Command implements Comparable<Command> {
 
 	protected void parseThreadNumArguments(CommandArguments cmdArgs, CommandLine cmdLine)
 			throws CommandArgumentException {
+		if (cmdLine.hasOption(OPT_THREAD_NUM_LONG) && cmdLine.hasOption(OPT_THREAD_GREEDY_LONG)) {
+			throw new CommandArgumentException(
+					"--thread-num and --thread-greedy cannot be set together.");			
+		}
+
 		if (cmdLine.hasOption(OPT_THREAD_NUM_LONG)) {
 			cmdArgs.setThreadNum(cmdLine.getOptionValue(OPT_THREAD_NUM_LONG, OPT_THREAD_NUM_LONG_DEFAULT));
+		}
+		if (cmdLine.hasOption(OPT_THREAD_GREEDY_LONG)) {
+			cmdArgs.setThreadGreedy(cmdLine.getOptionValue(OPT_THREAD_GREEDY_LONG, OPT_THREAD_GREEDY_LONG_DEFAULT));			
 		}
 	}
 
@@ -424,4 +432,9 @@ public abstract class Command implements Comparable<Command> {
 	protected static final String OPT_THREAD_NUM_LONG_DEFAULT = "1";
 	protected static final String OPT_THREAD_NUM_LONG_DESC = "Specify the thread number generator, default to "
 			+ OPT_THREAD_NUM_LONG_DEFAULT;
+
+	protected static final String OPT_THREAD_GREEDY_LONG = "thread-greedy";
+	protected static final String OPT_THREAD_GREEDY_LONG_DEFAULT = "-1";
+	protected static final String OPT_THREAD_GREEDY_LONG_DESC = "Specify the thread number generator, default to n-1";
+
 }
