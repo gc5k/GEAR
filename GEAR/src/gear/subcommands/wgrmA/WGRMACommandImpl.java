@@ -51,7 +51,9 @@ public class WGRMACommandImpl extends CommandImpl {
 		pGM = new GenotypeMatrix(sf.getSample(), pp.getMapData(), cmdArgs);
 
 		Logger.printUserLog("");
-		
+
+		countMissing();
+
 		allelefreq = pGM.getQCedAlleleFreq();
 		allelevar = pGM.getQCedGenoVar();
 
@@ -69,19 +71,42 @@ public class WGRMACommandImpl extends CommandImpl {
 
 		Gcnt = new int[pGM.getNumIndivdial()][pGM.getNumIndivdial()];
 
-		for (int i = 0; i < pGM.getNumIndivdial(); i++) {
-			ArrayList<Integer> mL = NewIt.newArrayList();
-			missList.add(mL);
+		if (!wgrmArgs.isDomOnly()) {
+			makeGA();
 		}
 
-		makeGA();
-
-		if (wgrmArgs.isDom()) {
+		if (wgrmArgs.isDom() || wgrmArgs.isDomOnly()) {
 			if (wgrmArgs.isInbred()) {
 				Logger.printUserLog("Skip dominace because '--inbred' option is switched on.");
 			}
 			makeGD();
 		}
+	}
+
+	private void countMissing() {
+		Logger.printUserLog("Counting missing genotypes...");
+
+		long missCnt = 0;
+		for (int i = 0; i < pGM.getNumIndivdial(); i++) {
+			ArrayList<Integer> mL = NewIt.newArrayList();
+			missList.add(mL);
+		}
+
+		for (int i = 0; i < pGM.getNumMarker(); i++) {
+
+			for (int j = 0; j < pGM.getNumIndivdial(); j++) {
+				int g = pGM.getAdditiveScore(j,i);
+				if (g == Person.MissingGenotypeCode) {
+					ArrayList<Integer> mL = missList.get(j);
+					mL.add(i);
+					missList.set(j, mL);
+					missCnt++;
+				}
+			}
+		}
+		DecimalFormat df = new DecimalFormat("0.0000");
+
+		Logger.printUserLog("Missing rate is " + df.format(missCnt*1.0d /(pGM.getNumIndivdial() * pGM.getNumMarker())) + ".");
 	}
 
 	private void prepareWeight() {
@@ -123,6 +148,7 @@ public class WGRMACommandImpl extends CommandImpl {
 	}
 	
 	private void makeGA() {
+		Logger.printUserLog("");
 		Logger.printUserLog("Making additive genetic relatedness matrix...");
 		long startNanoTime = System.nanoTime();
 		int numSamples = pGM.getNumIndivdial();
@@ -147,9 +173,6 @@ public class WGRMACommandImpl extends CommandImpl {
 			for (int j = 0; j < pGM.getNumIndivdial(); j++) {
 				int g = pGM.getAdditiveScore(j,i);
 				if (g == Person.MissingGenotypeCode) {
-					ArrayList<Integer> mL = missList.get(j);
-					mL.add(i);
-					missList.set(j, mL);
 					gMat[j][i] = 0;
 				} else {
 					gMat[j][i] = (float) ((g*1.0-2*f)/de * weight[i]);
@@ -641,139 +664,6 @@ public class WGRMACommandImpl extends CommandImpl {
 		}
 		
 		Logger.printElapsedTime(startNanoTime, "make dominance genetic relatedness matrix");
-	}
-
-	
-	private void makeGD_retired() {
-		float[][] gMat = new float[pGM.getNumIndivdial()][pGM.getNumMarker()];
-
-		for (int i = 0; i < pGM.getNumMarker(); i++) {
-			if (allelefreq[i][1] == Float.NaN || allelefreq[i][0] == 0 || allelefreq[i][1] == 0 || allelevar[i] == 0) continue;
-
-			float f = allelefreq[i][1];
-
-			for (int j = 0; j < pGM.getNumIndivdial(); j++) {
-				int g = pGM.getAdditiveScore(j,i);
-				if (g == Person.MissingGenotypeCode) {
-					ArrayList<Integer> mL = missList.get(j);
-					mL.add(i);
-					missList.set(j, mL);
-					gMat[j][i] = 0;
-				} else {					
-					if (g == 0) {
-						gMat[j][i] = (0 - 2*f*f) / (2*f*(1-f));
-					} else if (g == 1) {
-						gMat[j][i] = (2*f - 2*f*f) /(2*f*(1-f));
-					} else {
-						gMat[j][i] = ((4*f - 2) -(2*f*f))/ (2*f*(1-f));
-					}
-				}
-			}
-		}
-
-		float[][] GD = new float[gMat.length][gMat.length];
-
-		for (int i = 0; i < gMat.length; i++) {
-			for (int j = 0; j <= i; j++) {
-				float s = 0;
-				for (int l = 0; l < gMat[i].length; l++) {
-					s += gMat[i][l] * gMat[j][l];
-				}
-				GD[i][j] = s/Gcnt[i][j];
-			}
-		}
-
-		double grmDomMean = 0;
-		double grmDomSq = 0;
-
-		StringBuffer sb = new StringBuffer();
-		sb.append(wgrmArgs.getOutRoot());
-		PrintStream grm = null;
-		BufferedWriter grmGZ = null;
-		if (wgrmArgs.isGZ()) {
-			sb.append(".dom.grm.gz");
-			grmGZ = FileUtil.ZipFileWriter(sb.toString());
-		} else {
-			sb.append(".dom.grm.txt");
-			grm = FileUtil.CreatePrintStream(sb.toString());
-		}
-
-		int cnt = 0;
-		for (int i = 0; i < GD.length; i++) {
-			for (int j = 0; j <= i; j++) {
-				if (i != j) {
-					grmDomMean += GD[i][j];
-					grmDomSq += GD[i][j] * GD[i][j];
-					cnt++;
-				}
-				if (wgrmArgs.isGZ()) {
-					try {
-						grmGZ.append((i + 1) + "\t" + (j + 1) + "\t" + Gcnt[i][j] + "\t" + GD[i][j] + "\n");
-					} catch (IOException e) {
-						Logger.handleException(e,
-								"error in writing '" + sb.toString() + "' for " + (i + 1) + " " + (j + 1) + ".");
-					}
-				} else {
-					grm.println((i + 1) + "\t" + (j + 1) + "\t" + Gcnt[i][j] + "\t" + GD[i][j]);
-				}
-			}
-		}
-
-		if (wgrmArgs.isGZ()) {
-			try {
-				grmGZ.close();
-			} catch (IOException e) {
-				Logger.handleException(e, " error in closing '" + sb.toString() + "'.");
-			}
-		} else {
-			grm.close();
-		}
-		Logger.printUserLog("Writing GRM dominance scores into '" + sb.toString() + "'.");
-		StringBuffer sb_id = new StringBuffer();
-		sb_id.append(wgrmArgs.getOutRoot());
-		PrintStream grm_id = null;
-		sb_id.append(".dom.grm.id");
-		grm_id = FileUtil.CreatePrintStream(sb_id.toString());
-
-		ArrayList<PersonIndex> PI = sf.getSample();
-		for (int i = 0; i < PI.size(); i++) {
-			grm_id.println(PI.get(i).getFamilyID() + "\t" + PI.get(i).getIndividualID());
-		}
-		grm_id.close();
-		Logger.printUserLog("Writing " + PI.size() + " individuals' information into '" + sb_id.toString() + "'.");
-
-		grmDomMean /= cnt;
-		grmDomSq /= cnt;
-		double Effective_DomSample = -1 / grmDomMean;
-		double grmDomSD = (grmDomSq - grmDomMean * grmDomMean) * cnt / (cnt - 1);
-		double Effeictive_DomMarker = 1 / grmDomSD;
-
-		DecimalFormat df = new DecimalFormat("0.0000");
-		DecimalFormat dfE = new DecimalFormat("0.00E0");
-		if (Math.abs(grmDomMean) > 0.0001) {
-			Logger.printUserLog("Mean of dominance genetic relatedness is: " + df.format(grmDomMean));
-		} else {
-			Logger.printUserLog("Mean of dominance genetic relatedness is: " + dfE.format(grmDomMean));
-		}
-
-		if (Math.abs(grmDomSD) > 0.0001) {
-			Logger.printUserLog("Sampling variance of dominance genetic relatedness is: " + df.format(grmDomSD));
-		} else {
-			Logger.printUserLog("Sampling variance of dominance genetic relatedness is: " + dfE.format(grmDomSD));
-		}
-
-		if (Math.abs(Effeictive_DomMarker) > 0.0001) {
-			Logger.printUserLog("Effective dominance sample size is: " + df.format(Effective_DomSample));
-		} else {
-			Logger.printUserLog("Effective dominance sample size is: " + dfE.format(Effective_DomSample));
-		}
-
-		if (Math.abs(Effeictive_DomMarker) > 0.0001) {
-			Logger.printUserLog("Effective number of dominance genome segments is: " + df.format(Effeictive_DomMarker));
-		} else {
-			Logger.printUserLog(
-					"Effective number of dominance genome segments is: " + dfE.format(Effeictive_DomMarker));
-		}
 	}
 
 	private void readInbredList() {

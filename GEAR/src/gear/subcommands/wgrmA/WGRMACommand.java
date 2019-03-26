@@ -30,6 +30,8 @@ public class WGRMACommand extends Command {
 		options.addOption(OptionBuilder.withDescription(OPT_GZ_DESC).create(OPT_GZ));
 		options.addOption(OptionBuilder.withDescription(OPT_TXT_DESC).create(OPT_TXT));
 		options.addOption(OptionBuilder.withDescription(OPT_DOM_DESC).create(OPT_DOM));
+		options.addOption(OptionBuilder.withDescription(OPT_DOM_ONLY_LONG_DESC).withLongOpt(OPT_DOM_ONLY_LONG).create());
+
 		options.addOption(OptionBuilder.withDescription(OPT_GUI_DESC).withLongOpt(OPT_GUI_LONG).create());
 
 		options.addOption(OptionBuilder.withDescription(OPT_ADJ_VAR_DESC).withLongOpt(OPT_ADJ_VAR_LONG).create());
@@ -105,6 +107,10 @@ public class WGRMACommand extends Command {
 		} else {
 			if (cmdLine.hasOption(OPT_DOM)) {
 				grmArgs.setDom();
+			} else {
+				if (cmdLine.hasOption(OPT_DOM_ONLY_LONG)) {
+					grmArgs.setDomOnly();
+				}
 			}
 		}
 		
@@ -141,7 +147,10 @@ public class WGRMACommand extends Command {
 
 	private static final String OPT_DOM = "dom";
 	private static final String OPT_DOM_DESC = "dominance relationship";
-	
+
+	private static final String OPT_DOM_ONLY_LONG = "dom-only";
+	private static final String OPT_DOM_ONLY_LONG_DESC = "dominance only relationship";
+
 	private static final String OPT_INBRED_LIST_LONG = "inbred-list";
 	private static final String OPT_INBRED_LIST_DESC = "inbred individual list";	
 	

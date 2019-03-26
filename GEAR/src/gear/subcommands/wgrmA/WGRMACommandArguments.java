@@ -7,6 +7,7 @@ public class WGRMACommandArguments extends CommandArguments {
 	private boolean isGZ = true;
 	private boolean isVar = false;
 	private boolean isDom = false;
+	private boolean isDomOnly = false;
 	private boolean isInbred = false;
 	private boolean isInbredList = false;
 	private String InbredFile = null;
@@ -95,5 +96,13 @@ public class WGRMACommandArguments extends CommandArguments {
 
 	public String getWeightFile() {
 		return wFile;
+	}
+
+	public void setDomOnly() {
+		isDomOnly = true;
+	}
+	
+	public boolean isDomOnly() {
+		return isDomOnly;
 	}
 }
