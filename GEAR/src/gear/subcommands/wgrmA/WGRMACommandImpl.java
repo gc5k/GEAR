@@ -193,7 +193,7 @@ public class WGRMACommandImpl extends CommandImpl {
 			cpuNum = wgrmArgs.getThreadNum();
 		}
 
-		final int cpus = cpuNum;
+		final int cpus = cpuNum < grmTriangleSize ? cpuNum : 1;
 
 		Logger.printUserLog("Calculating GA with " + cpus + (cpus == 1 ? " thread." : " threads."));
 
