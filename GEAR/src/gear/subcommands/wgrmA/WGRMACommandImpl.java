@@ -281,7 +281,8 @@ public class WGRMACommandImpl extends CommandImpl {
 						Thread.sleep(1000);
 					} catch (InterruptedException e) {}
 				} while (totalProgress < GA.length);
-				System.out.println();
+				System.out.println("Done");
+				System.out.print("");
 			}
 		};
 		progressDisplayThread.start();

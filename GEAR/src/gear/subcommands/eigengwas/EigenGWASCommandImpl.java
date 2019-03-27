@@ -172,6 +172,7 @@ public class EigenGWASCommandImpl extends CommandImpl {
 					}
 				} while (totalProgress < pGM.getNumMarker());
 				System.out.println("Done.");
+				System.out.print("");
 			}
 		};
 		progressDisplayThread.start();
@@ -328,15 +329,6 @@ public class EigenGWASCommandImpl extends CommandImpl {
 			gui_file.println(lambdaGC);
 			gui_file.close();
 		}
-		// ////TEST
-		// try {
-		// write.close();
-		// bw.close();
-		//
-		// } catch (IOException e) {
-		// e.printStackTrace();
-		// }
-		// ////TEST
 	}
 
 	public void printResult() {

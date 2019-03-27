@@ -31,6 +31,9 @@ public class EbatchGWASCommandImpl extends CommandImpl {
 		if (eArgs.isGUI()) {
 			gArgs.setGUI();
 		}
+		if (eArgs.isThreadNum()) {
+			gArgs.setThreadNum(new Integer (eArgs.getThreadNum()).toString());
+		}
 
 		if (eArgs.isExtractFile()) {
 			gArgs.setExtractFile(eArgs.getExtractFile());
@@ -105,6 +108,10 @@ public class EbatchGWASCommandImpl extends CommandImpl {
 				eigenArgs.setBFile(eArgs.getBFile());
 				eigenArgs.setPhenotypeFile(eArgs.getOutRoot() + ".eigenvec");
 				eigenArgs.setPhenotypeIndex(i);
+				if (eArgs.isThreadNum()) {
+					eigenArgs.setThreadNum(new Integer (eArgs.getThreadNum()).toString());
+				}
+
 				eigenArgs.setOutRoot(eArgs.getOutRoot() + "." + i);
 				if (eArgs.isGUI()) {
 					eigenArgs.setGUI();

@@ -58,6 +58,10 @@ public class EbatchGWASCommand extends Command {
 		options.addOption(
 				OptionBuilder.withDescription(OPT_MAF_RANGE_DESC).withLongOpt(OPT_MAF_RANGE_LONG).hasArgs().create());
 
+		options.addOption(
+				OptionBuilder.withDescription(OPT_THREAD_NUM_LONG_DESC).withLongOpt(OPT_THREAD_NUM_LONG).hasArg().create());
+		options.addOption(
+				OptionBuilder.withDescription(OPT_THREAD_GREEDY_LONG_DESC).withLongOpt(OPT_THREAD_GREEDY_LONG).hasArg().create());
 	}
 
 	@Override
@@ -77,6 +81,7 @@ public class EbatchGWASCommand extends Command {
 		parseGENOArguments((CommandArguments) EbatArgs, cmdLine);
 		parseZeroVarArguments((CommandArguments) EbatArgs, cmdLine);
 		parseMAFRangeArguments((CommandArguments) EbatArgs, cmdLine);
+		parseThreadNumArguments((CommandArguments) EbatArgs, cmdLine);
 
 		EbatArgs.setEV(parseStringOptionValue(cmdLine, OPT_EV_LONG, "1"));
 
