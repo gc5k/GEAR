@@ -53,6 +53,12 @@ public class EigenGWASCommand extends Command {
 				OptionBuilder.withDescription(OPT_ZERO_VAR_DESC).withLongOpt(OPT_ZERO_VAR_LONG).create());
 		options.addOption(
 				OptionBuilder.withDescription(OPT_MAF_RANGE_DESC).withLongOpt(OPT_MAF_RANGE_LONG).hasArgs().create());
+		
+		options.addOption(
+				OptionBuilder.withDescription(OPT_THREAD_NUM_LONG_DESC).withLongOpt(OPT_THREAD_NUM_LONG).hasArg().create());
+		options.addOption(
+				OptionBuilder.withDescription(OPT_THREAD_GREEDY_LONG_DESC).withLongOpt(OPT_THREAD_GREEDY_LONG).hasArg().create());
+
 	}
 
 	public CommandArguments parse(CommandLine cmdLine) throws CommandArgumentException {
@@ -73,7 +79,8 @@ public class EigenGWASCommand extends Command {
 
 		parsePhenoFileArguments((CommandArguments) eigenArgs, cmdLine);
 		parsePhenoIndexArguments((CommandArguments) eigenArgs, cmdLine);
-		
+		parseThreadNumArguments((CommandArguments) eigenArgs, cmdLine);
+
 		if (cmdLine.hasOption(OPT_GUI_LONG)) {
 			eigenArgs.setGUI();
 		}
