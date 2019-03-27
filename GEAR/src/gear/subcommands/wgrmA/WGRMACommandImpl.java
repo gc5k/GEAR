@@ -78,8 +78,9 @@ public class WGRMACommandImpl extends CommandImpl {
 		if (wgrmArgs.isDom() || wgrmArgs.isDomOnly()) {
 			if (wgrmArgs.isInbred()) {
 				Logger.printUserLog("Skip dominace because '--inbred' option is switched on.");
+			} else {
+				makeGD();
 			}
-			makeGD();
 		}
 	}
 
@@ -648,9 +649,9 @@ public class WGRMACommandImpl extends CommandImpl {
 //		}
 
 		if (Math.abs(Effective_marker) > 0.0001) {
-			Logger.printUserLog("Effective number of genome segments is: " + df.format(Effective_marker));
+			Logger.printUserLog("Effective number of dominance genome segments is: " + df.format(Effective_marker));
 		} else {
-			Logger.printUserLog("Effective number of genome segments is: " + dfE.format(Effective_marker));
+			Logger.printUserLog("Effective number of dominance genome segments is: " + dfE.format(Effective_marker));
 		}
 
 		if(wgrmArgs.isGUI()) {
