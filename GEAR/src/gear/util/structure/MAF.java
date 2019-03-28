@@ -85,7 +85,7 @@ public class MAF
 			reader.errorPreviousLine("'" + tokens[4] + "' is not a valid MAF value. An MAF value must be a floating point number.");
 		}
 		
-		if (maf != Double.NaN && (maf < 0.0f || 1.0f < maf))
+		if (Double.isNaN(maf) && (maf < 0.0f || 1.0f < maf))
 		{
 			reader.errorPreviousLine("'" + tokens[4] + "' is not a valid MAF value. MAF must between 0 and 1 inclusively.");
 		}

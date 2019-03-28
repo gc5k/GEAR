@@ -133,7 +133,7 @@ public class WGRMACommandImpl extends CommandImpl {
 		} else if (wgrmArgs.isVanRaden()) {
 			for (int i = 0; i < pGM.getSNPList().size(); i++) {
 
-				if (allelefreq[i][1] == Double.NaN || allelefreq[i][0] == 0 || allelefreq[i][1] == 0 || allelevar[i] == 0) continue;
+				if (Float.isNaN(allelefreq[i][1]) || allelefreq[i][0] == 0 || allelefreq[i][1] == 0 || allelevar[i] == 0) continue;
 
 				weight[i] = (float) (wgrmArgs.isInbred()? Math.sqrt(4 * allelefreq[i][1] * (1 - allelefreq[i][1])):Math.sqrt(2 * allelefreq[i][1] * (1 - allelefreq[i][1])));
 				if (wgrmArgs.isAdjVar()) weight[i] = (float) Math.sqrt(allelevar[i]);
@@ -151,7 +151,7 @@ public class WGRMACommandImpl extends CommandImpl {
 		Logger.printUserLog("Standardizing genotypes (additive)...");
 		float W = 0;
 		for (int i = 0; i < pGM.getNumMarker(); i++) {
-			if (allelefreq[i][1] == Float.NaN || allelefreq[i][0] == 0 || allelefreq[i][1] == 0 || allelevar[i] == 0) continue;
+			if (Float.isNaN(allelefreq[i][0]) || allelefreq[i][0] == 0 || allelefreq[i][1] == 0 || allelevar[i] == 0) continue;
 			W += weight[i] * weight[i];
 
 			float f = allelefreq[i][1];
@@ -414,7 +414,7 @@ public class WGRMACommandImpl extends CommandImpl {
 		Logger.printUserLog("Standardizing genotypes (dominance)...");
 		float W = 0;
 		for (int i = 0; i < pGM.getNumMarker(); i++) {
-			if (allelefreq[i][1] == Float.NaN || allelefreq[i][0] == 0 || allelefreq[i][1] == 0 || allelevar[i] == 0) continue;
+			if (Float.isNaN(allelefreq[i][0]) || allelefreq[i][0] == 0 || allelefreq[i][1] == 0 || allelevar[i] == 0) continue;
 			W += weight[i]*weight[i]*weight[i]*weight[i];
 
 			float f = allelefreq[i][1];

@@ -27,7 +27,7 @@ public class PopStat {
 				}
 			}
 
-			if (cnt == 0) {
+			if (cnt == 0.0) {
 				axsq[i][0] = Float.NaN;
 				axsq[i][1] = Float.NaN;
 				axsq[i][2] = Float.NaN;

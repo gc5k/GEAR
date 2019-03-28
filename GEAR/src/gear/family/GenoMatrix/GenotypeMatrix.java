@@ -77,17 +77,20 @@ public class GenotypeMatrix {
 		Logger.printUserLog("Calculating allele frequencies, variance, and missing rates for " + numMarker + " loci...");
 		locusStat = PopStat.calLocusStat(this);
 		float aveF = 0, aveV = 0, aveM = 0;
+		long aveCnt = 0;
 		for(int i = 0; i < locusStat.length; i++) {
+			if (Float.isNaN(locusStat[i][0]) ) continue;
 			aveF += locusStat[i][0];
 			aveV += locusStat[i][2];
 			aveM += locusStat[i][3];
+			aveCnt++;
 		}
-		
+
 		DecimalFormat dfE = new DecimalFormat("0.0000");
 
-		Logger.printUserLog("Average MAF: " + dfE.format(aveF/ locusStat.length));
-		Logger.printUserLog("Average variance: " + dfE.format(aveV/ locusStat.length));
-		Logger.printUserLog("Average variance: " + dfE.format(aveM/ locusStat.length));
+		Logger.printUserLog("Average MAF: " + dfE.format(aveF/ aveCnt));
+		Logger.printUserLog("Average variance: " + dfE.format(aveV/ aveCnt));
+		Logger.printUserLog("Average missing rate: " + dfE.format(aveM/ aveCnt));
 
 		if (cmdArgs.isMAF() || cmdArgs.isMaxMAF() || cmdArgs.isGENO() || cmdArgs.isZeroVar() || cmdArgs.isMAFRange()) {
 			Logger.printUserLog("");
@@ -168,12 +171,11 @@ public class GenotypeMatrix {
 		float aveF = 0, aveV = 0, aveM = 0;
 		long aveCnt = 0;
 		for(int i = 0; i < locusStat.length; i++) {
-			if (locusStat[i][0]!=Float.NaN) {
-				aveF += locusStat[i][0];
-				aveV += locusStat[i][2];
-				aveM += locusStat[i][3];
-				aveCnt++;
-			}
+			if (Float.isNaN(locusStat[i][0]) ) continue;
+			aveF += locusStat[i][0];
+			aveV += locusStat[i][2];
+			aveM += locusStat[i][3];
+			aveCnt++;
 		}
 
 		DecimalFormat dfE = new DecimalFormat("0.0000");
