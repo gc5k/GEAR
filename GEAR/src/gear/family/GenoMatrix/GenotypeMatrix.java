@@ -1,5 +1,6 @@
 package gear.family.GenoMatrix;
 
+import java.text.DecimalFormat;
 import java.util.ArrayList;
 
 import gear.CmdArgs;
@@ -20,8 +21,9 @@ public class GenotypeMatrix {
 	private ArrayList<PersonIndex> pidx;
 	private ArrayList<SNP> snpList;
 	private ArrayList<Integer> QCedSnpIndex = NewIt.newArrayList();
-	private float[][] allelefreq;
-	private float[] allelevar;
+//	private float[][] allelefreq;
+//	private float[] allelevar;
+	private float[][] locusStat; //0 freq, 1 var, 2 missing
 
 	public GenotypeMatrix(ArrayList<PersonIndex> pi, MapFile mapF) {
 		QCedSnpIndex = NewIt.newArrayList();
@@ -71,9 +73,21 @@ public class GenotypeMatrix {
 			}
 		}
 		numMarker = pidx.get(0).getPerson().getNumMarkers();
+
+		Logger.printUserLog("Calculating allele frequencies, variance, and missing rates for " + numMarker + " loci...");
+		locusStat = PopStat.calLocusStat(this);
+		float aveF = 0, aveV = 0, aveM = 0;
+		for(int i = 0; i < locusStat.length; i++) {
+			aveF += locusStat[i][0];
+			aveV += locusStat[i][2];
+			aveM += locusStat[i][3];
+		}
 		
-		allelefreq = PopStat.calAlleleFrequencyFloat(this);
-		allelevar = PopStat.calGenoVarianceFloat(this);
+		DecimalFormat dfE = new DecimalFormat("0.0000");
+
+		Logger.printUserLog("Average MAF: " + dfE.format(aveF/ locusStat.length));
+		Logger.printUserLog("Average variance: " + dfE.format(aveV/ locusStat.length));
+		Logger.printUserLog("Average variance: " + dfE.format(aveM/ locusStat.length));
 
 		if (cmdArgs.isMAF() || cmdArgs.isMaxMAF() || cmdArgs.isGENO() || cmdArgs.isZeroVar() || cmdArgs.isMAFRange()) {
 			Logger.printUserLog("");
@@ -86,7 +100,7 @@ public class GenotypeMatrix {
 			int zeroVarFail = 0;
 			int mafRangeFail = 0;
 			for (int i = 0; i < numMarker; i++) {
-				double m = allelefreq[i][0] < 0.5 ? allelefreq[i][0] : (1 - allelefreq[i][0]);
+				double m = locusStat[i][0] < 0.5 ? locusStat[i][0] : (1 - locusStat[i][0]);
 				if (cmdArgs.isMAFRange()) {
 					double[][] mafR = cmdArgs.getMAFRange();
 					boolean mafFlag = false;
@@ -109,11 +123,11 @@ public class GenotypeMatrix {
 					maxmafFail++;
 					continue;
 				}
-				if (cmdArgs.isGENO() && allelefreq[i][2] > cmdArgs.getGENO()) {
+				if (cmdArgs.isGENO() && locusStat[i][3] > cmdArgs.getGENO()) {
 					genoFail++;
 					continue;
 				}
-				if (cmdArgs.isZeroVar() && allelevar[i] == 0) {
+				if (cmdArgs.isZeroVar() && locusStat[i][2] == 0) {
 					zeroVarFail++;
 					continue;
 				}
@@ -149,10 +163,24 @@ public class GenotypeMatrix {
 		}
 		numMarker = pidx.get(0).getPerson().getNumMarkers();
 		
-		Logger.printUserLog("Calculating allele frequencies and variance...");
+		Logger.printUserLog("Calculating statistics for " + numMarker + " loci...");
+		locusStat = PopStat.calLocusStat(this);
+		float aveF = 0, aveV = 0, aveM = 0;
+		long aveCnt = 0;
+		for(int i = 0; i < locusStat.length; i++) {
+			if (locusStat[i][0]!=Float.NaN) {
+				aveF += locusStat[i][0];
+				aveV += locusStat[i][2];
+				aveM += locusStat[i][3];
+				aveCnt++;
+			}
+		}
 
-		allelefreq = PopStat.calAlleleFrequencyFloat(this);
-		allelevar = PopStat.calGenoVarianceFloat(this);
+		DecimalFormat dfE = new DecimalFormat("0.0000");
+
+		Logger.printUserLog("Average MAF: " + dfE.format(aveF/ aveCnt));
+		Logger.printUserLog("Average variance: " + dfE.format(aveV/ aveCnt));
+		Logger.printUserLog("Average missing rate: " + dfE.format(aveM/ aveCnt));
 	}
 
 	public int getNumIndivdial() {
@@ -310,46 +338,46 @@ public class GenotypeMatrix {
 		return pidx;
 	}
 
-	public double getAlleleVar(int i) {
-		return allelevar[QCedSnpIndex.get(i)];
+	public float getAlleleVar(int i) {
+		return locusStat[QCedSnpIndex.get(i)][2];
 	}
 
 	public float[] getQCedGenoVar() {
 		float[] QCedAlleleVar = new float[QCedSnpIndex.size()];
 		for(int i = 0; i < QCedSnpIndex.size(); i++) {
-			QCedAlleleVar[i] = allelevar[QCedSnpIndex.get(i)];
+			QCedAlleleVar[i] = locusStat[QCedSnpIndex.get(i)][2];
 		}
 		return QCedAlleleVar;
 	}
 
-	public double getMAF(int i) {
-		return allelefreq[QCedSnpIndex.get(i)][0] < 0.5 ? allelefreq[QCedSnpIndex.get(i)][0]:allelefreq[QCedSnpIndex.get(i)][1];
+	public float getMAF(int i) {
+		return locusStat[QCedSnpIndex.get(i)][0] < 0.5 ? locusStat[QCedSnpIndex.get(i)][0]:locusStat[QCedSnpIndex.get(i)][1];
 	}
 
-	public double getA1Freq(int i) {
-		return allelefreq[QCedSnpIndex.get(i)][0];
+	public float getA1Freq(int i) {
+		return locusStat[QCedSnpIndex.get(i)][0];
 	}
 
 	public double getA2Freq(int i) {
-		return allelefreq[QCedSnpIndex.get(i)][1];
+		return locusStat[QCedSnpIndex.get(i)][1];
 	}
 
 	public float[][] getQCedAlleleFreq() {
-		float[][] QCedAlleleFreq = new float[QCedSnpIndex.size()][3];
+		float[][] QCedAlleleFreq = new float[QCedSnpIndex.size()][4];
 		for(int i = 0; i < QCedSnpIndex.size(); i++) {
-			System.arraycopy(allelefreq[QCedSnpIndex.get(i)], 0, QCedAlleleFreq[i], 0, 3);
+			System.arraycopy(locusStat[QCedSnpIndex.get(i)], 0, QCedAlleleFreq[i], 0, 4);
 		}
 		return QCedAlleleFreq;
 	}
 
 	public double getGenoMissing(int i) {
-		return allelefreq[QCedSnpIndex.get(i)][2];
+		return locusStat[QCedSnpIndex.get(i)][3];
 	}
 
 	public float[] getQCedGenoMissing() {
 		float[] QCedGenoMissing = new float[QCedSnpIndex.size()];
 		for(int i = 0; i < QCedSnpIndex.size(); i++) {
-			QCedGenoMissing[i] = allelefreq[i][2];
+			QCedGenoMissing[i] = locusStat[i][3];
 		}
 		return QCedGenoMissing;
 	}

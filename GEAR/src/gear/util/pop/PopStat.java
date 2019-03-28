@@ -8,36 +8,45 @@ import gear.family.GenoMatrix.GenotypeMatrix;
 import gear.util.Logger;
 
 public class PopStat {
-	public static float[][] calAlleleFrequencyFloat(GenotypeMatrix G) {
-		// [][0]a1 freq; [][1]a2 freq; [][2] missing rate
+	
+	public static float[][] calLocusStat(GenotypeMatrix G) {
+		// [][0]a1 freq; [][1]a2 var; [][2] missing rate
 		// it calculates second allele frequency (so, likely the major one)
-		float[][] allelefreq = new float[G.getNumMarker()][3];
-		for (int i = 0; i < G.getGRow(); i++) {
-			for (int j = 0; j < G.getNumMarker(); j++) {
-				int[] c = G.getBiAlleleGenotype(i, j);
-				allelefreq[j][c[0]]++;
-				allelefreq[j][c[1]]++;
-			}
-		}
+		float[][] axsq = new float[G.getNumMarker()][4];
 
 		for (int i = 0; i < G.getNumMarker(); i++) {
-			double wa = allelefreq[i][0] + allelefreq[i][1];
-			double a = allelefreq[i][0] + allelefreq[i][1] + allelefreq[i][2];
-			if (wa > 0) {
-				for (int j = 0; j < allelefreq[i].length - 1; j++) {
-					allelefreq[i][j] /= wa;
+			float cnt = 0;
+			float sq = 0;
+			float sm = 0;
+			for (int j = 0; j < G.getNumIndivdial(); j++) {
+				int g = G.getAdditiveScore(j, i);
+				if (g != ConstValues.MISSING_GENOTYPE) {
+					sq += g * g;
+					sm += g;
+					cnt++;
 				}
-				allelefreq[i][2] /= a;
-			} else {
-				allelefreq[i][0] = Float.NaN;
-				allelefreq[i][0] = Float.NaN;
-				allelefreq[i][2] = 1;
+			}
+
+			if (cnt == 0) {
+				axsq[i][0] = Float.NaN;
+				axsq[i][1] = Float.NaN;
+				axsq[i][2] = Float.NaN;
+				axsq[i][3] = 1;
+				continue;
+			}
+			axsq[i][0] = 1 - sm / cnt /2;
+			axsq[i][1] = sm / cnt /2;
+
+			axsq[i][3] =  (G.getNumIndivdial()-cnt)/(G.getNumIndivdial());
+			if (cnt > 2) {
+				axsq[i][2] = (sq - cnt * (sm / cnt) * (sm / cnt)) / (cnt - 1);
 			}
 		}
 
-		return allelefreq;
+		return axsq;
 	}
-	
+
+
 	public static double[][] calAlleleFrequency(GenotypeMatrix G) {
 		// [][0]a1 freq; [][1]a2 freq; [][2] missing rate
 		// it calculates second allele frequency (so, likely the major one)
@@ -67,33 +76,6 @@ public class PopStat {
 
 		return allelefreq;
 	}
-
-	public static float[] calGenoVarianceFloat(GenotypeMatrix G) {
-		// [][0]a1 freq; [][1]a2 freq; [][2] missing rate
-		// it calculates second allele frequency (so, likely the major one)
-		float[] axsq = new float[G.getNumMarker()];
-
-		for (int i = 0; i < G.getNumMarker(); i++) {
-			int cnt = 0;
-			float sq = 0;
-			float sm = 0;
-			for (int j = 0; j < G.getGRow(); j++) {
-				int g = G.getAdditiveScore(j, i);
-				if (g != ConstValues.MISSING_GENOTYPE) {
-					sq += g * g;
-					sm += g;
-					cnt++;
-				}
-			}
-
-			if (cnt > 2) {
-				axsq[i] = (sq - cnt * (sm / cnt) * (sm / cnt)) / (cnt - 1);
-			}
-		}
-
-		return axsq;
-	}
-
 
 	public static double[] calGenoVariance(GenotypeMatrix G) {
 		// [][0]a1 freq; [][1]a2 freq; [][2] missing rate
