@@ -1,18 +1,216 @@
 package gear.util.pop;
 
+import java.util.ArrayList;
+import java.util.stream.IntStream;
+
 import org.apache.commons.math.MathException;
 import org.apache.commons.math.random.RandomDataImpl;
 
 import gear.ConstValues;
+import gear.data.Person;
 import gear.family.GenoMatrix.GenotypeMatrix;
 import gear.util.Logger;
+import gear.util.NewIt;
 
 public class PopStat {
 	
+	public static ArrayList<ArrayList<Integer>> punchMissingGenoMT(GenotypeMatrix G, int threadNum) {
+		final ArrayList<ArrayList<Integer>> missList = NewIt.newArrayList();
+
+		for (int i = 0; i < G.getNumIndivdial(); i++) {
+			ArrayList<Integer> mL = NewIt.newArrayList();
+			missList.add(mL);
+		}
+
+		int markCnt = G.getNumMarker();
+		final int cpus = threadNum < markCnt ? threadNum : 1;
+
+		Thread[] computeThreads = new Thread[cpus];
+		final int[] taskProgresses = new int[cpus];
+		final int taskSize = markCnt / cpus;
+
+		for (int c = 0; c < cpus; ++c) {
+			final int threadIndex = c;
+			Thread thread = new Thread() {
+				public void run() {
+					int markStart = threadIndex * taskSize;
+					int markEnd = threadIndex < (cpus - 1) ? (taskSize * (threadIndex+1)) : markCnt;
+					
+					int taskProgress = 0;
+					for (int i = markStart; i < markEnd; i++) {
+						taskProgresses[threadIndex] = ++taskProgress;
+
+						for (int j = 0; j < G.getNumIndivdial(); j++) {
+							int g = G.getAdditiveScore(j,i);
+							if (g == Person.MissingGenotypeCode) {
+								ArrayList<Integer> mL = missList.get(j);
+								mL.add(i);
+								missList.set(j, mL);
+							}
+						}
+					}
+				}
+			};
+			thread.start();
+			computeThreads[c] = thread;
+		}
+		
+		Thread progressDisplayThread = new Thread() {
+			public void run() {
+				int totalProgress;
+				do {
+					totalProgress = IntStream.of(taskProgresses).sum();
+					float percentage = Math.min(100f, (float) totalProgress / G.getNumMarker() * 100f);
+					System.out.print(String.format(
+							"\r[INFO] Calculating missing genotype punchcard, %.2f%% completed...",
+							percentage));
+					try {
+						Thread.sleep(1000);
+					} catch (InterruptedException e) {
+					}
+				} while (totalProgress < G.getNumMarker());
+				System.out.println("Done.");
+				System.out.print("");
+			}
+		};
+		progressDisplayThread.start();
+
+		for (int i = 0; i < computeThreads.length; ++i) {
+			try {
+				computeThreads[i].join();
+			} catch (InterruptedException e) {
+				Logger.handleException(e, String.format("Compute thread %d is interrupted.", i));
+			}
+		}
+		try {
+			progressDisplayThread.join();
+		} catch (InterruptedException e) {
+			Logger.printUserError("Progress display thread is interrupted.");
+		}
+
+		return missList;
+	}
+
+
+	public static ArrayList<ArrayList<Integer>> punchMissingGeno(GenotypeMatrix G) {
+		ArrayList<ArrayList<Integer>> missList = NewIt.newArrayList();
+
+		for (int i = 0; i < G.getNumIndivdial(); i++) {
+			ArrayList<Integer> mL = NewIt.newArrayList();
+			missList.add(mL);
+		}
+
+		for (int i = 0; i < G.getNumMarker(); i++) {
+			for (int j = 0; j < G.getNumIndivdial(); j++) {
+				int g = G.getAdditiveScore(j,i);
+				if (g == Person.MissingGenotypeCode) {
+					ArrayList<Integer> mL = missList.get(j);
+					mL.add(i);
+//					missList.set(j, mL);
+				}
+			}
+		}
+		
+		return missList;
+	}
+
+	
+	public static float[][] calLocusStatMT(GenotypeMatrix G, int threadNum) {
+		final float[][] axsq = new float[G.getNumMarker()][4];
+
+		int markCnt = G.getNumMarker();
+		final int cpus = threadNum < markCnt ? threadNum : 1;
+
+		Thread[] computeThreads = new Thread[cpus];
+		final int[] taskProgresses = new int[cpus];
+		final int taskSize = markCnt / cpus;
+
+		for (int c = 0; c < cpus; ++c) {
+			final int threadIndex = c;
+			Thread thread = new Thread() {
+				public void run() {
+
+					int markStart = threadIndex * taskSize;
+					int markEnd = threadIndex < (cpus - 1) ? (taskSize * (threadIndex+1)) : markCnt;
+					
+					int taskProgress = 0;
+					for (int i = markStart; i < markEnd; i++) {
+
+						taskProgresses[threadIndex] = ++taskProgress;
+
+						float cnt = 0;
+						float sq = 0;
+						float sm = 0;
+						for (int j = 0; j < G.getNumIndivdial(); j++) {
+							int g = G.getAdditiveScore(j, i);
+							if (g != ConstValues.MISSING_GENOTYPE) {
+								sq += g * g;
+								sm += g;
+								cnt++;
+							}
+						}
+
+						if (cnt == 0.0) {
+							axsq[i][0] = Float.NaN;
+							axsq[i][1] = Float.NaN;
+							axsq[i][2] = Float.NaN;
+							axsq[i][3] = 1;
+							continue;
+						}
+						axsq[i][0] = 1 - sm / cnt /2;
+						axsq[i][1] = sm / cnt /2;
+
+						axsq[i][3] =  (G.getNumIndivdial()-cnt)/(G.getNumIndivdial());
+						if (cnt > 2) {
+							axsq[i][2] = (sq - cnt * (sm / cnt) * (sm / cnt)) / (cnt - 1);
+						}
+					}
+				}
+			};
+			thread.start();
+			computeThreads[c] = thread;
+		}
+
+		Thread progressDisplayThread = new Thread() {
+			public void run() {
+				int totalProgress;
+				do {
+					totalProgress = IntStream.of(taskProgresses).sum();
+					float percentage = Math.min(100f, (float) totalProgress / G.getNumMarker() * 100f);
+					System.out.print(String.format(
+							"\r[INFO] Calculating locus stats, %.2f%% completed...",
+							percentage));
+					try {
+						Thread.sleep(1000);
+					} catch (InterruptedException e) {
+					}
+				} while (totalProgress < G.getNumMarker());
+				System.out.println("Done.");
+				System.out.print("");
+			}
+		};
+		progressDisplayThread.start();
+
+		for (int i = 0; i < computeThreads.length; ++i) {
+			try {
+				computeThreads[i].join();
+			} catch (InterruptedException e) {
+				Logger.handleException(e, String.format("Compute thread %d is interrupted.", i));
+			}
+		}
+		try {
+			progressDisplayThread.join();
+		} catch (InterruptedException e) {
+			Logger.printUserError("Progress display thread is interrupted.");
+		}
+		
+		return axsq;
+	}
+
 	public static float[][] calLocusStat(GenotypeMatrix G) {
 		// [][0]a1 freq; [][1]a2 var; [][2] missing rate
 		// it calculates second allele frequency (so, likely the major one)
-		float[][] axsq = new float[G.getNumMarker()][4];
+		final float[][] axsq = new float[G.getNumMarker()][4];
 
 		for (int i = 0; i < G.getNumMarker(); i++) {
 			float cnt = 0;

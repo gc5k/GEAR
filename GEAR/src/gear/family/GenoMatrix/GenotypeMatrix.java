@@ -67,15 +67,17 @@ public class GenotypeMatrix {
 
 	protected void initial(CommandArguments cmdArgs) {
 		int c1 = 0;
+
 		for (PersonIndex pi : pidx) {
 			if (!pi.isPseudo()) {
 				genotypeMat[c1++] = pi.getPerson().getAlleleArray();
 			}
 		}
+
 		numMarker = pidx.get(0).getPerson().getNumMarkers();
 
 		Logger.printUserLog("Calculating allele frequencies, variance, and missing rates for " + numMarker + " loci...");
-		locusStat = PopStat.calLocusStat(this);
+		locusStat = PopStat.calLocusStatMT(this, cmdArgs.isThreadNum()? cmdArgs.getThreadNum():1);
 		float aveF = 0, aveV = 0, aveM = 0;
 		long aveCnt = 0;
 		for(int i = 0; i < locusStat.length; i++) {

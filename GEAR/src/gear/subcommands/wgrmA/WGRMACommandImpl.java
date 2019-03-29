@@ -24,6 +24,7 @@ import gear.util.BufferedReader;
 import gear.util.FileUtil;
 import gear.util.Logger;
 import gear.util.NewIt;
+import gear.util.pop.PopStat;
 
 public class WGRMACommandImpl extends CommandImpl {
 	private HashMap<String, Float> scores = NewIt.newHashMap(); // name-to-score
@@ -40,17 +41,21 @@ public class WGRMACommandImpl extends CommandImpl {
 
 	private int[][] Gcnt = null;
 
-	ArrayList<ArrayList<Integer>> missList = NewIt.newArrayList();
+	private ArrayList<ArrayList<Integer>> missList = null;
 
 	@Override
 	public void execute(CommandArguments cmdArgs) {
+
 		wgrmArgs = (WGRMACommandArguments) cmdArgs;
 
 		PLINKParser pp = PLINKParser.parse(wgrmArgs);
+
 		sf = new SampleFilter(pp.getPedigreeData(), cmdArgs);
+
 		pGM = new GenotypeMatrix(sf.getSample(), pp.getMapData(), cmdArgs);
 
-		punchMissingGeno();
+//		missList = PopStat.punchMissingGenoMT(pGM, cmdArgs.isThreadNum()? cmdArgs.getThreadNum():1);
+		missList = PopStat.punchMissingGeno(pGM);
 
 		allelefreq = pGM.getQCedAlleleFreq();
 		allelevar = pGM.getQCedGenoVar();
@@ -78,27 +83,6 @@ public class WGRMACommandImpl extends CommandImpl {
 				Logger.printUserLog("Skip dominace because '--inbred' option is switched on.");
 			} else {
 				makeGD();
-			}
-		}
-	}
-
-	private void punchMissingGeno() {
-
-		Logger.printUserLog("");
-		Logger.printUserLog("Making missing genotype punchcard...");
-		for (int i = 0; i < pGM.getNumIndivdial(); i++) {
-			ArrayList<Integer> mL = NewIt.newArrayList();
-			missList.add(mL);
-		}
-
-		for (int i = 0; i < pGM.getNumMarker(); i++) {
-			for (int j = 0; j < pGM.getNumIndivdial(); j++) {
-				int g = pGM.getAdditiveScore(j,i);
-				if (g == Person.MissingGenotypeCode) {
-					ArrayList<Integer> mL = missList.get(j);
-					mL.add(i);
-					missList.set(j, mL);
-				}
 			}
 		}
 	}
@@ -538,7 +522,8 @@ public class WGRMACommandImpl extends CommandImpl {
 						Thread.sleep(1000);
 					} catch (InterruptedException e) {}
 				} while (totalProgress < DA.length);
-				System.out.println();
+				System.out.println("Done");
+				System.out.print("");
 			}
 		};
 		progressDisplayThread.start();
