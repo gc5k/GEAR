@@ -71,7 +71,7 @@ public class DFPCommandImpl extends CommandImpl {
 		PLINKBinaryParser pp2 = new PLINKBinaryParser(dfpArgs.getBed2(), dfpArgs.getBim2(), dfpArgs.getFam2());
 		pp2.parse();
 		sf2 = new SampleFilter(pp2.getPedigreeData());
-		pGM2 = new GenotypeMatrix(sf2.getSample(), pp2.getMapData());
+		pGM2 = new GenotypeMatrix(sf2.getSample(), pp2.getMapData(), dfpArgs);
 		PersonTable2 = sf2.getSample();
 		Logger.printUserLog("");
 

@@ -39,7 +39,7 @@ public class BlupPcaCommandImpl extends CommandImpl {
 
 		PLINKParser pp = PLINKParser.parse(blupArgs);
 		sf = new SampleFilter(pp.getPedigreeData());
-		pGM = new GenotypeMatrix(sf.getSample(), pp.getMapData());
+		pGM = new GenotypeMatrix(sf.getSample(), pp.getMapData(), blupArgs);
 
 		double[][] freq = PopStat.calAlleleFrequency(pGM);
 		// PopStat.Imputation(gm);

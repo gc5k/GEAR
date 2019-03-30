@@ -49,6 +49,10 @@ public class DFPCommand extends Command
 
 	    options.addOption(OptionBuilder.withDescription(OPT_CHR_DESC).withLongOpt(OPT_CHR_LONG).hasArgs().create());
 	    options.addOption(OptionBuilder.withDescription(OPT_NOT_CHR_DESC).withLongOpt(OPT_NOT_CHR_LONG).hasArgs().create());
+		options.addOption(
+				OptionBuilder.withDescription(OPT_THREAD_NUM_LONG_DESC).withLongOpt(OPT_THREAD_NUM_LONG).hasArg().create());
+		options.addOption(
+				OptionBuilder.withDescription(OPT_THREAD_GREEDY_LONG_DESC).withLongOpt(OPT_THREAD_GREEDY_LONG).hasArg().create());
 
 	}
 
@@ -61,9 +65,9 @@ public class DFPCommand extends Command
 	    parseFileArguments((CommandArguments) dfpArgs, cmdLine);
 	    parseSampleFilterArguments((CommandArguments) dfpArgs, cmdLine);
 	    parseSNPFilterChromosomeArguments((CommandArguments) dfpArgs, cmdLine);
+	    parseThreadNumArguments((CommandArguments) dfpArgs, cmdLine);
 
-		if (cmdLine.hasOption(OPT_BFILE2_LONG))
-		{
+		if (cmdLine.hasOption(OPT_BFILE2_LONG)) {
 			dfpArgs.setBFile2(cmdLine.getOptionValue(OPT_BFILE2_LONG));
 		}
 

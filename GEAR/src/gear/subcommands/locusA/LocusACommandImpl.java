@@ -22,7 +22,6 @@ import gear.util.Logger;
 
 public class LocusACommandImpl extends CommandImpl {
 	private LocusACommandArguments locusArgs;
-	private MapFile map;
 	private PrintStream resultFile;
 	private DecimalFormat fmt1 = new DecimalFormat("0.0000");
 	private DecimalFormat fmt2 = new DecimalFormat("0.00E000");

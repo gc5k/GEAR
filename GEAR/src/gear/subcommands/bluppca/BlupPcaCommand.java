@@ -32,6 +32,12 @@ public class BlupPcaCommand extends Command {
 //		options.addOption(OptionBuilder.withDescription(OPT_FILE_DESC).withLongOpt(OPT_FILE_LONG).hasArg().create());
 		options.addOption(OptionBuilder.withDescription(OPT_PHE_DESC).hasArg().isRequired().create(OPT_PHE));
 		options.addOption(OptionBuilder.withDescription(OPT_MPHE_DESC).hasArgs().create(OPT_MPHE));
+		
+		options.addOption(
+				OptionBuilder.withDescription(OPT_THREAD_NUM_LONG_DESC).withLongOpt(OPT_THREAD_NUM_LONG).hasArg().create());
+		options.addOption(
+				OptionBuilder.withDescription(OPT_THREAD_GREEDY_LONG_DESC).withLongOpt(OPT_THREAD_GREEDY_LONG).hasArg().create());
+
 	}
 
 	@Override
@@ -40,6 +46,7 @@ public class BlupPcaCommand extends Command {
 		parseFileArguments((CommandArguments) blupArgs, cmdLine);
 		parsePhenoFileArguments((CommandArguments) blupArgs, cmdLine);
 		parsePhenoIndexArguments((CommandArguments) blupArgs, cmdLine);
+		parseThreadNumArguments((CommandArguments) blupArgs, cmdLine);
 
 		parseGRMArguments(blupArgs, cmdLine);
 		return blupArgs;
