@@ -2,21 +2,13 @@ package gear.subcommands.locusA;
 
 import java.io.PrintStream;
 import java.text.DecimalFormat;
-import java.util.ArrayList;
 
 import gear.family.GenoMatrix.GenotypeMatrix;
-import gear.family.pedigree.Hukou;
-import gear.family.pedigree.file.BEDReader;
-import gear.family.pedigree.file.MapFile;
 import gear.family.pedigree.file.SNP;
-import gear.family.plink.PLINKBinaryParser;
 import gear.family.plink.PLINKParser;
 import gear.qc.sampleqc.SampleFilter;
-import gear.qc.snpqc.SNPFilter;
-import gear.qc.snpqc.SNPFilterPostQC;
 import gear.subcommands.CommandArguments;
 import gear.subcommands.CommandImpl;
-import gear.subcommands.locus.LocusCommandArguments;
 import gear.util.FileUtil;
 import gear.util.Logger;
 

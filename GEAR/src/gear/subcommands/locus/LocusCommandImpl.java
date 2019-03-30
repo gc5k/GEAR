@@ -4,7 +4,6 @@ import java.io.PrintStream;
 import java.text.DecimalFormat;
 import java.util.ArrayList;
 
-import gear.family.GenoMatrix.GenotypeMatrix;
 import gear.family.pedigree.Hukou;
 import gear.family.pedigree.file.BEDReader;
 import gear.family.pedigree.file.MapFile;
@@ -16,7 +15,6 @@ import gear.qc.snpqc.SNPFilter;
 import gear.qc.snpqc.SNPFilterPostQC;
 import gear.subcommands.CommandArguments;
 import gear.subcommands.CommandImpl;
-import gear.subcommands.locusA.LocusACommandArguments;
 import gear.util.FileUtil;
 import gear.util.Logger;
 
