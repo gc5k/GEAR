@@ -91,7 +91,6 @@ public class PopStat {
 		return missList;
 	}
 
-
 	public static ArrayList<ArrayList<Integer>> punchMissingGeno(GenotypeMatrix G) {
 		ArrayList<ArrayList<Integer>> missList = NewIt.newArrayList();
 
@@ -114,13 +113,13 @@ public class PopStat {
 		return missList;
 	}
 
-	
-	public static float[][] calLocusStatMT(GenotypeMatrix G, int threadNum) {
-		final float[][] axsq = new float[G.getNumMarker()][4];
+	public static float[][] calLocusStatFullMT(GenotypeMatrix G, int threadNum) {
+		final float[][] axsq = new float[G.getNumMarker()][7];
 
 		int markCnt = G.getNumMarker();
 		final int cpus = threadNum < markCnt ? threadNum : 1;
 
+		Logger.printUserLog("Calculating locus statistics with " + cpus + " threads.");
 		Thread[] computeThreads = new Thread[cpus];
 		final int[] taskProgresses = new int[cpus];
 		final int taskSize = markCnt / cpus;
@@ -134,6 +133,7 @@ public class PopStat {
 					int markEnd = threadIndex < (cpus - 1) ? (taskSize * (threadIndex+1)) : markCnt;
 					
 					int taskProgress = 0;
+
 					for (int i = markStart; i < markEnd; i++) {
 
 						taskProgresses[threadIndex] = ++taskProgress;
@@ -141,29 +141,42 @@ public class PopStat {
 						float cnt = 0;
 						float sq = 0;
 						float sm = 0;
+						float[] genoCnt = new float[3];
+
 						for (int j = 0; j < G.getNumIndivdial(); j++) {
 							int g = G.getAdditiveScore(j, i);
 							if (g != ConstValues.MISSING_GENOTYPE) {
 								sq += g * g;
 								sm += g;
 								cnt++;
+								genoCnt[g]++;
 							}
 						}
 
 						if (cnt == 0.0) {
 							axsq[i][0] = Float.NaN;
 							axsq[i][1] = Float.NaN;
+
 							axsq[i][2] = Float.NaN;
-							axsq[i][3] = 1;
+
+							axsq[i][3] = Float.NaN;
+							axsq[i][4] = Float.NaN;
+							axsq[i][5] = Float.NaN;
+							axsq[i][6] = 1;
 							continue;
 						}
 						axsq[i][0] = 1 - sm / cnt /2;
 						axsq[i][1] = sm / cnt /2;
 
-						axsq[i][3] =  (G.getNumIndivdial()-cnt)/(G.getNumIndivdial());
 						if (cnt > 2) {
 							axsq[i][2] = (sq - cnt * (sm / cnt) * (sm / cnt)) / (cnt - 1);
 						}
+						axsq[i][3] = genoCnt[0];
+						axsq[i][4] = genoCnt[1];
+						axsq[i][5] = genoCnt[2];
+
+						axsq[i][6] =  (G.getNumIndivdial()-cnt)/(G.getNumIndivdial());
+
 					}
 				}
 			};
@@ -206,44 +219,6 @@ public class PopStat {
 		
 		return axsq;
 	}
-
-	public static float[][] calLocusStat(GenotypeMatrix G) {
-		// [][0]a1 freq; [][1]a2 var; [][2] missing rate
-		// it calculates second allele frequency (so, likely the major one)
-		final float[][] axsq = new float[G.getNumMarker()][4];
-
-		for (int i = 0; i < G.getNumMarker(); i++) {
-			float cnt = 0;
-			float sq = 0;
-			float sm = 0;
-			for (int j = 0; j < G.getNumIndivdial(); j++) {
-				int g = G.getAdditiveScore(j, i);
-				if (g != ConstValues.MISSING_GENOTYPE) {
-					sq += g * g;
-					sm += g;
-					cnt++;
-				}
-			}
-
-			if (cnt == 0.0) {
-				axsq[i][0] = Float.NaN;
-				axsq[i][1] = Float.NaN;
-				axsq[i][2] = Float.NaN;
-				axsq[i][3] = 1;
-				continue;
-			}
-			axsq[i][0] = 1 - sm / cnt /2;
-			axsq[i][1] = sm / cnt /2;
-
-			axsq[i][3] =  (G.getNumIndivdial()-cnt)/(G.getNumIndivdial());
-			if (cnt > 2) {
-				axsq[i][2] = (sq - cnt * (sm / cnt) * (sm / cnt)) / (cnt - 1);
-			}
-		}
-
-		return axsq;
-	}
-
 
 	public static double[][] calAlleleFrequency(GenotypeMatrix G) {
 		// [][0]a1 freq; [][1]a2 freq; [][2] missing rate

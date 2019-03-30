@@ -4,6 +4,7 @@ import java.io.PrintStream;
 import java.text.DecimalFormat;
 import java.util.ArrayList;
 
+import gear.family.GenoMatrix.GenotypeMatrix;
 import gear.family.pedigree.Hukou;
 import gear.family.pedigree.file.BEDReader;
 import gear.family.pedigree.file.MapFile;
@@ -15,6 +16,7 @@ import gear.qc.snpqc.SNPFilter;
 import gear.qc.snpqc.SNPFilterPostQC;
 import gear.subcommands.CommandArguments;
 import gear.subcommands.CommandImpl;
+import gear.subcommands.locusA.LocusACommandArguments;
 import gear.util.FileUtil;
 import gear.util.Logger;
 
@@ -29,6 +31,7 @@ public class LocusCommandImpl extends CommandImpl {
 
 	@Override
 	public void execute(CommandArguments cmdArgs) {
+		
 		locusArgs = (LocusCommandArguments) cmdArgs;
 
 		PLINKParser pp = PLINKParser.create(locusArgs);
@@ -122,7 +125,7 @@ public class LocusCommandImpl extends CommandImpl {
 		}
 		resultFile.close();
 		snpPostQC.printPostQCSummary();
-		Logger.printUserLog("Save " + workingSnpIndex + " results to " + locusArgs.getOutRoot() + ".locus.");
+		Logger.printUserLog("Saved " + workingSnpIndex + " results to " + locusArgs.getOutRoot() + ".locus.");
 	}
 	
 	private double calculateEVariance(double alleleFreq0, double alleleFreq1) {

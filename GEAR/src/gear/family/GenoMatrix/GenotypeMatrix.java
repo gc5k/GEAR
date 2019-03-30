@@ -23,24 +23,7 @@ public class GenotypeMatrix {
 	private ArrayList<Integer> QCedSnpIndex = NewIt.newArrayList();
 //	private float[][] allelefreq;
 //	private float[] allelevar;
-	private float[][] locusStat; //0 freq, 1 var, 2 missing
-
-	public GenotypeMatrix(ArrayList<PersonIndex> pi, MapFile mapF) {
-		QCedSnpIndex = NewIt.newArrayList();
-		for (int i = 0; i < mapF.getMarkerNumber(); i++) {
-			QCedSnpIndex.add(i);
-		}
-		snpList = mapF.getMarkerList();
-		pidx = pi;
-		genotypeMat = new int[pidx.size()][];
-
-		initial();
-		
-		if (this.getNumMarker() == 0) {
-			Logger.printUserLog("No SNPs were remained for analysis. GEAR quit.");
-			System.exit(1);
-		}
-	}
+	private float[][] locusStat; //0 freq, 1 freqAlt, 2 var, 3 AA, 4 Aa, 5 aa, 6 missing
 
 	public GenotypeMatrix(ArrayList<PersonIndex> pi, MapFile mapF, CommandArguments cmdArgs) {
 		QCedSnpIndex = NewIt.newArrayList();
@@ -76,15 +59,15 @@ public class GenotypeMatrix {
 
 		numMarker = pidx.get(0).getPerson().getNumMarkers();
 
-		Logger.printUserLog("Calculating allele frequencies, variance, and missing rates for " + numMarker + " loci...");
-		locusStat = PopStat.calLocusStatMT(this, cmdArgs.isThreadNum()? cmdArgs.getThreadNum():1);
+		Logger.printUserLog("");
+		locusStat = PopStat.calLocusStatFullMT(this, cmdArgs.isThreadNum()? cmdArgs.getThreadNum():1);
 		float aveF = 0, aveV = 0, aveM = 0;
 		long aveCnt = 0;
 		for(int i = 0; i < locusStat.length; i++) {
 			if (Float.isNaN(locusStat[i][0]) ) continue;
 			aveF += locusStat[i][0];
 			aveV += locusStat[i][2];
-			aveM += locusStat[i][3];
+			aveM += locusStat[i][6];
 			aveCnt++;
 		}
 
@@ -128,7 +111,7 @@ public class GenotypeMatrix {
 					maxmafFail++;
 					continue;
 				}
-				if (cmdArgs.isGENO() && locusStat[i][3] > cmdArgs.getGENO()) {
+				if (cmdArgs.isGENO() && locusStat[i][6] > cmdArgs.getGENO()) {
 					genoFail++;
 					continue;
 				}
@@ -157,34 +140,6 @@ public class GenotypeMatrix {
 
 			Logger.printUserLog(QCedSnpIndex.size() + " SNPs were remained for analysis.");
 		}
-	}
-
-	protected void initial() {
-		int c1 = 0;
-		for (PersonIndex pi : pidx) {
-			if (!pi.isPseudo()) {
-				genotypeMat[c1++] = pi.getPerson().getAlleleArray();
-			}
-		}
-		numMarker = pidx.get(0).getPerson().getNumMarkers();
-		
-		Logger.printUserLog("Calculating statistics for " + numMarker + " loci...");
-		locusStat = PopStat.calLocusStat(this);
-		float aveF = 0, aveV = 0, aveM = 0;
-		long aveCnt = 0;
-		for(int i = 0; i < locusStat.length; i++) {
-			if (Float.isNaN(locusStat[i][0]) ) continue;
-			aveF += locusStat[i][0];
-			aveV += locusStat[i][2];
-			aveM += locusStat[i][3];
-			aveCnt++;
-		}
-
-		DecimalFormat dfE = new DecimalFormat("0.0000");
-
-		Logger.printUserLog("Average MAF: " + dfE.format(aveF/ aveCnt));
-		Logger.printUserLog("Average variance: " + dfE.format(aveV/ aveCnt));
-		Logger.printUserLog("Average missing rate: " + dfE.format(aveM/ aveCnt));
 	}
 
 	public int getNumIndivdial() {
@@ -366,22 +321,30 @@ public class GenotypeMatrix {
 		return locusStat[QCedSnpIndex.get(i)][1];
 	}
 
-	public float[][] getQCedAlleleFreq() {
-		float[][] QCedAlleleFreq = new float[QCedSnpIndex.size()][4];
+	public float[][] getQCedAlleleStat() {
+		float[][] QCedAlleleStat = new float[QCedSnpIndex.size()][locusStat[0].length];
 		for(int i = 0; i < QCedSnpIndex.size(); i++) {
-			System.arraycopy(locusStat[QCedSnpIndex.get(i)], 0, QCedAlleleFreq[i], 0, 4);
+			System.arraycopy(locusStat[QCedSnpIndex.get(i)], 0, QCedAlleleStat[i], 0, locusStat[QCedSnpIndex.get(i)].length);
+		}
+		return QCedAlleleStat;
+	}
+
+	public float[][] getQCedAlleleFreq() {
+		float[][] QCedAlleleFreq = new float[QCedSnpIndex.size()][2];
+		for(int i = 0; i < QCedSnpIndex.size(); i++) {
+			System.arraycopy(locusStat[QCedSnpIndex.get(i)], 0, QCedAlleleFreq[i], 0, 2);
 		}
 		return QCedAlleleFreq;
 	}
 
 	public double getGenoMissing(int i) {
-		return locusStat[QCedSnpIndex.get(i)][3];
+		return locusStat[QCedSnpIndex.get(i)][6];
 	}
 
 	public float[] getQCedGenoMissing() {
 		float[] QCedGenoMissing = new float[QCedSnpIndex.size()];
 		for(int i = 0; i < QCedSnpIndex.size(); i++) {
-			QCedGenoMissing[i] = locusStat[i][3];
+			QCedGenoMissing[i] = locusStat[i][6];
 		}
 		return QCedGenoMissing;
 	}
