@@ -23,8 +23,10 @@ public class BEDReader extends PedigreeFile {
 	private MapFile mapData;
 	private RandomAccessFile bedFile;
 	private boolean isSnpMajor;
-	private int bytesPerRow;
-
+	private int byteCountPerRow;
+	
+	public int getByteCountPerRow() { return byteCountPerRow; }
+	
 	public BEDReader(String bedFilename, String famFilename, MapFile mapData) {
 		super(bedFilename);
 		famFile = famFilename;
@@ -98,17 +100,14 @@ public class BEDReader extends PedigreeFile {
 		Logger.printUserLog("Read " + hukouBook.size() + " individuals from '" + famFile + "'.");
 	}
 	
-	private void calculateBytesPerRow() {
-		if (IsSnpMajor()) {
-			bytesPerRow = (persons.size() + 3) / 4;
-		} else {
-			bytesPerRow = (mapData.getMarkerNumberOriginal()) / 4;
-		}
-	}
-	
 	public void prepareToParseGenotypes() {
 		parseFam();
-		calculateBytesPerRow();
+
+		if (IsSnpMajor()) {
+			byteCountPerRow = (persons.size() + 3) / 4;
+		} else {
+			byteCountPerRow = (mapData.getMarkerNumberOriginal()) / 4;
+		}
 	}
 	
 	public int readNextByte() {
@@ -123,6 +122,14 @@ public class BEDReader extends PedigreeFile {
 			System.exit(-1);
 		}
 		return nextByte;
+	}
+	
+	public void read(byte[] genotypes) {
+		try {
+			bedFile.readFully(genotypes);
+		} catch (IOException e) {
+			Logger.handleException(e, "I/O exception occurred when reading the bed file.");
+		}
 	}
 
 	@Override
@@ -246,7 +253,7 @@ public class BEDReader extends PedigreeFile {
 	
 	public void skipOneRow() {
 		try {
-			bedFile.skipBytes(bytesPerRow);
+			bedFile.skipBytes(byteCountPerRow);
 		} catch (IOException e) {
 			Logger.handleException(e, "An I/O exception occurred when reading the bed file.");
 		}

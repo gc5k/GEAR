@@ -56,6 +56,8 @@ public class LocusCommandImpl extends CommandImpl {
 		SNPFilterPostQC snpPostQC = new SNPFilterPostQC(locusArgs);
 		
 		ArrayList<Hukou> hkBook = bed.getHukouBook();
+		
+		byte[] genotypes = new byte[bed.getByteCountPerRow()];
 
 		for (int i = 0; i < numMarkers; ++i) {
 			if (snpFilter.isSnpIncluded(i)) {
@@ -65,14 +67,11 @@ public class LocusCommandImpl extends CommandImpl {
 				int missingCnt = 0;
 				int sum = 0;
 				int squareSum = 0;
-				for (int j = 0; j < numSamples; j += 4) {
-					int nextByte = bed.readNextByte();
-					int indCnt = j;
-					for (int k = 0; k < 8; k += 2) {
-
-						if(indCnt == numSamples) break;
-
-						if (!hkBook.get(indCnt++).isAvailable()) {
+				bed.read(genotypes);
+				for (int byteIndex = 0; byteIndex < genotypes.length; ++byteIndex) {
+					byte nextByte = genotypes[byteIndex];
+					for (int k = 0, sampleIndex = 0; k < 8 && sampleIndex < numSamples; k += 2, ++sampleIndex) {
+						if (!hkBook.get(sampleIndex).isAvailable()) {
 							continue;
 						}
 

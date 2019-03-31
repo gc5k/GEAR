@@ -9,7 +9,7 @@ import java.util.TreeSet;
 //import gear.he.h2trans.H2Transformer;
 //import gear.pscontrol.NonTransmitted;
 import gear.subcommands.Command;
-//import gear.util.Logger;
+import gear.util.Logger;
 //import gear.util.MonitorThread;
 
 public enum Gear {
@@ -114,7 +114,9 @@ public enum Gear {
 		Command subcmd = INSTANCE.getCommand(subcmdName);
 
 		if (subcmd != null) {
+			long startNanoTime = System.nanoTime();
 			subcmd.execute(subcmdArgs, subcmdName);
+			Logger.printElapsedTime(startNanoTime, "run the command");
 		}
 //		} else {
 //
