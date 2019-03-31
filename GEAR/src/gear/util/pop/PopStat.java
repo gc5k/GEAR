@@ -250,32 +250,6 @@ public class PopStat {
 		return allelefreq;
 	}
 
-	public static double[] calGenoVariance(GenotypeMatrix G) {
-		// [][0]a1 freq; [][1]a2 freq; [][2] missing rate
-		// it calculates second allele frequency (so, likely the major one)
-		double[] axsq = new double[G.getNumMarker()];
-
-		for (int i = 0; i < G.getNumMarker(); i++) {
-			int cnt = 0;
-			double sq = 0;
-			double sm = 0;
-			for (int j = 0; j < G.getGRow(); j++) {
-				int g = G.getAdditiveScore(j, i);
-				if (g != ConstValues.MISSING_GENOTYPE) {
-					sq += g * g;
-					sm += g;
-					cnt++;
-				}
-			}
-
-			if (cnt > 2) {
-				axsq[i] = (sq - cnt * (sm / cnt) * (sm / cnt)) / (cnt - 1);
-			}
-		}
-
-		return axsq;
-	}
-
 	public static double[][] calGenoFrequency(GenotypeMatrix G, boolean isFreq) {
 		double[][] gfreq = new double[G.getNumMarker()][3];
 		for (int i = 0; i < G.getGRow(); i++) {

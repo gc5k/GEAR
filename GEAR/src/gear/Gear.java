@@ -49,6 +49,7 @@ public enum Gear {
 		addCommand(new gear.subcommands.qpca.QPCACommand());
 		addCommand(new gear.subcommands.locus.LocusCommand());
 		addCommand(new gear.subcommands.locusA.LocusACommand());
+		addCommand(new gear.subcommands.locusB.LocusBCommand());
 
 		addCommand(new gear.subcommands.at.AtCommand());
 		addCommand(new gear.subcommands.ebatchgwas.EbatchGWASCommand());
