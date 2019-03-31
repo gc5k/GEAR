@@ -10,7 +10,6 @@ import gear.family.pedigree.file.MapFile;
 import gear.family.pedigree.file.SNP;
 import gear.family.plink.PLINKBinaryParser;
 import gear.family.plink.PLINKParser;
-import gear.qc.sampleqc.SampleFilter;
 import gear.qc.snpqc.SNPFilter;
 import gear.qc.snpqc.SNPFilterPostQC;
 import gear.subcommands.CommandArguments;
@@ -36,9 +35,6 @@ public class LocusCommandImpl extends CommandImpl {
 		pp.parseSmallFiles();
 		map = pp.getMapData();
 		snpFilter = pp.getSNPFilter();
-//		snpFilter.filter(locusArgs);
-
-		SampleFilter samFilter = new SampleFilter(pp.getPedigreeData(), locusArgs);
 
 		resultFile = FileUtil.CreatePrintStream(locusArgs.getOutRoot() + ".locus");
 		resultFile.println("SNP\tCHR\tBP\tRefAllele\tAltAllele\tFreq\tVar\tEVar\tAA\tAa\taa\tnChr");

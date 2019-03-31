@@ -118,42 +118,6 @@ public enum Gear {
 			subcmd.execute(subcmdArgs, subcmdName);
 			Logger.printElapsedTime(startNanoTime, "run the command");
 		}
-//		} else {
-//
-//			CmdArgs.INSTANCE.parse(args);
-//
-//			Logger.setLogFiles(CmdArgs.INSTANCE.out);
-//			Logger.hasUserLogTag(false);
-//			Logger.printUserLog(AboutInfo.WELCOME_MESSAGE);
-//			Logger.hasUserLogTag(true);
-//			Logger.printUserLog("Analysis started: " + Calendar.getInstance().getTime() + "\n");
-//
-//			MonitorThread monitor = new MonitorThread();
-//			monitor.start();
-//
-//			CmdArgs.INSTANCE.printOptionsInEffect();
-//
-//			if (CmdArgs.INSTANCE.calOption) {
-//				H2Transformer H2 = new H2Transformer();
-//				H2.H2();
-//
-//			} else if (CmdArgs.INSTANCE.nontransFlag) {
-//				NonTransmitted nt = new NonTransmitted();
-//				nt.GenerateNonTransmitted();
-//
-//			} else if (CmdArgs.INSTANCE.naiveImputFlag) {
-//				NaiveImputation ni = new NaiveImputation();
-//				ni.Imputation();
-//			} else if (CmdArgs.INSTANCE.imputeFlag) {
-//				ImputeProbabilityBestGuess bestGuess = new ImputeProbabilityBestGuess();
-//				bestGuess.convert();
-//			}
-//
-//			monitor.stopMonitoring();
-//
-//			Logger.printUserLog("");
-//			Logger.printUserLog("Analysis finished: " + Calendar.getInstance().getTime());
-//			Logger.printUserLog("Peak memory consumption: " + monitor.getPeakMemoryFormatString());
 	}
 
 }
