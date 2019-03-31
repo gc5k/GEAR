@@ -437,7 +437,7 @@ public class WGRMACommandImpl extends CommandImpl {
 
 		final int cpus = cpuNum;
 
-		Logger.printUserLog("Calculating GA with " + cpus + (cpus == 1 ? " thread." : " threads."));
+		Logger.printUserLog("Calculating GD with " + cpus + (cpus == 1 ? " thread." : " threads."));
 
 		Thread[] computeThreads = new Thread[cpus];
 		final int[] taskProgresses = new int[cpus];
