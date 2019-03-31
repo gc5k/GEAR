@@ -77,6 +77,7 @@ public class NSSCommandImpl extends CommandImpl {
 		snpFilter = pp.getSNPFilter();
 
 		sf = new SampleFilter(pp.getPedigreeData(), data.getMatchSubjetList());
+		sf.qualification();
 		bed = (BEDReader) pp.getPedigreeData();
 
 		nssResultList = NewIt.newArrayList();

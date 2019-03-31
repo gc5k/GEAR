@@ -48,7 +48,6 @@ public class SampleFilter {
 	public SampleFilter(PedigreeFile ped) {
 		pedData = ped;
 		personTable = NewIt.newArrayList();
-		qualification();
 	}
 	
 	public SampleFilter(CommandArguments cmdArgs) {
@@ -71,7 +70,6 @@ public class SampleFilter {
 	public SampleFilter(PedigreeFile ped, CommandArguments cmdArgs) {
 		this(cmdArgs);
 		pedData = ped;
-		qualification();
 	}
 
 	public SampleFilter(PedigreeFile ped, ArrayList<SubjectID> sID) {
@@ -82,10 +80,9 @@ public class SampleFilter {
 		for (SubjectID sid : sID) {
 			subSet.add(sid);
 		}
-		qualification();
 	}
 
-	private void qualification() {
+	public void qualification() {
 		ArrayList<Hukou> hukoubook = pedData.getHukouBook();
 		hukouBook = NewIt.newArrayList();
 		UniqueRecordSet<Family> families = pedData.getFamilies();

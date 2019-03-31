@@ -378,6 +378,7 @@ public final class ProfileCommandImpl extends CommandImpl {
 					profCmdArgs.getMachDosageBatch(), profCmdArgs.getMachInfoBatch());
 		} else if (profCmdArgs.isScale()) {
 			SampleFilter sf = new SampleFilter(pp.getPedigreeData());
+			sf.qualification();
 			GenotypeMatrix pGM = new GenotypeMatrix(sf.getSample(), pp.getMapData(), (CommandArguments) profCmdArgs);
 			freq = PopStat.calAlleleFrequency(pGM);
 

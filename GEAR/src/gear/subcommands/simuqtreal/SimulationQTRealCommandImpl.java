@@ -58,6 +58,7 @@ public class SimulationQTRealCommandImpl extends CommandImpl
 
 		pp = PLINKParser.parse(this.qtArgs);
 		sf = new SampleFilter(pp.getPedigreeData(), cmdArgs);
+		sf.qualification();
 		pGM = new GenotypeMatrix(sf.getSample(), pp.getMapData(), cmdArgs);
 
 		h2 = qtArgs.getHsq();

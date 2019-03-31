@@ -63,6 +63,7 @@ public class DFPCommandImpl extends CommandImpl {
 	private void RealCheck() {
 		PLINKParser pp1 = PLINKParser.parse((CommandArguments) dfpArgs);
 		sf1 = new SampleFilter(pp1.getPedigreeData(), (CommandArguments) dfpArgs);
+		sf1.qualification();
 		pGM1 = new GenotypeMatrix(sf1.getSample(), pp1.getMapData(), (CommandArguments) dfpArgs);
 		PersonTable1 = sf1.getSample();
 
@@ -71,6 +72,7 @@ public class DFPCommandImpl extends CommandImpl {
 		PLINKBinaryParser pp2 = new PLINKBinaryParser(dfpArgs.getBed2(), dfpArgs.getBim2(), dfpArgs.getFam2());
 		pp2.parse();
 		sf2 = new SampleFilter(pp2.getPedigreeData());
+		sf2.qualification();
 		pGM2 = new GenotypeMatrix(sf2.getSample(), pp2.getMapData(), dfpArgs);
 		PersonTable2 = sf2.getSample();
 		Logger.printUserLog("");
@@ -349,6 +351,7 @@ public class DFPCommandImpl extends CommandImpl {
 	public void RealCheckOne() {
 		PLINKParser pp1 = PLINKParser.parse((CommandArguments) dfpArgs);
 		sf1 = new SampleFilter(pp1.getPedigreeData(), (CommandArguments) dfpArgs);
+		sf1.qualification();
 		pGM1 = new GenotypeMatrix(sf1.getSample(), pp1.getMapData(), (CommandArguments) dfpArgs);
 		PersonTable1 = sf1.getSample();
 		refSNPList = pGM1.getSNPList();

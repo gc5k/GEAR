@@ -28,6 +28,7 @@ public class LocusACommandImpl extends CommandImpl {
 
 		PLINKParser pp = PLINKParser.parse(locusArgs);
 		sf = new SampleFilter(pp.getPedigreeData(), cmdArgs);
+		sf.qualification();
 
 		pGM = new GenotypeMatrix(sf.getSample(), pp.getMapData(), cmdArgs);
 

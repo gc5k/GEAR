@@ -37,6 +37,7 @@ public class ImputeCommandImpl extends CommandImpl {
 		data.LineUpFiles();
 
 		sf = new SampleFilter(pp.getPedigreeData(), data.getMatchSubjetList());
+		sf.qualification();
 		gm = new GenotypeMatrix(sf.getSample(), pp.getMapData(), cmdArgs);
 
 		naiveImpute();

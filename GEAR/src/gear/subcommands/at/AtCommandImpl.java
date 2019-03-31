@@ -27,6 +27,7 @@ public class AtCommandImpl extends CommandImpl {
 		PLINKParser pp = PLINKParser.parse(this.atArgs);
 
 		sf = new SampleFilter(pp.getPedigreeData());
+		sf.qualification();
 		pGM = new GenotypeMatrix(sf.getSample(), pp.getMapData(), cmdArgs);
 		CalLDMat();
 	}

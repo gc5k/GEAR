@@ -55,6 +55,7 @@ public class EigenGWASEpiCommandImpl extends CommandImpl {
 
 		PLINKParser pp = PLINKParser.parse(this.eigenArgs);
 		sf = new SampleFilter(pp.getPedigreeData(), cmdArgs);
+		sf.qualification();
 		pGM = new GenotypeMatrix(sf.getSample(), pp.getMapData(), cmdArgs);
 
 		eigenEpiGWAS();

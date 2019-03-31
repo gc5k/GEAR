@@ -51,6 +51,7 @@ public class WGRMACommandImpl extends CommandImpl {
 		PLINKParser pp = PLINKParser.parse(wgrmArgs);
 
 		sf = new SampleFilter(pp.getPedigreeData(), cmdArgs);
+		sf.qualification();
 
 		pGM = new GenotypeMatrix(sf.getSample(), pp.getMapData(), cmdArgs);
 

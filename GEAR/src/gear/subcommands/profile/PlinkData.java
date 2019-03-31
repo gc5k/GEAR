@@ -14,6 +14,7 @@ public class PlinkData extends Data
 	public PlinkData(PLINKParser parser, CommandArguments cmdArgs)
 	{
 		sampleFilter = new SampleFilter(parser.getPedigreeData(), cmdArgs);
+		sampleFilter.qualification();
 		genoMatrix = new GenotypeMatrix(sampleFilter.getSample(), parser.getMapData(), cmdArgs);
 		snpList = genoMatrix.getSNPList();
 		calcAllele1Frequencies();

@@ -64,6 +64,7 @@ public class FastPCACommandImpl extends CommandImpl {
 
 		PLINKParser pp = PLINKParser.parse(fpcaArgs);
 		sf = new SampleFilter(pp.getPedigreeData(), cmdArgs);
+		sf.qualification();
 		pGM = new GenotypeMatrix(sf.getSample(), pp.getMapData(), cmdArgs);
 
 		SampleSize = (int) Math.ceil(A.length * fpcaArgs.getProp());

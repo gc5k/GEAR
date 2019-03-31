@@ -10,6 +10,7 @@ import gear.family.pedigree.file.MapFile;
 import gear.family.pedigree.file.SNP;
 import gear.family.plink.PLINKBinaryParser;
 import gear.family.plink.PLINKParser;
+import gear.qc.sampleqc.SampleFilter;
 import gear.qc.snpqc.SNPFilter;
 import gear.qc.snpqc.SNPFilterPostQC;
 import gear.subcommands.CommandArguments;
@@ -35,6 +36,8 @@ public class LocusCommandImpl extends CommandImpl {
 		pp.parseSmallFiles();
 		map = pp.getMapData();
 		snpFilter = pp.getSNPFilter();
+		SampleFilter samFilter = new SampleFilter(pp.getPedigreeData(), locusArgs);
+		samFilter.qualification();
 
 		resultFile = FileUtil.CreatePrintStream(locusArgs.getOutRoot() + ".locus");
 		resultFile.println("SNP\tCHR\tBP\tRefAllele\tAltAllele\tFreq\tVar\tEVar\tAA\tAa\taa\tnChr");
@@ -64,9 +67,9 @@ public class LocusCommandImpl extends CommandImpl {
 				int sum = 0;
 				int squareSum = 0;
 				bed.read(genotypes);
-				for (int byteIndex = 0; byteIndex < genotypes.length; ++byteIndex) {
+				for (int byteIndex = 0, sampleIndex = 0; byteIndex < genotypes.length; ++byteIndex) {
 					byte nextByte = genotypes[byteIndex];
-					for (int k = 0, sampleIndex = 0; k < 8 && sampleIndex < numSamples; k += 2, ++sampleIndex) {
+					for (int k = 0; k < 8 && sampleIndex < numSamples; k += 2, ++sampleIndex) {
 						if (!hkBook.get(sampleIndex).isAvailable()) {
 							continue;
 						}

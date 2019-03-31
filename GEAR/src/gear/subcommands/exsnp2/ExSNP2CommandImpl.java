@@ -32,6 +32,7 @@ public class ExSNP2CommandImpl extends CommandImpl {
 
 		PLINKParser pp = PLINKParser.parse(esArgs);
 		sf = new SampleFilter(pp.getPedigreeData(), cmdArgs);
+		sf.qualification();
 		pGM = new GenotypeMatrix(sf.getSample(), pp.getMapData(), cmdArgs);
 
 		for (int i = 0; i < pGM.getNumMarker(); i++) {

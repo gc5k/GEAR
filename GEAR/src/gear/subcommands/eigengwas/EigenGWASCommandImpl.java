@@ -48,6 +48,7 @@ public class EigenGWASCommandImpl extends CommandImpl {
 		data.LineUpFiles();
 
 		sf = new SampleFilter(pp.getPedigreeData(), data.getMatchSubjetList());
+		sf.qualification();
 		pGM = new GenotypeMatrix(sf.getSample(), pp.getMapData(), cmdArgs);
 
 		eigenGWASMT();
