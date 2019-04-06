@@ -12,6 +12,7 @@ import gear.subcommands.CommandImpl;
 public class WGRMACommand extends Command {
 
 	public WGRMACommand() {
+		addAlias("grm");
 		addAlias("wgrm");
 	}
 
