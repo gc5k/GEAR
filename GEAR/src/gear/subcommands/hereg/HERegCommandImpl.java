@@ -294,7 +294,6 @@ public class HERegCommandImpl extends CommandImpl {
 		}
 
 		double b = (xySum - xSum * ySum/cnt)/(xSqSum - xSum * xSum/cnt);
-		System.out.println(b + " " + cnt);
 		Logger.printUserLog(cnt + " observations for HE regression.");
 
 		double[] y = new double[cnt];
