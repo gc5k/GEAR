@@ -1,6 +1,8 @@
 package gear.util.pop;
 
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
 import java.util.stream.IntStream;
 
 import org.apache.commons.math.MathException;
@@ -14,11 +16,11 @@ import gear.util.NewIt;
 
 public class PopStat {
 	
-	public static ArrayList<ArrayList<Integer>> punchMissingGenoMT(GenotypeMatrix G, int threadNum) {
-		final ArrayList<ArrayList<Integer>> missList = NewIt.newArrayList();
+	public static ArrayList<List<Integer>> punchMissingGenoMT(GenotypeMatrix G, int threadNum) {
+		final ArrayList<List<Integer>> missList = NewIt.newArrayList();
 
 		for (int i = 0; i < G.getNumIndivdial(); i++) {
-			ArrayList<Integer> mL = NewIt.newArrayList();
+			List<Integer> mL = Collections.synchronizedList(NewIt.newArrayList());
 			missList.add(mL);
 		}
 
@@ -43,9 +45,8 @@ public class PopStat {
 						for (int j = 0; j < G.getNumIndivdial(); j++) {
 							int g = G.getAdditiveScore(j,i);
 							if (g == Person.MissingGenotypeCode) {
-								ArrayList<Integer> mL = missList.get(j);
+								List<Integer> mL = missList.get(j);
 								mL.add(i);
-								missList.set(j, mL);
 							}
 						}
 					}
@@ -87,12 +88,16 @@ public class PopStat {
 		} catch (InterruptedException e) {
 			Logger.printUserError("Progress display thread is interrupted.");
 		}
+		
+		for (List<Integer> missingMarkersOfOneSample : missList) {
+			Collections.sort(missingMarkersOfOneSample);
+		}
 
 		return missList;
 	}
 
-	public static ArrayList<ArrayList<Integer>> punchMissingGeno(GenotypeMatrix G) {
-		ArrayList<ArrayList<Integer>> missList = NewIt.newArrayList();
+	public static ArrayList<List<Integer>> punchMissingGeno(GenotypeMatrix G) {
+		ArrayList<List<Integer>> missList = NewIt.newArrayList();
 
 		for (int i = 0; i < G.getNumIndivdial(); i++) {
 			ArrayList<Integer> mL = NewIt.newArrayList();
@@ -103,9 +108,8 @@ public class PopStat {
 			for (int j = 0; j < G.getNumIndivdial(); j++) {
 				int g = G.getAdditiveScore(j,i);
 				if (g == Person.MissingGenotypeCode) {
-					ArrayList<Integer> mL = missList.get(j);
+					List<Integer> mL = missList.get(j);
 					mL.add(i);
-//					missList.set(j, mL);
 				}
 			}
 		}

@@ -9,6 +9,7 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.List;
 import java.util.stream.IntStream;
 
 import gear.ConstValues;
@@ -41,7 +42,7 @@ public class WGRMACommandImpl extends CommandImpl {
 
 	private int[][] Gcnt = null;
 
-	private ArrayList<ArrayList<Integer>> missList = null;
+	private ArrayList<List<Integer>> missList = null;
 
 	@Override
 	public void execute(CommandArguments cmdArgs) {
@@ -55,8 +56,8 @@ public class WGRMACommandImpl extends CommandImpl {
 
 		pGM = new GenotypeMatrix(sf.getSample(), pp.getMapData(), cmdArgs);
 
-//		missList = PopStat.punchMissingGenoMT(pGM, cmdArgs.isThreadNum()? cmdArgs.getThreadNum():1);
-		missList = PopStat.punchMissingGeno(pGM);
+		missList = PopStat.punchMissingGenoMT(pGM, cmdArgs.isThreadNum()? cmdArgs.getThreadNum():1);
+		//missList = PopStat.punchMissingGeno(pGM);
 
 		allelefreq = pGM.getQCedAlleleFreq();
 		allelevar = pGM.getQCedGenoVar();
@@ -200,14 +201,14 @@ public class WGRMACommandImpl extends CommandImpl {
 
 					do {
 						float ws1 = finalWeightSquareSum ;
-						ArrayList<Integer> mL1 = missList.get(sampleIndex1);
+						List<Integer> mL1 = missList.get(sampleIndex1);
 						for(int j = 0; j < mL1.size(); j++) {
 							ws1 -= weight[mL1.get(j)]*weight[mL1.get(j)];		
 						}
 
 						do {
 							float ws2 = ws1;
-							ArrayList<Integer> mL2 = missList.get(sampleIndex2);
+							List<Integer> mL2 = missList.get(sampleIndex2);
 
 							for(int k = 0; k < mL2.size(); k++) {
 								ws2 -= weight[mL2.get(k)]*weight[mL2.get(k)];
@@ -462,14 +463,14 @@ public class WGRMACommandImpl extends CommandImpl {
 
 					do {
 						float ws1 = finalWeightSquareSum ;
-						ArrayList<Integer> mL1 = missList.get(sampleIndex1);
+						List<Integer> mL1 = missList.get(sampleIndex1);
 						for(int j = 0; j < mL1.size(); j++) {
 							ws1 -= weight[mL1.get(j)]*weight[mL1.get(j)];		
 						}
 
 						do {
 							float ws2 = ws1;
-							ArrayList<Integer> mL2 = missList.get(sampleIndex2);
+							List<Integer> mL2 = missList.get(sampleIndex2);
 
 							for(int k = 0; k < mL2.size(); k++) {
 								ws2 -= weight[mL2.get(k)]*weight[mL2.get(k)];
