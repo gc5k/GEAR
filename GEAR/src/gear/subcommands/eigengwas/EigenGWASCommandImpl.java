@@ -338,7 +338,7 @@ public class EigenGWASCommandImpl extends CommandImpl {
 		if (eigenArgs.isTAB()) {
 			eGWAS.println("SNP\tRefAllele\tBeta");
 		} else {
-			eGWAS.println("SNP\tCHR\tBP\tRefAllele\tAltAllele\tfreq\tBeta\tSE\tChi\tP\tPGC\tn1\tfreq1\tn2\tfreq2\tFst");
+			eGWAS.println("SNP\tCHR\tBP\tRefAllele\tAltAllele\tfreq\tBeta\tSE\tChi\tP\tPGC\tn1\tfreq1\tn2\tfreq2\tFst\tFstWC\tFstN\tFstH");
 		}
 
 		for (int i = 0; i < eGWASResult.length; i++) {

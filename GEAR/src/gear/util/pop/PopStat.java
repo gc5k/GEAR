@@ -332,4 +332,33 @@ public class PopStat {
 		/ (F * (1.0D - F));
 		return fst;
 	}
+	
+	public static double FstWC(double F, int n1, int n2, double f1, double f2) {
+		double nn= 1.0*(n1*n2)/(n1+n2);
+		double h1 = f1*(1-f1);
+		double h2 = f2*(1-f2);
+		double dsq = (f1-f2)*(f1-f2);
+		double d1= (2 * nn * (1/(n1 * 1.0d + n2 * 1.0d-2))*(n1 * 1.0d * h1 + n2 * 1.0d * h2));
+		double d2= (nn * dsq+(2*nn-1)*1/(n1+n2-2)*(n1*h1+n2*h2));
+		System.out.println("---" + nn + " " + h1 + " " + h2 + " " + dsq + " " + d1 + " " + d2);
+
+		double Fwc = 1.0 - d1/d2;
+		return Fwc;
+	}
+
+	public static double FstNei(double F, int n1, int n2, double f1, double f2) {
+		double p = (f1+f2)/2;
+		double q = 1 - p;
+		double dsq = (f1 - f2)*(f1 - f2);
+		double FNei = dsq/(2*p*q);
+		return FNei;
+	}
+
+	public static double FstHudson(double F, int n1, int n2, double f1, double f2) {
+		double h1 = f1*(1-f1);
+		double h2 = f2*(1-f2);
+		double dsq = (f1 - f2)*(f1 - f2);
+		double FHudson = (dsq-h1/(n1-1)-h2/(n2-1))/(h1+h2);
+		return FHudson;
+	}
 }

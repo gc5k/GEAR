@@ -20,6 +20,9 @@ public class EigenGWASResult {
 	private double n2;
 	private double freq2;
 	private double fst;
+	private double fstWC;
+	private double fstNei;
+	private double fstHudson;
 	private static DecimalFormat df = new DecimalFormat("0.0000");
 	private static DecimalFormat dfE = new DecimalFormat("0.00E000");
 	private boolean isGoodLocus;
@@ -40,10 +43,15 @@ public class EigenGWASResult {
 		isGoodLocus = isGood;
 		if (isGood) {
 			this.fst = PopStat.Fst(freq, (int) n1, (int) n2, freq1, freq2); 
+			this.fstWC = PopStat.FstWC(freq, (int) n1, (int) n2, freq1, freq2);
+			this.fstNei = PopStat.FstNei(freq, (int) n1, (int) n2, freq1, freq2);
+			this.fstHudson = PopStat.FstHudson(freq, (int) n1, (int) n2, freq1, freq2);
 		} else {
 			this.fst = Double.NaN;
+			this.fstWC = Double.NaN;
+			this.fstNei = Double.NaN;
+			this.fstHudson = Double.NaN;
 		}
-
 	}
 
 	public double GetP() {
@@ -132,6 +140,24 @@ public class EigenGWASResult {
 				sb.append(df.format(fst) + "\t");
 			} else {
 			sb.append(dfE.format(fst) + "\t");
+			}
+			
+			if (Math.abs(fstWC) > 0.0001) {
+				sb.append(df.format(fstWC) + "\t");
+			} else {
+			sb.append(dfE.format(fstWC) + "\t");
+			}
+
+			if (Math.abs(fstNei) > 0.0001) {
+				sb.append(df.format(fstNei) + "\t");
+			} else {
+			sb.append(dfE.format(fstNei) + "\t");
+			}
+
+			if (Math.abs(fstHudson) > 0.0001) {
+				sb.append(df.format(fstHudson) + "\t");
+			} else {
+			sb.append(dfE.format(fstHudson) + "\t");
 			}
 		}
 
