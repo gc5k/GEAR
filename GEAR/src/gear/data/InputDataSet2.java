@@ -74,7 +74,7 @@ public class InputDataSet2 implements SubjectOrder {
 		}
 		if (fileList.size() > 0) {
 			Logger.printUserLog(
-					effectiveSubList.size() + " samples were matched across " + fileList.size() + " files.");
+					effectiveSubList.size() + " samples were matched " + (fileList.size()>2? "across ": "between ") + fileList.size() + " files.");
 		}
 		Logger.printUserLog("");
 	}
@@ -179,6 +179,7 @@ public class InputDataSet2 implements SubjectOrder {
 			boolean flag = false;
 			for (int j = 0; j < tIdx.length; j++) {
 				flag = pf.isMissing(pf.getSubjectIndex(subjectID), tIdx[j]);
+				if (flag) break;
 			}
 			if (flag)
 				continue;

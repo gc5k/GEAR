@@ -80,6 +80,7 @@ public class PhenotypeFile implements SubjectOrder
 
 		this.phenotypes = phenotypes.toArray(new float[0][]);
 		this.isMissing = isMissing.toArray(new boolean[0][]);
+
 	}
 	
 	public PhenotypeFile(String fileName)
