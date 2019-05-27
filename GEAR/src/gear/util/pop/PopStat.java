@@ -340,8 +340,6 @@ public class PopStat {
 		double dsq = (f1-f2)*(f1-f2);
 		double d1= (2 * nn * (1/(n1 * 1.0d + n2 * 1.0d-2))*(n1 * 1.0d * h1 + n2 * 1.0d * h2));
 		double d2= (nn * dsq+(2*nn-1)*1/(n1+n2-2)*(n1*h1+n2*h2));
-		System.out.println("---" + nn + " " + h1 + " " + h2 + " " + dsq + " " + d1 + " " + d2);
-
 		double Fwc = 1.0 - d1/d2;
 		return Fwc;
 	}
