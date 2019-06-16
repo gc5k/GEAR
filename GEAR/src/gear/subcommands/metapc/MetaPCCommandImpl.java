@@ -41,22 +41,18 @@ public class MetaPCCommandImpl extends CommandImpl {
 		fReader = new FReader(mpcArgs.getMetaFile(), FileKeep, mpcArgs.getKeys(), mpcArgs.isQT(), mpcArgs.isGZ(),
 				mpcArgs.isChr(), mpcArgs.isChr() ? mpcArgs.getChr() : mpcArgs.getNotChr());
 
-		fReader.Start();
+		fReader.Start(); // reading meta files
+	}
 
-		int NumMetaFile = mpcArgs.getMetaFile().length;
+	private void makeSSGRM() {
 
-		if (NumMetaFile < 2) {
+		if (mpcArgs.getMetaFile().length < 2) {
 			Logger.printUserError("At least two summary statistic files should be specified.\n");
 			Logger.printUserError("GEAR quitted.\n");
 			System.exit(0);
 		}
 
-		mGRM = new double[NumMetaFile][NumMetaFile];
-
-		// reading meta files
-	}
-
-	private void makeSSGRM() {
+		mGRM = new double[mpcArgs.getMetaFile().length][mpcArgs.getMetaFile().length];
 
 		HashMap<String, ArrayList<Float>> snpFrq = NewIt.newHashMap();
 		HashMap<String, FStat> SumStat1 = fReader.getMetaStat().get(0);

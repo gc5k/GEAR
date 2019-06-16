@@ -43,6 +43,8 @@ public class WGRMACommand extends Command {
 		options.addOption(OptionBuilder.withDescription(OPT_INBRED_DESC).withLongOpt(OPT_INBRED_LONG).create());
 
 		options.addOption(OptionBuilder.withDescription(OPT_WEIGHT_DESC).hasArg().create(OPT_WEIGHT));
+		options.addOption(OptionBuilder.withDescription(OPT_MEM_LOW_DESC).withLongOpt(OPT_MEM_LOW).create());
+
 		options.addOption(OptionBuilder.withDescription(OPT_WVAR_DESC).create(OPT_WVAR));
 
 		options.addOption(OptionBuilder.withDescription(OPT_INBRED_LIST_DESC).withLongOpt(OPT_INBRED_LIST_LONG).hasArgs().create());
@@ -96,6 +98,10 @@ public class WGRMACommand extends Command {
 
 		parseMAFRangeArguments((CommandArguments) grmArgs, cmdLine);
 		parseThreadNumArguments((CommandArguments) grmArgs, cmdLine);
+
+		if (cmdLine.hasOption(OPT_MEM_LOW)) {
+			grmArgs.setMemLow();
+		}
 
 		if (cmdLine.hasOption(OPT_GZ)) {
 			grmArgs.setGZ();
@@ -167,6 +173,9 @@ public class WGRMACommand extends Command {
 	private static final String OPT_WEIGHT = "weight";
 	private static final String OPT_WEIGHT_DESC = "Specify weight file";
 
+	private static final String OPT_MEM_LOW = "mem-low";
+	private static final String OPT_MEM_LOW_DESC = "Low memory requirement";
+	
 	private final static String OPT_GUI_LONG = "gui";
 	private final static String OPT_GUI_DESC = "GUI";
 }

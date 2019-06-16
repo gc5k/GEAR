@@ -96,6 +96,86 @@ public class PopStat {
 		return missList;
 	}
 
+	public static int[][] punchMissingGenoMT2(GenotypeMatrix G, int threadNum) {
+		final int[][] missList = new int[G.getNumIndivdial()][];
+
+		int indCnt = G.getNumIndivdial();
+		final int cpus = threadNum < indCnt ? threadNum : 1;
+
+		Logger.printUserLog("Calculating missing genotype punchcard with " + cpus + " threads.");
+
+		Thread[] computeThreads = new Thread[cpus];
+		final int[] taskProgresses = new int[cpus];
+		final int taskSize = indCnt / cpus;
+
+		for (int c = 0; c < cpus; ++c) {
+			final int threadIndex = c;
+			Thread thread = new Thread() {
+				public void run() {
+					int indStart = threadIndex * taskSize;
+					int indEnd = threadIndex < (cpus - 1) ? (taskSize * (threadIndex+1)) : indCnt;
+
+					int taskProgress = 0;
+					for (int i = indStart; i < indEnd; i++) {
+						taskProgresses[threadIndex] = ++taskProgress;
+						ArrayList<Integer> mList = NewIt.newArrayList();
+
+						for (int j = 0; j < G.getNumMarker(); j++) {
+							int g = G.getAdditiveScore(i,j);
+							if (g == Person.MissingGenotypeCode) {
+								mList.add(j);
+							}
+						}
+						if (mList.size() > 0) {
+							missList[i] = new int[mList.size()];
+							for (int k = 0; k < mList.size(); k++) {
+								missList[i][k] = mList.get(k).intValue();
+							}
+						}
+					}
+				}
+			};
+			thread.start();
+			computeThreads[c] = thread;
+		}
+
+		Thread progressDisplayThread = new Thread() {
+			public void run() {
+				int totalProgress;
+				do {
+					totalProgress = IntStream.of(taskProgresses).sum();
+					float percentage = Math.min(100f, (float) totalProgress / G.getNumIndivdial() * 100f);
+					System.out.print(String.format(
+							"\r[INFO] Calculating missing genotype punchcard, %.2f%% completed...",
+							percentage));
+					try {
+						Thread.sleep(1000);
+					} catch (InterruptedException e) {
+					}
+				} while (totalProgress < G.getNumIndivdial());
+				System.out.println("Done.");
+				System.out.print("");
+			}
+		};
+		progressDisplayThread.start();
+
+		for (int i = 0; i < computeThreads.length; ++i) {
+			try {
+				computeThreads[i].join();
+			} catch (InterruptedException e) {
+				Logger.handleException(e, String.format("Compute thread %d is interrupted.", i));
+			}
+		}
+
+		try {
+			progressDisplayThread.join();
+		} catch (InterruptedException e) {
+			Logger.printUserError("Progress display thread is interrupted.");
+		}
+
+		return missList;
+	}
+
 	public static ArrayList<List<Integer>> punchMissingGeno(GenotypeMatrix G) {
 		ArrayList<List<Integer>> missList = NewIt.newArrayList();
 

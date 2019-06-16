@@ -11,6 +11,7 @@ public class WGRMACommandArguments extends CommandArguments {
 	private boolean isInbred = false;
 	private boolean isInbredList = false;
 	private String InbredFile = null;
+	private boolean isMemLow = false;
 	private boolean isGUI = false;
 
 	private boolean isVanRaden = false;
@@ -104,5 +105,13 @@ public class WGRMACommandArguments extends CommandArguments {
 	
 	public boolean isDomOnly() {
 		return isDomOnly;
+	}
+
+	public void setMemLow() {
+		isMemLow = true;	
+	}
+	
+	public boolean isMemLow() {
+		return isMemLow;
 	}
 }
