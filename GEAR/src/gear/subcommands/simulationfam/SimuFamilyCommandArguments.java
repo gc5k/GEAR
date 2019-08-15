@@ -144,8 +144,9 @@ public final class SimuFamilyCommandArguments extends CommandArguments {
 	// 1 plain maf
 	public void setMAF(double m) {
 		maf = m;
-		PlainmafFlag = true;
-		UnifmafFlag = false;
+		isPlainmafFlag = true;
+		isUnifmafFlag = false;
+		isFreqFileFlag = false;
 	}
 
 	public double getMAF() {
@@ -153,25 +154,30 @@ public final class SimuFamilyCommandArguments extends CommandArguments {
 	}
 
 	public boolean isPlainMAF() {
-		return PlainmafFlag;
+		return isPlainmafFlag;
 	}
 
 	// 2 unif maf
 	public void setUnifMAF() {
-		PlainmafFlag = false;
-		UnifmafFlag = true;
+		isPlainmafFlag = false;
+		isUnifmafFlag = true;
+		isFreqFileFlag = false;
 	}
 
 	public boolean isUnifMAF() {
-		return UnifmafFlag;
+		return isUnifmafFlag;
 	}
 
 	public void setFreqFile(String ff) {
 		FileUtil.exists(ff);
+		freqFile = ff;
+		isPlainmafFlag = false;
+		isUnifmafFlag = false;
+		isFreqFileFlag = true;
 	}
 
 	public boolean isFreqFile() {
-		return isFreqFile;
+		return isFreqFileFlag;
 	}
 
 	public String getFreqFile() {
@@ -302,8 +308,11 @@ public final class SimuFamilyCommandArguments extends CommandArguments {
 	private boolean makeBed = false;
 
 	private double maf = 0.5;
-	private boolean PlainmafFlag = true;
-	private boolean UnifmafFlag = false;
+	private boolean isPlainmafFlag = true;
+	private boolean isUnifmafFlag = false;
+
+	private String freqFile = null;
+	private boolean isFreqFileFlag = false;
 
 	private double ld = 0;
 	private boolean ldFlag = true;
@@ -328,8 +337,6 @@ public final class SimuFamilyCommandArguments extends CommandArguments {
 	private boolean isPolyDomEffectFile = false;
 	private String polyDomEffectFile = null;
 
-	private String freqFile = null;
-	private boolean isFreqFile = false;
 	private int rep = 1;
 
 }

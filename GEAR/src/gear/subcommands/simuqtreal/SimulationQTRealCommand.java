@@ -8,6 +8,7 @@ import gear.subcommands.Command;
 import gear.subcommands.CommandArgumentException;
 import gear.subcommands.CommandArguments;
 import gear.subcommands.CommandImpl;
+import gear.util.FileUtil;
 
 public class SimulationQTRealCommand extends Command
 {
@@ -102,27 +103,6 @@ public class SimulationQTRealCommand extends Command
 		simuQTRealArgs.setSeed(parseLongOptionValue(cmdLine, OPT_SEED_LONG, "2014"));
 		return simuQTRealArgs;
 	}
-
-	private void parseFileArguments(SimulationQTRealCommandArguments simuQTRealArgs, CommandLine cmdLine) throws CommandArgumentException
-	{
-		String bfile = cmdLine.getOptionValue("bfile");
-		String file = cmdLine.getOptionValue("file");
-
-		if ((bfile == null) && (file == null))
-		{
-			throw new CommandArgumentException("No genotypes are provided. Either --bfile or --file must be set.");
-		}
-
-		if ((bfile != null) && (file != null))
-		{
-			throw new CommandArgumentException("--bfile and --file cannot be set together.");
-		}
-
-		simuQTRealArgs.setBFile(bfile);
-		simuQTRealArgs.setFile(file);
-
-	}
-
 	
 	@Override
 	protected CommandImpl createCommandImpl()

@@ -6,13 +6,13 @@ import gear.util.Logger;
 
 public class SimulationQTRealCommandArguments extends CommandArguments {
 
-	public String getBFile() {
-		return bfile;
-	}
-
-	public void setBFile(String bfile) {
-		this.bfile = bfile;
-	}
+//	public String getBFile() {
+//		return bfile;
+//	}
+//
+//	public void setBFile(String bfile) {
+//		this.bfile = bfile;
+//	}
 
 	public String getBed() {
 		return getBFile() + ".bed";
@@ -151,6 +151,6 @@ public class SimulationQTRealCommandArguments extends CommandArguments {
 	private boolean isMakeBed = false;
 
 	private int rep = 1;
-	private String bfile;
+//	private String bfile;
 
 }

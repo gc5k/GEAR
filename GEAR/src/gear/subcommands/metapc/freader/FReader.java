@@ -7,8 +7,10 @@ import gear.util.NewIt;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.List;
 
 public class FReader {
 
@@ -19,7 +21,7 @@ public class FReader {
 		}
 		this.isGZ = isGZ;
 
-		workingMetaFile = NewIt.newArrayList();
+		workingMetaFile = Collections.synchronizedList(NewIt.newArrayList());
 		this.isChrKeep = isChr;
 		this.chrSet = Chr;
 
@@ -69,7 +71,7 @@ public class FReader {
 		return MStat;
 	}
 
-	public ArrayList<ArrayList<String>> getMetaSNPArray() {
+	public List<ArrayList<String>> getMetaSNPArray() {
 		return MetaSNPArray;
 	}
 
@@ -332,18 +334,23 @@ public class FReader {
 		return sumstat;
 	}
 
-	public ArrayList<String> getWorkingMetaFile() {
+	public List<String> getWorkingMetaFile() {
 		return workingMetaFile;
 	}
 
 	private boolean isChrKeep = true;
+
 	private HashSet<String> chrSet = null;
+
 	private String[] field = {"SNP", "CHR", "A1", "A2", "MAF"};
 	private boolean isGZ;
 	private int[][] KeyIdx; // snp, chr, bp, beta, se, p, a1, a2
-	private ArrayList<String> workingMetaFile;
+	private List<String> workingMetaFile;
+
 	private ArrayList<HashMap<String, FStat>> MStat = NewIt.newArrayList();
-	private ArrayList<ArrayList<String>> MetaSNPArray = NewIt.newArrayList();
+
+	private List<ArrayList<String>> MetaSNPArray = Collections.synchronizedList(NewIt.newArrayList());
+//	private ArrayList<ArrayList<String>> MetaSNPArray = NewIt.newArrayList();
 	private HashMap<String, ArrayList<Integer>> MetaSNPTable = NewIt.newHashMap();
 
 	// private int[] keepCohortIdx;
