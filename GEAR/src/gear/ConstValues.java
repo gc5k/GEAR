@@ -45,7 +45,7 @@ public class ConstValues {
 
 	private static String[] initNAStrs() {
 		if (CmdArgs.INSTANCE.getNA() == null) {
-			return new String[] { "-9", "na", "-Inf", "Inf", ".", "-", "?" };
+			return new String[] { "-9", "na", "-Inf", "Inf", ".", "-", "?", "nan" };
 		}
 		return CmdArgs.INSTANCE.getNA().trim().split(",");
 	}

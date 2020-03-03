@@ -21,7 +21,7 @@ public class FConstant {
 	}
 
 	private static String[] initNASNP() {
-		return new String[] { ".", "-", "na", "NA", "N.A.", "n.a." };
+		return new String[] { ".", "-", "na", "NA", "N.A.", "n.a.", "nan"};
 	}
 
 }
