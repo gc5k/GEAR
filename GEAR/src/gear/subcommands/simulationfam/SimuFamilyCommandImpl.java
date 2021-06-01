@@ -30,17 +30,21 @@ public final class SimuFamilyCommandImpl extends CommandImpl {
 		init();
 		try {
 			ibdF = new PrintWriter(new BufferedWriter(new FileWriter(famArgs.getOutRoot() + ".ibdo")));
-			ibdSibF = new PrintWriter(new BufferedWriter(new FileWriter(famArgs.getOutRoot() + ".hap")));
 		} catch (IOException e) {
 			Logger.handleException(e, "An I/O exception occurred when creating the .ibdo file.");
-			Logger.handleException(e, "An I/O exception occurred when creating the .ibd file.");
 		}
 
 		for (int i = 0; i < famArgs.getNumberOfFamilies(); i++) {
 			generateNuclearFamily(NKid[i], NAffKid[i], i);
 		}
 		ibdF.close();
-		ibdSibF.close();
+		
+		Logger.printUserLog("Writing recombination information into '" + famArgs.getOutRoot() + ".ibdo" + "'.");
+		Logger.printUserLog("Format: 1xk line, sib1's paternal recombination"  + ".");
+		Logger.printUserLog("        2xk line, sib1's maternal recombination"  + ".");
+		Logger.printUserLog("        3xk line, sib2's paternal recombination"  + ".");
+		Logger.printUserLog("        4xk line, sib2's maternal recombination"  + ".");
+		Logger.printUserLog("");
 
 		writeIBD();
 		writePheno();
@@ -293,9 +297,7 @@ public final class SimuFamilyCommandImpl extends CommandImpl {
 			IBDp[i][famIdx] = 1 - Math.abs(rc1[i][0] - rc2[i][0]);
 			IBDm[i][famIdx] = 1 - Math.abs(rc1[i][1] - rc2[i][1]);
 			IBD2[i][famIdx] = (1 - Math.abs(rc1[i][0] - rc2[i][0])) * (1 - Math.abs(rc1[i][1] - rc2[i][1]));
-			ibdSibF.print(ibd[i] + " ");
 		}
-		ibdSibF.println();
 	}
 
 	private int[][] sampleChromosome(int famIdx, int shift) {
@@ -367,37 +369,80 @@ public final class SimuFamilyCommandImpl extends CommandImpl {
 		sb.append(famArgs.getOutRoot() + ".ibd.gz");
 		BufferedWriter ibdGZFile = FileUtil.ZipFileWriter(sb.toString());
 
+		StringBuffer sbLocus = new StringBuffer();
+		sbLocus.append(famArgs.getOutRoot() + ".locus-ibd.gz");
+		BufferedWriter ibdLocusGZFile = FileUtil.ZipFileWriter(sbLocus.toString());
+
 		StringBuffer sbp = new StringBuffer();
 		sbp.append(famArgs.getOutRoot() + ".p.ibd.gz");
 		BufferedWriter ibdpGZFile = FileUtil.ZipFileWriter(sbp.toString());
 
+		StringBuffer sbpLocus = new StringBuffer();
+		sbpLocus.append(famArgs.getOutRoot() + ".p.locus-ibd.gz");
+		BufferedWriter ibdpLocusGZFile = FileUtil.ZipFileWriter(sbpLocus.toString());
+		
 		StringBuffer sbm = new StringBuffer();
 		sbm.append(famArgs.getOutRoot() + ".m.ibd.gz");
 		BufferedWriter ibdmGZFile = FileUtil.ZipFileWriter(sbm.toString());
 
+		StringBuffer sbmLocus = new StringBuffer();
+		sbmLocus.append(famArgs.getOutRoot() + ".m.locus-ibd.gz");
+		BufferedWriter ibdmLocusGZFile = FileUtil.ZipFileWriter(sbmLocus.toString());
+
+
+		//dom
 		StringBuffer sbDom = new StringBuffer();
 		sbDom.append(famArgs.getOutRoot() + ".dom.ibd.gz");
 		BufferedWriter ibdDomGZFile = FileUtil.ZipFileWriter(sbDom.toString());
 
-		// for (int i = 0; i < freq.length; i++)
-		// {
-		// IBD[i] = StatUtils.normalize(IBD[i]);
-		// IBDp[i] = StatUtils.normalize(IBDp[0]);
-		// IBDm[i] = StatUtils.normalize(IBDm[0]);
-		// IBD2[i] = StatUtils.normalize(IBD2[i]);
-		// }
+		StringBuffer sbDomLocus = new StringBuffer();
+		sbDomLocus.append(famArgs.getOutRoot() + ".dom.locus-ibd.gz");
+		BufferedWriter ibdDomLocusGZFile = FileUtil.ZipFileWriter(sbDomLocus.toString());
+
+		
+		Logger.printUserLog("Writing overall ibd to '" + sb.toString() + ".'");
+		Logger.printUserLog("Writing locus ibd to '" + sbLocus.toString() + ".'");
+
+		Logger.printUserLog("Writing overall paternal ibd to '" + sbp.toString() + ".'");
+		Logger.printUserLog("Writing locus paternal ibd to '" + sbpLocus.toString() + ".'");
+
+		Logger.printUserLog("Writing overall maternal ibd to '" + sbm.toString() + ".'");
+		Logger.printUserLog("Writing locus maternal ibd to '" + sbmLocus.toString() + ".'");
+
+		Logger.printUserLog("Writing overall dominance ibd2 to '" + sbDom.toString() + ".'");
+		Logger.printUserLog("Writing locus dominance ibd2 to '" + sbDomLocus.toString() + ".'");
+		Logger.printUserLog("");
 
 		for (int i = 0; i < famArgs.getNumberOfFamilies(); i++) {
 			double ibdA = 0;
 			double ibdAp = 0;
 			double ibdAm = 0;
 			double ibdD = 0;
-			for (int j = 0; j < freq.length; j++) {
-				ibdA += IBD[j][i];
-				ibdAp += IBDp[j][i];
-				ibdAm += IBDm[j][i];
-				ibdD += IBD2[j][i];
+			try {
+				ibdLocusGZFile.append((i + 1) * 4 + " " + ((i + 1) * 4 - 1) + " " + freq.length);
+				ibdpLocusGZFile.append((i + 1) * 4 + " " + ((i + 1) * 4 - 1) + " " + freq.length);
+				ibdmLocusGZFile.append((i + 1) * 4 + " " + ((i + 1) * 4 - 1) + " " + freq.length);
+				ibdDomLocusGZFile.append((i + 1) * 4 + " " + ((i + 1) * 4 - 1) + " " + freq.length);
+					
+				for (int j = 0; j < freq.length; j++) {
+					ibdA += IBD[j][i];
+					ibdAp += IBDp[j][i];
+					ibdAm += IBDm[j][i];
+					ibdD += IBD2[j][i];
+					ibdLocusGZFile.append(" " + IBD[j][i]);
+					ibdpLocusGZFile.append(" " + IBDp[j][i]);
+					ibdmLocusGZFile.append(" " + IBDm[j][i]);
+					ibdDomLocusGZFile.append(" " + IBD2[j][i]);
+				}
+				ibdLocusGZFile.append("\n");
+				ibdpLocusGZFile.append("\n");
+				ibdmLocusGZFile.append("\n");
+				ibdDomLocusGZFile.append("\n");
+
+			} catch (IOException e0) {
+				e0.printStackTrace();
 			}
+
 			ibdA /= freq.length;
 			ibdAm /= freq.length;
 			ibdAp /= freq.length;
@@ -413,25 +458,26 @@ public final class SimuFamilyCommandImpl extends CommandImpl {
 		}
 		try {
 			ibdGZFile.close();
+			ibdLocusGZFile.close();
+
 			ibdpGZFile.close();
+			ibdpLocusGZFile.close();
+
 			ibdmGZFile.close();
+			ibdmLocusGZFile.close();
+
 			ibdDomGZFile.close();
+			ibdDomLocusGZFile.close();
 		} catch (IOException e1) {
 			e1.printStackTrace();
 		}
 
 		PrintWriter famA = null;
-		PrintWriter famAp = null;
-		PrintWriter famAm = null;
-		PrintWriter famD = null;
 
 		try {
 			famA = new PrintWriter(new BufferedWriter(new FileWriter(famArgs.getOutRoot() + ".ibd.id")));
-			famAp = new PrintWriter(new BufferedWriter(new FileWriter(famArgs.getOutRoot() + ".p.ibd.id")));
-			famAm = new PrintWriter(new BufferedWriter(new FileWriter(famArgs.getOutRoot() + ".m.ibd.id")));
-			famD = new PrintWriter(new BufferedWriter(new FileWriter(famArgs.getOutRoot() + ".dom.ibd.id")));
 		} catch (IOException e) {
-			Logger.handleException(e, "An I/O exception occurred when creating the .ibd.id or .dom.ibd.id files.");
+			Logger.handleException(e, "An I/O exception occurred when creating the .ibd.id.");
 		}
 
 		int fid = 0;
@@ -441,26 +487,8 @@ public final class SimuFamilyCommandImpl extends CommandImpl {
 			famA.println(fid + " " + (fid + 2));
 			famA.println(fid + " " + (fid + 3));
 			famA.println(fid + " " + (fid + 4));
-
-			famAm.println(fid + " " + (fid + 1));
-			famAm.println(fid + " " + (fid + 2));
-			famAm.println(fid + " " + (fid + 3));
-			famAm.println(fid + " " + (fid + 4));
-
-			famAp.println(fid + " " + (fid + 1));
-			famAp.println(fid + " " + (fid + 2));
-			famAp.println(fid + " " + (fid + 3));
-			famAp.println(fid + " " + (fid + 4));
-
-			famD.println(fid + " " + (fid + 1));
-			famD.println(fid + " " + (fid + 2));
-			famD.println(fid + " " + (fid + 3));
-			famD.println(fid + " " + (fid + 4));
 		}
 		famA.close();
-		famAm.close();
-		famAp.close();
-		famD.close();
 	}
 
 	public void writePheno() {
@@ -796,7 +824,6 @@ public final class SimuFamilyCommandImpl extends CommandImpl {
 	private double[] deffect;
 
 	PrintWriter ibdF = null;
-	PrintWriter ibdSibF = null;
 
 	private double[][] IBD = null;
 	private double[][] IBDp = null;
