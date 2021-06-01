@@ -5,6 +5,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 
 import gear.ConstValues;
+import gear.data.InputDataSet2;
 import gear.subcommands.CommandArguments;
 import gear.subcommands.CommandImpl;
 import gear.util.BinaryInputFile;
@@ -207,5 +208,26 @@ public class GRMStatCommandImpl extends CommandImpl {
 		}
 	}
 
+	private double[][] readGrmGZMatrix() {
+		InputDataSet2 data = new InputDataSet2();
+		data.addFile(gsArgs.getGrmID());
+		int numSubjects = data.getFileSampleSize(grmFileIdx);
+		double[][] B = new double[numSubjects][numSubjects];
+		String[] tokens = null;
+		BufferedReader reader = BufferedReader.openGZipFile(gsArgs.getGrmGZ(), "GRM (gzip)");
+
+		for (int i = 0; i < B.length; i++) {
+			for (int j = 0; j <= i; j++) {
+				if ((tokens = reader.readTokens(4)) != null) {
+					B[i][j] = B[j][i] = Double.parseDouble(tokens[3]);
+				}
+			}
+		}
+		reader.close();
+		return B;
+	}
+
 	private GRMStatCommandArguments gsArgs = null;
+	private int grmFileIdx = 0;
+
 }
