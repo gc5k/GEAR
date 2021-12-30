@@ -265,8 +265,8 @@ public abstract class CommandArguments {
 	public void setPhenotypeIndex(String[] pheIndex) {
 		CommandSplitter CS = new CommandSplitter.Builder(pheIndex).OPT(Command.OPT_MPHE).IntMin(1).create();
 		this.mPheno = CS.ParseToInt();
-		for(int i = 0; i < this.mPheno.length; i++) {
-			this.mPheno[i]--;
+		for (int i = 0; i < this.mPheno.length; i++) {
+//			this.mPheno[i]--;
 			if (this.mPheno[i] < 0) {
 				Logger.printUserLog("incorrect --mphe " + (mPheno[i]+1) + ". It should be > 0.");
 				System.exit(0);
